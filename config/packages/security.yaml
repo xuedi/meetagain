@@ -22,6 +22,9 @@ security:
                 check_path: app_login
                 enable_csrf: true
             user_checker: App\Security\UserChecker
+            login_throttling:
+                max_attempts: 10
+                interval: '15 minutes'
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
