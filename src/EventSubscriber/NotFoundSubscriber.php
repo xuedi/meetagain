@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\NotFoundLog;
 use App\Service\CmsService;
+use App\Service\SitemapService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +19,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CmsService $cms,
+        private SitemapService $sitemapService,
         private RouterInterface $router,
         private EntityManagerInterface $em,
     ) {
@@ -51,7 +53,12 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             $context->setParameter('_locale', 'en');
             $this->router->setContext($context); // language not set on event subscriber yet
 
-            $event->setResponse($this->cms->createNotFoundPage());
+            // Special pages
+            $content = match (trim($path, '/')) {
+                'sitemap.xml' => $this->sitemapService->getContent('www.dragon-descendants.de'),
+                default => $this->cms->createNotFoundPage(),
+            };
+            $event->setResponse($content);
             $event->stopPropagation();
         }
     }
