@@ -12,6 +12,12 @@ deploy:
     php bin/console doctrine:migrations:migrate --allow-no-migration --no-interaction
     APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear
 
+install:
+    cp -n .env.dist .env
+    mkdir -p var/log/
+    touch var/log/dev.log
+    composer install
+
 run:
     truncate -s 0 var/log/dev.log
     symfony server:start --no-tls
