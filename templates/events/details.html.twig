@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_event"|trans }}{% endblock %}
+{% block title %}{{ "event"|trans }} - {{ event.name }} - {{ event.start|date('Y-m-d H:i') }}{% endblock %}
 
 {% set hasMap = false %}
 {% if event.location.longitude is not null and event.location.latitude is not null %}

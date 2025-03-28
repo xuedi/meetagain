@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Chinese/German Culture Exchange in Berlin">
     <title>{% block title %}meetAgain{% endblock %}</title>
-    {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('css/bulma.min.css') }}"/>
-        <link rel="stylesheet" href="{{ asset('css/custom.css') }}"/>
-        <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}"/>
-        <link rel="stylesheet" href="{{ asset('css/fontawesome-brands.css') }}"/>
-        <link rel="stylesheet" href="{{ asset('css/fontawesome-solid.css') }}"/>
-        <link rel="stylesheet" href="{{ asset('css/fonts.css') }}"/>
-    {% endblock %}
 
+    <link rel="stylesheet" href="{{ asset('css/bulma.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/fontawesome.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/fontawesome-brands.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/fontawesome-solid.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/fonts.css') }}"/>
+
+    {% block stylesheets %}{% endblock %}
     {% block javascripts %}{% endblock %}
     {% block importmap %}{{ importmap('app') }}{% endblock %}
 </head>
