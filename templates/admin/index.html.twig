@@ -1,15 +1,68 @@
 {% extends 'admin/base.html.twig' %}
 
+{% block javascripts %}
+    <script src="{{ asset('chart.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 
-    <section class="section">
-        <div class="container">
-            <h1>Admin Dashboard</h1>
-
-
-
+    <div class="container">
+        <div class="columns">
+            <div class="column is-8">
+                <div class="buttons has-addons is-centered">
+                    <a class="button" href="{{ path('app_admin', {'week': time.weekPrevious, 'year': time.year}) }}">
+                        <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                    </a>
+                    <div class="button">
+                        <span class="mr-2">Dashboard for the week: <b>{{ time.week }}</b></span>
+                        <span class="has-text-grey is-size-7">({{ time.weekDetails }})</span>
+                    </div>
+                    <a class="button" href="{{ path('app_admin', {'week': time.weekNext, 'year': time.year}) }}">
+                        <span class="icon"><i class="fa fa-arrow-right"></i></span>
+                    </a>
+                </div>
+                <div class="box">
+                    <h1 class="title is-6">Members</h1>
+                    <p>
+                        some stats come later
+                    </p>
+                </div>
+                <div class="box">
+                    <h1 class="title is-6">Activity</h1>
+                    <p>
+                        some stats come later
+                    </p>
+                </div>
+                <div class="box">
+                    <h1 class="title is-6">Pages not found</h1>
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+            <div class="column is-4">
+                <div class="box">
+                    <h1 class="title is-6">Details</h1>
+                    <p>
+                        Members: {{ details.memberCount }}<br>
+                        Pages not found: {{ details.notFoundCount }}
+                    </p>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
+
+    <script type="text/javascript">
+
+        const ctx = document.getElementById('myChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: [{
+                    data: [{% for day, number in pagesNotFound.list %}{x: '{{ day }}', y: {{ number }}},{% endfor %}]
+                }]
+            },
+        });
+    </script>
 
 {% endblock %}
 

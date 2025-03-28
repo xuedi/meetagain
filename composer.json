@@ -8,6 +8,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-imagick": "*",
+        "beberlei/doctrineextensions": "^1.5",
         "doctrine/data-fixtures": "^1.7",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.13",

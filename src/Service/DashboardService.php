@@ -1,0 +1,87 @@
+<?php declare(strict_types=1);
+
+namespace App\Service;
+
+use App\Entity\NotFoundLog;
+use App\Entity\User;
+use DateTime;
+use DateTimeImmutable;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+
+class DashboardService
+{
+    const int WEEKS_PER_YEAR = 52;
+
+    private int $week = 0;
+    private int $weekNext = 0;
+    private int $weekPrevious = 0;
+    private int $year = 0;
+
+    private DateTimeImmutable $weekStartDate;
+    private DateTimeImmutable $weekStopDate;
+
+    private EntityRepository $notFoundRepo;
+    private EntityRepository $userRepo;
+
+    public function __construct(
+        private EntityManagerInterface $em,
+    )
+    {
+        $this->userRepo = $this->em->getRepository(User::class);
+        $this->notFoundRepo = $this->em->getRepository(NotFoundLog::class);
+    }
+
+    public function getTimeControl(): array
+    {
+        $details = [];
+        $details['week'] = $this->week;
+        $details['year'] = $this->year;
+        $details['weekNext'] = $this->weekNext;
+        $details['weekPrevious'] = $this->weekPrevious;
+        $details['weekDetails'] = sprintf("%s - %s",
+            $this->weekStartDate->format('Y-m-d'),
+            $this->weekStopDate->format('Y-m-d'),
+        );
+        return $details;
+    }
+
+    public function getDetails(): array
+    {
+        $details = [];
+        $details['memberCount'] = $this->userRepo->count();
+        $details['notFoundCount'] = $this->notFoundRepo->matching($this->timeCrit())->count();
+        return $details;
+    }
+
+    public function getPagesNotFound(): array
+    {
+        $details = [];
+        $details['list'] = $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate);
+        return $details;
+    }
+
+    public function setTime(?int $year, ?int $week): void
+    {
+        $this->year = ($year === null) ? (int)new DateTime()->format('Y') : $year;
+        $this->week = ($week === null) ? (int)new DateTime()->format('W') : $week;
+
+        $tmpDate = new DateTime();
+        $tmpDate->setISODate($this->year, $this->week);
+
+        $this->weekStartDate = DateTimeImmutable::createFromMutable($tmpDate);
+        $this->weekStopDate = DateTimeImmutable::createFromMutable($tmpDate->modify('+6 days'));
+
+        $this->weekNext = $this->week + 1; // TODO: over/underflow someday
+        $this->weekPrevious = $this->week - 1;
+    }
+
+    private function timeCrit(): Criteria
+    {
+        $criteria = new Criteria();
+        $criteria->where(Criteria::expr()->gte('createdAt', $this->weekStartDate));
+        $criteria->andWhere(Criteria::expr()->lte('createdAt', $this->weekStopDate));
+        return $criteria;
+    }
+}

@@ -3,16 +3,24 @@
 namespace App\Controller;
 
 use App\Repository\ConfigRepository;
+use App\Service\DashboardService;
+use DateTime;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
-    #[Route('/', name: 'app_admin')]
-    public function index(): Response
+    #[Route('/{year}/{week}', name: 'app_admin')]
+    public function index(DashboardService $dashboard, ?int $year = null, ?int $week = null): Response
     {
-        return $this->render('admin/index.html.twig');
+        $dashboard->setTime($year, $week);
+
+        return $this->render('admin/index.html.twig', [
+            'time' => $dashboard->getTimeControl(),
+            'details' => $dashboard->getDetails(),
+            'pagesNotFound' => $dashboard->getPagesNotFound(),
+        ]);
     }
 
     #[Route('/config', name: 'app_admin_config')]
