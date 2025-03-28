@@ -9,6 +9,7 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -41,14 +42,6 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             $path = $event->getRequest()->getPathInfo();
             $ip = $event->getRequest()->getClientIp() ?? '';
 
-            $notFoundLog = new NotFoundLog();
-            $notFoundLog->setCreatedAt(new DateTimeImmutable());
-            $notFoundLog->setIp($ip);
-            $notFoundLog->setUrl($path);
-
-            $this->em->persist($notFoundLog);
-            $this->em->flush();
-
             $context = new RequestContext();
             $context->setParameter('_locale', 'en');
             $this->router->setContext($context); // language not set on event subscriber yet
@@ -58,6 +51,18 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
                 'sitemap.xml' => $this->sitemapService->getContent('www.dragon-descendants.de'),
                 default => $this->cms->createNotFoundPage(),
             };
+
+            if ($content->getStatusCode() !== Response::HTTP_OK) {
+                $notFoundLog = new NotFoundLog();
+                $notFoundLog->setCreatedAt(new DateTimeImmutable());
+                $notFoundLog->setIp($ip);
+                $notFoundLog->setUrl($path);
+
+                $this->em->persist($notFoundLog);
+                $this->em->flush();
+            }
+
+            $event->allowCustomResponseCode();
             $event->setResponse($content);
             $event->stopPropagation();
         }

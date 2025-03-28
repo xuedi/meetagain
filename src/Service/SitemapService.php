@@ -29,9 +29,11 @@ readonly class SitemapService
             $sites = array_merge($sites, $this->getEventPages($host, $locale));
         }
 
+        //application/xml
+
         return new Response($this->twig->render('sitemap/index.xml.twig', [
             'sites' => $sites,
-        ]), Response::HTTP_OK);
+        ]), Response::HTTP_OK, ['Content-Type' =>  'text/xml']);
     }
 
     private function getCmsPages(string $host, string $locale): array
