@@ -33,3 +33,6 @@ body {
     background-image: url('/images/monster.png');
     background-repeat: no-repeat;
 }
+#dropdown-cookie {
+    min-width: 350px;
+}
