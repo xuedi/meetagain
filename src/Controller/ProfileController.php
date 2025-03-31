@@ -145,4 +145,12 @@ class ProfileController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/images', name: 'app_profile_images')]
+    public function images(UserRepository $repo): Response
+    {
+        return $this->render('profile/images.html.twig', [
+            //
+        ]);
+    }
 }
