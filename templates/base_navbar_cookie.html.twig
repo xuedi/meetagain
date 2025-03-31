@@ -1,0 +1,56 @@
+<div class="navbar-item dropdown is-hoverable {# TODO: In the future show until consented: is-active #}">
+    <div class="dropdown-trigger">
+        <button class="button cookie-button" aria-haspopup="true" aria-controls="dropdown-cookie">
+            <span>{{ "menu_cookie_consent_button" | trans }}</span>
+            <span class="icon is-small">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+        </button>
+    </div>
+    <div class="dropdown-menu" id="dropdown-cookie" role="menu">
+        <div class="dropdown-content">
+            <h2 class="navbar-item">{{ "menu_cookie_consent_headline" | trans }}</h2>
+            <p class="navbar-item">
+                {{ "menu_cookie_consent_text" | trans }}
+            </p>
+            <h2 class="navbar-item">{{ "menu_cookie_consent_headline_partial" | trans }}</h2>
+            <p class="navbar-item">
+                {{ "menu_cookie_consent_partial_text" | trans }}
+            </p>
+            <div class="navbar-item">
+                <div class="list">
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <div class="list-item-title">
+                                <label class="checkbox">
+                                    <input type="checkbox" />
+                                    <strong>{{ "menu_cookie_consent_option_session" | trans }}</strong>
+                                </label>
+                            </div>
+                            <div class="list-item-description has-text-grey is-size-7">
+                                {{ "menu_cookie_consent_option_session_text" | trans }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item mt-3">
+                        <div class="list-item-content">
+                            <div class="list-item-title">
+                                <label class="checkbox">
+                                    <input type="checkbox" />
+                                    <strong>{{ "menu_cookie_consent_option_osm" | trans }}</strong>
+                                </label>
+                            </div>
+                            <div class="list-item-description has-text-grey is-size-7">
+                                {{ "menu_cookie_consent_option_osm_text" | trans }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <a class="button mr-2" href="#">{{ "menu_cookie_consent_button_accept" | trans }}</a>
+                <a class="button" href="#">{{ "menu_cookie_consent_button_reject" | trans }}</a>
+            </div>
+        </div>
+    </div>
+</div>

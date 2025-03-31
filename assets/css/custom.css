@@ -27,3 +27,9 @@ body {
         }
     }
 }
+
+.cookie-button {
+    padding-left:70px;
+    background-image: url('/images/monster.png');
+    background-repeat: no-repeat;
+}

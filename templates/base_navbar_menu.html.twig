@@ -1,0 +1,26 @@
+{% if is_granted('ROLE_USER') %}
+    <div class="dropdown is-hoverable">
+        <div class="dropdown-trigger">
+            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                <span>{{ app.user.name }}</span>
+                <span class="icon is-small">
+                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                </span>
+            </button>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+                <a class="navbar-item" href="{{ path('app_profile') }}">{{ "menu_profile_view_profile" | trans }}</a>
+                <a class="navbar-item" href="{{ path('app_profile_social') }}">{{ "menu_profile_social" | trans }}</a>
+                <a class="navbar-item" href="{{ path('app_profile_messages') }}">{{ "menu_profile_messages" | trans }}</a>
+                <a class="navbar-item" href="{{ path('app_profile_images') }}">{{ "menu_profile_images" | trans }}</a>
+                <hr class="dropdown-divider"/>
+                <a class="navbar-item" href="{{ path('app_profile_config') }}">{{ "menu_profile_config" | trans }}</a>
+                <hr class="dropdown-divider"/>
+                <a class="navbar-item" href="/logout">{{ "menu_profile_logout" | trans }}</a>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <a class="navbar-item" href="{{ path('app_login') }}">{{ "menu_login" | trans }}</a>
+{% endif %}

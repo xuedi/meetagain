@@ -55,13 +55,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-
-
-
-// event filters
-//class="eventOnchangeFilter"
-//const eventTimeFilter = document.getElementById('eventTimeFilter');
-//eventTimeFilter.onchange = function(){
-//    window.location = this.value;
-//};

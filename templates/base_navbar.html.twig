@@ -6,8 +6,6 @@
             </a>
             {% include 'base_navbar_burger.html.twig' %}
         </div>
-
-
         <div id="navBarTop" class="navbar-menu">
             <div class="navbar-start">
                 <a class="navbar-item" href="/{{ app.locale }}/about">{{ "menu_about" | trans }}</a>
@@ -20,71 +18,11 @@
                     <a class="navbar-item" href="{{ path('app_admin') }}">{{ "menu_admin" | trans }}</a>
                 {% endif %}
             </div>
-
-            <div class="navbar-end mt-2">
-                {% if is_granted('ROLE_USER') %}
-                    <div class="dropdown is-hoverable">
-                        <div class="dropdown-trigger">
-                            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                                <span>{{ app.user.name }}</span>
-                                <span class="icon is-small">
-                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                </span>
-                            </button>
-                        </div>
-                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                            <div class="dropdown-content">
-                                <a class="navbar-item" href="{{ path('app_profile') }}">{{ "menu_profile_view_profile" | trans }}</a>
-                                <a class="navbar-item" href="{{ path('app_profile_social') }}">{{ "menu_profile_social" | trans }}</a>
-                                <a class="navbar-item" href="{{ path('app_profile_messages') }}">{{ "menu_profile_messages" | trans }}</a>
-                                <a class="navbar-item" href="{{ path('app_profile_images') }}">{{ "menu_profile_images" | trans }}</a>
-                                <hr class="dropdown-divider"/>
-                                <a class="navbar-item" href="{{ path('app_profile_config') }}">{{ "menu_profile_config" | trans }}</a>
-                                <hr class="dropdown-divider"/>
-                                <a class="navbar-item" href="/logout">{{ "menu_profile_logout" | trans }}</a>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <a class="navbar-item" href="{{ path('app_login') }}">{{ "menu_login" | trans }}</a>
-                {% endif %}
-                <div class="dropdown is-hoverable ml-3">
-                    <div class="dropdown-trigger is-hoverable">
-                        <div class="button" aria-haspopup="true" aria-controls="dropdown-languages">
-                            <span class="image is-32x32 mt-3">
-                                <img class="is-flag" src="{{ asset('images/flags/' ~ app.request.locale ~ '.png') }}"  alt="Current locale flag"/>
-                            </span>
-                            <span class="icon is-small"><i class="fas fa-angle-down" aria-hidden="true"></i></span>
-                        </div>
-                    </div>
-                    {% if app.request.attributes.get('_route_params') is not null %}
-                        <div class="dropdown-menu" id="dropdown-languages" role="menu">
-                            <div class="dropdown-content">
-                                {% for enabledLocale in app.enabled_locales %}
-                                    {% if enabledLocale != app.request.locale %}
-                                        <nobr>
-                                            {% set attributes = app.request.attributes.get('_route_params') | merge({'_locale': enabledLocale}) %}
-                                            {% set link = path(app.request.attributes.get('_route'),  attributes) %}
-                                            <a class="navbar-item" href="{{ link }}">
-                                                <figure class="image is-32x32 mt-3">
-                                                    <img class="is-flag" src="{{ asset('images/flags/' ~ enabledLocale ~ '.png') }}"  alt="Locale flag"/>
-                                                </figure>
-                                                <span class="ml-3">
-                                                    {{ ('language_'~enabledLocale) | trans({}, "messages", enabledLocale) }}
-                                                </span>
-                                                <span class="ml-2 has-text-grey">
-                                                    ({{ ('language_'~enabledLocale) | trans }})
-                                                </span>
-                                            </a>
-                                        </nobr>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
+            <div class="navbar-end">
+                {% include 'base_navbar_menu.html.twig' %}
+                {% include 'base_navbar_cookie.html.twig' %}
+                {% include 'base_navbar_flags.html.twig' %}
             </div>
-
         </div>
     </div>
 </nav>
