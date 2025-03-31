@@ -1,0 +1,35 @@
+
+// where you want to render the map.
+const element = document.getElementById('osm-map');
+
+// adjust height
+element.style = 'height:220px;';
+
+// create Leaflet map on map element.
+const map = L.map(element, {attributionControl: false});
+
+// re-add standard attribution
+const attributionControl = L.control.attribution().addTo(map);
+attributionControl.setPrefix('<a href="https://leafletjs.com/">Leaflet</a>');
+
+// no custom icons, just different location
+const iconMarker = new L.icon({
+    iconUrl: '/images/leaflet/marker-icon.png',
+    shadowUrl: '/images/leaflet/marker-shadow.png',
+    iconSize:     [25, 41], // size of the icon
+    shadowSize:   [41, 41] // size of the shadow
+})
+
+// add OSM tile layer to the Leaflet map.
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '<a href="http://osm.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+// target's GPS coordinates.
+const target = L.latLng('{{ event.location.longitude }}', '{{ event.location.latitude }}');
+
+// Set map's center to target with zoom 14.
+map.setView(target, 16);
+
+// Place a marker on the same location.
+L.marker(target, {icon: iconMarker}).addTo(map);

@@ -117,39 +117,7 @@
         });
 
         {% if event.hasMap %}
-
-            // Where you want to render the map.
-            var element = document.getElementById('osm-map');
-
-            // Height has to be set. You can do this in CSS too.
-            element.style = 'height:220px;';
-
-            // Create Leaflet map on map element.
-            var map = L.map(element);
-
-            // no custom icons, just different location
-            var iconMarker = new L.icon({
-                iconUrl: '/images/leaflet/marker-icon.png',
-                shadowUrl: '/images/leaflet/marker-shadow.png',
-                iconSize:     [25, 41], // size of the icon
-                shadowSize:   [41, 41], // size of the shadow
-            })
-
-            // Add OSM tile layer to the Leaflet map.
-            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            // Target's GPS coordinates.
-            var target = L.latLng('{{ event.location.longitude }}', '{{ event.location.latitude }}');
-
-            // Set map's center to target with zoom 14.
-            map.setView(target, 16);
-
-            // Place a marker on the same location.
-            //L.marker(target, {icon: iconMarker}).addTo(map);
-            L.marker(target, {icon: iconMarker}).addTo(map);
-
+            {% include 'events/detailsOpenStreetMap.js.twig' %}
         {% endif %}
     </script>
 
