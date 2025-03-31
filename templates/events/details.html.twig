@@ -2,20 +2,15 @@
 
 {% block title %}{{ "event"|trans }} - {{ event.name }} - {{ event.start|date('Y-m-d H:i') }}{% endblock %}
 
-{% set hasMap = false %}
-{% if event.location.longitude is not null and event.location.latitude is not null %}
-    {% set hasMap = true %}
-{% endif %}
-
 {% block stylesheets %}
-    {% if hasMap %}
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    {% if event.hasMap %}
+        <link rel="stylesheet" href="{{ asset('css/leaflet.css') }}"/>
     {% endif %}
 {% endblock %}
 
 {% block javascripts %}
-    {% if hasMap %}
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" ></script>
+    {% if event.hasMap %}
+        <script src="{{ asset('leaflet.js') }}" ></script>
     {% endif %}
 {% endblock %}
 
@@ -97,7 +92,7 @@
                             {{ event.location.street }}<br>
                             {{ event.location.postcode }} {{ event.location.city }}
                         </p>
-                        {% if hasMap %}
+                        {% if event.hasMap %}
                             <div class="mt-3" id="osm-map"></div>
                         {% endif %}
                     </div>
@@ -121,7 +116,7 @@
             }
         });
 
-        {% if hasMap %}
+        {% if event.hasMap %}
 
             // Where you want to render the map.
             var element = document.getElementById('osm-map');
@@ -131,6 +126,14 @@
 
             // Create Leaflet map on map element.
             var map = L.map(element);
+
+            // no custom icons, just different location
+            var iconMarker = new L.icon({
+                iconUrl: '/images/leaflet/marker-icon.png',
+                shadowUrl: '/images/leaflet/marker-shadow.png',
+                iconSize:     [25, 41], // size of the icon
+                shadowSize:   [41, 41], // size of the shadow
+            })
 
             // Add OSM tile layer to the Leaflet map.
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -144,7 +147,8 @@
             map.setView(target, 16);
 
             // Place a marker on the same location.
-            L.marker(target).addTo(map);
+            //L.marker(target, {icon: iconMarker}).addTo(map);
+            L.marker(target, {icon: iconMarker}).addTo(map);
 
         {% endif %}
     </script>

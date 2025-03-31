@@ -288,6 +288,19 @@ class Event
         return $this;
     }
 
+    public function hasMap(): bool
+    {
+        if($this->getLocation() === null) {
+            return false;
+        }
+
+        if($this->getLocation()->getLatitude() === null || $this->getLocation()->getLongitude() === null) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @return Collection<int, Comment>
      */
