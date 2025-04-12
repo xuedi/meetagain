@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class GlobalService
+readonly class GlobalService
 {
     public function __construct(private RequestStack $requestStack, private TranslationService $translationService)
     {

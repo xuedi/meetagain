@@ -7,7 +7,7 @@ use App\Repository\EventRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class CmsService
+readonly class CmsService
 {
     public function __construct(private Environment $twig, private CmsRepository $repo, private EventRepository $eventRepo)
     {

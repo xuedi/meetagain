@@ -26,7 +26,7 @@ class DashboardService
     private EntityRepository $userRepo;
 
     public function __construct(
-        private EntityManagerInterface $em,
+        private readonly EntityManagerInterface $em,
     )
     {
         $this->userRepo = $this->em->getRepository(User::class);
