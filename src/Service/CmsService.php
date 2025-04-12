@@ -3,12 +3,13 @@
 namespace App\Service;
 
 use App\Repository\CmsRepository;
+use App\Repository\EventRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
 class CmsService
 {
-    public function __construct(private Environment $twig, private CmsRepository $repo)
+    public function __construct(private Environment $twig, private CmsRepository $repo, private EventRepository $eventRepo)
     {
     }
 
@@ -37,6 +38,7 @@ class CmsService
 
         return new Response($this->twig->render('cms/index.html.twig', [
             'blocks' => $blocks,
+            'events' => $this->eventRepo->getUpcomingEvents(),
         ]), Response::HTTP_OK);
     }
 

@@ -1,0 +1,32 @@
+
+    <div class="container mt-4 mb-4">
+        <div class="columns">
+            <div class="column is-4">
+                <img class="homepage-dragon" src="{{ asset('/images/meetup_432.jpg') }}" width="432" height="324" alt="Meetup members sitting together at a regular bi weekly gathering">
+            </div>
+            <div class="column is-4">
+                <h2 class="title is-4">{{ block.headline }}</h2>
+                <p>
+                    {{ block.text|nl2br }}
+                </p>
+            </div>
+            <div class="column is-4">
+                <div class="box mb-6">
+                    <div class="has-text-centered mb-4">
+                        <h2 class="title is-6">upcoming Events</h2>
+                    </div>
+                    {% for event in events %}
+                        <div>
+                            <div class="columns has-text-grey mb-0">
+                                <div class="column"><i class="fas fa-calendar"></i> {{ event.start|date('Y-m-d') }}</div>
+                                <div class="column"><i class="fas fa-clock"></i> {{ event.start|date('H:i') }}</div>
+                                <div class="column"><i class="fas fa-location-pin"></i> {{ event.location.name }}</div>
+                            </div>
+                            <a class="title is-6" href="{{ path('app_event_details', { 'id': event.id }) }}">{{ event.name|slice(0, 32) }}</a>
+                            {% if not loop.last %}<hr />{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>

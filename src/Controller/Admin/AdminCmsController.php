@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\BlockType\BlockType;
+use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Image;
@@ -60,6 +61,7 @@ class AdminCmsController extends AbstractController
             Text::getType()->name,
             Image::getType()->name,
             Hero::getType()->name,
+            EventTeaser::getType()->name,
         ];
 
         return $this->render('admin/cms/edit.html.twig', [
@@ -208,6 +210,7 @@ class AdminCmsController extends AbstractController
             Text::getType()->name => Text::fromJson($payload),
             Image::getType()->name => Image::fromJson($payload),
             Hero::getType()->name => Hero::fromJson($payload),
+            EventTeaser::getType()->name => EventTeaser::fromJson($payload),
         };
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\EventRepository;
+use App\Service\CmsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,12 +12,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_default')]
-    public function index(EventRepository $repo): Response
+    public function index(Request $request, CmsService $cms): Response
     {
-        return $this->render('index/index.html.twig', [
-            'title' => 'drfdfg',
-            'events' => $repo->getUpcomingEvents(),
-        ]);
+        return $cms->handle($request->getLocale(), 'index');
     }
 
     #[Route('/language/{locale}', name: 'app_default_language', requirements: ['locale' => 'en|de|cn'])]
