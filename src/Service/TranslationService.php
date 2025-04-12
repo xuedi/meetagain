@@ -178,9 +178,6 @@ readonly class TranslationService
             return sprintf('/%s/', implode('/', $chunks));
         }
 
-        $msg = 'TranslationService::replaceUriLanguageCode(): Could not identify a language code [%s] to replace in: %s';
-        $this->logger->error(sprintf($msg, implode(',', $languages), $link));
-
         return $link;
     }
 
