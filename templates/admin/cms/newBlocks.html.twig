@@ -2,7 +2,7 @@
     <a class="toggleTrigger" data-id="new-block-{{ name }}" href="#">
         <button class="button">
             <span class="icon"><i class="fa fa-plus"></i></span>
-            <span>{{ "block_" ~ name | trans }}</span>
+            <span>{{ "block_" ~ name | lower | trans }}</span>
         </button>
     </a>
 {% endfor %}
