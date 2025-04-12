@@ -7,6 +7,7 @@ use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -23,6 +24,7 @@ readonly class TranslationService
         private KernelInterface $appKernel,
         private ParameterBagInterface $appParams,
         private JustService $just,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -141,6 +143,45 @@ readonly class TranslationService
             'published' => $published,
             'languages' => $locales,
         ];
+    }
+
+    public function getLanguageCodes(): array
+    {
+        return $this->appParams->get('kernel.enabled_locales');
+    }
+
+    public function getAltLangList(string $currentLocale, string $currentUri): array
+    {
+        $altLangList = array_fill_keys($this->getLanguageCodes(), $currentUri);
+        unset($altLangList[$currentLocale]); // remove current
+        foreach ($altLangList as $languageCode => $link) {
+            $altLangList[$languageCode] = $this->replaceUriLanguageCode($link, $languageCode);
+        }
+
+        return $altLangList;
+    }
+
+    public function replaceUriLanguageCode(string $link, string $newCode): string
+    {
+        $languages = $this->getLanguageCodes();
+        $trimmedLink = trim($link, '/');
+
+        // Just language
+        if(in_array($trimmedLink, $languages)) {
+            return sprintf('/%s/', $newCode);
+        }
+
+        // whatever URI
+        $chunks = explode('/', $trimmedLink);
+        if(in_array($chunks[0], $languages)) {
+            $chunks[0] = $newCode;
+            return sprintf('/%s/', implode('/', $chunks));
+        }
+
+        $msg = 'TranslationService::replaceUriLanguageCode(): Could not identify a language code [%s] to replace in: %s';
+        $this->logger->error(sprintf($msg, implode(',', $languages), $link));
+
+        return $link;
     }
 
     private function removeDuplicates(array $translations): array

@@ -38,23 +38,17 @@
             </a>
         {% endif %}
 
-        {% if app.request.attributes.get('_route_params') is not null %}
-            <hr class="dropdown-divider"/>
-            <div class="navbar-item">
-                {% for enabledLocale in app.enabled_locales %}
-                    {% if enabledLocale != app.request.locale %}
-                        {% set attributes = app.request.attributes.get('_route_params') | merge({'_locale': enabledLocale}) %}
-                        {% set link = path(app.request.attributes.get('_route'),  attributes) %}
-                        <a class="button is-small mr-2" href="{{ link }}">
-                            <figure class="image is-32x32 mt-3">
-                                <img class="is-flag" src="{{ asset('images/flags/' ~ enabledLocale ~ '.png') }}"
-                                     alt="Locale flag"/>
-                            </figure>
-                        </a>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endif %}
+        <hr class="dropdown-divider"/>
+        <div class="navbar-item">
+            {% for altLangCode, altLangLink in globalService.getAlternativeLanguageCodes %}
+                <a class="button is-small mr-2" href="{{ altLangLink }}">
+                    <figure class="image is-32x32 mt-3">
+                        <img class="is-flag" src="{{ asset('images/flags/' ~ altLangCode ~ '.png') }}"
+                             alt="Locale flag"/>
+                    </figure>
+                </a>
+            {% endfor %}
+        </div>
 
     </div>
 

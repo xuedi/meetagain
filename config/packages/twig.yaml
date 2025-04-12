@@ -2,7 +2,7 @@ twig:
     form_themes: ['_form/bulma.html.twig']
     file_name_pattern: '*.twig'
     globals:
-        ga_tracking: 'UA-xxxxx-x'
+        globalService: '@App\Service\GlobalService'
 
 when@test:
     twig:

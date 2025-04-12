@@ -10,24 +10,21 @@
     {% if app.request.attributes.get('_route_params') is not null %}
         <div class="dropdown-menu" id="dropdown-languages" role="menu">
             <div class="dropdown-content">
-                {% for enabledLocale in app.enabled_locales %}
-                    {% if enabledLocale != app.request.locale %}
-                        <nobr>
-                            {% set attributes = app.request.attributes.get('_route_params') | merge({'_locale': enabledLocale}) %}
-                            {% set link = path(app.request.attributes.get('_route'),  attributes) %}
-                            <a class="navbar-item" href="{{ link }}">
-                                <figure class="image is-32x32 mt-3">
-                                    <img class="is-flag" src="{{ asset('images/flags/' ~ enabledLocale ~ '.png') }}"  alt="Locale flag"/>
-                                </figure>
-                                <span class="ml-3">
-                                    {{ ('language_'~enabledLocale) | trans({}, "messages", enabledLocale) }}
-                                </span>
-                                <span class="ml-2 has-text-grey">
-                                    ({{ ('language_'~enabledLocale) | trans }})
-                                </span>
-                            </a>
-                        </nobr>
-                    {% endif %}
+                {% for altLangCode, altLangLink in globalService.getAlternativeLanguageCodes %}
+                    <link rel=”alternate” hreflang="{{ altLangCode }}" href="{{ altLangLink }}" />
+                    <nobr>
+                        <a class="navbar-item" href="{{ altLangLink }}">
+                            <figure class="image is-32x32 mt-3">
+                                <img class="is-flag" src="{{ asset('images/flags/' ~ altLangCode ~ '.png') }}" width="100" height="64" alt="Locale flag"/>
+                            </figure>
+                            <span class="ml-3">
+                                {{ ('language_'~altLangCode) | trans({}, "messages", altLangCode) }}
+                            </span>
+                            <span class="ml-2 has-text-grey">
+                                ({{ ('language_'~altLangCode) | trans }})
+                            </span>
+                        </a>
+                    </nobr>
                 {% endfor %}
             </div>
         </div>

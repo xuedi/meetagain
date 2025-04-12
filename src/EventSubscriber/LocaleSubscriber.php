@@ -16,7 +16,7 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequest', 20]
+                ['onKernelRequest', 250]
             ],
         ];
     }
@@ -28,10 +28,12 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
             return;
         }
 
+        // save explicit session, if not available restore from session
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            $request->setLocale($request->getSession()->get('_locale', $this->defaultLocale));
+            $locale = $request->getSession()->get('_locale', $this->defaultLocale);
+            $request->setLocale($locale);
         }
     }
 }

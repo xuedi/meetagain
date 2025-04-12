@@ -15,6 +15,7 @@ class MemberController extends AbstractController
     #[Route('', name: 'app_member')]
     public function index(UserRepository $repo): Response
     {
+        dump('controller');
         return $this->render('member/index.html.twig', [
             'members' => $repo->findBy(['status' => UserStatus::Active, 'public' => true], ['createdAt' => 'ASC']),
         ]);
