@@ -24,12 +24,13 @@ class AdminEventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/{locale}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function eventEdit(
         Request $request,
         Event $event,
         UploadService $uploadService,
         EntityManagerInterface $entityManager,
+        string $locale = 'en',
     ): Response {
 
         $form = $this->createForm(EventType::class, $event);
@@ -48,12 +49,23 @@ class AdminEventController extends AbstractController
                 $uploadService->createThumbnails($image, [[600, 400]]);
             }
 
-            return $this->redirectToRoute('app_admin_event');
+            return $this->redirectToRoute('app_admin_event_edit', [
+                'editLocale' => $locale,
+                'id' => $event->getId(),
+            ]);
         }
 
         return $this->render('admin/event/edit.html.twig', [
+            'editLocale' => $locale,
             'event' => $event,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/{id}/delete', name: 'app_admin_event_delete')]
+    public function eventDelete(EventRepository $repo): Response
+    {
+        dump('delete');
+        exit;
     }
 }

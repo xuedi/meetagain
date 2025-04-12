@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Event;
 use App\Entity\EventIntervals;
+use App\Entity\EventTypes;
 use App\Entity\Host;
 use App\Entity\Location;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -38,6 +39,16 @@ class EventType extends AbstractType
                     'class' => EventIntervals::class,
                     'label' => 'Recurring',
                     'placeholder' => 'NonRecurring',
+                    'required' => false,
+                    'expanded' => false,
+                    'multiple' => false,
+                ]
+            )
+            ->add(
+                'type', EnumType::class, [
+                    'class' => EventTypes::class,
+                    'label' => 'Type',
+                    'placeholder' => 'Types',
                     'required' => false,
                     'expanded' => false,
                     'multiple' => false,
