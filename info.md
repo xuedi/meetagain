@@ -1,5 +1,7 @@
 
 ## TODO:
+ - add multi language content all the way, index, also events
+ - member list link to details only on loggedin users
  - activity levels for user view and admin view
  - add changed details for cms and event and other actions for system view only
  - add friend list & adding & approving
