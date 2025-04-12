@@ -2,7 +2,7 @@
     <a class="toggleTrigger" data-id="new-block-{{ name }}" href="#">
         <button class="button">
             <span class="icon"><i class="fa fa-plus"></i></span>
-            <span>{{ "block_" ~ name | lower | trans }}</span>
+            <span>{{ ("block_" ~ name) | lower | trans }}</span>
         </button>
     </a>
 {% endfor %}
@@ -17,7 +17,7 @@
         <input type="hidden" name="editLocale" value="{{ editLocale }}"/>
         <input type="hidden" name="blockType" value="{{ name }}"/>
         <div class="message-header">
-            <p>Add new {{ "block_" ~ name | trans }} block</p>
+            <p>Add new {{ ("block_" ~ name) | lower | trans }} block</p>
             <button class="delete toggleTrigger" data-id="new-block-{{ name }}" aria-label="delete"></button>
         </div>
         <div class="message-body">
