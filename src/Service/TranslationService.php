@@ -175,7 +175,7 @@ readonly class TranslationService
         $chunks = explode('/', $trimmedLink);
         if(in_array($chunks[0], $languages)) {
             $chunks[0] = $newCode;
-            return sprintf('/%s/', implode('/', $chunks));
+            return sprintf('/%s', implode('/', $chunks));
         }
 
         return $link;
