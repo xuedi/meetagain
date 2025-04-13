@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints\File;
 class EventType extends AbstractType
 {
     public function __construct(
+        private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
     ) {
     }
@@ -90,11 +91,9 @@ class EventType extends AbstractType
                 ],
             ]);
 
-        $eventId = $options['data']->getId();
-        $translations = $this->eventTransRepo->findBy(['event' => $eventId]);
-        foreach ($translations as $translation) {
-            $languageCode = $translation->getLanguage();
-
+        foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+            $eventId = $options['data']->getId();
+            $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
             $builder->add("title-$languageCode", TextType::class, [
                 'label' => "title ($languageCode)",
                 'data' => $translation?->getTitle() ?? '',

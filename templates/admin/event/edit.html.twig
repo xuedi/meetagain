@@ -88,7 +88,8 @@
                 </div>
 
                 <div class="mt-5">
-                    <a class="button is-danger toggleTrigger" data-id="event-delete-warning" href="{{ path('app_admin_event_delete', {'id': event.id}) }}">
+                    <a class="button is-danger toggleTrigger" data-id="event-delete-warning"
+                       href="{{ path('app_admin_event_delete', {'id': event.id}) }}">
                         <span class="icon"><i class="fa fa-trash"></i></span>
                     </a>
                     <button class="button">
@@ -107,15 +108,15 @@
 
     <script type="text/javascript">
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             let buttons = document.getElementsByClassName('translation-button');
             for (let i = 0; i < buttons.length; i++) {
                 buttons[i].addEventListener('click', event => {
                     event.preventDefault();
 
                     {% for locale in app.enabled_locales %}
-                        document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
-                        document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
+                    document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
+                    document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
                     {% endfor %}
 
                     let button = 'translation-button-' + event.currentTarget.getAttribute('data-id');
