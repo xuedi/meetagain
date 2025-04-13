@@ -47,8 +47,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
 
             $manager->persist($event);
 
-            // TODO: create recurring events via service?
-
             $this->addReference('event_' . md5((string) $name), $event);
         }
         $manager->flush();

@@ -3,9 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Event;
+use App\Entity\EventTranslation;
 use App\Entity\Image;
+use App\Form\EventTranslationType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
+use App\Repository\EventTranslationRepository;
+use App\Service\TranslationService;
 use App\Service\UploadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,6 +20,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/event')]
 class AdminEventController extends AbstractController
 {
+    public function __construct(
+        private readonly UploadService $uploadService,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TranslationService $translationService,
+        private readonly EventTranslationRepository $eventTransRepo,
+    ) {
+    }
+
     #[Route('/', name: 'app_admin_event')]
     public function eventList(EventRepository $repo): Response
     {
@@ -24,39 +36,45 @@ class AdminEventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/{locale}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
-    public function eventEdit(
-        Request $request,
-        Event $event,
-        UploadService $uploadService,
-        EntityManagerInterface $entityManager,
-        string $locale = 'en',
-    ): Response {
+    #[Route('/{id}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
+    public function eventEdit(Request $request, Event $event): Response {
 
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $image = $uploadService->upload($form, 'image', $this->getUser());
+
+            // overwrite basic data
             $event->setInitial(true);
             $event->setUser($this->getUser());
+
+            // event image
+            $image = $this->uploadService->upload($form, 'image', $this->getUser());
             if ($image instanceof Image) {
-                $event->setPreviewImage($image);
+                $event->setPreviewImage($image); // TODO: add source for image creation
             }
 
-            $entityManager->persist($event);
-            $entityManager->flush();
-            if ($image instanceof Image) {
-                $uploadService->createThumbnails($image, [[600, 400]]);
+            // save translations
+            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+                $translation = $this->getTranslation($languageCode, $event->getId());
+                $translation->setEvent($event);
+                $translation->setLanguage($languageCode);
+                $translation->setTitle($form->get("title-$languageCode")->getData());
+                $translation->setDescription($form->get("description-$languageCode")->getData());
+
+                $this->entityManager->persist($translation);
             }
 
-            return $this->redirectToRoute('app_admin_event_edit', [
-                'editLocale' => $locale,
-                'id' => $event->getId(),
-            ]);
+            // persist
+            $this->entityManager->persist($event);
+            $this->entityManager->flush();
+
+            // create thumbnail
+            if ($image instanceof Image) {
+                $this->uploadService->createThumbnails($image, [[600, 400]]);
+            }
         }
 
         return $this->render('admin/event/edit.html.twig', [
-            'editLocale' => $locale,
             'event' => $event,
             'form' => $form,
         ]);
@@ -67,5 +85,14 @@ class AdminEventController extends AbstractController
     {
         dump('delete');
         exit;
+    }
+
+    private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
+    {
+        $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);
+        if ($translation !== null) {
+            return $translation;
+        }
+        return new EventTranslation();
     }
 }

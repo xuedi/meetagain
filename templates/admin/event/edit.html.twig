@@ -50,19 +50,29 @@
 
                     <div class="columns">
                         <div class="column is-6">
-                            <p class="has-text-grey">Please Save before changing the language</p>
+                            <p class="has-text-grey">Dont forget the other languages</p>
                         </div>
                         <div class="column is-6">
                             <div class="buttons has-addons is-pulled-right">
                                 {% for locale in app.enabled_locales %}
-                                    {% set link = path('app_admin_event_edit', {'id': event.id, 'locale': locale}) %}
-                                    <a class="button {% if locale == editLocale %}is-active{% endif %}" href="{{ link }}">{{ locale }}</a>
+                                    <a class="button translation-button {% if locale == 'en' %}is-active{% endif %}"
+                                       id="translation-button-{{ locale }}"
+                                       data-id="{{ locale }}">{{ locale }}</a>
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
-                    {{ form_row(form.name) }}
-                    {{ form_row(form.description) }}
+                    {% for locale in app.enabled_locales %}
+                        <div class="div {% if locale != 'en' %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
+                            {{ form_row(form.("title-"~locale)) }}
+                            {{ form_row(form.("description-"~locale)) }}
+                        </div>
+                    {% endfor %}
+
+                    <div class="is-hidden">
+                        {{ form_row(form.name) }}
+                        {{ form_row(form.description) }}
+                    </div>
                 </div>
 
             </div>
@@ -94,5 +104,34 @@
         {{ form_end(form) }}
 
     </div>
+
+    <script type="text/javascript">
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let buttons = document.getElementsByClassName('translation-button');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', event => {
+                    event.preventDefault();
+
+                    {% for locale in app.enabled_locales %}
+                        document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
+                        document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
+                    {% endfor %}
+
+                    let button = 'translation-button-' + event.currentTarget.getAttribute('data-id');
+                    document.getElementById(button).classList.add('is-active');
+
+                    let target = 'translation-div-' + event.currentTarget.getAttribute('data-id');
+                    document.getElementById(target).classList.remove('is-hidden');
+
+                });
+            }
+        });
+
+    </script>
+
+
+
+
 
 {% endblock %}
