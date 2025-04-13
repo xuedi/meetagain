@@ -44,12 +44,6 @@ class Event
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(length: 128)]
-    private ?string $name = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
-
     #[ORM\ManyToMany(targetEntity: Host::class)]
     private Collection $host;
 
@@ -69,11 +63,18 @@ class Event
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'event')]
     private Collection $comments;
 
+    /**
+     * @var Collection<int, EventTranslation>
+     */
+    #[ORM\OneToMany(targetEntity: EventTranslation::class, mappedBy: 'event')]
+    private Collection $translations;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
         $this->rsvp = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->translations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -129,18 +130,6 @@ class Event
         return $this;
     }
 
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
     public function getRecurringRule(): ?EventIntervals
     {
         return $this->recurringRule;
@@ -185,18 +174,6 @@ class Event
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
 
         return $this;
     }
@@ -301,6 +278,16 @@ class Event
         return true;
     }
 
+    public function getTitle(string $language): string
+    {
+        return $this->findTranslation($language)?->getTitle() ?? '';
+    }
+
+    public function getDescription(string $language): string
+    {
+        return $this->findTranslation($language)?->getDescription() ?? '';
+    }
+
     /**
      * @return Collection<int, Comment>
      */
@@ -329,5 +316,44 @@ class Event
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, EventTranslation>
+     */
+    public function getTranslation(): Collection
+    {
+        return $this->translations;
+    }
+
+    public function addTranslation(EventTranslation $translation): static
+    {
+        if (!$this->translations->contains($translation)) {
+            $this->translations->add($translation);
+            $translation->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTranslation(Comment $translation): static
+    {
+        if ($this->translations->removeElement($translation)) {
+            if ($translation->getEvent() === $this) {
+                $translation->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    private function findTranslation(string $language): ?EventTranslation
+    {
+        foreach ($this->translations as $translation) {
+            if($translation->getLanguage() === $language) {
+                return $translation;
+            }
+        }
+        return null;
     }
 }

@@ -27,6 +27,7 @@ class EventRepository extends ServiceEntityRepository
         return $list;
     }
 
+    // TODO: already preload translations
     public function getUpcomingEvents(int $number = 3): array
     {
         $query = $this->getEntityManager()->createQuery(
@@ -39,6 +40,7 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    // TODO: already preload translations
     public function getPastEvents(int $number = 3, ?User $user = null): array
     {
         $query = $this->getEntityManager()->createQuery(
@@ -51,6 +53,7 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    // TODO: already preload translations
     public function findAllRecurring()
     {
         $qb = $this->getEntityManager()->createQueryBuilder();

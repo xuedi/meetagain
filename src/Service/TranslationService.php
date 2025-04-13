@@ -7,7 +7,6 @@ use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -24,7 +23,6 @@ readonly class TranslationService
         private KernelInterface $appKernel,
         private ParameterBagInterface $appParams,
         private JustService $just,
-        private LoggerInterface $logger,
     ) {
     }
 

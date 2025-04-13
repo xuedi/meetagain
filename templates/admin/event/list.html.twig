@@ -11,9 +11,10 @@
                 <th>Start date</th>
                 <th>Stop date</th>
                 <th>Recurring</th>
-                <th>Name</th>
                 <th>Location</th>
-                <th>Hosts</th>
+                <th>Rsvp</th>
+                <th>Type</th>
+                <th>Translation</th>
                 <th></th>
             </tr>
             </thead>
@@ -24,9 +25,10 @@
                     <td>{{ event.start|date('Y-m-d') }}</td>
                     <td>{{ event.stop|date('Y-m-d') }}</td>
                     <td>{% if event.recurringRule is null %}{{ 'No'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}</td>
-                    <td>{{ event.name|slice(0, 32) }}</td>
                     <td>{{ event.location.name }}</td>
-                    <td>{{ event.host|map(h => h.name)|join(', ') }}</td>
+                    <td>{{ event.type.name }}</td>
+                    <td>{{ event.rsvp|length }}</td>
+                    <td>trans</td>
                     <td><a href="{{ path('app_admin_event_edit', {'id': event.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
                 </tr>
             {% endfor %}

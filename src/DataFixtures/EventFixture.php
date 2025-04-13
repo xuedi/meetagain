@@ -25,13 +25,11 @@ class EventFixture extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as $data) {
-            [$initial, $start, $stop, $name, $desc, $recOf, $recRules, $location, $hosts, $rsvps, $type] = $data;
+            [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type] = $data;
             $event = new Event();
             $event->setInitial($initial);
             $event->setStart($this->setDateType($start));
             $event->setStop($this->setDateType($stop));
-            $event->setName($name);
-            $event->setDescription($desc);
             $event->setRecurringOf($recOf);
             $event->setRecurringRule($recRules);
             $event->setUser($this->getReference('user_' . md5('import')));
@@ -70,7 +68,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 '2015-02-26 19:30',
                 '2015-02-26 22:30',
                 'Let\'s meet up and talk Chinese!',
-                $this->getBlob('First'),
                 self::NO_RECURRING_OF,
                 self::NO_RECURRING_RULE,
                 'St. Oberholz',
@@ -83,7 +80,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 '2015-09-18 20:00',
                 '2015-09-18 22:30',
                 'Spicy Chinese dinner at a Sichuan restaurant',
-                $this->getBlob('SpicyChinese'),
                 self::NO_RECURRING_OF,
                 self::NO_RECURRING_RULE,
                 'Grand Tang',
@@ -96,7 +92,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 '2015-09-26 17:00',
                 '2015-09-26 20:30',
                 '中秋节 - Mid Autumn festival',
-                $this->getBlob('MidAutumnFestival'),
                 self::NO_RECURRING_OF,
                 self::NO_RECURRING_RULE,
                 'Garten der Welt',
@@ -109,7 +104,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 '2016-07-01 19:30',
                 '2016-07-01 20:30',
                 '下馆子！Let’s go eat!',
-                $this->getBlob('LetsGoEat'),
                 self::NO_RECURRING_OF,
                 self::NO_RECURRING_RULE,
                 'Lao Xiang',
@@ -122,7 +116,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 '2020-09-03 19:00',
                 '2020-09-03 20:00',
                 'Outdoor Meetup at Himmelbeet',
-                $this->getBlob('Himmelbeet'),
                 self::NO_RECURRING_OF,
                 self::NO_RECURRING_RULE,
                 'Himmelbeet',
@@ -135,7 +128,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 '2024-09-19 19:00',
                 '2024-09-19 22:30',
                 '定期活动 - Regular meetup',
-                $this->getBlob('Current'),
                 self::NO_RECURRING_OF,
                 EventIntervals::BiMonthly,
                 'Volksbar',
@@ -148,7 +140,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 '2025-02-26 19:30',
                 '2025-02-26 22:30',
                 '生日快乐 - Meetup get one year older',
-                'TEST - yearly birthday meetup event',
                 self::NO_RECURRING_OF,
                 EventIntervals::Yearly,
                 'Volksbar',

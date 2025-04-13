@@ -59,12 +59,6 @@ class EventType extends AbstractType
                 'expanded' => false,
                 'multiple' => false,
             ])
-            ->add('description', TextareaType::class, [
-                'attr' => ['rows' => 16],
-            ])
-            ->add('name', TextType::class, [
-                'label' => 'Titel'
-            ])
             ->add('location', EntityType::class, [
                 'class' => Location::class,
                 'choice_label' => 'name',

@@ -101,9 +101,6 @@ readonly class EventService
             $recurringEvent->setStop($this->updateDate($event->getStop(), $occurrence));
             $recurringEvent->setRecurringOf($event->getId());
             $recurringEvent->setRecurringRule(null);
-            $recurringEvent->setName($event->getName()); // TODO: set to null
-            $recurringEvent->setDescription($event->getDescription()); // TODO: set to null  // TODO: add a recurringContent Pointer to the last changed item and update all following
-            $recurringEvent->setDescription($event->getDescription()); // TODO: set to null
             $recurringEvent->setCreatedAt(new DateTimeImmutable());
             $recurringEvent->setHost($event->getHost());
             $recurringEvent->setType($event->getType());
