@@ -1,0 +1,15 @@
+{# not defined: new block  #}
+{% if block is not defined or editBlock == blockId %}
+
+    <div class="field">
+        <label class="label">Title</label>
+        <div class="control">
+            <input class="input" name="title" type="text" value="{% if block is defined %}{{ block.title }}{% endif %}">
+        </div>
+    </div>
+
+{% else %}
+
+    <p><strong>Title:</strong> {{ block.title }} <span class="has-text-grey">(only shown in browser)</span></p>
+
+{% endif %}

@@ -8,6 +8,7 @@ use App\Entity\BlockType\Text as TextBlockType;
 use App\Entity\BlockType\Paragraph as ParagraphBlockType;
 use App\Entity\BlockType\Hero as HeroBlockType;
 use App\Entity\BlockType\EventTeaser as EventTeaserType;
+use App\Entity\BlockType\Title as TitleType;
 use App\Repository\CmsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -119,12 +120,25 @@ class Cms
                     CmsBlockTypes::Text => TextBlockType::fromJson($block->getJson()),
                     CmsBlockTypes::Hero => HeroBlockType::fromJson($block->getJson()),
                     CmsBlockTypes::EventTeaser => EventTeaserType::fromJson($block->getJson()),
+                    CmsBlockTypes::Title => TitleType::fromJson($block->getJson()),
                     default => throw new Exception('To be implemented'),
                 };
             }
         }
 
         return new ArrayCollection($objects);
+    }
+
+    public function getPageTitle(string $language): ?string
+    {
+        $title = null;
+        foreach ($this->blocks as $block) {
+            if ($block->getLanguage() === $language && $block->getType() === CmsBlockTypes::Title) {
+                $title = TitleType::fromJson($block->getJson())->title;
+            }
+        }
+
+        return $title;
     }
 
     public function addBlock(CmsBlock $block): static

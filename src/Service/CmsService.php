@@ -37,6 +37,7 @@ readonly class CmsService
         }
 
         return new Response($this->twig->render('cms/index.html.twig', [
+            'title' => $cms->getPageTitle($locale) ?? 'No Title set',
             'blocks' => $blocks,
             'events' => $this->eventRepo->getUpcomingEvents(),
         ]), Response::HTTP_OK);

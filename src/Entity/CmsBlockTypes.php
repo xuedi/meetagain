@@ -13,4 +13,5 @@ enum CmsBlockTypes: int
     case Gallery = 7;
     case Hero = 8;
     case EventTeaser = 9;
+    case Title = 10;
 }

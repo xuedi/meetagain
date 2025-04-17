@@ -9,6 +9,7 @@ use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Image;
 use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
+use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use App\Form\CmsType;
@@ -62,6 +63,7 @@ class AdminCmsController extends AbstractController
             Image::getType()->name,
             Hero::getType()->name,
             EventTeaser::getType()->name,
+            Title::getType()->name,
         ];
 
         return $this->render('admin/cms/edit.html.twig', [
@@ -211,6 +213,7 @@ class AdminCmsController extends AbstractController
             Image::getType()->name => Image::fromJson($payload),
             Hero::getType()->name => Hero::fromJson($payload),
             EventTeaser::getType()->name => EventTeaser::fromJson($payload),
+            Title::getType()->name => Title::fromJson($payload),
         };
     }
 

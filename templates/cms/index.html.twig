@@ -1,6 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_CMD"|trans }}{% endblock %}
+{% block title %}
+    {% if title is defined  %}
+        {{ title }}
+    {% else %}
+        {{ "page_title_CMD"|trans }}
+    {% endif %}
+{% endblock %}
 
 {% block body %}
 
@@ -13,7 +19,7 @@
     <section class="section">
         <div class="container">
             {% for block in blocks %}
-                {% if block.type.value != 8 %}
+                {% if block.type.value != 8 and block.type.value != 10 %}
                     {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block} %}
                 {% endif %}
             {% endfor %}
