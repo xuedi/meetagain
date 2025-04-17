@@ -17,11 +17,11 @@ class EventRepository extends ServiceEntityRepository
     }
 
     // TODO: get via builder straight as keyValue
-    public function getEventNameList(): array
+    public function getEventNameList(string $language): array
     {
         $list = [];
         foreach ($this->findAll() as $event) {
-            $list[$event->getId()] = $event->getName();
+            $list[$event->getId()] = $event->getTitle($language);
         }
 
         return $list;

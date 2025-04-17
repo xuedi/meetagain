@@ -5,7 +5,7 @@
             <td>
                 <p class="has-text-grey">{{ event.start|date('Y-m-d') }}</p>
             </td>
-            <td>{{ event.name }}
+            <td>{{ event.title(globalService.currentLocale) }}
                 <a class="icon is-small" target="_blank" href="{{ path('app_event_details', {id: event.id}) }}">
                     <i class="fa fa-external-link" aria-hidden="true"></i>
                 </a>

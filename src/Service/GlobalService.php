@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use RuntimeException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 readonly class GlobalService
@@ -17,7 +18,7 @@ readonly class GlobalService
             return $request->getLocale();
         }
 
-        return [];
+        throw new RuntimeException('Cound not get current locale');
     }
 
     public function getLanguageCodes(): array

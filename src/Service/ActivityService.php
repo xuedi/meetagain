@@ -9,10 +9,14 @@ use App\Entity\UserActivity;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 readonly class ActivityService
 {
-    public function __construct(private EntityManagerInterface $em, private ActivityRepository $repo)
+    public function __construct(
+        private GlobalService $globalService,
+        private EntityManagerInterface $em,
+        private ActivityRepository $repo)
     {
     }
 
@@ -57,7 +61,7 @@ readonly class ActivityService
     private function prepareActivityList(array $list): array
     {
         $cachedUserName = $this->em->getRepository(User::class)->getUserNameList();
-        $cachedEventName = $this->em->getRepository(Event::class)->getEventNameList();
+        $cachedEventName = $this->em->getRepository(Event::class)->getEventNameList($this->globalService->getCurrentLocale());
 
         $preparedList = [];
         foreach ($list as $activity) {

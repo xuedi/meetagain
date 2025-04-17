@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\UserStatus;
+use App\Repository\EventRepository;
+use App\Repository\UserRepository;
 use App\Service\CmsService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,5 +17,15 @@ class DefaultController extends AbstractController
     public function catchAll(Request $request, CmsService $cms, string $page): Response
     {
         return $cms->handle($request->getLocale(), $page);
+    }
+
+    #[Route('/xuedi', name: 'app_xuedi')]
+    public function xuedi(EventRepository $repo, UserRepository $userRepo): Response
+    {
+        dump($repo->findOneBy(['id' => 1])->getTitle('en'));
+
+        return $this->render('member/index.html.twig', [
+            'members' => $userRepo->findBy(['status' => UserStatus::Active, 'public' => true], ['createdAt' => 'ASC']),
+        ]);
     }
 }
