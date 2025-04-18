@@ -11,7 +11,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class TranslationService
 {
@@ -20,9 +19,9 @@ readonly class TranslationService
         private UserRepository $userRepo,
         private EntityManagerInterface $entityManager,
         private Filesystem $fs,
-        private KernelInterface $appKernel,
         private ParameterBagInterface $appParams,
         private JustService $just,
+        private string $kernelProjectDir,
     ) {
     }
 
@@ -72,7 +71,7 @@ readonly class TranslationService
         $newTranslations = 0;
         $extractionTime = $this->just->command('translationsExtract');
 
-        $path = $this->appKernel->getProjectDir() . '/translations/';
+        $path = $this->kernelProjectDir . '/translations/';
         $dataBase = $this->translationRepo->getUniqueList();
         $importUser = $this->userRepo->findOneBy(['email' => 'system@beijingcode.org']);
 
@@ -111,7 +110,7 @@ readonly class TranslationService
         $locales = $this->appParams->get('kernel.enabled_locales');
 
         // clean up old translation files
-        $path = $this->appKernel->getProjectDir() . '/translations/';
+        $path = $this->kernelProjectDir . '/translations/';
         $finder = new Finder();
         $finder->files()->in($path)->depth(0)->name(['*.php']);
         foreach ($finder as $file) {
@@ -184,7 +183,7 @@ readonly class TranslationService
         $json = file_get_contents($apiUrl);
         $data = json_decode($json, true);
 
-        $this->entityManager->getConnection()->query(" TRUNCATE TABLE translation");
+        $this->entityManager->getConnection()->executeQuery(" TRUNCATE TABLE translation");
         $user = $this->userRepo->findOneBy(['email' => 'system@beijingcode.org']);
 
         foreach ($data as $item) {

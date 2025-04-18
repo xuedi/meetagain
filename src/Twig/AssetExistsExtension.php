@@ -8,7 +8,7 @@ use Twig\TwigFunction;
 
 class AssetExistsExtension extends AbstractExtension
 {
-    public function __construct(private readonly KernelInterface $appKernel)
+    public function __construct(private string $kernelProjectDir)
     {
     }
 
@@ -21,7 +21,7 @@ class AssetExistsExtension extends AbstractExtension
 
     public function assetExists($path): bool
     {
-        $assets = $this->appKernel->getProjectDir() . '/assets/';
+        $assets = $this->kernelProjectDir . '/assets/';
         $toCheck = realpath($assets . $path);
 
         return is_file($toCheck);

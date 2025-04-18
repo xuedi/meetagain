@@ -18,9 +18,9 @@ readonly class UploadService
 {
     public function __construct(
         private ImageRepository $imageRepo,
-        private KernelInterface $appKernel,
         private Filesystem $filesystem,
         private EntityManagerInterface $entityManager,
+        private string $kernelProjectDir,
     ) {
     }
 
@@ -70,13 +70,13 @@ readonly class UploadService
 
     private function getSourceFile(Image $image): string
     {
-        $path = $this->appKernel->getProjectDir() . '/data/images/';
+        $path = $this->kernelProjectDir . '/data/images/';
         return $path . $image->getHash() . '.' . $image->getExtension();
     }
 
     private function getThumbnailFile(Image $image, int $width, int $height): string
     {
-        $path = $this->appKernel->getProjectDir() . '/public/images/thumbnails/';
+        $path = $this->kernelProjectDir . '/public/images/thumbnails/';
         return $path . $image->getId() . '_' . $width . 'x' . $height . '.' . $image->getExtension(); // TODO: sprintf
     }
 }

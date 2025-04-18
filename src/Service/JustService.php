@@ -9,7 +9,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 readonly class JustService
 {
-    public function __construct(private KernelInterface $appKernel)
+    public function __construct(private string $kernelProjectDir)
     {
     }
 
@@ -19,7 +19,7 @@ readonly class JustService
         $stopwatch->start('action');
 
         $process = new Process(['just', $command]);
-        $process->setWorkingDirectory($this->appKernel->getProjectDir());
+        $process->setWorkingDirectory($this->kernelProjectDir);
         $process->enableOutput();
         $process->start();
         $process->wait();
