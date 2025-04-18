@@ -6,10 +6,18 @@
 
     <section class="section">
         <div class="container">
-            <h1 class="title is-3">Public Data API</h1>
-            <p>
-                All the Data you can have
+            <h1 class="title is-3">Public API</h1>
+            <p class="mb-5">
+                All the data you can have
             </p>
+            <div class="buttons has-addons">
+                <button class="button is-success is-selected">GET</button>
+                <a class="button" href="{{ path('app_api_translations') }}">/api/translations</a>
+            </div>
+            <div class="buttons has-addons">
+                <button class="button is-success is-selected">GET</button>
+                <a class="button" href="{{ path('app_api_glossary') }}">/api/glossary</a>
+            </div>
         </div>
     </section>
 

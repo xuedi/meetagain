@@ -33,4 +33,17 @@ class TranslationRepository extends ServiceEntityRepository
         }
         return $list;
     }
+
+    public function getExportList(): array
+    {
+        $list = [];
+        foreach ($this->findAll() as $translation) {
+            $list[] = [
+                'language' => $translation->getLanguage(),
+                'placeholder' => $translation->getPlaceholder(),
+                'translation' => $translation->getTranslation(),
+            ];
+        }
+        return $list;
+    }
 }
