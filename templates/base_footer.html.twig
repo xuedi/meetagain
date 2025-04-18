@@ -25,11 +25,17 @@
                     <li>
                         <a class="is-size-5-mobile" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
                     </li>
+                    <li>
+                        <a class="is-size-5-mobile" href="{{ path('app_glossary') }}">{{ "menu_glossary" | trans }}</a>
+                    </li>
                 </ul>
             </div>
             <div class="column is-6-mobile">
                 <h4>Social</h4>
                 <ul>
+                    <li>
+                        <a class="is-size-5-mobile" href="https://www.meetup.com/dragon-descendants/?eventOrigin=home_groups_you_organize" target="_blank">meetup.com</a>
+                    </li>
                     <li>
                         <a class="is-size-5-mobile" href="#" target="_blank">Instagram</a>
                     </li>
@@ -46,6 +52,9 @@
                     </li>
                     <li>
                         <a class="is-size-5-mobile" href="/{{ app.locale }}/privacy">{{ "menu_privacy" | trans }}</a>
+                    </li>
+                    <li>
+                        <a class="is-size-5-mobile" href="{{ path('app_cookie_overview') }}">{{ "menu_cookies" | trans }}</a>
                     </li>
                 </ul>
             </div>
