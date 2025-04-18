@@ -326,6 +326,13 @@ class Event
         return $this->translations;
     }
 
+    public function setTranslation(Collection $translations): static
+    {
+        $this->translations = $translations;
+
+        return $this;
+    }
+
     public function addTranslation(EventTranslation $translation): static
     {
         if (!$this->translations->contains($translation)) {

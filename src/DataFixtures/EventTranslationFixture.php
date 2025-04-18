@@ -108,37 +108,37 @@ class EventTranslationFixture extends Fixture implements DependentFixtureInterfa
             [
                 'en',
                 'Outdoor Meetup at Himmelbeet',
-                $this->getBlob('Himmelbeet'),
+                $this->getBlob('himmelbeet_en'),
             ],
             [
                 'de',
                 'Outdoor Meetup at Himmelbeet',
-                'Himmelbeet-de',
+                $this->getBlob('himmelbeet_de'),
             ],
             [
                 'cn',
                 'Outdoor Meetup at Himmelbeet',
-                'Himmelbeet-cn',
+                $this->getBlob('himmelbeet_cn'),
             ],
             [
                 'en',
                 '定期活动 - Regular meetup',
-                $this->getBlob('Current'),
+                $this->getBlob('current_en'),
             ],
             [
                 'de',
                 '定期活动 - Regular meetup',
-                'Current-de',
+                $this->getBlob('current_de'),
             ],
             [
                 'cn',
                 '定期活动 - Regular meetup',
-                'Current-cn',
+                $this->getBlob('current_cn'),
             ],
             [
                 'en',
                 '生日快乐 - Meetup get one year older',
-                'TEST - yearly birthday meetup event',
+                'TEST - yearly birthday meetup event - en',
             ],
             [
                 'de',

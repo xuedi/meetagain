@@ -104,6 +104,7 @@ readonly class EventService
             $recurringEvent->setCreatedAt(new DateTimeImmutable());
             $recurringEvent->setHost($event->getHost());
             $recurringEvent->setType($event->getType());
+            $recurringEvent->setTranslation($event->getTranslation());
 
             $this->em->persist($recurringEvent);
             $this->em->flush();

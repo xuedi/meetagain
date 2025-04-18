@@ -179,6 +179,29 @@ readonly class TranslationService
         return $link;
     }
 
+    public function importForLocalDevelopment(string $apiUrl): void
+    {
+        $json = file_get_contents($apiUrl);
+        $data = json_decode($json, true);
+
+        $this->entityManager->getConnection()->query(" TRUNCATE TABLE translation");
+        $user = $this->userRepo->findOneBy(['email' => 'system@beijingcode.org']);
+
+        foreach ($data as $item) {
+            $translation = new Translation();
+            $translation->setUser($user);
+            $translation->setLanguage($item['language']);
+            $translation->setPlaceholder($item['placeholder']);
+            $translation->setTranslation($item['translation']);
+            $translation->setCreatedAt(new DateTimeImmutable());
+
+            $this->entityManager->persist($translation);
+        }
+
+        $this->entityManager->flush();
+        $this->publish();
+    }
+
     private function removeDuplicates(array $translations): array
     {
         $cleanedList = [];

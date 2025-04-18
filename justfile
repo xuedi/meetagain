@@ -2,6 +2,7 @@ reset:
     php bin/console doctrine:schema:drop --force -q
     php bin/console doctrine:schema:create -q
     php bin/console doctrine:fixtures:load --append -q
+    php bin/console app:translation:import 'https://www.dragon-descendants.de/api/translations'
     just extendEvents
 
 deploy:
