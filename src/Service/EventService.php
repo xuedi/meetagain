@@ -7,6 +7,7 @@ use App\Entity\EventFilterRsvp;
 use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventIntervals;
+use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
 use App\Repository\EventRepository;
 use DateTime;
@@ -104,7 +105,17 @@ readonly class EventService
             $recurringEvent->setCreatedAt(new DateTimeImmutable());
             $recurringEvent->setHost($event->getHost());
             $recurringEvent->setType($event->getType());
-            $recurringEvent->setTranslation($event->getTranslation());
+
+            foreach ($event->getTranslation() as $eventTranslation) {
+                $newEventTranslation = new EventTranslation();
+                $newEventTranslation->setEvent($eventTranslation->getEvent());
+                $newEventTranslation->setTitle($eventTranslation->getTitle());
+                $newEventTranslation->setLanguage($eventTranslation->getLanguage());
+                $newEventTranslation->setDescription($eventTranslation->getDescription());
+
+                $this->em->persist($newEventTranslation);
+                $recurringEvent->addTranslation($newEventTranslation);
+            }
 
             $this->em->persist($recurringEvent);
             $this->em->flush();
