@@ -4,3 +4,7 @@ controllers:
         namespace: App\Controller
     type: attribute
     prefix: /{_locale}
+
+api:
+    resource: ../src/Controller/ApiController.php
+    type: attribute
