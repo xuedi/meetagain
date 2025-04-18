@@ -1,0 +1,4 @@
+Contact: mailto:security@beijingcode.org
+Expires: 2069-01-01T09:10:00.000Z
+Encryption: https://keys.openpgp.org/search?q=F56C+324B+37E3+2FF2+2F24+2C84+4929+428C+824F+C503
+Preferred-Languages: en, de
