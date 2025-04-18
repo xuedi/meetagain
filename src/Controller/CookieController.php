@@ -12,18 +12,18 @@ use Symfony\Component\Routing\Attribute\Route;
 class CookieController extends AbstractController
 {
     #[Route('/', name: 'app_cookie_overview')]
-    public function overviewIndex(ConfigRepository $repo): Response
+    public function overviewIndex(): Response
     {
         return $this->render('cookie/index.html.twig', [
-            'config' => $repo->findAll(),
+            //'config' => $repo->findAll(),
         ]);
     }
 
     #[Route('/update', name: 'app_cookie_update', methods: ['POST'])]
-    public function updateIndex(ConfigRepository $repo): Response
+    public function updateIndex(): Response
     {
         return $this->render('cookie/index.html.twig', [
-            'config' => $repo->findAll(),
+            //'config' => $repo->findAll(),
         ]);
     }
 }

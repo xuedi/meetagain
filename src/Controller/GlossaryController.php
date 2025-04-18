@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class GlossaryController extends AbstractController
 {
     #[Route('/', name: 'app_glossary')]
-    public function index(ConfigRepository $repo): Response
+    public function index(): Response
     {
         return $this->render('glossary/index.html.twig', [
             //
