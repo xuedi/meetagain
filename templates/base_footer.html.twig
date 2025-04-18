@@ -1,32 +1,52 @@
 <footer class="footer">
     <div class="container">
-        <div class="columns">
+        <div class="columns is-mobile is-multiline">
             <div class="column is-two-fifths is-hidden-mobile">
-                <span class="copyright">© 2014–2024 dragon-descendants.de</span><br>
-                <span>powerd by</span> <a target="_blank" href="https://codeberg.org/xuedi/meetAgain">meetAgain</a>
+                <span class="copyright">© 2014–2025 dragon-descendants.de</span><br>
+                <span>powered by</span> <a target="_blank" href="https://codeberg.org/xuedi/meetAgain">meetAgain</a>
             </div>
-            <div class="column"><strong>Static</strong>
+            <div class="column is-6-mobile">
+                <h4>Static</h4>
                 <ul>
-                    <li><a href="{{ path('app_default') }}">{{ "menu_default" | trans }}</a></li>
-                    <li><a href="/{{ app.locale }}/about">{{ "menu_about" | trans }}</a></li>
+                    <li>
+                        <a class="is-size-5-mobile" href="{{ path('app_default') }}">{{ "menu_default" | trans }}</a>
+                    </li>
+                    <li>
+                        <a class="is-size-5-mobile" href="/{{ app.locale }}/about">{{ "menu_about" | trans }}</a>
+                    </li>
                 </ul>
             </div>
-            <div class="column"><strong>Dynamic</strong>
+            <div class="column is-6-mobile">
+                <h4>Dynamic</h4>
                 <ul>
-                    <li><a href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a></li>
-                    <li><a href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a></li>
+                    <li>
+                        <a class="is-size-5-mobile" href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a>
+                    </li>
+                    <li>
+                        <a class="is-size-5-mobile" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
+                    </li>
                 </ul>
             </div>
-            <div class="column"><strong>Social</strong>
+            <div class="column is-6-mobile">
+                <h4>Social</h4>
                 <ul>
-                    <li><a href="#" target="_blank">Instagram</a></li>
-                    <li><a href="#" target="_blank">TikTok</a></li>
+                    <li>
+                        <a class="is-size-5-mobile" href="#" target="_blank">Instagram</a>
+                    </li>
+                    <li>
+                        <a class="is-size-5-mobile" href="#" target="_blank">TikTok</a>
+                    </li>
                 </ul>
             </div>
-            <div class="column"><strong>Legal</strong>
+            <div class="column is-6-mobile">
+                <h4>Legal</h4>
                 <ul>
-                    <li><a href="/{{ app.locale }}/imprint">{{ "menu_imprint" | trans }}</a></li>
-                    <li><a href="/{{ app.locale }}/privacy">{{ "menu_privacy" | trans }}</a></li>
+                    <li>
+                        <a class="is-size-5-mobile" href="/{{ app.locale }}/imprint">{{ "menu_imprint" | trans }}</a>
+                    </li>
+                    <li>
+                        <a class="is-size-5-mobile" href="/{{ app.locale }}/privacy">{{ "menu_privacy" | trans }}</a>
+                    </li>
                 </ul>
             </div>
         </div>
