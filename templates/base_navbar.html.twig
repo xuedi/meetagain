@@ -19,8 +19,12 @@
                 {% endif %}
             </div>
             <div class="navbar-end">
-                {% include 'base_navbar_menu.html.twig' %}
-                {% include 'base_navbar_cookie.html.twig' %}
+                {% if is_granted('ROLE_USER') %}
+                    {% include 'base_navbar_menu.html.twig' %}
+                {% else %}
+                    <a class="navbar-item" href="{{ path('app_login') }}">{{ "menu_login" | trans }}</a>
+                    {% include 'base_navbar_cookie.html.twig' %}
+                {% endif %}
                 {% include 'base_navbar_flags.html.twig' %}
             </div>
         </div>

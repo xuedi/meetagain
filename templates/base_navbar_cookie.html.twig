@@ -1,7 +1,9 @@
-<div class="navbar-item dropdown is-hoverable {# TODO: In the future show until consented: is-active #}">
+<div class="navbar-item dropdown is-hoverable {% if globalService.showCookieConsent%}is-active{% endif %}">
     <div class="dropdown-trigger">
         <button class="button cookie-button" aria-haspopup="true" aria-controls="dropdown-cookie">
+            {% if globalService.showCookieConsent%}
             <span>{{ "menu_cookie_consent_button" | trans }}</span>
+            {% endif %}
             <span class="icon is-small">
                 <i class="fas fa-angle-down" aria-hidden="true"></i>
             </span>
@@ -9,28 +11,48 @@
     </div>
     <div class="dropdown-menu" id="dropdown-cookie" role="menu">
         <div class="dropdown-content">
-            <h2 class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_headline" | trans }}</h2>
-            <p class="navbar-item is-6">
-                {{ "menu_cookie_consent_text" | trans }}
-            </p>
-            <h3 class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_options" | trans }}</h3>
-            <div class="navbar-item">
-                <div class="list">
-                    <div class="list-item mt-3">
-                        <div class="list-item-content">
-                            <div class="list-item-title">
-                                <label class="checkbox">
-                                    <input type="checkbox" />
-                                    <strong>{{ "menu_cookie_consent_option_osm" | trans }}</strong>
-                                </label>
-                            </div>
-                            <div class="list-item-description has-text-grey is-size-7">
-                                {{ "menu_cookie_consent_option_osm_text" | trans }}
+
+            <form action="{{ path('app_cookie') }}" method="post">
+
+                <h2 class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_headline" | trans }}</h2>
+                <p class="navbar-item is-6">
+                    {{ "menu_cookie_consent_text" | trans }}
+                </p>
+                <h3 class="navbar-item title mt-5 mb-0 is-size-6">{{ "menu_cookie_consent_options" | trans }}</h3>
+                <div class="navbar-item">
+                    <div class="list">
+                        <div class="list-item mt-0">
+                            <div class="list-item-content">
+                                <div class="list-item-title">
+                                    <label class="checkbox">
+                                        <input
+                                                type="checkbox"
+                                                name="osm_consent_checkbox"
+                                                {% if globalService.showOsm%}checked{% endif %}
+                                                id="osm_consent_checkbox"
+                                        />
+                                        <strong>{{ "menu_cookie_consent_option_osm" | trans }}</strong>
+                                    </label>
+                                </div>
+                                <div class="list-item-description has-text-grey is-size-7">
+                                    {{ "menu_cookie_consent_option_osm_text" | trans }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="navbar-item">
+                    <input
+                        type="submit"
+                        class="button mr-2"
+                        id="cookieAccept"
+                        data-url="{{ path('app_ajax_cookie_accept') }}"
+                        value="{{ "menu_cookie_consent_button_accept" | trans }}"
+                    >
+                </div>
+
+            </form>
+
         </div>
     </div>
 </div>

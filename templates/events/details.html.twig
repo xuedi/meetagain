@@ -92,7 +92,7 @@
                             {{ event.location.street }}<br>
                             {{ event.location.postcode }} {{ event.location.city }}
                         </p>
-                        {% if event.hasMap %}
+                        {% if showMap %}
                             <div class="mt-3" id="osm-map"></div>
                         {% endif %}
                     </div>
@@ -116,7 +116,7 @@
             }
         });
 
-        {% if event.hasMap %}
+        {% if showMap %}
             {% include 'events/detailsOpenStreetMap.js.twig' %}
         {% endif %}
     </script>

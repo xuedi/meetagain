@@ -26,6 +26,18 @@ readonly class GlobalService
         return $this->translationService->getLanguageCodes();
     }
 
+    public function getShowCookieConsent(): bool
+    {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+        return !$session->get('consent_accepted', false);
+    }
+
+    public function getShowOsm(): bool
+    {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+        return $session->get('consent_osm', false);
+    }
+
     public function getAlternativeLanguageCodes(): array
     {
         $request = $this->requestStack->getCurrentRequest();

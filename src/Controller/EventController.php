@@ -59,10 +59,14 @@ class EventController extends AbstractController
             $em->flush();
         }
 
+        $event = $repo->findOneBy(['id' => $id]);
+        $osmConsent = $request->getSession()->get('consent_osm', false);
+
         return $this->render('events/details.html.twig', [
+            'showMap' => ($event->hasMap() && $osmConsent),
             'commentForm' => $form,
             'comments' => $comments->findBy(['event' => $id]), // TODO: use custom repo with builder so userInfos are not lazy load
-            'event' => $repo->findOneBy(['id' => $id]),
+            'event' => $event,
             'user' => $this->getUser() ? $this->getAuthedUser() : null,
         ]);
     }
