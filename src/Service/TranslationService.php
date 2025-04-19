@@ -241,7 +241,7 @@ readonly class TranslationService
             if (!str_contains($name, 'messages')) {
                 continue;
             }
-            $language = str_replace(['messages.', 'messages+intl-icu', '.php'], '', $name);
+            $language = str_replace(['messages.', 'messages+intl-icu.', '.php'], '', $name);
             if (!$this->isValidLanguageCodes($language)) {
                 throw new RuntimeException("Is not a valid language code: '$language' from filename: '$name'");
             }
