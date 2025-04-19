@@ -7,6 +7,7 @@ use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -144,6 +145,11 @@ readonly class TranslationService
         return $this->appParams->get('kernel.enabled_locales');
     }
 
+    public function isValidLanguageCodes(string $code): bool
+    {
+        return in_array($code, $this->appParams->get('kernel.enabled_locales'));
+    }
+
     public function getAltLangList(string $currentLocale, string $currentUri): array
     {
         $altLangList = array_fill_keys($this->getLanguageCodes(), $currentUri);
@@ -232,12 +238,18 @@ readonly class TranslationService
         $finder->files()->in($path)->depth(0)->name(['*.php']);
         foreach ($finder as $file) {
             $language = str_replace(['messages.', '.php'], '', $file->getFilename());
+            if (!$this->isValidLanguageCodes($language)) {
+                throw new RuntimeException("Is not a valid language code: '$language'");
+            }
             $systemTranslations[$language] = include $file->getPathname();
         }
 
         $databaseStrings = $this->translationRepo->getUniqueList();
         foreach ($databaseStrings as $language => $translations) {
             foreach ($translations as $placeholder) {
+                if ($systemTranslations[$language] === null) {
+                    throw new RuntimeException("Could not find any system translations for language: '$language'");
+                }
                 if (!array_key_exists($placeholder, $systemTranslations[$language])) {
                     $entry = $this->translationRepo->findOneBy(['language' => $language, 'placeholder' => $placeholder]);
                     $this->entityManager->remove($entry);
