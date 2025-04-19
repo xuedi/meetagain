@@ -25,6 +25,7 @@ readonly class TranslationService
     ) {
     }
 
+    /** TODO: move to repo */
     public function getMatrix(): array
     {
         $structuredList = [];
@@ -44,6 +45,7 @@ readonly class TranslationService
         return $structuredList;
     }
 
+    /** TODO: move to repo */
     public function saveMatrix(Request $request): void
     {
         $dataBase = $this->translationRepo->buildKeyValueList();
@@ -71,6 +73,7 @@ readonly class TranslationService
         $newTranslations = 0;
         $this->cleanUpTranslationFiles();
         $extractionTime = $this->just->command('translationsExtract');
+        $deletedTranslations = $this->deleteOrphanedTranslations();
 
         $path = $this->kernelProjectDir . '/translations/';
         $dataBase = $this->translationRepo->getUniqueList();
@@ -100,6 +103,7 @@ readonly class TranslationService
         return [
             'count' => $numberTranslationCount,
             'new' => $newTranslations,
+            'deleted' => $deletedTranslations,
             'extractionTime' => $extractionTime,
         ];
     }
@@ -217,5 +221,32 @@ readonly class TranslationService
         }
 
         return $cleanedUp;
+    }
+
+    private function deleteOrphanedTranslations(): int
+    {
+        $orphanedTranslations = 0;
+        $systemTranslations = [];
+        $path = $this->kernelProjectDir . '/translations/';
+        $finder = new Finder();
+        $finder->files()->in($path)->depth(0)->name(['*.php']);
+        foreach ($finder as $file) {
+            $language = str_replace(['messages.', '.php'], '', $file->getFilename());
+            $systemTranslations[$language] = include $file->getPathname();
+        }
+
+        $databaseStrings = $this->translationRepo->getUniqueList();
+        foreach ($databaseStrings as $language => $translations) {
+            foreach ($translations as $placeholder) {
+                if (!array_key_exists($placeholder, $systemTranslations[$language])) {
+                    $entry = $this->translationRepo->findOneBy(['language' => $language, 'placeholder' => $placeholder]);
+                    $this->entityManager->remove($entry);
+                    $orphanedTranslations++;
+                }
+            }
+        }
+        $this->entityManager->flush();
+
+        return $orphanedTranslations;
     }
 }
