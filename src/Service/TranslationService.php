@@ -237,9 +237,13 @@ readonly class TranslationService
         $finder = new Finder();
         $finder->files()->in($path)->depth(0)->name(['*.php']);
         foreach ($finder as $file) {
-            $language = str_replace(['messages.', '.php'], '', $file->getFilename());
+            $name = $file->getFilename();
+            if (!str_contains($name, 'messages')) {
+                continue;
+            }
+            $language = str_replace(['messages.', 'messages+intl-icu', '.php'], '', $name);
             if (!$this->isValidLanguageCodes($language)) {
-                throw new RuntimeException("Is not a valid language code: '$language' from filename: '{$file->getFilename()}");
+                throw new RuntimeException("Is not a valid language code: '$language' from filename: '$name'");
             }
             $systemTranslations[$language] = include $file->getPathname();
         }
