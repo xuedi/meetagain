@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use App\Entity\UserStatus;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -20,10 +21,13 @@ class UserFixture extends Fixture
             $user->setEmail($email);
             $user->setPassword($password);
             $user->setPublic(true);
+            $user->setRestricted(false);
+            $user->setOsmConsent(false);
             $user->setStatus(UserStatus::Active);
             $user->setLocale($locale);
             $user->setRoles($roles);
             $user->setCreatedAt(new DateTimeImmutable());
+            $user->setLastLogin(new DateTime());
 
             $manager->persist($user);
 

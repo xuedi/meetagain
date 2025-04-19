@@ -33,10 +33,12 @@
                 {{ form_row(form.name) }}
                 {{ form_row(form.email) }}
                 {{ form_row(form.bio) }}
+                {{ form_row(form.locale) }}
             </div>
             <div class="column is-3">
                 {{ form_row(form.verified) }}
-                {{ form_row(form.locale) }}
+                {{ form_row(form.restricted) }}
+                {{ form_row(form.osmConsent) }}
                 {{ form_row(form.status) }}
                 {{ form_row(form.roles) }}
             </div>

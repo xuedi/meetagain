@@ -65,6 +65,7 @@ class ProfileController extends AbstractController
         }
 
         return $this->render('profile/index.html.twig', [
+            'lastLogin' => $request->getSession()->get('lastLogin', '-'),
             'user' => $this->getAuthedUser(),
             'upcoming' => $repo->getUpcomingEvents(10),
             'past' => $repo->getPastEvents(20),

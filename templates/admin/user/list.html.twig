@@ -54,7 +54,7 @@
                 <th>Roles</th>
                 <th>Rsvp</th>
                 <th>CreatedAt</th>
-                <th>verified</th>
+                <th>LastLogin</th>
                 <th></th>
             </tr>
             </thead>
@@ -68,7 +68,7 @@
                         <td>{{ user.roles|join(' | ') }}</td>
                         <td>{{ user.rsvpEvents|length }}</td>
                         <td>{{ user.createdAt|date('Y-m-d') }}</td>
-                        <td>{% if user.verified %}Yes{% else %}No{% endif %}</td>
+                        <td>{{ user.createdAt|date('Y-m-d') }}</td>
                         <td><a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"><span class="icon"><i
                                             class="fa fa-edit"></i></span></a></td>
                     </tr>

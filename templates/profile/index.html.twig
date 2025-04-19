@@ -36,8 +36,10 @@
                     <div class="box">
                         <h2 class="title is-5">Infos</h2>
                         <p>Joined: {{ user.createdAt|date('Y-m-d') }}</p>
+                        <p>LastLogin: {{ lastLogin|date('Y-m-d') }}</p>
                         <p>Email: {{ user.email }}</p>
-                        <p>Friends: x</p>
+                        <p>Following: {{ user.following|length }}</p>
+                        <p>Followers: {{ user.followers|length }}</p>
                         <p>Messages: x</p>
                         <p>RSVP: {{ user.getRsvpEvents|length }}</p>
                     </div>
