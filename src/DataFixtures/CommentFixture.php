@@ -43,7 +43,7 @@ class CommentFixture extends Fixture implements DependentFixtureInterface
             [$event, '2015-02-27 09:07', 'xuedi', 'yeah, no one came it was just us :cry:'],
             [$event, '2015-02-27 09:08', 'yimu', 'true, but a start is a start'],
             [$event, '2015-02-27 14:32', 'xuedi', 'i hope next time more people will come'],
-            [$event, '2015-02-28 15:00', 'xiaolong', 'i was there, have you forgotten about me? :angry:'],
+            [$event, '2015-02-28 15:00', 'Crystal Liu', 'i was there, have you forgotten about me? :angry:'],
         ];
     }
 }

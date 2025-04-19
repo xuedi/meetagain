@@ -13,6 +13,7 @@ use App\Service\TranslationService;
 use App\Service\UploadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -48,7 +49,11 @@ class AdminEventController extends AbstractController
             $event->setUser($this->getUser());
 
             // event image
-            $image = $this->uploadService->upload($form, 'image', $this->getUser());
+            $image = null;
+            $imageData = $form->get('image')->getData();
+            if ($imageData instanceof UploadedFile) {
+                $image = $this->uploadService->upload($imageData, $this->getUser());
+            }
             if ($image instanceof Image) {
                 $event->setPreviewImage($image); // TODO: add source for image creation
             }

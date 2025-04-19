@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageFixture extends Fixture implements DependentFixtureInterface
 {
@@ -43,6 +44,28 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
 
         $manager->flush();
         $this->imageService->createThumbnails($defaultImage, [[400, 400], [600, 400]]);
+
+        foreach ($this->getData() as [$path, $name]) {
+            // prepare import user
+            $user = $this->getReference('user_' . md5((string)$name));
+
+            // upload file & thumbnails
+            $uploadedImage = new UploadedFile($path, $name);
+            $image = $this->imageService->upload($uploadedImage, $user);
+            $manager->flush();
+            if($image instanceof Image) {
+                $this->imageService->createThumbnails($image, [[400, 400]]);
+            } else {
+                throw new \RuntimeException('Unable to upload image');
+            }
+
+            // associate image with user
+            $user->setImage($image);
+            $manager->persist($user);
+            $manager->flush();
+        }
+
+
     }
 
     public function getDependencies(): array
@@ -50,5 +73,26 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         return [
             UserFixture::class,
         ];
+    }
+
+
+    private function getData(): array
+    {
+        $fixedUsers = [];
+
+        $files = glob(__DIR__ . "/Avatars/*.jpg");
+        foreach ($files as $path) {
+            $chunks = explode("/", $path);
+            $name = str_replace('.jpg', '', end($chunks));
+            if (in_array($name, ['import', 'yimu'])) {
+                continue;
+            }
+            $fixedUsers[] = [
+                $path,
+                $name,
+            ];
+        }
+
+        return $fixedUsers;
     }
 }

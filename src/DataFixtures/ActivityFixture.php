@@ -49,9 +49,9 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
             ['2025-01-13 12:30:00', 'yimu', UserActivity::RsvpYes, ['event_id' => 6]],
             ['2025-01-15 20:00:00', 'yimu', UserActivity::FollowedUser, ['user_id' => 2]], // xuedi
             ['2025-01-17 09:00:00', 'xuedi', UserActivity::FollowedUser, ['user_id' => 3]], // yimu
-            ['2025-02-01 10:00:00', 'xiaolong', UserActivity::Registered, null],
-            ['2025-02-02 10:00:00', 'xiaolong', UserActivity::Login, null],
-            ['2025-02-03 10:00:00', 'xiaolong', UserActivity::ChangedUsername, ['old' => 'dalong', 'new' => 'xiaolong']],
+            ['2025-02-01 10:00:00', 'Crystal Liu', UserActivity::Registered, null],
+            ['2025-02-02 10:00:00', 'Crystal Liu', UserActivity::Login, null],
+            ['2025-02-03 10:00:00', 'Crystal Liu', UserActivity::ChangedUsername, ['old' => 'dalong', 'new' => 'xiaolong']],
         ];
     }
 }

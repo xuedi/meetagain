@@ -72,7 +72,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'St. Oberholz',
                 ['易木', '雪地'],
-                ['xuedi', 'yimu', 'xiaolong'],
+                ['xuedi', 'yimu', 'Crystal Liu'],
                 EventTypes::Regular,
             ],
             [
@@ -84,7 +84,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Grand Tang',
                 ['易木', '雪地'],
-                ['xuedi', 'yimu', 'user_c'],
+                ['xuedi', 'yimu'],
                 EventTypes::Dinner,
             ],
             [
@@ -96,7 +96,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Garten der Welt',
                 ['易木'],
-                ['xuedi', 'yimu', 'xiaolong', 'user_a', 'user_c'],
+                ['xuedi', 'yimu', 'Crystal Liu'],
                 EventTypes::Outdoor,
             ],
             [
@@ -108,7 +108,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Lao Xiang',
                 ['易木'],
-                ['yimu', 'xiaolong', 'user_a'],
+                ['yimu', 'Crystal Liu'],
                 EventTypes::Dinner,
             ],
             [
@@ -120,7 +120,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Himmelbeet',
                 ['雪地', '易木'],
-                ['xuedi', 'yimu', 'user_b', 'user_c'],
+                ['xuedi', 'yimu'],
                 EventTypes::Outdoor,
             ],
             [
@@ -132,7 +132,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 EventIntervals::BiMonthly,
                 'Volksbar',
                 ['易木', '雪地'],
-                ['xuedi', 'yimu', 'xiaolong', 'user_a', 'user_b', 'user_c'],
+                ['xuedi', 'yimu', 'Crystal Liu'],
                 EventTypes::Regular,
             ],
             [

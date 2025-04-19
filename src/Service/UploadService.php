@@ -24,14 +24,8 @@ readonly class UploadService
     ) {
     }
 
-    public function upload(FormInterface $form, string $fieldName, User $user): ?Image
+    public function upload(UploadedFile $imageData, User $user): ?Image
     {
-        // ensure form has expected type
-        $imageData = $form->get($fieldName)->getData();
-        if (!$imageData instanceof UploadedFile) {
-            return null;
-        }
-
         // load or create
         $hash = sha1($imageData->getContent());
         $image = $this->imageRepo->findOneBy(['hash' => $hash]);

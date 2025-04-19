@@ -13,6 +13,7 @@ use App\Service\ActivityService;
 use App\Service\FriendshipService;
 use App\Service\UploadService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -39,7 +40,14 @@ class ProfileController extends AbstractController
         $form = $this->createForm(ProfileType::class, $this->getAuthedUser());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $image = $uploadService->upload($form, 'image', $this->getAuthedUser());
+
+            // ensure form has expected type
+            $image = null;
+            $imageData = $form->get('image')->getData();
+            if ($imageData instanceof UploadedFile) {
+                $image = $uploadService->upload($imageData, $this->getAuthedUser());
+            }
+
             $newUserName = $form->get('name')->getData();
             if ($oldUserName !== $newUserName) {
                 $message = sprintf("Changed username from '%s' to '%s'", $oldUserName, $newUserName);
