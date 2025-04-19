@@ -239,7 +239,7 @@ readonly class TranslationService
         foreach ($finder as $file) {
             $language = str_replace(['messages.', '.php'], '', $file->getFilename());
             if (!$this->isValidLanguageCodes($language)) {
-                throw new RuntimeException("Is not a valid language code: '$language'");
+                throw new RuntimeException("Is not a valid language code: '$language' from filename: '{$file->getFilename()}");
             }
             $systemTranslations[$language] = include $file->getPathname();
         }
