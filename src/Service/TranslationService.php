@@ -74,7 +74,7 @@ readonly class TranslationService
         $newTranslations = 0;
         $this->cleanUpTranslationFiles();
         $extractionTime = $this->just->command('translationsExtract');
-        $deletedTranslations = $this->deleteOrphanedTranslations();
+        $deletedTranslations = 0; //$this->deleteOrphanedTranslations();
 
         $path = $this->kernelProjectDir . '/translations/';
         $dataBase = $this->translationRepo->getUniqueList();

@@ -12,7 +12,7 @@
                     <div class="box">
                         {{ form_start(form) }}
 
-                        <h1 class="subtitle">{{ "p: Please register"|trans }}</h1>
+                        <h1 class="subtitle">{{ "page_register_headline"|trans }}</h1>
 
                         {% for flash_error in app.flashes('verify_email_error') %}
                             <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
