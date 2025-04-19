@@ -6,5 +6,9 @@ controllers:
     prefix: /{_locale}
 
 api:
-    resource: ../src/Controller/ApiController.php
     type: attribute
+    resource: ../src/Controller/NonLocale/ApiController.php
+
+ajax:
+    type: attribute
+    resource: ../src/Controller/NonLocale/AjaxController.php

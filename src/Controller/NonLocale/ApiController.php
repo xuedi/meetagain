@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\NonLocale;
 
+use App\Controller\AbstractController;
 use App\Repository\TranslationRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +14,7 @@ class ApiController extends AbstractController
     #[Route('/', name: 'app_api')]
     public function index(): Response
     {
-        return $this->render('api/index.html.twig');
+        return $this->render('_non_locale/api.html.twig');
     }
 
     #[Route('/translations', name: 'app_api_translations', methods: ['GET'])]
