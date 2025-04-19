@@ -61,6 +61,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $verified = false;
 
+    #[ORM\Column]
+    private ?bool $restricted = false;
+
+    #[ORM\Column]
+    private ?bool $osmConsent = false;
+
     /**
      * @var Collection<int, Activity>
      */
@@ -353,5 +359,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getFriends(): array {
         return [];
+    }
+
+    public function isRestricted(): ?bool
+    {
+        return $this->restricted;
+    }
+
+    public function setRestricted(bool $restricted): static
+    {
+        $this->restricted = $restricted;
+
+        return $this;
+    }
+
+    public function isOsmConsent(): ?bool
+    {
+        return $this->osmConsent;
+    }
+
+    public function setOsmConsent(bool $osmConsent): static
+    {
+        $this->osmConsent = $osmConsent;
+
+        return $this;
     }
 }

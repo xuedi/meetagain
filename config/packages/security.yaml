@@ -27,9 +27,9 @@ security:
                 interval: '15 minutes'
 
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/manage, roles: ROLE_MANAGER }
-        - { path: ^/profile, roles: ROLE_USER }
+        - { path: "^/[a-z]{2}/admin", roles: ROLE_ADMIN }
+        - { path: "^/[a-z]{2}/manage", roles: ROLE_MANAGER }
+        - { path: "^/[a-z]{2}/profile", roles: ROLE_USER }
 
 when@test:
     security:

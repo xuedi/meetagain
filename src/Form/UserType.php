@@ -72,7 +72,21 @@ class UserType extends AbstractType
                 'verified', ChoiceType::class, [
                 'data' => $user->isVerified(),
                 'mapped' => false,
-                'label' => 'Verified',
+                'label' => 'Verified Regular',
+                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+            ])
+            ->add(
+                'restricted', ChoiceType::class, [
+                'data' => $user->isRestricted(),
+                'mapped' => false,
+                'label' => 'Restricted',
+                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+            ])
+            ->add(
+                'osmConsent', ChoiceType::class, [
+                'data' => $user->isOsmConsent(),
+                'mapped' => false,
+                'label' => 'OsmConsent',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
             ])
             ->add(
