@@ -69,6 +69,7 @@ readonly class TranslationService
     {
         $numberTranslationCount = 0;
         $newTranslations = 0;
+        $this->cleanUpTranslationFiles();
         $extractionTime = $this->just->command('translationsExtract');
 
         $path = $this->kernelProjectDir . '/translations/';
@@ -105,18 +106,10 @@ readonly class TranslationService
 
     public function publish(): array
     {
-        $cleanedUp = 0;
         $published = 0;
-        $locales = $this->appParams->get('kernel.enabled_locales');
-
-        // clean up old translation files
+        $cleanedUp = $this->cleanUpTranslationFiles();
         $path = $this->kernelProjectDir . '/translations/';
-        $finder = new Finder();
-        $finder->files()->in($path)->depth(0)->name(['*.php']);
-        foreach ($finder as $file) {
-            $this->fs->remove($file->getPathname());
-            $cleanedUp++;
-        }
+        $locales = $this->appParams->get('kernel.enabled_locales');
 
         // create new translation files
         foreach ($locales as $locale) {
@@ -210,5 +203,19 @@ readonly class TranslationService
             }
         }
         return $cleanedList;
+    }
+
+    private function cleanUpTranslationFiles(): int
+    {
+        $cleanedUp = 0;
+        $path = $this->kernelProjectDir . '/translations/';
+        $finder = new Finder();
+        $finder->files()->in($path)->depth(0)->name(['*.php']);
+        foreach ($finder as $file) {
+            $this->fs->remove($file->getPathname());
+            $cleanedUp++;
+        }
+
+        return $cleanedUp;
     }
 }
