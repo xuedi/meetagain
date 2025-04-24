@@ -24,6 +24,7 @@ readonly class UploadService
     ) {
     }
 
+    // TODO: always write down the source in ImagesUsageLocation
     public function upload(UploadedFile $imageData, User $user): ?Image
     {
         // load or create

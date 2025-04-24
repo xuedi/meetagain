@@ -5,7 +5,6 @@ namespace App\EventSubscriber;
 use App\Entity\NotFoundLog;
 use App\Service\CmsService;
 use App\Service\SitemapService;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
