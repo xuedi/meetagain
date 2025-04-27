@@ -11,7 +11,8 @@ deploy:
     composer install --no-dev --optimize-autoloader
     php bin/console asset-map:compile
     php bin/console doctrine:migrations:migrate --allow-no-migration --no-interaction
-    APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear
+    php bin/console cache:clear --env=prod
+    php bin/console cache:warmup --env=prod
 
 install:
     cp -n .env.dist .env
