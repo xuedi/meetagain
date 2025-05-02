@@ -39,6 +39,7 @@ class RegistrationController extends AbstractController
             $user->setPublic(true);
             $user->setLocale($request->getLocale());
             $user->setRegcode(sha1(random_bytes(128)));
+            $user->setLastLogin(new DateTimeImmutable());
             $user->setCreatedAt(new DateTimeImmutable());
 
             $em->persist($user);
