@@ -15,6 +15,7 @@ class Hero implements BlockType
     ) {
     }
 
+    #[\Override]
     public static function fromJson(array $json): self
     {
         return new self(
@@ -26,11 +27,13 @@ class Hero implements BlockType
         );
     }
 
+    #[\Override]
     public static function getType(): CmsBlockTypes
     {
         return CmsBlockTypes::Hero;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return [

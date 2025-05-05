@@ -11,6 +11,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class LocationFixture extends Fixture implements DependentFixtureInterface
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as [$name, $street, $city, $postcode, $description, $long, $lat]) {
@@ -32,6 +33,7 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
         $manager->flush();
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [

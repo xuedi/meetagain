@@ -8,14 +8,15 @@ use Twig\TwigFunction;
 
 class AssetExistsExtension extends AbstractExtension
 {
-    public function __construct(private string $kernelProjectDir)
+    public function __construct(private readonly string $kernelProjectDir)
     {
     }
 
+    #[\Override]
     public function getFunctions(): array
     {
         return [
-           new TwigFunction('asset_exists', [$this, 'assetExists']),
+           new TwigFunction('asset_exists', $this->assetExists(...)),
         ];
     }
 

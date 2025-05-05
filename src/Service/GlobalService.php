@@ -14,7 +14,7 @@ readonly class GlobalService
     public function getCurrentLocale(): string
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request !== null) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             return $request->getLocale();
         }
 
@@ -41,7 +41,7 @@ readonly class GlobalService
     public function getAlternativeLanguageCodes(): array
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request !== null) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $currentUri = $request->getRequestUri();
             $currentLocale = $request->getLocale();
             if(!str_starts_with($currentUri, '/_profiler')) {

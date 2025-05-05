@@ -50,6 +50,9 @@ test:
 
 check:
     vendor/bin/rector process src --dry-run -c tests/rector.php
-    vendor/bin/phpstan analyse -c tools/phpstan.neon
+    vendor/bin/phpstan analyse -c tests/phpstan.neon
     #vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
     #phpcs --_all inline since cant give config as parameter
+
+fix:
+    vendor/bin/rector process src -c tests/rector.php

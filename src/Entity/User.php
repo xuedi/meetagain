@@ -114,6 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @see UserInterface
      */
+    #[\Override]
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -124,6 +125,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return list<string>
      */
+    #[\Override]
     public function getRoles(): array
     {
         return $this->roles;
@@ -139,6 +141,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[\Override]
     public function getPassword(): ?string
     {
         return $this->password;
@@ -154,6 +157,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
+    #[\Override]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
@@ -312,11 +316,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeActivity(Activity $activity): static
     {
-        if ($this->activities->removeElement($activity)) {
-            // set the owning side to null (unless already changed)
-            if ($activity->getUser() === $this) {
-                $activity->setUser(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->activities->removeElement($activity) && $activity->getUser() === $this) {
+            $activity->setUser(null);
         }
 
         return $this;

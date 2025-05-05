@@ -67,7 +67,7 @@ class EventController extends AbstractController
             'commentForm' => $form,
             'comments' => $comments->findBy(['event' => $id]), // TODO: use custom repo with builder so userInfos are not lazy load
             'event' => $event,
-            'user' => $this->getUser() ? $this->getAuthedUser() : null,
+            'user' => $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface ? $this->getAuthedUser() : null,
         ]);
     }
 

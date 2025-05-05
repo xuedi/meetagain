@@ -9,9 +9,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 // TODO: deduplicate thumbnail generation
 readonly class UploadService

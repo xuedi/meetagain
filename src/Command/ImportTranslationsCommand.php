@@ -18,11 +18,13 @@ class ImportTranslationsCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this->addArgument('url', InputArgument::REQUIRED, 'Url of translation API');
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->translationService->importForLocalDevelopment($input->getArgument('url'));

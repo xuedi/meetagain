@@ -172,7 +172,7 @@ class AdminCmsController extends AbstractController
     {
         $repo = $em->getRepository(CmsBlock::class);
         $block = $repo->find($request->get('blockId'));
-        if ($block) {
+        if ($block !== null) {
             $block->setJson($this->getBlock($request->get('blockType'), $request->getPayload()->all())->toArray());
             $em->persist($block);
             $em->flush();
@@ -191,7 +191,7 @@ class AdminCmsController extends AbstractController
     {
         $repo = $em->getRepository(CmsBlock::class);
         $block = $repo->find($request->get('blockId'));
-        if ($block) {
+        if ($block !== null) {
             $em->remove($block);
             $em->flush();
         } else {
@@ -222,7 +222,7 @@ class AdminCmsController extends AbstractController
         // update half up or down
         $repo = $em->getRepository(CmsBlock::class);
         $block = $repo->find($blockId);
-        if ($block) {
+        if ($block !== null) {
             $block->setPriority($block->getPriority()+$value);
             $em->persist($block);
             $em->flush();

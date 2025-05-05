@@ -6,23 +6,23 @@ use App\Entity\CmsBlockTypes;
 
 class Text implements BlockType
 {
-    public string $content;
-
-    private function __construct(string $content)
+    private function __construct(public string $content)
     {
-        $this->content = $content;
     }
 
+    #[\Override]
     public static function fromJson(array $json): self
     {
         return new self($json['content']);
     }
 
+    #[\Override]
     public static function getType(): CmsBlockTypes
     {
         return CmsBlockTypes::Text;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return [

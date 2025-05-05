@@ -25,7 +25,7 @@ class CmsBlockRepository extends ServiceEntityRepository
                 ->select('MAX(b.priority)')
                 ->getQuery()
                 ->getSingleScalarResult();
-        } catch (\Throwable $th) {
+        } catch (\Throwable) {
             return 1;
         }
     }

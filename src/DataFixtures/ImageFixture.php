@@ -18,6 +18,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
     ) {
     }
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $defaultImage = new Image();
@@ -68,6 +69,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
 
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [

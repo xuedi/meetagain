@@ -19,6 +19,7 @@ class EventTranslationFixture extends Fixture implements DependentFixtureInterfa
     {
     }
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as $data) {
@@ -35,6 +36,7 @@ class EventTranslationFixture extends Fixture implements DependentFixtureInterfa
         $manager->flush();
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [

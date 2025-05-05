@@ -7,6 +7,7 @@ use Twig\TwigFilter;
 
 final class FormatBytesExtension extends AbstractExtension
 {
+    #[\Override]
     public function getFilters(): array
     {
         return [

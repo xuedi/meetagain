@@ -11,6 +11,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class UserFixture extends Fixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as [$locale, $name, $email, $password, $roles, $isVerified, $status]) {

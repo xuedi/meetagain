@@ -85,7 +85,7 @@ readonly class TranslationService
         foreach ($finder as $file) {
             [$name, $lang, $ext] = explode('.', $file->getFilename());
             $translations = $this->removeDuplicates(include($file->getPathname()));
-            foreach ($translations as $placeholder => $translationMessage) {
+            foreach (array_keys($translations) as $placeholder) {
                 if (!in_array($placeholder, $dataBase[$lang], true)) {
                     $translation = new Translation();
                     $translation->setLanguage($lang);
@@ -227,42 +227,5 @@ readonly class TranslationService
         }
 
         return $cleanedUp;
-    }
-
-    private function deleteOrphanedTranslations(): int
-    {
-        $orphanedTranslations = 0;
-        $systemTranslations = [];
-        $path = $this->kernelProjectDir . '/translations/';
-        $finder = new Finder();
-        $finder->files()->in($path)->depth(0)->name(['*.php']);
-        foreach ($finder as $file) {
-            $name = $file->getFilename();
-            if (!str_contains($name, 'messages')) {
-                continue;
-            }
-            $language = str_replace(['messages.', 'messages+intl-icu.', '.php'], '', $name);
-            if (!$this->isValidLanguageCodes($language)) {
-                throw new RuntimeException("Is not a valid language code: '$language' from filename: '$name'");
-            }
-            $systemTranslations[$language] = include $file->getPathname();
-        }
-
-        $databaseStrings = $this->translationRepo->getUniqueList();
-        foreach ($databaseStrings as $language => $translations) {
-            foreach ($translations as $placeholder) {
-                if ($systemTranslations[$language] === null) {
-                    throw new RuntimeException("Could not find any system translations for language: '$language'");
-                }
-                if (!array_key_exists($placeholder, $systemTranslations[$language])) {
-                    $entry = $this->translationRepo->findOneBy(['language' => $language, 'placeholder' => $placeholder]);
-                    $this->entityManager->remove($entry);
-                    $orphanedTranslations++;
-                }
-            }
-        }
-        $this->entityManager->flush();
-
-        return $orphanedTranslations;
     }
 }

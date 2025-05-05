@@ -22,8 +22,8 @@ class DashboardService
     private DateTimeImmutable $weekStartDate;
     private DateTimeImmutable $weekStopDate;
 
-    private EntityRepository $notFoundRepo;
-    private EntityRepository $userRepo;
+    private readonly EntityRepository $notFoundRepo;
+    private readonly EntityRepository $userRepo;
 
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -35,37 +35,26 @@ class DashboardService
 
     public function getTimeControl(): array
     {
-        $details = [];
-        $details['week'] = $this->week;
-        $details['year'] = $this->year;
-        $details['weekNext'] = $this->weekNext;
-        $details['weekPrevious'] = $this->weekPrevious;
-        $details['weekDetails'] = sprintf("%s - %s",
+        return ['week' => $this->week, 'year' => $this->year, 'weekNext' => $this->weekNext, 'weekPrevious' => $this->weekPrevious, 'weekDetails' => sprintf("%s - %s",
             $this->weekStartDate->format('Y-m-d'),
             $this->weekStopDate->format('Y-m-d'),
-        );
-        return $details;
+        )];
     }
 
     public function getDetails(): array
     {
-        $details = [];
-        $details['memberCount'] = $this->userRepo->count();
-        $details['notFoundCount'] = $this->notFoundRepo->matching($this->timeCrit())->count();
-        return $details;
+        return ['memberCount' => $this->userRepo->count(), 'notFoundCount' => $this->notFoundRepo->matching($this->timeCrit())->count()];
     }
 
     public function getPagesNotFound(): array
     {
-        $details = [];
-        $details['list'] = $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate);
-        return $details;
+        return ['list' => $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate)];
     }
 
     public function setTime(?int $year, ?int $week): void
     {
-        $this->year = ($year === null) ? (int)new DateTime()->format('Y') : $year;
-        $this->week = ($week === null) ? (int)new DateTime()->format('W') : $week;
+        $this->year = $year ?? (int)(new DateTime())->format('Y');
+        $this->week = $week ?? (int)(new DateTime())->format('W');
 
         $tmpDate = new DateTime();
         $tmpDate->setISODate($this->year, $this->week);

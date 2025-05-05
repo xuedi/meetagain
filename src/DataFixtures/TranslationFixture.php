@@ -10,6 +10,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class TranslationFixture extends Fixture implements DependentFixtureInterface
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $languageCode = ['cn','de','en'];
@@ -31,6 +32,7 @@ class TranslationFixture extends Fixture implements DependentFixtureInterface
         $manager->flush();
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [

@@ -11,11 +11,12 @@ use Twig\Environment;
 readonly class SitemapService
 {
     public function __construct(
-        private Environment           $twig,
-        private CmsService            $cms,
-        private EventRepository       $events,
+        private Environment $twig,
+        private CmsService $cms,
+        private EventRepository $events,
         private ParameterBagInterface $appParams,
-    ) {
+    )
+    {
     }
 
     public function getContent(string $host): Response
@@ -33,7 +34,7 @@ readonly class SitemapService
 
         return new Response($this->twig->render('sitemap/index.xml.twig', [
             'sites' => $sites,
-        ]), Response::HTTP_OK, ['Content-Type' =>  'text/xml']);
+        ]), Response::HTTP_OK, ['Content-Type' => 'text/xml']);
     }
 
     private function getCmsPages(string $host, string $locale): array
@@ -55,7 +56,7 @@ readonly class SitemapService
         foreach (['', 'events', 'members'] as $site) {
             $sites[] = [
                 'loc' => sprintf('https://%s/%s/%s', $host, $locale, $site),
-                'lastmod' => new DateTime()->format('Y-m-d'),
+                'lastmod' => (new DateTime())->format('Y-m-d'),
                 'prio' => 0.9,
             ];
         }

@@ -18,6 +18,7 @@ readonly class UserLocaleSubscriber implements EventSubscriberInterface
         $this->requestStack->getSession()->set('_locale', $user->getLocale());
     }
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

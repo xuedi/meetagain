@@ -267,15 +267,10 @@ class Event
 
     public function hasMap(): bool
     {
-        if($this->getLocation() === null) {
+        if(!$this->getLocation() instanceof \App\Entity\Location) {
             return false;
         }
-
-        if($this->getLocation()->getLatitude() === null || $this->getLocation()->getLongitude() === null) {
-            return false;
-        }
-
-        return true;
+        return $this->getLocation()->getLatitude() !== null && $this->getLocation()->getLongitude() !== null;
     }
 
     public function getTitle(string $language): string
@@ -308,11 +303,9 @@ class Event
 
     public function removeComment(Comment $comment): static
     {
-        if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
-            if ($comment->getEvent() === $this) {
-                $comment->setEvent(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->comments->removeElement($comment) && $comment->getEvent() === $this) {
+            $comment->setEvent(null);
         }
 
         return $this;
@@ -345,10 +338,8 @@ class Event
 
     public function removeTranslation(Comment $translation): static
     {
-        if ($this->translations->removeElement($translation)) {
-            if ($translation->getEvent() === $this) {
-                $translation->setEvent(null);
-            }
+        if ($this->translations->removeElement($translation) && $translation->getEvent() === $this) {
+            $translation->setEvent(null);
         }
 
         return $this;

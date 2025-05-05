@@ -17,12 +17,13 @@ class UserChecker implements UserCheckerInterface
 {
     public function __construct(
         private readonly ActivityService $activityService,
-        private EntityManagerInterface $em,
-        private RequestStack $requestStack,
+        private readonly EntityManagerInterface $em,
+        private readonly RequestStack $requestStack,
     )
     {
     }
 
+    #[\Override]
     public function checkPreAuth(UserInterface $user): void
     {
         if (!$user instanceof User) {
@@ -34,6 +35,7 @@ class UserChecker implements UserCheckerInterface
         }
     }
 
+    #[\Override]
     public function checkPostAuth(UserInterface $user): void
     {
         if (!$user instanceof User) {

@@ -32,7 +32,7 @@ class MemberController extends AbstractController
                 'userDetails' => $userDetails,
                 'isFollow' => $currentUser->getFollowing()->contains($userDetails),
             ]);
-        } catch (AuthenticationCredentialsNotFoundException $e) {
+        } catch (AuthenticationCredentialsNotFoundException) {
             return $this->render('member/403.html.twig');
         }
     }

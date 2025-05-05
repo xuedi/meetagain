@@ -24,7 +24,7 @@ class AdminLogsController extends AbstractController
     {
         $logs = $this->getLogList();
         return $this->render('admin/logs/system_list.html.twig', [
-            'content' => empty($logs) ? '' : $this->getLogContent($logs[$id]['source']),
+            'content' => $logs === [] ? '' : $this->getLogContent($logs[$id]['source']),
             'logs' => $logs,
         ]);
     }
@@ -53,7 +53,7 @@ class AdminLogsController extends AbstractController
         $lines = explode("\n", $content);
         $logList = [];
         foreach ($lines as $line) {
-            if (empty($line)) {
+            if ($line === '' || $line === '0') {
                 continue;
             }
             $logList[] = LogEntry::fromString($line);

@@ -10,9 +10,9 @@ use Throwable;
 // TODO: add strict validation and refactor more php 8'y
 class LogEntry
 {
-    private DateTimeImmutable $date;
-    private string $type;
-    private string $level;
+    private readonly DateTimeImmutable $date;
+    private readonly string $type;
+    private readonly string $level;
     private string $message;
     private ?string $json = null;
 

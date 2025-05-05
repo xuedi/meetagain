@@ -27,7 +27,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
         //$dbal = $this->getDoctrine()->getConnection();
         //$idsAndNames = $dbal->executeQuery('SELECT id, name FROM Categories')->fetchAll(\PDO::FETCH_KEY_PAIR);
 
-        $unhydratedList = $this->getEntityManager('nf')
+        $unhydratedList = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('DATE_FORMAT(nf.createdAt, \'%W\') AS groupedDay', 'COUNT(nf.id) as number')
             ->from(NotFoundLog::class, 'nf')

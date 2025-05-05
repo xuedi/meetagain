@@ -9,6 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class HostFixture extends Fixture implements DependentFixtureInterface
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as [$name, $user]) {
@@ -25,6 +26,7 @@ class HostFixture extends Fixture implements DependentFixtureInterface
         $manager->flush();
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [

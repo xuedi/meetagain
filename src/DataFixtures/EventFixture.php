@@ -14,14 +14,15 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class EventFixture extends Fixture implements DependentFixtureInterface
 {
-    private const IS_INITIAL = true;
-    private const NO_RECURRING_OF = null;
-    private const NO_RECURRING_RULE = null;
+    private const bool IS_INITIAL = true;
+    private const null NO_RECURRING_OF = null;
+    private const null NO_RECURRING_RULE = null;
 
-    public function __construct(private readonly Filesystem $fs)
+    public function __construct()
     {
     }
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as $data) {
@@ -50,6 +51,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
         $manager->flush();
     }
 
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -157,10 +159,5 @@ class EventFixture extends Fixture implements DependentFixtureInterface
         }
 
         return new DateTime($text);
-    }
-
-    private function getBlob(string $string): string
-    {
-        return $this->fs->readFile(__DIR__ . "/blobs/Event_$string.txt");
     }
 }

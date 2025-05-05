@@ -16,10 +16,12 @@ class EventExtentCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     protected function configure(): void
     {
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->eventService->extentRecurringEvents();

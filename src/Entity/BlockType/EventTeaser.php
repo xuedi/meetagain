@@ -12,6 +12,7 @@ class EventTeaser implements BlockType
     ) {
     }
 
+    #[\Override]
     public static function fromJson(array $json): self
     {
         return new self(
@@ -20,11 +21,13 @@ class EventTeaser implements BlockType
         );
     }
 
+    #[\Override]
     public static function getType(): CmsBlockTypes
     {
         return CmsBlockTypes::EventTeaser;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return [

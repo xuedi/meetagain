@@ -9,6 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class ConfigFixture extends Fixture
 {
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as [$name, $value, $type]) {

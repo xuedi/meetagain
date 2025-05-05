@@ -6,25 +6,23 @@ use App\Entity\CmsBlockTypes;
 
 class Paragraph implements BlockType
 {
-    public string $title;
-    public string $content;
-
-    private function __construct(string $title, string $content)
+    private function __construct(public string $title, public string $content)
     {
-        $this->title = $title;
-        $this->content = $content;
     }
 
+    #[\Override]
     public static function fromJson(array $json): self
     {
         return new self($json['title'], $json['content']);
     }
 
+    #[\Override]
     public static function getType(): CmsBlockTypes
     {
         return CmsBlockTypes::Paragraph;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return [

@@ -6,23 +6,23 @@ use App\Entity\CmsBlockTypes;
 
 class Image implements BlockType
 {
-    public string $id;
-
-    private function __construct(string $id)
+    private function __construct(public string $id)
     {
-        $this->id = $id;
     }
 
+    #[\Override]
     public static function fromJson(array $json): self
     {
         return new self($json['id']);
     }
 
+    #[\Override]
     public static function getType(): CmsBlockTypes
     {
         return CmsBlockTypes::Image;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return [
