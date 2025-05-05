@@ -230,7 +230,6 @@ class AdminCmsController extends AbstractController
             throw new RuntimeException('Could not load block');
         }
 
-
         // rebuild order
         $priority = 1;
         $blocks = $em->getRepository(CmsBlock::class)->findBy([

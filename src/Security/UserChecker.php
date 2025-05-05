@@ -42,7 +42,12 @@ class UserChecker implements UserCheckerInterface
             return;
         }
 
-        $this->requestStack->getCurrentRequest()->getSession()->set('lastLogin', $user->getLastLogin());
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            return;
+        }
+
+        $request->getSession()->set('lastLogin', $user->getLastLogin());
 
         $user->setLastLogin(new DateTime());
         $this->em->persist($user);

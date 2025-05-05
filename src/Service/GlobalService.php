@@ -28,14 +28,13 @@ readonly class GlobalService
 
     public function getShowCookieConsent(): bool
     {
-        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
         return !$session->get('consent_accepted', false);
     }
 
     public function getShowOsm(): bool
     {
-        $session = $this->requestStack->getCurrentRequest()->getSession();
-        return $session->get('consent_osm', false);
+        return $this->requestStack->getCurrentRequest()?->getSession()->get('consent_osm', false) ?? false;
     }
 
     public function getAlternativeLanguageCodes(): array

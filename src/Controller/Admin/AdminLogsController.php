@@ -32,7 +32,7 @@ class AdminLogsController extends AbstractController
     private function getLogList(): array
     {
         $list = [];
-        $logPath = realpath(__DIR__ . '/../../../var/log/');
+        $logPath = dirname(__DIR__, 3) . '/var/log/';
         $logFiles = glob($logPath . '/*.log');
 
         foreach ($logFiles as $logFile) { // TODO: turn into array map function
