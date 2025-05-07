@@ -6,7 +6,8 @@ use App\Entity\CmsBlockTypes;
 
 class Title implements BlockType
 {
-    private function __construct(public string $title) {
+    private function __construct(public string $title)
+    {
     }
 
     #[\Override]

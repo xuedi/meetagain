@@ -40,7 +40,6 @@ class ProfileController extends AbstractController
         $form = $this->createForm(ProfileType::class, $this->getAuthedUser());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
             // ensure form has expected type
             $image = null;
             $imageData = $form->get('image')->getData();

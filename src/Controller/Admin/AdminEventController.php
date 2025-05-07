@@ -38,12 +38,12 @@ class AdminEventController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
-    public function eventEdit(Request $request, Event $event): Response {
+    public function eventEdit(Request $request, Event $event): Response
+    {
 
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
             // overwrite basic data
             $event->setInitial(true);
             $event->setUser($this->getUser());

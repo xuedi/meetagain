@@ -18,7 +18,7 @@ class AjaxController extends AbstractController
     }
 
     #[Route('/cookie', name: 'app_ajax_cookie_accept', methods: ['GET'])]
-    public function AcceptCookiesIndex(Request $request): Response
+    public function acceptCookiesIndex(Request $request): Response
     {
         $request->getSession()->set('consent_accepted', true);
         if ($request->get('osmConsent') === 'true') {

@@ -19,7 +19,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
         parent::__construct($registry, NotFoundLog::class);
     }
 
-    public function getWeekSummary(DateTimeImmutable $startDate, DateTimeImmutable $endDate, ): array
+    public function getWeekSummary(DateTimeImmutable $startDate, DateTimeImmutable $endDate,): array
     {
         // TODO: remove custom stuff (doctrine.yaml::DoctrineExtensions\Query\Mysql\DateFormat) and find a upstream way
         //       also fill up dateRange in sql and return key value pair straight as array

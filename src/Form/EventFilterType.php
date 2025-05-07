@@ -23,7 +23,9 @@ class EventFilterType extends AbstractType
     {
         $builder
             ->add(
-                'time', ChoiceType::class, [
+                'time',
+                ChoiceType::class,
+                [
                     'data' => EventFilterTime::Future,
                     'label' => false,
                     'choices' => [
@@ -34,7 +36,9 @@ class EventFilterType extends AbstractType
                 ]
             )
             ->add(
-                'sort', ChoiceType::class, [
+                'sort',
+                ChoiceType::class,
+                [
                     'data' => EventFilterSort::OldToNew,
                     'label' => false,
                     'choices' => [
@@ -44,7 +48,9 @@ class EventFilterType extends AbstractType
                 ]
             )
             ->add(
-                'type', ChoiceType::class, [
+                'type',
+                ChoiceType::class,
+                [
                     'data' => EventTypes::All,
                     'label' => false,
                     'choices' => [
@@ -56,7 +62,9 @@ class EventFilterType extends AbstractType
                 ]
             )
             ->add(
-                'rsvp', ChoiceType::class, [
+                'rsvp',
+                ChoiceType::class,
+                [
                     'data' => EventFilterRsvp::All,
                     'label' => false,
                     'choices' => [

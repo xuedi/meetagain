@@ -70,7 +70,7 @@ class RegistrationController extends AbstractController
     public function verifyUserEmail(UserRepository $repo, EntityManagerInterface $em, string $code): Response
     {
         $user = $repo->findOneBy(['regcode' => $code]);
-        if ($user===null) {
+        if ($user === null) {
             return $this->render('registration/error.html.twig');
         }
         $user->setStatus(UserStatus::EmailVerified);

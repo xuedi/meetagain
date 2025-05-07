@@ -334,21 +334,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->followers;
     }
 
-    public function addFollower(User $user): void {
+    public function addFollower(User $user): void
+    {
         if (!$this->followers->contains($user)) {
             $this->followers->add($user);
             $user->addFollowing($this);
         }
     }
 
-    public function removeFollower(User $user): void {
+    public function removeFollower(User $user): void
+    {
         if ($this->followers->contains($user)) {
             $this->followers->removeElement($user);
             $user->removeFollowing($this);
         }
     }
 
-    public function addFollowing(User $user): void {
+    public function addFollowing(User $user): void
+    {
         if ($this->getId() === $user->getId()) {
             return;
         }
@@ -358,13 +361,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->following->add($user);
     }
 
-    public function removeFollowing(User $user): void {
+    public function removeFollowing(User $user): void
+    {
         if ($this->following->contains($user)) {
             $this->following->removeElement($user);
         }
     }
 
-    public function getFriends(): array {
+    public function getFriends(): array
+    {
         return [];
     }
 

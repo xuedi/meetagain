@@ -223,7 +223,7 @@ class AdminCmsController extends AbstractController
         $repo = $em->getRepository(CmsBlock::class);
         $block = $repo->find($blockId);
         if ($block !== null) {
-            $block->setPriority($block->getPriority()+$value);
+            $block->setPriority($block->getPriority() + $value);
             $em->persist($block);
             $em->flush();
         } else {
@@ -243,6 +243,5 @@ class AdminCmsController extends AbstractController
             $em->persist($block);
         }
         $em->flush();
-
     }
 }

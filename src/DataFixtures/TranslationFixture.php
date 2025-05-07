@@ -18,7 +18,6 @@ class TranslationFixture extends Fixture implements DependentFixtureInterface
         $importUser = $this->getReference('user_' . md5('import'));
         foreach ($this->getData() as [$placeholder, $translation]) {
             foreach ($languageSet as $index) {
-
                 $user = new Translation();
                 $user->setLanguage($languageCode[$index]);
                 $user->setUser($importUser);

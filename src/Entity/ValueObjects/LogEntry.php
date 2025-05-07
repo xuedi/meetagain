@@ -33,10 +33,9 @@ class LogEntry
             $this->message = trim(substr($line, 0, strpos($line, '{')));
             $this->json = trim(substr($line, strpos($line, '{') - 1));
         }
-
     }
 
-    static function fromString(string $line): self
+    public static function fromString(string $line): self
     {
         return new self($line);
     }

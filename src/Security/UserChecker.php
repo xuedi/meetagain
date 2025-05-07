@@ -20,8 +20,7 @@ readonly class UserChecker implements UserCheckerInterface
         private ActivityService $activityService,
         private EntityManagerInterface $em,
         private RequestStack $requestStack,
-    )
-    {
+    ) {
     }
 
     #[\Override]

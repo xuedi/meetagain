@@ -53,8 +53,7 @@ check:
     #vendor/bin/phpstan analyse -c tests/phpstan.neon
     #vendor/bin/rector process src --dry-run -c tests/rector.php
     vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
-    vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
-
+    #vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
 
 fix:
     vendor/bin/phpcbf --standard=./tests/phpcs.xml

@@ -57,28 +57,33 @@ class ProfileType extends AbstractType
                 ]),
             ],
         ])->add(
-            'public', ChoiceType::class, [
+            'public',
+            ChoiceType::class,
+            [
                 'data' => $user->isPublic(),
                 'mapped' => false,
                 'label' => 'Public profile:',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
             ]
         )->add(
-            'languages', ChoiceType::class, [
+            'languages',
+            ChoiceType::class,
+            [
                 'data' => $user->getLocale(),
                 'mapped' => false,
                 'label' => 'Language after login:',
                 'choices' => $languageList,
             ]
         )->add(
-            'bio', TextareaType::class, [
+            'bio',
+            TextareaType::class,
+            [
                 'data' => $user->getBio(),
                 'required' => false,
                 'mapped' => false,
                 'label' => 'Bio:',
             ]
         );
-
     }
 
     #[\Override]

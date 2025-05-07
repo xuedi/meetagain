@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageFixture extends Fixture implements DependentFixtureInterface
 {
-
     public function __construct(
         private readonly UploadService $imageService,
     ) {
@@ -54,7 +53,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
             $uploadedImage = new UploadedFile($path, $name);
             $image = $this->imageService->upload($uploadedImage, $user);
             $manager->flush();
-            if($image instanceof Image) {
+            if ($image instanceof Image) {
                 $this->imageService->createThumbnails($image, [[400, 400]]);
             } else {
                 throw new \RuntimeException('Unable to upload image');
@@ -65,8 +64,6 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
             $manager->persist($user);
             $manager->flush();
         }
-
-
     }
 
     #[\Override]

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="../vendor/squizlabs/php_codesniffer/phpcs.xsd">
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../vendor/squizlabs/php_codesniffer/phpcs.xsd">
 
     <arg name="basepath" value=".."/>
     <arg name="cache" value=".phpcs-cache"/>
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
 
+    <rule ref="PSR2"/>
     <rule ref="PSR12"/>
 
-    <rule ref= "Generic.Files.LineLength">
+    <rule ref="Generic.Files.LineLength">
         <properties>
             <property name="lineLimit" value="140"/>
             <property name="absoluteLineLimit" value="180"/>
@@ -20,6 +20,7 @@
     <rule ref="PSR12">
         <exclude name="PSR12.Files.FileHeader" />
         <exclude name="PSR12.Files.OpenTag" />
+        <exclude name="Generic.Files.LineLength"/>
     </rule>
 
     <file>../src/</file>

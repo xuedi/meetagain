@@ -58,7 +58,9 @@ class UserType extends AbstractType
                 'label' => 'Bio'
             ])
             ->add(
-                'roles', ChoiceType::class, [
+                'roles',
+                ChoiceType::class,
+                [
                     'choices' => [
                         $this->translator->trans('role_system') => 'ROLE_SYSTEM',
                         $this->translator->trans('role_admin') => 'ROLE_ADMIN',
@@ -70,35 +72,48 @@ class UserType extends AbstractType
                 ]
             )
             ->add(
-                'verified', ChoiceType::class, [
+                'verified',
+                ChoiceType::class,
+                [
                 'data' => $user->isVerified(),
                 'mapped' => false,
                 'label' => 'Verified Regular',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-            ])
+                ]
+            )
             ->add(
-                'restricted', ChoiceType::class, [
+                'restricted',
+                ChoiceType::class,
+                [
                 'data' => $user->isRestricted(),
                 'mapped' => false,
                 'label' => 'Restricted',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-            ])
+                ]
+            )
             ->add(
-                'osmConsent', ChoiceType::class, [
+                'osmConsent',
+                ChoiceType::class,
+                [
                 'data' => $user->isOsmConsent(),
                 'mapped' => false,
                 'label' => 'OsmConsent',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-            ])
+                ]
+            )
             ->add(
-                'locale', ChoiceType::class, [
+                'locale',
+                ChoiceType::class,
+                [
                     'data' => $user->getLocale(),
                     'label' => 'Locale',
                     'choices' => $languageList,
                 ]
             )
             ->add(
-                'status', ChoiceType::class, [
+                'status',
+                ChoiceType::class,
+                [
                     'data' => $user->getStatus(),
                     'choices' => UserStatus::getChoices($this->translator),
                 ]

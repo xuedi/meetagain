@@ -267,7 +267,7 @@ class Event
 
     public function hasMap(): bool
     {
-        if(!$this->getLocation() instanceof \App\Entity\Location) {
+        if (!$this->getLocation() instanceof \App\Entity\Location) {
             return false;
         }
         return $this->getLocation()->getLatitude() !== null && $this->getLocation()->getLongitude() !== null;
@@ -348,7 +348,7 @@ class Event
     private function findTranslation(string $language): ?EventTranslation
     {
         foreach ($this->translations as $translation) {
-            if($translation->getLanguage() === $language) {
+            if ($translation->getLanguage() === $language) {
                 return $translation;
             }
         }

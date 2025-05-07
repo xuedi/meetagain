@@ -113,7 +113,7 @@ class Cms
         $objects = [];
         foreach ($this->blocks as $block) {
             if ($block->getLanguage() === $language) {
-                $objects[] = match($block->getType()) {
+                $objects[] = match ($block->getType()) {
                     CmsBlockTypes::Paragraph => ParagraphBlockType::fromJson($block->getJson()),
                     CmsBlockTypes::Headline => HeadlineBlockType::fromJson($block->getJson()),
                     CmsBlockTypes::Image => ImageBlockType::fromJson($block->getJson()),

@@ -15,7 +15,6 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         foreach ($this->getData() as [$time, $userName, $type, $meta]) {
-
             $activity = new Activity();
             $activity->setUser($this->getReference('user_' . md5((string) $userName)));
             $activity->setCreatedAt(new DateTimeImmutable($time));

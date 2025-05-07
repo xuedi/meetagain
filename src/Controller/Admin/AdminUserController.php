@@ -22,8 +22,8 @@ class AdminUserController extends AbstractController
     public function userList(UserRepository $repo): Response
     {
         return $this->render('admin/user/list.html.twig', [
-            'needForApproval' => $repo->findBy(['status' => 1],['createdAt'=>'desc']),
-            'users' => $repo->findBy([],['createdAt'=>'desc']),
+            'needForApproval' => $repo->findBy(['status' => 1], ['createdAt' => 'desc']),
+            'users' => $repo->findBy([], ['createdAt' => 'desc']),
         ]);
     }
 

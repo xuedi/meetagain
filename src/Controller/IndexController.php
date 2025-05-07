@@ -18,7 +18,8 @@ class IndexController extends AbstractController
     }
 
     #[Route('/language/{locale}', name: 'app_default_language', requirements: ['locale' => 'en|de|cn'])]
-    public function setLanguage(Request $request, EntityManagerInterface $entityManager, string $locale): Response {
+    public function setLanguage(Request $request, EntityManagerInterface $entityManager, string $locale): Response
+    {
 
         // set session
         $session = $request->getSession();

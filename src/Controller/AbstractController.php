@@ -9,7 +9,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 abstract class AbstractController extends AbstractSymfonyController
 {
     protected function getAuthedUser(): User
-    { // just to avoid phpstorms null pointer warning
+    {
+ // just to avoid phpstorms null pointer warning
         $user = $this->getUser();
         if (!$user instanceof User) {
             throw new AuthenticationCredentialsNotFoundException(
