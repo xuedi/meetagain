@@ -13,12 +13,12 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusExce
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserChecker implements UserCheckerInterface
+readonly class UserChecker implements UserCheckerInterface
 {
     public function __construct(
-        private readonly ActivityService $activityService,
-        private readonly EntityManagerInterface $em,
-        private readonly RequestStack $requestStack,
+        private ActivityService $activityService,
+        private EntityManagerInterface $em,
+        private RequestStack $requestStack,
     )
     {
     }

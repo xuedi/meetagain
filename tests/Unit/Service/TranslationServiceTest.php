@@ -18,12 +18,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class TranslationServiceTest extends TestCase
 {
     private MockObject|TranslationRepository $translationRepositoryMock;
-    private MockObject|UserRepository $userRepositoryMock;
-    private MockObject|EntityManagerInterface $entityManagerInterfaceMock;
-    private MockObject|Filesystem $filesystemMock;
-    private MockObject|KernelInterface $kernelInterfaceMock;
-    private MockObject|ParameterBagInterface $parameterBagInterfaceMock;
-    private MockObject|JustService $justServiceMock;
     private TranslationService $subject;
 
     protected function setUp(): void
@@ -31,21 +25,21 @@ class TranslationServiceTest extends TestCase
         parent::setUp();
 
         $this->translationRepositoryMock = $this->createMock(TranslationRepository::class);
-        $this->userRepositoryMock = $this->createMock(UserRepository::class);
-        $this->entityManagerInterfaceMock = $this->createMock(EntityManagerInterface::class);
-        $this->filesystemMock = $this->createMock(Filesystem::class);
-        $this->kernelInterfaceMock = $this->createMock(KernelInterface::class);
-        $this->parameterBagInterfaceMock = $this->createMock(ParameterBagInterface::class);
-        $this->justServiceMock = $this->createMock(JustService::class);
+        $userRepositoryMock = $this->createMock(UserRepository::class);
+        $entityManagerInterfaceMock = $this->createMock(EntityManagerInterface::class);
+        $filesystemMock = $this->createMock(Filesystem::class);
+        $kernelInterfaceMock = $this->createMock(KernelInterface::class);
+        $parameterBagInterfaceMock = $this->createMock(ParameterBagInterface::class);
+        $justServiceMock = $this->createMock(JustService::class);
 
         $this->subject = new TranslationService(
             $this->translationRepositoryMock,
-            $this->userRepositoryMock,
-            $this->entityManagerInterfaceMock,
-            $this->filesystemMock,
-            $this->kernelInterfaceMock,
-            $this->parameterBagInterfaceMock,
-            $this->justServiceMock
+            $userRepositoryMock,
+            $entityManagerInterfaceMock,
+            $filesystemMock,
+            $kernelInterfaceMock,
+            $parameterBagInterfaceMock,
+            $justServiceMock
         );
     }
 

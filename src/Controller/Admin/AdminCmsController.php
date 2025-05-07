@@ -124,7 +124,7 @@ class AdminCmsController extends AbstractController
         $cmsBlock = new CmsBlock();
         $cmsBlock->setLanguage($locale);
         $cmsBlock->setPriority($em->getRepository(CmsBlock::class)->getMaxPriority() + 1);
-        $cmsBlock->setType($blockObject->getType());
+        $cmsBlock->setType($blockObject::getType());
         $cmsBlock->setJson($blockObject->toArray());
 
         $cmsPage->addBlock($cmsBlock);

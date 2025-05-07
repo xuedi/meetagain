@@ -14,8 +14,6 @@ class GlossaryController extends AbstractController
     #[Route('/', name: 'app_glossary')]
     public function index(): Response
     {
-        return $this->render('glossary/index.html.twig', [
-            //
-        ]);
+        return $this->render('glossary/index.html.twig');
     }
 }

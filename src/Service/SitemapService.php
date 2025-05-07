@@ -7,6 +7,9 @@ use DateTime;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 readonly class SitemapService
 {
@@ -19,23 +22,40 @@ readonly class SitemapService
     {
     }
 
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     */
     public function getContent(string $host): Response
     {
         $sites = [];
 
         $locales = $this->appParams->get('kernel.enabled_locales');
         foreach ($locales as $locale) {
-            $sites = array_merge($sites, $this->getCmsPages($host, $locale));
-            $sites = array_merge($sites, $this->getStaticPages($host, $locale));
-            $sites = array_merge($sites, $this->getEventPages($host, $locale));
+            $sites = [
+                ...$sites,
+                ...$this->getAllSitesForLocale($host, $locale)
+            ];
         }
-
-        //application/xml
 
         return new Response($this->twig->render('sitemap/index.xml.twig', [
             'sites' => $sites,
         ]), Response::HTTP_OK, ['Content-Type' => 'text/xml']);
     }
+
+    /**
+     * @return array<int, array{loc: string, lastmod: string, prio: float}>
+     */
+    private function getAllSitesForLocale(string $host, string $locale): array
+    {
+        return [
+            ...$this->getCmsPages($host, $locale),
+            ...$this->getStaticPages($host, $locale),
+            ...$this->getEventPages($host, $locale)
+        ];
+    }
+
 
     private function getCmsPages(string $host, string $locale): array
     {
