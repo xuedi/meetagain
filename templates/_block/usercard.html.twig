@@ -1,12 +1,25 @@
-<div class="card">
-    <div class="card-image">
-        <figure class="image">
-            <a href="{{ path('app_member_view', {'id': user.id}) }}">
+{% if is_granted('ROLE_USER') %}
+    <div class="card">
+        <div class="card-image">
+            <figure class="image">
+                <a href="{{ path('app_member_view', {'id': user.id}) }}">
+                    {% include '_block/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
+                </a>
+            </figure>
+        </div>
+        <div class="card-content p-3 has-text-centered">
+            <a href="{{ path('app_member_view', {'id': user.id}) }}">{{ user.name }}</a>
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-image">
+            <figure class="image">
                 {% include '_block/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
-            </a>
-        </figure>
+            </figure>
+        </div>
+        <div class="card-content p-3 has-text-centered">
+            {{ user.name }}
+        </div>
     </div>
-    <div class="card-content p-3 has-text-centered">
-        <a href="{{ path('app_member_view', {'id': user.id}) }}">{{ user.name }}</a>
-    </div>
-</div>
+{% endif %}
