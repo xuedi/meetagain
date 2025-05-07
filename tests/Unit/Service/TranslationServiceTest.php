@@ -2,44 +2,41 @@
 
 namespace App\Tests\Unit\Service;
 
-use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Translation;
 use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use App\Service\JustService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class TranslationServiceTest extends TestCase
 {
     private MockObject|TranslationRepository $translationRepositoryMock;
     private TranslationService $subject;
 
+    /**
+     * @throws Exception
+     */
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->translationRepositoryMock = $this->createMock(TranslationRepository::class);
-        $userRepositoryMock = $this->createMock(UserRepository::class);
-        $entityManagerInterfaceMock = $this->createMock(EntityManagerInterface::class);
-        $filesystemMock = $this->createMock(Filesystem::class);
-        $kernelInterfaceMock = $this->createMock(KernelInterface::class);
-        $parameterBagInterfaceMock = $this->createMock(ParameterBagInterface::class);
-        $justServiceMock = $this->createMock(JustService::class);
 
         $this->subject = new TranslationService(
             $this->translationRepositoryMock,
-            $userRepositoryMock,
-            $entityManagerInterfaceMock,
-            $filesystemMock,
-            $kernelInterfaceMock,
-            $parameterBagInterfaceMock,
-            $justServiceMock
+            $this->createMock(UserRepository::class),
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(Filesystem::class),
+            $this->createMock(ParameterBagInterface::class),
+            $this->createMock(JustService::class),
+            __DIR__ .'/tmp/'
         );
     }
 
