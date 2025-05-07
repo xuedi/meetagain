@@ -53,8 +53,8 @@ class DashboardService
 
     public function setTime(?int $year, ?int $week): void
     {
-        $this->year = $year ?? (int)(new DateTime())->format('Y');
-        $this->week = $week ?? (int)(new DateTime())->format('W');
+        $this->year = $year ?? (int)new DateTime()->format('Y');
+        $this->week = $week ?? (int)new DateTime()->format('W');
 
         $tmpDate = new DateTime();
         $tmpDate->setISODate($this->year, $this->week);

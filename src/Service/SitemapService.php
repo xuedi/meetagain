@@ -76,7 +76,7 @@ readonly class SitemapService
         foreach (['', 'events', 'members'] as $site) {
             $sites[] = [
                 'loc' => sprintf('https://%s/%s/%s', $host, $locale, $site),
-                'lastmod' => (new DateTime())->format('Y-m-d'),
+                'lastmod' => new DateTime()->format('Y-m-d'),
                 'prio' => 0.9,
             ];
         }
