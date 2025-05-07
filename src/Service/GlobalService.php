@@ -43,7 +43,7 @@ readonly class GlobalService
         if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $currentUri = $request->getRequestUri();
             $currentLocale = $request->getLocale();
-            if(!str_starts_with($currentUri, '/_profiler')) {
+            if (!str_starts_with($currentUri, '/_profiler')) {
                 return $this->translationService->getAltLangList($currentLocale, $currentUri);
             }
         }

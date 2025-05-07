@@ -20,7 +20,8 @@ use RuntimeException;
 
 readonly class EventService
 {
-    public function __construct(private EventRepository $repo, private EntityManagerInterface $em) {
+    public function __construct(private EventRepository $repo, private EntityManagerInterface $em)
+    {
     }
 
     public function getFilteredList(
@@ -28,8 +29,7 @@ readonly class EventService
         EventFilterSort $sort,
         EventTypes $type,
         EventFilterRsvp $rsvp,
-    ): array
-    {
+    ): array {
         $criteria = new Criteria();
         $criteria->orderBy(['start' => $sort->value]);
         $criteria->where(match ($time) { // TODO: all should be a dummy, no idea how

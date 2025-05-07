@@ -18,8 +18,7 @@ readonly class SitemapService
         private CmsService $cms,
         private EventRepository $events,
         private ParameterBagInterface $appParams,
-    )
-    {
+    ) {
     }
 
     /**

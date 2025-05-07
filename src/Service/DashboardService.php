@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityRepository;
 
 class DashboardService
 {
-    const int WEEKS_PER_YEAR = 52;
+    private const int WEEKS_PER_YEAR = 52;
 
     private int $week = 0;
     private int $weekNext = 0;
@@ -27,15 +27,15 @@ class DashboardService
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-    )
-    {
+    ) {
         $this->userRepo = $this->em->getRepository(User::class);
         $this->notFoundRepo = $this->em->getRepository(NotFoundLog::class);
     }
 
     public function getTimeControl(): array
     {
-        return ['week' => $this->week, 'year' => $this->year, 'weekNext' => $this->weekNext, 'weekPrevious' => $this->weekPrevious, 'weekDetails' => sprintf("%s - %s",
+        return ['week' => $this->week, 'year' => $this->year, 'weekNext' => $this->weekNext, 'weekPrevious' => $this->weekPrevious, 'weekDetails' => sprintf(
+            "%s - %s",
             $this->weekStartDate->format('Y-m-d'),
             $this->weekStopDate->format('Y-m-d'),
         )];

@@ -10,7 +10,6 @@ use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 readonly class ActivityService
 {
@@ -18,8 +17,7 @@ readonly class ActivityService
         private GlobalService $globalService,
         private EntityManagerInterface $em,
         private ActivityRepository $repo
-    )
-    {
+    ) {
     }
 
     public function log(UserActivity $type, User $user, array $meta): void

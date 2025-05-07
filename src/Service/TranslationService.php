@@ -167,13 +167,13 @@ readonly class TranslationService
         $trimmedLink = trim($link, '/');
 
         // Just language
-        if(in_array($trimmedLink, $languages)) {
+        if (in_array($trimmedLink, $languages, true)) {
             return sprintf('/%s/', $newCode);
         }
 
         // whatever URI
         $chunks = explode('/', $trimmedLink);
-        if(in_array($chunks[0], $languages)) {
+        if (in_array($chunks[0], $languages, true)) {
             $chunks[0] = $newCode;
             return sprintf('/%s', implode('/', $chunks));
         }
@@ -184,7 +184,7 @@ readonly class TranslationService
     public function importForLocalDevelopment(string $apiUrl): void
     {
         $json = file_get_contents($apiUrl);
-        $data = json_decode($json, true);
+        $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         $this->entityManager->getConnection()->executeQuery(" TRUNCATE TABLE translation");
         $user = $this->userRepo->findOneBy(['email' => 'system@beijingcode.org']);
@@ -208,7 +208,7 @@ readonly class TranslationService
     {
         $cleanedList = [];
         foreach ($translations as $key => $translation) {
-            if(!isset($cleanedList[strtolower($key)])) {
+            if (!isset($cleanedList[strtolower($key)])) {
                 $cleanedList[strtolower($key)] = $translation;
             }
         }
