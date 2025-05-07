@@ -2,12 +2,9 @@
 
 namespace App\Controller;
 
-use App\Service\CmsService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Requirement\Requirement;
 use Throwable;
 use Twig\Environment;
 
