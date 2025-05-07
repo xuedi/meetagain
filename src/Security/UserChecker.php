@@ -8,6 +8,7 @@ use App\Entity\UserStatus;
 use App\Service\ActivityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -43,7 +44,7 @@ readonly class UserChecker implements UserCheckerInterface
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        if ($request === null) {
+        if (!$request instanceof Request) {
             return;
         }
 
