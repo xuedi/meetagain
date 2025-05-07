@@ -69,8 +69,8 @@ class DashboardService
     private function timeCrit(): Criteria
     {
         $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->gte('createdAt', $this->weekStartDate));
-        $criteria->andWhere(Criteria::expr()->lte('createdAt', $this->weekStopDate));
+        $criteria->where(Criteria::expr()?->gte('createdAt', $this->weekStartDate));
+        $criteria->andWhere(Criteria::expr()?->lte('createdAt', $this->weekStopDate));
         return $criteria;
     }
 }
