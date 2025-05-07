@@ -49,10 +49,13 @@ test:
     XDEBUG_MODE=coverage vendor/bin/phpunit -c tests/phpunit.xml
 
 check:
-    vendor/bin/rector process src --dry-run -c tests/rector.php
-    vendor/bin/phpstan analyse -c tests/phpstan.neon
-    #vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
-    #phpcs --_all inline since cant give config as parameter
+    # stan & rector are disabled, since they cant deal with php8.4's: "new DateTime()->"
+    #vendor/bin/phpstan analyse -c tests/phpstan.neon
+    #vendor/bin/rector process src --dry-run -c tests/rector.php
+    vendor/bin/phpcs --standard=./tests/phpcs.xml
+    vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
+
 
 fix:
-    vendor/bin/rector process src -c tests/rector.php
+    vendor/bin/phpcbf --standard=./tests/phpcs.xml
+    #vendor/bin/rector process src -c tests/rector.php
