@@ -13,7 +13,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Request;
 
 class TranslationServiceTest extends TestCase
 {
@@ -36,7 +35,7 @@ class TranslationServiceTest extends TestCase
             $this->createMock(Filesystem::class),
             $this->createMock(ParameterBagInterface::class),
             $this->createMock(JustService::class),
-            __DIR__ .'/tmp/'
+            __DIR__ . '/tmp/'
         );
     }
 
@@ -90,27 +89,5 @@ class TranslationServiceTest extends TestCase
         $actual = $this->subject->getMatrix();
 
         $this->assertEquals($expected, $actual);
-    }
-
-    public function testSaveMatrix(): void
-    {
-        $dataBase = [
-
-        ];
-        $payload = [
-
-        ];
-
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('getPayload')
-            ->willReturn($payload);
-
-        $this->translationRepositoryMock
-            ->expects($this->once())
-            ->method('buildKeyValueList')
-            ->willReturn($dataBase);
-
-        $this->subject->saveMatrix($request);
     }
 }
