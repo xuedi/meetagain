@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\UserStatus;
 use App\Repository\UserRepository;
 use App\Service\FriendshipService;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,15 +11,24 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 #[Route('/members')]
 class MemberController extends AbstractController
 {
-    #[Route('', name: 'app_member')]
-    public function index(UserRepository $repo): Response
+    private const int PAGE_SIZE = 24;
+
+    #[Route('/{page}', name: 'app_member')]
+    public function index(UserRepository $repo, int $page = 1): Response
     {
+        $offset = ($page - 1) * self::PAGE_SIZE;
+        $userTotal = $repo->getNumberOfActivePublicMembers();
+        $users = $repo->findActivePublicMembers(self::PAGE_SIZE, $offset);
         return $this->render('member/index.html.twig', [
-            'members' => $repo->findBy(['status' => UserStatus::Active, 'public' => true], ['createdAt' => 'ASC']),
+            'users' => $users,
+            'userTotal' => $userTotal,
+            'pageSize' => self::PAGE_SIZE,
+            'pageCurrent' => $page,
+            'pageTotal' => ceil($userTotal / self::PAGE_SIZE),
         ]);
     }
 
-    #[Route('/{id}', name: 'app_member_view')]
+    #[Route('/view/{id}', name: 'app_member_view')]
     public function view(UserRepository $repo, int $id): Response
     {
         try {

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\UserStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -88,5 +89,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    public function findActivePublicMembers(int $limit = 500, int $offset = 0): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u, i') // forces to fet all columns from user and image table
+            ->leftJoin('u.image', 'i')  // Assuming 'image' is the property name
+            ->where('u.status = :status')
+            ->andWhere('u.public = :public')
+            ->setParameter('status', UserStatus::Active)
+            ->setParameter('public', true)
+            ->orderBy('u.createdAt', 'ASC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getNumberOfActivePublicMembers(): int
+    {
+        return (int)$this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.status = :status')
+            ->andWhere('u.public = :public')
+            ->setParameter('status', UserStatus::Active)
+            ->setParameter('public', true)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

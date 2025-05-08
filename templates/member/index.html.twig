@@ -3,22 +3,51 @@
 {% block title %}{{ "page_title_member"|trans }}{% endblock %}
 
 {% block body %}
-
     <section class="section">
         <div class="container">
             <h1 class="title is-3">Members</h1>
 
             <div class="columns is-multiline">
-                {% for member in members %}
-
+                {% for user in users %}
                     <div class="column is-2">
-                        {% include '_block/usercard.html.twig' with {'user': member} %}
+                        {% include '_block/usercard.html.twig' with {'user': user} %}
                     </div>
-
                 {% endfor %}
             </div>
 
+            {% if pageTotal > 1 %}
+                <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                    {% if pageCurrent > 1 %}
+                        <a href="{{ path('app_member', {'page': pageCurrent - 1}) }}"
+                           class="pagination-previous">Previous</a>
+                    {% endif %}
+                    
+                    {% if pageCurrent < pageTotal %}
+                        <a href="{{ path('app_member', {'page': pageCurrent + 1}) }}"
+                           class="pagination-next">Next</a>
+                    {% endif %}
+
+                    <ul class="pagination-list">
+                        {% for i in 1..pageTotal %}
+                            <li>
+                                <a href="{{ path('app_member', {'page': i}) }}"
+                                   class="pagination-link {% if i == pageCurrent %}is-current{% endif %}"
+                                   aria-label="Page {{ i }}"
+                                   aria-current="{% if i == pageCurrent %}page{% endif %}">
+                                    {{ i }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+
+                <div class="has-text-centered mt-4">
+                    <p class="help">
+                        Showing page {{ pageCurrent }} of {{ pageTotal }}
+                        ({{ userTotal }} total members)
+                    </p>
+                </div>
+            {% endif %}
         </div>
     </section>
-
 {% endblock %}
