@@ -58,3 +58,7 @@ check:
 fix:
     vendor/bin/phpcbf --standard=./tests/phpcs.xml
     #vendor/bin/rector process src -c tests/rector.php
+
+update_coverage_badge: ## generate badge and add it to repo
+	php tests/badgeGenerator.php
+	git add tests/badge/coverage.svg
