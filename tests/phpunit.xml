@@ -25,6 +25,7 @@
     </php>
     <coverage>
         <report>
+            <clover outputFile="reports/clover.xml"/>
             <html outputDirectory="./reports/coverage/" lowUpperBound="50" highLowerBound="90"/>
         </report>
     </coverage>

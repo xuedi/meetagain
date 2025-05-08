@@ -1,13 +1,15 @@
 
-Badges?
 
-## introduction
+[![Code Coverage](https://github.com/xuedi/meetAgain/raw/branch/master/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/src/branch/master/tests/badgeGenerator.php)
+
+
+## Introduction
 meetup.com got crazily expensive, I created my own page as a single meetup
 instance, with basic modular CMS to customize any number of pages. Menus and
 such are static and have to be changed in code. | Minimalist PHP8.4+ Symfony
 
 
-### software design
+### Software design
 A classic symfony application as upstream as possible no fancy libraries
 or dependencies.
 
@@ -19,15 +21,15 @@ or dependencies.
  - ext-imagick
 
 
-### usage
+### Usage
 ```
-just           # get all possible interactions
+just           # get a list with all possible cli interactions
 just install   # installes dependencies and builds system
 just reset     # drops DB and rebuild everything for local development
 ``` 
 
 
-## TODO:
+### TODO:
  - activity levels for user view and admin view
  - add changed details for cms and event and other actions for system view only
  - add messages and way to block users
