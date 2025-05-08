@@ -193,4 +193,25 @@ class UserTest extends TestCase
 
         $this->assertEquals($code, $this->user->getRegcode());
     }
+
+    public function testRestrictedGetterAndSetter(): void
+    {
+        $this->assertFalse($this->user->isRestricted());
+        $this->user->setRestricted(true);
+        $this->assertTrue($this->user->isRestricted());
+    }
+
+    public function testisOsmConsentGetterAndSetter(): void
+    {
+        $this->assertFalse($this->user->isOsmConsent());
+        $this->user->setOsmConsent(true);
+        $this->assertTrue($this->user->isOsmConsent());
+    }
+
+    public function testisPublicGetterAndSetter(): void
+    {
+        $this->assertTrue($this->user->isPublic());
+        $this->user->setPublic(false);
+        $this->assertFalse($this->user->isPublic());
+    }
 }

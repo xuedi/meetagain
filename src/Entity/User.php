@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use PHPUnit\Framework\Attributes\CodeCoverageIgnore;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -52,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?UserStatus $status = null;
 
     #[ORM\Column]
-    private bool $public;
+    private bool $public = true;
 
     #[ORM\Column(length: 40, nullable: true)]
     private ?string $regcode = null;
@@ -157,7 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    #[\Override]
+    #[CodeCoverageIgnore] #[\Override]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
@@ -368,11 +369,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->following->contains($user)) {
             $this->following->removeElement($user);
         }
-    }
-
-    public function getFriends(): array
-    {
-        return [];
     }
 
     public function isRestricted(): ?bool
