@@ -22,7 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $name = null;
@@ -324,11 +324,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getFollowing(): Collection
-    {
-        return $this->following;
-    }
-
     public function getFollowers(): Collection
     {
         return $this->followers;
@@ -336,18 +331,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addFollower(User $user): void
     {
-        if (!$this->followers->contains($user)) {
-            $this->followers->add($user);
-            $user->addFollowing($this);
+        if ($this->getId() === $user->getId()) {
+            return;
         }
+        if ($this->followers->contains($user)) {
+            return;
+        }
+        $this->followers->add($user);
     }
 
     public function removeFollower(User $user): void
     {
         if ($this->followers->contains($user)) {
             $this->followers->removeElement($user);
-            $user->removeFollowing($this);
         }
+    }
+
+    public function getFollowing(): Collection
+    {
+        return $this->following;
     }
 
     public function addFollowing(User $user): void

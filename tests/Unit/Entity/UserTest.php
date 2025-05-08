@@ -18,6 +18,7 @@ class UserTest extends TestCase
     protected function setUp(): void
     {
         $this->user = new UserStub();
+        $this->user->setId(1); // stubbyStub
     }
 
     public function testEmailGetterAndSetter(): void
@@ -88,38 +89,55 @@ class UserTest extends TestCase
     public function testFollowingLogic(): void
     {
         // Setup
-        $userToFollow = new UserStub();
-        $userToFollow->setId(2); // Assuming there's a setId method
-        $this->user->setId(1);
+        $user = new UserStub();
+        $user->setId(2); // Assuming there's a setId method
 
         // Test adding following
-        $this->user->addFollowing($userToFollow);
-        $this->assertTrue($this->user->getFollowing()->contains($userToFollow));
+        $this->user->addFollowing($user);
+        $this->assertTrue($this->user->getFollowing()->contains($user));
 
         // Test duplicate adding (should not duplicate)
-        $this->user->addFollowing($userToFollow);
+        $this->user->addFollowing($user);
         $this->assertCount(1, $this->user->getFollowing());
 
         // Test self-following prevention
         $this->user->addFollowing($this->user);
-        $this->assertCount(1, $this->user->getFollowing());
+        $this->assertCount(1, $this->user->getFollowing());;
         $this->assertFalse($this->user->getFollowing()->contains($this->user));
 
         // Test removing following
-        $this->user->removeFollowing($userToFollow);
-        $this->assertFalse($this->user->getFollowing()->contains($userToFollow));
+        $this->user->removeFollowing($user);
+        $this->assertFalse($this->user->getFollowing()->contains($user));
 
         // Test removing non-existent following (should not throw)
-        $this->user->removeFollowing($userToFollow);
+        $this->user->removeFollowing($user);
     }
 
-    public function testCannotFollowSelf(): void
+    public function testFollowerLogic(): void
     {
-        // Attempt to follow self
-        $this->user->addFollowing($this->user);
+        // Setup
+        $user = new UserStub();
+        $user->setId(3); // Assuming there's a setId method
 
-        // Verify that the following collection is empty (self-following was prevented)
-        $this->assertFalse($this->user->getFollowing()->contains($this->user));
+        // Test adding following
+        $this->user->addFollower($user);
+        $this->assertTrue($this->user->getFollowers()->contains($user));
+
+        // Test duplicate adding (should not duplicate)
+        $this->user->addFollower($user);
+        $this->assertCount(1, $this->user->getFollowers());
+
+        // Test self-following prevention
+        $this->user->addFollower($this->user);
+        $this->assertCount(1, $this->user->getFollowers());
+        $this->assertFalse($this->user->getFollowers()->contains($this->user));
+
+        // Test removing following
+        $this->user->removeFollower($user);
+        $this->assertFalse($this->user->getFollowers()->contains($user));
+
+        // Test removing non-existent following (should not throw)
+        $this->user->removeFollower($user);
     }
 
     public function testVerificationStatus(): void
@@ -166,5 +184,13 @@ class UserTest extends TestCase
         $this->user->setBio($bio);
 
         $this->assertEquals($bio, $this->user->getBio());
+    }
+
+    public function testRegcodeGetterAndSetter(): void
+    {
+        $code = 'RegHash';
+        $this->user->setRegcode($code);
+
+        $this->assertEquals($code, $this->user->getRegcode());
     }
 }
