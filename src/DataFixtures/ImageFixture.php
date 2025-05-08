@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageFixture extends Fixture implements DependentFixtureInterface
@@ -59,7 +60,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
             if ($image instanceof Image) {
                 $this->imageService->createThumbnails($image, [[400, 400]]);
             } else {
-                throw new \RuntimeException('Unable to upload image');
+                throw new RuntimeException('Unable to upload image');
             }
 
             // associate image with user

@@ -25,8 +25,8 @@ class GetRandomFixtureUsersCommand extends Command
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $file = __DIR__ . '/../DataFixtures/UserFixture.php';
-        $search = "[]";
+        $file = __DIR__ . '/../DataFixtures/EventFixture.php';
+        $search = "['xXx']";
 
         $content = file_get_contents($file);
         $pos = strpos($content, $search);
@@ -62,7 +62,7 @@ class GetRandomFixtureUsersCommand extends Command
         // special users
         $specialUser = ['xuedi', 'Adem Lane', 'Crystal Liu'];
         foreach ($specialUser as $user) {
-            if (random_int(1, 11) > 7) {
+            if (random_int(1, 11) > 4) {
                 $elements[] = "'" . $user . "'";
             }
         }

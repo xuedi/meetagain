@@ -5,12 +5,16 @@ namespace App\DataFixtures;
 use App\Entity\Event;
 use App\Entity\EventIntervals;
 use App\Entity\EventTypes;
+use App\Entity\Image;
+use App\Service\UploadService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EventFixture extends Fixture implements DependentFixtureInterface
 {
@@ -18,13 +22,15 @@ class EventFixture extends Fixture implements DependentFixtureInterface
     private const null NO_RECURRING_OF = null;
     private const null NO_RECURRING_RULE = null;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly UploadService $imageService,
+    ) {
     }
 
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        $importUser = $this->getReference('user_' . md5('import'));
         foreach ($this->getData() as $data) {
             [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type] = $data;
             $event = new Event();
@@ -44,9 +50,21 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 $event->addRsvp($this->getReference('user_' . md5((string)$user)));
             }
 
-            $manager->persist($event);
+            // upload a file for thumbnails
+            $reference = 'event_' . md5((string)$name);
+            $imageFile = __DIR__ . "/Events/$reference.jpg";
+            $uploadedImage = new UploadedFile($imageFile, "$reference.jpg");
+            $image = $this->imageService->upload($uploadedImage, $importUser);
+            $manager->flush();
+            if ($image instanceof Image) {
+                $this->imageService->createThumbnails($image, [[600, 400]]);
+            } else {
+                throw new RuntimeException('Unable to upload image: ' . $imageFile);
+            }
+            $event->setPreviewImage($image);
 
-            $this->addReference('event_' . md5((string) $name), $event);
+            $manager->persist($event);
+            $this->addReference($reference, $event);
         }
         $manager->flush();
     }
@@ -62,6 +80,16 @@ class EventFixture extends Fixture implements DependentFixtureInterface
         ];
     }
 
+    public function getEventNames(): array
+    {
+        $nameList = [];
+        foreach ($this->getData() as $data) {
+            $nameList[] = $data[3];
+        }
+
+        return $nameList;
+    }
+
     private function getData(): array
     {
         return [
@@ -74,7 +102,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'St. Oberholz',
                 ['Adem Lane', 'xuedi'],
-                ['xuedi', 'Adem Lane', 'Crystal Liu'],
+                ['Adil Floyd', 'Aston Hood', 'Bailey Richards', 'Bec Ferguson', 'Danyal Lester', 'Demi Wilkinson', 'Freya Browning', 'Kaitlin Hale', 'Molly Vaughan', 'Nic Fassbender', 'Orlando Diggs', 'Owen Garcia', 'axisbos audax', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 EventTypes::Regular,
             ],
             [
@@ -86,7 +114,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Grand Tang',
                 ['Adem Lane', 'xuedi'],
-                ['xuedi', 'Adem Lane'],
+                ['Adil Floyd', 'Lana Steiner', 'Leyton Fields', 'Lyle Kauffman', 'Zuzanna Burke', 'axisbos audax', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 EventTypes::Dinner,
             ],
             [
@@ -98,7 +126,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Garten der Welt',
                 ['Adem Lane'],
-                ['xuedi', 'Adem Lane', 'Crystal Liu'],
+                ['Amanda Lowery', 'Anita Cruz', 'Florence Shaw', 'Jessie Meyton', 'Jonathan Kelly', 'Marco Kelly', 'Priya Shepard', 'xuedi', 'Adem Lane'],
                 EventTypes::Outdoor,
             ],
             [
@@ -110,7 +138,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Lao Xiang',
                 ['Adem Lane'],
-                ['Adem Lane', 'Crystal Liu'],
+                ['Ayah Wilkinson', 'Billie Wright', 'Herbert Fowler', 'Jay Shepard', 'Leyton Fields', 'Maddison Gillespie', 'Marco Kelly', 'xuedi', 'Adem Lane'],
                 EventTypes::Dinner,
             ],
             [
@@ -122,7 +150,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Himmelbeet',
                 ['xuedi', 'Adem Lane'],
-                ['xuedi', 'Adem Lane'],
+                ['Crystal Liu', 'Adil Floyd', 'Aston Hood', 'Ayah Wilkinson', 'Jay Shepard', 'Marco Gross', 'Phoenix Baker', 'Rory Huff', 'xuedi'],
                 EventTypes::Outdoor,
             ],
             [
@@ -134,7 +162,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 EventIntervals::BiMonthly,
                 'Volksbar',
                 ['Adem Lane', 'xuedi'],
-                ['xuedi', 'Adem Lane', 'Crystal Liu'],
+                ['Adil Floyd', 'Aysha Becker', 'Bailey Richards', 'Belle Woods', 'Benedict Doherty', 'Eduard Franz', 'Koray Okumus', 'Youssef Roberson', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 EventTypes::Regular,
             ],
             [
@@ -146,7 +174,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 EventIntervals::Yearly,
                 'Volksbar',
                 ['Adem Lane', 'xuedi'],
-                ['xuedi', 'Adem Lane'],
+                ['Benedict Doherty', 'Byron Robertson', 'Isobel Fuller', 'Levi Rocha', 'Nala Goins', 'Priya Shepard', 'Zara Bush', 'xuedi', 'Adem Lane'],
                 EventTypes::Dinner,
             ],
         ];
