@@ -44,12 +44,12 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
             ['2025-01-03 10:00:00', 'xuedi', UserActivity::RsvpYes, ['event_id' => 1]],
             ['2025-01-04 10:00:00', 'xuedi', UserActivity::RsvpYes, ['event_id' => 2]],
             ['2025-01-04 12:30:00', 'xuedi', UserActivity::RsvpYes, ['event_id' => 6]],
-            ['2025-01-11 10:00:00', 'yimu', UserActivity::Registered, null],
-            ['2025-01-12 10:00:00', 'yimu', UserActivity::Login, null],
-            ['2025-01-13 10:00:00', 'yimu', UserActivity::RsvpYes, ['event_id' => 1]],
-            ['2025-01-13 12:30:00', 'yimu', UserActivity::RsvpYes, ['event_id' => 6]],
-            ['2025-01-15 20:00:00', 'yimu', UserActivity::FollowedUser, ['user_id' => 2]], // xuedi
-            ['2025-01-17 09:00:00', 'xuedi', UserActivity::FollowedUser, ['user_id' => 3]], // yimu
+            ['2025-01-11 10:00:00', 'Adem Lane', UserActivity::Registered, null],
+            ['2025-01-12 10:00:00', 'Adem Lane', UserActivity::Login, null],
+            ['2025-01-13 10:00:00', 'Adem Lane', UserActivity::RsvpYes, ['event_id' => 1]],
+            ['2025-01-13 12:30:00', 'Adem Lane', UserActivity::RsvpYes, ['event_id' => 6]],
+            ['2025-01-15 20:00:00', 'Adem Lane', UserActivity::FollowedUser, ['user_id' => 2]],
+            ['2025-01-17 09:00:00', 'xuedi', UserActivity::FollowedUser, ['user_id' => 3]],
             ['2025-02-01 10:00:00', 'Crystal Liu', UserActivity::Registered, null],
             ['2025-02-02 10:00:00', 'Crystal Liu', UserActivity::Login, null],
             ['2025-02-03 10:00:00', 'Crystal Liu', UserActivity::ChangedUsername, ['old' => 'dalong', 'new' => 'xiaolong']],

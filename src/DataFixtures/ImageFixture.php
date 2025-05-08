@@ -14,6 +14,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
         private readonly UploadService $imageService,
+        private readonly UserFixture $userFixture,
     ) {
     }
 
@@ -45,12 +46,14 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         $manager->flush();
         $this->imageService->createThumbnails($defaultImage, [[400, 400], [600, 400]]);
 
-        foreach ($this->getData() as [$path, $name]) {
+        foreach ($this->userFixture->getUsernames() as $name) {
+            $path = __DIR__ . "/Avatars/$name.jpg";
+
             // prepare import user
             $user = $this->getReference('user_' . md5((string)$name));
 
             // upload file & thumbnails
-            $uploadedImage = new UploadedFile($path, $name);
+            $uploadedImage = new UploadedFile($path, "$name.jpg");
             $image = $this->imageService->upload($uploadedImage, $user);
             $manager->flush();
             if ($image instanceof Image) {
@@ -72,26 +75,5 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         return [
             UserFixture::class,
         ];
-    }
-
-
-    private function getData(): array
-    {
-        $fixedUsers = [];
-
-        $files = glob(__DIR__ . "/Avatars/*.jpg");
-        foreach ($files as $path) {
-            $chunks = explode("/", $path);
-            $name = str_replace('.jpg', '', end($chunks));
-            if (in_array($name, ['import', 'yimu'])) {
-                continue;
-            }
-            $fixedUsers[] = [
-                $path,
-                $name,
-            ];
-        }
-
-        return $fixedUsers;
     }
 }
