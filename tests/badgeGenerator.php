@@ -20,12 +20,18 @@ foreach ($metrics as $metric) {
 }
 $coverage = round(($checkedElements / $totalElements) * 100);
 
-$color = 'ff0000';
-if ($coverage >= 50) $color = 'd80000';
-if ($coverage >= 60) $color = 'c4a600';
-if ($coverage >= 70) $color = 'b9d117';
-if ($coverage >= 80) $color = '7ad117';
-if ($coverage >= 90) $color = '34D058';
+$color = match (true) {
+    $coverage >= 0 => 'FF0000',
+    $coverage >= 10 => 'FF3300',
+    $coverage >= 20 => 'FF6600',
+    $coverage >= 30 => 'FF9900',
+    $coverage >= 40 => 'FFFF00',
+    $coverage >= 50 => '99FF00',
+    $coverage >= 60 => '66FF00',
+    $coverage >= 70 => '33FF00',
+    $coverage >= 80 => '00FF33',
+    $coverage >= 90 => '00FF00',
+};
 
 $darkeningFactor = 1.2;
 $R = sprintf("%02X", floor(hexdec(substr($color, 0, 2)) / $darkeningFactor));
