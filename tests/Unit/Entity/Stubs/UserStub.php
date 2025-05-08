@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Unit\Entity\Stubs;
+namespace App\Tests\Unit\Entity\Stubs;
 
 use App\Entity\User;
 

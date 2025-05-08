@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Unit\Entity;
+namespace App\Tests\Unit\Entity;
 
 use App\Entity\Activity;
 use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\UserStatus;
+use App\Tests\Unit\Entity\Stubs\UserStub;
 use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
-use Unit\Entity\Stubs\UserStub;
 
 class UserTest extends TestCase
 {

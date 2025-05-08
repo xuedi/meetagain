@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Unit\Entity;
+namespace App\Tests\Unit\Entity;
 
 use App\Entity\Config;
 use App\Entity\ConfigType;
