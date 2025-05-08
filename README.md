@@ -1,6 +1,6 @@
 
 
-[![Code Coverage]https://raw.githubusercontent.com/xuedi/meetAgain/refs/heads/master/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
+[![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/refs/heads/master/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
 
 
 ## Introduction
