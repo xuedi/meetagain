@@ -8,7 +8,11 @@
             </figure>
         </div>
         <div class="card-content p-3 has-text-centered">
-            <a href="{{ path('app_member_view', {'id': user.id}) }}">{{ user.name }}</a>
+            {% include '_block/username.html.twig' with {
+                'link': path('app_member_view', {'id': user.id}),
+                'verified': user.verified,
+                'name': user.name
+            } %}
         </div>
     </div>
 {% else %}

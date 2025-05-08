@@ -76,6 +76,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anita Cruz', 'Bec Ferguson', 'Byron Robertson', 'Courtney Turner', 'Fergus Gray', 'Herbert Fowler', 'Julius Vaughan', 'Kelsey Lowe', 'Luqman Anthony', 'Madeleine Pitts', 'Marco Kelly', 'Owen Harding', 'Sarah Page', 'Zara Bush', 'xuedi', 'Crystal Liu'],
                 'followers' => ['import', 'Ali Mahdi', 'Ava Wright', 'Ayah Wilkinson', 'Bec Ferguson', 'Courtney Turner', 'Eva Bond', 'Genevieve Mclean', 'Harry Bender', 'Jay Shepard', 'Lucy Bond', 'Marco Kelly', 'Nicola Harris', 'Nicolas Wang', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -87,6 +88,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adem Lane', 'Aliah Lane', 'Ali Mahdi', 'Anaiah Whitten', 'Franklin Mays', 'Genevieve Mclean', 'Kaden Scott', 'Loki Bright', 'Lori Bryson', 'Noah Pierre', 'Olivia Rhye', 'Orlando Diggs', 'Phoenix Baker', 'Zaid Schwartz', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['xuedi', 'Abraham Baker', 'Adil Floyd', 'Alesha Barry', 'Anaiah Whitten', 'Ava Wright', 'Belle Woods', 'Candice Wu', 'Jay Shepard', 'Kaitlin Hale', 'Madeleine Pitts', 'Molly Vaughan', 'Nicola Harris', 'Nicolas Wang', 'Orlando Diggs', 'Priya Shepard', 'Rene Wells', 'Scott Clayton', 'Youssef Roberson', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -98,6 +100,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'Angelica Wallace', 'Byron Robertson', 'Ethan Campbell', 'Hasan Johns', 'Katherine Moss', 'Marco Kelly', 'Maxwell Tan', 'Olivia Rhye', 'Rene Wells', 'Stefan Sears', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Alesha Barry', 'Billie Wright', 'Fergus Gray', 'Herbert Fowler', 'Isobel Fuller', 'Jay Shepard', 'Mathilde Lewis', 'Nala Goins', 'Nikolas Gibbons', 'Phoenix Baker', 'Rosalee Melvin', 'Sienna Hewitt', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -109,6 +112,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adem Lane', 'Adil Floyd', 'Anita Cruz', 'Courtney Turner', 'Eduard Franz', 'Fergus Gray', 'Franklin Mays', 'Freya Browning', 'Marco Gross', 'Olivia Rhye', 'Orlando Diggs', 'Phoenix Baker', 'Stefan Sears', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Amanda Lowery', 'Anaiah Whitten', 'Courtney Turner', 'Kari Rasmussen', 'Levi Rocha', 'Liam Hood', 'Lola Sanders', 'Nikolas Gibbons', 'Noel Baldwin', 'Rachael Strong', 'Rhianna Shepard', 'Sarah Page', 'Scott Clayton', 'Sophia Perez', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -120,6 +124,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amelie Bennett', 'Ashton Blackwell', 'Caitlyn King', 'Danyal Lester', 'Genevieve Mclean', 'Liam Hood', 'Lily-Rose Chedjou', 'Noah Pierre', 'Youssef Roberson', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['xuedi', 'Amanda Lowery', 'Ashwin Santiago', 'Ayah Wilkinson', 'Blake Riley', 'Cohen Lozano', 'Courtney Turner', 'Drew Cano', 'Elsie Roy', 'Eva Bond', 'Harry Bender', 'Jackson Reed', 'Jayden Moss', 'Kari Rasmussen', 'Katy Fuller', 'Kyla Clay', 'Loki Bright', 'Lori Bryson', 'Maddison Gillespie', 'Nala Goins', 'Natali Craig', 'Nikolas Gibbons', 'Noah Pierre', 'Rory Huff', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -131,6 +136,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Angelica Wallace', 'Billie Wright', 'Brianna Ware', 'Candice Wu', 'Cohen Lozano', 'Demi Wilkinson', 'Eva Bond', 'Harriet Rojas', 'Harry Bender', 'Isobel Carroll', 'Jessie Meyton', 'Joshua Wilson', 'Kate Morrison', 'Katherine Moss', 'Liam Hood', 'Maxwell Tan', 'Natali Craig', 'Nikolas Gibbons', 'Owen Garcia', 'Sienna Hewitt', 'Zara Bush'],
                 'followers' => ['Alisa Hester', 'Ammar Foley', 'Bec Ferguson', 'Candice Wu', 'Harriet Rojas', 'Jackson Reed', 'Owen Garcia', 'Rachael Strong', 'Youssef Roberson', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -142,6 +148,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anaiah Whitten', 'Ashwin Santiago', 'Aston Hood', 'Billie Wright', 'Julius Vaughan', 'Levi Rocha', 'Rene Wells', 'Sally Mason', 'Youssef Roberson', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Ali Mahdi', 'Alisa Hester', 'Belle Woods', 'Cameron Yang', 'Isla Allison', 'Jessie Meyton', 'Nikolas Gibbons', 'Orlando Diggs', 'Sarah Page', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -153,6 +160,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alec Whitten', 'Amanda Lowery', 'Danyal Lester', 'Ethan Campbell', 'Eve Leroy', 'Fleur Cook', 'Isobel Fuller', 'Jay Shepard', 'Kari Rasmussen', 'Lulu Meyers', 'Noel Baldwin', 'Rory Huff', 'Adem Lane'],
                 'followers' => ['Elisa Nishikawa', 'Erica Wyatt', 'Eva Bond', 'Kelly Williams', 'Maddison Gillespie', 'Marco Gross', 'Mathilde Lewis', 'Molly Vaughan', 'Nicolas Wang', 'Rachael Strong', 'Scott Clayton'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -164,6 +172,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adriana O-Sullivan', 'Ashwin Santiago', 'Demi Wilkinson', 'Harry Bender', 'Lyle Kauffman', 'Marvin Robbins', 'Noel Baldwin', 'xuedi', 'Adem Lane'],
                 'followers' => ['Clifford Jennings', 'Jayden Moss', 'Jessie Meyton', 'Lyle Kauffman', 'Owen Harding', 'Rayhan Zua', 'Youssef Roberson'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -175,6 +184,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Ali Mahdi', 'Alisa Hester', 'Benedict Doherty', 'Elisa Nishikawa', 'Harriet Rojas', 'Harry Bender', 'Isobel Carroll', 'Julius Vaughan', 'Kaden Scott', 'Kaitlin Hale', 'Liam Hood', 'Lily-Rose Chedjou', 'Madeleine Pitts', 'Rhianna Shepard'],
                 'followers' => ['Abraham Baker', 'Amelie Bennett', 'Anaiah Whitten', 'Blake Riley', 'Jaya Willis', 'Lyle Kauffman', 'Olivia Rhye', 'Phoenix Baker', 'Youssef Roberson', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -186,6 +196,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Alisa Hester', 'Genevieve Mclean', 'Jordan Burgess', 'Lana Steiner', 'Nala Goins', 'Nic Fassbender', 'Nicolas Wang', 'Pippa Wilkinson', 'Scott Clayton', 'Zara Bush', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Adem Lane', 'Billie Wright', 'Jonathan Kelly', 'Julius Vaughan', 'Marco Gross', 'Noah Pierre', 'Owen Harding', 'Sarah Page', 'Sophia Perez', 'Zahra Christensen', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -197,6 +208,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ashwin Santiago', 'Freya Browning', 'Jonathan Kelly', 'Katherine Moss', 'Sophia Perez', 'xuedi'],
                 'followers' => ['Candice Wu', 'Drew Cano', 'Freya Browning', 'Joshua Wilson', 'Kate Morrison', 'Levi Rocha', 'Riley O-Moore', 'Sophia Perez', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -208,6 +220,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Aliah Lane', 'Dillan Nguyen', 'Franklin Mays', 'Harry Bender', 'Jayden Moss', 'Kate Morrison', 'Lyle Kauffman', 'Adem Lane'],
                 'followers' => ['Alec Whitten', 'Alisa Hester', 'Brianna Ware', 'Ethan Valdez', 'Frank Whitaker', 'Herbert Fowler', 'Kate Morrison', 'Natali Craig', 'Rene Wells', 'Sienna Hewitt', 'Zahra Christensen', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -219,6 +232,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'Ayah Wilkinson', 'Belle Woods', 'Florence Shaw', 'Madeleine Pitts', 'Nala Goins', 'Nicolas Wang', 'Phoenix Baker', 'Pippa Wilkinson', 'xuedi'],
                 'followers' => ['Clifford Jennings', 'Fleur Cook', 'Isobel Carroll', 'Koray Okumus', 'Scott Clayton', 'Zahir Mays', 'Zahra Christensen', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -230,6 +244,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Bailey Richards', 'Florence Shaw', 'Julius Vaughan', 'Kaden Scott', 'Lulu Meyers', 'Natali Craig', 'Nikolas Gibbons', 'Olly Schroeder', 'Rene Wells', 'Crystal Liu'],
                 'followers' => ['Aliah Lane', 'Belle Woods', 'Clifford Jennings', 'Courtney Turner', 'Elisa Nishikawa', 'Erica Wyatt', 'Freya Browning', 'Kelly Williams', 'Marvin Robbins', 'Mathilde Lewis', 'Owen Garcia'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -241,6 +256,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Bailey Richards', 'Caitlyn King', 'Danyal Lester', 'Eduard Franz', 'Franklin Mays', 'Lulu Meyers', 'Owen Harding', 'Zuzanna Burke', 'xuedi', 'Adem Lane'],
                 'followers' => ['Adil Floyd', 'Aliah Lane', 'Ammar Foley', 'Andi Lane', 'Eva Bond', 'Isla Allison', 'Isobel Carroll', 'Isobel Fuller', 'Jessie Meyton', 'Joshua Wilson', 'Koray Okumus', 'Lucy Bond', 'Owen Harding', 'Sienna Hewitt', 'Youssef Roberson', 'Zaid Schwartz'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -252,6 +268,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alec Whitten', 'Ammar Foley', 'Anaiah Whitten', 'Candice Wu', 'Jackson Reed', 'Lana Steiner', 'Loki Bright', 'Lori Bryson', 'Maddison Gillespie', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Crystal Liu', 'Belle Woods', 'Eduard Franz', 'Ethan Valdez', 'Eve Leroy', 'Kaitlin Hale', 'Levi Rocha', 'Phoenix Baker', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -263,6 +280,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Belle Woods', 'Brianna Ware', 'Jonathan Kelly', 'Katherine Moss', 'Lori Bryson', 'Natali Craig', 'Nikolas Gibbons', 'Sally Mason', 'Adem Lane'],
                 'followers' => ['Alesha Barry', 'Andi Lane', 'Bailey Richards', 'Dillan Nguyen', 'Kate Morrison', 'Koray Okumus', 'Youssef Roberson', 'Zuzanna Burke', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -274,6 +292,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adriana O-Sullivan', 'Amanda Lowery', 'Aston Hood', 'Ava Wright', 'Ayah Wilkinson', 'Aysha Becker', 'Ethan Valdez', 'Fleur Cook', 'Jaya Willis', 'Jay Shepard', 'Jordan Burgess', 'Marvin Robbins', 'Nicolas Trevino', 'Crystal Liu'],
                 'followers' => ['Courtney Turner', 'Eve Leroy', 'Hasan Johns', 'Kate Morrison', 'Nicolas Trevino', 'Nikolas Gibbons', 'Riley O-Moore', 'Sophia Perez', 'Zaynab Donnelly'],
+ 'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -285,6 +304,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adem Lane', 'Adriana O-Sullivan', 'Ammar Foley', 'Erica Wyatt', 'Katherine Moss', 'Lucy Bond', 'Owen Garcia', 'Zahra Christensen', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['import', 'Ashton Blackwell', 'Ashwin Santiago', 'Jaya Willis', 'Jonathan Kelly', 'Maddison Gillespie', 'Marco Gross', 'Rhianna Shepard', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -296,6 +316,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Angelica Wallace', 'Florence Shaw', 'Isla Allison', 'Isobel Fuller', 'Jackson Reed', 'Liam Hood', 'Natali Craig', 'Rene Wells', 'Sarah Page', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Amelie Bennett', 'Courtney Turner', 'Ethan Valdez', 'Maxwell Tan'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -307,6 +328,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amelie Bennett', 'Elena Owens', 'Levi Rocha', 'Luqman Anthony'],
                 'followers' => ['Abraham Baker', 'Amelie Bennett', 'Ava Wright', 'Courtney Turner', 'Lyle Kauffman', 'Marvin Robbins', 'Orlando Diggs', 'Youssef Roberson', 'Zahra Christensen', 'Zara Bush', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -318,6 +340,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anita Cruz', 'Aysha Becker', 'Herbert Fowler', 'Jackson Reed', 'Jayden Moss', 'Mikey Lawrence', 'Orlando Diggs', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Ashton Blackwell', 'Bec Ferguson', 'Candice Wu', 'Demi Wilkinson', 'Elsie Roy', 'Genevieve Mclean', 'Harriet Rojas', 'Joshua Wilson', 'Loki Bright', 'Lola Sanders', 'Rhea Levine', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -329,6 +352,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Ali Mahdi', 'Amelie Bennett', 'Fleur Cook', 'Kari Rasmussen', 'Kelly Williams', 'Koray Okumus', 'Lulu Meyers', 'Owen Garcia', 'Adem Lane'],
                 'followers' => ['Ava Bentley', 'Elsie Roy', 'Jonathan Kelly', 'Julius Vaughan', 'Lana Steiner', 'Lily-Rose Chedjou', 'Noel Baldwin', 'Youssef Roberson', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -340,6 +364,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Benedict Doherty', 'Billie Wright', 'Ethan Valdez', 'Genevieve Mclean', 'Katherine Moss', 'Mikey Lawrence', 'Nala Goins', 'Pippa Wilkinson', 'Zara Bush', 'Zaynab Donnelly', 'xuedi'],
                 'followers' => ['Anaiah Whitten', 'Ayah Wilkinson', 'Aysha Becker', 'Clifford Jennings', 'Hasan Johns', 'Isobel Carroll', 'Isobel Fuller', 'Kari Rasmussen', 'Katy Fuller', 'Kelly Williams', 'Lori Bryson', 'Mikey Lawrence', 'Nicolas Wang', 'Rosalee Melvin', 'Scott Clayton', 'Stefan Sears', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -351,6 +376,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'Amanda Lowery', 'Amelie Laurent', 'Aysha Becker', 'Jonathan Kelly', 'Kaden Scott', 'Kelsey Lowe', 'Levi Rocha', 'Noel Baldwin', 'Olly Schroeder', 'Rene Wells', 'Sophia Perez', 'xuedi'],
                 'followers' => ['Alesha Barry', 'Alisa Hester', 'Amelie Laurent', 'Andi Lane', 'Belle Woods', 'Clifford Jennings', 'Lana Steiner', 'Lola Sanders', 'Rhea Levine', 'Rory Huff'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -362,6 +388,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ava Bentley', 'Belle Woods', 'Florence Shaw', 'Maddison Gillespie', 'Rory Huff', 'Youssef Roberson', 'Adem Lane'],
                 'followers' => ['xuedi', 'Alesha Barry', 'Cohen Lozano', 'Jaya Willis', 'Jay Shepard', 'Lyle Kauffman'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -373,6 +400,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Adil Floyd', 'Ali Mahdi', 'Amelie Bennett', 'Angelica Wallace', 'Blake Riley', 'Danyal Lester', 'Jaya Willis', 'Jayden Moss', 'Leyton Fields', 'Maddison Gillespie', 'Marco Kelly', 'Mikey Lawrence', 'Olly Schroeder', 'Rosalee Melvin', 'xuedi'],
                 'followers' => ['Adem Lane', 'Bailey Richards', 'Belle Woods', 'Hasan Johns', 'Koray Okumus', 'Marco Gross', 'Nicola Harris', 'Zaynab Donnelly', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -384,6 +412,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Blake Riley', 'Byron Robertson', 'Cameron Yang', 'Courtney Turner', 'Dillan Nguyen', 'Elsie Roy', 'Fergus Gray', 'Loki Bright', 'Mikey Lawrence', 'Molly Vaughan', 'Nikolas Gibbons', 'Owen Garcia', 'Rayhan Zua', 'Rory Huff'],
                 'followers' => ['Abraham Baker', 'Ashton Blackwell', 'Ava Wright', 'Danyal Lester', 'Ethan Campbell', 'Joshua Wilson', 'Maxwell Tan', 'Rosalee Melvin', 'Sarah Page', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -395,6 +424,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Elena Owens', 'Kelsey Lowe', 'Kyla Clay', 'Zahra Christensen'],
                 'followers' => ['Belle Woods', 'Caitlyn King', 'Florence Shaw', 'Katherine Moss', 'Lily-Rose Chedjou', 'Lori Bryson', 'Marco Gross', 'Sophia Perez', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -406,6 +436,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Demi Wilkinson', 'Elisa Nishikawa', 'Ethan Campbell', 'Herbert Fowler', 'Jay Shepard', 'Lulu Meyers', 'Rhea Levine', 'Scott Clayton', 'Adem Lane'],
                 'followers' => ['Crystal Liu', 'Benedict Doherty', 'Cohen Lozano', 'Courtney Turner', 'Danyal Lester', 'Fergus Gray', 'Jaya Willis', 'Kyla Clay', 'Maddison Gillespie', 'Madeleine Pitts', 'Owen Harding', 'Rory Huff', 'Scott Clayton', 'Sienna Hewitt', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -417,6 +448,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Adem Lane', 'Aliah Lane', 'Aysha Becker', 'Ethan Campbell', 'Fleur Cook', 'Harry Bender', 'Herbert Fowler', 'Isobel Carroll', 'Jayden Moss', 'Olly Schroeder', 'Owen Harding', 'Zahir Mays', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Alec Whitten', 'Brianna Ware', 'Jonathan Kelly', 'Katherine Moss', 'Mathilde Lewis', 'Sophia Perez', 'Adem Lane'],
+ 'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -428,6 +460,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'xuedi', 'Aston Hood', 'Ava Wright', 'Cameron Yang', 'Courtney Turner', 'Eve Leroy', 'Kelsey Lowe', 'Crystal Liu'],
                 'followers' => ['xuedi', 'Elisa Nishikawa', 'Fergus Gray', 'Kaitlin Hale', 'Kari Rasmussen', 'Lily-Rose Chedjou', 'Zahra Christensen', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -439,6 +472,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ashwin Santiago', 'Aston Hood', 'Aysha Becker', 'Blake Riley', 'Byron Robertson', 'Fleur Cook', 'Kyla Clay', 'Lori Bryson', 'Mollie Hall'],
                 'followers' => ['Ali Mahdi', 'Ashwin Santiago', 'Belle Woods', 'Eduard Franz', 'Frank Whitaker', 'Leyton Fields', 'Liam Hood', 'Mathilde Lewis', 'Nic Fassbender', 'Noel Baldwin', 'Orlando Diggs', 'Youssef Roberson', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -450,6 +484,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Adem Lane', 'Ali Mahdi', 'Amanda Lowery', 'Bailey Richards', 'Bec Ferguson', 'Byron Robertson', 'Danyal Lester', 'Elsie Roy', 'Eva Bond', 'Lola Sanders', 'Orlando Diggs', 'Sophia Perez', 'Crystal Liu'],
                 'followers' => ['Alisa Hester', 'Amanda Lowery', 'Anaiah Whitten', 'Ashton Blackwell', 'Belle Woods', 'Caitlyn King', 'Eduard Franz', 'Erica Wyatt', 'Isobel Carroll', 'Kari Rasmussen', 'Lola Sanders', 'Luqman Anthony', 'Noah Pierre', 'Owen Garcia', 'Owen Harding', 'Sarah Page', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -461,6 +496,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Abraham Baker', 'Billie Wright', 'Courtney Turner', 'Frank Whitaker', 'Lulu Meyers', 'Noel Baldwin', 'Phoenix Baker', 'xuedi', 'Adem Lane'],
                 'followers' => ['Alec Whitten', 'Ava Bentley', 'Benedict Doherty', 'Elsie Roy', 'Joshua Wilson', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -472,6 +508,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Amanda Lowery', 'Aston Hood', 'Danyal Lester', 'Julius Vaughan', 'Kelsey Lowe', 'Loki Bright', 'Rachael Strong', 'Adem Lane'],
                 'followers' => ['Alisa Hester', 'Andi Lane', 'Billie Wright', 'Cohen Lozano', 'Lana Steiner', 'Leyton Fields', 'Lori Bryson', 'Marco Kelly', 'Nic Fassbender', 'Rachael Strong', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -483,6 +520,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adem Lane', 'Amelie Bennett', 'Ammar Foley', 'Anita Cruz', 'Benedict Doherty', 'Byron Robertson', 'Eva Bond', 'Joshua Wilson', 'Kari Rasmussen', 'Katy Fuller', 'Koray Okumus', 'Leyton Fields', 'Marco Gross', 'Mollie Hall', 'Riley O-Moore', 'Rory Huff', 'Sienna Hewitt', 'Sophia Perez', 'xuedi'],
                 'followers' => ['xuedi', 'Amelie Laurent', 'Andi Lane', 'Brianna Ware', 'Joshua Wilson', 'Kari Rasmussen', 'Lana Steiner', 'Lori Bryson', 'Nic Fassbender'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -494,6 +532,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'Alesha Barry', 'Ali Mahdi', 'Bailey Richards', 'Brianna Ware', 'Eduard Franz', 'Isobel Carroll', 'Kaden Scott', 'Koray Okumus', 'Kyla Clay', 'Leyton Fields', 'Lyle Kauffman', 'Mathilde Lewis', 'Molly Vaughan', 'Noel Baldwin', 'Olly Schroeder', 'Scott Clayton', 'Crystal Liu'],
                 'followers' => ['Belle Woods', 'Elisa Nishikawa', 'Ethan Valdez', 'Genevieve Mclean', 'Herbert Fowler', 'Kelly Williams', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -505,6 +544,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Aliah Lane', 'Ava Bentley', 'Aysha Becker', 'Kaden Scott', 'Nicolas Wang', 'Olivia Rhye', 'Owen Garcia', 'Rory Huff'],
                 'followers' => ['Adem Lane', 'Bailey Richards', 'Byron Robertson', 'Cohen Lozano', 'Elisa Nishikawa', 'Elsie Roy', 'Kelly Williams', 'Lulu Meyers', 'Nala Goins', 'Nicola Harris', 'Nicolas Wang', 'Rachael Strong', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -516,6 +556,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Dillan Nguyen', 'Isobel Carroll', 'Rachael Strong', 'Rosalee Melvin'],
                 'followers' => ['Anaiah Whitten', 'Andi Lane', 'Elena Owens', 'Erica Wyatt', 'Fergus Gray', 'Frank Whitaker', 'Molly Vaughan', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -527,6 +568,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Courtney Turner', 'Demi Wilkinson', 'Isobel Fuller', 'Kelsey Lowe', 'Rayhan Zua', 'Riley O-Moore'],
                 'followers' => ['Adem Lane', 'Angelica Wallace', 'Aysha Becker', 'Belle Woods', 'Caitlyn King', 'Eduard Franz', 'Harry Bender', 'Jessie Meyton', 'Jonathan Kelly', 'Lyle Kauffman', 'Maddison Gillespie', 'Sally Mason', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -538,6 +580,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adriana O-Sullivan', 'Ava Wright', 'Harry Bender', 'Jonathan Kelly', 'Nicolas Trevino', 'Owen Garcia', 'Riley O-Moore', 'Youssef Roberson', 'Crystal Liu'],
                 'followers' => ['xuedi', 'Adriana O-Sullivan', 'Caitlyn King', 'Fleur Cook', 'Frank Whitaker', 'Genevieve Mclean', 'Isla Allison', 'Isobel Fuller', 'Jaya Willis', 'Jordan Burgess', 'Kate Morrison', 'Liam Hood', 'Nic Fassbender', 'Rene Wells', 'Rhea Levine', 'Rhianna Shepard', 'Rosalee Melvin', 'Sarah Page', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -549,6 +592,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Aliah Lane', 'Billie Wright', 'Eve Leroy', 'Frank Whitaker', 'Isla Allison', 'Isobel Carroll', 'Loki Bright', 'Madeleine Pitts', 'Marco Kelly', 'Zahra Christensen', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Amanda Lowery', 'Anita Cruz', 'Billie Wright', 'Blake Riley', 'Byron Robertson', 'Eve Leroy', 'Harry Bender', 'Lana Steiner', 'Lulu Meyers', 'Lyle Kauffman', 'Nic Fassbender', 'Nicola Harris', 'Nikolas Gibbons', 'Owen Garcia', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -560,6 +604,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Ali Mahdi', 'Anaiah Whitten', 'Cameron Yang', 'Drew Cano', 'Jayden Moss', 'Natali Craig', 'Owen Harding', 'Zara Bush'],
                 'followers' => ['Abraham Baker', 'Benedict Doherty', 'Eva Bond', 'Fleur Cook', 'Kelly Williams', 'Levi Rocha', 'Mathilde Lewis', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -571,6 +616,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Angelica Wallace', 'Franklin Mays', 'Freya Browning', 'Kate Morrison', 'Nala Goins', 'Nicolas Wang', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Adil Floyd', 'Anaiah Whitten', 'Danyal Lester', 'Eva Bond', 'Fergus Gray', 'Liam Hood', 'Luqman Anthony', 'Nikolas Gibbons', 'Pippa Wilkinson', 'Rhea Levine', 'Sally Mason', 'Sarah Page', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -582,6 +628,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Brianna Ware', 'Maxwell Tan', 'Olly Schroeder'],
                 'followers' => ['Ethan Valdez', 'Isla Allison', 'Jordan Burgess', 'Kyla Clay', 'Lucy Bond', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -593,6 +640,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ashwin Santiago', 'Cameron Yang', 'Eve Leroy', 'Harriet Rojas', 'Noel Baldwin'],
                 'followers' => ['xuedi', 'Byron Robertson', 'Danyal Lester', 'Ethan Campbell', 'Katherine Moss', 'Lana Steiner', 'Mathilde Lewis', 'Mikey Lawrence', 'Nicolas Trevino', 'Nikolas Gibbons', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -604,6 +652,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Clifford Jennings', 'Cohen Lozano', 'Erica Wyatt', 'Fergus Gray', 'Freya Browning', 'Harriet Rojas', 'Katy Fuller', 'Owen Garcia', 'Phoenix Baker'],
                 'followers' => ['Benedict Doherty', 'Blake Riley', 'Cameron Yang', 'Eva Bond', 'Genevieve Mclean', 'Jackson Reed', 'Phoenix Baker', 'Rhianna Shepard', 'Stefan Sears', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -615,6 +664,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amanda Lowery', 'Andi Lane', 'Bec Ferguson', 'Brianna Ware', 'Koray Okumus', 'Phoenix Baker'],
                 'followers' => ['Abraham Baker', 'Andi Lane', 'Anita Cruz', 'Erica Wyatt', 'Kyla Clay', 'Marvin Robbins', 'Nikolas Gibbons', 'Owen Harding', 'Rhianna Shepard', 'Sienna Hewitt', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -626,6 +676,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alesha Barry', 'Brianna Ware', 'Candice Wu', 'Ethan Campbell', 'Franklin Mays', 'Frank Whitaker', 'Jackson Reed', 'Jaya Willis', 'Kate Morrison', 'Liam Hood', 'Nicola Harris', 'Olly Schroeder', 'Youssef Roberson', 'Adem Lane'],
                 'followers' => ['Adil Floyd', 'Alec Whitten', 'Ammar Foley', 'Anaiah Whitten', 'Aysha Becker', 'Cameron Yang', 'Elsie Roy', 'Eva Bond', 'Harry Bender', 'Isobel Carroll', 'Lulu Meyers', 'Noah Pierre', 'Olly Schroeder', 'Zahir Mays', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -637,6 +688,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Clifford Jennings', 'Demi Wilkinson', 'Jaya Willis', 'Joshua Wilson', 'Kelly Williams', 'Marco Kelly', 'Nala Goins', 'Riley O-Moore', 'Rosalee Melvin'],
                 'followers' => ['Anaiah Whitten', 'Ashton Blackwell', 'Candice Wu', 'Frank Whitaker', 'Jessie Meyton', 'Lyle Kauffman', 'Phoenix Baker', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -648,6 +700,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Benedict Doherty', 'Drew Cano', 'Fleur Cook', 'Jay Shepard', 'Jordan Burgess', 'Kari Rasmussen', 'Nicolas Wang', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Adriana O-Sullivan', 'Amelie Laurent', 'Clifford Jennings', 'Fergus Gray', 'Franklin Mays', 'Jay Shepard', 'Kyla Clay', 'Levi Rocha', 'Liam Hood', 'Rhianna Shepard', 'Zara Bush', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -659,6 +712,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amanda Lowery', 'Aston Hood', 'Elena Owens', 'Elsie Roy', 'Erica Wyatt', 'Frank Whitaker', 'Jay Shepard', 'Jonathan Kelly', 'Lori Bryson', 'Natali Craig', 'Owen Harding', 'Zara Bush'],
                 'followers' => ['Alec Whitten', 'Herbert Fowler', 'Marco Kelly', 'Nicolas Trevino', 'Noel Baldwin', 'Sienna Hewitt', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -670,6 +724,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alesha Barry', 'Ali Mahdi', 'Ammar Foley', 'Ayah Wilkinson', 'Aysha Becker', 'Bec Ferguson', 'Harriet Rojas', 'Lily-Rose Chedjou', 'Maxwell Tan', 'Owen Garcia', 'Riley O-Moore', 'Scott Clayton', 'xuedi'],
                 'followers' => ['Anita Cruz', 'Eduard Franz', 'Elena Owens', 'Freya Browning', 'Noah Pierre', 'Olivia Rhye', 'Orlando Diggs', 'Rosalee Melvin', 'Sarah Page', 'Sophia Perez', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -681,6 +736,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Adem Lane', 'Bec Ferguson', 'Cameron Yang', 'Elisa Nishikawa', 'Elsie Roy', 'Hasan Johns', 'Loki Bright', 'Phoenix Baker', 'Scott Clayton', 'Zahir Mays', 'Adem Lane'],
                 'followers' => ['Anaiah Whitten', 'Ashwin Santiago', 'Blake Riley', 'Cameron Yang', 'Nicolas Wang', 'Rhianna Shepard', 'Zara Bush', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -692,6 +748,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Cameron Yang', 'Eduard Franz', 'Frank Whitaker', 'Julius Vaughan', 'Nikolas Gibbons', 'Zahra Christensen'],
                 'followers' => ['xuedi', 'Amelie Laurent', 'Andi Lane', 'Ava Bentley', 'Ava Wright', 'Ayah Wilkinson', 'Byron Robertson', 'Elena Owens', 'Erica Wyatt', 'Ethan Valdez', 'Jessie Meyton', 'Loki Bright', 'Nikolas Gibbons', 'Riley O-Moore', 'Youssef Roberson', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -703,6 +760,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ashwin Santiago', 'Cameron Yang', 'Isobel Carroll', 'Kaitlin Hale', 'Katy Fuller', 'Kelsey Lowe', 'Koray Okumus', 'xuedi'],
                 'followers' => ['Alesha Barry', 'Benedict Doherty', 'Demi Wilkinson', 'Joshua Wilson', 'Katherine Moss', 'Luqman Anthony', 'Maxwell Tan', 'Molly Vaughan', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -714,6 +772,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Andi Lane', 'Cohen Lozano', 'Courtney Turner', 'Freya Browning', 'Jordan Burgess', 'Lucy Bond', 'Natali Craig', 'Owen Garcia', 'Rhea Levine', 'Zara Bush', 'Zuzanna Burke', 'Crystal Liu'],
                 'followers' => ['Amelie Bennett', 'Anita Cruz', 'Bailey Richards', 'Elisa Nishikawa', 'Freya Browning', 'Lucy Bond', 'Luqman Anthony', 'Nic Fassbender', 'Nicolas Trevino', 'Olly Schroeder', 'Orlando Diggs', 'Scott Clayton', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -725,6 +784,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Caitlyn King', 'Joshua Wilson', 'Kaden Scott', 'Koray Okumus', 'Rayhan Zua'],
                 'followers' => ['Ayah Wilkinson', 'Aysha Becker', 'Billie Wright', 'Liam Hood', 'Loki Bright', 'Nic Fassbender', 'Sally Mason', 'Scott Clayton', 'Zara Bush', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -736,6 +796,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Eduard Franz', 'Ethan Campbell', 'Katherine Moss', 'Molly Vaughan', 'Nicolas Trevino', 'Pippa Wilkinson', 'Rene Wells', 'Sophia Perez', 'Adem Lane'],
                 'followers' => ['Elsie Roy', 'Fleur Cook', 'Kari Rasmussen', 'Kate Morrison', 'Liam Hood', 'Lyle Kauffman', 'Owen Harding', 'Priya Shepard', 'Sophia Perez', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -747,6 +808,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Lyle Kauffman', 'Orlando Diggs', 'Owen Harding', 'Rhea Levine', 'Zaynab Donnelly'],
                 'followers' => ['Benedict Doherty', 'Cameron Yang', 'Fleur Cook', 'Hasan Johns', 'Kyla Clay', 'Maddison Gillespie', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -758,6 +820,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Ammar Foley', 'Ayah Wilkinson', 'Billie Wright', 'Cohen Lozano', 'Ethan Campbell', 'Harriet Rojas', 'Kate Morrison', 'Kyla Clay', 'Leyton Fields', 'Marco Gross', 'Pippa Wilkinson', 'Rachael Strong', 'xuedi', 'Adem Lane'],
                 'followers' => ['Alesha Barry', 'Byron Robertson', 'Clifford Jennings', 'Julius Vaughan', 'Lulu Meyers', 'Noel Baldwin', 'Rachael Strong', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -769,6 +832,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ammar Foley', 'Franklin Mays', 'Hasan Johns', 'Isobel Carroll', 'Lyle Kauffman', 'Marco Kelly', 'Mikey Lawrence', 'Olly Schroeder', 'Rhianna Shepard'],
                 'followers' => ['Adem Lane', 'Aston Hood', 'Caitlyn King', 'Mikey Lawrence', 'Nicola Harris', 'Rhianna Shepard', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -780,6 +844,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Abraham Baker', 'Cohen Lozano', 'Dillan Nguyen', 'Elisa Nishikawa', 'Koray Okumus', 'Levi Rocha', 'Lucy Bond', 'Marco Kelly', 'Owen Garcia'],
                 'followers' => ['Amanda Lowery', 'Belle Woods', 'Elisa Nishikawa', 'Erica Wyatt', 'Jayden Moss', 'Nicolas Wang', 'Owen Garcia', 'Crystal Liu'],
+'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -791,6 +856,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Andi Lane', 'Bailey Richards', 'Courtney Turner', 'Erica Wyatt', 'Eve Leroy', 'Maxwell Tan', 'Orlando Diggs'],
                 'followers' => ['Ashton Blackwell', 'Fleur Cook', 'Genevieve Mclean', 'Kyla Clay', 'Rachael Strong'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -802,6 +868,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adriana O-Sullivan', 'Courtney Turner', 'Eduard Franz', 'Eva Bond', 'Florence Shaw', 'Kari Rasmussen', 'Lily-Rose Chedjou', 'Marco Kelly', 'Mathilde Lewis', 'xuedi', 'Adem Lane'],
                 'followers' => ['Abraham Baker', 'Aston Hood', 'Brianna Ware', 'Jordan Burgess', 'Kelly Williams', 'Koray Okumus', 'Loki Bright', 'Olly Schroeder', 'Phoenix Baker'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -813,6 +880,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ammar Foley', 'Ava Wright', 'Ayah Wilkinson', 'Erica Wyatt', 'Fleur Cook', 'Franklin Mays', 'Jaya Willis', 'Kaitlin Hale', 'Katherine Moss', 'Kyla Clay', 'Loki Bright', 'Lyle Kauffman', 'Molly Vaughan', 'Owen Harding', 'Priya Shepard', 'Stefan Sears'],
                 'followers' => ['Adem Lane', 'Anaiah Whitten', 'Aston Hood', 'Ava Bentley', 'Brianna Ware', 'Cohen Lozano', 'Ethan Valdez', 'Katherine Moss', 'Liam Hood', 'Nicola Harris'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -824,6 +892,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Candice Wu', 'Dillan Nguyen', 'Drew Cano', 'Frank Whitaker', 'Isobel Fuller', 'Kate Morrison', 'Kelsey Lowe', 'Marco Kelly'],
                 'followers' => ['Alec Whitten', 'Andi Lane', 'Danyal Lester', 'Elisa Nishikawa', 'Franklin Mays', 'Mollie Hall', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -835,6 +904,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Frank Whitaker', 'Madeleine Pitts', 'Olly Schroeder', 'xuedi', 'Adem Lane'],
                 'followers' => ['Ashton Blackwell', 'Eva Bond', 'Isobel Carroll', 'Koray Okumus', 'Lyle Kauffman', 'Nicola Harris', 'Sally Mason'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -846,6 +916,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ammar Foley', 'Courtney Turner', 'Elisa Nishikawa', 'Jonathan Kelly', 'Kaden Scott', 'Kelly Williams', 'Luqman Anthony', 'Molly Vaughan', 'Natali Craig', 'Olly Schroeder', 'Rhianna Shepard', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Adem Lane', 'Ali Mahdi', 'Clifford Jennings', 'Drew Cano', 'Herbert Fowler', 'Jaya Willis', 'Kelly Williams', 'Lola Sanders'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -857,6 +928,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Elisa Nishikawa', 'Florence Shaw', 'Kate Morrison', 'Rosalee Melvin', 'Stefan Sears', 'Adem Lane'],
                 'followers' => ['Lana Steiner', 'Levi Rocha', 'Mikey Lawrence', 'Rhianna Shepard', 'Rosalee Melvin', 'xuedi'],
+'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -868,6 +940,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ashton Blackwell', 'Cameron Yang', 'Eduard Franz', 'Fleur Cook', 'Isobel Fuller', 'Kaitlin Hale', 'Liam Hood', 'Zahir Mays'],
                 'followers' => ['Billie Wright', 'Kaden Scott', 'Maxwell Tan', 'Sally Mason'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -879,6 +952,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Aston Hood', 'Danyal Lester', 'Erica Wyatt', 'Florence Shaw', 'Jaya Willis', 'Jordan Burgess', 'Kaden Scott', 'Rory Huff', 'Zahra Christensen', 'xuedi'],
                 'followers' => ['Danyal Lester', 'Eve Leroy', 'Isobel Carroll', 'Jessie Meyton', 'Kari Rasmussen', 'Kelly Williams', 'Levi Rocha', 'Madeleine Pitts', 'Marco Kelly', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -890,6 +964,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adil Floyd', 'Benedict Doherty', 'Cohen Lozano', 'Katy Fuller', 'Lucy Bond', 'Marco Gross', 'Nicolas Wang', 'Crystal Liu'],
                 'followers' => ['xuedi', 'Amelie Bennett', 'Bailey Richards', 'Blake Riley', 'Dillan Nguyen', 'Eva Bond', 'Isla Allison', 'Kaden Scott', 'Owen Garcia', 'Phoenix Baker', 'Rhea Levine', 'Rhianna Shepard', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -901,6 +976,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Brianna Ware', 'Caitlyn King', 'Herbert Fowler', 'Kyla Clay', 'Lola Sanders', 'Noah Pierre', 'Rory Huff', 'Rosalee Melvin', 'Zara Bush', 'Crystal Liu'],
                 'followers' => ['import', 'Abraham Baker', 'Herbert Fowler', 'Jonathan Kelly', 'Marco Kelly', 'Nic Fassbender', 'Nikolas Gibbons', 'Owen Garcia', 'Priya Shepard', 'Sophia Perez', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -912,6 +988,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Elisa Nishikawa', 'Fleur Cook', 'Hasan Johns', 'Jay Shepard', 'Lana Steiner', 'Molly Vaughan', 'Noel Baldwin', 'Phoenix Baker', 'Scott Clayton'],
                 'followers' => ['Crystal Liu', 'Caitlyn King', 'Jackson Reed', 'Marvin Robbins', 'Natali Craig', 'Noah Pierre', 'Rory Huff', 'Youssef Roberson', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -923,6 +1000,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Abraham Baker', 'Adem Lane', 'Aliah Lane', 'Bec Ferguson', 'Cameron Yang', 'Clifford Jennings', 'Eve Leroy', 'Jay Shepard', 'Katherine Moss', 'Leyton Fields', 'Maddison Gillespie', 'Madeleine Pitts', 'Marco Kelly', 'Nala Goins', 'Sienna Hewitt', 'Sophia Perez', 'xuedi'],
                 'followers' => ['Crystal Liu', 'Jessie Meyton', 'Kelly Williams', 'Lana Steiner', 'Phoenix Baker', 'Sienna Hewitt', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -934,6 +1012,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Dillan Nguyen', 'Franklin Mays', 'Freya Browning', 'Isla Allison', 'Jonathan Kelly', 'Lily-Rose Chedjou', 'Lyle Kauffman', 'Mollie Hall', 'Nicola Harris', 'Olivia Rhye'],
                 'followers' => ['Blake Riley', 'Franklin Mays', 'Genevieve Mclean', 'Isla Allison', 'Jonathan Kelly', 'Joshua Wilson', 'Koray Okumus', 'Marco Gross', 'Olivia Rhye', 'Rayhan Zua', 'Rhea Levine', 'Sarah Page'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -945,6 +1024,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Alesha Barry', 'Anaiah Whitten', 'Anita Cruz', 'Jay Shepard', 'Jordan Burgess', 'Kaitlin Hale', 'Kate Morrison', 'Katherine Moss', 'Mathilde Lewis', 'Nikolas Gibbons', 'Zahra Christensen', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Anita Cruz', 'Erica Wyatt', 'Ethan Valdez', 'Jackson Reed', 'Natali Craig', 'Rayhan Zua', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -956,6 +1036,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Andi Lane', 'Bailey Richards', 'Elena Owens', 'Jackson Reed', 'Joshua Wilson', 'Nicolas Trevino', 'Owen Garcia', 'Zahra Christensen', 'Adem Lane'],
                 'followers' => ['Alec Whitten', 'Ashwin Santiago', 'Caitlyn King', 'Jessie Meyton', 'Jonathan Kelly', 'Kari Rasmussen', 'Rhianna Shepard', 'Sophia Perez', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -967,6 +1048,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Bec Ferguson', 'Blake Riley', 'Elsie Roy', 'Isla Allison', 'Sienna Hewitt', 'Zahir Mays'],
                 'followers' => ['xuedi', 'Amanda Lowery', 'Fergus Gray', 'Nicola Harris', 'Rhianna Shepard', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -978,6 +1060,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ayah Wilkinson', 'Bailey Richards', 'Jayden Moss', 'Katy Fuller', 'Lucy Bond', 'Luqman Anthony', 'Natali Craig', 'Adem Lane'],
                 'followers' => ['Angelica Wallace', 'Erica Wyatt', 'Jordan Burgess', 'Kaden Scott', 'Riley O-Moore', 'Crystal Liu'],
+'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -989,6 +1072,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Abraham Baker', 'Amanda Lowery', 'Eduard Franz', 'Freya Browning', 'Kelsey Lowe', 'Loki Bright', 'Nala Goins', 'Rayhan Zua', 'Stefan Sears'],
                 'followers' => ['Aliah Lane', 'Ayah Wilkinson', 'Ethan Valdez', 'Isla Allison', 'Jaya Willis', 'Nic Fassbender', 'Nicolas Trevino', 'Olly Schroeder', 'Youssef Roberson', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1000,6 +1084,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Brianna Ware', 'Elena Owens', 'Lulu Meyers', 'Lyle Kauffman', 'Rhea Levine', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Aysha Becker', 'Cameron Yang', 'Jay Shepard', 'Owen Garcia', 'Phoenix Baker', 'Rayhan Zua', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -1011,6 +1096,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Ayah Wilkinson', 'Brianna Ware', 'Byron Robertson', 'Caitlyn King', 'Drew Cano', 'Elena Owens', 'Eve Leroy', 'Joshua Wilson', 'Koray Okumus', 'Noah Pierre', 'Sally Mason', 'Crystal Liu'],
                 'followers' => ['Adem Lane', 'Amanda Lowery', 'Ammar Foley', 'Clifford Jennings', 'Drew Cano', 'Jackson Reed', 'Kari Rasmussen', 'Kelsey Lowe', 'Koray Okumus', 'Maxwell Tan', 'Zuzanna Burke'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1022,6 +1108,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adil Floyd', 'Alesha Barry', 'Amanda Lowery', 'Ava Bentley', 'Belle Woods', 'Elena Owens', 'Julius Vaughan', 'Kelly Williams', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['import', 'Elisa Nishikawa', 'Ethan Valdez', 'Leyton Fields', 'Marco Gross', 'Mikey Lawrence', 'Zaynab Donnelly', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1033,6 +1120,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ayah Wilkinson', 'Caitlyn King', 'Courtney Turner', 'Eve Leroy', 'Isla Allison', 'Jackson Reed', 'Olivia Rhye', 'Rene Wells', 'xuedi'],
                 'followers' => ['Amelie Bennett', 'Ashwin Santiago', 'Bec Ferguson', 'Eduard Franz', 'Freya Browning', 'Jonathan Kelly', 'Kaitlin Hale', 'Katy Fuller', 'Lulu Meyers', 'Rachael Strong', 'Rhea Levine', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1044,6 +1132,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alesha Barry', 'Danyal Lester', 'Franklin Mays', 'Harry Bender', 'Scott Clayton', 'Zaynab Donnelly', 'Zuzanna Burke', 'xuedi'],
                 'followers' => ['Adil Floyd', 'Ayah Wilkinson', 'Aysha Becker', 'Belle Woods', 'Courtney Turner', 'Florence Shaw', 'Isla Allison', 'Lily-Rose Chedjou', 'Loki Bright', 'Mollie Hall', 'Rosalee Melvin', 'Youssef Roberson', 'Zahir Mays', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1055,6 +1144,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Aston Hood', 'Billie Wright', 'Danyal Lester', 'Eva Bond', 'Genevieve Mclean', 'Harriet Rojas', 'Isobel Carroll', 'Isobel Fuller', 'Jaya Willis', 'Kate Morrison', 'Madeleine Pitts', 'Mathilde Lewis', 'Noah Pierre', 'xuedi'],
                 'followers' => ['Ammar Foley', 'Andi Lane', 'Blake Riley', 'Jessie Meyton', 'Jordan Burgess', 'Kate Morrison', 'Nala Goins', 'Youssef Roberson'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1066,6 +1156,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adriana O-Sullivan', 'Brianna Ware', 'Danyal Lester', 'Jessie Meyton', 'Julius Vaughan', 'Koray Okumus', 'Lily-Rose Chedjou', 'Lulu Meyers', 'Mathilde Lewis', 'Maxwell Tan', 'Scott Clayton', 'Adem Lane'],
                 'followers' => ['Adil Floyd', 'Andi Lane', 'Anita Cruz', 'Ava Bentley', 'Caitlyn King', 'Harriet Rojas', 'Isobel Fuller', 'Lily-Rose Chedjou', 'Lulu Meyers', 'Mathilde Lewis', 'Maxwell Tan', 'Mollie Hall', 'Molly Vaughan', 'Riley O-Moore', 'Sarah Page', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1077,6 +1168,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Freya Browning', 'Isla Allison', 'Olly Schroeder', 'Sally Mason', 'Zahra Christensen'],
                 'followers' => ['Demi Wilkinson', 'Florence Shaw', 'Julius Vaughan', 'Leyton Fields', 'Loki Bright', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1088,6 +1180,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Candice Wu', 'Courtney Turner', 'Ethan Campbell', 'Herbert Fowler', 'Jessie Meyton', 'Katherine Moss', 'Leyton Fields', 'Zahir Mays', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Alisa Hester', 'Ashton Blackwell', 'Courtney Turner', 'Elsie Roy', 'Katherine Moss', 'Lily-Rose Chedjou', 'Loki Bright', 'Mikey Lawrence', 'Rosalee Melvin'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1099,6 +1192,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Aliah Lane', 'Anaiah Whitten', 'Bec Ferguson', 'Elena Owens', 'Marco Kelly', 'Mikey Lawrence', 'Rayhan Zua', 'Adem Lane'],
                 'followers' => ['Cameron Yang', 'Marco Kelly', 'Noel Baldwin', 'Orlando Diggs', 'Sienna Hewitt', 'xuedi'],
+'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1110,6 +1204,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Abraham Baker', 'Angelica Wallace', 'Bec Ferguson', 'Blake Riley', 'Brianna Ware', 'Clifford Jennings', 'Cohen Lozano', 'Demi Wilkinson', 'Ethan Valdez', 'Florence Shaw', 'Lana Steiner', 'Lyle Kauffman', 'xuedi', 'Adem Lane'],
                 'followers' => ['Abraham Baker', 'Ali Mahdi', 'Amanda Lowery', 'Angelica Wallace', 'Byron Robertson', 'Demi Wilkinson', 'Erica Wyatt', 'Ethan Valdez', 'Loki Bright', 'Nikolas Gibbons', 'Phoenix Baker', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1121,6 +1216,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amelie Laurent', 'Ava Bentley', 'Ava Wright', 'Belle Woods', 'Blake Riley', 'Brianna Ware', 'Florence Shaw', 'Julius Vaughan', 'Kate Morrison', 'Kyla Clay', 'Lori Bryson', 'Nicolas Wang', 'Noah Pierre', 'Noel Baldwin', 'Rachael Strong'],
                 'followers' => ['Anaiah Whitten', 'Angelica Wallace', 'Aysha Becker', 'Fergus Gray', 'Leyton Fields', 'Madeleine Pitts', 'Nic Fassbender', 'Owen Garcia', 'Stefan Sears', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1132,6 +1228,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Frank Whitaker', 'Herbert Fowler', 'Jay Shepard', 'Mikey Lawrence', 'Molly Vaughan', 'xuedi'],
                 'followers' => ['import', 'Aliah Lane', 'Amelie Laurent', 'Anaiah Whitten', 'Ashwin Santiago', 'Belle Woods', 'Eduard Franz', 'Fergus Gray', 'Fleur Cook', 'Jaya Willis', 'Kelly Williams', 'Lori Bryson', 'Mathilde Lewis', 'Noel Baldwin', 'Sienna Hewitt', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -1143,6 +1240,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ava Bentley', 'Clifford Jennings', 'Elsie Roy', 'Sienna Hewitt', 'xuedi', 'Adem Lane'],
                 'followers' => ['Adriana O-Sullivan', 'Aysha Becker', 'Clifford Jennings', 'Ethan Campbell', 'Harriet Rojas', 'Lana Steiner', 'Noel Baldwin', 'Owen Garcia'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -1154,6 +1252,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Adil Floyd', 'Billie Wright', 'Clifford Jennings', 'Cohen Lozano', 'Levi Rocha', 'Nicola Harris', 'Sarah Page', 'xuedi'],
                 'followers' => ['xuedi', 'Crystal Liu', 'Herbert Fowler', 'Jay Shepard', 'Kyla Clay', 'Lucy Bond', 'Madeleine Pitts', 'Nic Fassbender', 'Nicolas Trevino', 'Owen Harding', 'Pippa Wilkinson', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1165,6 +1264,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Genevieve Mclean', 'Jonathan Kelly', 'Lana Steiner', 'Lily-Rose Chedjou', 'Lucy Bond', 'Crystal Liu'],
                 'followers' => ['Adriana O-Sullivan', 'Alec Whitten', 'Aliah Lane', 'Belle Woods', 'Franklin Mays', 'Jordan Burgess', 'Kelly Williams', 'Koray Okumus', 'Lulu Meyers', 'Nicola Harris', 'Noel Baldwin', 'Scott Clayton', 'Sienna Hewitt', 'Youssef Roberson', 'Zahir Mays', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1176,6 +1276,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adem Lane', 'Angelica Wallace', 'Bec Ferguson', 'Billie Wright', 'Blake Riley', 'Ethan Valdez', 'Herbert Fowler', 'Jay Shepard', 'Olly Schroeder', 'Orlando Diggs', 'Owen Garcia', 'Rhea Levine', 'Riley O-Moore', 'Zaid Schwartz'],
                 'followers' => ['Cameron Yang', 'Jaya Willis', 'Julius Vaughan', 'Lulu Meyers', 'Marco Kelly', 'Molly Vaughan', 'Nala Goins', 'Natali Craig', 'Nicolas Trevino', 'Nikolas Gibbons', 'Olivia Rhye', 'Pippa Wilkinson', 'Rene Wells', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1187,6 +1288,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adil Floyd', 'Ammar Foley', 'Bailey Richards', 'Clifford Jennings', 'Elisa Nishikawa', 'Kaitlin Hale'],
                 'followers' => ['Angelica Wallace', 'Elsie Roy', 'Mikey Lawrence', 'Molly Vaughan'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1198,6 +1300,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Benedict Doherty', 'Blake Riley', 'Lyle Kauffman', 'Marco Gross', 'Maxwell Tan', 'Mikey Lawrence', 'Pippa Wilkinson', 'Sarah Page', 'Zara Bush', 'xuedi', 'Adem Lane'],
                 'followers' => ['Ava Bentley', 'Brianna Ware', 'Harry Bender', 'Jaya Willis', 'Nala Goins', 'Natali Craig', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1209,6 +1312,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alesha Barry', 'Ali Mahdi', 'Katherine Moss', 'Kyla Clay', 'Lana Steiner', 'Zaid Schwartz', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Isla Allison', 'Jackson Reed', 'Jordan Burgess', 'Molly Vaughan', 'Nikolas Gibbons', 'Sally Mason', 'Zara Bush', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1220,6 +1324,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Benedict Doherty', 'Clifford Jennings', 'Dillan Nguyen', 'Ethan Campbell', 'Eve Leroy', 'Harry Bender', 'Isla Allison', 'Isobel Carroll', 'Liam Hood', 'Lily-Rose Chedjou', 'Lyle Kauffman', 'Nicolas Wang', 'Rosalee Melvin'],
                 'followers' => ['Alesha Barry', 'Eve Leroy', 'Freya Browning', 'Hasan Johns', 'Isobel Carroll', 'Katy Fuller', 'Lana Steiner', 'Leyton Fields', 'Maxwell Tan', 'Molly Vaughan', 'Nicola Harris', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -1231,6 +1336,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Abraham Baker', 'Ashwin Santiago', 'Blake Riley', 'Demi Wilkinson', 'Franklin Mays', 'Luqman Anthony', 'Nikolas Gibbons', 'Rachael Strong', 'Rhianna Shepard', 'Rosalee Melvin', 'Zaynab Donnelly'],
                 'followers' => ['Eduard Franz', 'Eve Leroy', 'Kaden Scott', 'Rhea Levine'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1242,6 +1348,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'Adil Floyd', 'Brianna Ware', 'Elena Owens', 'Kari Rasmussen', 'Nikolas Gibbons', 'Priya Shepard', 'Youssef Roberson'],
                 'followers' => ['Ava Wright', 'Brianna Ware', 'Julius Vaughan', 'Kelsey Lowe', 'Nicola Harris', 'Noah Pierre', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1253,6 +1360,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Adil Floyd', 'Ayah Wilkinson', 'Aysha Becker', 'Ethan Campbell', 'Eve Leroy', 'Isla Allison', 'Isobel Fuller', 'Kari Rasmussen', 'Lucy Bond', 'Mikey Lawrence', 'Nicolas Trevino', 'xuedi', 'Adem Lane'],
                 'followers' => ['Ayah Wilkinson', 'Belle Woods', 'Dillan Nguyen', 'Florence Shaw', 'Jayden Moss', 'Kelly Williams', 'Marco Gross', 'Olly Schroeder', 'Owen Garcia', 'Phoenix Baker', 'Zahra Christensen', 'Zaid Schwartz', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1264,6 +1372,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Anita Cruz', 'Blake Riley', 'Elsie Roy', 'Eva Bond', 'Eve Leroy', 'Fergus Gray', 'Kaden Scott', 'Nala Goins', 'Noel Baldwin', 'Olly Schroeder', 'Sophia Perez', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Aliah Lane', 'Amanda Lowery', 'Aysha Becker', 'Billie Wright', 'Frank Whitaker', 'Harry Bender', 'Levi Rocha', 'Noah Pierre', 'Rachael Strong', 'Zaynab Donnelly', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1275,6 +1384,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alisa Hester', 'Ethan Valdez', 'Katherine Moss', 'Rhea Levine', 'Stefan Sears', 'Crystal Liu'],
                 'followers' => ['Ali Mahdi', 'Amelie Laurent', 'Belle Woods', 'Eduard Franz', 'Elena Owens', 'Eve Leroy', 'Hasan Johns', 'Kelsey Lowe', 'Levi Rocha', 'Leyton Fields', 'Olly Schroeder', 'Rene Wells', 'Youssef Roberson', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1286,6 +1396,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Angelica Wallace', 'Ava Wright', 'Elisa Nishikawa', 'Jordan Burgess', 'Liam Hood', 'Youssef Roberson', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Crystal Liu', 'Alesha Barry', 'Amanda Lowery', 'Ashton Blackwell', 'Hasan Johns', 'Kate Morrison', 'Kyla Clay', 'Marvin Robbins', 'Olly Schroeder', 'Pippa Wilkinson', 'Priya Shepard', 'Rayhan Zua', 'Zahra Christensen', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1297,6 +1408,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ashwin Santiago', 'Bailey Richards', 'Blake Riley', 'Elisa Nishikawa', 'Ethan Campbell', 'Kaden Scott', 'Levi Rocha', 'Marvin Robbins', 'Nic Fassbender', 'Rayhan Zua', 'Rhea Levine', 'Sally Mason', 'Sarah Page'],
                 'followers' => ['Aston Hood', 'Ava Wright', 'Brianna Ware', 'Candice Wu', 'Jessie Meyton', 'Levi Rocha', 'Leyton Fields', 'Lucy Bond', 'Maddison Gillespie', 'Nicola Harris', 'Olivia Rhye', 'Owen Harding', 'Sophia Perez', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1308,6 +1420,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anita Cruz', 'Eva Bond', 'Hasan Johns', 'Jackson Reed', 'Jessie Meyton', 'Marco Gross', 'Natali Craig', 'Youssef Roberson', 'xuedi', 'Adem Lane'],
                 'followers' => ['Blake Riley', 'Drew Cano', 'Elena Owens', 'Elisa Nishikawa', 'Jonathan Kelly', 'Owen Garcia', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1319,6 +1432,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anaiah Whitten', 'Blake Riley', 'Julius Vaughan', 'Orlando Diggs', 'Riley O-Moore', 'xuedi', 'Adem Lane'],
                 'followers' => ['Amanda Lowery', 'Amelie Laurent', 'Ashton Blackwell', 'Brianna Ware', 'Franklin Mays', 'Jay Shepard', 'Marco Gross', 'Owen Harding', 'Stefan Sears'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1330,6 +1444,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adem Lane', 'Adriana O-Sullivan', 'Alisa Hester', 'Cohen Lozano', 'Eduard Franz', 'Elena Owens', 'Elsie Roy', 'Eve Leroy', 'Herbert Fowler', 'Isobel Carroll', 'Isobel Fuller', 'Joshua Wilson', 'Kaitlin Hale', 'Lulu Meyers', 'Noah Pierre', 'Sophia Perez', 'Zahra Christensen'],
                 'followers' => ['import', 'Candice Wu', 'Elena Owens', 'Harriet Rojas', 'Rosalee Melvin'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1341,6 +1456,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Billie Wright', 'Fergus Gray', 'Florence Shaw', 'Frank Whitaker', 'Hasan Johns', 'Jackson Reed', 'Owen Harding', 'Rayhan Zua', 'Rory Huff', 'Zahra Christensen', 'Adem Lane'],
                 'followers' => ['Alisa Hester', 'Amelie Laurent', 'Andi Lane', 'Cameron Yang', 'Courtney Turner', 'Katherine Moss', 'Kelly Williams', 'Marco Gross', 'Marvin Robbins', 'Noah Pierre', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1352,6 +1468,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'Alisa Hester', 'Amelie Bennett', 'Ava Wright', 'Bailey Richards', 'Brianna Ware', 'Cameron Yang', 'Clifford Jennings', 'Isla Allison', 'Jackson Reed', 'Levi Rocha', 'Leyton Fields', 'Lulu Meyers', 'Rory Huff', 'Zahra Christensen', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Amanda Lowery', 'Caitlyn King', 'Frank Whitaker', 'Jessie Meyton', 'Jonathan Kelly', 'Kate Morrison', 'Lana Steiner', 'Mollie Hall', 'Noel Baldwin', 'Stefan Sears', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1363,6 +1480,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Aston Hood', 'Belle Woods', 'Demi Wilkinson', 'Lucy Bond', 'Nicola Harris', 'Nikolas Gibbons', 'Olly Schroeder', 'Stefan Sears', 'xuedi', 'Adem Lane'],
                 'followers' => ['Ayah Wilkinson', 'Jay Shepard', 'Katy Fuller', 'Kelly Williams', 'Kyla Clay', 'Lulu Meyers', 'Molly Vaughan', 'Olivia Rhye', 'Rachael Strong', 'Rene Wells', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1374,6 +1492,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Aliah Lane', 'Ava Bentley', 'Courtney Turner', 'Liam Hood', 'Marvin Robbins', 'Molly Vaughan', 'Riley O-Moore', 'Stefan Sears', 'Zaynab Donnelly', 'Adem Lane'],
                 'followers' => ['Adem Lane', 'Aliah Lane', 'Demi Wilkinson', 'Herbert Fowler', 'Isobel Carroll', 'Luqman Anthony', 'Rhianna Shepard', 'Stefan Sears', 'Zahir Mays', 'Zaid Schwartz', 'Zuzanna Burke'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1385,6 +1504,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Alisa Hester', 'Amelie Bennett', 'Cohen Lozano', 'xuedi'],
                 'followers' => ['Adil Floyd', 'Cohen Lozano', 'Drew Cano', 'Elsie Roy', 'Ethan Campbell', 'Harriet Rojas', 'Jordan Burgess', 'Priya Shepard'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1396,6 +1516,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alisa Hester', 'Amelie Laurent', 'Ammar Foley', 'Ashton Blackwell', 'Belle Woods', 'Dillan Nguyen', 'Erica Wyatt', 'Eve Leroy', 'Fergus Gray', 'Kari Rasmussen', 'Liam Hood', 'Lola Sanders', 'Nala Goins', 'Nicola Harris', 'Rhea Levine', 'Youssef Roberson', 'xuedi'],
                 'followers' => ['Alec Whitten', 'Bailey Richards', 'Bec Ferguson', 'Belle Woods', 'Brianna Ware', 'Isla Allison', 'Isobel Carroll', 'Olly Schroeder', 'Owen Harding', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1407,6 +1528,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Billie Wright', 'Erica Wyatt', 'Frank Whitaker', 'Phoenix Baker', 'Zaid Schwartz', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Abraham Baker', 'Benedict Doherty', 'Cameron Yang', 'Drew Cano', 'Elena Owens', 'Ethan Campbell', 'Kari Rasmussen', 'Lucy Bond', 'Marvin Robbins', 'Nicola Harris', 'Pippa Wilkinson', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1418,6 +1540,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Benedict Doherty', 'Liam Hood', 'Loki Bright', 'Marco Gross', 'Orlando Diggs'],
                 'followers' => ['import', 'Andi Lane', 'Anita Cruz', 'Herbert Fowler', 'Isobel Fuller', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1429,6 +1552,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Demi Wilkinson', 'Elisa Nishikawa', 'Franklin Mays', 'Genevieve Mclean', 'Jay Shepard', 'Noah Pierre', 'Olivia Rhye', 'Pippa Wilkinson', 'Zahra Christensen', 'Crystal Liu'],
                 'followers' => ['Alisa Hester', 'Jayden Moss', 'Jessie Meyton', 'Julius Vaughan', 'Kyla Clay', 'Lily-Rose Chedjou', 'Marvin Robbins', 'Nic Fassbender', 'Pippa Wilkinson', 'Priya Shepard', 'Zaid Schwartz', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1440,6 +1564,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Adem Lane', 'Ava Wright', 'Ayah Wilkinson', 'Brianna Ware', 'Franklin Mays', 'Frank Whitaker', 'Genevieve Mclean', 'Hasan Johns', 'Jonathan Kelly', 'Kaden Scott', 'Lola Sanders', 'Marvin Robbins', 'Sienna Hewitt'],
                 'followers' => ['Alesha Barry', 'Ashwin Santiago', 'Jessie Meyton', 'Maddison Gillespie', 'Zaid Schwartz'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1451,6 +1576,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ali Mahdi', 'Amelie Laurent', 'Ashton Blackwell', 'Bailey Richards', 'Courtney Turner', 'Zaid Schwartz', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Aliah Lane', 'Ali Mahdi', 'Ammar Foley', 'Cameron Yang', 'Fergus Gray', 'Katherine Moss', 'Maddison Gillespie', 'Olly Schroeder', 'Owen Harding', 'Sophia Perez', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1462,6 +1588,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Bailey Richards', 'Fleur Cook', 'Hasan Johns', 'Kelly Williams', 'Lana Steiner', 'Lily-Rose Chedjou', 'Marco Kelly', 'Rachael Strong', 'Sophia Perez', 'Zuzanna Burke', 'xuedi', 'Adem Lane'],
                 'followers' => ['import', 'Abraham Baker', 'Amanda Lowery', 'Benedict Doherty', 'Maxwell Tan', 'Nala Goins', 'Orlando Diggs', 'Zaynab Donnelly', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1473,6 +1600,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['import', 'Candice Wu', 'Harriet Rojas', 'Liam Hood', 'Lori Bryson', 'Molly Vaughan', 'Orlando Diggs', 'Rhianna Shepard', 'Sarah Page', 'Youssef Roberson', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Crystal Liu', 'Amanda Lowery', 'Bailey Richards', 'Franklin Mays', 'Jonathan Kelly', 'Loki Bright', 'Lyle Kauffman', 'Mikey Lawrence', 'Nicolas Trevino', 'Owen Harding', 'Phoenix Baker', 'Rhianna Shepard'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1484,6 +1612,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anita Cruz', 'Blake Riley', 'Jayden Moss', 'Leyton Fields', 'Nala Goins', 'Olivia Rhye'],
                 'followers' => ['Alec Whitten', 'Alisa Hester', 'Ashton Blackwell', 'Herbert Fowler', 'Isla Allison', 'Loki Bright', 'Mikey Lawrence', 'Phoenix Baker', 'Priya Shepard', 'Sienna Hewitt', 'Zahra Christensen', 'Zaynab Donnelly'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1495,6 +1624,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['xuedi', 'Ava Bentley', 'Bailey Richards', 'Drew Cano', 'Elisa Nishikawa', 'Fleur Cook', 'Isla Allison', 'Jonathan Kelly', 'Kaitlin Hale', 'Kate Morrison', 'Katy Fuller', 'Kelsey Lowe', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Byron Robertson', 'Cohen Lozano', 'Drew Cano', 'Fergus Gray', 'Hasan Johns', 'Jessie Meyton', 'Lori Bryson', 'Owen Garcia', 'Youssef Roberson', 'Zahir Mays', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1506,6 +1636,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alesha Barry', 'Amelie Laurent', 'Ashton Blackwell', 'Ava Wright', 'Demi Wilkinson', 'Drew Cano', 'Fergus Gray', 'Jay Shepard', 'Zahir Mays', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Angelica Wallace', 'Ava Bentley', 'Kaitlin Hale', 'Katy Fuller', 'Koray Okumus', 'Maddison Gillespie', 'Rosalee Melvin', 'xuedi', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -1517,6 +1648,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Demi Wilkinson', 'Florence Shaw', 'Franklin Mays', 'Kaitlin Hale', 'Nic Fassbender', 'Sophia Perez'],
                 'followers' => ['Ali Mahdi', 'Anita Cruz', 'Caitlyn King', 'Cohen Lozano', 'Demi Wilkinson', 'Hasan Johns', 'Kaden Scott', 'Kaitlin Hale', 'Madeleine Pitts', 'Rhianna Shepard', 'Stefan Sears'],
+ 'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -1528,6 +1660,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anita Cruz', 'Blake Riley', 'Elena Owens', 'Ethan Campbell', 'Franklin Mays', 'Olly Schroeder', 'Phoenix Baker', 'Sophia Perez'],
                 'followers' => ['Aliah Lane', 'Drew Cano', 'Ethan Valdez', 'Fleur Cook', 'Kelly Williams', 'Kelsey Lowe', 'Lyle Kauffman', 'Natali Craig', 'Olly Schroeder', 'Rayhan Zua', 'Rory Huff'],
+                'restricted' => false,
             ],
             [
                 'language' => 'cn',
@@ -1539,6 +1672,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Jay Shepard', 'Kaitlin Hale', 'Koray Okumus', 'Lori Bryson', 'Maddison Gillespie', 'Nikolas Gibbons', 'xuedi'],
                 'followers' => ['Blake Riley', 'Elisa Nishikawa', 'Erica Wyatt', 'Kelsey Lowe', 'Phoenix Baker', 'Zuzanna Burke', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1550,6 +1684,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Belle Woods', 'Lyle Kauffman', 'Mathilde Lewis', 'Zahra Christensen', 'Zara Bush', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Ammar Foley', 'Bailey Richards', 'Blake Riley', 'Fleur Cook', 'Florence Shaw', 'Franklin Mays', 'Hasan Johns', 'Jessie Meyton', 'Kari Rasmussen', 'Kelly Williams', 'Zuzanna Burke', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1561,6 +1696,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amelie Bennett', 'Ashwin Santiago', 'Fergus Gray', 'Harriet Rojas', 'Jaya Willis', 'Jessie Meyton', 'Katherine Moss', 'Maddison Gillespie', 'Pippa Wilkinson', 'Stefan Sears', 'Zara Bush', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Ava Wright', 'Cameron Yang', 'Isobel Carroll', 'Jayden Moss', 'Jay Shepard', 'Kyla Clay', 'Nikolas Gibbons', 'Rosalee Melvin'],
+                'restricted' => false,
             ],
             [
                 'language' => 'de',
@@ -1572,6 +1708,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Crystal Liu', 'Abraham Baker', 'Caitlyn King', 'Cameron Yang', 'Elena Owens', 'Kate Morrison', 'Maddison Gillespie', 'Scott Clayton', 'Zahir Mays'],
                 'followers' => ['Angelica Wallace', 'Ethan Valdez', 'Harry Bender', 'Jaya Willis', 'Jordan Burgess', 'Noah Pierre', 'xuedi', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1583,6 +1720,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Alesha Barry', 'Belle Woods', 'Brianna Ware', 'Lori Bryson', 'Noah Pierre', 'xuedi', 'Adem Lane'],
                 'followers' => ['Candice Wu', 'Elena Owens', 'Erica Wyatt', 'Eva Bond', 'Fleur Cook', 'Hasan Johns', 'Levi Rocha', 'Madeleine Pitts', 'Nicola Harris', 'Olly Schroeder', 'Rene Wells', 'Rhianna Shepard'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1594,6 +1732,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Ammar Foley', 'Ava Wright', 'Ethan Valdez', 'Fergus Gray', 'Marvin Robbins', 'Mathilde Lewis', 'Phoenix Baker', 'Pippa Wilkinson', 'Riley O-Moore', 'Sally Mason'],
                 'followers' => ['Aysha Becker', 'Benedict Doherty', 'Blake Riley', 'Fergus Gray', 'Harry Bender', 'Koray Okumus', 'Lyle Kauffman', 'Nicolas Wang', 'Scott Clayton', 'Youssef Roberson', 'Zahra Christensen', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1605,6 +1744,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adil Floyd', 'Alisa Hester', 'Jordan Burgess', 'Lily-Rose Chedjou', 'Lola Sanders', 'Madeleine Pitts', 'Nicolas Trevino', 'xuedi', 'Crystal Liu'],
                 'followers' => ['Abraham Baker', 'Adriana O-Sullivan', 'Alec Whitten', 'Andi Lane', 'Jaya Willis', 'Pippa Wilkinson', 'Rory Huff'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1616,6 +1756,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Bec Ferguson', 'Demi Wilkinson', 'Fergus Gray', 'Florence Shaw', 'Harriet Rojas', 'Herbert Fowler', 'Jackson Reed', 'Lori Bryson', 'Nikolas Gibbons', 'xuedi'],
                 'followers' => ['xuedi', 'Aliah Lane', 'Ava Bentley', 'Drew Cano', 'Ethan Campbell', 'Harriet Rojas', 'Koray Okumus', 'Levi Rocha', 'Lori Bryson', 'Mikey Lawrence', 'Mollie Hall', 'Nic Fassbender', 'Rhea Levine', 'Crystal Liu'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1627,6 +1768,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Franklin Mays', 'Frank Whitaker', 'Harriet Rojas', 'Hasan Johns', 'Jessie Meyton', 'Zaynab Donnelly', 'Zuzanna Burke', 'Crystal Liu'],
                 'followers' => ['Adriana O-Sullivan', 'Florence Shaw', 'Isobel Fuller', 'Julius Vaughan', 'Lyle Kauffman', 'Natali Craig', 'Nicolas Trevino', 'Scott Clayton', 'Sienna Hewitt', 'Stefan Sears'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1638,6 +1780,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Angelica Wallace', 'Isla Allison', 'Jordan Burgess', 'Kaitlin Hale', 'Koray Okumus', 'Lori Bryson', 'Mathilde Lewis', 'Molly Vaughan', 'Nic Fassbender', 'Rory Huff', 'Stefan Sears', 'xuedi', 'Adem Lane', 'Crystal Liu'],
                 'followers' => ['Crystal Liu', 'Adil Floyd', 'Aston Hood', 'Candice Wu', 'Eve Leroy', 'Harriet Rojas', 'Lulu Meyers', 'Marco Gross', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1649,6 +1792,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amelie Laurent', 'Andi Lane', 'Blake Riley', 'Genevieve Mclean', 'Isla Allison', 'Marco Kelly', 'Mikey Lawrence', 'Natali Craig', 'Rory Huff', 'Sally Mason'],
                 'followers' => ['xuedi', 'Alesha Barry', 'Alisa Hester', 'Billie Wright', 'Eduard Franz', 'Lyle Kauffman', 'Nicola Harris', 'Pippa Wilkinson', 'xuedi', 'Adem Lane'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1660,6 +1804,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Adem Lane', 'Ayah Wilkinson', 'Bec Ferguson', 'Elena Owens', 'Isobel Carroll', 'Isobel Fuller', 'Jackson Reed', 'Jayden Moss', 'Leyton Fields', 'Lori Bryson', 'Nala Goins', 'Rachael Strong', 'Zahra Christensen'],
                 'followers' => ['Abraham Baker', 'Benedict Doherty', 'Billie Wright', 'Franklin Mays', 'Maxwell Tan', 'Owen Harding', 'Riley O-Moore'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1671,6 +1816,7 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Amelie Bennett', 'Ashton Blackwell', 'Cohen Lozano', 'Elena Owens', 'Joshua Wilson', 'Kaden Scott', 'Kelly Williams', 'Kyla Clay', 'Lyle Kauffman', 'Madeleine Pitts', 'Marco Kelly', 'Olly Schroeder', 'Riley O-Moore', 'Sarah Page', 'Scott Clayton', 'xuedi'],
                 'followers' => ['Adriana O-Sullivan', 'Angelica Wallace', 'Kaitlin Hale', 'Mikey Lawrence', 'Olly Schroeder', 'Riley O-Moore', 'Zuzanna Burke', 'xuedi'],
+                'restricted' => false,
             ],
             [
                 'language' => 'en',
@@ -1682,6 +1828,19 @@ class UserFixture extends Fixture
                 'status' => UserStatus::Active,
                 'following' => ['Anaiah Whitten', 'Aston Hood', 'Ethan Campbell', 'Jaya Willis', 'Lily-Rose Chedjou', 'Mathilde Lewis', 'Phoenix Baker', 'Adem Lane'],
                 'followers' => ['Alec Whitten', 'Alesha Barry', 'Anita Cruz', 'Billie Wright', 'Clifford Jennings', 'Fleur Cook', 'Freya Browning', 'Lana Steiner', 'Marco Gross', 'Nala Goins', 'Rhea Levine', 'Sophia Perez', 'Zaynab Donnelly', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => false,
+            ],
+            [
+                'language' => 'en',
+                'name' => 'axisbos audax',
+                'email' => 'axisbos.audax@beijingcode.org',
+                'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
+                'roles' => ['ROLE_USER'],
+                'verified' => false,
+                'status' => UserStatus::Active,
+                'following' => ['Anaiah Whitten', 'Aston Hood', 'Ethan Campbell', 'Jaya Willis', 'Lily-Rose Chedjou', 'Mathilde Lewis', 'Phoenix Baker', 'Adem Lane'],
+                'followers' => ['Alec Whitten', 'Alesha Barry', 'Anita Cruz', 'Billie Wright', 'Clifford Jennings', 'Fleur Cook', 'Freya Browning', 'Lana Steiner', 'Marco Gross', 'Nala Goins', 'Rhea Levine', 'Sophia Perez', 'Zaynab Donnelly', 'Adem Lane', 'Crystal Liu'],
+                'restricted' => true,
             ],
         ];
     }
