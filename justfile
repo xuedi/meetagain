@@ -61,4 +61,10 @@ fix:
 
 update_coverage_badge: ## generate badge and add it to repo
 	php tests/badgeGenerator.php
-	git add tests/badge/coverage.svg
+	git add tests/badge/coverage.sv
+
+up:
+	docker-compose -f docker/docker-compose.yml up -d
+
+down:
+	docker-compose -f docker/docker-compose.yml down

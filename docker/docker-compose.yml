@@ -1,0 +1,30 @@
+
+services:
+
+  nginx:
+    build: ./nginx/
+    container_name: meetAgainNginx
+    ports:
+      - 80:80
+    volumes:
+      - ../:/var/www/html/
+
+  php-fpm:
+    build: ./php-fpm/
+    container_name: meetAgainPhpFpm
+    expose:
+      - 9000
+    volumes:
+      - ../:/var/www/html/
+
+  mariadb:
+    image: mariadb
+    volumes:
+      -    mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+
+volumes:
+  mysql-data:
