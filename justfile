@@ -71,10 +71,14 @@ dockerUp:
 dockerDown:
 	{{DOCKER}} down
 
-dockerInstall:
+dockerInstall: dockerUp
+    {{DOCKER}} exec php-fpm composer install
+    {{DOCKER}} exec php-fpm php bin/console cache:clear
     {{DOCKER}} exec php-fpm php bin/console doctrine:schema:drop --force -q
     {{DOCKER}} exec php-fpm php bin/console doctrine:schema:create -q
     {{DOCKER}} exec php-fpm php bin/console doctrine:fixtures:load --append -q
+    {{DOCKER}} exec php-fpm php bin/console app:translation:import 'https://www.dragon-descendants.de/api/translations'
+    {{DOCKER}} exec php-fpm php bin/console app:event:extent
 
 dockerRebuild:
     {{DOCKER}} build --no-cache php-fpm

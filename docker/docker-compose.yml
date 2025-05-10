@@ -11,6 +11,7 @@ services:
   php-fpm:
     build: php-fpm
     container_name: "ma-php"
+    user: ${DOCKER_HOST_UID}:${DOCKER_HOST_GID}
     expose:
       - 9000
     volumes:
@@ -30,10 +31,12 @@ services:
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
 
-  mailer:
-    image: schickling/mailcatcher
-    container_name: "ma-mail"
-    ports: [ "1025", "1080" ]
+  mailhog:
+    container_name: "ma-mailhog"
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   mysql-data:
