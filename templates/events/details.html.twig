@@ -3,13 +3,13 @@
 {% block title %}{{ "event"|trans }} - {{ event.title(globalService.currentLocale) }} - {{ event.start|date('Y-m-d H:i') }}{% endblock %}
 
 {% block stylesheets %}
-    {% if event.hasMap %}
+    {% if event.hasMap and globalService.showOsm %}
         <link rel="stylesheet" href="{{ asset('css/leaflet.css') }}"/>
     {% endif %}
 {% endblock %}
 
 {% block javascripts %}
-    {% if event.hasMap %}
+    {% if event.hasMap and globalService.showOsm%}
         <script src="{{ asset('leaflet.js') }}" ></script>
     {% endif %}
 {% endblock %}
@@ -92,7 +92,7 @@
                             {{ event.location.street }}<br>
                             {{ event.location.postcode }} {{ event.location.city }}
                         </p>
-                        {% if showMap %}
+                        {% if event.hasMap and globalService.showOsm %}
                             <div class="mt-3" id="osm-map"></div>
                         {% endif %}
                     </div>
@@ -116,7 +116,7 @@
             }
         });
 
-        {% if showMap %}
+        {% if event.hasMap and globalService.showOsm %}
             {% include 'events/detailsOpenStreetMap.js.twig' %}
         {% endif %}
     </script>

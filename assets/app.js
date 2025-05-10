@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
 
     // Add a click event on each of them
-    $navbarBurgers.forEach( el => {
+    $navbarBurgers.forEach(el => {
         el.addEventListener('click', () => {
 
             // Get the target from the "data-target" attribute
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // expandable card
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     let cardToggles = document.getElementsByClassName('card-toggle');
     for (let i = 0; i < cardToggles.length; i++) {
         cardToggles[i].addEventListener('click', e => {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // toggle is-hidden
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     let trigger = document.getElementsByClassName('toggleTrigger');
     for (let i = 0; i < trigger.length; i++) {
         trigger[i].addEventListener('click', event => {
@@ -57,22 +57,24 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // confirm cookie consent jia ajax
-document.addEventListener('DOMContentLoaded', function() {
-    let trigger = document.getElementById('cookieAccept');
-    let osmConsent = document.getElementById('osm_consent_checkbox');
-    trigger.addEventListener('click', event => {
-        event.preventDefault();
+document.addEventListener('DOMContentLoaded', function () {
+    let cookieTrigger = document.getElementsByClassName('cookieTrigger');
+    for (let i = 0; i < cookieTrigger.length; i++) {
+        cookieTrigger[i].addEventListener('click', event => {
+            event.preventDefault();
 
-        let url = trigger.dataset.url + '?osmConsent=' + osmConsent.checked;
-        console.log(url);
+            let osmConsent = document.getElementById('osm_consent_checkbox');
+            let url = event.currentTarget.dataset.url + '?osmConsent=' + osmConsent.checked;
+            console.log(url);
 
-        let xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                location.reload();
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    location.reload();
+                }
             }
-        }
-        xhr.send();
-    });
+            xhr.send();
+        });
+    }
 });

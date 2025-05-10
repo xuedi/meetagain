@@ -8,6 +8,7 @@ use App\Entity\EventFilterRsvp;
 use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
+use App\Entity\Session\Consent;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
 use App\Repository\CommentRepository;
@@ -60,10 +61,7 @@ class EventController extends AbstractController
         }
 
         $event = $repo->findOneBy(['id' => $id]);
-        $osmConsent = $request->getSession()->get('consent_osm', false);
-
         return $this->render('events/details.html.twig', [
-            'showMap' => ($event->hasMap() && $osmConsent),
             'commentForm' => $form,
             'comments' => $comments->findBy(['event' => $id]), // TODO: use custom repo with builder so userInfos are not lazy load
             'event' => $event,

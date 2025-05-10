@@ -3,6 +3,8 @@
 namespace App\Controller\NonLocale;
 
 use App\Controller\AbstractController;
+use App\Entity\Session\Consent;
+use App\Entity\Session\ConsentType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,16 +19,34 @@ class AjaxController extends AbstractController
         return $this->render('_non_locale/ajax.html.twig');
     }
 
-    #[Route('/cookie', name: 'app_ajax_cookie_accept', methods: ['GET'])]
+    #[Route('/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['GET'])]
     public function acceptCookiesIndex(Request $request): Response
     {
-        $request->getSession()->set('consent_accepted', true);
-        if ($request->get('osmConsent') === 'true') {
-            $request->getSession()->set('consent_osm', true);
-        } else {
-            $request->getSession()->set('consent_osm', false);
-        }
+        $consent = Consent::getBySession($request->getSession());
+        $consent->setCookies(ConsentType::Granted);
+        $consent->setOsm($request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
+        $consent->save($request->getSession());
 
-        return new JsonResponse('Saved preferences', Response::HTTP_OK);
+        $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
+        foreach ($consent->getHtmlCookies() as $cookie) {
+            $response->headers->setCookie($cookie);
+        }
+        
+        return $response;
+    }
+
+    #[Route('/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['GET'])]
+    public function denyCookiesIndex(Request $request): Response
+    {
+        $consent = Consent::getBySession($request->getSession());
+        $consent->setCookies(ConsentType::Denied);
+        $consent->setOsm(ConsentType::Denied);
+        $consent->save($request->getSession());
+
+        $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
+        $response->headers->clearCookie(Consent::TYPE_COOKIES);
+        $response->headers->clearCookie(Consent::TYPE_OSM);
+
+        return $response;
     }
 }

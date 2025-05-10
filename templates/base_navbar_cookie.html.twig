@@ -1,7 +1,7 @@
-<div class="navbar-item dropdown is-hoverable {% if globalService.showCookieConsent%}is-active{% endif %}">
+<div class="navbar-item dropdown is-hoverable {% if globalService.showCookieConsent %}is-active{% endif %}">
     <div class="dropdown-trigger">
         <button class="button cookie-button" aria-haspopup="true" aria-controls="dropdown-cookie">
-            {% if globalService.showCookieConsent%}
+            {% if globalService.showCookieConsent %}
             <span>{{ "menu_cookie_consent_button" | trans }}</span>
             {% endif %}
             <span class="icon is-small">
@@ -26,10 +26,10 @@
                                 <div class="list-item-title">
                                     <label class="checkbox">
                                         <input
-                                                type="checkbox"
-                                                name="osm_consent_checkbox"
-                                                {% if globalService.showOsm%}checked{% endif %}
-                                                id="osm_consent_checkbox"
+                                            type="checkbox"
+                                            name="osm_consent_checkbox"
+                                            {% if globalService.showOsm %}checked{% endif %}
+                                            id="osm_consent_checkbox"
                                         />
                                         <strong>{{ "menu_cookie_consent_option_osm" | trans }}</strong>
                                     </label>
@@ -44,10 +44,15 @@
                 <div class="navbar-item">
                     <input
                         type="submit"
-                        class="button mr-2"
-                        id="cookieAccept"
+                        class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_accept') }}"
                         value="{{ "menu_cookie_consent_button_accept" | trans }}"
+                    >
+                    <input
+                        type="submit"
+                        class="button mr-2 cookieTrigger"
+                        data-url="{{ path('app_ajax_cookie_deny') }}"
+                        value="{{ "menu_cookie_consent_button_deny" | trans }}"
                     >
                 </div>
 

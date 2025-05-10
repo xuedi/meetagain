@@ -2,7 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Session\Consent;
+use App\Entity\Session\ConsentType;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 readonly class GlobalService
@@ -14,7 +17,7 @@ readonly class GlobalService
     public function getCurrentLocale(): string
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
+        if ($request instanceof Request) {
             return $request->getLocale();
         }
 
@@ -29,18 +32,35 @@ readonly class GlobalService
     public function getShowCookieConsent(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        return !$session->get('consent_accepted', false);
+        if ($session === null) {
+            return true;
+        }
+
+        if (Consent::getBySession($session)->getCookies() === ConsentType::Unknown) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getShowOsm(): bool
     {
-        return $this->requestStack->getCurrentRequest()?->getSession()->get('consent_osm', false) ?? false;
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        if ($session === null) {
+            return false;
+        }
+
+        if (Consent::getBySession($session)->getOsm() === ConsentType::Granted) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getAlternativeLanguageCodes(): array
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
+        if ($request instanceof Request) {
             $currentUri = $request->getRequestUri();
             $currentLocale = $request->getLocale();
             if (!str_starts_with($currentUri, '/_profiler')) {
