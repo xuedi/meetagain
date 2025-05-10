@@ -40,6 +40,7 @@ class CmsFixture extends Fixture implements DependentFixtureInterface
             ['imprint'],
             ['privacy'],
             ['about'],
+            ['index'],
         ];
     }
 }

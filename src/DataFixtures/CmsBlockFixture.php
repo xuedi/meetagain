@@ -56,6 +56,12 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
             ['about', 'de', 2, CmsBlockTypes::Text, ['content' => $this->getBlob('about_de')]],
             ['about', 'cn', 1, CmsBlockTypes::Headline, ['title' => '关于我们']],
             ['about', 'cn', 2, CmsBlockTypes::Text, ['content' => $this->getBlob('about_cn')]],
+            ['index', 'en', 1, CmsBlockTypes::Headline, ['title' => 'Welcome']],
+            ['index', 'en', 2, CmsBlockTypes::Text, ['content' => $this->getBlob('welcome_en')]],
+            ['index', 'de', 1, CmsBlockTypes::Headline, ['title' => 'Willkommen']],
+            ['index', 'de', 2, CmsBlockTypes::Text, ['content' => $this->getBlob('welcome_de')]],
+            ['index', 'cn', 1, CmsBlockTypes::Headline, ['title' => '你好']],
+            ['index', 'cn', 2, CmsBlockTypes::Text, ['content' => $this->getBlob('welcome_cn')]],
         ];
     }
 
