@@ -1,4 +1,4 @@
-
+.env
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -7,7 +7,6 @@
 /tests/reports/clover.xml
 /var/
 /vendor/
-
 /.idea/
 
 ###> symfony/asset-mapper ###

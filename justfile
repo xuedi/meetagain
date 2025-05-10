@@ -1,3 +1,5 @@
+DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
+
 reset:
     php bin/console doctrine:schema:drop --force -q
     php bin/console doctrine:schema:create -q
@@ -63,8 +65,16 @@ update_coverage_badge: ## generate badge and add it to repo
 	php tests/badgeGenerator.php
 	git add tests/badge/coverage.sv
 
-up:
-	docker-compose -f docker/docker-compose.yml up -d
+dockerUp:
+	{{DOCKER}} up -d
 
-down:
-	docker-compose -f docker/docker-compose.yml down
+dockerDown:
+	{{DOCKER}} down
+
+dockerInstall:
+    {{DOCKER}} exec php-fpm php bin/console doctrine:schema:drop --force -q
+    {{DOCKER}} exec php-fpm php bin/console doctrine:schema:create -q
+    {{DOCKER}} exec php-fpm php bin/console doctrine:fixtures:load --append -q
+
+dockerRebuild:
+    {{DOCKER}} build --no-cache php-fpm
