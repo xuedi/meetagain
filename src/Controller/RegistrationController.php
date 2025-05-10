@@ -51,6 +51,7 @@ class RegistrationController extends AbstractController
             $email->subject('Please Confirm your Email');
             $email->htmlTemplate('registration/activation_email.html.twig');
             $email->context([
+                'host' => sprintf('%s://%s', $request->getScheme(), $request->getHost()),
                 'token' => $user->getRegcode(),
                 'lang' => $request->getLocale(),
                 'username' => $user->getName(),

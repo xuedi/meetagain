@@ -34,6 +34,7 @@ services:
   mailhog:
     container_name: "ma-mailhog"
     image: mailhog/mailhog
+    user: ${DOCKER_HOST_UID}:${DOCKER_HOST_GID}
     ports:
       - "1025:1025"
       - "8025:8025"
