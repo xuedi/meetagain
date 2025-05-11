@@ -11,14 +11,12 @@ such are static and have to be changed in code. | Minimalist PHP8.4+ Symfony
 
 ### Software design
 A classic symfony application as upstream as possible no fancy libraries
-or dependencies.
+or dependencies. Local development in docker via JustFile.  
 
 
 ### PHP modules
- - PHP >= 8.4
- - ext-ctype
- - ext-iconv
- - ext-imagick
+I used some nice PHP >= 8.4 features out of convenience. Module needed are:
+gd, apcu, pdo_mysql, imagick, intl, iconv, ctype. Optional: xdebug opcache
 
 
 ### Usage
@@ -31,6 +29,7 @@ just down     # stops the stack
 
 
 ### TODO:
+ - add functionality to add new entries in the admin interface (location, event & venue)
  - add messages and way to block users
  - send messages when to promote and notify of a new event
  - activity levels for user view and admin view
