@@ -23,9 +23,10 @@ or dependencies.
 
 ### Usage
 ```
-just           # get a list with all possible cli interactions
-just install   # installes dependencies and builds system
-just reset     # drops DB and rebuild everything for local development
+just          # get a list with all possible cli interactions
+just install  # deletes all data and reset to fresh fixture version
+just up       # starts docker development stack
+just down     # stops the stack
 ``` 
 
 
@@ -39,3 +40,9 @@ just reset     # drops DB and rebuild everything for local development
  - add community translation suggestions and manger approval
  - cross-table reference for images and user gallery
  - play with qodana inspections
+
+### Helpful copy & pasta stuff
+```
+// misguided web attempts
+SELECT url, COUNT(*) AS number FROM `not_found_log` GROUP BY url ORDER BY number DESC;
+```
