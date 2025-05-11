@@ -30,9 +30,10 @@ just reset     # drops DB and rebuild everything for local development
 
 
 ### TODO:
+ - add messages and way to block users
+ - send messages when to promote and notify of a new event
  - activity levels for user view and admin view
  - add changed details for cms and event and other actions for system view only
- - add messages and way to block users
  - add comments
  - admin Log display: checkbox level and type, 3 stage subselect: year, month, day
  - add community translation suggestions and manger approval

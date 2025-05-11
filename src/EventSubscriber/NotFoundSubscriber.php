@@ -8,6 +8,7 @@ use App\Service\SitemapService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -48,6 +49,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
 
             // Special pages
             $content = match (trim($path, '/')) {
+                '' => $this->redirectToFrontpage(),
                 'sitemap.xml' => $this->sitemapService->getContent('www.dragon-descendants.de'),
                 default => $this->cms->createNotFoundPage(),
             };
@@ -66,5 +68,11 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             $event->setResponse($content);
             $event->stopPropagation();
         }
+    }
+
+    private function redirectToFrontpage(): RedirectResponse
+    {
+        $url = $this->router->generate('app_default');
+        return new RedirectResponse($url)->setStatusCode(Response::HTTP_OK);
     }
 }

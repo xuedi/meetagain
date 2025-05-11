@@ -1,4 +1,5 @@
 DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
+PHP := DOCKER + " exec php-fpm"
 
 reset:
     php bin/console doctrine:schema:drop --force -q
@@ -41,7 +42,7 @@ translationsExtract:
     php bin/console translation:extract --force --format php cn
 
 clearLogs:
-    truncate -s 0 var/log/dev.log
+    {{PHP}} truncate -s 0 var/log/dev.log
 
 clearCache:
     composer dump-autoload
@@ -72,13 +73,13 @@ dockerDown:
 	{{DOCKER}} down
 
 dockerInstall: dockerUp
-    {{DOCKER}} exec php-fpm composer install
-    {{DOCKER}} exec php-fpm php bin/console cache:clear
-    {{DOCKER}} exec php-fpm php bin/console doctrine:schema:drop --force -q
-    {{DOCKER}} exec php-fpm php bin/console doctrine:schema:create -q
-    {{DOCKER}} exec php-fpm php bin/console doctrine:fixtures:load --append -q
-    {{DOCKER}} exec php-fpm php bin/console app:translation:import 'https://www.dragon-descendants.de/api/translations'
-    {{DOCKER}} exec php-fpm php bin/console app:event:extent
+    {{PHP}} composer install
+    {{PHP}} php bin/console cache:clear
+    {{PHP}} php bin/console doctrine:schema:drop --force -q
+    {{PHP}} php bin/console doctrine:schema:create -q
+    {{PHP}} php bin/console doctrine:fixtures:load --append -q
+    {{PHP}} php bin/console app:translation:import 'https://www.dragon-descendants.de/api/translations'
+    {{PHP}} php bin/console app:event:extent
 
 dockerRebuild:
     {{DOCKER}} build --no-cache php-fpm

@@ -23,7 +23,7 @@ class UserFixture extends Fixture
             $user->setName($name);
             $user->setEmail($data['email']);
             $user->setPassword($data['password']);
-            $user->setPublic(true);
+            $user->setPublic(!($name === 'import'));
             $user->setRestricted(false);
             $user->setBio($this->getRandomBio());
             $user->setOsmConsent(false);
