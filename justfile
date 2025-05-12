@@ -1,5 +1,5 @@
 DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
-PHP := DOCKER + " exec php-fpm"
+PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php-fpm"
 JUST := just_executable() + " --justfile=" + justfile()
 
 install:
@@ -36,9 +36,10 @@ translationsExtract:
     {{PHP}} php bin/console translation:extract --force --format php cn
 
 test:
-    {{PHP}} XDEBUG_MODE=coverage vendor/bin/phpunit -c tests/phpunit.xml
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
 
-check: checkStan checkRector checkPhpcs checkPsalm
+check: test checkStan checkRector checkPhpcs checkPsalm
+    {{PHP}} composer validate --strict
     echo "Did run all checks successfully"
 
 checkStan:
