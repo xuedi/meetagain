@@ -1,0 +1,25 @@
+name: PHP Composer
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: php-actions/composer@run-as-current-user
+
+      - name: PHPUnit Tests
+        uses: php-actions/phpunit@composer-version--user
+        env:
+          TEST_NAME: UnitTestRunner
+        with:
+          configuration: tests/phpunit.xml
