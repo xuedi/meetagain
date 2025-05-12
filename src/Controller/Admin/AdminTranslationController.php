@@ -8,18 +8,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/translations')]
 class AdminTranslationController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_translation')]
+    #[Route('/admin/translations/', name: 'app_admin_translation')]
     public function translationsIndex(TranslationService $translationService): Response
     {
         return $this->render('admin/translations/list.html.twig', [
             'translationMatrix' => $translationService->getMatrix(),
         ]);
     }
-
-    #[Route('/save', name: 'app_admin_translation_save')]
+    #[Route('/admin/translations/save', name: 'app_admin_translation_save')]
     public function translationsSave(TranslationService $translationService, Request $request): Response
     {
         // todo check token
@@ -28,16 +26,14 @@ class AdminTranslationController extends AbstractController
 
         return $this->redirectToRoute('app_admin_translation');
     }
-
-    #[Route('/extract', name: 'app_admin_translation_extract')]
+    #[Route('/admin/translations/extract', name: 'app_admin_translation_extract')]
     public function translationsExtract(TranslationService $translationService): Response
     {
         return $this->render('admin/translations/extract.html.twig', [
             'result' => $translationService->extract(),
         ]);
     }
-
-    #[Route('/publish', name: 'app_admin_translation_publish')]
+    #[Route('/admin/translations/publish', name: 'app_admin_translation_publish')]
     public function translationsPublish(TranslationService $translationService): Response
     {
         return $this->render('admin/translations/publish.html.twig', [

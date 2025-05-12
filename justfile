@@ -55,7 +55,7 @@ checkPsalm:
 
 checkAutoFix:
     {{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
-    {{PHP}} #vendor/bin/rector process src -c tests/rector.php
+    {{PHP}} vendor/bin/rector process src -c tests/rector.php
 
 update_coverage_badge: ## generate badge and add it to repo
 	{{PHP}} php tests/badgeGenerator.php

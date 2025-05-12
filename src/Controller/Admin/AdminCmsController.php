@@ -24,10 +24,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 //TODO: move lots of logic to service
 
-#[Route('/admin/cms')]
 class AdminCmsController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_cms')]
+    #[Route('/admin/cms/', name: 'app_admin_cms')]
     public function cmsList(CmsRepository $repo): Response
     {
         $newForm = $this->createForm(CmsType::class, null, [
@@ -39,8 +38,7 @@ class AdminCmsController extends AbstractController
             'cms' => $repo->findAll(),
         ]);
     }
-
-    #[Route('/{id}/edit/{locale}/{blockId}', name: 'app_admin_cms_edit', requirements: ['locale' => 'en|de|cn'], methods: ['GET', 'POST'])]
+    #[Route('/admin/cms/{id}/edit/{locale}/{blockId}', name: 'app_admin_cms_edit', requirements: ['locale' => 'en|de|cn'], methods: ['GET', 'POST'])]
     public function cmsEdit(Request $request, Cms $cms, EntityManagerInterface $em, string $locale = 'en', ?int $blockId = null): Response
     {
         $form = $this->createForm(CmsType::class, $cms);
@@ -75,8 +73,7 @@ class AdminCmsController extends AbstractController
             'cms' => $cms,
         ]);
     }
-
-    #[Route('/delete', name: 'app_admin_cms_delete', methods: ['GET'])]
+    #[Route('/admin/cms/delete', name: 'app_admin_cms_delete', methods: ['GET'])]
     public function cmsDelete(Request $request, CmsRepository $repo, EntityManagerInterface $em): Response
     {
         $id = $request->query->get('id');
@@ -88,8 +85,7 @@ class AdminCmsController extends AbstractController
 
         return $this->redirectToRoute('app_admin_cms');
     }
-
-    #[Route('/add', name: 'app_admin_cms_add', methods: ['POST'])]
+    #[Route('/admin/cms/add', name: 'app_admin_cms_add', methods: ['POST'])]
     public function cmsAdd(Request $request, EntityManagerInterface $em): Response
     {
         $newPage = new Cms();
@@ -106,8 +102,7 @@ class AdminCmsController extends AbstractController
             'locale' => $request->getLocale(),
         ]);
     }
-
-    #[Route('/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
+    #[Route('/admin/cms/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
     public function cmsBlockAdd(Request $request, EntityManagerInterface $em, int $id): Response
     {
         $cmsRepo = $em->getRepository(Cms::class);
@@ -136,8 +131,7 @@ class AdminCmsController extends AbstractController
             'locale' => $locale,
         ]);
     }
-
-    #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
+    #[Route('/admin/cms/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
     public function cmsBlockMoveDown(Request $request, EntityManagerInterface $em): Response
     {
         $pageId = $request->get('id');
@@ -151,8 +145,7 @@ class AdminCmsController extends AbstractController
             'locale' => $locale,
         ]);
     }
-
-    #[Route('/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
+    #[Route('/admin/cms/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
     public function cmsBlockMoveUp(Request $request, EntityManagerInterface $em): Response
     {
         $pageId = $request->get('id');
@@ -166,8 +159,7 @@ class AdminCmsController extends AbstractController
             'locale' => $locale,
         ]);
     }
-
-    #[Route('/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
+    #[Route('/admin/cms/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
     public function cmsBlockSave(Request $request, EntityManagerInterface $em): Response
     {
         $repo = $em->getRepository(CmsBlock::class);
@@ -185,8 +177,7 @@ class AdminCmsController extends AbstractController
             'locale' => $request->get('locale'),
         ]);
     }
-
-    #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
+    #[Route('/admin/cms/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
     public function cmsBlockDelete(Request $request, EntityManagerInterface $em): Response
     {
         $repo = $em->getRepository(CmsBlock::class);
@@ -203,7 +194,6 @@ class AdminCmsController extends AbstractController
             'locale' => $request->get('locale'),
         ]);
     }
-
     private function getBlock(string $blockType, array $payload): BlockType
     {
         return match ($blockType) {
@@ -216,7 +206,6 @@ class AdminCmsController extends AbstractController
             Title::getType()->name => Title::fromJson($payload),
         };
     }
-
     private function adjustPrio(EntityManagerInterface $em, mixed $pageId, mixed $blockId, mixed $locale, float $value): void
     {
         // update half up or down

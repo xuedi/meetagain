@@ -11,18 +11,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/host')]
 class AdminHostController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_host')]
+    #[Route('/admin/host/', name: 'app_admin_host')]
     public function hostList(HostRepository $repo): Response
     {
         return $this->render('admin/host/list.html.twig', [
             'hosts' => $repo->findAll(),
         ]);
     }
-
-    #[Route('/{id}', name: 'app_admin_host_edit', methods: ['GET', 'POST'])]
+    #[Route('/admin/host/{id}', name: 'app_admin_host_edit', methods: ['GET', 'POST'])]
     public function hostEdit(Request $request, Host $host, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(HostType::class, $host);

@@ -102,7 +102,7 @@ class UserTest extends TestCase
 
         // Test self-following prevention
         $this->user->addFollowing($this->user);
-        $this->assertCount(1, $this->user->getFollowing());;
+        $this->assertCount(1, $this->user->getFollowing());
         $this->assertFalse($this->user->getFollowing()->contains($this->user));
 
         // Test removing following

@@ -5,7 +5,6 @@ namespace App\Controller\Admin;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
-use App\Form\EventTranslationType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
@@ -18,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/event')]
 class AdminEventController extends AbstractController
 {
     public function __construct(
@@ -28,16 +26,14 @@ class AdminEventController extends AbstractController
         private readonly EventTranslationRepository $eventTransRepo,
     ) {
     }
-
-    #[Route('/', name: 'app_admin_event')]
+    #[Route('/admin/event/', name: 'app_admin_event')]
     public function eventList(EventRepository $repo): Response
     {
         return $this->render('admin/event/list.html.twig', [
             'events' => $repo->findBy([], ['start' => 'ASC']),
         ]);
     }
-
-    #[Route('/{id}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
+    #[Route('/admin/event/{id}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function eventEdit(Request $request, Event $event): Response
     {
 
@@ -84,14 +80,12 @@ class AdminEventController extends AbstractController
             'form' => $form,
         ]);
     }
-
-    #[Route('/{id}/delete', name: 'app_admin_event_delete')]
+    #[Route('/admin/event/{id}/delete', name: 'app_admin_event_delete')]
     public function eventDelete(EventRepository $repo): Response
     {
         dump('delete');
         exit;
     }
-
     private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
     {
         $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);

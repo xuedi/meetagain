@@ -8,18 +8,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/logs')]
 class AdminLogsController extends AbstractController
 {
-    #[Route('/activity', name: 'app_admin_logs_activity')]
+    #[Route('/admin/logs/activity', name: 'app_admin_logs_activity')]
     public function activityList(ActivityService $activityService): Response
     {
         return $this->render('admin/logs/activity_list.html.twig', [
             'activities' => $activityService->getAdminList(),
         ]);
     }
-
-    #[Route('/{id}', name: 'app_admin_logs_system')]
+    #[Route('/admin/logs/{id}', name: 'app_admin_logs_system')]
     public function systemLogs(int $id = 0): Response
     {
         $logs = $this->getLogList();
@@ -28,7 +26,6 @@ class AdminLogsController extends AbstractController
             'logs' => $logs,
         ]);
     }
-
     private function getLogList(): array
     {
         $list = [];
@@ -45,7 +42,6 @@ class AdminLogsController extends AbstractController
 
         return $list;
     }
-
     // TODO: add a level filter and split content with parser like: https://packagist.org/packages/innmind/log-reader
     private function getLogContent(string $path): array
     {

@@ -77,10 +77,10 @@ class Consent implements JsonSerializable
         $consent = new self();
         try {
             $json = $session->get(self::SESSION_NAME);
-            $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode((string) $json, true, 512, JSON_THROW_ON_ERROR);
             $consent->setCookies(ConsentType::from($data[self::TYPE_COOKIES] ?? 'unknown'));
             $consent->setOsm(ConsentType::from($data[self::TYPE_OSM] ?? 'unknown'));
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             //
         }
 

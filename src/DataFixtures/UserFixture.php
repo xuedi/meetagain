@@ -23,7 +23,7 @@ class UserFixture extends Fixture
             $user->setName($name);
             $user->setEmail($data['email']);
             $user->setPassword($data['password']);
-            $user->setPublic(!($name === 'import'));
+            $user->setPublic($name !== 'import');
             $user->setRestricted(false);
             $user->setBio($this->getRandomBio());
             $user->setOsmConsent(false);
@@ -41,7 +41,7 @@ class UserFixture extends Fixture
         // after all references are set, we can add followers and following
         foreach ($this->getData() as $data) {
             $name = $data['name'];
-            $user = $this->getReference('user_' . md5((string)$name), User::class);;
+            $user = $this->getReference('user_' . md5((string)$name), User::class);
             foreach ($data['followers'] as $follower) {
                 $user->addFollower($this->getReference('user_' . md5((string)$follower), User::class));
             }

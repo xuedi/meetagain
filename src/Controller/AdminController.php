@@ -4,14 +4,12 @@ namespace App\Controller;
 
 use App\Repository\ConfigRepository;
 use App\Service\DashboardService;
-use DateTime;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin')]
 class AdminController extends AbstractController
 {
-    #[Route('/{year}/{week}', name: 'app_admin')]
+    #[Route('/admin/{year}/{week}', name: 'app_admin')]
     public function index(DashboardService $dashboard, ?int $year = null, ?int $week = null): Response
     {
         $dashboard->setTime($year, $week);
@@ -22,8 +20,7 @@ class AdminController extends AbstractController
             'pagesNotFound' => $dashboard->getPagesNotFound(),
         ]);
     }
-
-    #[Route('/config', name: 'app_admin_config')]
+    #[Route('/admin/config', name: 'app_admin_config')]
     public function configIndex(ConfigRepository $repo): Response
     {
         return $this->render('admin/config.html.twig', [

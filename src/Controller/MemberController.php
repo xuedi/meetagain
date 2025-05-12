@@ -8,12 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
-#[Route('/members')]
 class MemberController extends AbstractController
 {
     private const int PAGE_SIZE = 24;
-
-    #[Route('/{page}', name: 'app_member')]
+    #[Route('/members/{page}', name: 'app_member')]
     public function index(UserRepository $repo, int $page = 1): Response
     {
         $offset = ($page - 1) * self::PAGE_SIZE;
@@ -27,8 +25,7 @@ class MemberController extends AbstractController
             'pageTotal' => ceil($userTotal / self::PAGE_SIZE),
         ]);
     }
-
-    #[Route('/view/{id}', name: 'app_member_view')]
+    #[Route('/members/view/{id}', name: 'app_member_view')]
     public function view(UserRepository $repo, int $id): Response
     {
         try {
@@ -44,8 +41,7 @@ class MemberController extends AbstractController
             return $this->render('member/403.html.twig');
         }
     }
-
-    #[Route('/toggleFollow/{id}', name: 'app_member_toggle_follow')]
+    #[Route('/members/toggleFollow/{id}', name: 'app_member_toggle_follow')]
     public function toggleFollow(FriendshipService $service, int $id): Response
     {
         return $service->toggleFollow($id, 'app_member_view');

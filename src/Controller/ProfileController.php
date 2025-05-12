@@ -19,14 +19,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/profile')]
 class ProfileController extends AbstractController
 {
     public function __construct(private readonly ActivityService $activityService)
     {
     }
-
-    #[Route('/', name: 'app_profile')]
+    #[Route('/profile/', name: 'app_profile')]
     public function index(
         Request $request,
         EventRepository $repo,
@@ -79,8 +77,7 @@ class ProfileController extends AbstractController
             'form' => $form,
         ]);
     }
-
-    #[Route('/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]
+    #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {
         $user = $this->getAuthedUser();
@@ -96,8 +93,7 @@ class ProfileController extends AbstractController
 
         return $this->redirectToRoute('app_profile');
     }
-
-    #[Route('/messages', name: 'app_profile_messages')]
+    #[Route('/profile/messages', name: 'app_profile_messages')]
     public function messages(UserRepository $repo): Response
     {
         return $this->render('profile/messages.html.twig', [
@@ -105,8 +101,7 @@ class ProfileController extends AbstractController
             'user' => $this->getAuthedUser(),
         ]);
     }
-
-    #[Route('/social', name: 'app_profile_social')]
+    #[Route('/profile/social', name: 'app_profile_social')]
     public function social(UserRepository $repo, string $show = 'friends'): Response
     {
         return $this->render('profile/social.html.twig', [
@@ -118,20 +113,17 @@ class ProfileController extends AbstractController
             'show' => $show,
         ]);
     }
-
-    #[Route('/social/friends/', name: 'app_profile_social_friends')]
+    #[Route('/profile/social/friends/', name: 'app_profile_social_friends')]
     public function socialFriends(UserRepository $repo): Response
     {
         return $this->social($repo, 'friends');
     }
-
-    #[Route('/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow')]
+    #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow')]
     public function toggleFollow(FriendshipService $service, int $id): Response
     {
         return $service->toggleFollow($id, 'app_profile_social');
     }
-
-    #[Route('/config', name: 'app_profile_config')]
+    #[Route('/profile/config', name: 'app_profile_config')]
     public function config(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(ChangePassword::class);
@@ -153,8 +145,7 @@ class ProfileController extends AbstractController
             'form' => $form,
         ]);
     }
-
-    #[Route('/images', name: 'app_profile_images')]
+    #[Route('/profile/images', name: 'app_profile_images')]
     public function images(UserRepository $repo): Response
     {
         return $this->render('profile/images.html.twig', [

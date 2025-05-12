@@ -12,8 +12,6 @@ use Doctrine\ORM\EntityRepository;
 
 class DashboardService
 {
-    private const int WEEKS_PER_YEAR = 52;
-
     private int $week = 0;
     private int $weekNext = 0;
     private int $weekPrevious = 0;

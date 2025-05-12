@@ -11,18 +11,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/location')]
 class AdminLocationController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_location')]
+    #[Route('/admin/location/', name: 'app_admin_location')]
     public function locationList(LocationRepository $repo): Response
     {
         return $this->render('admin/location/list.html.twig', [
             'locations' => $repo->findAll(),
         ]);
     }
-
-    #[Route('/{id}', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
+    #[Route('/admin/location/{id}', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
     public function locationEdit(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(LocationType::class, $location);

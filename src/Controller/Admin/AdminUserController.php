@@ -15,10 +15,9 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/admin/user')]
 class AdminUserController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_user')]
+    #[Route('/admin/user/', name: 'app_admin_user')]
     public function userList(UserRepository $repo): Response
     {
         return $this->render('admin/user/list.html.twig', [
@@ -26,8 +25,7 @@ class AdminUserController extends AbstractController
             'users' => $repo->findBy([], ['createdAt' => 'desc']),
         ]);
     }
-
-    #[Route('/{id}', name: 'app_admin_user_edit', methods: ['GET', 'POST'])]
+    #[Route('/admin/user/{id}', name: 'app_admin_user_edit', methods: ['GET', 'POST'])]
     public function userEdit(Request $request, User $user, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(UserType::class, $user);
@@ -44,8 +42,7 @@ class AdminUserController extends AbstractController
             'form' => $form,
         ]);
     }
-
-    #[Route('/{id}/approve', name: 'app_admin_user_approve', methods: ['GET'])]
+    #[Route('/admin/user/{id}/approve', name: 'app_admin_user_approve', methods: ['GET'])]
     public function userApprove(User $user, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         $user->setStatus(UserStatus::Active);
@@ -63,8 +60,7 @@ class AdminUserController extends AbstractController
 
         return $this->redirectToRoute('app_admin_user');
     }
-
-    #[Route('/{id}/deny', name: 'app_admin_user_deny', methods: ['GET'])]
+    #[Route('/admin/user/{id}/deny', name: 'app_admin_user_deny', methods: ['GET'])]
     public function userDeny(User $user, EntityManagerInterface $em): Response
     {
         $user->setStatus(UserStatus::Denied);
@@ -74,8 +70,7 @@ class AdminUserController extends AbstractController
 
         return $this->redirectToRoute('app_admin_user');
     }
-
-    #[Route('/{id}/delete', name: 'app_admin_user_delete', methods: ['GET'])]
+    #[Route('/admin/user/{id}/delete', name: 'app_admin_user_delete', methods: ['GET'])]
     public function userDelete(User $user, EntityManagerInterface $em): Response
     {
         $user->setStatus(UserStatus::Deleted);

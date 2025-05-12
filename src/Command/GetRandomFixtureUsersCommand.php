@@ -41,8 +41,8 @@ class GetRandomFixtureUsersCommand extends Command
 
     private function strReplaceFirst($search, $replace, $subject): string
     {
-        $search = '/' . preg_quote($search, '/') . '/';
-        return preg_replace($search, $replace, $subject, 1);
+        $search = '/' . preg_quote((string) $search, '/') . '/';
+        return preg_replace($search, (string) $replace, (string) $subject, 1);
     }
 
     /**

@@ -10,16 +10,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/ajax')]
 class AjaxController extends AbstractController
 {
-    #[Route('/', name: 'app_ajax', methods: ['GET'])]
+    #[Route('/ajax/', name: 'app_ajax', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('_non_locale/ajax.html.twig');
     }
-
-    #[Route('/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['GET'])]
+    #[Route('/ajax/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['GET'])]
     public function acceptCookiesIndex(Request $request): Response
     {
         $consent = Consent::getBySession($request->getSession());
@@ -34,8 +32,7 @@ class AjaxController extends AbstractController
         
         return $response;
     }
-
-    #[Route('/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['GET'])]
+    #[Route('/ajax/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['GET'])]
     public function denyCookiesIndex(Request $request): Response
     {
         $consent = Consent::getBySession($request->getSession());
