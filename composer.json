@@ -9,10 +9,8 @@
         "ext-iconv": "*",
         "ext-imagick": "*",
         "beberlei/doctrineextensions": "^1.5",
-        "doctrine/data-fixtures": "^2.0",
         "doctrine/dbal": "^4",
         "doctrine/doctrine-bundle": "^2.13",
-        "doctrine/doctrine-fixtures-bundle": "^3.6",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.3",
         "knplabs/knp-time-bundle": "^2.4",
@@ -97,6 +95,8 @@
         }
     },
     "require-dev": {
+        "doctrine/data-fixtures": "^2",
+        "doctrine/doctrine-fixtures-bundle": "^4",
         "phpstan/phpstan": "^2",
         "phpunit/phpunit": "^12",
         "rector/rector": "^2",

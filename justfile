@@ -38,15 +38,23 @@ translationsExtract:
 test:
     {{PHP}} XDEBUG_MODE=coverage vendor/bin/phpunit -c tests/phpunit.xml
 
-check:
-    {{PHP}} # stan & rector are disabled, since they cant deal with php8.4's: "new DateTime()->"
-    {{PHP}} #vendor/bin/phpstan analyse -c tests/phpstan.neon
-    {{PHP}} #vendor/bin/rector process src --dry-run -c tests/rector.php
-    {{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
-    {{PHP}} #vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
+check: checkStan checkRector checkPhpcs checkPsalm
+    echo "Did run all checks successfully"
 
-fix:
-    {{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml
+checkStan:
+    {{PHP}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M
+
+checkRector:
+    {{PHP}} vendor/bin/rector process src --dry-run -c tests/rector.php
+
+checkPhpcs:
+    {{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+
+checkPsalm:
+    {{PHP}} vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
+
+checkAutoFix:
+    {{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
     {{PHP}} #vendor/bin/rector process src -c tests/rector.php
 
 update_coverage_badge: ## generate badge and add it to repo

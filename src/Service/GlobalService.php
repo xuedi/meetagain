@@ -7,6 +7,7 @@ use App\Entity\Session\ConsentType;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 readonly class GlobalService
 {
@@ -32,29 +33,21 @@ readonly class GlobalService
     public function getShowCookieConsent(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if ($session === null) {
+        if (!$session instanceof SessionInterface) {
             return true;
         }
 
-        if (Consent::getBySession($session)->getCookies() === ConsentType::Unknown) {
-            return true;
-        }
-
-        return false;
+        return Consent::getBySession($session)->getCookies() === ConsentType::Unknown;
     }
 
     public function getShowOsm(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if ($session === null) {
-            return false;
-        }
-
-        if (Consent::getBySession($session)->getOsm() === ConsentType::Granted) {
+        if (!$session instanceof SessionInterface) {
             return true;
         }
 
-        return false;
+        return Consent::getBySession($session)->getOsm() === ConsentType::Granted;
     }
 
     public function getAlternativeLanguageCodes(): array
