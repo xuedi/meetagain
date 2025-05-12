@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Image;
+use App\Entity\User;
 use App\Service\UploadService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -29,7 +30,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         $defaultImage->setSize(0);
         $defaultImage->setAlt('Default image for Events');
         $defaultImage->setCreatedAt(new DateTimeImmutable());
-        $defaultImage->setUploader($this->getReference('user_' . md5('import')));
+        $defaultImage->setUploader($this->getReference('user_' . md5('import'), User::class));
 
         $manager->persist($defaultImage);
 
@@ -40,7 +41,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         $regularMeetup->setSize(0);
         $regularMeetup->setAlt('Regular meetup picture');
         $regularMeetup->setCreatedAt(new DateTimeImmutable());
-        $regularMeetup->setUploader($this->getReference('user_' . md5('import')));
+        $regularMeetup->setUploader($this->getReference('user_' . md5('import'), User::class));
 
         $manager->persist($regularMeetup);
 
@@ -51,7 +52,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
             $path = __DIR__ . "/Avatars/$name.jpg";
 
             // prepare import user
-            $user = $this->getReference('user_' . md5((string)$name));
+            $user = $this->getReference('user_' . md5((string)$name), User::class);
 
             // upload file & thumbnails
             $uploadedImage = new UploadedFile($path, "$name.jpg");

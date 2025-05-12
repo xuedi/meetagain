@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Host;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -16,7 +17,7 @@ class HostFixture extends Fixture implements DependentFixtureInterface
             $host = new Host();
             $host->setName($name);
             if ($user) {
-                $host->setUser($this->getReference('user_' . md5((string) $user)));
+                $host->setUser($this->getReference('user_' . md5((string) $user), User::class));
             }
 
             $manager->persist($host);

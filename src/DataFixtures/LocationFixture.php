@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Location;
+use App\Entity\User;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -21,7 +22,7 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
             $location->setCity($city);
             $location->setPostcode($postcode);
             $location->setDescription($description);
-            $location->setUser($this->getReference('user_' . md5('import')));
+            $location->setUser($this->getReference('user_' . md5('import'), User::class));
             $location->setLongitude($long);
             $location->setLatitude($lat);
             $location->setCreatedAt(new DateTimeImmutable());

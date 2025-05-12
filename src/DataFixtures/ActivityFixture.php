@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Activity;
+use App\Entity\User;
 use App\Entity\UserActivity;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -16,7 +17,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
     {
         foreach ($this->getData() as [$time, $userName, $type, $meta]) {
             $activity = new Activity();
-            $activity->setUser($this->getReference('user_' . md5((string) $userName)));
+            $activity->setUser($this->getReference('user_' . md5((string) $userName), User::class));
             $activity->setCreatedAt(new DateTimeImmutable($time));
             $activity->setVisible(true);
             $activity->setMessage('');

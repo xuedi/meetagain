@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Cms;
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -17,7 +18,7 @@ class CmsFixture extends Fixture implements DependentFixtureInterface
             $cms = new Cms();
             $cms->setSlug($slug);
             $cms->setCreatedAt(new DateTimeImmutable());
-            $cms->setCreatedBy($this->getReference('user_' . md5('import')));
+            $cms->setCreatedBy($this->getReference('user_' . md5('import'), User::class));
             $cms->setPublished(true);
 
             $manager->persist($cms);

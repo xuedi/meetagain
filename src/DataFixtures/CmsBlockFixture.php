@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -20,7 +21,7 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
     {
         foreach ($this->getData() as [$page, $lang, $prio, $type, $json]) {
             $block = new CmsBlock();
-            $block->setPage($this->getReference('cms_' . md5((string)$page)));
+            $block->setPage($this->getReference('cms_' . md5((string)$page), Cms::class));
             $block->setLanguage($lang);
             $block->setPriority($prio);
             $block->setType($type);

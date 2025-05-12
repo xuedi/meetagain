@@ -5,7 +5,10 @@ namespace App\DataFixtures;
 use App\Entity\Event;
 use App\Entity\EventIntervals;
 use App\Entity\EventTypes;
+use App\Entity\Host;
 use App\Entity\Image;
+use App\Entity\Location;
+use App\Entity\User;
 use App\Service\UploadService;
 use DateTime;
 use DateTimeImmutable;
@@ -30,7 +33,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $importUser = $this->getReference('user_' . md5('import'));
+        $importUser = $this->getReference('user_' . md5('import'), User::class);
         foreach ($this->getData() as $data) {
             [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type] = $data;
             $event = new Event();
@@ -39,15 +42,15 @@ class EventFixture extends Fixture implements DependentFixtureInterface
             $event->setStop($this->setDateType($stop));
             $event->setRecurringOf($recOf);
             $event->setRecurringRule($recRules);
-            $event->setUser($this->getReference('user_' . md5('import')));
-            $event->setLocation($this->getReference('location_' . md5((string)$location)));
+            $event->setUser($this->getReference('user_' . md5('import'), User::class));
+            $event->setLocation($this->getReference('location_' . md5((string)$location), Location::class));
             $event->setCreatedAt(new DateTimeImmutable());
             $event->setType($type);
             foreach ($hosts as $user) {
-                $event->addHost($this->getReference('host_' . md5((string)$user)));
+                $event->addHost($this->getReference('host_' . md5((string)$user), Host::class));
             }
             foreach ($rsvps as $user) {
-                $event->addRsvp($this->getReference('user_' . md5((string)$user)));
+                $event->addRsvp($this->getReference('user_' . md5((string)$user), User::class));
             }
 
             // upload a file for thumbnails

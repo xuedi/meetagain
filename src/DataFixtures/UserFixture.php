@@ -41,12 +41,12 @@ class UserFixture extends Fixture
         // after all references are set, we can add followers and following
         foreach ($this->getData() as $data) {
             $name = $data['name'];
-            $user = $this->getReference('user_' . md5((string)$name));
+            $user = $this->getReference('user_' . md5((string)$name), User::class);;
             foreach ($data['followers'] as $follower) {
-                $user->addFollower($this->getReference('user_' . md5((string)$follower)));
+                $user->addFollower($this->getReference('user_' . md5((string)$follower), User::class));
             }
             foreach ($data['following'] as $following) {
-                $user->addFollowing($this->getReference('user_' . md5((string)$following)));
+                $user->addFollowing($this->getReference('user_' . md5((string)$following), User::class));
             }
             $manager->persist($user);
         }

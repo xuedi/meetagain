@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Translation;
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,7 +16,7 @@ class TranslationFixture extends Fixture implements DependentFixtureInterface
     {
         $languageCode = ['cn','de','en'];
         $languageSet = [0,1,2];
-        $importUser = $this->getReference('user_' . md5('import'));
+        $importUser = $this->getReference('user_' . md5('import'), User::class);
         foreach ($this->getData() as [$placeholder, $translation]) {
             foreach ($languageSet as $index) {
                 $user = new Translation();

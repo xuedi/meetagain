@@ -3,6 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\Comment;
+use App\Entity\Event;
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,8 +17,8 @@ class CommentFixture extends Fixture implements DependentFixtureInterface
     {
         foreach ($this->getData() as [$event, $date, $user, $msg]) {
             $comment = new Comment();
-            $comment->setEvent($this->getReference('event_' . md5((string)$event)));
-            $comment->setUser($this->getReference('user_' . md5((string)$user)));
+            $comment->setEvent($this->getReference('event_' . md5((string)$event), Event::class));
+            $comment->setUser($this->getReference('user_' . md5((string)$user), User::class));
             $comment->setCreatedAt(new DateTimeImmutable($date));
             $comment->setContent($msg);
 
