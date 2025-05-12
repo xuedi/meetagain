@@ -10,16 +10,26 @@ permissions:
   contents: read
 
 jobs:
-  build-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: php-actions/composer@run-as-current-user
+      - uses: actions/checkout@v4
 
-      - name: PHPUnit Tests
-        uses: php-actions/phpunit@composer-version--user
-        env:
-          TEST_NAME: UnitTestRunner
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
         with:
-          configuration: tests/phpunit.xml
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run test suite
+        run: composer run-script phpunit
