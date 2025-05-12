@@ -10,7 +10,7 @@
         "ext-imagick": "*",
         "beberlei/doctrineextensions": "^1.5",
         "doctrine/data-fixtures": "^2.0",
-        "doctrine/dbal": "^3",
+        "doctrine/dbal": "^4",
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-fixtures-bundle": "^3.6",
         "doctrine/doctrine-migrations-bundle": "^3.3",
