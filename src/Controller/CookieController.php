@@ -11,12 +11,20 @@ class CookieController extends AbstractController
     #[Route('/cookie/', name: 'app_cookie', methods: ['POST'])]
     public function index(Request $request): Response
     {
-        $request->getSession()->set('consent_accepted', true);
-        if ($request->get('osm_consent_checkbox') ?? 'off' === 'on') {
-            $request->getSession()->set('consent_osm', true);
-        } else {
-            $request->getSession()->set('consent_osm', false);
+        /*
+         * TODO: do some old school formBuilder stuff
+        $consent = Consent::getBySession($request->getSession());
+        $consent->setCookies(ConsentType::Granted);
+        $consent->setOsm($request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
+        $consent->save($request->getSession());
+
+        $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
+        foreach ($consent->getHtmlCookies() as $cookie) {
+            $response->headers->setCookie($cookie);
         }
+
+        return $response;
+         */
 
         return $this->render('cookie/index.html.twig');
     }
