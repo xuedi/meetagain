@@ -1,5 +1,5 @@
 
-
+![License](https://img.shields.io/badge/license-GPLv2-green.svg?style=flat)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/refs/heads/master/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
 
 

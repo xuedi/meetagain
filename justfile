@@ -1,7 +1,10 @@
 DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
 PHP := DOCKER + " exec php-fpm"
+JUST := just_executable() + " --justfile=" + justfile()
 
-install: up
+install:
+    cp --no-clobber .env.dist .env
+    {{JUST}} up
     {{PHP}} composer install
     {{PHP}} php bin/console cache:clear
     {{PHP}} php bin/console doctrine:schema:drop --force -q
