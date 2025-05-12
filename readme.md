@@ -1,7 +1,7 @@
 
-![License](https://img.shields.io/badge/license-GPLv2-green.svg?style=flat)
+[![License](https://img.shields.io/badge/license-GPLv2-green.svg?style=flat)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html.en)
+[![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
-
 
 ## Introduction
 meetup.com got crazily expensive, I created my own page as a single meetup
