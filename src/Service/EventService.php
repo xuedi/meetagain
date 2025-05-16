@@ -34,8 +34,8 @@ readonly class EventService
         $criteria->orderBy(['start' => $sort->value]);
         $criteria->where(match ($time) { // TODO: all should be a dummy, no idea how
             EventFilterTime::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
-            EventFilterTime::Past => Criteria::expr()->lte('start', new DateTimeImmutable()),
-            EventFilterTime::Future => Criteria::expr()->gte('start', new DateTimeImmutable()),
+            EventFilterTime::Past => Criteria::expr()->lte('start', new DateTime()),
+            EventFilterTime::Future => Criteria::expr()->gte('start', new DateTime()),
         });
         $criteria->andWhere(match ($type) {
             EventTypes::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
