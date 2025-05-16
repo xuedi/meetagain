@@ -44,4 +44,5 @@ just down     # stops the stack
 ```
 // misguided web attempts
 SELECT url, COUNT(*) AS number FROM `not_found_log` GROUP BY url ORDER BY number DESC;
+COMPOSE_ENV_FILES=../.env # env parameter for phpstorm docker remote php interpreter
 ```
