@@ -91,6 +91,7 @@ class EventServiceTest extends TestCase
             ],
         ];
     }
+
     public function testCanUpdateDatetime(): void
     {
         $paraTarget = new DateTime('2010-10-10 10:10:10');
