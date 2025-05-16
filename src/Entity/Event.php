@@ -16,7 +16,7 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column]
     private ?bool $initial = null;
@@ -319,13 +319,6 @@ class Event
         return $this->translations;
     }
 
-    public function setTranslation(Collection $translations): static
-    {
-        $this->translations = $translations;
-
-        return $this;
-    }
-
     public function addTranslation(EventTranslation $translation): static
     {
         if (!$this->translations->contains($translation)) {
@@ -336,7 +329,7 @@ class Event
         return $this;
     }
 
-    public function removeTranslation(Comment $translation): static
+    public function removeTranslation(EventTranslation $translation): static
     {
         if ($this->translations->removeElement($translation) && $translation->getEvent() === $this) {
             $translation->setEvent(null);
