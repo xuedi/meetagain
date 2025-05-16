@@ -12,7 +12,8 @@ return RectorConfig::configure()
         __DIR__ . '/../src',
         __DIR__ . '/../tests',
     ])
-    ->withPhpSets(php83: true)
+    ->withPhpSets(php84: true)
+    ->withPHPStanConfigs([__DIR__ . '/phpstan.neon'])
     ->withPreparedSets(deadCode: true, codeQuality: true)
     ->withAttributesSets(symfony: true, doctrine: true, phpunit: true)
     ->withTypeCoverageLevel(0)
