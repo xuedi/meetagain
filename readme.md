@@ -30,6 +30,7 @@ just down     # stops the stack
 
 
 ### TODO:
+ - rework system of enums in drown down menus like EventTypes (separate filter from data)
  - add functionality to add new entries in the admin interface (location, event & venue)
  - add messages and way to block users
  - send messages when to promote and notify of a new event
