@@ -14,7 +14,6 @@
                 <th>Location</th>
                 <th>Rsvp</th>
                 <th>Type</th>
-                <th>Translation</th>
                 <th><a href="{{ path('app_admin_event_add') }}"><span class="icon"><i class="fa fa-add"></i></span></a></th>
             </tr>
             </thead>
@@ -26,9 +25,8 @@
                     <td>{{ event.stop|date('Y-m-d') }}</td>
                     <td>{% if event.recurringRule is null %}{{ 'No'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}</td>
                     <td>{{ event.location.name }}</td>
-                    <td>{{ event.type.name }}</td>
                     <td>{{ event.rsvp|length }}</td>
-                    <td>trans</td>
+                    <td>{{ event.type.name }}</td>
                     <td><a href="{{ path('app_admin_event_edit', {'id': event.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
                 </tr>
             {% endfor %}
