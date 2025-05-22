@@ -13,6 +13,7 @@ use App\Service\TranslationService;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -37,6 +38,9 @@ class EventType extends AbstractType
         $builder
             ->add('initial', HiddenType::class, [
                 'data' => true,
+            ])
+            ->add('published', CheckboxType::class, [
+                'label' => 'Published',
             ])
             ->add('start', DateTimeType::class, [
                 'widget' => 'single_text',

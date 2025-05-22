@@ -107,12 +107,14 @@ class AdminEventController extends AbstractController
         $form->remove('createdAt');
         $form->remove('image');
         $form->remove('user');
+        $form->remove('published');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $event->setCreatedAt(new DateTimeImmutable());
             $event->setPreviewImage(null);
             $event->setInitial(true);
+            $event->setPublished(false);
             $event->setUser($this->getUser());
 
             $entityManager->persist($event);

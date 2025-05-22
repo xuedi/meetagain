@@ -38,6 +38,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
             [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type] = $data;
             $event = new Event();
             $event->setInitial($initial);
+            $event->setPublished(true);
             $event->setStart($this->setDateType($start));
             $event->setStop($this->setDateType($stop));
             $event->setRecurringOf($recOf);

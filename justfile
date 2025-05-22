@@ -65,5 +65,11 @@ update_coverage_badge: ## generate badge and add it to repo
 	{{PHP}} php tests/badgeGenerator.php
 	git add tests/badge/coverage.svg
 
-rebuild:
+dockerRebuild:
     {{DOCKER}} build --no-cache php-fpm
+
+dockerEnter:
+    {{DOCKER}} exec php-fpm bash
+
+createMigration:
+    {{PHP}} bin/console doctrine:migrations:diff

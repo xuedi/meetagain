@@ -95,6 +95,7 @@ readonly class EventService
             }
             $recurringEvent = new Event();
             $recurringEvent->setUser($event->getUser());
+            $recurringEvent->setPublished($event->isPublished());
             $recurringEvent->setLocation($event->getLocation());
             $recurringEvent->setPreviewImage($event->getPreviewImage());
             $recurringEvent->setInitial(false);

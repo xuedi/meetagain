@@ -69,6 +69,9 @@ class Event
     #[ORM\OneToMany(targetEntity: EventTranslation::class, mappedBy: 'event')]
     private Collection $translations;
 
+    #[ORM\Column]
+    private ?bool $published = null;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
@@ -346,5 +349,17 @@ class Event
             }
         }
         return null;
+    }
+
+    public function isPublished(): ?bool
+    {
+        return $this->published;
+    }
+
+    public function setPublished(bool $published): static
+    {
+        $this->published = $published;
+
+        return $this;
     }
 }
