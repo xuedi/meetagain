@@ -35,6 +35,9 @@ translationsExtract:
     {{PHP}} php bin/console translation:extract --force --format php en
     {{PHP}} php bin/console translation:extract --force --format php cn
 
+debugRouter:
+	{{PHP}} php bin/console debug:router
+
 test:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
 
