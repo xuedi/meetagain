@@ -10,6 +10,7 @@ use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\TranslationService;
 use App\Service\UploadService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -26,6 +27,7 @@ class AdminEventController extends AbstractController
         private readonly EventTranslationRepository $eventTransRepo,
     ) {
     }
+
     #[Route('/admin/event/', name: 'app_admin_event')]
     public function eventList(EventRepository $repo): Response
     {
@@ -33,7 +35,8 @@ class AdminEventController extends AbstractController
             'events' => $repo->findBy([], ['start' => 'ASC']),
         ]);
     }
-    #[Route('/admin/event/{id}', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
+
+    #[Route('/admin/event/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function eventEdit(Request $request, Event $event): Response
     {
 
@@ -80,6 +83,7 @@ class AdminEventController extends AbstractController
             'form' => $form,
         ]);
     }
+
     #[Route('/admin/event/{id}/delete', name: 'app_admin_event_delete')]
     public function eventDelete(EventRepository $repo): Response
     {
@@ -93,5 +97,33 @@ class AdminEventController extends AbstractController
             return $translation;
         }
         return new EventTranslation();
+    }
+
+    #[Route('/admin/event/add', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
+    public function eventAdd(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $event = new Event();
+        $form = $this->createForm(EventType::class, $event);
+        $form->remove('createdAt');
+        $form->remove('image');
+        $form->remove('user');
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $event->setCreatedAt(new DateTimeImmutable());
+            $event->setPreviewImage(null);
+            $event->setInitial(true);
+            $event->setUser($this->getUser());
+
+            $entityManager->persist($event);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
+        }
+
+        return $this->render('admin/event/new.html.twig', [
+            'location' => $event,
+            'form' => $form,
+        ]);
     }
 }

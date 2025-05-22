@@ -22,7 +22,7 @@ class AdminLocationController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/location/edit/{id}', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
+    #[Route('/admin/location/{id}/edit', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
     public function locationEdit(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(LocationType::class, $location);

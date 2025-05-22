@@ -86,20 +86,22 @@ class EventType extends AbstractType
                 ],
             ]);
 
-        foreach ($this->translationService->getLanguageCodes() as $languageCode) {
-            $eventId = $options['data']->getId();
-            $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
-            $builder->add("title-$languageCode", TextType::class, [
-                'label' => "title ($languageCode)",
-                'data' => $translation?->getTitle() ?? '',
-                'mapped' => false,
-            ]);
-            $builder->add("description-$languageCode", TextareaType::class, [
-                'label' => "description ($languageCode)",
-                'data' => $translation?->getDescription() ?? '',
-                'mapped' => false,
-                'attr' => ['rows' => 16],
-            ]);
+        $eventId = $options['data']->getId();
+        if(null !== $eventId) { // not for new events
+            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+                $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
+                $builder->add("title-$languageCode", TextType::class, [
+                    'label' => "title ($languageCode)",
+                    'data' => $translation?->getTitle() ?? '',
+                    'mapped' => false,
+                ]);
+                $builder->add("description-$languageCode", TextareaType::class, [
+                    'label' => "description ($languageCode)",
+                    'data' => $translation?->getDescription() ?? '',
+                    'mapped' => false,
+                    'attr' => ['rows' => 16],
+                ]);
+            }
         }
     }
 
