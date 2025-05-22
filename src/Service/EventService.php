@@ -43,6 +43,7 @@ readonly class EventService
             EventTypes::Outdoor => Criteria::expr()->eq('type', EventTypes::Outdoor->value),
             EventTypes::Dinner => Criteria::expr()->eq('type', EventTypes::Dinner->value),
         });
+        $criteria->andWhere(Criteria::expr()->eq('published', true));
         $result = $this->repo->matching($criteria)->toArray();
 
         return $this->structureList($result);
