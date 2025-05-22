@@ -1,7 +1,6 @@
 {
   "type": "project",
   "name": "xuedi/meetagain",
-  "version": "0.5.0",
   "description": "Simple PHP app to organize a group and schedule recurring events ",
   "license": "GPL-2.0-only",
   "authors": [
