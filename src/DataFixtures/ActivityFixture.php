@@ -19,7 +19,6 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
             $activity = new Activity();
             $activity->setUser($this->getReference('user_' . md5((string) $userName), User::class));
             $activity->setCreatedAt(new DateTimeImmutable($time));
-            $activity->setVisible(true);
             $activity->setType($type);
             $activity->setMeta($meta);
 

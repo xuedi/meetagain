@@ -28,7 +28,6 @@ readonly class ActivityService
         $activity->setCreatedAt(new DateTimeImmutable());
         $activity->setUser($user);
         $activity->setType($type);
-        $activity->setVisible($this->isVisible($type));
         $activity->setMeta($meta);
 
         $this->em->persist($activity);
@@ -43,19 +42,6 @@ readonly class ActivityService
     public function getAdminList(): array
     {
         return $this->prepareActivityList($this->repo->findAll());
-    }
-
-    private function isVisible(ActivityType $type): bool
-    {
-        /* Private events, for admin only:
-         * UserActivity::ChangedUsername
-         */
-        return match ($type->value) {
-            ActivityType::Login->value => true,
-            ActivityType::RsvpYes->value => true,
-            ActivityType::RsvpNo->value => true,
-            default => false,
-        };
     }
 
     private function prepareActivityList(array $list): array

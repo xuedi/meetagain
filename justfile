@@ -4,7 +4,7 @@ JUST := just_executable() + " --justfile=" + justfile()
 
 install:
     cp --no-clobber .env.dist .env
-    {{JUST}} up
+    {{JUST}} dockerStart
     {{PHP}} composer install
     {{PHP}} php bin/console cache:clear
     {{PHP}} php bin/console doctrine:schema:drop --force -q

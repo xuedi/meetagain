@@ -22,9 +22,6 @@ class Activity
     #[ORM\Column(enumType: ActivityType::class)]
     private ?ActivityType $type = null;
 
-    #[ORM\Column]
-    private ?bool $visible = null;
-
     #[ORM\Column(nullable: true)]
     private ?array $Meta = null;
 
@@ -65,18 +62,6 @@ class Activity
     public function setType(ActivityType $type): static
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function isVisible(): ?bool
-    {
-        return $this->visible;
-    }
-
-    public function setVisible(bool $visible): static
-    {
-        $this->visible = $visible;
 
         return $this;
     }
