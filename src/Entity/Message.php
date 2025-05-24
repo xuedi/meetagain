@@ -28,6 +28,12 @@ class Message
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
+    #[ORM\Column]
+    private ?bool $deleted = null;
+
+    #[ORM\Column]
+    private ?bool $wasRead = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,6 +83,30 @@ class Message
     public function setContent(string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function isDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): static
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function isWasRead(): ?bool
+    {
+        return $this->wasRead;
+    }
+
+    public function setWasRead(bool $wasRead): static
+    {
+        $this->wasRead = $wasRead;
 
         return $this;
     }

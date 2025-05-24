@@ -46,7 +46,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         $manager->persist($regularMeetup);
 
         $manager->flush();
-        $this->imageService->createThumbnails($defaultImage, [[400, 400], [600, 400]]);
+        $this->imageService->createThumbnails($defaultImage, [[400, 400], [50, 50], [600, 400]]);
 
         foreach ($this->userFixture->getUsernames() as $name) {
             $path = __DIR__ . "/Avatars/$name.jpg";
@@ -59,7 +59,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
             $image = $this->imageService->upload($uploadedImage, $user);
             $manager->flush();
             if ($image instanceof Image) {
-                $this->imageService->createThumbnails($image, [[400, 400]]);
+                $this->imageService->createThumbnails($image, [[50, 50], [400, 400]]);
             } else {
                 throw new RuntimeException('Unable to upload image');
             }

@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    private ?array $userNameList = null;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
@@ -23,12 +24,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     // TODO: get via builder straight as keyValue
     public function getUserNameList(): array
     {
-        $list = [];
+        if ($this->userNameList !== null) {
+            return $this->userNameList;
+        }
+        $this->userNameList = [];
         foreach ($this->findAll() as $user) {
-            $list[$user->getId()] = $user->getName();
+            $this->userNameList[$user->getId()] = $user->getName();
         }
 
-        return $list;
+        return $this->userNameList;
     }
 
     public function getFollowers(User $user, bool $excludeFriends = false): array
@@ -117,5 +121,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('public', true)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function resolveUserName(int $userId): string
+    {
+        return $this->getUserNameList()[$userId];
     }
 }

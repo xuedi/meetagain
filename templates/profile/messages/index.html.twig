@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_title_profile"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-3">
+
+                    <div class="panel is-shadowless">
+
+                        <div class="panel-block">
+                            <h1 class="title is-5">Messages</h1>
+                        </div>
+
+                        {% for conversation in conversations %}
+                            <!-- TODO: is-active -->
+                            <a class="panel-block is-block"
+                               {% if conversationsId == conversation.user.id %} style="background-color: aliceblue;" {% endif %}
+                               href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}"
+                            >
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            {% include '_block/image.html.twig' with {'image': conversation.user.image, 'size': '50x50'} %}
+                                        </div>
+                                        <div class="level-item">
+                                            <div class="is-block has-text-left">
+                                                <strong>{{ conversation.user.name }}</strong><br/>
+                                                <small class="is-small">{{ conversation.lastMessage | time_diff }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="level-right">
+                                        <div class="content">
+                                            {{ conversation.messages }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+
+                        <a class="panel-block">
+                            <span class="panel-icon">
+                                <i class="fas fa-search" aria-hidden="true"></i>
+                            </span>
+                            <div class="select is-link">
+                                <select>
+                                    <option>Message friends</option>
+                                    {% for user in friends %}
+                                        <a class="panel-block">
+                                            <option>{{ user.name }}</option>
+                                        </a>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+
+
+                <div class="column is-1"></div>
+
+
+                <div class="column is-8">
+
+                    {% if messages is null %}
+                    <h1 class="title is-6">Friends</h1>
+                    you can only message to people you are friends with, or people who allow to be messages from everyone
+                    {% else %}
+                        {% for message in messages %}
+                            {% if user.id == message.sender.id %}
+                                <div class="level is-block">
+                                    <div class="level-right">
+                                        <div class="level-item">
+                                            <div class="box">
+                                                <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
+                                                <span class="breakText">{{ message.content }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="level-item">
+                                            {% include '_block/image.html.twig' with {'image': message.sender.image, 'size': '50x50'} %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            {% include '_block/image.html.twig' with {'image': message.sender.image, 'size': '50x50'} %}
+                                        </div>
+                                        <div class="level-item">
+                                            <div class="box">
+                                                <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
+                                                {{ message.content }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <hr>
+                        {{ form_start(form) }}
+                        <div class="level">
+                            <div class="level-item">
+                                <input class="input" type="text" name="{{ field_name(form.comment) }}" placeholder="Message" />
+                            </div>
+                            <div class="level-right">
+                                <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                            </div>
+                        </div>
+                        {{ form_end(form) }}
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+    </section>
+
+{% endblock %}

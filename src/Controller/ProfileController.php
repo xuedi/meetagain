@@ -24,6 +24,7 @@ class ProfileController extends AbstractController
     public function __construct(private readonly ActivityService $activityService)
     {
     }
+
     #[Route('/profile/', name: 'app_profile')]
     public function index(
         Request $request,
@@ -77,6 +78,7 @@ class ProfileController extends AbstractController
             'form' => $form,
         ]);
     }
+
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {
@@ -92,64 +94,5 @@ class ProfileController extends AbstractController
         }
 
         return $this->redirectToRoute('app_profile');
-    }
-    #[Route('/profile/messages', name: 'app_profile_messages')]
-    public function messages(UserRepository $repo): Response
-    {
-        return $this->render('profile/messages.html.twig', [
-            'friends' => $repo->getFriends($this->getAuthedUser()),
-            'user' => $this->getAuthedUser(),
-        ]);
-    }
-    #[Route('/profile/social', name: 'app_profile_social')]
-    public function social(UserRepository $repo, string $show = 'friends'): Response
-    {
-        return $this->render('profile/social.html.twig', [
-            'followers' => $repo->getFollowers($this->getAuthedUser(), true),
-            'following' => $repo->getFollowing($this->getAuthedUser(), true),
-            'friends' => $repo->getFriends($this->getAuthedUser()),
-            'activities' => $this->activityService->getUserList($this->getAuthedUser()),
-            'user' => $this->getAuthedUser(),
-            'show' => $show,
-        ]);
-    }
-    #[Route('/profile/social/friends/', name: 'app_profile_social_friends')]
-    public function socialFriends(UserRepository $repo): Response
-    {
-        return $this->social($repo, 'friends');
-    }
-    #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow')]
-    public function toggleFollow(FriendshipService $service, int $id): Response
-    {
-        return $service->toggleFollow($id, 'app_profile_social');
-    }
-    #[Route('/profile/config', name: 'app_profile_config')]
-    public function config(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(ChangePassword::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getAuthedUser();
-            if ($hasher->isPasswordValid($user, $form->get('oldPassword')->getData())) {
-                $user->setPassword($hasher->hashPassword($user, $form->get('newPassword')->getData()));
-
-                $em->persist($user);
-                $em->flush();
-
-                $this->addFlash('success', 'Password was changed, please verify by logging in again');
-            } else {
-                $this->addFlash('error', 'The old password does not match');
-            }
-        }
-        return $this->render('profile/config.html.twig', [
-            'form' => $form,
-        ]);
-    }
-    #[Route('/profile/images', name: 'app_profile_images')]
-    public function images(UserRepository $repo): Response
-    {
-        return $this->render('profile/images.html.twig', [
-            //
-        ]);
     }
 }

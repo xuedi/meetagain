@@ -35,7 +35,7 @@
 
                     <p>{{ userDetails.bio }}</p>
 
-                    <a href="#" class="button is-small mt-4">
+                    <a href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-small mt-4">
                         <span class="icon"><i class="fa fa-envelope"></i></span><span>Message</span>
                     </a>
                 </div>

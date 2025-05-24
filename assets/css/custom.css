@@ -36,3 +36,9 @@ body {
 #dropdown-cookie {
     min-width: 350px;
 }
+
+.breakText {
+    display: block;
+    max-width: 720px !important;
+    word-break: break-all;
+}
