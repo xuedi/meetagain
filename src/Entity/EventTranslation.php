@@ -15,7 +15,7 @@ class EventTranslation
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Event $event = null;
 
