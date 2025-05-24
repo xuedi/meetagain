@@ -22,7 +22,7 @@ class MessageRepository extends ServiceEntityRepository
         $list = [];
 
         $result = $this->createQueryBuilder('m')
-            ->select('m.createdAt, us.id as senderId, ur.id as receiverId')
+            ->select('m.createdAt, us.id as senderId, ur.id as receiverId, m.wasRead') //
             ->leftJoin('m.receiver', 'us')  // join user
             ->leftJoin('m.sender', 'ur')  // join user
             ->where('m.sender = :user OR m.receiver = :user')
@@ -36,12 +36,16 @@ class MessageRepository extends ServiceEntityRepository
             $partnerId = $user->getId() === $item['senderId'] ? $item['receiverId'] : $item['senderId'];
             if (!isset($list[$partnerId])) {
                 $list[$partnerId] = [
-                    'messages' => 0,
+                    'messages' => 1,
+                    'unread' => $item['wasRead'] === false ? 1 : 0,
                     'lastMessage' => $item['createdAt'],
                     'user' => $userRepo->findOneBy(['id' => $partnerId]),
                 ];
             } else {
                 $list[$partnerId]['messages']++;
+                if ($item['wasRead'] === false) {
+                    $list[$partnerId]['unread']++;
+                }
             }
         }
 
@@ -50,7 +54,7 @@ class MessageRepository extends ServiceEntityRepository
 
     public function getMessages(User $user, User|null $partner): ?array
     {
-        if($partner === null) {
+        if ($partner === null) {
             return null;
         }
 
@@ -61,5 +65,29 @@ class MessageRepository extends ServiceEntityRepository
             ->orderBy('m.createdAt', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function hasNewMessages(User $user): bool
+    {
+        $result = $this->createQueryBuilder('m')
+            ->where('m.receiver = :user AND m.wasRead = false')
+            ->setParameter('user', $user)
+            ->orderBy('m.createdAt', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return count($result) > 0;
+    }
+
+    public function markConversationRead(User $user, User $conversationPartner): void
+    {
+        $this->createQueryBuilder('m')
+            ->update(Message::class, 'm')
+            ->set('m.wasRead', true)
+            ->where('m.receiver = :user AND m.sender = :partner')
+            ->setParameter('user', $user)
+            ->setParameter('partner', $conversationPartner)
+            ->getQuery()
+            ->execute();
     }
 }

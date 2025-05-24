@@ -30,6 +30,16 @@ readonly class GlobalService
         return $this->translationService->getLanguageCodes();
     }
 
+    public function hasNewMessages(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request instanceof Request) {
+            return $request->getSession()->get('hasNewMessage', false);
+        }
+
+        return false;
+    }
+
     public function getShowCookieConsent(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();

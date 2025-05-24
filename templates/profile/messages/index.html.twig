@@ -36,7 +36,9 @@
                                     </div>
                                     <div class="level-right">
                                         <div class="content">
-                                            {{ conversation.messages }}
+                                            {% if conversation.unread > 0 %}
+                                            <span class="tag has-background-danger-light">{{ conversation.unread }}</span>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -99,6 +101,13 @@
                                                 {{ message.content }}
                                             </div>
                                         </div>
+                                        {% if message.wasRead == false %}
+                                        <div class="level-item">
+                                            <span class="panel-icon has-text-danger">
+                                                <i class="fas fa-circle" aria-hidden="true"></i>
+                                            </span>
+                                        </div>
+                                            {% endif %}
                                     </div>
                                 </div>
                             {% endif %}

@@ -18,8 +18,10 @@ class MessageController extends AbstractController
     public function index(Request $request, EntityManagerInterface $em, ?int $id = null): Response
     {
         $form = null;
+        $user = $this->getAuthedUser();
         $msgRepo = $em->getRepository(Message::class);
         $userRepo = $em->getRepository(User::class);
+        $messages = null;
 
         $conversationPartner = $userRepo->findOneBy(['id' => $id]);
         if ($conversationPartner !== null) {
@@ -37,15 +39,21 @@ class MessageController extends AbstractController
                 $em->persist($msg);
                 $em->flush();
             }
+            // preRender then flush when no new messages
+            $messages = $msgRepo->getMessages($user, $conversationPartner);
+            $msgRepo->markConversationRead($user, $conversationPartner);
+            if(!$msgRepo->hasNewMessages($user)) {
+                $request->getSession()->set('hasNewMessage', false);
+            }
         }
 
         $conversationPartner = $userRepo->findOneBy(['id' => $id]);
         return $this->render('profile/messages/index.html.twig', [
             'conversationsId' => $id,
-            'conversations' => $msgRepo->getConversations($this->getAuthedUser()),
-            'messages' => $msgRepo->getMessages($this->getAuthedUser(), $conversationPartner),
-            'friends' => $userRepo->getFriends($this->getAuthedUser()),
-            'user' => $this->getAuthedUser(),
+            'conversations' => $msgRepo->getConversations($user),
+            'messages' => $messages,
+            'friends' => $userRepo->getFriends($user),
+            'user' => $user,
             'form' => $form,
         ]);
     }

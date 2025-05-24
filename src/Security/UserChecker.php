@@ -2,9 +2,10 @@
 
 namespace App\Security;
 
-use App\Entity\User;
 use App\Entity\ActivityType;
+use App\Entity\User;
 use App\Entity\UserStatus;
+use App\Repository\MessageRepository;
 use App\Service\ActivityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +21,9 @@ readonly class UserChecker implements UserCheckerInterface
         private ActivityService $activityService,
         private EntityManagerInterface $em,
         private RequestStack $requestStack,
-    ) {
+        private MessageRepository $msgRepo,
+    )
+    {
     }
 
     #[\Override]
@@ -54,5 +57,9 @@ readonly class UserChecker implements UserCheckerInterface
         $this->em->flush();
 
         $this->activityService->log(ActivityType::Login, $user, []);
+
+        if ($this->msgRepo->hasNewMessages($user)) {
+            $request->getSession()->set('hasNewMessage', true);
+        }
     }
 }

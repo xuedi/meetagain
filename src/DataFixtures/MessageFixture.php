@@ -51,20 +51,18 @@ class MessageFixture extends Fixture implements DependentFixtureInterface
             ['2025-01-06 11:10:00', 'Abraham Baker', 'xuedi', 'That would be great! When are you free?', true],
             ['2025-01-06 12:30:00', 'xuedi', 'Abraham Baker', 'How about next week?', true],
             ['2025-01-07 09:15:00', 'Abraham Baker', 'xuedi', 'Perfect! Any specific day you prefer?', true],
-            ['2025-01-07 10:20:00', 'xuedi', 'Abraham Baker', 'Tuesday would work best for me', true],
-            ['2025-01-08 14:25:00', 'Abraham Baker', 'xuedi', 'Tuesday works! What time?', true],
+            ['2025-01-08 14:25:00', 'Abraham Baker', 'xuedi', 'Tuesday? What time?', true],
             ['2025-01-08 15:30:00', 'xuedi', 'Abraham Baker', 'How about 2 PM?', true],
             ['2025-01-09 11:45:00', 'Abraham Baker', 'xuedi', 'Sounds good! Where should we meet?', true],
             ['2025-01-09 13:50:00', 'xuedi', 'Abraham Baker', 'There\'s a nice cafe downtown', true],
             ['2025-01-10 10:15:00', 'Abraham Baker', 'xuedi', 'The one on Main Street?', true],
             ['2025-01-10 11:20:00', 'xuedi', 'Abraham Baker', 'Yes, that\'s the one!', true],
-            ['2025-01-11 09:30:00', 'Abraham Baker', 'xuedi', 'Great! Looking forward to it', true],
-            ['2025-01-12 14:40:00', 'xuedi', 'Abraham Baker', 'Me too! See you then', true],
-            ['2025-01-12 15:45:00', 'Abraham Baker', 'xuedi', 'See you! Thanks again', true],
             ['2025-02-03 11:32:00', 'xuedi', 'Crystal Liu', 'hello, welcome to the group', true],
             ['2025-02-03 11:33:15', 'Crystal Liu', 'xuedi', 'thank you for organizing the event', true],
             ['2025-02-03 11:37:54', 'xuedi', 'Crystal Liu', 'you are welcome to join us again, dont forget to RSVP', true],
             ['2025-02-03 11:37:54', 'Crystal Liu', 'xuedi', 'When is the next meetup?', false],
+            ['2025-04-02 22:04:23', 'Alisa Hester', 'xuedi', 'Hello', false],
+            ['2025-04-02 22:05:36', 'Alisa Hester', 'xuedi', 'I lost my scarf last week, was it maybe found?', false],
         ];
     }
 }
