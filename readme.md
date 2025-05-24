@@ -22,14 +22,16 @@ gd, apcu, pdo_mysql, imagick, intl, iconv, ctype. Optional: xdebug opcache
 
 ### Usage
 ```
-just          # get a list with all possible cli interactions
-just install  # deletes all data and reset to fresh fixture version
-just up       # starts docker development stack
-just down     # stops the stack
+just             # get a list with all possible cli interactions
+just install     # deletes all data and reset to fresh fixture version
+just dockerStart # starts docker development stack
+just dockerStop  # stops the stack
 ``` 
 
 
 ### TODO:
+ - overwrite cookie settings with user DB settings
+ - implement a promoted event flag and a widget for the CMS
  - rework system of enums in drown down menus like EventTypes (separate filter from data)
  - add functionality to add new entries in the admin interface (location, event & venue)
  - add messages and way to block users

@@ -13,13 +13,6 @@ install:
     {{PHP}} php bin/console app:translation:import 'https://www.dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
 
-up:
-	{{DOCKER}} up -d
-	{{PHP}} truncate -s 0 var/log/dev.log
-
-down:
-	{{DOCKER}} down
-
 clearLogs:
     {{PHP}} truncate -s 0 var/log/dev.log
 
@@ -37,6 +30,22 @@ translationsExtract:
 
 debugRouter:
 	{{PHP}} php bin/console debug:router
+
+createMigration:
+    {{PHP}} php bin/console doctrine:migrations:diff
+
+dockerStart:
+	{{DOCKER}} up -d
+	{{PHP}} truncate -s 0 var/log/dev.log
+
+dockerStop:
+	{{DOCKER}} down
+
+dockerRebuild:
+    {{DOCKER}} build --no-cache php-fpm
+
+dockerEnter:
+    {{DOCKER}} exec php-fpm bash
 
 test:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
@@ -64,12 +73,3 @@ checkAutoFix:
 update_coverage_badge: ## generate badge and add it to repo
 	{{PHP}} php tests/badgeGenerator.php
 	git add tests/badge/coverage.svg
-
-dockerRebuild:
-    {{DOCKER}} build --no-cache php-fpm
-
-dockerEnter:
-    {{DOCKER}} exec php-fpm bash
-
-createMigration:
-    {{PHP}} bin/console doctrine:migrations:diff

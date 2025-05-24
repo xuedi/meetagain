@@ -10,7 +10,7 @@
             <div class="columns">
                 <div class="column is-5">
 
-                    <h1 class="subtitle">{{ "p: Please sign in"|trans }}</h1>
+                    <h1 class="subtitle">{{ "page_login_headline"|trans }}</h1>
 
                     <form method="post" class="box">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -21,23 +21,21 @@
 
                         <div class="field">
                             <label class="label">Email</label>
-                            <div class="control">
-                                <label>
-                                    <input type="email" name="_username" id="username" class="input" autocomplete="email">
-                                </label>
-                            </div>
+                            <p class="control has-icons-left">
+                                <input type="email" name="_username" id="username" class="input" autocomplete="email" placeholder="Email">
+                                <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+                            </p>
                         </div>
 
                         <div class="field">
                             <label class="label">Password</label>
-                            <div class="control">
-                                <label>
-                                    <input type="password" name="_password" id="password" class="input">
-                                </label>
-                            </div>
+                            <p class="control has-icons-left">
+                                <input type="password" name="_password" id="password" class="input" placeholder="Password">
+                                <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+                            </p>
                         </div>
 
-                        <div class="field is-grouped">
+                        <div class="field is-grouped mt-5">
                             <div class="control">
                                 <button type="submit" class="button is-link">Login</button>
                                 <a href="{{ path('app_register') }}" type="button" class="button">Register</a>
@@ -46,6 +44,7 @@
                     </form>
 
                 </div>
+
             </div>
 
         </div>

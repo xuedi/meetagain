@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,17 +44,11 @@ class AdminUserController extends AbstractController
         ]);
     }
     #[Route('/admin/user/{id}/approve', name: 'app_admin_user_approve', methods: ['GET'])]
-    public function userApprove(User $user, EntityManagerInterface $em, MailerInterface $mailer): Response
+    public function userApprove(User $user, EntityManagerInterface $em, EmailService $emailService): Response
     {
         $user->setStatus(UserStatus::Active);
 
-        $email = new TemplatedEmail();
-        $email->from(new Address('registration@dragon-descendants.de', 'Dragon Descendants Meetup'));
-        $email->to((string) $user->getEmail());
-        $email->subject('Welcome!');
-        $email->htmlTemplate('registration/approved_email.html.twig');
-
-        $mailer->send($email);
+        $emailService->sendWelcome($user);
 
         $em->persist($user);
         $em->flush();

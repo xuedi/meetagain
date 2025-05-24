@@ -20,7 +20,7 @@ readonly class ActivityService
     ) {
     }
 
-    public function log(UserActivity $type, User $user, array $meta): void
+    public function log(UserActivity $type, User $user, array $meta = []): void
     {
         $this->checkRequiredMetaData($type, $meta);
 
@@ -70,7 +70,7 @@ readonly class ActivityService
     }
 
     // TODO: Translate messages
-    public function prepareActivity(Activity $activity): Activity
+    private function prepareActivity(Activity $activity): Activity
     {
         $cachedUserName = $this->em->getRepository(User::class)->getUserNameList();
         $cachedEventName = $this->em->getRepository(Event::class)->getEventNameList($this->globalService->getCurrentLocale());
@@ -95,20 +95,31 @@ readonly class ActivityService
     {
         switch ($type->value) {
             case UserActivity::RsvpYes->value:
-                if (!isset($meta['event_id'])) {
-                    throw new InvalidArgumentException('Missing event_id in meta');
-                }
+                $this->ensureHasKey($meta, 'event_id');
+                $this->ensureIsNumeric($meta, 'event_id');
                 break;
             case UserActivity::FollowedUser->value:
-                if (!isset($meta['user_id'])) {
-                    throw new InvalidArgumentException('Missing user_id in meta');
-                }
+                $this->ensureHasKey($meta, 'user_id');
+                $this->ensureIsNumeric($meta, 'user_id');
                 break;
             case UserActivity::ChangedUsername->value:
-                if (!isset($meta['old'], $meta['new'])) {
-                    throw new InvalidArgumentException('Missing old or new in meta');
-                }
+                $this->ensureHasKey($meta, 'old');
+                $this->ensureHasKey($meta, 'new');
                 break;
+        }
+    }
+
+    private function ensureHasKey(array $meta, string $key): void
+    {
+        if (!isset($meta[$key])) {
+            throw new InvalidArgumentException("Missing '$key' in meta");
+        }
+    }
+
+    private function ensureIsNumeric(array $meta, string $key): void
+    {
+        if (is_numeric($meta[$key])) {
+            throw new InvalidArgumentException("Value '$key' has to be numeric");
         }
     }
 }
