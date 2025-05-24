@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Entity\Image;
-use App\Entity\UserActivity;
+use App\Entity\ActivityType;
 use App\Form\ChangePassword;
 use App\Form\ProfileType;
 use App\Repository\EventRepository;
@@ -48,7 +48,7 @@ class ProfileController extends AbstractController
             $newUserName = $form->get('name')->getData();
             if ($oldUserName !== $newUserName) {
                 $message = sprintf("Changed username from '%s' to '%s'", $oldUserName, $newUserName);
-                $this->activityService->log(UserActivity::ChangedUsername, $user, ['old' => $oldUserName, 'new' => $newUserName]);
+                $this->activityService->log(ActivityType::ChangedUsername, $user, ['old' => $oldUserName, 'new' => $newUserName]);
             }
             // TODO: add following to the form so it is handled automatically
             $user->setBio($form->get('bio')->getData());
@@ -86,9 +86,9 @@ class ProfileController extends AbstractController
         $em->flush();
 
         if ($event->hasRsvp($user)) {
-            $this->activityService->log(UserActivity::RsvpYes, $user, ['event_id' => $event->getId()]);
+            $this->activityService->log(ActivityType::RsvpYes, $user, ['event_id' => $event->getId()]);
         } else {
-            $this->activityService->log(UserActivity::RsvpNo, $user, ['event_id' => $event->getId()]);
+            $this->activityService->log(ActivityType::RsvpNo, $user, ['event_id' => $event->getId()]);
         }
 
         return $this->redirectToRoute('app_profile');

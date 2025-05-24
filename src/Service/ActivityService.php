@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\Activity;
 use App\Entity\Event;
 use App\Entity\User;
-use App\Entity\UserActivity;
+use App\Entity\ActivityType;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +20,7 @@ readonly class ActivityService
     ) {
     }
 
-    public function log(UserActivity $type, User $user, array $meta = []): void
+    public function log(ActivityType $type, User $user, array $meta = []): void
     {
         $this->checkRequiredMetaData($type, $meta);
 
@@ -28,7 +28,6 @@ readonly class ActivityService
         $activity->setCreatedAt(new DateTimeImmutable());
         $activity->setUser($user);
         $activity->setType($type);
-        $activity->setMessage(''); // TODO: remove
         $activity->setVisible($this->isVisible($type));
         $activity->setMeta($meta);
 
@@ -46,15 +45,15 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->findAll());
     }
 
-    private function isVisible(UserActivity $type): bool
+    private function isVisible(ActivityType $type): bool
     {
         /* Private events, for admin only:
          * UserActivity::ChangedUsername
          */
         return match ($type->value) {
-            UserActivity::Login->value => true,
-            UserActivity::RsvpYes->value => true,
-            UserActivity::RsvpNo->value => true,
+            ActivityType::Login->value => true,
+            ActivityType::RsvpYes->value => true,
+            ActivityType::RsvpNo->value => true,
             default => false,
         };
     }
@@ -77,32 +76,30 @@ readonly class ActivityService
 
         $meta = $activity->getMeta();
         $msg = match ($activity->getType()->value) {
-            UserActivity::Login->value => "User logged in",
-            UserActivity::Registered->value => "User registered",
-            UserActivity::RsvpYes->value => sprintf('Going to event: %s', $cachedEventName[$meta['event_id']]),
-            UserActivity::RsvpNo->value => sprintf('Is skipping event: %s', $cachedEventName[$meta['event_id']]),
-            UserActivity::FollowedUser->value => sprintf('Started following: %s', $cachedUserName[$meta['user_id']]),
-            UserActivity::ChangedUsername->value => sprintf('Changed username from %s to %s', $meta['old'], $meta['new']),
+            ActivityType::Login->value => "User logged in",
+            ActivityType::Registered->value => "User registered",
+            ActivityType::RsvpYes->value => sprintf('Going to event: %s', $cachedEventName[$meta['event_id']]),
+            ActivityType::RsvpNo->value => sprintf('Is skipping event: %s', $cachedEventName[$meta['event_id']]),
+            ActivityType::FollowedUser->value => sprintf('Started following: %s', $cachedUserName[$meta['user_id']]),
+            ActivityType::ChangedUsername->value => sprintf('Changed username from %s to %s', $meta['old'], $meta['new']),
             default => '',
         };
-
-        $activity->setMessage($msg);
 
         return $activity;
     }
 
-    private function checkRequiredMetaData(UserActivity $type, array $meta): void
+    private function checkRequiredMetaData(ActivityType $type, array $meta): void
     {
         switch ($type->value) {
-            case UserActivity::RsvpYes->value:
+            case ActivityType::RsvpYes->value:
                 $this->ensureHasKey($meta, 'event_id');
                 $this->ensureIsNumeric($meta, 'event_id');
                 break;
-            case UserActivity::FollowedUser->value:
+            case ActivityType::FollowedUser->value:
                 $this->ensureHasKey($meta, 'user_id');
                 $this->ensureIsNumeric($meta, 'user_id');
                 break;
-            case UserActivity::ChangedUsername->value:
+            case ActivityType::ChangedUsername->value:
                 $this->ensureHasKey($meta, 'old');
                 $this->ensureHasKey($meta, 'new');
                 break;

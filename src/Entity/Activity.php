@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ActivityRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
@@ -17,14 +16,11 @@ class Activity
     #[ORM\ManyToOne(inversedBy: 'activities')]
     private ?User $user = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $message = null;
-
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(enumType: UserActivity::class)]
-    private ?UserActivity $type = null;
+    #[ORM\Column(enumType: ActivityType::class)]
+    private ?ActivityType $type = null;
 
     #[ORM\Column]
     private ?bool $visible = null;
@@ -49,18 +45,6 @@ class Activity
         return $this;
     }
 
-    public function getMessage(): ?string
-    {
-        return $this->message;
-    }
-
-    public function setMessage(string $message): static
-    {
-        $this->message = $message;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -73,12 +57,12 @@ class Activity
         return $this;
     }
 
-    public function getType(): ?UserActivity
+    public function getType(): ?ActivityType
     {
         return $this->type;
     }
 
-    public function setType(UserActivity $type): static
+    public function setType(ActivityType $type): static
     {
         $this->type = $type;
 

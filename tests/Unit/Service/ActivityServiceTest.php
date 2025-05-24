@@ -5,7 +5,7 @@ namespace App\Tests\Unit\Service;
 use App\Entity\Activity;
 use App\Entity\Event;
 use App\Entity\User;
-use App\Entity\UserActivity;
+use App\Entity\ActivityType;
 use App\Repository\ActivityRepository;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
@@ -37,7 +37,7 @@ class ActivityServiceTest extends TestCase
     {
         $expectedMessage = '';
         $expectedUserMock = $this->userMock;
-        $expectedUserActivity = UserActivity::Login;
+        $expectedUserActivity = ActivityType::Login;
 
         $this->emMock->expects($this->once())->method('flush');
         $this->emMock->expects($this->once())->method('persist')
@@ -53,7 +53,7 @@ class ActivityServiceTest extends TestCase
     }
 
     #[DataProvider('getAllLoggingActivityCases')]
-    public function testAllLoggingActivity(UserActivity $expectedUserActivity): void
+    public function testAllLoggingActivity(ActivityType $expectedUserActivity): void
     {
         $expectedUserMock = $this->userMock;
 
@@ -74,18 +74,18 @@ class ActivityServiceTest extends TestCase
     public static function getAllLoggingActivityCases(): array
     {
         return [
-            [UserActivity::ChangedUsername],
-            [UserActivity::Login],
-            [UserActivity::RsvpYes],
-            [UserActivity::RsvpNo],
-            [UserActivity::Registered],
-            [UserActivity::FollowedUser],
-            [UserActivity::UnFollowedUser],
+            [ActivityType::ChangedUsername],
+            [ActivityType::Login],
+            [ActivityType::RsvpYes],
+            [ActivityType::RsvpNo],
+            [ActivityType::Registered],
+            [ActivityType::FollowedUser],
+            [ActivityType::UnFollowedUser],
         ];
     }
 
     #[DataProvider('getAllActivityPreparationCases')]
-    public function testActivityPreparation(UserActivity $userActivity, string $expectedMessage, array $metaData): void
+    public function testActivityPreparation(ActivityType $userActivity, string $expectedMessage, array $metaData): void
     {
         $userRepoMock = $this->createMock(UserRepository::class);
         $userRepoMock->method('getUserNameList')->willReturn([1 => 'UserNumberOne']);
@@ -116,22 +116,22 @@ class ActivityServiceTest extends TestCase
     public static function getAllActivityPreparationCases(): array
     {
         return [
-            [UserActivity::ChangedUsername, 'Changed username from oldUsername to newUsername', [
+            [ActivityType::ChangedUsername, 'Changed username from oldUsername to newUsername', [
                 'old' => 'oldUsername',
                 'new' => 'newUsername'
             ]],
-            [UserActivity::FollowedUser, 'Started following: UserNumberOne', [
+            [ActivityType::FollowedUser, 'Started following: UserNumberOne', [
                 'user_id' => 1,
             ]],
-            [UserActivity::RsvpYes, 'Going to event: EventNumberOne', [
+            [ActivityType::RsvpYes, 'Going to event: EventNumberOne', [
                 'event_id' => 1,
             ]],
-            [UserActivity::RsvpNo, 'Is skipping event: #2', [
+            [ActivityType::RsvpNo, 'Is skipping event: #2', [
                 'event_id' => 2,
             ]],
-            [UserActivity::UnFollowedUser, '', []],
-            [UserActivity::Registered, 'User registered', []],
-            [UserActivity::Login, 'User logged in', []],
+            [ActivityType::UnFollowedUser, '', []],
+            [ActivityType::Registered, 'User registered', []],
+            [ActivityType::Login, 'User logged in', []],
         ];
     }
 }

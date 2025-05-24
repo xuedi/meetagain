@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum UserActivity: int
+enum ActivityType: int
 {
     case ChangedUsername = 0;
     case Login = 1;

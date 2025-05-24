@@ -3,7 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
-use App\Entity\UserActivity;
+use App\Entity\ActivityType;
 use App\Entity\UserStatus;
 use App\Service\ActivityService;
 use DateTime;
@@ -53,6 +53,6 @@ readonly class UserChecker implements UserCheckerInterface
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->activityService->log(UserActivity::Login, $user, []);
+        $this->activityService->log(ActivityType::Login, $user, []);
     }
 }

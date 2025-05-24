@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Entity\UserActivity;
+use App\Entity\ActivityType;
 use App\Entity\UserStatus;
 use App\Form\RegistrationType;
 use App\Repository\UserRepository;
@@ -65,8 +65,7 @@ class SecurityController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $activityService->log(UserActivity::Registered, $user, []);
-            // TODO: add logging for registration & activation
+            $activityService->log(ActivityType::Registered, $user, []);
 
             $emailService->sendEmailConformationRequest($user, $request);
 
