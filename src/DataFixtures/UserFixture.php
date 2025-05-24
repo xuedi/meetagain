@@ -93,7 +93,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Crystal Liu',
-                'email' => 'Crystal Liu@beijingcode.org',
+                'email' => 'Crystal-Liu@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -105,7 +105,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Abraham Baker',
-                'email' => 'Abraham Baker@beijingcode.org',
+                'email' => 'Abraham-Baker@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -117,7 +117,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Adem Lane',
-                'email' => 'Adem Lane@beijingcode.org',
+                'email' => 'Adem-Lane@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -129,7 +129,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Adil Floyd',
-                'email' => 'Adil Floyd@beijingcode.org',
+                'email' => 'Adil-Floyd@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -141,7 +141,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => "Adriana O-Sullivan",
-                'email' => "Adriana O-Sullivan@beijingcode.org",
+                'email' => "Adriana-O-Sullivan@beijingcode.org",
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -153,7 +153,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Alec Whitten',
-                'email' => 'Alec Whitten@beijingcode.org',
+                'email' => 'Alec-Whitten@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -165,7 +165,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Alesha Barry',
-                'email' => 'Alesha Barry@beijingcode.org',
+                'email' => 'Alesha-Barry@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -177,7 +177,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Aliah Lane',
-                'email' => 'Aliah Lane@beijingcode.org',
+                'email' => 'Aliah-Lane@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -189,7 +189,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ali Mahdi',
-                'email' => 'Ali Mahdi@beijingcode.org',
+                'email' => 'Ali-Mahdi@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -201,7 +201,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Alisa Hester',
-                'email' => 'Alisa Hester@beijingcode.org',
+                'email' => 'Alisa-Hester@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -213,7 +213,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Amanda Lowery',
-                'email' => 'Amanda Lowery@beijingcode.org',
+                'email' => 'Amanda-Lowery@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -225,7 +225,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Amelie Bennett',
-                'email' => 'Amelie Bennett@beijingcode.org',
+                'email' => 'Amelie-Bennett@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -237,7 +237,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Amelie Laurent',
-                'email' => 'Amelie Laurent@beijingcode.org',
+                'email' => 'Amelie-Laurent@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -249,7 +249,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Ammar Foley',
-                'email' => 'Ammar Foley@beijingcode.org',
+                'email' => 'Ammar-Foley@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -261,7 +261,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Anaiah Whitten',
-                'email' => 'Anaiah Whitten@beijingcode.org',
+                'email' => 'Anaiah-Whitten@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -273,7 +273,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Andi Lane',
-                'email' => 'Andi Lane@beijingcode.org',
+                'email' => 'Andi-Lane@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -285,7 +285,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Angelica Wallace',
-                'email' => 'Angelica Wallace@beijingcode.org',
+                'email' => 'Angelica-Wallace@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -297,7 +297,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Anita Cruz',
-                'email' => 'Anita Cruz@beijingcode.org',
+                'email' => 'Anita-Cruz@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -309,7 +309,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ashton Blackwell',
-                'email' => 'Ashton Blackwell@beijingcode.org',
+                'email' => 'Ashton-Blackwell@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -321,7 +321,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ashwin Santiago',
-                'email' => 'Ashwin Santiago@beijingcode.org',
+                'email' => 'Ashwin-Santiago@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -333,7 +333,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Aston Hood',
-                'email' => 'Aston Hood@beijingcode.org',
+                'email' => 'Aston-Hood@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -345,7 +345,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ava Bentley',
-                'email' => 'Ava Bentley@beijingcode.org',
+                'email' => 'Ava-Bentley@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -357,7 +357,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ava Wright',
-                'email' => 'Ava Wright@beijingcode.org',
+                'email' => 'Ava-Wright@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -369,7 +369,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ayah Wilkinson',
-                'email' => 'Ayah Wilkinson@beijingcode.org',
+                'email' => 'Ayah-Wilkinson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -381,7 +381,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Aysha Becker',
-                'email' => 'Aysha Becker@beijingcode.org',
+                'email' => 'Aysha-Becker@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -393,7 +393,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Bailey Richards',
-                'email' => 'Bailey Richards@beijingcode.org',
+                'email' => 'Bailey-Richards@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -405,7 +405,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Bec Ferguson',
-                'email' => 'Bec Ferguson@beijingcode.org',
+                'email' => 'Bec-Ferguson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -417,7 +417,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Belle Woods',
-                'email' => 'Belle Woods@beijingcode.org',
+                'email' => 'Belle-Woods@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -429,7 +429,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Benedict Doherty',
-                'email' => 'Benedict Doherty@beijingcode.org',
+                'email' => 'Benedict-Doherty@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -441,7 +441,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Billie Wright',
-                'email' => 'Billie Wright@beijingcode.org',
+                'email' => 'Billie-Wright@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -453,7 +453,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Blake Riley',
-                'email' => 'Blake Riley@beijingcode.org',
+                'email' => 'Blake-Riley@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -465,7 +465,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Brianna Ware',
-                'email' => 'Brianna Ware@beijingcode.org',
+                'email' => 'Brianna-Ware@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -477,7 +477,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Byron Robertson',
-                'email' => 'Byron Robertson@beijingcode.org',
+                'email' => 'Byron-Robertson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -489,7 +489,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Caitlyn King',
-                'email' => 'Caitlyn King@beijingcode.org',
+                'email' => 'Caitlyn-King@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -501,7 +501,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Cameron Yang',
-                'email' => 'Cameron Yang@beijingcode.org',
+                'email' => 'Cameron-Yang@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -513,7 +513,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Candice Wu',
-                'email' => 'Candice Wu@beijingcode.org',
+                'email' => 'Candice-Wu@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -525,7 +525,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Clifford Jennings',
-                'email' => 'Clifford Jennings@beijingcode.org',
+                'email' => 'Clifford-Jennings@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -537,7 +537,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Cohen Lozano',
-                'email' => 'Cohen Lozano@beijingcode.org',
+                'email' => 'Cohen-Lozano@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -549,7 +549,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Courtney Turner',
-                'email' => 'Courtney Turner@beijingcode.org',
+                'email' => 'Courtney-Turner@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -561,7 +561,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Danyal Lester',
-                'email' => 'Danyal Lester@beijingcode.org',
+                'email' => 'Danyal-Lester@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -573,7 +573,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Demi Wilkinson',
-                'email' => 'Demi Wilkinson@beijingcode.org',
+                'email' => 'Demi-Wilkinson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -585,7 +585,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Dillan Nguyen',
-                'email' => 'Dillan Nguyen@beijingcode.org',
+                'email' => 'Dillan-Nguyen@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -597,7 +597,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Drew Cano',
-                'email' => 'Drew Cano@beijingcode.org',
+                'email' => 'Drew-Cano@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -609,7 +609,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Eduard Franz',
-                'email' => 'Eduard Franz@beijingcode.org',
+                'email' => 'Eduard-Franz@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -621,7 +621,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Elena Owens',
-                'email' => 'Elena Owens@beijingcode.org',
+                'email' => 'Elena-Owens@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -633,7 +633,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Elisa Nishikawa',
-                'email' => 'Elisa Nishikawa@beijingcode.org',
+                'email' => 'Elisa-Nishikawa@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -645,7 +645,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Elsie Roy',
-                'email' => 'Elsie Roy@beijingcode.org',
+                'email' => 'Elsie-Roy@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -657,7 +657,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Erica Wyatt',
-                'email' => 'Erica Wyatt@beijingcode.org',
+                'email' => 'Erica-Wyatt@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -669,7 +669,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ethan Campbell',
-                'email' => 'Ethan Campbell@beijingcode.org',
+                'email' => 'Ethan-Campbell@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -681,7 +681,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Ethan Valdez',
-                'email' => 'Ethan Valdez@beijingcode.org',
+                'email' => 'Ethan-Valdez@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -693,7 +693,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Eva Bond',
-                'email' => 'Eva Bond@beijingcode.org',
+                'email' => 'Eva-Bond@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -705,7 +705,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Eve Leroy',
-                'email' => 'Eve Leroy@beijingcode.org',
+                'email' => 'Eve-Leroy@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -717,7 +717,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Fergus Gray',
-                'email' => 'Fergus Gray@beijingcode.org',
+                'email' => 'Fergus-Gray@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -729,7 +729,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Fleur Cook',
-                'email' => 'Fleur Cook@beijingcode.org',
+                'email' => 'Fleur-Cook@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -741,7 +741,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Florence Shaw',
-                'email' => 'Florence Shaw@beijingcode.org',
+                'email' => 'Florence-Shaw@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -753,7 +753,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Franklin Mays',
-                'email' => 'Franklin Mays@beijingcode.org',
+                'email' => 'Franklin-Mays@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -765,7 +765,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Frank Whitaker',
-                'email' => 'Frank Whitaker@beijingcode.org',
+                'email' => 'Frank-Whitaker@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -777,7 +777,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Freya Browning',
-                'email' => 'Freya Browning@beijingcode.org',
+                'email' => 'Freya-Browning@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -789,7 +789,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Genevieve Mclean',
-                'email' => 'Genevieve Mclean@beijingcode.org',
+                'email' => 'Genevieve-Mclean@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -801,7 +801,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Harriet Rojas',
-                'email' => 'Harriet Rojas@beijingcode.org',
+                'email' => 'Harriet-Rojas@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -813,7 +813,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Harry Bender',
-                'email' => 'Harry Bender@beijingcode.org',
+                'email' => 'Harry-Bender@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -825,7 +825,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Hasan Johns',
-                'email' => 'Hasan Johns@beijingcode.org',
+                'email' => 'Hasan-Johns@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -837,7 +837,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Herbert Fowler',
-                'email' => 'Herbert Fowler@beijingcode.org',
+                'email' => 'Herbert-Fowler@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -849,7 +849,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Isla Allison',
-                'email' => 'Isla Allison@beijingcode.org',
+                'email' => 'Isla-Allison@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -861,7 +861,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Isobel Carroll',
-                'email' => 'Isobel Carroll@beijingcode.org',
+                'email' => 'Isobel-Carroll@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -873,7 +873,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Isobel Fuller',
-                'email' => 'Isobel Fuller@beijingcode.org',
+                'email' => 'Isobel-Fuller@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -885,7 +885,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Jackson Reed',
-                'email' => 'Jackson Reed@beijingcode.org',
+                'email' => 'Jackson-Reed@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -897,7 +897,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Jaya Willis',
-                'email' => 'Jaya Willis@beijingcode.org',
+                'email' => 'Jaya-Willis@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -909,7 +909,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Jayden Moss',
-                'email' => 'Jayden Moss@beijingcode.org',
+                'email' => 'Jayden-Moss@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -921,7 +921,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Jay Shepard',
-                'email' => 'Jay Shepard@beijingcode.org',
+                'email' => 'Jay-Shepard@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -933,7 +933,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Jessie Meyton',
-                'email' => 'Jessie Meyton@beijingcode.org',
+                'email' => 'Jessie-Meyton@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -945,7 +945,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Jonathan Kelly',
-                'email' => 'Jonathan Kelly@beijingcode.org',
+                'email' => 'Jonathan-Kelly@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -957,7 +957,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Jordan Burgess',
-                'email' => 'Jordan Burgess@beijingcode.org',
+                'email' => 'Jordan-Burgess@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -969,7 +969,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Joshua Wilson',
-                'email' => 'Joshua Wilson@beijingcode.org',
+                'email' => 'Joshua-Wilson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -981,7 +981,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Julius Vaughan',
-                'email' => 'Julius Vaughan@beijingcode.org',
+                'email' => 'Julius-Vaughan@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -993,7 +993,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Kaden Scott',
-                'email' => 'Kaden Scott@beijingcode.org',
+                'email' => 'Kaden-Scott@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1005,7 +1005,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Kaitlin Hale',
-                'email' => 'Kaitlin Hale@beijingcode.org',
+                'email' => 'Kaitlin-Hale@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1017,7 +1017,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Kari Rasmussen',
-                'email' => 'Kari Rasmussen@beijingcode.org',
+                'email' => 'Kari-Rasmussen@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1029,7 +1029,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Kate Morrison',
-                'email' => 'Kate Morrison@beijingcode.org',
+                'email' => 'Kate-Morrison@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1041,7 +1041,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Katherine Moss',
-                'email' => 'Katherine Moss@beijingcode.org',
+                'email' => 'Katherine-Moss@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1053,7 +1053,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Katy Fuller',
-                'email' => 'Katy Fuller@beijingcode.org',
+                'email' => 'Katy-Fuller@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1065,7 +1065,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Kelly Williams',
-                'email' => 'Kelly Williams@beijingcode.org',
+                'email' => 'Kelly-Williams@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1077,7 +1077,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Kelsey Lowe',
-                'email' => 'Kelsey Lowe@beijingcode.org',
+                'email' => 'Kelsey-Lowe@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1089,7 +1089,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Koray Okumus',
-                'email' => 'Koray Okumus@beijingcode.org',
+                'email' => 'Koray-Okumus@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1101,7 +1101,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Kyla Clay',
-                'email' => 'Kyla Clay@beijingcode.org',
+                'email' => 'Kyla-Clay@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1113,7 +1113,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Lana Steiner',
-                'email' => 'Lana Steiner@beijingcode.org',
+                'email' => 'Lana-Steiner@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1125,7 +1125,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Levi Rocha',
-                'email' => 'Levi Rocha@beijingcode.org',
+                'email' => 'Levi-Rocha@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1137,7 +1137,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Leyton Fields',
-                'email' => 'Leyton Fields@beijingcode.org',
+                'email' => 'Leyton-Fields@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1149,7 +1149,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Liam Hood',
-                'email' => 'Liam Hood@beijingcode.org',
+                'email' => 'Liam-Hood@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1161,7 +1161,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Lily-Rose Chedjou',
-                'email' => 'Lily-Rose Chedjou@beijingcode.org',
+                'email' => 'Lily-Rose-Chedjou@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1173,7 +1173,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Loki Bright',
-                'email' => 'Loki Bright@beijingcode.org',
+                'email' => 'Loki-Bright@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1185,7 +1185,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Lola Sanders',
-                'email' => 'Lola Sanders@beijingcode.org',
+                'email' => 'Lola-Sanders@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1197,7 +1197,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Lori Bryson',
-                'email' => 'Lori Bryson@beijingcode.org',
+                'email' => 'Lori-Bryson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1209,7 +1209,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Lucy Bond',
-                'email' => 'Lucy Bond@beijingcode.org',
+                'email' => 'Lucy-Bond@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1221,7 +1221,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Lulu Meyers',
-                'email' => 'Lulu Meyers@beijingcode.org',
+                'email' => 'Lulu-Meyers@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1233,7 +1233,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Luqman Anthony',
-                'email' => 'Luqman Anthony@beijingcode.org',
+                'email' => 'Luqman-Anthony@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1245,7 +1245,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Lyle Kauffman',
-                'email' => 'Lyle Kauffman@beijingcode.org',
+                'email' => 'Lyle-Kauffman@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1257,7 +1257,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Maddison Gillespie',
-                'email' => 'Maddison Gillespie@beijingcode.org',
+                'email' => 'Maddison-Gillespie@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1269,7 +1269,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Madeleine Pitts',
-                'email' => 'Madeleine Pitts@beijingcode.org',
+                'email' => 'Madeleine-Pitts@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1281,7 +1281,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Marco Gross',
-                'email' => 'Marco Gross@beijingcode.org',
+                'email' => 'Marco-Gross@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1293,7 +1293,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Marco Kelly',
-                'email' => 'Marco Kelly@beijingcode.org',
+                'email' => 'Marco-Kelly@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1305,7 +1305,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Marvin Robbins',
-                'email' => 'Marvin Robbins@beijingcode.org',
+                'email' => 'Marvin-Robbins@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1317,7 +1317,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Mathilde Lewis',
-                'email' => 'Mathilde Lewis@beijingcode.org',
+                'email' => 'Mathilde-Lewis@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1329,7 +1329,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Maxwell Tan',
-                'email' => 'Maxwell Tan@beijingcode.org',
+                'email' => 'Maxwell-Tan@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1341,7 +1341,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Mikey Lawrence',
-                'email' => 'Mikey Lawrence@beijingcode.org',
+                'email' => 'Mikey-Lawrence@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1353,7 +1353,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Mollie Hall',
-                'email' => 'Mollie Hall@beijingcode.org',
+                'email' => 'Mollie-Hall@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1365,7 +1365,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Molly Vaughan',
-                'email' => 'Molly Vaughan@beijingcode.org',
+                'email' => 'Molly-Vaughan@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1377,7 +1377,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Nala Goins',
-                'email' => 'Nala Goins@beijingcode.org',
+                'email' => 'Nala-Goins@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1389,7 +1389,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Natali Craig',
-                'email' => 'Natali Craig@beijingcode.org',
+                'email' => 'Natali-Craig@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1401,7 +1401,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Nic Fassbender',
-                'email' => 'Nic Fassbender@beijingcode.org',
+                'email' => 'Nic-Fassbender@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1413,7 +1413,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Nicola Harris',
-                'email' => 'Nicola Harris@beijingcode.org',
+                'email' => 'Nicola-Harris@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1425,7 +1425,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Nicolas Trevino',
-                'email' => 'Nicolas Trevino@beijingcode.org',
+                'email' => 'Nicolas-Trevino@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1437,7 +1437,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Nicolas Wang',
-                'email' => 'Nicolas Wang@beijingcode.org',
+                'email' => 'Nicolas-Wang@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1449,7 +1449,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Nikolas Gibbons',
-                'email' => 'Nikolas Gibbons@beijingcode.org',
+                'email' => 'Nikolas-Gibbons@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1461,7 +1461,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Noah Pierre',
-                'email' => 'Noah Pierre@beijingcode.org',
+                'email' => 'Noah-Pierre@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1473,7 +1473,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Noel Baldwin',
-                'email' => 'Noel Baldwin@beijingcode.org',
+                'email' => 'Noel-Baldwin@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1485,7 +1485,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Olivia Rhye',
-                'email' => 'Olivia Rhye@beijingcode.org',
+                'email' => 'Olivia-Rhye@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1497,7 +1497,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Olly Schroeder',
-                'email' => 'Olly Schroeder@beijingcode.org',
+                'email' => 'Olly-Schroeder@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1509,7 +1509,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Orlando Diggs',
-                'email' => 'Orlando Diggs@beijingcode.org',
+                'email' => 'Orlando-Diggs@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1521,7 +1521,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Owen Garcia',
-                'email' => 'Owen Garcia@beijingcode.org',
+                'email' => 'Owen-Garcia@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1533,7 +1533,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Owen Harding',
-                'email' => 'Owen Harding@beijingcode.org',
+                'email' => 'Owen-Harding@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1545,7 +1545,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Phoenix Baker',
-                'email' => 'Phoenix Baker@beijingcode.org',
+                'email' => 'Phoenix-Baker@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1557,7 +1557,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Pippa Wilkinson',
-                'email' => 'Pippa Wilkinson@beijingcode.org',
+                'email' => 'Pippa-Wilkinson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1569,7 +1569,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Priya Shepard',
-                'email' => 'Priya Shepard@beijingcode.org',
+                'email' => 'Priya-Shepard@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1581,7 +1581,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Rachael Strong',
-                'email' => 'Rachael Strong@beijingcode.org',
+                'email' => 'Rachael-Strong@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1593,7 +1593,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Rayhan Zua',
-                'email' => 'Rayhan Zua@beijingcode.org',
+                'email' => 'Rayhan-Zua@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1605,7 +1605,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Rene Wells',
-                'email' => 'Rene Wells@beijingcode.org',
+                'email' => 'Rene-Wells@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1617,7 +1617,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Rhea Levine',
-                'email' => 'Rhea Levine@beijingcode.org',
+                'email' => 'Rhea-Levine@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1629,7 +1629,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Rhianna Shepard',
-                'email' => 'Rhianna Shepard@beijingcode.org',
+                'email' => 'Rhianna-Shepard@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1641,7 +1641,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => "Riley O-Moore",
-                'email' => "Riley O-Moore@beijingcode.org",
+                'email' => "Riley-O-Moore@beijingcode.org",
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1653,7 +1653,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Rory Huff',
-                'email' => 'Rory Huff@beijingcode.org',
+                'email' => 'Rory-Huff@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1665,7 +1665,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'cn',
                 'name' => 'Rosalee Melvin',
-                'email' => 'Rosalee Melvin@beijingcode.org',
+                'email' => 'Rosalee-Melvin@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1677,7 +1677,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Sally Mason',
-                'email' => 'Sally Mason@beijingcode.org',
+                'email' => 'Sally-Mason@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1689,7 +1689,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Sarah Page',
-                'email' => 'Sarah Page@beijingcode.org',
+                'email' => 'Sarah-Page@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1701,7 +1701,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'de',
                 'name' => 'Scott Clayton',
-                'email' => 'Scott Clayton@beijingcode.org',
+                'email' => 'Scott-Clayton@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1713,7 +1713,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Sienna Hewitt',
-                'email' => 'Sienna Hewitt@beijingcode.org',
+                'email' => 'Sienna-Hewitt@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1725,7 +1725,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Sophia Perez',
-                'email' => 'Sophia Perez@beijingcode.org',
+                'email' => 'Sophia-Perez@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1737,7 +1737,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Stefan Sears',
-                'email' => 'Stefan Sears@beijingcode.org',
+                'email' => 'Stefan-Sears@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
@@ -1749,7 +1749,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Youssef Roberson',
-                'email' => 'Youssef Roberson@beijingcode.org',
+                'email' => 'Youssef-Roberson@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1761,7 +1761,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Zahir Mays',
-                'email' => 'Zahir Mays@beijingcode.org',
+                'email' => 'Zahir-Mays@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1773,7 +1773,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Zahra Christensen',
-                'email' => 'Zahra Christensen@beijingcode.org',
+                'email' => 'Zahra-Christensen@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1785,7 +1785,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Zaid Schwartz',
-                'email' => 'Zaid Schwartz@beijingcode.org',
+                'email' => 'Zaid-Schwartz@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1797,7 +1797,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Zara Bush',
-                'email' => 'Zara Bush@beijingcode.org',
+                'email' => 'Zara-Bush@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1809,7 +1809,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Zaynab Donnelly',
-                'email' => 'Zaynab Donnelly@beijingcode.org',
+                'email' => 'Zaynab-Donnelly@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1821,7 +1821,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'Zuzanna Burke',
-                'email' => 'Zuzanna Burke@beijingcode.org',
+                'email' => 'Zuzanna-Burke@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
@@ -1833,7 +1833,7 @@ class UserFixture extends Fixture
             [
                 'language' => 'en',
                 'name' => 'axisbos audax',
-                'email' => 'axisbos.audax@beijingcode.org',
+                'email' => 'axisbos-audax@beijingcode.org',
                 'password' => '$2y$13$4OCpKLHN5POFsrAek5RmTu6jAKLyz0xp.czPVLl4yffg91RC9u2fG',
                 'roles' => ['ROLE_USER'],
                 'verified' => false,

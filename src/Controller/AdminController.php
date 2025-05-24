@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminController extends AbstractController
 {
-    #[Route('/admin/{year}/{week}', name: 'app_admin')]
+    #[Route('/admin/dashboard/{year}/{week}', name: 'app_admin')]
     public function index(DashboardService $dashboard, ?int $year = null, ?int $week = null): Response
     {
         $dashboard->setTime($year, $week);
@@ -20,6 +20,7 @@ class AdminController extends AbstractController
             'pagesNotFound' => $dashboard->getPagesNotFound(),
         ]);
     }
+
     #[Route('/admin/config', name: 'app_admin_config')]
     public function configIndex(ConfigRepository $repo): Response
     {
