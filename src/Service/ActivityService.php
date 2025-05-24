@@ -55,7 +55,7 @@ readonly class ActivityService
     }
 
     // TODO: Translate messages
-    private function prepareActivity(Activity $activity): Activity
+    public function prepareActivity(Activity $activity): Activity
     {
         $cachedUserName = $this->em->getRepository(User::class)->getUserNameList();
         $cachedEventName = $this->em->getRepository(Event::class)->getEventNameList($this->globalService->getCurrentLocale());
@@ -80,31 +80,31 @@ readonly class ActivityService
     {
         switch ($type->value) {
             case ActivityType::RsvpYes->value:
-                $this->ensureHasKey($meta, 'event_id');
-                $this->ensureIsNumeric($meta, 'event_id');
+                $this->ensureHasKey($meta, 'event_id', $type->name);
+                $this->ensureIsNumeric($meta, 'event_id', $type->name);
                 break;
             case ActivityType::FollowedUser->value:
-                $this->ensureHasKey($meta, 'user_id');
-                $this->ensureIsNumeric($meta, 'user_id');
+                $this->ensureHasKey($meta, 'user_id', $type->name);
+                $this->ensureIsNumeric($meta, 'user_id', $type->name);
                 break;
             case ActivityType::ChangedUsername->value:
-                $this->ensureHasKey($meta, 'old');
-                $this->ensureHasKey($meta, 'new');
+                $this->ensureHasKey($meta, 'old', $type->name);
+                $this->ensureHasKey($meta, 'new', $type->name);
                 break;
         }
     }
 
-    private function ensureHasKey(array $meta, string $key): void
+    private function ensureHasKey(array $meta, string $key, string $type): void
     {
         if (!isset($meta[$key])) {
-            throw new InvalidArgumentException("Missing '$key' in meta");
+            throw new InvalidArgumentException("Missing '$key' in meta in $type");
         }
     }
 
-    private function ensureIsNumeric(array $meta, string $key): void
+    private function ensureIsNumeric(array $meta, string $key, string $type): void
     {
-        if (is_numeric($meta[$key])) {
-            throw new InvalidArgumentException("Value '$key' has to be numeric");
+        if (!is_numeric($meta[$key])) {
+            throw new InvalidArgumentException("Value '$key' has to be numeric in $type");
         }
     }
 }

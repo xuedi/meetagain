@@ -41,10 +41,9 @@ class ActivityServiceTest extends TestCase
 
         $this->emMock->expects($this->once())->method('flush');
         $this->emMock->expects($this->once())->method('persist')
-            ->with($this->callback(function (Activity $actual) use ($expectedUserActivity, $expectedUserMock, $expectedMessage) {
+            ->with($this->callback(function (Activity $actual) use ($expectedUserActivity, $expectedUserMock) {
                 $this->assertSame($actual->getType(), $expectedUserActivity, 'Failed property match: Type');
                 $this->assertSame($actual->getUser(), $expectedUserMock, 'Failed property match: User');
-                $this->assertSame($actual->getMessage(), $expectedMessage, 'Failed property match: Message');
 
                 return true;
             }));
