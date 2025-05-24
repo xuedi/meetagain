@@ -30,15 +30,16 @@ just dockerStop  # stops the stack
 
 
 ### TODO:
+ - add a functionality to regenerate thumbnails
+ - add functionality to admin to send messages to all users
  - overwrite cookie settings with user DB settings
  - implement a promoted event flag and a widget for the CMS
  - rework system of enums in drown down menus like EventTypes (separate filter from data)
  - add functionality to add new entries in the admin interface (location, event & venue)
- - add messages and way to block users
+ - add a block-list to messages for certain users
  - send messages when to promote and notify of a new event
  - activity levels for user view and admin view
  - add changed details for cms and event and other actions for system view only
- - add comments
  - admin Log display: checkbox level and type, 3 stage subselect: year, month, day
  - add community translation suggestions and manger approval
  - cross-table reference for images and user gallery
