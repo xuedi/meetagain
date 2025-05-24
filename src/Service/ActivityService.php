@@ -41,7 +41,7 @@ readonly class ActivityService
 
     public function getAdminList(): array
     {
-        return $this->prepareActivityList($this->repo->findAll());
+        return $this->prepareActivityList($this->repo->findBy([], ['createdAt' => 'DESC'], 250));
     }
 
     private function prepareActivityList(array $list): array
@@ -70,6 +70,8 @@ readonly class ActivityService
             ActivityType::ChangedUsername->value => sprintf('Changed username from %s to %s', $meta['old'], $meta['new']),
             default => '',
         };
+
+        $activity->setMessage($msg);
 
         return $activity;
     }
