@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Message;
 use App\Entity\User;
 use App\Entity\ActivityType;
 use App\Entity\UserStatus;
@@ -78,9 +79,9 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/register/verify/{code}', name: 'app_register_confirm_email')]
-    public function verifyUserEmail(UserRepository $repo, EntityManagerInterface $em, string $code): Response
+    public function verifyUserEmail(EntityManagerInterface $em, string $code): Response
     {
-        $user = $repo->findOneBy(['regcode' => $code]);
+        $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
         if ($user === null) {
             return $this->render('security/register_error.html.twig');
         }
@@ -89,6 +90,20 @@ class SecurityController extends AbstractController
 
         $em->persist($user);
         $em->flush();
+
+        $xuedi = $em->getRepository(User::class)->findOneBy(['email' => 'admin@beijingcode.org']);
+        if($xuedi !== null) {
+            $msg = new Message();
+            $msg->setDeleted(false);
+            $msg->setWasRead(false);
+            $msg->setSender($xuedi);
+            $msg->setReceiver($user);
+            $msg->setCreatedAt(new DateTimeImmutable());
+            $msg->setContent("Welcome to the community! Feel free to ask me anything. Or suggest a new features.");
+
+            $em->persist($msg);
+            $em->flush();
+        }
 
         return $this->render('security/register_success.html.twig');
     }

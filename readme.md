@@ -30,6 +30,8 @@ just dockerStop  # stops the stack
 
 
 ### TODO:
+ - add system config setting with slider on off to make for example for: auto register confirmation
+ - remove hardcoded user and make systemuser configurable: src/Controller/SecurityController.php:94
  - add user settings to control what email notification will be send and how often
  - add functionality to admin to send messages to all users
  - overwrite cookie settings with user DB settings
