@@ -30,11 +30,11 @@ just dockerStop  # stops the stack
 
 
 ### TODO:
- - add a functionality to regenerate thumbnails
+ - add user settings to control what email notification will be send and how often
  - add functionality to admin to send messages to all users
  - overwrite cookie settings with user DB settings
  - implement a promoted event flag and a widget for the CMS
- - rework system of enums in drown down menus like EventTypes (separate filter from data)
+ - rework a system of enums in drop down menus like EventTypes (separate filter from data)
  - add functionality to add new entries in the admin interface (location, event & venue)
  - add a block-list to messages for certain users
  - send messages when to promote and notify of a new event

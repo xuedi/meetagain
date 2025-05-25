@@ -45,6 +45,7 @@
                             </a>
                         {% endfor %}
 
+                        {#
                         <a class="panel-block">
                             <span class="panel-icon">
                                 <i class="fas fa-search" aria-hidden="true"></i>
@@ -60,6 +61,7 @@
                                 </select>
                             </div>
                         </a>
+                        #}
 
                     </div>
                 </div>
@@ -71,8 +73,17 @@
                 <div class="column is-8">
 
                     {% if messages is null %}
-                    <h1 class="title is-6">Friends</h1>
-                    you can only message to people you are friends with, or people who allow to be messages from everyone
+                    <h1 class="title is-6">Hello,</h1>
+                    <p class="mb-2">
+                        this is your message overview. On the left are the people you exchanged messages with.
+                    </p>
+                    <p class="mb-2">
+                        You can only message to people you are friends with, or people who allow to be messages from everyone
+                    </p>
+                    <p class="mb-2">
+                        have a look at the members page, on the detail view of each member you have a message buttun until xuedi
+                        implements a kind addressbook here
+                    </p>
                     {% else %}
                         {% for message in messages %}
                             {% if user.id == message.sender.id %}
