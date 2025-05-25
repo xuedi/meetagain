@@ -26,6 +26,9 @@ class SystemController extends AbstractController
         $startTime = microtime(true);
         $cnt = 0;
         foreach ($userRepo->findAll() as $user) {
+            if ($user === null) {
+                continue;
+            }
             $upload->createThumbnails($user->getImage(), [[50, 50], [400, 400]]);
             $cnt++;
         }
