@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\ConfigRepository;
 use App\Service\DashboardService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,14 +17,6 @@ class AdminController extends AbstractController
             'time' => $dashboard->getTimeControl(),
             'details' => $dashboard->getDetails(),
             'pagesNotFound' => $dashboard->getPagesNotFound(),
-        ]);
-    }
-
-    #[Route('/admin/config', name: 'app_admin_config')]
-    public function configIndex(ConfigRepository $repo): Response
-    {
-        return $this->render('admin/config.html.twig', [
-            'config' => $repo->findAll(),
         ]);
     }
 }
