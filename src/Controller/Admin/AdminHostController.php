@@ -20,7 +20,8 @@ class AdminHostController extends AbstractController
             'hosts' => $repo->findAll(),
         ]);
     }
-    #[Route('/admin/host/{id}', name: 'app_admin_host_edit', methods: ['GET', 'POST'])]
+
+    #[Route('/admin/host/edit/{id}', name: 'app_admin_host_edit', methods: ['GET', 'POST'])]
     public function hostEdit(Request $request, Host $host, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(HostType::class, $host);
@@ -34,6 +35,25 @@ class AdminHostController extends AbstractController
 
         return $this->render('admin/host/edit.html.twig', [
             'host' => $host,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/admin/host/add', name: 'app_admin_host_add', methods: ['GET', 'POST'])]
+    public function hostAdd(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $host = new Host();
+        $form = $this->createForm(HostType::class, $host);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($host);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_admin_host');
+        }
+
+        return $this->render('admin/host/new.html.twig', [
             'form' => $form,
         ]);
     }
