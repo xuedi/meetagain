@@ -1,6 +1,6 @@
 
-[![Gitea Release](https://img.shields.io/badge/Version-v0.5.0-2aae48.svg)](https://github.com/xuedi/meetAgain/releases)
-[![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-2aae48.svg)](https://eupl.eu/1.2/en)
+[![Gitea Release](https://img.shields.io/badge/Version-v0.5.0-31c754.svg)](https://github.com/xuedi/meetAgain/releases)
+[![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
 [![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
 
