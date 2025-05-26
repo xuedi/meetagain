@@ -107,4 +107,17 @@ class SecurityController extends AbstractController
 
         return $this->render('security/register_success.html.twig');
     }
+
+    #[Route(path: '/reset', name: 'app_reset')]
+    public function reset(AuthenticationUtils $authenticationUtils): Response
+    {
+        //$error = $authenticationUtils->getLastAuthenticationError();
+        //$lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/reset.html.twig', [
+            //'last_username' => $lastUsername,
+            //'error' => $error,
+            'error' => null,
+        ]);
+    }
 }
