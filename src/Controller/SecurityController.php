@@ -6,6 +6,8 @@ use App\Entity\Message;
 use App\Entity\User;
 use App\Entity\ActivityType;
 use App\Entity\UserStatus;
+use App\Form\NewPasswordType;
+use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
@@ -14,6 +16,7 @@ use App\Service\GlobalService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -109,15 +112,69 @@ class SecurityController extends AbstractController
     }
 
     #[Route(path: '/reset', name: 'app_reset')]
-    public function reset(AuthenticationUtils $authenticationUtils): Response
+    public function reset(
+        Request $request,
+        ActivityService $activityService,
+        EntityManagerInterface $em,
+        UserRepository $userRepo,
+        EmailService $emailService,
+    ): Response
     {
-        //$error = $authenticationUtils->getLastAuthenticationError();
-        //$lastUsername = $authenticationUtils->getLastUsername();
+        $form = $this->createForm(PasswordResetType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $email = $form->get('email')->getData();
+            $user = $userRepo->findOneBy(['email' => $email]);
+            if (null === $user) {
+                $form->get('email')->addError(new FormError('No valid user found'));
+            } else {
+                $activityService->log(ActivityType::PasswordResetRequest, $user);
+                $user->setRegcode(sha1(random_bytes(128)));
+                $em->persist($user);
+                $em->flush();
+                $emailService->sendEmailResetPasswordRequest($user, $request);
+
+                return $this->render('security/reset_email_send.html.twig');
+            }
+        }
 
         return $this->render('security/reset.html.twig', [
-            //'last_username' => $lastUsername,
-            //'error' => $error,
-            'error' => null,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/reset/verify/{code}', name: 'app_reset_password')]
+    public function resetPassword(
+        EntityManagerInterface $em,
+        string $code,
+        Request $request,
+        ActivityService $activityService,
+        UserPasswordHasherInterface $hasher,
+    ): Response
+    {
+        $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
+        if ($user === null) {
+            return $this->render('security/reset_error.html.twig');
+        }
+
+        $form = $this->createForm(NewPasswordType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword($hasher->hashPassword($user, $form->get('password')->getData()));
+            $user->setRegcode(null);
+
+            $em->persist($user);
+            $em->flush();
+
+            $activityService->log(ActivityType::PasswordReset, $user);
+
+            return $this->render('security/reset_success.html.twig');
+        }
+
+        return $this->render('security/reset_password.html.twig', [
+            'form' => $form,
         ]);
     }
 }

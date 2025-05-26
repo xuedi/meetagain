@@ -18,7 +18,7 @@ readonly class EmailService
     public function sendWelcome(User $user): bool
     {
         $email = new TemplatedEmail();
-        $email->from(new Address('registration@dragon-descendants.de', 'Dragon Descendants Meetup'));
+        $email->from($this->getSenderAddress());
         $email->to((string)$user->getEmail());
         $email->subject('Welcome!');
         $email->htmlTemplate('_emails/welcome.html.twig');
@@ -29,10 +29,27 @@ readonly class EmailService
     public function sendEmailConformationRequest(User $user, Request $request): bool
     {
         $email = new TemplatedEmail();
-        $email->from(new Address('registration@dragon-descendants.de', 'Dragon Descendants Meetup'));
+        $email->from($this->getSenderAddress());
         $email->to((string)$user->getEmail());
         $email->subject('Please Confirm your Email');
         $email->htmlTemplate('_emails/verification_request.html.twig');
+        $email->context([
+            'host' => sprintf('%s://%s', $request->getScheme(), $request->getHost()),
+            'token' => $user->getRegcode(),
+            'lang' => $request->getLocale(),
+            'username' => $user->getName(),
+        ]);
+
+        return $this->sendEmail($email);
+    }
+
+    public function sendEmailResetPasswordRequest(User $user, Request $request): bool
+    {
+        $email = new TemplatedEmail();
+        $email->from($this->getSenderAddress());
+        $email->to((string)$user->getEmail());
+        $email->subject('Password reset request');
+        $email->htmlTemplate('_emails/password_reset_request.html.twig');
         $email->context([
             'host' => sprintf('%s://%s', $request->getScheme(), $request->getHost()),
             'token' => $user->getRegcode(),
@@ -53,5 +70,10 @@ readonly class EmailService
             // TODO: add logging
             return false;
         }
+    }
+
+    private function getSenderAddress(): Address
+    {
+        return new Address('service@dragon-descendants.de', 'Dragon Descendants Meetup');
     }
 }

@@ -2,21 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\ActivityType;
 use App\Entity\Event;
 use App\Entity\Image;
-use App\Entity\ActivityType;
-use App\Form\ChangePassword;
 use App\Form\ProfileType;
 use App\Repository\EventRepository;
-use App\Repository\UserRepository;
 use App\Service\ActivityService;
-use App\Service\FriendshipService;
 use App\Service\UploadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ProfileController extends AbstractController
@@ -31,7 +27,8 @@ class ProfileController extends AbstractController
         EventRepository $repo,
         UploadService $uploadService,
         EntityManagerInterface $entityManager,
-    ): Response {
+    ): Response
+    {
 
         $user = $this->getAuthedUser();
         $oldUserName = $user->getName();

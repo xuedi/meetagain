@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_title_register"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-5">
+
+                    Your password has been reset successfully. You can now <a href="{{ path('app_login') }}">login</a>.
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
