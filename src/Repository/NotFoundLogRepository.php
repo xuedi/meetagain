@@ -19,7 +19,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
         parent::__construct($registry, NotFoundLog::class);
     }
 
-    public function getWeekSummary(DateTimeImmutable $startDate, DateTimeImmutable $endDate,): array
+    public function getWeekSummary(DateTimeImmutable $startDate, DateTimeImmutable $endDate): array
     {
         // TODO: remove custom stuff (doctrine.yaml::DoctrineExtensions\Query\Mysql\DateFormat) and find a upstream way
         //       also fill up dateRange in sql and return key value pair straight as array
@@ -39,7 +39,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        $list = array_fill_keys(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'], 0);
+        $list = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
         foreach ($unhydratedList as $item) {
             $list[$item['groupedDay']] = $item['number'];
         }
@@ -47,28 +47,14 @@ class NotFoundLogRepository extends ServiceEntityRepository
         return $list;
     }
 
-    //    /**
-    //     * @return NotFoundLog[] Returns an array of NotFoundLog objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('n')
-    //            ->andWhere('n.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('n.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?NotFoundLog
-    //    {
-    //        return $this->createQueryBuilder('n')
-    //            ->andWhere('n.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getTop100(): array
+    {
+        return $this->createQueryBuilder('n')
+            ->select('COUNT(n.id) as number', 'n.url')
+            ->GroupBy('n.url')
+            ->orderBy('number', 'DESC')
+            ->setMaxResults(100)
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

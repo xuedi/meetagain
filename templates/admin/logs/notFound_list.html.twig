@@ -1,0 +1,28 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <section class="section">
+        <div class="container">
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Url</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in list %}
+                    <tr>
+                        <td>{{ item.number }}</td>
+                        <td>{{ item.url }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+
+{% endblock %}
