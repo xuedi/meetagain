@@ -41,10 +41,20 @@
             <div class="column is-4">
                 <div class="box">
                     <h1 class="title is-6">Details</h1>
-                    <p>
-                        Members: {{ details.memberCount }}<br>
-                        Pages not found: {{ details.notFoundCount }}
-                    </p>
+                    <table class="table is-narrow">
+                        <tr>
+                            <td>Members:</td>
+                            <td>{{ details.memberCount }}</td>
+                        </tr>
+                        <tr>
+                            <td>Pages not found:</td>
+                            <td>{{ details.notFoundCount }}</td>
+                        </tr>
+                        <tr>
+                            <td>Activities:</td>
+                            <td>{{ details.activityCount }}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>

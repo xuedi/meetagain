@@ -4,6 +4,9 @@ namespace App\Service;
 
 use App\Entity\NotFoundLog;
 use App\Entity\User;
+use App\Repository\ActivityRepository;
+use App\Repository\NotFoundLogRepository;
+use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
@@ -20,14 +23,12 @@ class DashboardService
     private DateTimeImmutable $weekStartDate;
     private DateTimeImmutable $weekStopDate;
 
-    private readonly EntityRepository $notFoundRepo;
-    private readonly EntityRepository $userRepo;
-
     public function __construct(
-        private readonly EntityManagerInterface $em,
+        private readonly UserRepository $userRepo,
+        private readonly NotFoundLogRepository $notFoundRepo,
+        private readonly ActivityRepository $activityRepo,
     ) {
-        $this->userRepo = $this->em->getRepository(User::class);
-        $this->notFoundRepo = $this->em->getRepository(NotFoundLog::class);
+        // nothing to do, just chilling :-)
     }
 
     public function getTimeControl(): array
@@ -41,12 +42,18 @@ class DashboardService
 
     public function getDetails(): array
     {
-        return ['memberCount' => $this->userRepo->count(), 'notFoundCount' => $this->notFoundRepo->matching($this->timeCrit())->count()];
+        return [
+            'memberCount' => $this->userRepo->count(),
+            'notFoundCount' => $this->notFoundRepo->matching($this->timeCrit())->count(),
+            'activityCount' => $this->activityRepo->matching($this->timeCrit())->count(),
+        ];
     }
 
     public function getPagesNotFound(): array
     {
-        return ['list' => $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate)];
+        return [
+            'list' => $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate)
+        ];
     }
 
     public function setTime(?int $year, ?int $week): void
