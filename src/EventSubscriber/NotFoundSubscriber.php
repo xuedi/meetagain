@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 readonly class NotFoundSubscriber implements EventSubscriberInterface
 {
@@ -23,6 +24,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
         private SitemapService $sitemapService,
         private RouterInterface $router,
         private EntityManagerInterface $em,
+        private Environment $twig
     ) {
     }
 
@@ -40,8 +42,9 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
         if ($exception instanceof NotFoundHttpException) {
-            $path = $event->getRequest()->getPathInfo();
+            $originalPath = $event->getRequest()->getPathInfo();
             $ip = $event->getRequest()->getClientIp() ?? '';
+            $path = str_ends_with($originalPath, '.env') ? '.env' : $originalPath;
 
             $context = new RequestContext();
             $context->setParameter('_locale', 'en');
@@ -50,18 +53,13 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             // Special pages
             $content = match (trim($path, '/')) {
                 '' => $this->redirectToFrontpage(),
+                '.env' => $this->createFunEnvResponse($originalPath, $ip),
                 'sitemap.xml' => $this->sitemapService->getContent('www.dragon-descendants.de'),
                 default => $this->cms->createNotFoundPage(),
             };
 
             if ($content->getStatusCode() !== Response::HTTP_OK) {
-                $notFoundLog = new NotFoundLog();
-                $notFoundLog->setCreatedAt(new DateTimeImmutable());
-                $notFoundLog->setIp($ip);
-                $notFoundLog->setUrl($path);
-
-                $this->em->persist($notFoundLog);
-                $this->em->flush();
+                $this->logNotFound($originalPath, $ip);
             }
 
             $event->allowCustomResponseCode();
@@ -74,5 +72,23 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
     {
         $url = $this->router->generate('app_default');
         return new RedirectResponse($url)->setStatusCode(Response::HTTP_OK);
+    }
+
+    private function createFunEnvResponse(string $path, string $ip): Response
+    {
+        $this->logNotFound($path, $ip);
+
+        return new Response($this->twig->render('env_fun_file.txt.twig'), Response::HTTP_NOT_FOUND);
+    }
+
+    private function logNotFound(string $path, string $ip): void
+    {
+        $notFoundLog = new NotFoundLog();
+        $notFoundLog->setCreatedAt(new DateTimeImmutable());
+        $notFoundLog->setIp($ip);
+        $notFoundLog->setUrl($path);
+
+        $this->em->persist($notFoundLog);
+        $this->em->flush();
     }
 }
