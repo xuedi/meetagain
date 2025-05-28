@@ -48,9 +48,9 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
 
             $context = new RequestContext();
             $context->setParameter('_locale', 'en');
-            $this->router->setContext($context); // language not set on event subscriber yet
+            $this->router->setContext($context); // language isn't set on event subscriber yet
 
-            // Special pages
+            // try stuff and special cases before actual 404
             $content = match (trim($path, '/')) {
                 '' => $this->redirectToFrontpage(),
                 '.env' => $this->createFunEnvResponse(),
@@ -58,7 +58,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
                 default => $this->cms->createNotFoundPage(),
             };
 
-            if ($content->getStatusCode() !== Response::HTTP_OK) {
+            if ($content->getStatusCode() !== Response::HTTP_OK || $path === '.env') {
                 $notFoundLog = new NotFoundLog();
                 $notFoundLog->setCreatedAt(new DateTimeImmutable());
                 $notFoundLog->setIp($ip);
@@ -82,6 +82,6 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
 
     private function createFunEnvResponse(): Response
     {
-        return new Response($this->twig->render('env_fun_file.txt.twig'), Response::HTTP_NOT_FOUND);
+        return new Response($this->twig->render('env_fun_file.txt.twig'), Response::HTTP_OK);
     }
 }
