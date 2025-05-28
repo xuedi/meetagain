@@ -53,13 +53,19 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             // Special pages
             $content = match (trim($path, '/')) {
                 '' => $this->redirectToFrontpage(),
-                '.env' => $this->createFunEnvResponse($originalPath, $ip),
+                '.env' => $this->createFunEnvResponse(),
                 'sitemap.xml' => $this->sitemapService->getContent('www.dragon-descendants.de'),
                 default => $this->cms->createNotFoundPage(),
             };
 
             if ($content->getStatusCode() !== Response::HTTP_OK) {
-                $this->logNotFound($originalPath, $ip);
+                $notFoundLog = new NotFoundLog();
+                $notFoundLog->setCreatedAt(new DateTimeImmutable());
+                $notFoundLog->setIp($ip);
+                $notFoundLog->setUrl($originalPath);
+
+                $this->em->persist($notFoundLog);
+                $this->em->flush();
             }
 
             $event->allowCustomResponseCode();
@@ -74,21 +80,8 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
         return new RedirectResponse($url)->setStatusCode(Response::HTTP_OK);
     }
 
-    private function createFunEnvResponse(string $path, string $ip): Response
+    private function createFunEnvResponse(): Response
     {
-        $this->logNotFound($path, $ip);
-
         return new Response($this->twig->render('env_fun_file.txt.twig'), Response::HTTP_NOT_FOUND);
-    }
-
-    private function logNotFound(string $path, string $ip): void
-    {
-        $notFoundLog = new NotFoundLog();
-        $notFoundLog->setCreatedAt(new DateTimeImmutable());
-        $notFoundLog->setIp($ip);
-        $notFoundLog->setUrl($path);
-
-        $this->em->persist($notFoundLog);
-        $this->em->flush();
     }
 }
