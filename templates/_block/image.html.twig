@@ -2,5 +2,5 @@
     {% set file = image.id ~ '_' ~ size ~ '.' ~ image.extension %}
     <img src="/images/thumbnails/{{ file }}" {% if image.alt %}alt="{{ image.alt }}"{% endif %} />
 {% else %}
-    <img src="/images/thumbnails/1_{{ size }}.png" alt="Placeholder IMAGE"/>
+    <img src="/images/default_{{ size }}.png" alt="Placeholder IMAGE"/>
 {% endif %}

@@ -5,11 +5,12 @@ namespace App\Controller\Admin;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
+use App\Entity\ImageType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\TranslationService;
-use App\Service\UploadService;
+use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminEventController extends AbstractController
 {
     public function __construct(
-        private readonly UploadService $uploadService,
+        private readonly ImageService $imageService,
         private readonly EntityManagerInterface $entityManager,
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
@@ -51,7 +52,7 @@ class AdminEventController extends AbstractController
             $image = null;
             $imageData = $form->get('image')->getData();
             if ($imageData instanceof UploadedFile) {
-                $image = $this->uploadService->upload($imageData, $this->getUser());
+                $image = $this->imageService->upload($imageData, $this->getUser(), ImageType::EventTeaser);
             }
             if ($image instanceof Image) {
                 $event->setPreviewImage($image); // TODO: add source for image creation
@@ -74,7 +75,7 @@ class AdminEventController extends AbstractController
 
             // create thumbnail
             if ($image instanceof Image) {
-                $this->uploadService->createThumbnails($image, [[600, 400]]);
+                $this->imageService->createThumbnails($image);
             }
         }
 

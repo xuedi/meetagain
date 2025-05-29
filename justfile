@@ -20,8 +20,8 @@ clearCache:
     {{PHP}} composer dump-autoload
     {{PHP}} php bin/console cache:clear
 
-extendEvents:
-    {{PHP}} php bin/console app:event:extent
+app +parameter='':
+    {{PHP}} php bin/console {{parameter}}
 
 translationsExtract:
     php bin/console translation:extract --force --format php de
@@ -32,12 +32,6 @@ dockerTranslationsExtract:
     {{PHP}} php bin/console translation:extract --force --format php de
     {{PHP}} php bin/console translation:extract --force --format php en
     {{PHP}} php bin/console translation:extract --force --format php cn
-
-debugRouter:
-	{{PHP}} php bin/console debug:router
-
-createMigration:
-    {{PHP}} php bin/console doctrine:migrations:diff
 
 dockerStart:
 	{{DOCKER}} up -d

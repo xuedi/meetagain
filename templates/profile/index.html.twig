@@ -14,9 +14,20 @@
                     <div class="box">
                         <div class="columns">
                             <div class="column is-6">
-                                <figure class="image">
-                                    {% include '_block/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
-                                </figure>
+
+                                <div class="card">
+                                    <div class="card-image">
+                                        <figure class="image">
+                                            {% include '_block/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
+                                        </figure>
+                                    </div>
+                                    <div class="card-content is-overlay">
+                                        <a href="{{ path('app_profile_rotate_avatar') }}">
+                                            <i class="fa fa-rotate-right fa-2x"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
                                 {{ form_row(form.image) }}
                                 <small>The image should be squarish, it will be cropped</small>
                             </div>

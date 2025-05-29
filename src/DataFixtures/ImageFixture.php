@@ -3,8 +3,9 @@
 namespace App\DataFixtures;
 
 use App\Entity\Image;
+use App\Entity\ImageType;
 use App\Entity\User;
-use App\Service\UploadService;
+use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class ImageFixture extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
-        private readonly UploadService $imageService,
+        private readonly ImageService $imageService,
         private readonly UserFixture $userFixture,
     ) {
     }
@@ -23,31 +24,6 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $defaultImage = new Image();
-        $defaultImage->setHash('b184cd5280c69dad635c047e4f98d9cb47ba9613');
-        $defaultImage->setExtension('png');
-        $defaultImage->setMimeType('image/png');
-        $defaultImage->setSize(0);
-        $defaultImage->setAlt('Default image for Events');
-        $defaultImage->setCreatedAt(new DateTimeImmutable());
-        $defaultImage->setUploader($this->getReference('user_' . md5('import'), User::class));
-
-        $manager->persist($defaultImage);
-
-        $regularMeetup = new Image();
-        $regularMeetup->setHash('71a185614cb3c6315672b3a450b768a6f5ef4d87');
-        $regularMeetup->setExtension('jpg');
-        $regularMeetup->setMimeType('image/jpg');
-        $regularMeetup->setSize(0);
-        $regularMeetup->setAlt('Regular meetup picture');
-        $regularMeetup->setCreatedAt(new DateTimeImmutable());
-        $regularMeetup->setUploader($this->getReference('user_' . md5('import'), User::class));
-
-        $manager->persist($regularMeetup);
-
-        $manager->flush();
-        $this->imageService->createThumbnails($defaultImage, [[400, 400], [50, 50], [600, 400]]);
-
         foreach ($this->userFixture->getUsernames() as $name) {
             $path = __DIR__ . "/Avatars/$name.jpg";
 
@@ -56,13 +32,9 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
 
             // upload file & thumbnails
             $uploadedImage = new UploadedFile($path, "$name.jpg");
-            $image = $this->imageService->upload($uploadedImage, $user);
+            $image = $this->imageService->upload($uploadedImage, $user, ImageType::ProfilePicture);
             $manager->flush();
-            if ($image instanceof Image) {
-                $this->imageService->createThumbnails($image, [[50, 50], [400, 400]]);
-            } else {
-                throw new RuntimeException('Unable to upload image');
-            }
+            $this->imageService->createThumbnails($image);
 
             // associate image with user
             $user->setImage($image);

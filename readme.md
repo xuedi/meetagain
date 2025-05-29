@@ -26,8 +26,7 @@ the only thing you need to do is `just install` and then login as admin@example.
 
 
 ### TODO:
- - add an install script & add user & pass from fixtures into readme
- - add a function to rotate profile pictures, change thumbnail generation to only do when not exist
+ - change thumbnail generation to only do when not exist
  - an option when a recurring event was changed, to apply changes on all inherit event that follow
  - write cron jobs: 
    - removing regCodes and deactivating user that have not confirmed their emails in xDays
@@ -45,7 +44,7 @@ the only thing you need to do is `just install` and then login as admin@example.
  - admin Log display: checkbox level and type, 3 stage subselect: year, month, day
  - add community translation suggestions and manger approval
  - cross-table reference for images and user gallery
- - play with qodana inspections
+ - add an install script for non docker installations
 
 
 ### Helpful copy & pasta stuff

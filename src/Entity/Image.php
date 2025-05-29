@@ -37,6 +37,9 @@ class Image
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(enumType: ImageType::class)]
+    private ?ImageType $type = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +125,18 @@ class Image
     public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getType(): ?ImageType
+    {
+        return $this->type;
+    }
+
+    public function setType(ImageType $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

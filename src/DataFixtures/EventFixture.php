@@ -7,9 +7,10 @@ use App\Entity\EventIntervals;
 use App\Entity\EventTypes;
 use App\Entity\Host;
 use App\Entity\Image;
+use App\Entity\ImageType;
 use App\Entity\Location;
 use App\Entity\User;
-use App\Service\UploadService;
+use App\Service\ImageService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -26,7 +27,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
     private const null NO_RECURRING_RULE = null;
 
     public function __construct(
-        private readonly UploadService $imageService,
+        private readonly ImageService $imageService,
     ) {
     }
 
@@ -58,10 +59,10 @@ class EventFixture extends Fixture implements DependentFixtureInterface
             $reference = 'event_' . md5((string)$name);
             $imageFile = __DIR__ . "/Events/$reference.jpg";
             $uploadedImage = new UploadedFile($imageFile, "$reference.jpg");
-            $image = $this->imageService->upload($uploadedImage, $importUser);
+            $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::EventTeaser);
             $manager->flush();
             if ($image instanceof Image) {
-                $this->imageService->createThumbnails($image, [[600, 400]]);
+                $this->imageService->createThumbnails($image);
             } else {
                 throw new RuntimeException('Unable to upload image: ' . $imageFile);
             }

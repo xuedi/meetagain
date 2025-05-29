@@ -5,10 +5,11 @@ namespace App\Controller;
 use App\Entity\ActivityType;
 use App\Entity\Event;
 use App\Entity\Image;
+use App\Entity\ImageType;
 use App\Form\ProfileType;
 use App\Repository\EventRepository;
 use App\Service\ActivityService;
-use App\Service\UploadService;
+use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,11 +26,10 @@ class ProfileController extends AbstractController
     public function index(
         Request $request,
         EventRepository $repo,
-        UploadService $uploadService,
+        ImageService $imageService,
         EntityManagerInterface $entityManager,
     ): Response
     {
-
         $user = $this->getAuthedUser();
         $oldUserName = $user->getName();
 
@@ -40,19 +40,19 @@ class ProfileController extends AbstractController
             $image = null;
             $imageData = $form->get('image')->getData();
             if ($imageData instanceof UploadedFile) {
-                $image = $uploadService->upload($imageData, $this->getAuthedUser());
+                $image = $imageService->upload($imageData, $this->getAuthedUser(), ImageType::ProfilePicture);
             }
 
             $newUserName = $form->get('name')->getData();
             if ($oldUserName !== $newUserName) {
-                $message = sprintf("Changed username from '%s' to '%s'", $oldUserName, $newUserName);
-                $this->activityService->log(ActivityType::ChangedUsername, $user, ['old' => $oldUserName, 'new' => $newUserName]);
+                $this->activityService->log(ActivityType::ChangedUsername, $user, [
+                    'old' => $oldUserName,
+                    'new' => $newUserName
+                ]);
             }
-            // TODO: add following to the form so it is handled automatically
             $user->setBio($form->get('bio')->getData());
             $user->setLocale($form->get('languages')->getData());
             $user->setPublic($form->get('public')->getData());
-
 
             if ($image instanceof Image) {
                 $user->setImage($image);
@@ -61,7 +61,7 @@ class ProfileController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
             if ($image instanceof Image) {
-                $uploadService->createThumbnails($image, [[400, 400]]);
+                $imageService->createThumbnails($image);
             }
 
             return $this->redirectToRoute('app_profile');
@@ -74,6 +74,17 @@ class ProfileController extends AbstractController
             'past' => $repo->getPastEvents(20),
             'form' => $form,
         ]);
+    }
+
+    #[Route('/profile/rotate-avatar', name: 'app_profile_rotate_avatar')]
+    public function rotateProfile(ImageService $imageService): Response
+    {
+        $user = $this->getAuthedUser();
+        if ($user->getImage() !== null) {
+            $imageService->rotateThumbNail($user->getImage());
+        }
+
+        return $this->redirectToRoute('app_profile');
     }
 
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]
