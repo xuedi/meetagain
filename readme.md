@@ -20,13 +20,9 @@ I used some nice PHP >= 8.4 features out of convenience. Module needed are:
 gd, apcu, pdo_mysql, imagick, intl, iconv, ctype. Optional: xdebug opcache
 
 
-### Usage
-```
-just             # get a list with all possible cli interactions
-just install     # deletes all data and reset to fresh fixture version
-just dockerStart # starts docker development stack
-just dockerStop  # stops the stack
-``` 
+### Installation
+For local installation, when you have the tool `just` and docker installed,
+the only thing you need to do is `just install` and then login as admin@example.org
 
 
 ### TODO:
