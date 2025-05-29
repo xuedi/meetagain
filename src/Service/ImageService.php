@@ -62,6 +62,7 @@ readonly class ImageService
             $imagick = new Imagick();
             $imagick->readImage($source);
             $imagick->setImageCompressionQuality(90);
+            $imagick->autoOrient();
             $imagick->cropThumbnailImage($width, $height);
             $imagick->stripImage(); // metadata
             $imagick->writeImage($target);
