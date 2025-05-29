@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Entity\UserStatus;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -126,5 +127,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function resolveUserName(int $userId): string
     {
         return $this->getUserNameList()[$userId];
+    }
+
+    public function getOldRegistrations(int $int)
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        return $qb->select('u')
+            ->from(User::class, 'u')
+            ->where($qb->expr()->isNotNull('u.regcode'))
+            ->andWhere($qb->expr()->lt('u.createdAt', ':date'))
+            ->andWhere($qb->expr()->eq('u.status', ':status'))
+            ->setParameter('date', new DateTime('-'.$int.' days'))
+            ->setParameter('status', UserStatus::Registered->value)
+            ->getQuery()
+            ->getResult();
     }
 }

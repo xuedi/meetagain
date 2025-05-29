@@ -87,6 +87,9 @@ readonly class ImageService
                 $imagick->readImage($thumbnail);
                 $imagick->rotateImage(new ImagickPixel('white'), 90);
                 $imagick->writeImage($thumbnail);
+                $image->setUpdatedAt(new DateTimeImmutable());
+                $this->entityManager->persist($image);
+                $this->entityManager->flush();
             } catch (ImagickException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));;
             }

@@ -37,6 +37,9 @@ class Image
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $updatedAt = null;
+
     #[ORM\Column(enumType: ImageType::class)]
     private ?ImageType $type = null;
 
@@ -137,6 +140,18 @@ class Image
     public function setType(ImageType $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
