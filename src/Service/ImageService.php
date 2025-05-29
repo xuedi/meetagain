@@ -9,7 +9,9 @@ use App\Repository\ImageRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
+use ImagickException;
 use ImagickPixel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -20,6 +22,7 @@ readonly class ImageService
         private Filesystem $filesystem,
         private EntityManagerInterface $entityManager,
         private ConfigService $configService,
+        private LoggerInterface $logger,
         private string $kernelProjectDir,
     )
     {
@@ -59,13 +62,17 @@ readonly class ImageService
                 continue;
             }
 
-            $imagick = new Imagick();
-            $imagick->readImage($source);
-            $imagick->setImageCompressionQuality(90);
-            $imagick->autoOrient();
-            $imagick->cropThumbnailImage($width, $height);
-            $imagick->stripImage(); // metadata
-            $imagick->writeImage($target);
+            try {
+                $imagick = new Imagick();
+                $imagick->readImage($source);
+                $imagick->setImageCompressionQuality(90);
+                $imagick->autoOrient();
+                $imagick->cropThumbnailImage($width, $height);
+                $imagick->stripImage(); // metadata
+                $imagick->writeImage($target);
+            } catch (ImagickException $e) {
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));;
+            }
         }
     }
 
@@ -74,10 +81,15 @@ readonly class ImageService
         $sizes = $this->configService->getThumbnailSizes($image->getType());
         foreach ($sizes as [$width, $height]) {
             $thumbnail = $this->getThumbnailFile($image, $width, $height);
-            $imagick = new Imagick();
-            $imagick->readImage($thumbnail);
-            $imagick->rotateImage(new ImagickPixel('white'), 90);
-            $imagick->writeImage($thumbnail);
+
+            try {
+                $imagick = new Imagick();
+                $imagick->readImage($thumbnail);
+                $imagick->rotateImage(new ImagickPixel('white'), 90);
+                $imagick->writeImage($thumbnail);
+            } catch (ImagickException $e) {
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));;
+            }
         }
     }
 
