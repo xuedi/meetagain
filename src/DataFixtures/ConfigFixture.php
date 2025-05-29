@@ -4,10 +4,12 @@ namespace App\DataFixtures;
 
 use App\Entity\Config;
 use App\Entity\ConfigType;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class ConfigFixture extends Fixture
+class ConfigFixture extends Fixture implements DependentFixtureInterface
 {
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -23,13 +25,23 @@ class ConfigFixture extends Fixture
         $manager->flush();
     }
 
-    private function getData(): array
+    #[\Override]
+    public function getDependencies(): array
     {
         return [
-            ['pageUrl', 'https://www.dragon-descendants.de', ConfigType::String],
+            UserFixture::class,
+        ];
+    }
+
+    private function getData(): array
+    {
+        $importUser = $this->getReference('user_' . md5((string) 'import'), User::class);
+        return [
+            ['pageUrl', 'http://localhost', ConfigType::String],
             ['recurringTargetMonths', '60', ConfigType::Integer],
             ['isOpenRegistration', 'true', ConfigType::Boolean],
             ['isOffline', 'false', ConfigType::Boolean],
+            ['systemUser', $importUser->getEmail(), ConfigType::String],
         ];
     }
 }

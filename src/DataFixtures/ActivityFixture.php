@@ -38,17 +38,17 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            ['2025-01-01 10:00:00', 'xuedi', ActivityType::Registered, null],
-            ['2025-01-02 10:00:00', 'xuedi', ActivityType::Login, null],
-            ['2025-01-03 10:00:00', 'xuedi', ActivityType::RsvpYes, ['event_id' => 1]],
-            ['2025-01-04 10:00:00', 'xuedi', ActivityType::RsvpYes, ['event_id' => 2]],
-            ['2025-01-04 12:30:00', 'xuedi', ActivityType::RsvpYes, ['event_id' => 6]],
+            ['2025-01-01 10:00:00', 'admin', ActivityType::Registered, null],
+            ['2025-01-02 10:00:00', 'admin', ActivityType::Login, null],
+            ['2025-01-03 10:00:00', 'admin', ActivityType::RsvpYes, ['event_id' => 1]],
+            ['2025-01-04 10:00:00', 'admin', ActivityType::RsvpYes, ['event_id' => 2]],
+            ['2025-01-04 12:30:00', 'admin', ActivityType::RsvpYes, ['event_id' => 6]],
             ['2025-01-11 10:00:00', 'Adem Lane', ActivityType::Registered, null],
             ['2025-01-12 10:00:00', 'Adem Lane', ActivityType::Login, null],
             ['2025-01-13 10:00:00', 'Adem Lane', ActivityType::RsvpYes, ['event_id' => 1]],
             ['2025-01-13 12:30:00', 'Adem Lane', ActivityType::RsvpYes, ['event_id' => 6]],
             ['2025-01-15 20:00:00', 'Adem Lane', ActivityType::FollowedUser, ['user_id' => 2]],
-            ['2025-01-17 09:00:00', 'xuedi', ActivityType::FollowedUser, ['user_id' => 3]],
+            ['2025-01-17 09:00:00', 'admin', ActivityType::FollowedUser, ['user_id' => 3]],
             ['2025-02-01 10:00:00', 'Crystal Liu', ActivityType::Registered, null],
             ['2025-02-02 10:00:00', 'Crystal Liu', ActivityType::Login, null],
             ['2025-02-03 10:00:00', 'Crystal Liu', ActivityType::ChangedUsername, ['old' => 'dalong', 'new' => 'xiaolong']],

@@ -187,7 +187,7 @@ readonly class TranslationService
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         $this->entityManager->getConnection()->executeQuery(" TRUNCATE TABLE translation");
-        $user = $this->userRepo->findOneBy(['email' => 'system@beijingcode.org']);
+        $user = $this->userRepo->findOneBy(['email' => 'system@example.org']);
 
         foreach ($data as $item) {
             $translation = new Translation();

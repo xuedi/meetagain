@@ -38,7 +38,7 @@ class HostFixture extends Fixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            ['xuedi', 'xuedi'],
+            ['admin', 'admin'],
             ['Adem Lane', 'Adem Lane'],
             ['Crystal Liu', 'Crystal Liu'],
         ];
