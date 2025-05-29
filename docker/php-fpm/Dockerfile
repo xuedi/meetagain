@@ -2,7 +2,7 @@ FROM php:8.4-fpm
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-RUN install-php-extensions gd xdebug apcu pdo_mysql imagick intl opcache
+RUN install-php-extensions gd xdebug-3.4.0 apcu pdo_mysql imagick intl opcache
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y git unzip vim
 

@@ -57,7 +57,6 @@ class MemberController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_MANAGER');
 
         $user = $repo->findOneBy(['id' => $id]);
-        dump($user);
         if ($user->getImage() !== null) {
             $imageService->rotateThumbNail($user->getImage());
         }

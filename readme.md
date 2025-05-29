@@ -26,7 +26,6 @@ the only thing you need to do is `just install` and then login as admin@example.
 
 
 ### TODO:
- - change thumbnail generation to only do when not exist
  - an option when a recurring event was changed, to apply changes on all inherit event that follow
  - write cron jobs: 
    - removing regCodes and deactivating user that have not confirmed their emails in xDays
