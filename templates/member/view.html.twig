@@ -31,6 +31,11 @@
                                 <span class="icon"><i class="fa fa-circle-exclamation"></i></span><span>follow</span>
                             </div>
                         {% endif %}
+                        {% if is_granted('ROLE_MANAGER') %}
+                        <a href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
+                            <i class="fa fa-rotate-right fa-lg"></i>
+                        </a>
+                        {% endif %}
                     </div>
 
                     <p>{{ userDetails.bio }}</p>

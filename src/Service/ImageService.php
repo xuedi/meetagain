@@ -9,10 +9,10 @@ use App\Repository\ImageRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
+use ImagickPixel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-// TODO: deduplicate thumbnail generation
 readonly class ImageService
 {
     public function __construct(
@@ -21,7 +21,8 @@ readonly class ImageService
         private EntityManagerInterface $entityManager,
         private ConfigService $configService,
         private string $kernelProjectDir,
-    ) {
+    )
+    {
     }
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
@@ -54,6 +55,9 @@ readonly class ImageService
         $sizes = $this->configService->getThumbnailSizes($image->getType());
         foreach ($sizes as [$width, $height]) {
             $target = $this->getThumbnailFile($image, $width, $height);
+            if (file_exists($target)) {
+                continue;
+            }
 
             $imagick = new Imagick();
             $imagick->readImage($source);
@@ -66,7 +70,14 @@ readonly class ImageService
 
     public function rotateThumbNail(Image $image): void
     {
-        //
+        $sizes = $this->configService->getThumbnailSizes($image->getType());
+        foreach ($sizes as [$width, $height]) {
+            $thumbnail = $this->getThumbnailFile($image, $width, $height);
+            $imagick = new Imagick();
+            $imagick->readImage($thumbnail);
+            $imagick->rotateImage(new ImagickPixel('white'), 90);
+            $imagick->writeImage($thumbnail);
+        }
     }
 
     private function getSourceFile(Image $image): string

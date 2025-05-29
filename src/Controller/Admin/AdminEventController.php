@@ -55,7 +55,7 @@ class AdminEventController extends AbstractController
                 $image = $this->imageService->upload($imageData, $this->getUser(), ImageType::EventTeaser);
             }
             if ($image instanceof Image) {
-                $event->setPreviewImage($image); // TODO: add source for image creation
+                $event->setPreviewImage($image);
             }
 
             // save translations
