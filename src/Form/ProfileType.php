@@ -41,7 +41,7 @@ class ProfileType extends AbstractType
             'label' => false,
             'constraints' => [
                 new File([
-                    'maxSize' => '5000k',
+                    'maxSize' => '10M',
                     'mimeTypes' => [
                         'image/*',
                     ],
