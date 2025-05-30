@@ -10,8 +10,9 @@
                 <th>CreatedAt</th>
                 <th>Uploader</th>
                 <th>Size</th>
+                <th>Location</th>
                 <th>Type</th>
-                <th>Hash</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -20,8 +21,26 @@
                     <td>{{ image.createdAt | date('Y-m-d') }}</td>
                     <td>{{ image.uploader.email }}</td>
                     <td>{{ image.size | format_bytes }}</td>
+                    <td>{{ image.type.name }}</td>
                     <td>{{ image.mimeType }}</td>
-                    <td>{{ image.hash }}</td>
+                    <td>
+                        <div class="dropdown is-hoverable">
+                            <div class="dropdown-trigger">
+                                <span aria-haspopup="true" aria-controls="dropdown-image">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-image" aria-hidden="true"></i>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-image" role="menu">
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item">
+                                        {% include '_block/image.html.twig' with {'image': image} %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
