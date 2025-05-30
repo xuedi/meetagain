@@ -47,7 +47,7 @@
                     <div class="column is-2">
 
                         <nav class="panel">
-                            <p class="panel-heading">Admin</p>
+                            <p class="panel-heading p-2">Admin</p>
                             <a class="panel-block" href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
                                 <span class="panel-icon">
                                     <i class="fas fa-rotate-right"></i>
@@ -66,7 +66,7 @@
                                 </span>
                                 Restrict user
                                 {% if userDetails.restricted %}
-                                    <span class="icon"><i class="fas fa-check"></i></span>
+                                    <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
                                 {% endif %}
                             </a>
                             <a class="panel-block" href="{{ path('app_member_verify', {'id': userDetails.id}) }}">
@@ -75,7 +75,7 @@
                                 </span>
                                 Verify user
                                 {% if userDetails.verified %}
-                                    <span class="icon"><i class="fas fa-check"></i></span>
+                                    <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
                                 {% endif %}
                             </a>
                         </nav>
