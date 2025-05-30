@@ -6,29 +6,31 @@
 
 ## Introduction
 meetup.com got crazily expensive, I created my own page as a single meetup
-instance, with basic modular CMS to customize any number of pages. Menus and
-such are static and have to be changed in code. | Minimalist PHP8.4+ Symfony
+instance with a basic modular CMS to customize any number of pages. Menus and
+such are static and have to be changed in code as for now.
 
 
 ### Software design
-A classic symfony application as upstream as possible no fancy libraries
-or dependencies. Local development in docker via JustFile.  
+A classic PHP symfony application is as upstream as possible no fancy libraries or
+dependencies. Local development in docker via JustFile. Works without any JS, has
+just basic twig templating. 
 
 
 ### PHP modules
 I used some nice PHP >= 8.4 features out of convenience. Module needed are:
-gd, apcu, pdo_mysql, imagick, intl, iconv, ctype. Optional: xdebug opcache
+apcu, pdo_mysql, imagick, intl, iconv, ctype. Optional: xdebug, opcache, gd
 
 
 ### Installation
-For local installation, when you have the tool `just` and docker installed, the only
+For local installation, when you have the tool `just` and `docker` installed, the only
 thing you need to do is `just install` and then login as admin@example.org @ 1234
 
 
-### Helpful copy & pasta stuff
+### Phpstorm
+For aesthetic reasons i try to keep the root folder as clean as possible, so docker and
+other configs like tests & code-check tools are in their respective folders. To have phpstorm
+run smoothly with the docker container, the config has to be bent a bit.
 ```
-// misguided web attempts
-SELECT url, COUNT(*) AS number FROM `not_found_log` GROUP BY url ORDER BY number DESC;
 COMPOSE_ENV_FILES=../.env # env parameter for phpstorm docker remote php interpreter
 ```
 
