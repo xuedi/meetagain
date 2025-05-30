@@ -4,19 +4,20 @@
 
 {% block body %}
 
-    {% set followLink = path('app_member_toggle_follow', {'id': userDetails.id}) %}
-
     <section class="section">
         <div class="container">
             <div class="columns">
                 <div class="column is-4">
-                    {% include '_block/image.html.twig' with {'image': userDetails.image, 'size': '400x400'} %}
+                    <div>
+                        {% include '_block/image.html.twig' with {'image': userDetails.image, 'size': '400x400'} %}
+                    </div>
                 </div>
 
-                <div class="column is-7">
+                <div class="column is-6">
                     <div class="mb-4">
                         <h1 class="title is-3 is-inline">{{ userDetails.name }}</h1>
                         {% if userDetails.id != currentUser.id %}
+                            {% set followLink = path('app_member_toggle_follow', {'id': userDetails.id}) %}
                             {% if isFollow %}
                                 <a href="{{ followLink }}" class="button is-danger is-small ml-4 mt-1">
                                     <span class="icon"><i class="fa fa-minus"></i></span><span>Unfollow</span>
@@ -31,11 +32,6 @@
                                 <span class="icon"><i class="fa fa-circle-exclamation"></i></span><span>follow</span>
                             </div>
                         {% endif %}
-                        {% if is_granted('ROLE_MANAGER') %}
-                        <a href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
-                            <i class="fa fa-rotate-right fa-lg"></i>
-                        </a>
-                        {% endif %}
                     </div>
 
                     <p>{{ userDetails.bio }}</p>
@@ -44,6 +40,48 @@
                         <span class="icon"><i class="fa fa-envelope"></i></span><span>Message</span>
                     </a>
                 </div>
+
+
+
+                {% if is_granted('ROLE_MANAGER') %}
+                    <div class="column is-2">
+
+                        <nav class="panel">
+                            <p class="panel-heading">Admin</p>
+                            <a class="panel-block" href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
+                                <span class="panel-icon">
+                                    <i class="fas fa-rotate-right"></i>
+                                </span>
+                                Rotate image
+                            </a>
+                            <a class="panel-block" href="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}">
+                                <span class="panel-icon">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                                Remove image
+                            </a>
+                            <a class="panel-block" href="{{ path('app_member_restrict', {'id': userDetails.id}) }}">
+                                <span class="panel-icon">
+                                    <i class="fas fa-ban {% if userDetails.restricted %}has-text-danger{% endif %}"></i>
+                                </span>
+                                Restrict user
+                                {% if userDetails.restricted %}
+                                    <span class="icon"><i class="fas fa-check"></i></span>
+                                {% endif %}
+                            </a>
+                            <a class="panel-block" href="{{ path('app_member_verify', {'id': userDetails.id}) }}">
+                                <span class="panel-icon">
+                                    <i class="fa-regular fa-user-check {% if userDetails.verified %}has-text-success{% endif %}"></i>
+                                </span>
+                                Verify user
+                                {% if userDetails.verified %}
+                                    <span class="icon"><i class="fas fa-check"></i></span>
+                                {% endif %}
+                            </a>
+                        </nav>
+                    </div>
+
+                {% endif %}
 
             </div>
 

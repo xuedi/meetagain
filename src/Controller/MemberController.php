@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\UserRepository;
 use App\Service\FriendshipService;
 use App\Service\ImageService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -52,7 +53,7 @@ class MemberController extends AbstractController
     }
 
     #[Route('/members/rotate-avatar/{id}', name: 'app_member_rotate_avatar')]
-    public function rotateProfile(UserRepository $repo, ImageService $imageService, int $id): Response
+    public function rotateProfileImage(UserRepository $repo, ImageService $imageService, int $id): Response
     {
         $this->denyAccessUnlessGranted('ROLE_MANAGER');
 
@@ -60,6 +61,45 @@ class MemberController extends AbstractController
         if ($user->getImage() !== null) {
             $imageService->rotateThumbNail($user->getImage());
         }
+
+        return $this->redirectToRoute('app_member_view', ['id' => $id]);
+    }
+
+    #[Route('/members/remove-image/{id}', name: 'app_member_remove_avatar')]
+    public function removeProfileImage(UserRepository $repo, EntityManagerInterface $em, int $id): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+
+        $user = $repo->findOneBy(['id' => $id]);
+        $user->setImage(null);
+        $em->persist($user);
+        $em->flush();
+
+        return $this->redirectToRoute('app_member_view', ['id' => $id]);
+    }
+
+    #[Route('/members/restrict/{id}', name: 'app_member_restrict')]
+    public function restrictUser(UserRepository $repo, EntityManagerInterface $em, int $id): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+
+        $user = $repo->findOneBy(['id' => $id]);
+        $user->setRestricted(!$user->isRestricted());
+        $em->persist($user);
+        $em->flush();
+
+        return $this->redirectToRoute('app_member_view', ['id' => $id]);
+    }
+
+    #[Route('/members/verify/{id}', name: 'app_member_verify')]
+    public function verifyUser(UserRepository $repo, EntityManagerInterface $em, int $id): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+
+        $user = $repo->findOneBy(['id' => $id]);
+        $user->setVerified(!$user->isVerified());
+        $em->persist($user);
+        $em->flush();
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
