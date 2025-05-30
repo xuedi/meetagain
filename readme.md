@@ -11,12 +11,12 @@ such are static and have to be changed in code as for now.
 
 
 ### Software design
-A classic PHP symfony application is as upstream as possible no fancy libraries or
-dependencies. Local development in docker via JustFile. Works without any JS, has
-just basic twig templating. 
+A classic PHP symfony application, as upstream as possible no fancy libraries. Local 
+development in docker via JustFile. Has just basic twig templating with upstream bulma
+and almost no JS & CSS. 
 
 
-### PHP modules
+#### PHP modules
 I used some nice PHP >= 8.4 features out of convenience. Module needed are:
 apcu, pdo_mysql, imagick, intl, iconv, ctype. Optional: xdebug, opcache, gd
 
@@ -26,10 +26,10 @@ For local installation, when you have the tool `just` and `docker` installed, th
 thing you need to do is `just install` and then login as admin@example.org @ 1234
 
 
-### Phpstorm
-For aesthetic reasons i try to keep the root folder as clean as possible, so docker and
-other configs like tests & code-check tools are in their respective folders. To have phpstorm
-run smoothly with the docker container, the config has to be bent a bit.
+#### Phpstorm
+For aesthetic reasons I try to keep the root folder as clean as possible, so docker and other
+configs like tests and code-check tools are in their respective folders. To have phpstorm run
+smoothly with the docker container, the config has to be bent a bit.
 ```
 COMPOSE_ENV_FILES=../.env # env parameter for phpstorm docker remote php interpreter
 ```
