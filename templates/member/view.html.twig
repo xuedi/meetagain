@@ -78,6 +78,14 @@
                                     <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
                                 {% endif %}
                             </a>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <a class="panel-block" href="{{ path('app_member_takeover', {'id': userDetails.id}) }}">
+                                <span class="panel-icon">
+                                    <i class="fas fa-person-walking-dashed-line-arrow-right"></i>
+                                </span>
+                                Takeover user
+                            </a>
+                            {% endif %}
                         </nav>
                     </div>
 

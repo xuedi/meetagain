@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use App\Service\FriendshipService;
 use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -100,6 +101,17 @@ class MemberController extends AbstractController
         $user->setVerified(!$user->isVerified());
         $em->persist($user);
         $em->flush();
+
+        return $this->redirectToRoute('app_member_view', ['id' => $id]);
+    }
+
+    #[Route('/members/takeover/{id}', name: 'app_member_takeover')]
+    public function takeoverUser(UserRepository $repo, Security $security, int $id): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $user = $repo->findOneBy(['id' => $id]);
+        $security->login($user);
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
