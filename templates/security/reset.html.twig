@@ -17,7 +17,8 @@
             </div>
             <div class="columns">
                 <div class="column is-1">
-                    <strong>Captcha</strong><br> {{ captcha }}
+                    <strong>Captcha</strong><br>
+                    <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
                 </div>
                 <div class="column is-4">
                     {{ form_row(form.captcha) }}
@@ -25,6 +26,9 @@
             </div>
 
             {{ form_widget(form) }}
+            <p>
+                You will recive an email with a link to reset your password
+            </p>
             <button class="button">{{ "button_send_reset_link" | trans }}</button>
             {{ form_end(form) }}
 
