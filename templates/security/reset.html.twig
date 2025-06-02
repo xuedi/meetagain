@@ -27,15 +27,13 @@
 
             {{ form_widget(form) }}
             <p>
-                You will receive an email with a link to reset your password, if you can't
-            </p>
-            <p>
-                read the captcha code, please refresh or rey so reset try, you will get a new one.
+                You will receive an email with a link to reset your password, if you can't<br>
+                read the captcha code, please refresh the page or just try, and you will get a new one.
             <p class="mt-4">
                 You cannot get more than <strong>7</strong> new captcha per minute.
             </p>
             <p class="mb-5">
-                You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
+                You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free try in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
             </p>
             <button class="button">{{ "button_send_reset_link" | trans }}</button>
             {{ form_end(form) }}
