@@ -45,57 +45,21 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="mt-5">
-                        <h2 class="title is-4">{{ "Images"|trans }}</h2>
-                        ...
-                    </div>
-                    <div class="mt-5">
-                        <h2 class="title is-4">{{ "Comments"|trans }}</h2>
-                        <div class="columns">
-                            <div class="column is-four-fifths">
-                                {% for comment in comments %}
-                                    {% include '_block/comment.html.twig' with {'comment': comment, 'user': user, 'event': event} %}
-                                {% endfor %}
-                                {% if is_granted('ROLE_USER') %}
-                                    {{ form_start(commentForm) }}
-                                    {{ form_row(commentForm.comment, { 'id': 'replyInput' }) }}
-                                    <button class="button is-link">{{ "button_add" | trans }}</button>
-                                    {{ form_end(commentForm) }}
-                                {% endif %}
-                            </div>
+                    {% if is_granted('ROLE_USER') %}
+                        <div class="mt-5">
+                            {% include 'events/details_images.html.twig'%}
                         </div>
-                    </div>
+                        <div class="mt-5">
+                            {% include 'events/details_comments.html.twig'%}
+                        </div>
+                    {% else %}
+                        <div class="mt-5">
+                            <p>Please <a href="{{ path('app_login') }}">login</a> to post images or write comments</p>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="column is-3">
-                    {% include '_block/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
-                    <div class="box mt-5">
-                        <strong>{{ event.start|date('d. F Y') }}</strong>
-                        <p>
-                            {{ event.start|date('H:i') }} to {{ event.start|date('H:i') }}<br>
-                            {% if event.recurringRule is defined and event.recurringRule.name is defined %}
-                                Recurring: {{ event.recurringRule.name }}
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="box mt-5">
-                        <h2 class="title is-4">Hosts</h2>
-                        <div class="columns is-multiline">
-                            {% for host in event.host %}
-                                <div class="tag is-large m-1">{{ host.user.name }}</div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="box mt-5">
-                        <h2 class="title is-4">Location</h2>
-                        <strong>{{ event.location.name }}</strong>
-                        <p>
-                            {{ event.location.street }}<br>
-                            {{ event.location.postcode }} {{ event.location.city }}
-                        </p>
-                        {% if event.hasMap and globalService.showOsm %}
-                            <div class="mt-3" id="osm-map"></div>
-                        {% endif %}
-                    </div>
+                    {% include 'events/details_sidepanel.html.twig'%}
                 </div>
             </div>
 

@@ -1,0 +1,14 @@
+<h2 class="title is-4">{{ "Comments"|trans }}</h2>
+<div class="columns">
+    <div class="column is-four-fifths">
+        {% for comment in comments %}
+            {% include '_block/comment.html.twig' with {'comment': comment, 'user': user, 'event': event} %}
+        {% endfor %}
+        {% if is_granted('ROLE_USER') %}
+            {{ form_start(commentForm) }}
+            {{ form_row(commentForm.comment, { 'id': 'replyInput' }) }}
+            <button class="button is-link">{{ "button_add" | trans }}</button>
+            {{ form_end(commentForm) }}
+        {% endif %}
+    </div>
+</div>

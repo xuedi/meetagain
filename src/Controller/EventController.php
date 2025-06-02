@@ -19,9 +19,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class EventController extends AbstractController
 {
+    public function __construct(private readonly RouterInterface $router)
+    {
+    }
+
     #[Route('/events', name: 'app_event')]
     public function index(EventService $eventService, Request $request): Response
     {
@@ -63,9 +69,10 @@ class EventController extends AbstractController
         $event = $repo->findOneBy(['id' => $id]);
         return $this->render('events/details.html.twig', [
             'commentForm' => $form,
-            'comments' => $comments->findBy(['event' => $id]), // TODO: use custom repo with builder so userInfos are not lazy load
+            'comments' => $comments->findBy(['event' => $id]),
+            'route' => $request->attributes->get('_route'),
             'event' => $event,
-            'user' => $this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface ? $this->getAuthedUser() : null,
+            'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
         ]);
     }
 

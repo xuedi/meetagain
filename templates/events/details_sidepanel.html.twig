@@ -1,0 +1,30 @@
+
+{% include '_block/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
+<div class="box mt-5">
+    <strong>{{ event.start|date('d. F Y') }}</strong>
+    <p>
+        {{ event.start|date('H:i') }} to {{ event.start|date('H:i') }}<br>
+        {% if event.recurringRule is defined and event.recurringRule.name is defined %}
+            Recurring: {{ event.recurringRule.name }}
+        {% endif %}
+    </p>
+</div>
+<div class="box mt-5">
+    <h2 class="title is-4">Hosts</h2>
+    <div class="columns is-multiline">
+        {% for host in event.host %}
+            <div class="tag is-large m-1">{{ host.user.name }}</div>
+        {% endfor %}
+    </div>
+</div>
+<div class="box mt-5">
+    <h2 class="title is-4">Location</h2>
+    <strong>{{ event.location.name }}</strong>
+    <p>
+        {{ event.location.street }}<br>
+        {{ event.location.postcode }} {{ event.location.city }}
+    </p>
+    {% if event.hasMap and globalService.showOsm %}
+        <div class="mt-3" id="osm-map"></div>
+    {% endif %}
+</div>
