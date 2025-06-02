@@ -22,10 +22,10 @@
     <g transform="translate(76)" font-family="&#39;DejaVu Sans&#39;,Verdana,Geneva,sans-serif" font-size="11">
         <path d="M0 0h46.939C48.629 0 50 1.343 50 3v14c0 1.657-1.37 3-3.061 3H0V0z" id="state-bg" fill="url(#state-fill)" fill-rule="nonzero"></path>
         <text fill="#010101" fill-opacity=".3">
-            <tspan x="10" y="15">11%</tspan>
+            <tspan x="10" y="15">10%</tspan>
         </text>
         <text fill="#FFFFFF">
-            <tspan x="10" y="14">11%</tspan>
+            <tspan x="10" y="14">10%</tspan>
         </text>
     </g>
 </g>
