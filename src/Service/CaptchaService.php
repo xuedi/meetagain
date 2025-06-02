@@ -32,17 +32,17 @@ class CaptchaService
         }
         $image = $this->generateImage($code);
 
-        $this->session->set('captcha_text' . $this->session->getId(), $code);
-        $this->session->set('captcha_image' . $this->session->getId(), $image);
         $refresh = $this->session->get('captcha_refresh' . $this->session->getId(), []);
         $refresh[] = new DateTimeImmutable();
-        $this->session->set('captcha_refresh' . $this->session->getId(), $refresh);
 
+        $this->session->set('captcha_refresh' . $this->session->getId(), $refresh);
+        $this->session->set('captcha_text' . $this->session->getId(), $code);
+        $this->session->set('captcha_image' . $this->session->getId(), $image);
 
         return $image;
     }
 
-    public function isValidate(string $code): ?string
+    public function isValid(string $code): ?string
     {
         $code = strtolower($code);
         $expected = strtolower($this->session->get('captcha_text' . $this->session->getId(), null));

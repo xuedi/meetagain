@@ -130,7 +130,7 @@ class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $captcha = $form->get('captcha')->getData();
-            $captchaError = $captchaService->isValidate($captcha);
+            $captchaError = $captchaService->isValid($captcha);
             if($captchaError !== null) {
                 $form->get('captcha')->addError(new FormError($captchaError));
             }
