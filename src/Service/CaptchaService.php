@@ -24,7 +24,6 @@ class CaptchaService
             return $image;
         }
 
-        $this->session->set('captcha_refresh_count' . $this->session->getId(), $this->getRefreshCount() - 1);
         $code = '';
         $length = 4;
         $validCharacters = 'abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
