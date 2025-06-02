@@ -2,7 +2,7 @@
   "type": "project",
   "name": "xuedi/meetagain",
   "description": "Simple PHP app to organize a group and schedule recurring events ",
-  "license": "GPL-2.0-only",
+  "license": "EUPL-1.2",
   "authors": [
     {
       "name": "Daniel Koch",
@@ -24,7 +24,6 @@
     "doctrine/doctrine-fixtures-bundle": "^4",
     "doctrine/doctrine-migrations-bundle": "^3.3",
     "doctrine/orm": "^3.3",
-    "gregwar/captcha-bundle": "^2.3",
     "knplabs/knp-time-bundle": "^2.4",
     "nikic/php-parser": "^5.3",
     "phpdocumentor/reflection-docblock": "^5.4",

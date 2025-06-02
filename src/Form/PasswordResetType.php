@@ -32,11 +32,6 @@ class PasswordResetType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('captcha', CaptchaType::class, array(
-                'width' => 200,
-                'height' => 50,
-                'length' => 6,
-            ))
         ;
     }
 }
