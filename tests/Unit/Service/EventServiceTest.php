@@ -4,7 +4,7 @@ namespace App\Tests\Unit\Service;
 
 use App\Repository\EventRepository;
 use App\Service\EventService;
-use App\Tests\Unit\Entity\Stubs\EventStub;
+use App\Tests\Unit\Service\Stubs\EventStub;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

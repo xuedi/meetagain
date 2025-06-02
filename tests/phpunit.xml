@@ -31,7 +31,8 @@
     </coverage>
     <source>
         <include>
-            <directory>../src</directory>
+            <directory>../src/Service</directory>
+            <directory>../src/Security</directory>
         </include>
     </source>
 </phpunit>
