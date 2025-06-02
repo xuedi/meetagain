@@ -3,9 +3,9 @@
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Activity;
+use App\Entity\ActivityType;
 use App\Entity\Event;
 use App\Entity\User;
-use App\Entity\ActivityType;
 use App\Repository\ActivityRepository;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
@@ -30,12 +30,15 @@ class ActivityServiceTest extends TestCase
         $this->emMock = $this->createMock(EntityManagerInterface::class);
         $this->globServiceMock = $this->createMock(GlobalService::class);
         $this->activityRepoMock = $this->createMock(ActivityRepository::class);
-        $this->subject = new ActivityService($this->globServiceMock, $this->emMock, $this->activityRepoMock);
+        $this->subject = new ActivityService(
+            $this->globServiceMock,
+            $this->emMock,
+            $this->activityRepoMock
+        );
     }
 
     public function testSimpleLoggingActivity(): void
     {
-        $expectedMessage = '';
         $expectedUserMock = $this->userMock;
         $expectedUserActivity = ActivityType::Login;
 
@@ -51,7 +54,7 @@ class ActivityServiceTest extends TestCase
         $this->subject->log($expectedUserActivity, $expectedUserMock, []);
     }
 
-    #[DataProvider('getAllLoggingActivityCases')]
+    #[DataProvider('getLogMatrix')]
     public function testAllLoggingActivity(ActivityType $expectedUserActivity): void
     {
         $expectedUserMock = $this->userMock;
@@ -70,7 +73,7 @@ class ActivityServiceTest extends TestCase
         $this->subject->log($expectedUserActivity, $expectedUserMock, $validMetaData);
     }
 
-    public static function getAllLoggingActivityCases(): array
+    public static function getLogMatrix(): array
     {
         return [
             [ActivityType::ChangedUsername],
@@ -83,8 +86,8 @@ class ActivityServiceTest extends TestCase
         ];
     }
 
-    #[DataProvider('getAllActivityPreparationCases')]
-    public function testActivityPreparation(ActivityType $userActivity, string $expectedMessage, array $metaData): void
+    #[DataProvider('getPrepareActivityMatrix')]
+    public function testPrepareActivity(ActivityType $userActivity, string $expectedMessage, array $metaData): void
     {
         $userRepoMock = $this->createMock(UserRepository::class);
         $userRepoMock->method('getUserNameList')->willReturn([1 => 'UserNumberOne']);
@@ -112,7 +115,7 @@ class ActivityServiceTest extends TestCase
         $this->assertEquals($activity->getMessage(), $expectedMessage);
     }
 
-    public static function getAllActivityPreparationCases(): array
+    public static function getPrepareActivityMatrix(): array
     {
         return [
             [ActivityType::ChangedUsername, 'Changed username from oldUsername to newUsername', [
@@ -132,5 +135,51 @@ class ActivityServiceTest extends TestCase
             [ActivityType::Registered, 'User registered', []],
             [ActivityType::Login, 'User logged in', []],
         ];
+    }
+
+    public function testGetUserList(): void
+    {
+        $expected = [
+            'User registered',
+            'User logged in',
+        ];
+
+        $this->activityRepoMock
+            ->method('findBy')
+            ->willReturn([
+                new Activity()->setType(ActivityType::Registered),
+                new Activity()->setType(ActivityType::Login),
+            ]);
+
+
+        $result = $this->subject->getUserList($this->userMock);
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertEquals($result[0]->getMessage(), $expected[0]);;
+        $this->assertEquals($result[1]->getMessage(), $expected[1]);;
+    }
+
+    public function testGetAdminList(): void
+    {
+        $expected = [
+            'User registered',
+            'User logged in',
+        ];
+
+        $this->activityRepoMock
+            ->method('findBy')
+            ->willReturn([
+                new Activity()->setType(ActivityType::Registered),
+                new Activity()->setType(ActivityType::Login),
+            ]);
+
+
+        $result = $this->subject->getAdminList();
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertEquals($result[0]->getMessage(), $expected[0]);;
+        $this->assertEquals($result[1]->getMessage(), $expected[1]);;
     }
 }
