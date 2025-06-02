@@ -27,13 +27,48 @@
 
             {{ form_widget(form) }}
             <p>
-                You will recive an email with a link to reset your password
+                You will receive an email with a link to reset your password, if you can't
+            </p>
+            <p>
+                read the captcha code, please refresh or rey so reset try, you will get a new one.
+            <p class="mt-4">
+                You cannot get more than <strong>7</strong> new captcha per minute.
+            </p>
+            <p class="mb-5">
+                You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
             </p>
             <button class="button">{{ "button_send_reset_link" | trans }}</button>
             {{ form_end(form) }}
 
         </div>
     </section>
+
+
+    <script type="text/javascript">
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const refreshCount = document.getElementById('refreshCount');
+            const refreshTime = document.getElementById('refreshTime');
+            const timeID = setInterval(timeAndDate, 1000);
+
+            function timeAndDate() {
+                let xhr = new XMLHttpRequest();
+                xhr.open("GET", '{{ path('app_ajax_get_captcha_count') }}', true);
+                xhr.responseType = 'json'; // Set response type to JSON
+
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        if (this.response && refreshCount && refreshTime) {
+                            refreshCount.textContent = this.response.count ?? '';
+                            refreshTime.textContent = this.response.next ?? '';
+                        }
+                    }
+                }
+                xhr.send();
+            }
+        });
+
+    </script>
 
 
 {% endblock %}

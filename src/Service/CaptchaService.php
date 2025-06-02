@@ -2,17 +2,14 @@
 
 namespace App\Service;
 
+use DateTimeImmutable;
 use Imagick;
 use ImagickDraw;
 use ImagickPixel;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-readonly class CaptchaService
+class CaptchaService
 {
-    const int LENGTH = 4;
-    const string FONT = __DIR__ . '/../../assets/fonts/captcha.ttf';
-    const string VALID_CHARACTERS = 'abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
-
     private SessionInterface $session;
 
     public function setSession(SessionInterface $session): void
@@ -26,14 +23,22 @@ readonly class CaptchaService
         if($image !== null) {
             return $image;
         }
+
+        $this->session->set('captcha_refresh_count' . $this->session->getId(), $this->getRefreshCount() - 1);
         $code = '';
-        foreach (range(0, self::LENGTH - 1) as $i) {
-            $code .= self::VALID_CHARACTERS[random_int(0, strlen(self::VALID_CHARACTERS) - 1)];
+        $length = 4;
+        $validCharacters = 'abcdefghjklmnpqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ';
+        foreach (range(0, $length - 1) as $i) {
+            $code .= $validCharacters[random_int(0, strlen($validCharacters) - 1)];
         }
         $image = $this->generateImage($code);
 
         $this->session->set('captcha_text' . $this->session->getId(), $code);
         $this->session->set('captcha_image' . $this->session->getId(), $image);
+        $refresh = $this->session->get('captcha_refresh' . $this->session->getId(), []);
+        $refresh[] = new DateTimeImmutable();
+        $this->session->set('captcha_refresh' . $this->session->getId(), $refresh);
+
 
         return $image;
     }
@@ -61,7 +66,7 @@ readonly class CaptchaService
             $angle = random_int(-20, 20);
             $y = $baseY + random_int(-6, 6);
             $draw = new ImagickDraw();
-            $draw->setFont(self::FONT);
+            $draw->setFont(__DIR__ . '/../../assets/fonts/captcha.ttf');
             $draw->setFontSize($size + random_int(-4, 6));;
             $draw->setFillColor(sprintf('#%s0%s0%s0', random_int(0, 9), random_int(0, 9), random_int(0, 9)));;
             $image->annotateImage($draw, $x, $y, $angle, $char);
@@ -73,7 +78,39 @@ readonly class CaptchaService
 
     public function reset(): void
     {
+        if($this->getRefreshCount() >= 7) {
+            return;
+        }
         $this->session->remove('captcha_text' . $this->session->getId());
         $this->session->remove('captcha_image' . $this->session->getId());
+    }
+
+    public function getRefreshCount(): int
+    {
+        $refresh = $this->session->get('captcha_refresh' . $this->session->getId(), []);
+        foreach ($refresh as $key => $value) {
+            if ($value->modify('+1 minute') < new DateTimeImmutable()) {
+                unset($refresh[$key]);
+            }
+        }
+        $this->session->set('captcha_refresh' . $this->session->getId(), $refresh);
+        return count($refresh);
+    }
+
+    public function getRefreshTime(): int
+    {
+        $refresh = $this->session->get('captcha_refresh' . $this->session->getId(), []);
+        $now = new DateTimeImmutable();
+        $minSeconds = PHP_INT_MAX;
+
+        foreach ($refresh as $value) {
+            $expireTime = $value->modify('+1 minute');
+            $seconds = $expireTime->getTimestamp() - $now->getTimestamp();
+            if ($seconds > 0 && $seconds < $minSeconds) {
+                $minSeconds = $seconds;
+            }
+        }
+
+        return $minSeconds === PHP_INT_MAX ? 0 : $minSeconds;
     }
 }

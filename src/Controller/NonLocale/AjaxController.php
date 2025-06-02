@@ -5,6 +5,7 @@ namespace App\Controller\NonLocale;
 use App\Controller\AbstractController;
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
+use App\Service\CaptchaService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +18,7 @@ class AjaxController extends AbstractController
     {
         return $this->render('_non_locale/ajax.html.twig');
     }
+
     #[Route('/ajax/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['GET'])]
     public function acceptCookiesIndex(Request $request): Response
     {
@@ -32,6 +34,7 @@ class AjaxController extends AbstractController
         
         return $response;
     }
+
     #[Route('/ajax/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['GET'])]
     public function denyCookiesIndex(Request $request): Response
     {
@@ -45,5 +48,15 @@ class AjaxController extends AbstractController
         $response->headers->clearCookie(Consent::TYPE_OSM);
 
         return $response;
+    }
+
+    #[Route('/ajax/get-captcha-count', name: 'app_ajax_get_captcha_count', methods: ['GET'])]
+    public function getCaptchaCountIndex(Request $request, CaptchaService $captchaService): Response
+    {
+        $captchaService->setSession($request->getSession());
+        return new JsonResponse([
+            'count' => $captchaService->getRefreshCount(),
+            'next' => $captchaService->getRefreshTime(),
+        ]);
     }
 }

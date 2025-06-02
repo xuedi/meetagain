@@ -158,6 +158,8 @@ class SecurityController extends AbstractController
 
         return $this->render('security/reset.html.twig', [
             'captcha' => $captchaService->generate(),
+            'refreshCount' => $captchaService->getRefreshCount(),
+            'refreshTime' => $captchaService->getRefreshTime(),
             'form' => $form,
         ]);
     }
