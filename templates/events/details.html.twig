@@ -4,13 +4,13 @@
 
 {% block stylesheets %}
     {% if event.hasMap and globalService.showOsm %}
-        <link rel="stylesheet" href="{{ asset('css/leaflet.css') }}"/>
+        <link rel="stylesheet" href="{{ '/stylesheet/leaflet.css' }}"/>
     {% endif %}
 {% endblock %}
 
 {% block javascripts %}
     {% if event.hasMap and globalService.showOsm%}
-        <script src="{{ asset('leaflet.js') }}" ></script>
+        <script src="{{ '/javascript/leaflet.js' }}" ></script>
     {% endif %}
 {% endblock %}
 
