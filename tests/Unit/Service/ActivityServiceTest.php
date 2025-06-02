@@ -12,6 +12,7 @@ use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\GlobalService;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +56,7 @@ class ActivityServiceTest extends TestCase
     }
 
     #[DataProvider('getLogMatrix')]
-    public function testAllLoggingActivity(ActivityType $expectedUserActivity): void
+    public function testLog(ActivityType $expectedUserActivity): void
     {
         $expectedUserMock = $this->userMock;
 
@@ -156,8 +157,8 @@ class ActivityServiceTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
-        $this->assertEquals($result[0]->getMessage(), $expected[0]);;
-        $this->assertEquals($result[1]->getMessage(), $expected[1]);;
+        $this->assertEquals($result[0]->getMessage(), $expected[0]);
+        $this->assertEquals($result[1]->getMessage(), $expected[1]);
     }
 
     public function testGetAdminList(): void
@@ -179,7 +180,19 @@ class ActivityServiceTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
-        $this->assertEquals($result[0]->getMessage(), $expected[0]);;
-        $this->assertEquals($result[1]->getMessage(), $expected[1]);;
+        $this->assertEquals($result[0]->getMessage(), $expected[0]);
+        $this->assertEquals($result[1]->getMessage(), $expected[1]);
+    }
+
+    public function testEnsureHasKey(): void
+    {
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'old' in meta in ChangedUsername"));
+        $this->subject->log(ActivityType::ChangedUsername, $this->userMock, []);
+    }
+
+    public function testEnsureIsNumeric(): void
+    {
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in RsvpYes"));
+        $this->subject->log(ActivityType::RsvpYes, $this->userMock, ['event_id' => 'notAnInteger']);;
     }
 }
