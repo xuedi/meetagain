@@ -7,20 +7,26 @@
     <section class="section">
         <div class="container">
 
+            <h1 class="subtitle">{{ "page_reset_headline"|trans }}</h1>
+
+            {{ form_start(form) }}
             <div class="columns">
                 <div class="column is-5">
-
-                    <h1 class="subtitle">{{ "page_reset_headline"|trans }}</h1>
-
-                    {{ form_start(form) }}
-                    {{ form_widget(form) }}
-                    <button class="button">{{ "button_send_reset_link" | trans }}</button>
-                    {{ form_end(form) }}
-
-
+                    {{ form_row(form.email) }}
                 </div>
-
             </div>
+            <div class="columns">
+                <div class="column is-1">
+                    <strong>Captcha</strong><br> {{ captcha }}
+                </div>
+                <div class="column is-4">
+                    {{ form_row(form.captcha) }}
+                </div>
+            </div>
+
+            {{ form_widget(form) }}
+            <button class="button">{{ "button_send_reset_link" | trans }}</button>
+            {{ form_end(form) }}
 
         </div>
     </section>

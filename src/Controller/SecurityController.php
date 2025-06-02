@@ -11,6 +11,7 @@ use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
+use App\Service\CaptchaService;
 use App\Service\EmailService;
 use App\Service\GlobalService;
 use DateTime;
@@ -118,17 +119,29 @@ class SecurityController extends AbstractController
         EntityManagerInterface $em,
         UserRepository $userRepo,
         EmailService $emailService,
+        CaptchaService $captchaService,
     ): Response
     {
+        $captchaService->setSession($request->getSession());
+
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $captcha = $form->get('captcha')->getData();
+            $captchaError = $captchaService->isValidate($captcha);
+            if($captchaError !== null) {
+                $form->get('captcha')->addError(new FormError($captchaError));
+            }
+
             $email = $form->get('email')->getData();
             $user = $userRepo->findOneBy(['email' => $email]);
             if (null === $user) {
                 $form->get('email')->addError(new FormError('No valid user found'));
-            } else {
+            }
+
+            if ($form->getErrors(true)->count() === 0) {
                 $activityService->log(ActivityType::PasswordResetRequest, $user);
                 $user->setRegcode(sha1(random_bytes(128)));
                 $em->persist($user);
@@ -136,10 +149,15 @@ class SecurityController extends AbstractController
                 $emailService->sendEmailResetPasswordRequest($user, $request);
 
                 return $this->render('security/reset_email_send.html.twig');
+            } else {
+                $captchaService->reset();
             }
+        } else {
+            $captchaService->reset();
         }
 
         return $this->render('security/reset.html.twig', [
+            'captcha' => $captchaService->generate(),
             'form' => $form,
         ]);
     }
