@@ -43,8 +43,7 @@
             {% for altLangCode, altLangLink in globalService.getAlternativeLanguageCodes %}
                 <a class="button is-small mr-2" href="{{ altLangLink }}">
                     <figure class="image is-32x32 mt-3">
-                        <img class="is-flag" src="{{ '/images/flags/' ~ altLangCode ~ '.png' }}"
-                             alt="Locale flag"/>
+                        <img class="is-flag" src="{{ '/images/flags/' ~ altLangCode ~ '.png' }}" width="100" height="64" alt="Locale flag"/>
                     </figure>
                 </a>
             {% endfor %}
