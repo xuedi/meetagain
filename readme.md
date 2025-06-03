@@ -1,8 +1,8 @@
 
 [![Gitea Release](https://img.shields.io/badge/Version-v0.5.0-31c754.svg)](https://github.com/xuedi/meetAgain/releases)
 [![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
-[![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
 [![EUPL Licence](https://img.shields.io/badge/Roadmap-0.6-31c754.svg)](https://github.com/xuedi/meetAgain/milestones?sort=title&direction=asc)
+[![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
 
 ## Introduction
@@ -35,3 +35,5 @@ smoothly with the docker container, the config has to be bent a bit.
 COMPOSE_ENV_FILES=../.env # env parameter for phpstorm docker remote php interpreter
 ```
 
+---
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=76XY2B8VZPTXL)
