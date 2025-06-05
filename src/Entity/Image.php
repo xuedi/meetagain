@@ -43,6 +43,9 @@ class Image
     #[ORM\Column(enumType: ImageType::class)]
     private ?ImageType $type = null;
 
+    #[ORM\ManyToOne(inversedBy: 'images')]
+    private ?Event $event = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -152,6 +155,18 @@ class Image
     public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getEvent(): ?Event
+    {
+        return $this->event;
+    }
+
+    public function setEvent(?Event $event): static
+    {
+        $this->event = $event;
 
         return $this;
     }

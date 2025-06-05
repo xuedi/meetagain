@@ -12,7 +12,7 @@ readonly class ConfigService
         return match ($type) {
             ImageType::ProfilePicture => [[400, 400], [50, 50]],
             ImageType::EventTeaser => [[600, 400]],
-            ImageType::EventUpload => [[600, 400]],
+            ImageType::EventUpload => [[1024, 768], [210, 140]],
         };
     }
 }

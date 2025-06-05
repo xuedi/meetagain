@@ -1,2 +1,25 @@
-<h2 class="title is-4">{{ "Images"|trans }}</h2>
-Imagelist
+<nav class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h2 class="title is-4">{{ "Images"|trans }}</h2>
+        </div>
+    </div>
+    <div class="level-right">
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('app_event_upload', {'event': event.id}) }}" class="button is-success is-small ml-4">
+                <span class="icon"><i class="fa fa-plus"></i></span><span>Upload photo</span>
+            </a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="columns is-multiline mt-2">
+    {% for image in event.images %}
+        <div class="column is-2">
+            {% include '_block/image.html.twig' with {'image': image, 'size': '210x140'} %}
+        </div>
+    {% endfor %}
+</div>
+
+
+

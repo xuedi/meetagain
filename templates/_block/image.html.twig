@@ -1,16 +1,17 @@
-{% if image %}
-    {% if size is not defined %}
-        {% set size = '50x50' %}
-        {% if image.type.value == 1 %}
-            {% set size = '400x400' %}
-        {% endif %}
-        {% if image.type.value == 2 %}
-            {% set size = '600x400' %}
-        {% endif %}
-        {% if image.type.value == 3 %}
-            {% set size = '600x400' %}
-        {% endif %}
+{% if size is not defined %}
+    {% set size = '50x50' %}
+    {% if image.type.value == 1 %}
+        {% set size = '400x400' %}
     {% endif %}
+    {% if image.type.value == 2 %}
+        {% set size = '600x400' %}
+    {% endif %}
+    {% if image.type.value == 3 %}
+        {% set size = '600x400' %}
+    {% endif %}
+{% endif %}
+
+{% if image is defined and image %}
     {% set file = image.id ~ '_' ~ size ~ '.' ~ image.extension %}
     {% if image.updatedAt is not null %}{# to invalidate browser cache #}
         {% set file = file ~ '?v' ~ image.updatedAt|date("YmdHis") %}

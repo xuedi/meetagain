@@ -59,6 +59,7 @@ readonly class ActivityService
     {
         $cachedUserName = $this->em->getRepository(User::class)->getUserNameList();
         $cachedEventName = $this->em->getRepository(Event::class)->getEventNameList($this->globalService->getCurrentLocale());
+        $actingUser = $cachedUserName[$activity->getId()];
 
         $meta = $activity->getMeta();
         $msg = match ($activity->getType()->value) {
@@ -68,6 +69,11 @@ readonly class ActivityService
             ActivityType::RsvpNo->value => sprintf('Is skipping event: %s', $cachedEventName[$meta['event_id']]),
             ActivityType::FollowedUser->value => sprintf('Started following: %s', $cachedUserName[$meta['user_id']]),
             ActivityType::ChangedUsername->value => sprintf('Changed username from %s to %s', $meta['old'], $meta['new']),
+            ActivityType::EventImageUploaded->value => sprintf('%s uploaded %d images to the event %s',
+                $actingUser,
+                $meta['images'],
+                $cachedEventName[$meta['event_id']]
+            ),
             default => '',
         };
 
@@ -90,6 +96,12 @@ readonly class ActivityService
             case ActivityType::ChangedUsername->value:
                 $this->ensureHasKey($meta, 'old', $type->name);
                 $this->ensureHasKey($meta, 'new', $type->name);
+                break;
+            case ActivityType::EventImageUploaded->value:
+                $this->ensureHasKey($meta, 'event_id', $type->name);
+                $this->ensureIsNumeric($meta, 'event_id', $type->name);
+                $this->ensureHasKey($meta, 'images', $type->name);
+                $this->ensureIsNumeric($meta, 'images', $type->name);
                 break;
         }
     }

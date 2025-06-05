@@ -95,11 +95,8 @@ class ProfileController extends AbstractController
         $em->persist($event);
         $em->flush();
 
-        if ($event->hasRsvp($user)) {
-            $this->activityService->log(ActivityType::RsvpYes, $user, ['event_id' => $event->getId()]);
-        } else {
-            $this->activityService->log(ActivityType::RsvpNo, $user, ['event_id' => $event->getId()]);
-        }
+        $type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
+        $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
         return $this->redirectToRoute('app_profile');
     }

@@ -22,34 +22,14 @@
             <div class="columns">
                 <div class="column is-9">
                     {{ event.description(globalService.currentLocale)|nl2br }}
-                    <div class="mt-5">
-                        <h2 class="title is-4">RSVP
-                            {% if is_granted('ROLE_USER') %}
-                                {% set link = path('app_event_toggle_rsvp', {'event': event.id}) %}
-                                {% if event.rsvp.contains(app.user) %}
-                                    <a href="{{ link }}" class="button is-danger is-small ml-4">
-                                        <span class="icon"><i class="fa fa-minus"></i></span><span>Remove me</span>
-                                    </a>
-                                {% else %}
-                                    <a href="{{ link }}" class="button is-success is-small ml-4">
-                                        <span class="icon"><i class="fa fa-plus"></i></span><span>Add me</span>
-                                    </a>
-                                {% endif %}
-                            {% endif %}
-                        </h2>
-                        <div class="columns is-multiline mt-2">
-                            {% for rsvp in event.rsvp %}
-                                <div class="column is-2">
-                                    {% include '_block/usercard.html.twig' with {'user': rsvp} %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
                     {% if is_granted('ROLE_USER') %}
-                        <div class="mt-5">
+                        <div class="mt-5 box">
+                            {% include 'events/details_rsvp.html.twig'%}
+                        </div>
+                        <div class="mt-5 box">
                             {% include 'events/details_images.html.twig'%}
                         </div>
-                        <div class="mt-5">
+                        <div class="mt-5 box">
                             {% include 'events/details_comments.html.twig'%}
                         </div>
                     {% else %}

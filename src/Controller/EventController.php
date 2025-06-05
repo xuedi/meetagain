@@ -2,29 +2,34 @@
 
 namespace App\Controller;
 
+use App\Entity\ActivityType;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\EventFilterRsvp;
 use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
-use App\Entity\Session\Consent;
+use App\Entity\ImageType;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
+use App\Form\EventUploadType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
+use App\Service\ActivityService;
 use App\Service\EventService;
+use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class EventController extends AbstractController
 {
-    public function __construct(private readonly RouterInterface $router)
+    public function __construct(
+        private readonly ActivityService $activityService
+    )
     {
     }
 
@@ -64,6 +69,8 @@ class EventController extends AbstractController
             $comment->setCreatedAt(new DateTimeImmutable());
             $em->persist($comment);
             $em->flush();
+
+            $form = $this->createForm(CommentType::class);
         }
 
         $event = $repo->findOneBy(['id' => $id]);
@@ -76,12 +83,51 @@ class EventController extends AbstractController
         ]);
     }
 
+    #[Route('/event/upload/{event}', name: 'app_event_upload', methods: ['GET', 'POST'])]
+    public function upload(Event $event, Request $request, ImageService $imageService, EntityManagerInterface $em): Response
+    {
+        $user = $this->getAuthedUser();
+
+        $form = $this->createForm(EventUploadType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $files = $form->get('files')->getData();
+            foreach ($files as $uploadedFile) {
+                $image = $imageService->upload($uploadedFile, $user, ImageType::EventUpload);
+                $em->persist($image);
+                $em->flush();
+                $event->addImage($image);
+                $imageService->createThumbnails($image);
+            }
+            $em->persist($event);
+            $em->flush();
+
+            $this->activityService->log(
+                ActivityType::EventImageUploaded,
+                $user, [
+                    'event_id' => $event->getId(),
+                    'images' => count($files)
+                ]
+            );
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
+
+        return $this->render('events/upload.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {
+        $user = $this->getAuthedUser();
         $event->toggleRsvp($this->getAuthedUser());
         $em->persist($event);
         $em->flush();
+
+        $type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
+        $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }

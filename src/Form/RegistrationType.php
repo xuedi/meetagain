@@ -59,6 +59,7 @@ class RegistrationType extends AbstractType
                     ]),
                 ],
             ])
+            //->add('save',SubmitType::class,array('label'=>'Insert Image','attr'=>array('class'=>'btn btn-primary','style'=>'margin-bottom:15px')))
         ;
     }
 

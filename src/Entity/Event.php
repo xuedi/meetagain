@@ -69,6 +69,12 @@ class Event
     #[ORM\OneToMany(targetEntity: EventTranslation::class, mappedBy: 'event')]
     private Collection $translations;
 
+    /**
+     * @var Collection<int, Image>
+     */
+    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'event')]
+    private Collection $images;
+
     #[ORM\Column]
     private ?bool $published = null;
 
@@ -76,6 +82,7 @@ class Event
     {
         $this->host = new ArrayCollection();
         $this->rsvp = new ArrayCollection();
+        $this->images = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->translations = new ArrayCollection();
     }
@@ -359,6 +366,36 @@ class Event
     public function setPublished(bool $published): static
     {
         $this->published = $published;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getEvent() === $this) {
+                $image->setEvent(null);
+            }
+        }
 
         return $this;
     }
