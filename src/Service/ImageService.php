@@ -105,6 +105,6 @@ readonly class ImageService
     private function getThumbnailFile(Image $image, int $width, int $height): string
     {
         $path = $this->kernelProjectDir . '/public/images/thumbnails/';
-        return $path . $image->getId() . '_' . $width . 'x' . $height . '.' . $image->getExtension(); // TODO: sprintf
+        return $path . $image->getHash() . '_' . $width . 'x' . $height . '.' . $image->getExtension(); // TODO: sprintf
     }
 }

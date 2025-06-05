@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Repository\ConfigRepository;
+use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use App\Service\ImageService;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,15 +22,12 @@ class SystemController extends AbstractController
     }
 
     #[Route('/admin/system/redo-thumbnails', name: 'app_admin_redo_thumbnails')]
-    public function thumbnailsIndex(ImageService $upload, UserRepository $userRepo): Response
+    public function thumbnailsIndex(ImageService $upload, ImageRepository $imageRepo): Response
     {
         $startTime = microtime(true);
         $cnt = 0;
-        foreach ($userRepo->findAll() as $user) {
-            if ($user->getImage() === null) {
-                continue;
-            }
-            $upload->createThumbnails($user->getImage());
+        foreach ($imageRepo->findAll() as $image) {
+            $upload->createThumbnails($image);
             $cnt++;
         }
         // TODO: do for for all images, and get the config from the setting and loop all source

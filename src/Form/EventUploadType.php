@@ -16,7 +16,7 @@ class EventUploadType extends AbstractType
     {
         $builder
             ->add('files', FileType::class, [
-                'label' => 'Additional images',
+                'label' => 'Image upload',
                 'mapped' => false,
                 'required' => false,
                 'multiple' => true,
