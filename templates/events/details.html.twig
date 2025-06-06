@@ -6,12 +6,14 @@
     {% if event.hasMap and globalService.showOsm %}
         <link rel="stylesheet" href="{{ '/stylesheet/leaflet.css' }}"/>
     {% endif %}
+    <link rel="stylesheet" href="{{ '/stylesheet/photoviewer.min.css' }}"/>
 {% endblock %}
 
 {% block javascripts %}
     {% if event.hasMap and globalService.showOsm%}
         <script src="{{ '/javascript/leaflet.js' }}" ></script>
     {% endif %}
+    <script src="{{ '/javascript/photoviewer.js' }}" ></script>
 {% endblock %}
 
 {% block body %}
@@ -59,6 +61,26 @@
                 });
             }
         });
+
+        {% if is_granted('ROLE_USER') %}
+            document.addEventListener('DOMContentLoaded', function () {
+                let galleryTrigger = document.getElementsByClassName('galleryTrigger');
+                for (let i = 0; i < galleryTrigger.length; i++) {
+                    galleryTrigger[i].addEventListener('click', event => {
+                        event.preventDefault();
+
+                        let options = {
+                            title: false,
+                        };
+                        let items = Array.from(document.querySelectorAll('.galleryTrigger')).map(el => ({
+                            src: el.href
+                        }));
+                        let photoviewer = new PhotoViewer(items, options);
+                    });
+                }
+            });
+        {% endif %}
+
 
         {% if event.hasMap and globalService.showOsm %}
             {% include 'events/detailsOpenStreetMap.js.twig' %}
