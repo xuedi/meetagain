@@ -1,0 +1,12 @@
+
+{% set no = '' %}
+{% set yes = '' %}
+{% if status %}
+    {% set yes = 'is-success' %}
+{% else %}
+    {% set no = 'is-danger' %}
+{% endif %}
+<div class="buttons has-addons">
+    <a href="{{ link }}" class="button is-small {{ yes }}">{{ "toggle_yes"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {{ no }}">{{ "toggle_no"|trans }}</a>
+</div>

@@ -14,20 +14,16 @@
             </td>
             <td class="is-right">
                 {% if isPast %}
-                    <span class="tag is-small is-success is-light">Yes</span>
-                {% else %}
-                    {% set link = path('app_profile_toggle_rsvp', {event: event.id}) %}
-                    {% set no = '' %}
-                    {% set yes = '' %}
                     {% if event.rsvp.contains(user) %}
-                        {% set yes = 'is-success' %}
+                        <span class="tag is-small is-success is-light">{{ "toggle_yes"|trans }}</span>
                     {% else %}
-                        {% set no = 'is-danger' %}
+                        <span class="tag is-small is-danger is-light">{{ "toggle_no"|trans }}</span>
                     {% endif %}
-                    <div class="buttons has-addons">
-                        <a href="{{ link }}" class="button is-small {{ yes }}">Yes</a>
-                        <a href="{{ link }}" class="button is-small {{ no }}">No</a>
-                    </div>
+                {% else %}
+                    {% include '_block/toggle.html.twig' with {
+                        'link': path('app_profile_toggle_rsvp', {event: event.id}),
+                        'status': event.rsvp.contains(user)
+                    } %}
                 {% endif %}
             </td>
         </tr>
