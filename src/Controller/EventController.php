@@ -73,11 +73,14 @@ class EventController extends AbstractController
             $form = $this->createForm(CommentType::class);
         }
 
+        if (!$this->getUser() instanceof UserInterface) {
+            $request->getSession()->set('redirectUrl', $request->getRequestUri());
+        }
+
         $event = $repo->findOneBy(['id' => $id]);
         return $this->render('events/details.html.twig', [
             'commentForm' => $form,
             'comments' => $comments->findBy(['event' => $id]),
-            'route' => $request->attributes->get('_route'),
             'event' => $event,
             'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
         ]);

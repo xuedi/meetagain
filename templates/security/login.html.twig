@@ -14,7 +14,7 @@
 
                     <form method="post" class="box">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                        <input type="hidden" name="_target_path" value="{{ path('app_profile') }}"/>
+                        <input type="hidden" name="_target_path" value="{{ redirectPath }}"/>
                         {% if error %}
                             <div class="alert alert-danger mb-5">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                         {% endif %}

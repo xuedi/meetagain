@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Controller\SecurityController;
 use App\Entity\Session\Consent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -22,6 +23,14 @@ readonly class KernelRequestSubscriber implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+
+        // clean temp redirect route if not showing login controller
+        $currentRoute = $request->attributes->get('_route', null);
+        if (!in_array($currentRoute, [null, '_wdt', SecurityController::LOGIN_ROUTE])) {
+            $request->getSession()->remove('redirectUrl');
+        }
+
+        // setting cookie consent session from cookie
         $consentSession = $request->getSession()->get('consent_accepted', null);
         if ($consentSession === null) {
             $consent = Consent::createByCookies($request->cookies);

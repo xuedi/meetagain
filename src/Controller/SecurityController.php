@@ -26,13 +26,21 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/login/{route}', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils, ?string $route = null): Response
+    const string LOGIN_ROUTE = 'app_login';
+
+    #[Route(path: '/login', name: self::LOGIN_ROUTE)]
+    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        $redirectPath = $this->generateUrl('app_profile');
+        if (null !== $request->getSession()->get('redirectUrl', null)) {
+            $redirectPath = $request->getSession()->get('redirectUrl');
+        }
+
         return $this->render('security/login.html.twig', [
+            'redirectPath' => $redirectPath,
             'last_username' => $lastUsername,
             'error' => $error,
         ]);

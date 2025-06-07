@@ -24,13 +24,13 @@
                     {{ event.description(globalService.currentLocale)|nl2br }}
                     {% if is_granted('ROLE_USER') %}
                         <div class="mt-5 box">
-                            {% include 'events/details_rsvp.html.twig'%}
+                            {% include 'events/details/rsvp.html.twig'%}
                         </div>
                         <div class="mt-5 box">
-                            {% include 'events/details_images.html.twig'%}
+                            {% include 'events/details/images.html.twig'%}
                         </div>
                         <div class="mt-5 box">
-                            {% include 'events/details_comments.html.twig'%}
+                            {% include 'events/details/comments.html.twig'%}
                         </div>
                     {% else %}
                         <div class="mt-5">
@@ -39,7 +39,7 @@
                     {% endif %}
                 </div>
                 <div class="column is-3">
-                    {% include 'events/details_sidepanel.html.twig'%}
+                    {% include 'events/details/sidepanel.html.twig'%}
                 </div>
             </div>
 
