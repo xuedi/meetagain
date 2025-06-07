@@ -63,7 +63,7 @@ class MessageRepository extends ServiceEntityRepository
         return $list;
     }
 
-    public function getMessages(User $user, User|null $partner): ?array
+    public function getMessages(User $user, User|null $partner = null): ?array
     {
         if ($partner === null) {
             return null;
@@ -76,6 +76,16 @@ class MessageRepository extends ServiceEntityRepository
             ->orderBy('m.createdAt', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function getMessageCount(User $user): int
+    {
+        return count($this->createQueryBuilder('m')
+            ->where('m.receiver = :self')
+            ->setParameter('self', $user)
+            ->orderBy('m.createdAt', 'ASC')
+            ->getQuery()
+            ->getArrayResult());
     }
 
     public function hasNewMessages(User $user): bool

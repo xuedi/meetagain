@@ -8,6 +8,7 @@ use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Form\ProfileType;
 use App\Repository\EventRepository;
+use App\Repository\MessageRepository;
 use App\Service\ActivityService;
 use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +27,7 @@ class ProfileController extends AbstractController
     public function index(
         Request $request,
         EventRepository $repo,
+        MessageRepository $msgRepo,
         ImageService $imageService,
         EntityManagerInterface $entityManager,
     ): Response
@@ -69,6 +71,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/index.html.twig', [
             'lastLogin' => $request->getSession()->get('lastLogin', '-'),
+            'messageCount' => $msgRepo->getMessageCount($user),
             'user' => $this->getAuthedUser(),
             'upcoming' => $repo->getUpcomingEvents(10),
             'past' => $repo->getPastEvents(20),

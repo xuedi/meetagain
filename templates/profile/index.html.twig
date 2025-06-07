@@ -51,7 +51,7 @@
                         <p>Email: {{ user.email }}</p>
                         <p>Following: {{ user.following|length }}</p>
                         <p>Followers: {{ user.followers|length }}</p>
-                        <p>Messages: x</p>
+                        <p>Messages: {{ messageCount }}</p>
                         <p>RSVP: {{ user.getRsvpEvents|length }}</p>
                     </div>
 
