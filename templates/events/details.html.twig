@@ -47,7 +47,9 @@
         </div>
     </section>
 
-    <script src="{{ '/javascript/fslightbox.js' }}" ></script>
+    {% if is_granted('ROLE_USER') and event.images|length > 0 %}
+        <script src="{{ '/javascript/fslightbox.js' }}" ></script>
+    {% endif %}
 
     <script type="text/javascript">
 
