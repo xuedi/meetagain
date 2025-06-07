@@ -14,6 +14,7 @@ class ConfigFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating config ... ';
         foreach ($this->getData() as [$name, $value, $type]) {
             $user = new Config();
             $user->setName($name);
@@ -23,6 +24,7 @@ class ConfigFixture extends Fixture implements DependentFixtureInterface
             $manager->persist($user);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

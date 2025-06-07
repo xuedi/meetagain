@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use App\Entity\Location;
 use App\Entity\User;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,6 +14,7 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating locations ... ';
         foreach ($this->getData() as [$name, $street, $city, $postcode, $description, $long, $lat]) {
             $location = new Location();
             $location->setName($name);
@@ -29,9 +29,10 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
 
             $manager->persist($location);
 
-            $this->addReference('location_' . md5((string) $name), $location);
+            $this->addReference('location_' . md5((string)$name), $location);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

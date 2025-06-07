@@ -2,10 +2,8 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Activity;
 use App\Entity\Message;
 use App\Entity\User;
-use App\Entity\ActivityType;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -16,11 +14,12 @@ class MessageFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating messages ... ';
         foreach ($this->getData() as [$time, $userSender, $userReceiver, $content, $wasRead]) {
             $msg = new Message();
             $msg->setCreatedAt(new DateTimeImmutable($time));
-            $msg->setSender($this->getReference('user_' . md5((string) $userSender), User::class));
-            $msg->setReceiver($this->getReference('user_' . md5((string) $userReceiver), User::class));
+            $msg->setSender($this->getReference('user_' . md5((string)$userSender), User::class));
+            $msg->setReceiver($this->getReference('user_' . md5((string)$userReceiver), User::class));
             $msg->setContent($content);
             $msg->setDeleted(false);
             $msg->setWasRead($wasRead);
@@ -28,6 +27,7 @@ class MessageFixture extends Fixture implements DependentFixtureInterface
             $manager->persist($msg);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

@@ -3,11 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Event;
-use App\Entity\EventIntervals;
 use App\Entity\EventTranslation;
-use App\Entity\EventTypes;
-use DateTime;
-use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -22,11 +18,12 @@ class EventTranslationFixture extends Fixture implements DependentFixtureInterfa
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating eventTranslations ... ';
         foreach ($this->getData() as $data) {
             [$language, $title, $description] = $data;
 
             $eventTranslation = new EventTranslation();
-            $eventTranslation->setEvent($this->getReference('event_' . md5((string) $title), Event::class));
+            $eventTranslation->setEvent($this->getReference('event_' . md5((string)$title), Event::class));
             $eventTranslation->setLanguage($language);
             $eventTranslation->setTitle($title);
             $eventTranslation->setDescription($description);
@@ -34,6 +31,7 @@ class EventTranslationFixture extends Fixture implements DependentFixtureInterfa
             $manager->persist($eventTranslation);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

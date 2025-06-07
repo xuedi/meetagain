@@ -13,6 +13,7 @@ class HostFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating hosts ... ';
         foreach ($this->getData() as [$name, $user]) {
             $host = new Host();
             $host->setName($name);
@@ -25,6 +26,7 @@ class HostFixture extends Fixture implements DependentFixtureInterface
             $this->addReference('host_' . md5((string)$name), $host);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

@@ -15,6 +15,7 @@ class CommentFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating comments ... ';
         foreach ($this->getData() as [$event, $date, $user, $msg]) {
             $comment = new Comment();
             $comment->setEvent($this->getReference('event_' . md5((string)$event), Event::class));
@@ -24,9 +25,8 @@ class CommentFixture extends Fixture implements DependentFixtureInterface
 
             $manager->persist($comment);
         }
-
-
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

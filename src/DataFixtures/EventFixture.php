@@ -6,19 +6,13 @@ use App\Entity\Event;
 use App\Entity\EventIntervals;
 use App\Entity\EventTypes;
 use App\Entity\Host;
-use App\Entity\Image;
-use App\Entity\ImageType;
 use App\Entity\Location;
 use App\Entity\User;
-use App\Service\ImageService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use RuntimeException;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EventFixture extends Fixture implements DependentFixtureInterface
 {
@@ -26,15 +20,10 @@ class EventFixture extends Fixture implements DependentFixtureInterface
     private const null NO_RECURRING_OF = null;
     private const null NO_RECURRING_RULE = null;
 
-    public function __construct(
-        private readonly ImageService $imageService,
-    ) {
-    }
-
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $importUser = $this->getReference('user_' . md5('import'), User::class);
+        echo 'Creating events ... ';
         foreach ($this->getData() as $data) {
             [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type] = $data;
             $event = new Event();
@@ -55,23 +44,11 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 $event->addRsvp($this->getReference('user_' . md5((string)$user), User::class));
             }
 
-            // upload a file for thumbnails
-            $reference = 'event_' . md5((string)$name);
-            $imageFile = __DIR__ . "/Events/$reference.jpg";
-            $uploadedImage = new UploadedFile($imageFile, "$reference.jpg");
-            $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::EventTeaser);
-            $manager->flush();
-            if ($image instanceof Image) {
-                $this->imageService->createThumbnails($image);
-            } else {
-                throw new RuntimeException('Unable to upload image: ' . $imageFile);
-            }
-            $event->setPreviewImage($image);
-
             $manager->persist($event);
-            $this->addReference($reference, $event);
+            $this->addReference('event_' . md5((string)$name), $event);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]
@@ -81,7 +58,6 @@ class EventFixture extends Fixture implements DependentFixtureInterface
             UserFixture::class,
             LocationFixture::class,
             HostFixture::class,
-            ImageFixture::class,
         ];
     }
 

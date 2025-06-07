@@ -2,15 +2,13 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Image;
+use App\Entity\Event;
 use App\Entity\ImageType;
 use App\Entity\User;
 use App\Service\ImageService;
-use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageFixture extends Fixture implements DependentFixtureInterface
@@ -18,29 +16,75 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
     public function __construct(
         private readonly ImageService $imageService,
         private readonly UserFixture $userFixture,
-    ) {
+        private readonly EventFixture $eventFixture,
+    )
+    {
     }
 
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        foreach ($this->userFixture->getUsernames() as $name) {
-            $path = __DIR__ . "/Avatars/$name.jpg";
+        echo 'Creating images .';
+        $importUser = $this->getReference('user_' . md5('import'), User::class);
+        $adminUser = $this->getReference('user_' . md5('admin'), User::class);
 
-            // prepare import user
-            $user = $this->getReference('user_' . md5((string)$name), User::class);
+        // add user profile photos
+        foreach ($this->userFixture->getUsernames() as $name) {
+            $imageFile = __DIR__ . "/Avatars/$name.jpg";
+            $reference = 'user_' . md5((string)$name);
+            $user = $this->getReference($reference, User::class);
 
             // upload file & thumbnails
-            $uploadedImage = new UploadedFile($path, "$name.jpg");
+            $uploadedImage = new UploadedFile($imageFile, "$name.jpg");
             $image = $this->imageService->upload($uploadedImage, $user, ImageType::ProfilePicture);
             $manager->flush();
             $this->imageService->createThumbnails($image);
 
-            // associate image with user
+            // associate image with a user
             $user->setImage($image);
             $manager->persist($user);
             $manager->flush();
         }
+        echo '.';
+
+        // add event preview photos
+        $eventList = $this->eventFixture->getEventNames();
+        foreach ($eventList as $name) {
+            $reference = 'event_' . md5((string)$name);
+            $imageFile = __DIR__ . "/Events/$reference.jpg";
+            $event = $this->getReference($reference, Event::class);
+
+            // upload file & thumbnails
+            $uploadedImage = new UploadedFile($imageFile, "$reference.jpg");
+            $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::EventTeaser);
+            $manager->flush();
+            $this->imageService->createThumbnails($image);
+
+            // associate image with the event
+            $event->setPreviewImage($image);
+            $manager->persist($event);
+            $manager->flush();
+        }
+        echo '.';
+        
+        // add photos to 2 random events
+        $eventPhotos = $this->getEventPhotos();
+        $randomEvents = array_rand(array_flip($eventList), 4);
+        foreach ($randomEvents as $name) {
+            $event = $this->getReference('event_' . md5((string)$name), Event::class);
+            $randomPhotos = array_rand(array_flip($eventPhotos), random_int(6, 15));
+            foreach ($randomPhotos as $imageFile) {
+                $uploadedImage = new UploadedFile($imageFile, "image.jpg");
+                $image = $this->imageService->upload($uploadedImage, $adminUser, ImageType::EventUpload);
+                $manager->flush();
+                $this->imageService->createThumbnails($image);
+
+                $event->addImage($image);
+            }
+            $manager->persist($event);
+            $manager->flush();
+        }
+        echo ' OK' . PHP_EOL;
     }
 
     #[\Override]
@@ -48,6 +92,18 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
     {
         return [
             UserFixture::class,
+            EventFixture::class,
         ];
+    }
+
+    private function getEventPhotos(): array
+    {
+        $path = __DIR__ . '/EventPhotos';
+        if (!is_dir($path)) {
+            return [];
+        }
+
+        $files = glob($path . '/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+        return $files ?: [];
     }
 }

@@ -19,6 +19,7 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating cms blocks ... ';
         foreach ($this->getData() as [$page, $lang, $prio, $type, $json]) {
             $block = new CmsBlock();
             $block->setPage($this->getReference('cms_' . md5((string)$page), Cms::class));
@@ -30,6 +31,7 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
             $manager->persist($block);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

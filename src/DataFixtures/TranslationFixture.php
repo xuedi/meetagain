@@ -14,6 +14,7 @@ class TranslationFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating translations ... ';
         $languageCode = ['cn','de','en'];
         $languageSet = [0,1,2];
         $importUser = $this->getReference('user_' . md5('import'), User::class);
@@ -30,6 +31,7 @@ class TranslationFixture extends Fixture implements DependentFixtureInterface
             }
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]

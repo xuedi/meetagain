@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Image;
+use App\Entity\User;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -27,5 +28,28 @@ class ImageRepository extends ServiceEntityRepository
             ->setParameter('date', new DateTime('-'.$int.' days'))
             ->getQuery()
             ->getResult();
+    }
+
+    public function getEventList(User $user): array
+    {
+        $return = [];
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $result = $qb->select('i')
+            ->from(Image::class, 'i')
+            ->where('i.uploader = :user')
+            ->andWhere('i.event is not null')
+            ->setParameter('user', $user)
+            ->groupBy('i.event')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($result as $item) {
+            $event = $item->getEvent();
+            $return[] = [
+                'id' => $event->getId(),
+                'date' => $event->getStart()->format('Y-m-d'),
+            ];
+        }
+        return $return;
     }
 }

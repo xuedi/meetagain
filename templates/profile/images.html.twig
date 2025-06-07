@@ -6,11 +6,48 @@
 
     <section class="section">
         <div class="container">
-            <h1 class="title is-6">Images</h1>
-            <p>
-                All the images you uploaded and where they are used
-            </p>
+            <div class="columns">
+                <div class="column is-2">
+                    <aside class="menu">
+                        <p class="menu-label">General</p>
+                        <ul class="menu-list">
+                            <li><a href="{{ path('app_profile_images') }}">Profile picture</a></li>
+                        </ul>
+                        <p class="menu-label">Events</p>
+                        <ul class="menu-list">
+                            {% for event in eventList %}
+                                <li><a href="{{ path('app_profile_images', {'action': 'event', 'id': event.id}) }}">{{ event.date }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        {#
+                        <p class="menu-label">Food</p>
+                        <ul class="menu-list">
+                            <li><a href="#">dish A</a></li>
+                            <li><a href="#">dish B</a></li>
+                        </ul>
+                        #}
+                    </aside>
+                </div>
+                <div class="column is-10">
+                    <h1 class="title is-6">Images</h1>
+
+                    {% if action == 'profile' %}
+                        <p class="notification has-text-centered">
+                            Your profile can be changed by uploading a new image. <a href="{{ path('app_profile') }}">here</a>
+                        </p>
+                        {% include '_block/image.html.twig' with {'image': profile, 'size': '400x400'} %}
+                    {% endif %}
+
+                    {% if action == 'event' %}
+                        {% for image in imageList %}
+                            {% include '_block/image.html.twig' with {'image': image} %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </section>
+
+
 
 {% endblock %}

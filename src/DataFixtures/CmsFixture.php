@@ -14,6 +14,7 @@ class CmsFixture extends Fixture implements DependentFixtureInterface
     #[\Override]
     public function load(ObjectManager $manager): void
     {
+        echo 'Creating cms pages ... ';
         foreach ($this->getData() as [$slug]) {
             $cms = new Cms();
             $cms->setSlug($slug);
@@ -25,6 +26,7 @@ class CmsFixture extends Fixture implements DependentFixtureInterface
             $this->addReference('cms_' . md5((string) $slug), $cms);
         }
         $manager->flush();
+        echo 'OK' . PHP_EOL;
     }
 
     #[\Override]
