@@ -34,7 +34,13 @@
                         </div>
                     {% else %}
                         <div class="mt-5">
-                            <p>Please <a href="{{ path('app_login') }}">login</a> to post images or write comments</p>
+                            <span class="tag is-warning">RSVP</span>
+                            {% for user in event.rsvp %}
+                                <span class="tag">{{ user.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="notification has-text-centered mt-5">
+                            Please <a href="{{ path('app_login') }}">login</a> to see and post comments & pictures
                         </div>
                     {% endif %}
                 </div>
