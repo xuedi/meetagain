@@ -9,7 +9,12 @@
             <div class="content">
                 <nav class="level mb-2">
                     <div class="level-left">
-                        <strong class="level-item">{{ comment.user.name }}</strong>
+                        <strong class="level-item mr-1">{{ comment.user.name }}</strong>
+                        {% if comment.user.id != user.id %}
+                        <a class="level-item" href="{{ path('app_profile_messages', {'id': comment.user.id}) }}">
+                            <span class="icon"><i class="fa fa-envelope"></i></span>
+                        </a>
+                        {% endif %}
                         <small class="level-item">{{ comment.createdAt | time_diff }}</small>
                     </div>
                     {% if is_granted('ROLE_USER') %}

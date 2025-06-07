@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Message;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,7 +18,7 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    public function getConversations(User $user): array
+    public function getConversations(User $user, ?int $id = null): array
     {
         $list = [];
 
@@ -47,6 +48,16 @@ class MessageRepository extends ServiceEntityRepository
                     $list[$partnerId]['unread']++;
                 }
             }
+        }
+
+        // add new conversation partner for new message
+        if ($id !== null) {
+            $list[] = [
+                'messages' => 0,
+                'unread' => 0,
+                'lastMessage' => new DateTimeImmutable(),
+                'user' => $userRepo->findOneBy(['id' => $id]),
+            ];
         }
 
         return $list;
