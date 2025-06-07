@@ -16,7 +16,7 @@
 <div class="columns is-multiline mt-2">
     {% for image in event.images %}
         <div class="column is-2">
-            <a class="galleryTrigger" href="/images/thumbnails/{{ image.hash ~ '_1024x768.' ~ image.extension }}">
+            <a data-fslightbox="gallery" href="/images/thumbnails/{{ image.hash ~ '_1024x768.' ~ image.extension }}">
             {% include '_block/image.html.twig' with {'image': image, 'size': '210x140'} %}
             </a>
         </div>
