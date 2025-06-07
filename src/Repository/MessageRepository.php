@@ -50,8 +50,8 @@ class MessageRepository extends ServiceEntityRepository
             }
         }
 
-        // add new conversation partner for new message
-        if ($id !== null) {
+        // add a new conversation partner for a new message
+        if ($id !== null && !isset($list[$id])) {
             $list[] = [
                 'messages' => 0,
                 'unread' => 0,
