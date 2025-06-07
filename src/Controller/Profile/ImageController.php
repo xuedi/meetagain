@@ -28,8 +28,6 @@ class ImageController extends AbstractController
                 break;
         }
 
-        dump($imageList);
-
         return $this->render('profile/images.html.twig', [
             'action' => $action,
             'profile' => $profile,
