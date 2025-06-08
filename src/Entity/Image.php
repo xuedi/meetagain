@@ -46,6 +46,9 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'images')]
     private ?Event $event = null;
 
+    #[ORM\Column(nullable: true, enumType: ImageReported::class)]
+    private ?ImageReported $reported = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -167,6 +170,18 @@ class Image
     public function setEvent(?Event $event): static
     {
         $this->event = $event;
+
+        return $this;
+    }
+
+    public function getReported(): ?ImageReported
+    {
+        return $this->reported;
+    }
+
+    public function setReported(?ImageReported $reported): static
+    {
+        $this->reported = $reported;
 
         return $this;
     }

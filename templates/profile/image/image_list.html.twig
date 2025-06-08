@@ -1,0 +1,13 @@
+<div class="columns is-multiline">
+    {% for image in imageList %}
+        <a class="column is-one-fifth" href="{{ path('app_profile_images', {'action': 'event', 'id': id, 'imageId': image.id}) }}">
+            <div class="card {% if image.reported is not null %}p-3 is-danger{% endif %}">
+                <div class="card-image">
+                    <figure class="image">
+                        {% include '_block/image.html.twig' with {'image': image} %}
+                    </figure>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+</div>

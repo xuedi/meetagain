@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Activity;
 use App\Entity\Event;
+use App\Entity\ImageReported;
 use App\Entity\User;
 use App\Entity\ActivityType;
 use App\Repository\ActivityRepository;
@@ -70,6 +71,7 @@ readonly class ActivityService
             ActivityType::FollowedUser->value => sprintf('Started following: %s', $cachedUserName[$meta['user_id']]),
             ActivityType::ChangedUsername->value => sprintf('Changed username from %s to %s', $meta['old'], $meta['new']),
             ActivityType::EventImageUploaded->value => sprintf('uploaded %d images to the event %s', $meta['images'], $cachedEventName[$meta['event_id']]),
+            ActivityType::ReportedImage->value => sprintf('Reported image for reason: %s', ImageReported::from($meta['reason'])->name), //
             default => '',
         };
 
@@ -98,6 +100,12 @@ readonly class ActivityService
                 $this->ensureIsNumeric($meta, 'event_id', $type->name);
                 $this->ensureHasKey($meta, 'images', $type->name);
                 $this->ensureIsNumeric($meta, 'images', $type->name);
+                break;
+            case ActivityType::ReportedImage->value:
+                $this->ensureHasKey($meta, 'image_id', $type->name);
+                $this->ensureIsNumeric($meta, 'image_id', $type->name);
+                $this->ensureHasKey($meta, 'reason', $type->name);
+                $this->ensureIsNumeric($meta, 'reason', $type->name);
                 break;
         }
     }

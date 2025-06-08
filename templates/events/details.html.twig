@@ -6,11 +6,17 @@
     {% if event.hasMap and globalService.showOsm %}
         <link rel="stylesheet" href="{{ '/stylesheet/leaflet.css' }}"/>
     {% endif %}
+    {% if is_granted('ROLE_USER') and event.images|length > 0 %}
+        <link rel="stylesheet" href="{{ '/stylesheet/fancybox.css' }}"/>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
     {% if event.hasMap and globalService.showOsm%}
         <script src="{{ '/javascript/leaflet.js' }}" ></script>
+    {% endif %}
+    {% if is_granted('ROLE_USER') and event.images|length > 0 %}
+        <script src="{{ '/javascript/fancybox.umd.js' }}" ></script>
     {% endif %}
 {% endblock %}
 
@@ -53,10 +59,6 @@
         </div>
     </section>
 
-    {% if is_granted('ROLE_USER') and event.images|length > 0 %}
-        <script src="{{ '/javascript/fslightbox.js' }}" ></script>
-    {% endif %}
-
     <script type="text/javascript">
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -73,6 +75,13 @@
         {% if event.hasMap and globalService.showOsm %}
             {% include 'events/detailsOpenStreetMap.js.twig' %}
         {% endif %}
+
+        {% if is_granted('ROLE_USER') and event.images|length > 0 %}
+            Fancybox.bind("[data-fancybox]", {
+                // Your custom options
+            });
+        {% endif %}
+
     </script>
 
 

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_title_member"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <h1 class="title">Report image</h1>
+
+            <div class="columns">
+                <div class="column is-2">
+                    {% include '_block/image.html.twig' with {'image': image} %}
+                </div>
+                <div class="column is-10">
+                    {{ form_start(form) }}
+
+                    {{ form_row(form.reported) }}
+
+                    <button class="button is-danger">
+                        <span class="icon is-small">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </span>
+                        <span>{{ "button_report" | trans }}</span>
+                    </button>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

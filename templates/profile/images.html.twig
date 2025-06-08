@@ -11,12 +11,13 @@
                     <aside class="menu">
                         <p class="menu-label">General</p>
                         <ul class="menu-list">
-                            <li><a href="{{ path('app_profile_images') }}">Profile picture</a></li>
+                            <li><a class="{% if action == 'profile' %}is-active{% endif %}" href="{{ path('app_profile_images') }}">Profile picture</a></li>
                         </ul>
                         <p class="menu-label">Events</p>
                         <ul class="menu-list">
                             {% for event in eventList %}
-                                <li><a href="{{ path('app_profile_images', {'action': 'event', 'id': event.id}) }}">{{ event.date }}</a></li>
+                                {% set link = path('app_profile_images', {'action': 'event', 'id': event.id}) %}
+                                <li><a class="{% if event.id == id %}is-active{% endif %}" href="{{ link }}">{{ event.date }}</a></li>
                             {% endfor %}
                         </ul>
                         {#
@@ -35,13 +36,15 @@
                         <p class="notification has-text-centered">
                             Your profile can be changed by uploading a new image. <a href="{{ path('app_profile') }}">here</a>
                         </p>
-                        {% include '_block/image.html.twig' with {'image': profile, 'size': '400x400'} %}
+                        {% include 'profile/image/image_details.html.twig' with {'image': image, 'size': '400x400'} %}
                     {% endif %}
 
                     {% if action == 'event' %}
-                        {% for image in imageList %}
-                            {% include '_block/image.html.twig' with {'image': image} %}
-                        {% endfor %}
+                        {% if image is defined and image %}
+                            {% include 'profile/image/image_details.html.twig' with {'image': image, 'size': '1024x768'} %}
+                        {% else %}
+                            {% include 'profile/image/image_list.html.twig' with {'imageList': imageList} %}
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

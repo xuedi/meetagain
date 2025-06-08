@@ -1,0 +1,42 @@
+
+{% if image.reported is not null %}
+    <div class="notification is-danger has-text-centered">
+        This image was reported for the reason: <strong>{{ image.reported.name }}</strong>.
+        For now the image is not visible to other users until it is reviewed
+    </div>
+{% endif %}
+
+<div class="columns">
+    <div class="column is-half">
+        {% include '_block/image.html.twig' with {'image': image, 'size': size} %}
+    </div>
+    <div class="column is-half">
+        <h2 class="title is-5">Details</h2>
+        <table class="table">
+            <tbody>
+            <tr>
+                <td>uploaded:</td>
+                <td>{{ image.createdAt | time_diff }}</td>
+            </tr>
+            <tr>
+                <td>type:</td>
+                <td>{{ image.mimeType }}</td>
+            </tr>
+            <tr>
+                <td>size:</td>
+                <td>{{ image.size | format_bytes }}</td>
+            </tr>
+            {% if image.event is defined and image.event %}{# TODO: open links for every source #}
+            <tr>
+                <td>location:</td>
+                <td><a target="_blank" href="{{ path('app_event_details', {'id': image.event.id}) }}">show</a> in events</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td>reported:</td>
+                <td>{% if image.reported is null %}no{% else %}yes{% endif %}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

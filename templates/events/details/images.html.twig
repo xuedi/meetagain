@@ -15,11 +15,15 @@
 
 <div class="columns is-multiline mt-2">
     {% for image in event.images %}
-        <div class="column is-2">
-            <a data-fslightbox="gallery" href="/images/thumbnails/{{ image.hash ~ '_1024x768.' ~ image.extension }}">
-            {% include '_block/image.html.twig' with {'image': image, 'size': '210x140'} %}
-            </a>
-        </div>
+        {% if image.reported is null %}
+            {% set href = '/images/thumbnails/' ~ image.hash ~ '_1024x768.' ~ image.extension %}
+            {% set Caption = 'You can <a href=' ~ path('app_report_image', {'id': image.id}) ~ '>report</a> an image if there is something wrong.' %}
+            <div class="column is-2">
+                <a data-fancybox="gallery" data-caption="{{ Caption }}" href="{{ href }}">
+                    {% include '_block/image.html.twig' with {'image': image, 'size': '210x140'} %}
+                </a>
+            </div>
+        {% endif %}
     {% endfor %}
 </div>
 

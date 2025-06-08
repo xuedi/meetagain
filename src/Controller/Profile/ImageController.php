@@ -4,7 +4,6 @@ namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
 use App\Repository\ImageRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -14,23 +13,25 @@ class ImageController extends AbstractController
     {
     }
 
-    #[Route('/profile/images/{action}/{id}', name: 'app_profile_images')]
-    public function images($action = 'profile', ?int $id = null): Response
+    #[Route('/profile/images/{action}/{id}/{imageId}', name: 'app_profile_images')]
+    public function images($action = 'profile', ?int $id = null, ?int $imageId = null): Response
     {
-        $profile = null;
+        $image = null;
         $imageList = null;
         switch ($action) {
             case 'profile':
-                $profile = $this->getAuthedUser()->getImage();
+                $image = $this->getAuthedUser()->getImage();
                 break;
             case 'event':
                 $imageList = $this->imageRepo->findBy(['uploader' => $this->getUser(), 'event' => $id]);
+                $image = $imageId === null ? null : $this->imageRepo->findOneBy(['id' => $imageId]);
                 break;
         }
 
         return $this->render('profile/images.html.twig', [
             'action' => $action,
-            'profile' => $profile,
+            'id' => $id,
+            'image' => $image,
             'imageList' => $imageList,
             'eventList' => $this->imageRepo->getEventList($this->getUser()),
         ]);
