@@ -27,7 +27,7 @@ class ReportController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->activityService->log(ActivityType::ReportedImage, $user, [
                 'image_id' => $image->getId(),
-                'reason' => $form->get('reported')->getData(),
+                'reason' => $form->get('reported')->getData()->value,
             ]);
             return $this->redirectToRoute('app_report_success');
         }
