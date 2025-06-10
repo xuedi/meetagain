@@ -34,4 +34,11 @@ class ConfigController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/profile/config/toggleVisibility', name: 'app_profile_config_toggle_visibility')]
+    public function toggleVisibility(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em): Response
+    {
+        return $this->render('profile/config.html.twig', [
+        ]);
+    }
 }

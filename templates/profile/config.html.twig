@@ -12,17 +12,49 @@
 
                     <div class="box">
                         <h1 class="title is-5">Settings</h1>
-                        <p>more to come soon</p>
-                        <p>Startpage: activities/upcoming events/ profile/ messages</p>
-                        <br>
-                        <br>
+                        <table class="table is-fullwidth">
+                            <tr>
+                                <td>page to go to after login</td>
+                                <td>Dropdown: profile, activity, messages</td>
+                            </tr>
+                            <tr>
+                                <td>enable eMail notification</td>
+                                <td class="has-text-right">
+                                    {% include '_block/toggle.html.twig' with {
+                                        'link': path('app_profile_config_toggle_visibility'),
+                                        'status': true
+                                    } %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>date format</td>
+                                <td>Dropdown: formats</td>
+                            </tr>
+                        </table>
                     </div>
 
                     <div class="box">
                         <h2 class="title is-5">Privacy</h2>
-                        <p>more to come soon</p>
-                        <br>
-                        <br>
+                        <table class="table is-fullwidth">
+                            <tr>
+                                <td>Show me on the members page</td>
+                                <td class="has-text-right">
+                                    {% include '_block/toggle.html.twig' with {
+                                        'link': path('app_profile_config_toggle_visibility'),
+                                        'status': true
+                                    } %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Can be tagged by others in photos</td>
+                                <td class="has-text-right">
+                                    {% include '_block/toggle.html.twig' with {
+                                        'link': path('app_profile_config_toggle_visibility'),
+                                        'status': true
+                                    } %}
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
                 </div>
