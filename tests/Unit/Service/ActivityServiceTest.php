@@ -69,7 +69,7 @@ class ActivityServiceTest extends TestCase
                 return true;
             }));
 
-        $validMetaData = ['old' => 'x', 'new' => 'x', 'event_id' => 1, 'user_id' => 2];
+        $validMetaData = ['old' => 'x', 'new' => 'x', 'event_id' => 1, 'user_id' => 2, 'reason' => 1, 'images' => 1, 'image_id' =>2];
 
         $this->subject->log($expectedUserActivity, $expectedUserMock, $validMetaData);
     }
@@ -84,6 +84,8 @@ class ActivityServiceTest extends TestCase
             [ActivityType::Registered],
             [ActivityType::FollowedUser],
             [ActivityType::UnFollowedUser],
+            [ActivityType::EventImageUploaded],
+            [ActivityType::ReportedImage],
         ];
     }
 
@@ -135,6 +137,13 @@ class ActivityServiceTest extends TestCase
             [ActivityType::UnFollowedUser, '', []],
             [ActivityType::Registered, 'User registered', []],
             [ActivityType::Login, 'User logged in', []],
+            [ActivityType::EventImageUploaded, 'uploaded 2 images to the event EventNumberOne', [
+                'images' => 2,
+                'event_id' => 1
+            ]],
+            [ActivityType::ReportedImage, 'Reported image for reason: Privacy', [
+                'reason' => 1
+            ]],
         ];
     }
 
@@ -195,4 +204,6 @@ class ActivityServiceTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in RsvpYes"));
         $this->subject->log(ActivityType::RsvpYes, $this->userMock, ['event_id' => 'notAnInteger']);;
     }
+
+    //TODO: checkRequiredMetaData test exception matric
 }
