@@ -25,7 +25,7 @@ class AdminTranslationController extends AbstractController
         $translationService->saveMatrix($request);
         // flash message
 
-        return $this->redirectToRoute('app_admin_translation');
+        return $this->redirectToRoute('app_admin_translation_edit');
     }
     #[Route('/admin/translations/extract', name: 'app_admin_translation_extract')]
     public function translationsExtract(TranslationService $translationService): Response
