@@ -13,6 +13,7 @@ class AdminImageController extends AbstractController
     public function imageList(ImageRepository $repo): Response
     {
         return $this->render('admin/image/list.html.twig', [
+            'active' => 'image',
             'images' => $repo->findAll(),
         ]);
     }

@@ -34,6 +34,7 @@ class AdminCmsController extends AbstractController
         ]);
 
         return $this->render('admin/cms/list.html.twig', [
+            'active' => 'cms',
             'form' => $newForm,
             'cms' => $repo->findAll(),
         ]);
@@ -65,6 +66,7 @@ class AdminCmsController extends AbstractController
         ];
 
         return $this->render('admin/cms/edit.html.twig', [
+            'active' => 'cms',
             'newBlocks' => $newBlocks,
             'editLocale' => $locale,
             'editBlock' => $blockId,

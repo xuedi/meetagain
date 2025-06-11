@@ -15,6 +15,7 @@ class AdminLogsController extends AbstractController
     public function activityList(ActivityService $activityService): Response
     {
         return $this->render('admin/logs/activity_list.html.twig', [
+            'active' => 'activity',
             'activities' => $activityService->getAdminList(),
         ]);
     }
@@ -24,6 +25,7 @@ class AdminLogsController extends AbstractController
     {
         $logs = $this->getLogList();
         return $this->render('admin/logs/system_list.html.twig', [
+            'active' => 'logs',
             'content' => $logs === [] ? '' : $this->getLogContent($logs[$id]['source']),
             'logs' => $logs,
         ]);
@@ -34,6 +36,7 @@ class AdminLogsController extends AbstractController
     {
         $logs = $this->getLogList();
         return $this->render('admin/logs/notFound_list.html.twig', [
+            'active' => '404',
             'list' => $foundLogRepo->getTop100(),
         ]);
     }

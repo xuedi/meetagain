@@ -9,10 +9,10 @@
             <tr>
                 <th>CreatedAt</th>
                 <th>Uploader</th>
+                <th></th>
                 <th>Size</th>
                 <th>Location</th>
                 <th>Type</th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -20,9 +20,6 @@
                 <tr>
                     <td>{{ image.createdAt | date('Y-m-d') }}</td>
                     <td>{{ image.uploader.email }}</td>
-                    <td>{{ image.size | format_bytes }}</td>
-                    <td>{{ image.type.name }}</td>
-                    <td>{{ image.mimeType }}</td>
                     <td>
                         <div class="dropdown is-hoverable">
                             <div class="dropdown-trigger">
@@ -34,13 +31,16 @@
                             </div>
                             <div class="dropdown-menu" id="dropdown-image" role="menu">
                                 <div class="dropdown-content">
-                                    <div class="dropdown-item">
+                                    <div class="dropdown-item is-hovered">
                                         {% include '_block/image.html.twig' with {'image': image} %}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </td>
+                    <td>{{ image.size | format_bytes }}</td>
+                    <td>{{ image.type.name }}</td>
+                    <td>{{ image.mimeType }}</td>
                 </tr>
             {% endfor %}
             </tbody>

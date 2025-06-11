@@ -17,6 +17,7 @@ class SystemController extends AbstractController
     public function configIndex(ConfigRepository $repo): Response
     {
         return $this->render('admin/config.html.twig', [
+            'active' => 'config',
             'config' => $repo->findAll(),
         ]);
     }
@@ -33,6 +34,7 @@ class SystemController extends AbstractController
         // TODO: do for for all images, and get the config from the setting and loop all source
         $executionTime = microtime(true) - $startTime;
         return $this->render('admin/thumbnails.html.twig', [
+            'active' => 'redo',
             'count' => $cnt * 2, // 2 for each user,
             'time' => round($executionTime, 2)
         ]);

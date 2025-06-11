@@ -33,6 +33,7 @@ class AdminEventController extends AbstractController
     public function eventList(EventRepository $repo): Response
     {
         return $this->render('admin/event/list.html.twig', [
+            'active' => 'event',
             'events' => $repo->findBy([], ['start' => 'ASC']),
         ]);
     }
@@ -80,6 +81,7 @@ class AdminEventController extends AbstractController
         }
 
         return $this->render('admin/event/edit.html.twig', [
+            'active' => 'event',
             'event' => $event,
             'form' => $form,
         ]);
@@ -125,6 +127,7 @@ class AdminEventController extends AbstractController
         }
 
         return $this->render('admin/event/new.html.twig', [
+            'active' => 'event',
             'location' => $event,
             'form' => $form,
         ]);

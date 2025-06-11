@@ -10,10 +10,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminTranslationController extends AbstractController
 {
-    #[Route('/admin/translations/', name: 'app_admin_translation')]
+    #[Route('/admin/translations/edit', name: 'app_admin_translation_edit')]
     public function translationsIndex(TranslationService $translationService): Response
     {
         return $this->render('admin/translations/list.html.twig', [
+            'active' => 'edit',
             'translationMatrix' => $translationService->getMatrix(),
         ]);
     }
@@ -30,6 +31,7 @@ class AdminTranslationController extends AbstractController
     public function translationsExtract(TranslationService $translationService): Response
     {
         return $this->render('admin/translations/extract.html.twig', [
+            'active' => 'extract',
             'result' => $translationService->extract(),
         ]);
     }
@@ -37,6 +39,7 @@ class AdminTranslationController extends AbstractController
     public function translationsPublish(TranslationService $translationService): Response
     {
         return $this->render('admin/translations/publish.html.twig', [
+            'active' => 'publish',
             'result' => $translationService->publish(),
         ]);
     }

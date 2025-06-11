@@ -17,6 +17,7 @@ class AdminHostController extends AbstractController
     public function hostList(HostRepository $repo): Response
     {
         return $this->render('admin/host/list.html.twig', [
+            'active' => 'host',
             'hosts' => $repo->findAll(),
         ]);
     }
@@ -34,6 +35,7 @@ class AdminHostController extends AbstractController
         }
 
         return $this->render('admin/host/edit.html.twig', [
+            'active' => 'host',
             'host' => $host,
             'form' => $form,
         ]);
@@ -54,6 +56,7 @@ class AdminHostController extends AbstractController
         }
 
         return $this->render('admin/host/new.html.twig', [
+            'active' => 'host',
             'form' => $form,
         ]);
     }

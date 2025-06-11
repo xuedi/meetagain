@@ -1,31 +1,31 @@
 <aside class="menu">
     <p class="menu-label">System</p>
     <ul class="menu-list">
-        <li><a href="{{ path('app_admin_config') }}">{{ "menu_admin_config" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_redo_thumbnails') }}">{{ "menu_admin_redo_thumbnails" | trans }}</a></li>
+        <li><a class="{% if active == 'config' %}is-active{% endif %}" href="{{ path('app_admin_config') }}">{{ "menu_admin_config" | trans }}</a></li>
+        <li><a class="{% if active == 'redo' %}is-active{% endif %}" href="{{ path('app_admin_redo_thumbnails') }}">{{ "menu_admin_redo_thumbnails" | trans }}</a></li>
     </ul>
     <p class="menu-label">Tables</p>
     <ul class="menu-list">
-        <li><a href="{{ path('app_admin_event') }}">{{ "menu_admin_event" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_location') }}">{{ "menu_admin_location" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_host') }}">{{ "menu_admin_host" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_image') }}">{{ "menu_admin_images" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_user') }}">{{ "menu_admin_user" | trans }}</a></li>
+        <li><a class="{% if active == 'event' %}is-active{% endif %}" href="{{ path('app_admin_event') }}">{{ "menu_admin_event" | trans }}</a></li>
+        <li><a class="{% if active == 'location' %}is-active{% endif %}" href="{{ path('app_admin_location') }}">{{ "menu_admin_location" | trans }}</a></li>
+        <li><a class="{% if active == 'host' %}is-active{% endif %}" href="{{ path('app_admin_host') }}">{{ "menu_admin_host" | trans }}</a></li>
+        <li><a class="{% if active == 'image' %}is-active{% endif %}" href="{{ path('app_admin_image') }}">{{ "menu_admin_images" | trans }}</a></li>
+        <li><a class="{% if active == 'user' %}is-active{% endif %}" href="{{ path('app_admin_user') }}">{{ "menu_admin_user" | trans }}</a></li>
     </ul>
     <p class="menu-label">CMS</p>
     <ul class="menu-list">
-        <li><a href="{{ path('app_admin_cms') }}">{{ "menu_admin_cms" | trans }}</a></li>
+        <li><a class="{% if active == 'cms' %}is-active{% endif %}" href="{{ path('app_admin_cms') }}">{{ "menu_admin_cms" | trans }}</a></li>
     </ul>
     <p class="menu-label">Translation</p>
     <ul class="menu-list">
-        <li><a href="{{ path('app_admin_translation_extract') }}">{{ "menu_admin_translation_extract" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_translation') }}">{{ "menu_admin_translation_edit" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_translation_publish') }}">{{ "menu_admin_translation_publish" | trans }}</a></li>
+        <li><a class="{% if active == 'extract' %}is-active{% endif %}" href="{{ path('app_admin_translation_extract') }}">{{ "menu_admin_translation_extract" | trans }}</a></li>
+        <li><a class="{% if active == 'edit' %}is-active{% endif %}" href="{{ path('app_admin_translation_edit') }}">{{ "menu_admin_translation_edit" | trans }}</a></li>
+        <li><a class="{% if active == 'publish' %}is-active{% endif %}" href="{{ path('app_admin_translation_publish') }}">{{ "menu_admin_translation_publish" | trans }}</a></li>
     </ul>
     <p class="menu-label">Logs</p>
     <ul class="menu-list">
-        <li><a href="{{ path('app_admin_logs_system') }}">{{ "menu_admin_logs_system" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_logs_activity') }}">{{ "menu_admin_logs_activity" | trans }}</a></li>
-        <li><a href="{{ path('app_admin_logs_not_found') }}">{{ "menu_admin_logs_404" | trans }}</a></li>
+        <li><a class="{% if active == 'logs' %}is-active{% endif %}" href="{{ path('app_admin_logs_system') }}">{{ "menu_admin_logs_system" | trans }}</a></li>
+        <li><a class="{% if active == 'activity' %}is-active{% endif %}" href="{{ path('app_admin_logs_activity') }}">{{ "menu_admin_logs_activity" | trans }}</a></li>
+        <li><a class="{% if active == '404' %}is-active{% endif %}" href="{{ path('app_admin_logs_not_found') }}">{{ "menu_admin_logs_404" | trans }}</a></li>
     </ul>
 </aside>

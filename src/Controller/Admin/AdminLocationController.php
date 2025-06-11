@@ -18,6 +18,7 @@ class AdminLocationController extends AbstractController
     public function locationList(LocationRepository $repo): Response
     {
         return $this->render('admin/location/list.html.twig', [
+            'active' => 'location',
             'locations' => $repo->findAll(),
         ]);
     }
@@ -35,6 +36,7 @@ class AdminLocationController extends AbstractController
         }
 
         return $this->render('admin/location/edit.html.twig', [
+            'active' => 'location',
             'location' => $location,
             'form' => $form,
         ]);
@@ -60,6 +62,7 @@ class AdminLocationController extends AbstractController
         }
 
         return $this->render('admin/location/edit.html.twig', [
+            'active' => 'location',
             'location' => $location,
             'form' => $form,
         ]);
