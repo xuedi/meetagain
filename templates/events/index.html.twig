@@ -4,9 +4,17 @@
 
 {% block body %}
 
+    <section class="section mt-1 is-hidden-desktop has-text-centered">
+        <a class="button has-background-info-light" href="{{ path('app_event_featured') }}">
+                        <span class="icon has-text-warning">
+                            <i class="fa-regular fa-star"></i>
+                        </span>
+            <span>{{ "events_featured_button" | trans }}</span>
+        </a>
+    </section>
+
     <section class="section mt-1 is-hidden-mobile">
         <div class="container">
-
 
             <nav class="level">
                 <!-- Left side -->
