@@ -2,6 +2,10 @@
 
 {% block title %}{{ "page_title_admin"|trans }}{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href='/stylesheet/jstable.min.css'/>
+{% endblock %}
+
 {% block body %}
 
     <section class="section">
@@ -16,5 +20,17 @@
             </div>
         </div>
     </section>
+
+    <script src='/javascript/jstable.min.js'></script>
+    <script>
+        let myTable = new JSTable("#filteredTable", {
+            sortable: true,
+            searchable: true,
+            perPage: 15,
+            perPageSelect: [
+                5, 10, 15, 25, 50, 100,
+            ]
+        });
+    </script>
 
 {% endblock %}

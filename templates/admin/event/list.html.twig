@@ -4,7 +4,7 @@
 
     <div class="container">
 
-        <table class="table is-fullwidth">
+        <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
                 <th>CreatedBy</th>
@@ -27,7 +27,14 @@
                     <td>{{ event.location.name }}</td>
                     <td>{{ event.rsvp|length }}</td>
                     <td>{{ event.type.name }}</td>
-                    <td><a href="{{ path('app_admin_event_edit', {'id': event.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
+                    <td>
+                        <a href="{{ path('app_admin_event_edit', {'id': event.id}) }}">
+                            <span class="icon"><i class="fa fa-edit"></i></span>
+                        </a>
+                        {% if event.featured %}
+                            <span class="icon has-text-warning"><i class="fa fa-star"></i></span>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

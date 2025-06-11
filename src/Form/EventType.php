@@ -49,6 +49,13 @@ class EventType extends AbstractType
                     $this->translator->trans('draft') => false,
                 ],
             ])
+            ->add('featured', ChoiceType::class, [
+                'label' => 'Featured',
+                'choices'  => [
+                    $this->translator->trans('yes') => true,
+                    $this->translator->trans('no') => false,
+                ],
+            ])
             ->add('start', DateTimeType::class, [
                 'widget' => 'single_text',
             ])

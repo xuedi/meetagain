@@ -121,6 +121,14 @@ class EventController extends AbstractController
         ]);
     }
 
+    #[Route('/event/featured/', name: 'app_event_featured')]
+    public function featured(EventRepository $repo): Response
+    {
+        return $this->render('events/featured.html.twig', [
+            'list' => $repo->findBy(['featured' => true], ['start' => 'ASC']),
+        ]);
+    }
+
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {

@@ -25,10 +25,11 @@ class EventFixture extends Fixture implements DependentFixtureInterface
     {
         echo 'Creating events ... ';
         foreach ($this->getData() as $data) {
-            [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type] = $data;
+            [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type, $featured] = $data;
             $event = new Event();
             $event->setInitial($initial);
             $event->setPublished(true);
+            $event->setFeatured($featured);
             $event->setStart($this->setDateType($start));
             $event->setStop($this->setDateType($stop));
             $event->setRecurringOf($recOf);
@@ -85,6 +86,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 ['Adem Lane', 'admin'],
                 ['Adil Floyd', 'Aston Hood', 'Bailey Richards', 'Bec Ferguson', 'Danyal Lester', 'Demi Wilkinson', 'Freya Browning', 'Kaitlin Hale', 'Molly Vaughan', 'Nic Fassbender', 'Orlando Diggs', 'Owen Garcia', 'axisbos audax', 'admin', 'Adem Lane', 'Crystal Liu'],
                 EventTypes::Regular,
+                true,
             ],
             [
                 self::IS_INITIAL,
@@ -97,6 +99,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 ['Adem Lane', 'admin'],
                 ['Adil Floyd', 'Lana Steiner', 'Leyton Fields', 'Lyle Kauffman', 'Zuzanna Burke', 'axisbos audax', 'admin', 'Adem Lane', 'Crystal Liu'],
                 EventTypes::Dinner,
+                true,
             ],
             [
                 self::IS_INITIAL,
@@ -109,6 +112,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 ['Adem Lane'],
                 ['Amanda Lowery', 'Anita Cruz', 'Florence Shaw', 'Jessie Meyton', 'Jonathan Kelly', 'Marco Kelly', 'Priya Shepard', 'admin', 'Adem Lane'],
                 EventTypes::Outdoor,
+                true,
             ],
             [
                 self::IS_INITIAL,
@@ -121,6 +125,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 ['Adem Lane'],
                 ['Ayah Wilkinson', 'Billie Wright', 'Herbert Fowler', 'Jay Shepard', 'Leyton Fields', 'Maddison Gillespie', 'Marco Kelly', 'admin', 'Adem Lane'],
                 EventTypes::Dinner,
+                true,
             ],
             [
                 self::IS_INITIAL,
@@ -133,6 +138,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 ['admin', 'Adem Lane'],
                 ['Crystal Liu', 'Adil Floyd', 'Aston Hood', 'Ayah Wilkinson', 'Jay Shepard', 'Marco Gross', 'Phoenix Baker', 'Rory Huff', 'admin'],
                 EventTypes::Outdoor,
+                true,
             ],
             [
                 self::IS_INITIAL,
@@ -145,6 +151,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 ['Adem Lane', 'admin'],
                 ['Adil Floyd', 'Aysha Becker', 'Bailey Richards', 'Belle Woods', 'Benedict Doherty', 'Eduard Franz', 'Koray Okumus', 'Youssef Roberson', 'admin', 'Adem Lane', 'Crystal Liu'],
                 EventTypes::Regular,
+                false,
             ],
             [
                 self::IS_INITIAL,
@@ -157,6 +164,7 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 ['Adem Lane', 'admin'],
                 ['Benedict Doherty', 'Byron Robertson', 'Isobel Fuller', 'Levi Rocha', 'Nala Goins', 'Priya Shepard', 'Zara Bush', 'admin', 'Adem Lane'],
                 EventTypes::Dinner,
+                true,
             ],
         ];
     }

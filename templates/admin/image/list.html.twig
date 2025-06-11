@@ -1,9 +1,5 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href='/stylesheet/jstable.min.css'/>
-{% endblock %}
-
 {% block content %}
 
     <div class="container">
@@ -51,15 +47,6 @@
         </table>
 
     </div>
-
-    <script src='/javascript/jstable.min.js'></script>
-    <script>
-        let myTable = new JSTable("#filteredTable", {
-            sortable: true,
-            searchable: true,
-        });
-        mytable.paginate(50);
-    </script>
 
 {% endblock %}
 

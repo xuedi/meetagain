@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_title_events_featured"|trans }}{% endblock %}
+
+{% block body %}
+
+
+    <section class="section">
+        <div class="container">
+
+            <h1 class="title">Memorable Events</h1>
+            <p>
+                A selection of a few past events that we thought were memorable.
+            </p>
+
+            <div class="columns is-multiline mt-5">
+                {% for event in list %}
+                    <a class="column is-one-third" href="{{ path('app_event_details', {'id': event.id}) }}">
+                        <div class="card">
+                            <div class="card-image">
+                                <figure class="image">
+                                    {% include '_block/image.html.twig' with {'image': event.previewImage} %}
+                                </figure>
+                            </div>
+                            <div class="card-content">
+                                <h2 class="title is-5">{{ event.title(globalService.currentLocale) }}</h2>
+                                <p class="subtitle is-6">{{ event.location.name }} - {{ event.start | time_diff }}</p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+
+
+        </div>
+    </section>
+
+
+{% endblock %}

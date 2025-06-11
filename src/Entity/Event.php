@@ -78,6 +78,9 @@ class Event
     #[ORM\Column]
     private ?bool $published = null;
 
+    #[ORM\Column]
+    private ?bool $featured = null;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
@@ -396,6 +399,18 @@ class Event
                 $image->setEvent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isFeatured(): ?bool
+    {
+        return $this->featured;
+    }
+
+    public function setFeatured(bool $featured): static
+    {
+        $this->featured = $featured;
 
         return $this;
     }
