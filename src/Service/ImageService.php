@@ -52,8 +52,9 @@ readonly class ImageService
         return $image;
     }
 
-    public function createThumbnails(Image $image): void
+    public function createThumbnails(Image $image): int
     {
+        $cnt = 0;
         $source = $this->getSourceFile($image);
         $sizes = $this->configService->getThumbnailSizes($image->getType());
         foreach ($sizes as [$width, $height]) {
@@ -70,10 +71,13 @@ readonly class ImageService
                 $imagick->cropThumbnailImage($width, $height);
                 $imagick->stripImage(); // metadata
                 $imagick->writeImage($target);
+                $cnt++;
             } catch (ImagickException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));;
             }
         }
+
+        return $cnt;
     }
 
     public function rotateThumbNail(Image $image): void
