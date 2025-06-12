@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\NotFoundLog;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
+use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
 use DateTime;
@@ -24,6 +25,7 @@ class DashboardService
     private DateTimeImmutable $weekStopDate;
 
     public function __construct(
+        private readonly EventRepository $eventRepo,
         private readonly UserRepository $userRepo,
         private readonly NotFoundLogRepository $notFoundRepo,
         private readonly ActivityRepository $activityRepo,
@@ -44,8 +46,10 @@ class DashboardService
     {
         return [
             'memberCount' => $this->userRepo->count(),
-            'notFoundCount' => $this->notFoundRepo->matching($this->timeCrit())->count(),
-            'activityCount' => $this->activityRepo->matching($this->timeCrit())->count(),
+            'eventCount' => $this->eventRepo->count(),
+            'weekEventCount' => $this->eventRepo->matching($this->timeCrit('start'))->count(),
+            'weekNotFoundCount' => $this->notFoundRepo->matching($this->timeCrit())->count(),
+            'weekActivityCount' => $this->activityRepo->matching($this->timeCrit())->count(),
         ];
     }
 
@@ -71,11 +75,18 @@ class DashboardService
         $this->weekPrevious = $this->week - 1;
     }
 
-    private function timeCrit(): Criteria
+    private function timeCrit(?string $column = 'createdAt'): Criteria
     {
+        $start = $this->weekStartDate;
+        $stop = $this->weekStopDate;
+        if ($column === 'start') {
+            $start = new DateTime()->setTimestamp($start->getTimestamp());
+            $stop = new DateTime()->setTimestamp($stop->getTimestamp());
+        }
+
         $criteria = new Criteria();
-        $criteria->where(Criteria::expr()?->gte('createdAt', $this->weekStartDate));
-        $criteria->andWhere(Criteria::expr()?->lte('createdAt', $this->weekStopDate));
+        $criteria->where(Criteria::expr()?->gte($column, $start));
+        $criteria->andWhere(Criteria::expr()?->lte($column, $stop));
         return $criteria;
     }
 

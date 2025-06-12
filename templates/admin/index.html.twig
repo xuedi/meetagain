@@ -56,19 +56,32 @@
             </div>
             <div class="column is-4">
                 <div class="box">
-                    <h1 class="title is-6">Details</h1>
+                    <h1 class="title is-6">General</h1>
                     <table class="table is-narrow">
                         <tr>
                             <td>Members:</td>
                             <td>{{ details.memberCount }}</td>
                         </tr>
                         <tr>
+                            <td>Events:</td>
+                            <td>{{ details.eventCount }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="box">
+                    <h1 class="title is-6">This week</h1>
+                    <table class="table is-narrow">
+                        <tr>
                             <td>Pages not found:</td>
-                            <td>{{ details.notFoundCount }}</td>
+                            <td>{{ details.weekNotFoundCount }}</td>
                         </tr>
                         <tr>
                             <td>Activities:</td>
-                            <td>{{ details.activityCount }}</td>
+                            <td>{{ details.weekActivityCount }}</td>
+                        </tr>
+                        <tr>
+                            <td>Events:</td>
+                            <td>{{ details.weekEventCount }}</td>
                         </tr>
                     </table>
                 </div>
