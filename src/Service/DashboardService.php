@@ -78,4 +78,9 @@ class DashboardService
         $criteria->andWhere(Criteria::expr()?->lte('createdAt', $this->weekStopDate));
         return $criteria;
     }
+
+    public function getNeedForApproval(): array
+    {
+        return $this->userRepo->findBy(['status' => 1], ['createdAt' => 'desc']);
+    }
 }

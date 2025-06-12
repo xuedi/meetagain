@@ -14,6 +14,8 @@ class AdminController extends AbstractController
         $dashboard->setTime($year, $week);
 
         return $this->render('admin/index.html.twig', [
+            'active' => 'dashboard',
+            'needForApproval' => $dashboard->getNeedForApproval(),
             'time' => $dashboard->getTimeControl(),
             'details' => $dashboard->getDetails(),
             'pagesNotFound' => $dashboard->getPagesNotFound(),

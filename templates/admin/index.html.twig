@@ -22,16 +22,32 @@
                     </a>
                 </div>
                 <div class="box">
-                    <h1 class="title is-6">Members</h1>
-                    <p>
-                        some stats come later
-                    </p>
-                </div>
-                <div class="box">
-                    <h1 class="title is-6">Activity</h1>
-                    <p>
-                        some stats come later
-                    </p>
+                    <h1 class="title is-6">Members to approve</h1>
+                    {% if needForApproval|length == 0 %}
+                        <p>No members to approve</p>
+                    {% else %}
+                        <table class="table">
+                            <tbody>
+                            {% for user in needForApproval %}
+                                {% if user.status.value == 1 %}
+                                    <tr>
+                                        <td>{{ user.createdAt|date('Y-m-d') }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.name }}</td>
+                                        <td>
+                                            <a href="{{ path('app_admin_user_approve', {'id': user.id}) }}">
+                                                <span class="icon has-text-success"><i class="fa fa-check-square"></i></span>
+                                            </a>
+                                            <a href="{{ path('app_admin_user_deny', {'id': user.id}) }}">
+                                                <span class="icon has-text-danger"><i class="fa fa-minus-square"></i></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
                 </div>
                 <div class="box">
                     <h1 class="title is-6">Pages not found</h1>

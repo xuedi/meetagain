@@ -23,7 +23,6 @@ class AdminUserController extends AbstractController
     {
         return $this->render('admin/user/list.html.twig', [
             'active' => 'user',
-            'needForApproval' => $repo->findBy(['status' => 1], ['createdAt' => 'desc']),
             'users' => $repo->findBy([], ['createdAt' => 'desc']),
         ]);
     }
@@ -55,7 +54,7 @@ class AdminUserController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        return $this->redirectToRoute('app_admin_user');
+        return $this->redirectToRoute('app_admin');
     }
     #[Route('/admin/user/{id}/deny', name: 'app_admin_user_deny', methods: ['GET'])]
     public function userDeny(User $user, EntityManagerInterface $em): Response
@@ -65,7 +64,7 @@ class AdminUserController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        return $this->redirectToRoute('app_admin_user');
+        return $this->redirectToRoute('app_admin');
     }
     #[Route('/admin/user/{id}/delete', name: 'app_admin_user_delete', methods: ['GET'])]
     public function userDelete(User $user, EntityManagerInterface $em): Response

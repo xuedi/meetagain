@@ -4,47 +4,6 @@
 
     <div class="container">
 
-        <h1 class="title is-5">Ready to approve</h1>
-
-        {% if needForApproval is empty %}
-            <p>
-                Currently, there are no users to be approved
-            </p>
-            <br>
-        {% else %}
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>CreatedAt</th>
-                    <th>eMail</th>
-                    <th>Name</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for user in users %}
-                    {% if user.status.value == 1 %}
-                        <tr>
-                            <td>{{ user.createdAt|date('Y-m-d') }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.name }}</td>
-                            <td>
-                                <a href="{{ path('app_admin_user_approve', {'id': user.id}) }}">
-                                    <span class="icon is-success"><i class="fa fa-check-square"></i></span>
-                                </a>
-                                <a href="{{ path('app_admin_user_deny', {'id': user.id}) }}">
-                                    <span class="icon is-danger"><i class="fa fa-minus-square"></i></span>
-                                </a>
-                            </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-
-        <h1 class="title is-5">Active Users</h1>
-
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
@@ -69,8 +28,11 @@
                         <td>{{ user.rsvpEvents|length }}</td>
                         <td>{{ user.createdAt|date('Y-m-d') }}</td>
                         <td>{{ user.createdAt|date('Y-m-d') }}</td>
-                        <td><a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"><span class="icon"><i
-                                            class="fa fa-edit"></i></span></a></td>
+                        <td>
+                            <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}">
+                                <span class="icon"><i class="fa fa-edit"></i></span>
+                            </a>
+                        </td>
                     </tr>
                 {% endif %}
             {% endfor %}

@@ -11,8 +11,11 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 readonly class GlobalService
 {
-    public function __construct(private RequestStack $requestStack, private TranslationService $translationService)
-    {
+    public function __construct(
+        private RequestStack $requestStack,
+        private TranslationService $translationService,
+        private DashboardService $dashboardService,
+    ) {
     }
 
     public function getCurrentLocale(): string
@@ -58,6 +61,15 @@ readonly class GlobalService
         }
 
         return Consent::getBySession($session)->getOsm() === ConsentType::Granted;
+    }
+
+    public function getAdminAttention(): bool
+    {
+        if (count($this->dashboardService->getNeedForApproval()) > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getAlternativeLanguageCodes(): array
