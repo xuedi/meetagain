@@ -10,7 +10,7 @@
             <div class="columns">
                 <div class="column is-5">
 
-                    <h1 class="subtitle">{{ "page_register_headline"|trans }}</h1>
+                    <h1 class="title is-5">{{ "page_register_headline"|trans }}</h1>
 
                     <div class="box">
                         {{ form_start(form) }}
@@ -30,7 +30,7 @@
                         {{ form_row(form.agreeTerms) }}
 
 
-                        <button class="button is-primary">{{ "button_Register" | trans }}</button>
+                        <button class="button is-link">{{ "button_Register" | trans }}</button>
                         <a class="button" href="/{{ app.request.locale }}/terms" target="_blank">{{ "terms" | trans }}</a>
                         {{ form_end(form) }}
                     </div>

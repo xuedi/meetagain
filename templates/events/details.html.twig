@@ -40,13 +40,20 @@
                         </div>
                     {% else %}
                         <div class="mt-5">
-                            <span class="tag is-warning">RSVP</span>
-                            {% for user in event.rsvp %}
-                                <span class="tag">{{ user.name }}</span>
-                            {% endfor %}
+                            <div class="tags">
+                                <span class="tag has-background-grey has-text-light">RSVP</span>
+                                {% for user in event.rsvp %}
+                                    <span class="tag">{{ user.name }}</span>
+                                {% endfor %}
+                            </div>
                         </div>
-                        <div class="notification has-text-centered mt-5">
-                            Please <a href="{{ path('app_login') }}">login</a> to see and post comments & pictures
+                        <div class="notification has-text-centered mt-6 is-warning">
+                            <p>
+                                Please <a class="is-bold" href="{{ path('app_login') }}">login</a> to see and post, comments and pictures.
+                            </p>
+                            <p class="mt-2">
+                                If you have not registered yet, please <a href="{{ path('app_register') }}">register</a>.
+                            </p>
                         </div>
                     {% endif %}
                 </div>
