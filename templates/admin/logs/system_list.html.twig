@@ -2,45 +2,30 @@
 
 {% block content %}
 
-    <section class="section">
+    <div class="container">
 
-        TODO: Scroll down source selector, filter for type, level
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th colspan="2">CreatedAt</th>
+                <th>Type</th>
+                <th>Level</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.date | date('Y-m-d') }}</td>
+                    <td>{{ log.date | date('H:i') }}</td>
+                    <td>{{ log.type }}</td>
+                    <td>{{ log.level }}</td>
+                    <td>{{ log.message }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-        <div class="container">
-            <div class="columns">
-                <div class="column is-3">
-                    <ul>
-                        {% for id,log in logs %}
-                            <li><a href="{{ path('app_admin_logs_system', {'id': id}) }}">{{ log.name }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="column is-9">
-                    <table class="table is-fullwidth">
-                        <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Message</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for line in content %}
-                            <tr>
-                                <td>
-                                    <nobr>{{ line.date|date('Y-m-d H:i:s') }}</nobr><br>
-                                    <nobr>{{ line.type }}</nobr><br>
-                                    <nobr>{{ line.level }}</nobr>
-                                </td>
-                                <td>{{ line.message }}{# Toggle show {{ line.json }} #}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-
-
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
 
 {% endblock %}

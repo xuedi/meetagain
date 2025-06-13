@@ -20,21 +20,19 @@ class AdminLogsController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/logs/system/{id}', name: 'app_admin_logs_system')]
+    #[Route('/admin/logs/system', name: 'app_admin_logs_system')]
     public function systemLogs(int $id = 0): Response
     {
         $logs = $this->getLogList();
         return $this->render('admin/logs/system_list.html.twig', [
             'active' => 'logs',
-            'content' => $logs === [] ? '' : $this->getLogContent($logs[$id]['source']),
-            'logs' => $logs,
+            'logs' => $this->getLogs(),
         ]);
     }
 
     #[Route('/admin/logs/404', name: 'app_admin_logs_not_found')]
     public function notFoundLogs(NotFoundLogRepository $foundLogRepo): Response
     {
-        $logs = $this->getLogList();
         return $this->render('admin/logs/notFound_list.html.twig', [
             'active' => '404',
             'list' => $foundLogRepo->getTop100(),
@@ -47,28 +45,25 @@ class AdminLogsController extends AbstractController
         $logPath = dirname(__DIR__, 3) . '/var/log/';
         $logFiles = glob($logPath . '/*.log');
 
-        foreach ($logFiles as $logFile) { // TODO: turn into array map function
-            $nameChunks = explode('/', $logFile);
-            $list[] = [
-                'name' => end($nameChunks),
-                'source' => $logFile,
-            ];
+        foreach ($logFiles as $logFile) {
+            $list[] = $logFile;
         }
 
         return $list;
     }
 
-    // TODO: add a level filter and split content with parser like: https://packagist.org/packages/innmind/log-reader
-    private function getLogContent(string $path): array
+    private function getLogs(): array
     {
-        $content = file_get_contents($path);
-        $lines = explode("\n", $content);
         $logList = [];
-        foreach ($lines as $line) {
-            if ($line === '' || $line === '0') {
-                continue;
+        foreach ($this->getLogList() as $logFile) {
+            $content = file_get_contents($logFile);
+            $lines = explode("\n", $content);
+            foreach ($lines as $line) {
+                if ($line === '' || $line === '0') {
+                    continue;
+                }
+                $logList[] = LogEntry::fromString($line);
             }
-            $logList[] = LogEntry::fromString($line);
         }
 
         return $logList;
