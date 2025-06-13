@@ -24,8 +24,8 @@ class EventServiceTest extends TestCase
         $this->eventRepoMock = $this->createMock(EventRepository::class);
         $this->emMock = $this->createMock(EntityManagerInterface::class);
         $this->subject = new EventService(
-            $this->eventRepoMock,
-            $this->emMock
+            repo: $this->eventRepoMock,
+            em: $this->emMock
         );
     }
 

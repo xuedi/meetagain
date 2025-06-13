@@ -19,7 +19,9 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
 
         $this->subject = new CaptchaService();
-        $this->subject->setSession($this->sessionMock);
+        $this->subject->setSession(
+            session: $this->sessionMock
+        );
     }
 
     public function testGenerateIsReturningExistingData(): void
@@ -275,7 +277,7 @@ class CaptchaServiceTest extends TestCase
 
     private function assertBase64(mixed $value): void
     {
-        if(!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value)) {
+        if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value)) {
             $this->fail('Value is not base64 encoded');
         }
     }

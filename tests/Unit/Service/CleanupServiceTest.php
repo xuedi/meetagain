@@ -27,9 +27,9 @@ class CleanupServiceTest extends TestCase
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
 
         $this->subject = new CleanupService(
-            $this->imageRepoMock,
-            $this->userRepoMock,
-            $this->entityManagerMock
+            imageRepo: $this->imageRepoMock,
+            userRepo: $this->userRepoMock,
+            entityManager: $this->entityManagerMock
         );
     }
 

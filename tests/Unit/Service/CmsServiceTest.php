@@ -37,8 +37,26 @@ class CmsServiceTest extends TestCase
         );
     }
 
-    public function testRemoveImageCache(): void
+    public function testCanCreateNotFoundPage(): void
     {
-        $this->subject->createNotFoundPage();
+        $expectedCode = 404;
+        $expectedContent = '404 page content';
+
+        $this->twigMock
+            ->expects($this->once())
+            ->method('render')
+            ->with('cms/404.html.twig')
+            ->willReturn($expectedContent);
+
+        $response = $this->subject->createNotFoundPage();
+
+        $this->assertEquals($expectedContent, $response->getContent());
+        $this->assertEquals($expectedCode, $response->getStatusCode());
+    }
+
+    public function testCanGetSites(): void
+    {
+        $this->cmsRepoMock->expects($this->once())->method('findAll');
+        $this->subject->getSites();
     }
 }

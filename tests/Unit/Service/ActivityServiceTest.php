@@ -32,9 +32,9 @@ class ActivityServiceTest extends TestCase
         $this->globServiceMock = $this->createMock(GlobalService::class);
         $this->activityRepoMock = $this->createMock(ActivityRepository::class);
         $this->subject = new ActivityService(
-            $this->globServiceMock,
-            $this->emMock,
-            $this->activityRepoMock
+            globalService: $this->globServiceMock,
+            em: $this->emMock,
+            repo: $this->activityRepoMock,
         );
     }
 
@@ -69,7 +69,7 @@ class ActivityServiceTest extends TestCase
                 return true;
             }));
 
-        $validMetaData = ['old' => 'x', 'new' => 'x', 'event_id' => 1, 'user_id' => 2, 'reason' => 1, 'images' => 1, 'image_id' =>2];
+        $validMetaData = ['old' => 'x', 'new' => 'x', 'event_id' => 1, 'user_id' => 2, 'reason' => 1, 'images' => 1, 'image_id' => 2];
 
         $this->subject->log($expectedUserActivity, $expectedUserMock, $validMetaData);
     }
