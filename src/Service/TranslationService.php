@@ -7,11 +7,14 @@ use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 readonly class TranslationService
 {
@@ -21,9 +24,10 @@ readonly class TranslationService
         private EntityManagerInterface $entityManager,
         private Filesystem $fs,
         private ParameterBagInterface $appParams,
-        private JustService $just,
+        private KernelInterface $kernel,
         private string $kernelProjectDir,
-    ) {
+    )
+    {
     }
 
     /** TODO: move to repo */
@@ -73,7 +77,7 @@ readonly class TranslationService
         $numberTranslationCount = 0;
         $newTranslations = 0;
         $this->cleanUpTranslationFiles();
-        $extractionTime = $this->just->command('translationsExtract');
+        $extractionTime = $this->extractTranslationsFromFiles();
         $deletedTranslations = 0; //$this->deleteOrphanedTranslations();
 
         $path = $this->kernelProjectDir . '/translations/';
@@ -227,5 +231,25 @@ readonly class TranslationService
         }
 
         return $cleanedUp;
+    }
+
+    private function extractTranslationsFromFiles(): string
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('action');
+
+        foreach ($this->appParams->get('kernel.enabled_locales') as $locale) {
+            $application = new Application($this->kernel);
+            $application->setAutoExit(false);
+            $application->run(new ArrayInput([
+                'command' => 'translation:extract',
+                'fooArgument' => 'barValue',
+                '--format' => 'php',
+                '--force' => true,
+                $locale => true,
+            ]));
+        }
+
+        return (string)$stopwatch->stop('action');
     }
 }

@@ -26,16 +26,6 @@ app +parameter='':
 do +parameter='':
     {{PHP}} {{parameter}}
 
-translationsExtract:
-    php bin/console translation:extract --force --format php de
-    php bin/console translation:extract --force --format php en
-    php bin/console translation:extract --force --format php cn
-
-dockerTranslationsExtract:
-    {{PHP}} php bin/console translation:extract --force --format php de
-    {{PHP}} php bin/console translation:extract --force --format php en
-    {{PHP}} php bin/console translation:extract --force --format php cn
-
 start:
 	{{DOCKER}} up -d
 	{{PHP}} truncate -s 0 var/log/dev.log
