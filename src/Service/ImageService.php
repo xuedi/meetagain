@@ -34,6 +34,9 @@ readonly class ImageService
         $hash = sha1($imageData->getContent());
         $image = $this->imageRepo->findOneBy(['hash' => $hash]);
         if ($image !== null) {
+            $image->setUpdatedAt(new DateTimeImmutable());
+            $this->entityManager->persist($image);
+
             return $image;
         }
 
@@ -52,11 +55,12 @@ readonly class ImageService
         return $image;
     }
 
-    public function createThumbnails(Image $image): int
+    public function createThumbnails(Image $image, ?ImageType $imageType = null): int
     {
         $cnt = 0;
         $source = $this->getSourceFile($image);
-        $sizes = $this->configService->getThumbnailSizes($image->getType());
+        $imageType = $imageType ?? $image->getType();
+        $sizes = $this->configService->getThumbnailSizes($imageType);
         foreach ($sizes as [$width, $height]) {
             $target = $this->getThumbnailFile($image, $width, $height);
             if (file_exists($target)) {

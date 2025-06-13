@@ -12,14 +12,21 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
+use App\Entity\ImageType;
+use App\Form\CmsBlockImageType;
 use App\Form\CmsType;
+use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
+use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Routing\Attribute\Route;
 
 //TODO: move lots of logic to service
@@ -39,6 +46,7 @@ class AdminCmsController extends AbstractController
             'cms' => $repo->findAll(),
         ]);
     }
+
     #[Route('/admin/cms/{id}/edit/{locale}/{blockId}', name: 'app_admin_cms_edit', requirements: ['locale' => 'en|de|cn'], methods: ['GET', 'POST'])]
     public function cmsEdit(Request $request, Cms $cms, EntityManagerInterface $em, string $locale = 'en', ?int $blockId = null): Response
     {
@@ -67,6 +75,9 @@ class AdminCmsController extends AbstractController
 
         return $this->render('admin/cms/edit.html.twig', [
             'active' => 'cms',
+            'imageUploadForm' => $this->createForm(CmsBlockImageType::class, null, [
+                'action' => $this->generateUrl('app_admin_cms_block_image_upload'),
+                'method' => 'POST']),
             'newBlocks' => $newBlocks,
             'editLocale' => $locale,
             'editBlock' => $blockId,
@@ -75,6 +86,35 @@ class AdminCmsController extends AbstractController
             'cms' => $cms,
         ]);
     }
+
+    #[Route('/admin/cms/blockImageUpload/', name: 'app_admin_cms_block_image_upload', methods: ['POST'])]
+    public function blockImageUpload(Request $request, ImageService $imageService, CmsBlockRepository $repo, EntityManagerInterface $em): Response
+    {
+        $correct = false;
+
+        $form = $this->createForm(CmsBlockImageType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $blockId = $form->get('blockId')->getData();
+            $imageData = $form->get('imageUpload')->getData();
+            if ($imageData instanceof UploadedFile) {
+                $image = $imageService->upload($imageData, $this->getUser(), ImageType::CmsBlock);
+                $image->setUpdatedAt(new DateTimeImmutable());
+                $em->persist($image);
+                $imageService->createThumbnails($image, ImageType::CmsBlock);
+                $em->flush();
+
+                $block = $repo->findOneBy(['id' => $blockId]);
+                $block->setImage($image);
+                $em->persist($block);
+                $em->flush();
+
+            }
+        }
+
+        return new JsonResponse(['status' => 'OK'], Response::HTTP_OK);
+    }
+
     #[Route('/admin/cms/delete', name: 'app_admin_cms_delete', methods: ['GET'])]
     public function cmsDelete(Request $request, CmsRepository $repo, EntityManagerInterface $em): Response
     {
@@ -87,6 +127,7 @@ class AdminCmsController extends AbstractController
 
         return $this->redirectToRoute('app_admin_cms');
     }
+
     #[Route('/admin/cms/add', name: 'app_admin_cms_add', methods: ['POST'])]
     public function cmsAdd(Request $request, EntityManagerInterface $em): Response
     {
@@ -104,6 +145,7 @@ class AdminCmsController extends AbstractController
             'locale' => $request->getLocale(),
         ]);
     }
+
     #[Route('/admin/cms/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
     public function cmsBlockAdd(Request $request, EntityManagerInterface $em, int $id): Response
     {
@@ -133,6 +175,7 @@ class AdminCmsController extends AbstractController
             'locale' => $locale,
         ]);
     }
+
     #[Route('/admin/cms/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
     public function cmsBlockMoveDown(Request $request, EntityManagerInterface $em): Response
     {
@@ -147,6 +190,7 @@ class AdminCmsController extends AbstractController
             'locale' => $locale,
         ]);
     }
+
     #[Route('/admin/cms/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
     public function cmsBlockMoveUp(Request $request, EntityManagerInterface $em): Response
     {
@@ -161,6 +205,7 @@ class AdminCmsController extends AbstractController
             'locale' => $locale,
         ]);
     }
+
     #[Route('/admin/cms/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
     public function cmsBlockSave(Request $request, EntityManagerInterface $em): Response
     {
@@ -179,6 +224,7 @@ class AdminCmsController extends AbstractController
             'locale' => $request->get('locale'),
         ]);
     }
+
     #[Route('/admin/cms/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
     public function cmsBlockDelete(Request $request, EntityManagerInterface $em): Response
     {
@@ -196,6 +242,7 @@ class AdminCmsController extends AbstractController
             'locale' => $request->get('locale'),
         ]);
     }
+
     private function getBlock(string $blockType, array $payload): BlockType
     {
         return match ($blockType) {
@@ -208,6 +255,7 @@ class AdminCmsController extends AbstractController
             Title::getType()->name => Title::fromJson($payload),
         };
     }
+
     private function adjustPrio(EntityManagerInterface $em, mixed $pageId, mixed $blockId, mixed $locale, float $value): void
     {
         // update half up or down

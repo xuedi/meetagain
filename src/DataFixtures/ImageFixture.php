@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\CmsBlock;
 use App\Entity\Event;
 use App\Entity\ImageType;
 use App\Entity\User;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class ImageFixture extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
+        private readonly CmsBlockFixture $cmsBlockFixture,
         private readonly ImageService $imageService,
         private readonly UserFixture $userFixture,
         private readonly EventFixture $eventFixture,
@@ -27,6 +29,24 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         echo 'Creating images .';
         $importUser = $this->getReference('user_' . md5('import'), User::class);
         $adminUser = $this->getReference('user_' . md5('admin'), User::class);
+
+        // add photos for cmdBlocks
+        foreach ($this->cmsBlockFixture->getBlockReferenceForImages() as $blockId) {
+            $imageFile = __DIR__ . "/CmsBlock/$blockId";
+            $reference = 'cmsBlock_' . md5($blockId);
+            $cmsBlock = $this->getReference($reference, CmsBlock::class);
+
+            // upload file & thumbnails
+            $uploadedImage = new UploadedFile($imageFile, "$blockId.jpg");
+            $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
+            $manager->flush();
+            $this->imageService->createThumbnails($image);
+
+            // associate image with a user
+            $cmsBlock->setImage($image);
+            $manager->persist($cmsBlock);
+            $manager->flush();
+        }
 
         // add user profile photos
         foreach ($this->userFixture->getUsernames() as $name) {
@@ -93,6 +113,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         return [
             UserFixture::class,
             EventFixture::class,
+            CmsBlockFixture::class,
         ];
     }
 

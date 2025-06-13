@@ -118,8 +118,8 @@ class Cms
                     CmsBlockTypes::Headline => HeadlineBlockType::fromJson($block->getJson()),
                     CmsBlockTypes::Image => ImageBlockType::fromJson($block->getJson()),
                     CmsBlockTypes::Text => TextBlockType::fromJson($block->getJson()),
-                    CmsBlockTypes::Hero => HeroBlockType::fromJson($block->getJson()),
-                    CmsBlockTypes::EventTeaser => EventTeaserType::fromJson($block->getJson()),
+                    CmsBlockTypes::Hero => HeroBlockType::fromJson($block->getJson(), $block->getImage()),
+                    CmsBlockTypes::EventTeaser => EventTeaserType::fromJson($block->getJson(), $block->getImage()),
                     CmsBlockTypes::Title => TitleType::fromJson($block->getJson()),
                     default => throw new Exception('To be implemented'),
                 };

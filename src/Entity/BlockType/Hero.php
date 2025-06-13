@@ -3,6 +3,7 @@
 namespace App\Entity\BlockType;
 
 use App\Entity\CmsBlockTypes;
+use App\Entity\Image as ImageEntity;
 
 class Hero implements BlockType
 {
@@ -11,12 +12,13 @@ class Hero implements BlockType
         public string $subHeadline,
         public string $text,
         public string $buttonLink,
-        public string $buttonText
+        public string $buttonText,
+        public ?ImageEntity $image,
     ) {
     }
 
     #[\Override]
-    public static function fromJson(array $json): self
+    public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
         return new self(
             $json['headline'],
@@ -24,6 +26,7 @@ class Hero implements BlockType
             $json['text'],
             $json['buttonLink'],
             $json['buttonText'],
+            $image,
         );
     }
 
@@ -42,6 +45,7 @@ class Hero implements BlockType
             'text' => $this->text,
             'buttonLink' => $this->buttonLink,
             'buttonText' => $this->buttonText,
+            'image' => $this->image,
         ];
     }
 }

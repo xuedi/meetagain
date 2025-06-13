@@ -19,7 +19,12 @@
 
     <div class="columns is-vcentered">
         <div class="column is-4">
-            <img class="homepage-dragon" src="{{ '/images/meetup_432.jpg' }}" width="432" height="324" alt="Meetup members sitting together at a regular bi weekly gathering">
+            {% include '_block/image.html.twig' with {'image': blockImage} %}<br/>
+            <div class="field">
+                <div class="control">
+                    <input type="file" name="blockImage" class="fileUploadTrigger" data-blockId="{{ blockId }}">
+                </div>
+            </div>
         </div>
         <div class="column is-7">
             <h1 class="title is-4">{{ block.headline }}</h1>

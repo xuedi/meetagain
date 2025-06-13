@@ -3,17 +3,18 @@
 namespace App\Entity\BlockType;
 
 use App\Entity\CmsBlockTypes;
+use App\Entity\Image as ImageEntity;
 
 class Image implements BlockType
 {
-    private function __construct(public string $id)
+    private function __construct(public string $id, public ?ImageEntity $image)
     {
     }
 
     #[\Override]
-    public static function fromJson(array $json): self
+    public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
-        return new self($json['id']);
+        return new self($json['id'], $image);
     }
 
     #[\Override]
@@ -27,6 +28,7 @@ class Image implements BlockType
     {
         return [
             'id' => $this->id,
+            'image' => $this->image,
         ];
     }
 }

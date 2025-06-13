@@ -21,13 +21,16 @@ class CmsBlock
 
     #[ORM\ManyToOne(inversedBy: 'blocks')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Cms $page = null;
+    private ?Cms $page = null; // TODO: rename to just cms (cms_id in DB)
 
     #[ORM\Column]
     private array $json = [];
 
     #[ORM\Column]
     private ?float $priority = null;
+
+    #[ORM\ManyToOne]
+    private ?Image $image = null;
 
     public function getId(): ?int
     {
@@ -90,6 +93,18 @@ class CmsBlock
     public function setPriority(float $priority): static
     {
         $this->priority = $priority;
+
+        return $this;
+    }
+
+    public function getImage(): ?Image
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Image $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }
