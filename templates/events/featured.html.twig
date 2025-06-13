@@ -14,7 +14,7 @@
             </p>
 
             <div class="columns is-multiline mt-5">
-                {% for event in list %}
+                {% for event in featured %}
                     <a class="column is-one-third" href="{{ path('app_event_details', {'id': event.id}) }}">
                         <div class="card">
                             <div class="card-image">
@@ -31,6 +31,27 @@
                 {% endfor %}
             </div>
 
+            <h1 class="title mt-5">The last 3 Events</h1>
+            <p>
+                If you want to reconnect to people on a recent event. To see more events, check out the filter on our <a href="{{ path('app_event') }}">Events</a> page.
+            </p>
+            <div class="columns is-multiline mt-5">
+                {% for event in last %}
+                    <a class="column is-one-third" href="{{ path('app_event_details', {'id': event.id}) }}">
+                        <div class="card">
+                            <div class="card-image">
+                                <figure class="image">
+                                    {% include '_block/image.html.twig' with {'image': event.previewImage} %}
+                                </figure>
+                            </div>
+                            <div class="card-content">
+                                <h2 class="title is-5">{{ event.title(globalService.currentLocale) }}</h2>
+                                <p class="subtitle is-6">{{ event.location.name }} - {{ event.start | time_diff }}</p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
 
         </div>
     </section>

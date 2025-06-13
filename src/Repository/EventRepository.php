@@ -47,7 +47,7 @@ class EventRepository extends ServiceEntityRepository
             'SELECT e
             FROM App\Entity\Event e
             WHERE e.start < :date
-            ORDER BY e.start ASC'
+            ORDER BY e.start DESC'
         )->setParameter('date', new DateTime())->setMaxResults($number);
 
         return $query->getResult();

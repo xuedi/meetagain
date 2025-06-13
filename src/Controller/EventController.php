@@ -125,7 +125,8 @@ class EventController extends AbstractController
     public function featured(EventRepository $repo): Response
     {
         return $this->render('events/featured.html.twig', [
-            'list' => $repo->findBy(['featured' => true], ['start' => 'ASC']),
+            'featured' => $repo->findBy(['featured' => true], ['start' => 'ASC']),
+            'last' => $repo->getPastEvents(),
         ]);
     }
 
