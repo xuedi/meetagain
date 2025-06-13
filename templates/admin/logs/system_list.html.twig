@@ -7,7 +7,7 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th colspan="2">CreatedAt</th>
+                <th>CreatedAt</th>
                 <th>Type</th>
                 <th>Level</th>
                 <th>Message</th>
@@ -16,8 +16,7 @@
             <tbody>
             {% for log in logs %}
                 <tr>
-                    <td>{{ log.date | date('Y-m-d') }}</td>
-                    <td>{{ log.date | date('H:i') }}</td>
+                    <td>{{ log.date | date('Y-m-d  H:i') }}</td>
                     <td>{{ log.type }}</td>
                     <td>{{ log.level }}</td>
                     <td>{{ log.message }}</td>
