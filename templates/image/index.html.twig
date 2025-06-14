@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_image_title"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-7">
+
+                    {% include 'image/modal_content.html.twig' with {'image': image} %}
+
+                </div>
+                <div class="column is-5">
+                    <h2 class="title is-4">Image to replace</h2>
+                    {% include '_block/image.html.twig' with {'image': image} %}
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

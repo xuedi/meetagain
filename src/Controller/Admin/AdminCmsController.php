@@ -75,10 +75,6 @@ class AdminCmsController extends AbstractController
 
         return $this->render('admin/cms/edit.html.twig', [
             'active' => 'cms',
-            'imageUploadGallery' => $em->getRepository(ImageEntity::class)->findBy(['type' => ImageType::CmsBlock]),
-            'imageUploadForm' => $this->createForm(CmsBlockImageType::class, null, [
-                'action' => $this->generateUrl('app_admin_cms_block_image_upload'),
-                'method' => 'POST']),
             'newBlocks' => $newBlocks,
             'editLocale' => $locale,
             'editBlock' => $blockId,
@@ -86,48 +82,6 @@ class AdminCmsController extends AbstractController
             'form' => $form,
             'cms' => $cms,
         ]);
-    }
-
-    #[Route('/admin/cms/blockImageUpload/', name: 'app_admin_cms_block_image_upload', methods: ['POST'])]
-    public function blockImageUpload(Request $request, ImageService $imageService, CmsBlockRepository $repo, EntityManagerInterface $em): Response
-    {
-        $correct = false;
-
-        $form = $this->createForm(CmsBlockImageType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $blockId = $form->get('blockId')->getData();
-            $imageData = $form->get('imageUpload')->getData();
-            if ($imageData instanceof UploadedFile) {
-                $image = $imageService->upload($imageData, $this->getUser(), ImageType::CmsBlock);
-                $image->setUpdatedAt(new DateTimeImmutable());
-                $em->persist($image);
-                $imageService->createThumbnails($image, ImageType::CmsBlock);
-                $em->flush();
-
-                $block = $repo->findOneBy(['id' => $blockId]);
-                $block->setImage($image);
-                $em->persist($block);
-                $em->flush();
-
-            }
-        }
-
-        return new JsonResponse(['status' => 'OK'], Response::HTTP_OK);
-    }
-
-    #[Route('/admin/cms/blockImageChange', name: 'app_admin_cms_block_image_change', methods: ['GET'])]
-    public function blockImageChange(Request $request, EntityManagerInterface $em): Response
-    {
-        $cmsId = $request->query->get('cmsId');
-        $imageId = $request->query->get('imageId');
-        $blockId = $request->query->get('blockId');
-        $block = $em->getRepository(CmsBlock::class)->findOneBy(['id' => $blockId]);
-        $block->setImage($em->getRepository(ImageEntity::class)->find($imageId));
-        $em->persist($block);
-        $em->flush();
-
-        return $this->redirectToRoute('app_admin_cms_edit', ['id' => $cmsId]);
     }
 
     #[Route('/admin/cms/delete', name: 'app_admin_cms_delete', methods: ['GET'])]

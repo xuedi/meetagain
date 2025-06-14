@@ -121,3 +121,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    (document.querySelectorAll('.fileUploadTrigger') || []).forEach((trigger) => {
+        trigger.addEventListener('change', event => {
+            event.preventDefault();
+
+            let url = event.currentTarget.getAttribute('data-url');
+
+            let formData = new FormData();
+            formData.append('image_upload[newImage]', event.currentTarget.files[0]);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    location.reload();
+                }
+            }
+            xhr.send(formData);
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    (document.querySelectorAll('.fileSelectTrigger, .fileRotateTrigger') || []).forEach((trigger) => {
+        trigger.addEventListener('click', event => {
+            event.preventDefault();
+
+            let url = event.currentTarget.getAttribute('href');
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    location.reload();
+                }
+            }
+            xhr.send();
+        });
+    });
+});

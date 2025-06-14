@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Profile\ImageController;
 use App\Entity\ActivityType;
 use App\Entity\Event;
 use App\Entity\Image;
@@ -25,6 +26,7 @@ class ProfileController extends AbstractController
 
     #[Route('/profile/', name: 'app_profile')]
     public function index(
+        ImageUploadController $imageUploadController,
         Request $request,
         EventRepository $repo,
         MessageRepository $msgRepo,
@@ -69,7 +71,10 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
+        $modal = $imageUploadController->modal('user', $user->getId(), true)->getContent();
+
         return $this->render('profile/index.html.twig', [
+            'modal' => $modal,
             'lastLogin' => $request->getSession()->get('lastLogin', '-'),
             'messageCount' => $msgRepo->getMessageCount($user),
             'user' => $this->getAuthedUser(),
@@ -77,17 +82,6 @@ class ProfileController extends AbstractController
             'past' => $repo->getPastEvents(20),
             'form' => $form,
         ]);
-    }
-
-    #[Route('/profile/rotate-avatar', name: 'app_profile_rotate_avatar')]
-    public function rotateProfile(ImageService $imageService): Response
-    {
-        $user = $this->getAuthedUser();
-        if ($user->getImage() !== null) {
-            $imageService->rotateThumbNail($user->getImage());
-        }
-
-        return $this->redirectToRoute('app_profile');
     }
 
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]

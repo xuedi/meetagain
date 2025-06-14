@@ -100,33 +100,4 @@
         </div>
     {% endif %}
 
-
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            let trigger = document.getElementsByClassName('fileUploadTrigger');
-            for (let i = 0; i < trigger.length; i++) {
-                trigger[i].addEventListener('change', event => {
-                    event.preventDefault();
-
-                    let blockId = event.currentTarget.getAttribute('data-blockId');
-                    let url = '{{ path('app_admin_cms_block_image_upload') }}';
-
-                    let formData = new FormData();
-                    formData.append('cms_block_image[blockId]', blockId);
-                    formData.append('cms_block_image[imageUpload]', event.currentTarget.files[0]);
-
-                    let xhr = new XMLHttpRequest();
-                    xhr.open("POST", url, true);
-                    xhr.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            location.reload();
-                        }
-                    }
-                    xhr.send(formData);
-
-                });
-            }
-        });
-    </script>
-
 {% endblock %}

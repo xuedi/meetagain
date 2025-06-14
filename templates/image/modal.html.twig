@@ -1,0 +1,32 @@
+{# TODO: generalize and use also for profile and so on, make mini gallery loading and save targets dynamic #}
+<div class="card">
+    <div class="card-image">
+        <figure class="image">
+            {% include '_block/image.html.twig' with {'image': image} %}
+        </figure>
+    </div>
+    <div class="card-content is-overlay">
+        <div class="button is-link modalTrigger" data-target="imageUploadModal-{{ entity }}-{{ id }}">
+            <span class="icon">
+                <i class="fa fa-images"></i>
+            </span>
+            <span>Change Image</span>
+        </div>
+        {% if rotate %}
+            <a class="button is-link fileRotateTrigger" href="{{ path('app_image_rotate', {'entity': entity, 'id': id}) }}">
+                <span class="icon">
+                    <i class="fa fa-rotate-right"></i>
+                </span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+<div class="modal" id="imageUploadModal-{{ entity }}-{{ id }}">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            {% include 'image/modal_content.html.twig' with {'image': image} %}
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
