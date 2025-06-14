@@ -48,12 +48,7 @@
         </div>
         <div class="column is-1"></div>
         <div class="column is-4">
-            {% include '_block/image.html.twig' with {'image': blockImage} %}<br/>
-            <div class="field">
-                <div class="control">
-                    <input type="file" name="blockImage" class="fileUploadTrigger" data-blockId="{{ blockId }}">
-                </div>
-            </div>
+            {% include 'admin/cms/image_upload.html.twig' with {'blockId': blockId, 'image': blockImage, 'cmsId': cmsId} %}
         </div>
     </div>
 

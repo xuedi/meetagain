@@ -1,0 +1,38 @@
+{# TODO: generalize and use also for profile and so on, make mini gallery loading and save targets dynamic #}
+<div class="card">
+    <div class="card-image">
+        <figure class="image">
+            {% include '_block/image.html.twig' with {'image': image} %}
+        </figure>
+    </div>
+    <div class="card-content is-overlay">
+        <div class="button is-link modalTrigger" data-target="imageUploadModal-{{ blockId }}">
+            <span class="icon">
+                <i class="fa fa-images"></i>
+            </span>
+            <span>Change Image</span>
+        </div>
+    </div>
+</div>
+<div class="modal" id="imageUploadModal-{{ blockId }}">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            <div class="title is-4">Choose from previous types</div>
+            {% for imageItem in imageUploadGallery %}
+                {% set changeLink = path('app_admin_cms_block_image_change', {'imageId': imageItem.id, 'blockId': blockId, 'cmsId': cmsId}) %}
+                <a href="{{ changeLink }}" class="image-item imageUploadGalleryTrigger">
+                    {% include '_block/image.html.twig' with {'image': imageItem, 'size': '80x80'} %}
+                </a>
+            {% endfor %}
+            <div class="title is-4 mt-5">Upload new Image</div>
+            <div class="field">
+                <div class="control">
+                    <input type="file" name="blockImage" class="fileUploadTrigger" data-blockId="{{ blockId }}">
+                </div>
+            </div>
+            <p>selected images are uploaded and used immediately, no conformation</p>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>

@@ -12,6 +12,7 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
+use App\Entity\Image as ImageEntity;
 use App\Entity\ImageType;
 use App\Form\CmsBlockImageType;
 use App\Form\CmsType;
@@ -26,7 +27,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Routing\Attribute\Route;
 
 //TODO: move lots of logic to service
@@ -75,6 +75,7 @@ class AdminCmsController extends AbstractController
 
         return $this->render('admin/cms/edit.html.twig', [
             'active' => 'cms',
+            'imageUploadGallery' => $em->getRepository(ImageEntity::class)->findBy(['type' => ImageType::CmsBlock]),
             'imageUploadForm' => $this->createForm(CmsBlockImageType::class, null, [
                 'action' => $this->generateUrl('app_admin_cms_block_image_upload'),
                 'method' => 'POST']),
@@ -113,6 +114,20 @@ class AdminCmsController extends AbstractController
         }
 
         return new JsonResponse(['status' => 'OK'], Response::HTTP_OK);
+    }
+
+    #[Route('/admin/cms/blockImageChange', name: 'app_admin_cms_block_image_change', methods: ['GET'])]
+    public function blockImageChange(Request $request, EntityManagerInterface $em): Response
+    {
+        $cmsId = $request->query->get('cmsId');
+        $imageId = $request->query->get('imageId');
+        $blockId = $request->query->get('blockId');
+        $block = $em->getRepository(CmsBlock::class)->findOneBy(['id' => $blockId]);
+        $block->setImage($em->getRepository(ImageEntity::class)->find($imageId));
+        $em->persist($block);
+        $em->flush();
+
+        return $this->redirectToRoute('app_admin_cms_edit', ['id' => $cmsId]);
     }
 
     #[Route('/admin/cms/delete', name: 'app_admin_cms_delete', methods: ['GET'])]
