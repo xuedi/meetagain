@@ -20,6 +20,7 @@ class ConfigServiceTest extends TestCase
         $sizes = $this->subject->getThumbnailSizes(ImageType::ProfilePicture);
         $expected = [
             [400, 400],
+            [80, 80],
             [50, 50]
         ];
 
@@ -53,7 +54,8 @@ class ConfigServiceTest extends TestCase
     {
         $sizes = $this->subject->getThumbnailSizes(ImageType::CmsBlock);
         $expected = [
-            [432, 432]
+            [432, 432],
+            [80, 80],
         ];
 
         $this->assertSame($expected, $sizes);
