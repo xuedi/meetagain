@@ -11,6 +11,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PluginRepository extends ServiceEntityRepository
 {
+    public const string PLUGIN_LIST_KEY = 'PluginRepository::PLUGIN_LIST_KEY';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Plugin::class);

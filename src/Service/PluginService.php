@@ -8,6 +8,8 @@ use App\Repository\PluginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class PluginService
 {
@@ -103,5 +105,16 @@ readonly class PluginService
 
         $this->em->persist($pluginEntity);
         $this->em->flush();
+    }
+
+    public function handleRoute(string $page): string
+    {
+        foreach ($this->plugins as $plugin) {
+            $content = $plugin->handleRoute($page);
+            if ($content !== null) {
+                return $content;
+            }
+        }
+        throw new NotFoundHttpException();
     }
 }

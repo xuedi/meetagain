@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twig\Environment;
 
 readonly class CmsService
@@ -26,7 +27,7 @@ readonly class CmsService
         ]);
 
         if ($cms === null) {
-            return $this->createNotFoundPage();
+            throw new NotFoundHttpException();
         }
 
         $blocks = $cms->getLanguageFilteredBlockJsonList($locale);

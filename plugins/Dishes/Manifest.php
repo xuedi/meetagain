@@ -35,4 +35,12 @@ class Manifest implements Plugin
     {
         // TODO: Implement uninstall() method.
     }
+
+    public function handleRoute(string $url): ?string
+    {
+        return match ($url) {
+            'dishes' => 'dishes',
+            default => null,
+        };
+    }
 }

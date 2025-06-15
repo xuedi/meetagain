@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_title_error"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            {{ pluginContent|raw }}
+
+        </div>
+    </section>
+
+{% endblock %}

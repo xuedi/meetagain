@@ -13,4 +13,5 @@ interface Plugin
     public function getDescription(): string;
     public function install(): void;
     public function uninstall(): void;
+    public function handleRoute(string $url): ?string;
 }
