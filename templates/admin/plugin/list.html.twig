@@ -1,0 +1,48 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Version</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for plugin in plugins %}
+                <tr>
+                    <td>{{ plugin.version }}</td>
+                    <td>{{ plugin.name }}</td>
+                    <td>{{ plugin.description }}</td>
+                    <td class="has-text-right">
+                        {% if plugin.deleted %}
+                            <a class="button is-danger" href="{{ path('admin_plugin_remove', {id: plugin.id}) }}">Remove deleted</a>
+                        {% else %}
+                            {% if plugin.installed %}
+                                {% if plugin.enabled %}
+                                    <button class="button is-danger is-light" disabled>Uninstall</button>
+                                    <a class="button is-danger is-light" href="{{ path('admin_plugin_disable', {ident: plugin.ident}) }}">Disable</a>
+                                {% else %}
+                                    <a class="button is-danger is-light" href="{{ path('admin_plugin_uninstall', {ident: plugin.ident}) }}">Uninstall</a>
+                                    <a class="button is-success is-light" href="{{ path('admin_plugin_enable', {ident: plugin.ident}) }}">Enable</a>
+                                {% endif %}
+                            {% else %}
+                                <a class="button is-success is-light" href="{{ path('admin_plugin_install', {ident: plugin.ident}) }}">Install</a>
+                                <button class="button is-success is-light" disabled>Enable</button>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
+
