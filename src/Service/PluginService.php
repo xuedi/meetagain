@@ -7,9 +7,11 @@ use App\Plugin as PluginInterface;
 use App\Repository\PluginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Twig\Environment;
 
 readonly class PluginService
 {
@@ -17,7 +19,7 @@ readonly class PluginService
         #[AutowireIterator(PluginInterface::class)]
         private iterable $plugins,
         private PluginRepository $pluginRepo,
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
     )
     {
     }
@@ -107,14 +109,39 @@ readonly class PluginService
         $this->em->flush();
     }
 
-    public function handleRoute(string $page): string
+    public function handleRoute(Request $request): string
     {
         foreach ($this->plugins as $plugin) {
-            $content = $plugin->handleRoute($page);
+
+            // only for enabled plugins
+            if (!$this->pluginRepo->findOneBy(['ident' => $plugin->getIdent()])->isEnabled()) {
+                continue;
+            }
+
+            // only when route prefix is correct
+            if (!$this->hasMatchingPrefix($plugin->getIdent(), $request->getPathInfo())) {
+                continue;
+            }
+
+            // choose response
+            $content = $plugin->handleRoute($request);
             if ($content !== null) {
                 return $content;
             }
         }
         throw new NotFoundHttpException();
+    }
+
+    private function hasMatchingPrefix(string $getIdent, string $pathInfo): bool
+    {
+        $chunks = explode('/', trim($pathInfo, '/'));
+        if (count($chunks) < 2) {
+            return false; // should never happen, root path is handles elsewhere
+        }
+        if(strtolower($chunks[1]) === $getIdent) {
+            return true;
+        }
+
+        return false;
     }
 }

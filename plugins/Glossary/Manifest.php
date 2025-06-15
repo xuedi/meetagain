@@ -3,6 +3,9 @@
 namespace Plugin\Glossary;
 
 use App\Plugin;
+use Plugin\Glossary\Controller\EditController;
+use Plugin\Glossary\Controller\IndexController;
+use Symfony\Component\HttpFoundation\Request;
 
 class Manifest implements Plugin
 {
@@ -36,11 +39,14 @@ class Manifest implements Plugin
         // TODO: Implement uninstall() method.
     }
 
-    public function handleRoute(string $url): ?string
+    public function handleRoute(Request $request): ?string
     {
-        return match ($url) {
-            'glossary' => 'Glossary',
-            default => null,
-        };
+        // just for fun
+
+        $app = new App();
+        $app->addController(IndexController::class);
+        $app->addController(EditController::class);
+
+        return $app->handleRoute($request);
     }
 }

@@ -17,7 +17,7 @@ class DefaultController extends AbstractController
     {
         try {
             return $this->render('cms/plugin.html.twig', [
-                'pluginContent' => $pluginService->handleRoute($page),
+                'pluginContent' => $pluginService->handleRoute($request),
             ]);
         } catch (NotFoundHttpException $e) {
             //

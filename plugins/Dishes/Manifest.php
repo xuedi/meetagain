@@ -3,6 +3,7 @@
 namespace Plugin\Dishes;
 
 use App\Plugin;
+use Symfony\Component\HttpFoundation\Request;
 
 class Manifest implements Plugin
 {
@@ -36,10 +37,12 @@ class Manifest implements Plugin
         // TODO: Implement uninstall() method.
     }
 
-    public function handleRoute(string $url): ?string
+    public function handleRoute(Request $request): ?string
     {
-        return match ($url) {
-            'dishes' => 'dishes',
+        return match ($request->getPathInfo()) {
+            '/en/dishes' => 'dishes EN',
+            '/cn/dishes' => 'dishes CN',
+            '/de/dishes' => 'dishes DE',
             default => null,
         };
     }
