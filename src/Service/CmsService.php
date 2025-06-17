@@ -27,7 +27,7 @@ readonly class CmsService
         ]);
 
         if ($cms === null) {
-            throw new NotFoundHttpException();
+            return $this->createNotFoundPage();
         }
 
         $blocks = $cms->getLanguageFilteredBlockJsonList($locale);
