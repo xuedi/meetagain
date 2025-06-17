@@ -7,11 +7,10 @@ use App\Plugin as PluginInterface;
 use App\Repository\PluginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use RuntimeException;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Twig\Environment;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class PluginService
 {
@@ -20,6 +19,7 @@ readonly class PluginService
         private iterable $plugins,
         private PluginRepository $pluginRepo,
         private EntityManagerInterface $em,
+        private KernelInterface $kernel,
     )
     {
     }
@@ -70,6 +70,8 @@ readonly class PluginService
 
         $this->em->persist($pluginEntity);
         $this->em->flush();
+
+        // TODO: run local plugin migrations and so on
     }
 
     public function uninstall(string $ident): void
@@ -98,6 +100,8 @@ readonly class PluginService
 
         $this->em->persist($pluginEntity);
         $this->em->flush();
+
+        $this->generatePluginConfig();
     }
 
     public function disable(string $ident): void
@@ -107,41 +111,33 @@ readonly class PluginService
 
         $this->em->persist($pluginEntity);
         $this->em->flush();
+
+        $this->generatePluginConfig();
     }
 
-    public function handleRoute(Request $request): string
+    public function generatePluginConfig(): void
     {
-        foreach ($this->plugins as $plugin) {
-
-            // only for enabled plugins
-            if (!$this->pluginRepo->findOneBy(['ident' => $plugin->getIdent()])->isEnabled()) {
-                continue;
-            }
-
-            // only when route prefix is correct
-            if (!$this->hasMatchingPrefix($plugin->getIdent(), $request->getPathInfo())) {
-                continue;
-            }
-
-            // choose response
-            $content = $plugin->handleRoute($request);
-            if ($content !== null) {
-                return $content;
-            }
+        $nameList = [];
+        $pluginConfigFile = __DIR__ . '/../../config/plugins.php';
+        $plugins = $this->pluginRepo->findBy(['enabled' => true]);
+        foreach ($plugins as $plugin) {
+            $nameList[] = "'" . $plugin->getName() . "'";
         }
-        throw new NotFoundHttpException();
+        $content = "<?php declare(strict_types=1); return [" . implode(',', $nameList) . "];";
+        file_put_contents($pluginConfigFile, $content);
+
+        $this->clearCache();
     }
 
-    private function hasMatchingPrefix(string $getIdent, string $pathInfo): bool
+    private function clearCache(): void
     {
-        $chunks = explode('/', trim($pathInfo, '/'));
-        if (count($chunks) < 2) {
-            return false; // should never happen, root path is handles elsewhere
-        }
-        if(strtolower($chunks[1]) === $getIdent) {
-            return true;
-        }
+        // TODO: Move into own class with the extract translations
+        $input = new ArrayInput([
+            'command' => 'cache:clear',
+        ]);
 
-        return false;
+        $application = new Application($this->kernel);
+        $application->setAutoExit(false);
+        $application->run($input);
     }
 }

@@ -1,0 +1,6 @@
+controllers:
+    type: attribute
+    prefix: /{_locale}
+    resource:
+        path: ../../../plugins/Glossary/Controller/
+        namespace: Plugin\Glossary\Controller

@@ -1,0 +1,12 @@
+doctrine:
+    orm:
+        mappings:
+            Plugin\Glossary\:
+                dir: "%kernel.project_dir%/plugins/Glossary/Entity"
+                is_bundle: false
+                prefix: Plugin\Glossary\Entity
+                alias: Plugin\Glossary
+
+doctrine_migrations:
+    migrations_paths:
+        Plugin\Glossary\Migrations: "%kernel.project_dir%/plugins/Glossary/Migrations"

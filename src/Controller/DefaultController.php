@@ -16,14 +16,6 @@ class DefaultController extends AbstractController
     public function catchAll(Request $request, CmsService $cms, PluginService $pluginService, string $page): Response
     {
         try {
-            return $this->render('cms/plugin.html.twig', [
-                'pluginContent' => $pluginService->handleRoute($request),
-            ]);
-        } catch (NotFoundHttpException $e) {
-            //
-        }
-
-        try {
             return $cms->handle($request->getLocale(), $page);
         } catch (NotFoundHttpException $e) {
             //

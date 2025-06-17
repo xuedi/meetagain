@@ -1,9 +1,9 @@
 controllers:
+    type: attribute
+    prefix: /{_locale}
     resource:
         path: ../src/Controller/
         namespace: App\Controller
-    type: attribute
-    prefix: /{_locale}
 
 api:
     type: attribute

@@ -2,27 +2,16 @@
 
 namespace Plugin\Glossary\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
-class IndexController extends AbstractController
+class IndexController extends AbstractSymfonyController
 {
-    public function list(Request $request): string
+    #[Route('/glossary', name: 'app_plugin_glossary')]
+    public function show(Request $request): Response
     {
-        return $this->render('index.html.twig');
-    }
-
-    public function details(Request $request): string
-    {
-        return $this->render('index.html.twig', [
-            'id' => 1223, // get from request
-        ]);
-    }
-
-    public function getRoutes(): array
-    {
-        return [
-            '/glossary' => 'list',
-            '/glossary/details' => 'details',
-        ];
+        return $this->render('@Glossary/index.html.twig');
     }
 }

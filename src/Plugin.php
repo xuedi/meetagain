@@ -3,16 +3,20 @@
 namespace App;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\HttpFoundation\Request;
 
 #[AutoconfigureTag]
 interface Plugin
 {
+    /** @deprecated use getName instead */
     public function getIdent(): string;
+
     public function getName(): string;
+
     public function getVersion(): string;
+
     public function getDescription(): string;
+
     public function install(): void;
+
     public function uninstall(): void;
-    public function handleRoute(Request $request): ?string;
 }

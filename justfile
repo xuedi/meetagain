@@ -4,6 +4,7 @@ JUST := just_executable() + " --justfile=" + justfile()
 
 install:
     cp --no-clobber .env.dist .env
+    cp --no-clobber config/plugins.dist.php config/plugins.php
     {{JUST}} start
     {{PHP}} composer install
     {{PHP}} php bin/console cache:clear
@@ -65,3 +66,6 @@ checkAutoFix:
 update_coverage_badge: ## generate badge and add it to repo
 	{{PHP}} php tests/badgeGenerator.php
 	git add tests/badge/coverage.svg
+
+#migrations:
+#    {{PHP}} php bin/console do:mi:di --namespace=$(MIG_NAMESPACE) --filter-expression=/^service_order/ --formatted

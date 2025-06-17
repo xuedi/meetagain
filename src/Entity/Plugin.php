@@ -14,7 +14,7 @@ class Plugin
     private ?int $id = null;
 
     #[ORM\Column(length: 8)]
-    private ?string $ident = null;
+    private ?string $ident = null; // TODO: deprecated, use name instead
 
     #[ORM\Column(length: 16)]
     private ?string $version = null;
