@@ -26,13 +26,13 @@
                             {% if plugin.installed %}
                                 {% if plugin.enabled %}
                                     <button class="button is-danger is-light" disabled>Uninstall</button>
-                                    <a class="button is-danger is-light" href="{{ path('admin_plugin_disable', {ident: plugin.ident}) }}">Disable</a>
+                                    <a class="button is-danger is-light" href="{{ path('admin_plugin_disable', {name: plugin.name}) }}">Disable</a>
                                 {% else %}
-                                    <a class="button is-danger is-light" href="{{ path('admin_plugin_uninstall', {ident: plugin.ident}) }}">Uninstall</a>
-                                    <a class="button is-success is-light" href="{{ path('admin_plugin_enable', {ident: plugin.ident}) }}">Enable</a>
+                                    <a class="button is-danger is-light" href="{{ path('admin_plugin_uninstall', {name: plugin.name}) }}">Uninstall</a>
+                                    <a class="button is-success is-light" href="{{ path('admin_plugin_enable', {name: plugin.name}) }}">Enable</a>
                                 {% endif %}
                             {% else %}
-                                <a class="button is-success is-light" href="{{ path('admin_plugin_install', {ident: plugin.ident}) }}">Install</a>
+                                <a class="button is-success is-light" href="{{ path('admin_plugin_install', {name: plugin.name}) }}">Install</a>
                                 <button class="button is-success is-light" disabled>Enable</button>
                             {% endif %}
                         {% endif %}

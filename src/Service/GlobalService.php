@@ -38,7 +38,7 @@ readonly class GlobalService
 
     public function getPlugins(): array
     {
-        return $this->pluginRepo->findBy(['enabled' => true], ['ident' => 'ASC']);
+        return $this->pluginRepo->findBy(['enabled' => true], ['name' => 'ASC']);
     }
 
     public function hasNewMessages(): bool

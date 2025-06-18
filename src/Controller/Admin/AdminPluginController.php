@@ -29,34 +29,34 @@ class AdminPluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/install/{ident}', name: 'admin_plugin_install')]
-    public function install(string $ident): Response
+    #[Route('/admin/plugin/install/{name}', name: 'admin_plugin_install')]
+    public function install(string $name): Response
     {
-        $this->pluginService->install($ident);
+        $this->pluginService->install($name);
 
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/uninstall/{ident}', name: 'admin_plugin_uninstall')]
-    public function uninstall(string $ident): Response
+    #[Route('/admin/plugin/uninstall/{name}', name: 'admin_plugin_uninstall')]
+    public function uninstall(string $name): Response
     {
-        $this->pluginService->uninstall($ident);
+        $this->pluginService->uninstall($name);
 
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/enable/{ident}', name: 'admin_plugin_enable')]
-    public function enable(string $ident): Response
+    #[Route('/admin/plugin/enable/{name}', name: 'admin_plugin_enable')]
+    public function enable(string $name): Response
     {
-        $this->pluginService->enable($ident);
+        $this->pluginService->enable($name);
 
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/disable/{ident}', name: 'admin_plugin_disable')]
-    public function disable(string $ident): Response
+    #[Route('/admin/plugin/disable/{name}', name: 'admin_plugin_disable')]
+    public function disable(string $name): Response
     {
-        $this->pluginService->disable($ident);
+        $this->pluginService->disable($name);
 
         return $this->redirectToRoute('app_admin_plugin');
     }
