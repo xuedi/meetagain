@@ -72,6 +72,7 @@ readonly class PluginService
         $this->em->flush();
 
         // TODO: run local plugin migrations and so on
+        $this->pluginMigration($ident);
     }
 
     public function uninstall(string $ident): void
@@ -134,6 +135,19 @@ readonly class PluginService
         // TODO: Move into own class with the extract translations
         $input = new ArrayInput([
             'command' => 'cache:clear',
+        ]);
+
+        $application = new Application($this->kernel);
+        $application->setAutoExit(false);
+        $application->run($input);
+    }
+
+    private function pluginMigration(string $ident): void
+    {
+        $input = new ArrayInput([
+            'command' => 'doctrine:migrations:migrate',
+            '--no-interaction' => true,
+            '--em' => $ident . '_em',
         ]);
 
         $application = new Application($this->kernel);

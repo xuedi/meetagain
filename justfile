@@ -66,6 +66,3 @@ checkAutoFix:
 update_coverage_badge: ## generate badge and add it to repo
 	{{PHP}} php tests/badgeGenerator.php
 	git add tests/badge/coverage.svg
-
-#migrations:
-#    {{PHP}} php bin/console do:mi:di --namespace=$(MIG_NAMESPACE) --filter-expression=/^service_order/ --formatted
