@@ -6,11 +6,6 @@ use App\Plugin;
 
 class Manifest implements Plugin
 {
-    public function getIdent(): string
-    {
-        return 'glossary';
-    }
-
     public function getName(): string
     {
         return 'Glossary';

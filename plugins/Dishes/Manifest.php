@@ -7,11 +7,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Manifest implements Plugin
 {
-    public function getIdent(): string
-    {
-        return 'dishes';
-    }
-
     public function getName(): string
     {
         return 'Dishes';

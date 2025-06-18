@@ -1,1 +1,1 @@
-<?php declare(strict_types=1); return ['Glossary'];
+<?php declare(strict_types=1); return [];

@@ -2,7 +2,7 @@
 
 namespace Plugin\Glossary\Entity;
 
-use App\Entity\User;
+use DateTimeImmutable;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,7 +18,7 @@ class Glossary
     private ?string $phrase = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     private ?int $createdBy = null;
@@ -40,24 +40,24 @@ class Glossary
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getCreatedBy(): ?User
+    public function getCreatedBy(): ?int
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?User $createdBy): static
+    public function setCreatedBy(?int $createdBy): static
     {
         $this->createdBy = $createdBy;
 

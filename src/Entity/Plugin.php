@@ -13,9 +13,6 @@ class Plugin
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 8)]
-    private ?string $ident = null; // TODO: deprecated, use name instead
-
     #[ORM\Column(length: 16)]
     private ?string $version = null;
 
@@ -82,18 +79,6 @@ class Plugin
     public function setVersion(string $version): static
     {
         $this->version = $version;
-
-        return $this;
-    }
-
-    public function getIdent(): ?string
-    {
-        return $this->ident;
-    }
-
-    public function setIdent(string $ident): static
-    {
-        $this->ident = $ident;
 
         return $this;
     }

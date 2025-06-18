@@ -26,15 +26,14 @@ readonly class PluginService
 
     public function getAdminList(): array
     {
-        $list = $this->pluginRepo->findAllWithIdentKey();
+        $list = $this->pluginRepo->findAllWithNameKey();
         foreach ($this->plugins as $plugin) {
-            $ident = $plugin->getIdent();
-            if (isset($list[$ident])) {
-                $list[$ident]->setDeleted(false);
+            $name = $plugin->getName();
+            if (isset($list[$name])) {
+                $list[$name]->setDeleted(false);
                 continue;
             }
             $newPlugin = new Plugin();
-            $newPlugin->setIdent($ident);
             $newPlugin->setName($plugin->getName());
             $newPlugin->setVersion($plugin->getVersion());
             $newPlugin->setDescription($plugin->getDescription());
@@ -42,7 +41,7 @@ readonly class PluginService
             $newPlugin->setInstalled(false);
             $newPlugin->setEnabled(false);
 
-            $list[$ident] = $newPlugin;
+            $list[$name] = $newPlugin;
         }
         ksort($list);
 
@@ -55,13 +54,12 @@ readonly class PluginService
         $this->em->flush();
     }
 
-    public function install(string $ident): void
+    public function install(string $name): void
     {
-        $plugin = $this->getPlugin($ident);
+        $plugin = $this->getPlugin($name);
         $plugin->install();
 
         $pluginEntity = new Plugin();
-        $pluginEntity->setIdent($ident);
         $pluginEntity->setName($plugin->getName());
         $pluginEntity->setVersion($plugin->getVersion());
         $pluginEntity->setDescription($plugin->getDescription());
@@ -71,31 +69,31 @@ readonly class PluginService
         $this->em->persist($pluginEntity);
         $this->em->flush();
 
-        $this->pluginMigration($ident);
+        $this->pluginMigration($name);
     }
 
-    public function uninstall(string $ident): void
+    public function uninstall(string $name): void
     {
-        $plugin = $this->getPlugin($ident);
+        $plugin = $this->getPlugin($name);
         $plugin->uninstall();
 
-        $this->em->remove($this->pluginRepo->findOneBy(['ident' => $ident]));
+        $this->em->remove($this->pluginRepo->findOneBy(['name' => $name]));
         $this->em->flush();
     }
 
-    private function getPlugin(string $ident): PluginInterface
+    private function getPlugin(string $name): PluginInterface
     {
         foreach ($this->plugins as $plugin) {
-            if ($plugin->getIdent() === $ident) {
+            if ($plugin->getName() === $name) {
                 return $plugin;
             }
         }
         throw new Exception('Plugin not found');
     }
 
-    public function enable(string $ident): void
+    public function enable(string $name): void
     {
-        $pluginEntity = $this->pluginRepo->findOneBy(['ident' => $ident]);
+        $pluginEntity = $this->pluginRepo->findOneBy(['name' => $name]);
         $pluginEntity->setEnabled(true);
 
         $this->em->persist($pluginEntity);
@@ -104,9 +102,9 @@ readonly class PluginService
         $this->generatePluginConfig();
     }
 
-    public function disable(string $ident): void
+    public function disable(string $name): void
     {
-        $pluginEntity = $this->pluginRepo->findOneBy(['ident' => $ident]);
+        $pluginEntity = $this->pluginRepo->findOneBy(['name' => $name]);
         $pluginEntity->setEnabled(false);
 
         $this->em->persist($pluginEntity);
@@ -141,12 +139,12 @@ readonly class PluginService
         $application->run($input);
     }
 
-    private function pluginMigration(string $ident): void
+    private function pluginMigration(string $name): void
     {
         $input = new ArrayInput([
             'command' => 'doctrine:migrations:migrate',
             '--no-interaction' => true,
-            '--em' => $ident . '_em',
+            '--em' => 'em' . $name,
         ]);
 
         $application = new Application($this->kernel);

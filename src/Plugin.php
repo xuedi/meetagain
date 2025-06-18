@@ -7,9 +7,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag]
 interface Plugin
 {
-    /** @deprecated use getName instead */
-    public function getIdent(): string;
-
     public function getName(): string;
 
     public function getVersion(): string;

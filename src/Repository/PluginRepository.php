@@ -18,12 +18,12 @@ class PluginRepository extends ServiceEntityRepository
         parent::__construct($registry, Plugin::class);
     }
 
-    public function findAllWithIdentKey(): array
+    public function findAllWithNameKey(): array
     {
         $result = [];
         $plugins = $this->findAll();
         foreach ($plugins as $plugin) {
-            $result[$plugin->getIdent()] = $plugin;
+            $result[$plugin->getName()] = $plugin;
         }
 
         return $result;

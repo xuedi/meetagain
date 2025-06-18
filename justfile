@@ -4,13 +4,13 @@ JUST := just_executable() + " --justfile=" + justfile()
 
 install:
     cp --no-clobber .env.dist .env
-    cp --no-clobber config/plugins.dist.php config/plugins.php
+    cp config/plugins.dist.php config/plugins.php
     {{JUST}} start
     {{PHP}} composer install
     {{PHP}} php bin/console cache:clear
     {{PHP}} php bin/console doctrine:schema:drop --force -q
-    {{PHP}} php bin/console doctrine:schema:create -q
-    {{PHP}} php bin/console doctrine:fixtures:load --append -q
+    {{PHP}} php bin/console doctrine:schema:create -q --em=default
+    {{PHP}} php bin/console doctrine:fixtures:load --append -q --em=default
     {{PHP}} php bin/console app:translation:import 'https://www.dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
 

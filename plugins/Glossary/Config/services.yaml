@@ -1,9 +1,0 @@
-services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
-
-    Plugin\:
-      resource: '../plugins/'
-      exclude:
-        - '../plugin/*/Entity/'
