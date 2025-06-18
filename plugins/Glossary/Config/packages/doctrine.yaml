@@ -10,7 +10,7 @@ doctrine:
                 naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
                 mappings:
                     Plugin\Glossary\:
-                        dir: "%kernel.project_dir%/plugins/Glossary/srv/Entity"
+                        dir: "%kernel.project_dir%/plugins/Glossary/Entity"
                         is_bundle: false
                         prefix: Plugin\Glossary\Entity
                         alias: Plugin\Glossary
@@ -18,4 +18,4 @@ doctrine:
 doctrine_migrations:
     em: emGlossary
     migrations_paths:
-        DoctrineMigrationsGlossary: "%kernel.project_dir%/plugins/Glossary/migrations"
+        DoctrineMigrationsGlossary: "%kernel.project_dir%/plugins/Glossary/Migrations"
