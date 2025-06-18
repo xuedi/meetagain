@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Glossary\DoctrineMigrationsGlossary;
+namespace Plugin\Glossary\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
