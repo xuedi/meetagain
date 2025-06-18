@@ -71,7 +71,6 @@ readonly class PluginService
         $this->em->persist($pluginEntity);
         $this->em->flush();
 
-        // TODO: run local plugin migrations and so on
         $this->pluginMigration($ident);
     }
 
