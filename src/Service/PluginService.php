@@ -28,6 +28,7 @@ readonly class PluginService
     {
         $list = $this->pluginRepo->findAllWithNameKey();
         foreach ($this->plugins as $plugin) {
+            dump($plugin);
             $name = $plugin->getName();
             if (isset($list[$name])) {
                 $list[$name]->setDeleted(false);
