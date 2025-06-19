@@ -37,12 +37,6 @@ body {
     }
 }
 
-.column {
-    .is-danger {
-        background-color: #ff3860;
-    }
-}
-
 .cookie-button {
     padding-left:70px;
     background-image: url('/images/monster.png');
