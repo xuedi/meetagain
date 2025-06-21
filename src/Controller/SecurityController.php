@@ -80,7 +80,7 @@ class SecurityController extends AbstractController
 
             $activityService->log(ActivityType::Registered, $user, []);
 
-            $emailService->sendEmailConformationRequest($user, $request);
+            $emailService->sendConformationRequest($user, $request);
 
             return $this->render('security/register_email_send.html.twig');
         }
@@ -154,7 +154,7 @@ class SecurityController extends AbstractController
                 $user->setRegcode(sha1(random_bytes(128)));
                 $em->persist($user);
                 $em->flush();
-                $emailService->sendEmailResetPasswordRequest($user, $request);
+                $emailService->sendResetPasswordRequest($user, $request);
 
                 return $this->render('security/reset_email_send.html.twig');
             } else {

@@ -7,12 +7,12 @@ use JsonSerializable;
 
 class NotificationSettings implements JsonSerializable
 {
-    private bool $announcements {
+    public bool $announcements {
         get => $this->announcements;
         set => $this->announcements = $value;
     }
 
-    private bool $followingUpdates {
+    public bool $followingUpdates {
         get => $this->followingUpdates;
         set => $this->followingUpdates = $value;
     }

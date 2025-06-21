@@ -16,4 +16,9 @@ readonly class ConfigService
             ImageType::CmsBlock => [[432, 432], [80, 80]],
         };
     }
+
+    public function getHost(): string
+    {
+        return $_ENV['APP_HOST'] ?? 'http://localhost';
+    }
 }
