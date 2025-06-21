@@ -2,7 +2,7 @@
     <div class="dropdown-trigger is-hoverable">
         <div class="button" aria-haspopup="true" aria-controls="dropdown-languages">
             <span class="image is-32x32 mt-3">
-                <img class="is-flag" src="{{ '/images/flags/' ~ app.request.locale ~ '.png' }}"  alt="Current locale flag"/>
+                <img class="is-flag" src="{{ '/images/flags/' ~ app.request.locale ~ '.png' }}" width="100" height="64" alt="Current locale flag: {{ app.request.locale }}"/>
             </span>
             <span class="icon is-small"><i class="fas fa-angle-down" aria-hidden="true"></i></span>
         </div>
@@ -15,7 +15,7 @@
                     <nobr>
                         <a class="navbar-item" href="{{ altLangLink }}">
                             <figure class="image is-32x32 mt-3">
-                                <img class="is-flag" src="{{ '/images/flags/' ~ altLangCode ~ '.png' }}" width="100" height="64" alt="Locale flag"/>
+                                <img class="is-flag" src="{{ '/images/flags/' ~ altLangCode ~ '.png' }}" width="100" height="64" alt="Locale flag: {{ altLangCode }}"/>
                             </figure>
                             <span class="ml-3">
                                 {{ ('language_'~altLangCode) | trans({}, "messages", altLangCode) }}

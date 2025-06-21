@@ -1,6 +1,11 @@
-<div class="navbar-item dropdown is-hoverable {% if globalService.showCookieConsent %}is-active{% endif %}">
+<div class="navbar-item dropdown is-hoverable {% if globalService.showCookieConsent %}is-active{% endif %}" role="region" aria-label="{{ "menu_cookie_consent_headline" | trans }}">
     <div class="dropdown-trigger">
-        <button class="button cookie-button" aria-haspopup="true" aria-controls="dropdown-cookie">
+        <button 
+            class="button cookie-button" 
+            aria-haspopup="true" 
+            aria-controls="dropdown-cookie"
+            aria-expanded="{% if globalService.showCookieConsent %}true{% else %}false{% endif %}"
+        >
             {% if globalService.showCookieConsent %}
             <span>{{ "menu_cookie_consent_button" | trans }}</span>
             {% endif %}
@@ -11,30 +16,29 @@
     </div>
     <div class="dropdown-menu" id="dropdown-cookie" role="menu">
         <div class="dropdown-content">
-
-            <form action="{{ path('app_cookie') }}" method="post">
-
-                <h2 class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_headline" | trans }}</h2>
-                <p class="navbar-item is-6">
+            <form action="{{ path('app_cookie') }}" method="post" aria-labelledby="cookie-form-title">
+                <h2 id="cookie-form-title" class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_headline" | trans }}</h2>
+                <p id="cookie-form-description" class="navbar-item is-6">
                     {{ "menu_cookie_consent_text" | trans }}
                 </p>
-                <h3 class="navbar-item title mt-5 mb-0 is-size-6">{{ "menu_cookie_consent_options" | trans }}</h3>
+                <h3 id="cookie-options-title" class="navbar-item title mt-5 mb-0 is-size-6">{{ "menu_cookie_consent_options" | trans }}</h3>
                 <div class="navbar-item">
-                    <div class="list">
+                    <div class="list" role="group" aria-labelledby="cookie-options-title">
                         <div class="list-item mt-0">
                             <div class="list-item-content">
                                 <div class="list-item-title">
-                                    <label class="checkbox">
+                                    <label class="checkbox" for="osm_consent_checkbox">
                                         <input
                                             type="checkbox"
                                             name="osm_consent_checkbox"
                                             {% if globalService.showOsm %}checked{% endif %}
                                             id="osm_consent_checkbox"
+                                            aria-describedby="osm-description"
                                         />
                                         <strong>{{ "menu_cookie_consent_option_osm" | trans }}</strong>
                                     </label>
                                 </div>
-                                <div class="list-item-description has-text-grey is-size-7">
+                                <div id="osm-description" class="list-item-description has-text-grey is-size-7">
                                     {{ "menu_cookie_consent_option_osm_text" | trans }}
                                 </div>
                             </div>
@@ -47,17 +51,19 @@
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_accept') }}"
                         value="{{ "menu_cookie_consent_button_accept" | trans }}"
+                        aria-label="{{ "menu_cookie_consent_button_accept" | trans }}"
+                        role="button"
                     >
                     <input
                         type="submit"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_deny') }}"
                         value="{{ "menu_cookie_consent_button_deny" | trans }}"
+                        aria-label="{{ "menu_cookie_consent_button_deny" | trans }}"
+                        role="button"
                     >
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
