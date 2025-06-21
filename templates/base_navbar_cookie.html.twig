@@ -15,7 +15,7 @@
         </button>
     </div>
     <div class="dropdown-menu" id="dropdown-cookie" role="menu" aria-labelledby="dropdown-cookie" aria-hidden="{% if globalService.showCookieConsent %}false{% else %}true{% endif %}">
-        <div class="dropdown-content">
+        <div class="dropdown-content" role="dialog" aria-labelledby="cookie-form-title">
             <form action="{{ path('app_cookie') }}" method="post" aria-labelledby="cookie-form-title">
                 <h2 id="cookie-form-title" class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_headline" | trans }}</h2>
                 <p id="cookie-form-description" class="navbar-item is-6">
