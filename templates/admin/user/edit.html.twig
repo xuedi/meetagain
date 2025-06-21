@@ -33,23 +33,41 @@
                 {{ form_row(form.name) }}
                 {{ form_row(form.email) }}
                 {{ form_row(form.bio) }}
-                {{ form_row(form.locale) }}
+
+                <div class="columns">
+                    <div class="column">
+                        {{ form_row(form.verified) }}
+                    </div>
+                    <div class="column">
+                        {{ form_row(form.restricted) }}
+                    </div>
+                    <div class="column">
+                        {{ form_row(form.public) }}
+                    </div>
+                    <div class="column">
+                        {{ form_row(form.tagging) }}
+                    </div>
+                    <div class="column">
+                        {{ form_row(form.osmConsent) }}
+                    </div>
+                </div>
             </div>
             <div class="column is-3">
-                {{ form_row(form.verified) }}
-                {{ form_row(form.restricted) }}
-                {{ form_row(form.osmConsent) }}
+                {{ form_row(form.locale) }}
                 {{ form_row(form.status) }}
                 {{ form_row(form.roles) }}
+                <br>
+                <br>
+                <a class="button is-danger toggleTrigger" data-id="user-delete-warning" href="{{ deleteLink }}">
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                </a>
+                <button class="button">{{ "button_save" | trans }}</button>
             </div>
         </div>
 
 
         {{ form_widget(form) }}
-        <button class="button">{{ "button_save" | trans }}</button>
-        <a class="button is-danger toggleTrigger" data-id="user-delete-warning" href="{{ deleteLink }}">
-            <span class="icon"><i class="fa fa-trash"></i></span>
-        </a>
+
         {{ form_end(form) }}
 
 

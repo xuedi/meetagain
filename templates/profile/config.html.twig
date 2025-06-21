@@ -45,19 +45,28 @@
                         <table class="table is-fullwidth">
                             <tr>
                                 <td>Show me on the members page</td>
-                                <td class="has-text-right">
+                                <td>
                                     {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_visibility'),
-                                        'status': true
+                                        'link': path('app_profile_config_toggle_osm'),
+                                        'status': user.isOsmConsent
                                     } %}
                                 </td>
                             </tr>
                             <tr>
                                 <td>Can be tagged by others in photos</td>
-                                <td class="has-text-right">
+                                <td>
+                                    {% include '_block/toggle.html.twig' with {
+                                        'link': path('app_profile_config_toggle_tagging'),
+                                        'status': user.isTagging
+                                    } %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Enable osm maps on the event page</td>
+                                <td>
                                     {% include '_block/toggle.html.twig' with {
                                         'link': path('app_profile_config_toggle_visibility'),
-                                        'status': true
+                                        'status': user.isPublic
                                     } %}
                                 </td>
                             </tr>

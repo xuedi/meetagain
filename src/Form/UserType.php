@@ -97,7 +97,27 @@ class UserType extends AbstractType
                 [
                 'data' => $user->isOsmConsent(),
                 'mapped' => false,
-                'label' => 'OsmConsent',
+                'label' => 'show Maps',
+                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+                ]
+            )
+            ->add(
+                'public',
+                ChoiceType::class,
+                [
+                'data' => $user->isPublic(),
+                'mapped' => false,
+                'label' => 'isPublic',
+                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+                ]
+            )
+            ->add(
+                'tagging',
+                ChoiceType::class,
+                [
+                'data' => $user->isTagging(),
+                'mapped' => false,
+                'label' => 'allowTagging',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
                 ]
             )

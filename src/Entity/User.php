@@ -72,6 +72,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $osmConsent = false;
 
+    #[ORM\Column]
+    private ?bool $tagging = true;
+
     #[ORM\OneToMany(targetEntity: Activity::class, mappedBy: 'user')]
     private Collection $activities;
 
@@ -467,6 +470,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $messagesReceived->setReceiver(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isTagging(): ?bool
+    {
+        return $this->tagging;
+    }
+
+    public function setTagging(bool $tagging): static
+    {
+        $this->tagging = $tagging;
 
         return $this;
     }
