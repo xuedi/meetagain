@@ -15,7 +15,6 @@ readonly class NotificationService
     {
         // get user
         // get all people following this user
-        // decide what kind of notifications
-        dump($activity);
+        // TODO: decide what kind of notifications
     }
 }
