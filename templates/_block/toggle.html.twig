@@ -1,4 +1,12 @@
 
+{% set disabled = '' %}
+{% if enabled is defined %}
+    {% if not enabled %}
+        {% set disabled = 'disabled' %}
+        {% set link = '#' %}
+    {% endif %}
+{% endif %}
+
 {% set no = '' %}
 {% set yes = '' %}
 {% if status %}
@@ -7,6 +15,6 @@
     {% set no = 'is-danger' %}
 {% endif %}
 <div class="buttons has-addons is-right">
-    <a href="{{ link }}" class="button is-small {{ yes }}">{{ "toggle_yes"|trans }}</a>
-    <a href="{{ link }}" class="button is-small {{ no }}">{{ "toggle_no"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {{ yes }}" {{ disabled }}>{{ "toggle_yes"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {{ no }}" {{ disabled }}>{{ "toggle_no"|trans }}</a>
 </div>

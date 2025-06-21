@@ -17,7 +17,8 @@ readonly class ActivityService
     public function __construct(
         private GlobalService $globalService,
         private EntityManagerInterface $em,
-        private ActivityRepository $repo
+        private ActivityRepository $repo,
+        private NotificationService $notificationService,
     ) {
     }
 
@@ -30,6 +31,8 @@ readonly class ActivityService
         $activity->setUser($user);
         $activity->setType($type);
         $activity->setMeta($meta);
+
+        $this->notificationService->notify($activity);
 
         $this->em->persist($activity);
         $this->em->flush();

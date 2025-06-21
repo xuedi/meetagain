@@ -5,6 +5,7 @@ namespace App\Controller\Profile;
 use App\Controller\AbstractController;
 use App\Form\ChangePassword;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -40,11 +41,26 @@ class ConfigController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/config/toggleVisibility', name: 'app_profile_config_toggle_visibility')]
-    public function toggleVisibility(): Response
+    #[Route('/profile/config/toggle/{type}', name: 'app_profile_config_toggle', requirements: ['type' => 'osm|tagging|notification|public'])]
+    public function toggle(string $type): Response
     {
         $user = $this->getAuthedUser();
-        $user->setPublic(!$user->isPublic());
+        switch ($type) {
+            case 'osm':
+                $user->setOsmConsent(!$user->isOsmConsent());
+                break;
+            case 'tagging':
+                $user->setTagging(!$user->isTagging());
+                break;
+            case 'notification':
+                $user->setNotification(!$user->isNotification());
+                break;
+            case 'public':
+                $user->setPublic(!$user->isPublic());
+                break;
+            default:
+                throw new Exception('Invalid type');
+        }
 
         $this->em->persist($user);
         $this->em->flush();
@@ -52,23 +68,11 @@ class ConfigController extends AbstractController
         return $this->redirectToRoute('app_profile_config');
     }
 
-    #[Route('/profile/config/toggleOsm', name: 'app_profile_config_toggle_osm')]
-    public function toggleOsm(): Response
+    #[Route('/profile/config/toggleNotification/{type}', name: 'app_profile_config_toggle_notification')]
+    public function toggleNotification(string $type): Response
     {
         $user = $this->getAuthedUser();
-        $user->setOsmConsent(!$user->isOsmConsent());
-
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return $this->redirectToRoute('app_profile_config');
-    }
-
-    #[Route('/profile/config/toggleTagging', name: 'app_profile_config_toggle_tagging')]
-    public function toggleTagging(): Response
-    {
-        $user = $this->getAuthedUser();
-        $user->setTagging(!$user->isTagging());
+        $user->setNotificationSettings($user->getNotificationSettings()->toggle($type));
 
         $this->em->persist($user);
         $this->em->flush();

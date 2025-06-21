@@ -7,13 +7,6 @@
     <section class="section">
         <div class="container">
 
-            <div class="notification is-danger has-text-centered">
-                <span class="icon has-text-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </span>
-                The config page is still under construction and is not yet fully functional.
-            </div>
-
             <div class="columns">
                 <div class="column">
 
@@ -21,22 +14,30 @@
                         <h1 class="title is-5">Settings</h1>
                         <table class="table is-fullwidth">
                             <tr>
-                                <td>enable eMail notification</td>
-                                <td class="has-text-right">
+                                <td>Enable eMail notification</td>
+                                <td>
                                     {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_visibility'),
-                                        'status': true
+                                        'link': path('app_profile_config_toggle', {'type': 'notification'}),
+                                        'status': user.isNotification
                                     } %}
                                 </td>
                             </tr>
+                            {% for notification in user.notificationSettings.list %}
                             <tr>
-                                <td>page to go to after login</td>
-                                <td>Dropdown: profile, activity, messages</td>
+                                <td>
+                                    <div class="{% if not user.isNotification %}has-text-grey{% endif %}">
+                                        {{ notification.label }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% include '_block/toggle.html.twig' with {
+                                        'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
+                                        'status': notification.value,
+                                        'enabled': user.isNotification
+                                    } %}
+                                </td>
                             </tr>
-                            <tr>
-                                <td>date format</td>
-                                <td>Dropdown: formats</td>
-                            </tr>
+                            {% endfor %}
                         </table>
                     </div>
 
@@ -47,7 +48,7 @@
                                 <td>Show me on the members page</td>
                                 <td>
                                     {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_visibility'),
+                                        'link': path('app_profile_config_toggle', {'type': 'public'}),
                                         'status': user.isPublic
                                     } %}
                                 </td>
@@ -56,7 +57,7 @@
                                 <td>Can be tagged by others in photos</td>
                                 <td>
                                     {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_tagging'),
+                                        'link': path('app_profile_config_toggle', {'type': 'tagging'}),
                                         'status': user.isTagging
                                     } %}
                                 </td>
@@ -65,7 +66,7 @@
                                 <td>Enable osm maps on the event page</td>
                                 <td>
                                     {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_osm'),
+                                        'link': path('app_profile_config_toggle', {'type': 'osm'}),
                                         'status': user.isOsmConsent
                                     } %}
                                 </td>

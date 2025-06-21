@@ -504,14 +504,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNotificationSettings(): ?array
+    public function getNotificationSettings(): NotificationSettings
     {
-        return $this->notificationSettings;
+        return NotificationSettings::fromJson($this->notificationSettings);
     }
 
-    public function setNotificationSettings(?array $notificationSettings): static
+    public function setNotificationSettings(?NotificationSettings $notificationSettings): static
     {
-        $this->notificationSettings = $notificationSettings;
+        $this->notificationSettings = $notificationSettings->jsonSerialize();
 
         return $this;
     }
