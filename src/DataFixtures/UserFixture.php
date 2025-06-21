@@ -33,6 +33,7 @@ class UserFixture extends Fixture
             $user->setPublic($name !== 'import');
             $user->setTagging(true);
             $user->setRestricted(false);
+            $user->setNotification(true);
             $user->setBio($this->getRandomBio());
             $user->setOsmConsent(false);
             $user->setLocale($data['language']);

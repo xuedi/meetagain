@@ -90,6 +90,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'receiver', orphanRemoval: true)]
     private Collection $messagesReceived;
 
+    #[ORM\Column]
+    private ?bool $notification = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?array $notificationSettings = null;
+
     public function __construct()
     {
         $this->rsvp = new ArrayCollection();
@@ -482,6 +488,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTagging(bool $tagging): static
     {
         $this->tagging = $tagging;
+
+        return $this;
+    }
+
+    public function isNotification(): ?bool
+    {
+        return $this->notification;
+    }
+
+    public function setNotification(bool $notification): static
+    {
+        $this->notification = $notification;
+
+        return $this;
+    }
+
+    public function getNotificationSettings(): ?array
+    {
+        return $this->notificationSettings;
+    }
+
+    public function setNotificationSettings(?array $notificationSettings): static
+    {
+        $this->notificationSettings = $notificationSettings;
 
         return $this;
     }

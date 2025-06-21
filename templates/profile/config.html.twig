@@ -47,8 +47,8 @@
                                 <td>Show me on the members page</td>
                                 <td>
                                     {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_osm'),
-                                        'status': user.isOsmConsent
+                                        'link': path('app_profile_config_toggle_visibility'),
+                                        'status': user.isPublic
                                     } %}
                                 </td>
                             </tr>
@@ -65,8 +65,8 @@
                                 <td>Enable osm maps on the event page</td>
                                 <td>
                                     {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_visibility'),
-                                        'status': user.isPublic
+                                        'link': path('app_profile_config_toggle_osm'),
+                                        'status': user.isOsmConsent
                                     } %}
                                 </td>
                             </tr>
