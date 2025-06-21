@@ -22,22 +22,19 @@
                                     } %}
                                 </td>
                             </tr>
+                            {% if user.isNotification %}
                             {% for notification in user.notificationSettings.list %}
                             <tr>
-                                <td>
-                                    <div class="{% if not user.isNotification %}has-text-grey{% endif %}">
-                                        {{ notification.label }}
-                                    </div>
-                                </td>
+                                <td>{{ notification.label }}</td>
                                 <td>
                                     {% include '_block/toggle.html.twig' with {
                                         'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
                                         'status': notification.value,
-                                        'enabled': user.isNotification
                                     } %}
                                 </td>
                             </tr>
                             {% endfor %}
+                            {% endif %}
                         </table>
                     </div>
 
