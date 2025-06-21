@@ -31,7 +31,7 @@ class ConfigController extends AbstractController
 
                 $this->addFlash('success', 'Password was changed, please verify by logging in again');
             } else {
-                $this->addFlash('error', 'The old password does not match');
+                $this->addFlash('error', 'The old password is not correct');
             }
         }
         return $this->render('profile/config.html.twig', [

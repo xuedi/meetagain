@@ -21,10 +21,6 @@
                         <h1 class="title is-5">Settings</h1>
                         <table class="table is-fullwidth">
                             <tr>
-                                <td>page to go to after login</td>
-                                <td>Dropdown: profile, activity, messages</td>
-                            </tr>
-                            <tr>
                                 <td>enable eMail notification</td>
                                 <td class="has-text-right">
                                     {% include '_block/toggle.html.twig' with {
@@ -32,6 +28,10 @@
                                         'status': true
                                     } %}
                                 </td>
+                            </tr>
+                            <tr>
+                                <td>page to go to after login</td>
+                                <td>Dropdown: profile, activity, messages</td>
                             </tr>
                             <tr>
                                 <td>date format</td>
@@ -92,7 +92,7 @@
                         {{ form_row(form.oldPassword) }}
                         {{ form_row(form.newPassword) }}
 
-                        <button class="button is-primary">{{ "button_Change_Password" | trans }}</button>
+                        <button class="button is-link">{{ "button_Change_Password" | trans }}</button>
                         {{ form_end(form) }}
 
                         <p class="mt-4">
