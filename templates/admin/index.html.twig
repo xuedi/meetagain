@@ -85,6 +85,27 @@
                         </tr>
                     </table>
                 </div>
+                <div class="box">
+                    <h2 class="title is-6">Health tests</h2>
+                    <table class="table is-narrow">
+                        <tr>
+                            <td>Cache:</td>
+                            <td>
+                                {% if tests.cache %}
+                                    <span class="icon-text">
+                                        <span class="icon has-text-success"><i class="fa fa-check"></i></span>
+                                        <span class="has-text-success">Success</span>
+                                    </span>
+                                {% else %}
+                                    <span class="icon-text">
+                                        <span class="icon has-text-danger"><i class="fas fa-circle-exclamation"></i></span>
+                                        <span class="has-text-danger">Failed</span>
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
