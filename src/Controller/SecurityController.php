@@ -70,6 +70,7 @@ class SecurityController extends AbstractController
 
             $user->setPassword($hasher->hashPassword($user, $plainPassword));
             $user->setRoles(['ROLE_USER']);
+            $user->setNotification(true);
             $user->setStatus(UserStatus::Registered);
             $user->setPublic(true);
             $user->setVerified(false);
@@ -120,7 +121,7 @@ class SecurityController extends AbstractController
             $em->persist($msg);
             $em->flush();
         }
-        $this->activityService->log(ActivityType::ActivatedAccount, $user, []);
+        $this->activityService->log(ActivityType::RegistrationEmailConfirmed, $user, []);
 
         return $this->render('security/register_success.html.twig');
     }

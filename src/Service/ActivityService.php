@@ -76,6 +76,7 @@ readonly class ActivityService
         $msg = match ($activity->getType()->value) {
             ActivityType::Login->value => "User logged in",
             ActivityType::Registered->value => "User registered",
+            ActivityType::RegistrationEmailConfirmed->value => "User confirmed Email",
             ActivityType::RsvpYes->value => sprintf('Going to event: %s', $cachedEventName[$meta['event_id']]),
             ActivityType::RsvpNo->value => sprintf('Is skipping event: %s', $cachedEventName[$meta['event_id']]),
             ActivityType::FollowedUser->value => sprintf('Started following: %s', $cachedUserName[$meta['user_id']]),
