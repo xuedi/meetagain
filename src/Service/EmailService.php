@@ -2,17 +2,27 @@
 
 namespace App\Service;
 
+use App\Entity\EmailQueue;
 use App\Entity\Event;
 use App\Entity\User;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Twig\Environment;
 
 readonly class EmailService
 {
-    public function __construct(private MailerInterface $mailer, private ConfigService $config)
+    public function __construct(
+        private MailerInterface $mailer,
+        private ConfigService $config,
+        private Environment $twig,
+        private EntityManagerInterface $em
+    )
     {
     }
 
@@ -81,7 +91,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->sendEmail($email);
+        return $this->addToEmailQueue($email);
     }
 
     // TODO: buffer in message queue first
@@ -100,5 +110,24 @@ readonly class EmailService
     private function getSenderAddress(): Address
     {
         return new Address('service@dragon-descendants.de', 'Dragon Descendants Meetup');
+    }
+
+    private function addToEmailQueue(TemplatedEmail $email): bool
+    {
+        $renderer = new BodyRenderer($this->twig);
+        $renderer->render($email);
+
+        $emailQueue = new EmailQueue();
+        $emailQueue->setSender($email->getFrom()[0]->toString());
+        $emailQueue->setRecipient($email->getTo()[0]->toString());
+        $emailQueue->setSubject($email->getSubject());
+        $emailQueue->setBody($email->getHtmlBody());
+        $emailQueue->setCreatedAt(new DateTimeImmutable());
+        $emailQueue->setSendAt(null);
+
+        $this->em->persist($emailQueue);
+        $this->em->flush();
+
+        return true;
     }
 }
