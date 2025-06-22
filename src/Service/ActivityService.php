@@ -82,6 +82,7 @@ readonly class ActivityService
             ActivityType::ChangedUsername->value => sprintf('Changed username from %s to %s', $meta['old'], $meta['new']),
             ActivityType::EventImageUploaded->value => sprintf('uploaded %d images to the event %s', $meta['images'], $cachedEventName[$meta['event_id']]),
             ActivityType::ReportedImage->value => sprintf('Reported image for reason: %s', ImageReported::from($meta['reason'])->name), //
+            ActivityType::SendMessage->value => sprintf('Send a message to: %s', $cachedUserName[$meta['user_id']]), //
             default => '',
         };
 
@@ -97,6 +98,7 @@ readonly class ActivityService
                 $this->ensureHasKey($meta, 'event_id', $type->name);
                 $this->ensureIsNumeric($meta, 'event_id', $type->name);
                 break;
+            case ActivityType::SendMessage->value:
             case ActivityType::FollowedUser->value:
                 $this->ensureHasKey($meta, 'user_id', $type->name);
                 $this->ensureIsNumeric($meta, 'user_id', $type->name);

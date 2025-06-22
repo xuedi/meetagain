@@ -17,6 +17,11 @@ class NotificationSettings implements JsonSerializable
         set => $this->followingUpdates = $value;
     }
 
+    public bool $receivedMessage {
+        get => $this->receivedMessage;
+        set => $this->receivedMessage = $value;
+    }
+
     public static function fromJson(?array $notificationSettings): self
     {
         if ($notificationSettings === null) {
@@ -29,6 +34,7 @@ class NotificationSettings implements JsonSerializable
     {
         $this->announcements = $data['announcements'] ?? true;
         $this->followingUpdates = $data['followingUpdates'] ?? true;
+        $this->receivedMessage = $data['receivedMessage'] ?? true;
     }
 
     public function jsonSerialize(): array
@@ -36,6 +42,7 @@ class NotificationSettings implements JsonSerializable
         return [
             'announcements' => $this->announcements,
             'followingUpdates' => $this->followingUpdates,
+            'receivedMessage' => $this->receivedMessage,
         ];
     }
 
@@ -52,6 +59,11 @@ class NotificationSettings implements JsonSerializable
                 'value' => $this->followingUpdates,
                 'label' => '--> Updates from people i follow',
             ],
+            [
+                'key' => 'receivedMessage',
+                'value' => $this->receivedMessage,
+                'label' => '--> When i received a message',
+            ],
         ];
     }
 
@@ -63,6 +75,9 @@ class NotificationSettings implements JsonSerializable
                 break;
             case 'followingUpdates':
                 $this->followingUpdates = !$this->followingUpdates;
+                break;
+            case 'receivedMessage':
+                $this->receivedMessage = !$this->receivedMessage;
                 break;
             default:
                 throw new Exception(sprintf("Invalid type: '%s'", $type));

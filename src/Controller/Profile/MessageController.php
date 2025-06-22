@@ -3,9 +3,11 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Entity\ActivityType;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Form\CommentType;
+use App\Service\ActivityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +16,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MessageController extends AbstractController
 {
+    public function __construct(private readonly ActivityService $activityService)
+    {
+    }
+
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
     public function index(Request $request, EntityManagerInterface $em, ?int $id = null): Response
     {
@@ -38,6 +44,8 @@ class MessageController extends AbstractController
 
                 $em->persist($msg);
                 $em->flush();
+
+                $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' => $conversationPartner->getId()]);
             }
             // preRender then flush when no new messages
             $messages = $msgRepo->getMessages($user, $conversationPartner);

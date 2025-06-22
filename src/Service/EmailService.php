@@ -91,10 +91,27 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email);
+        return $this->addToEmailQueue($email); // TODO: implement for all message
     }
 
-    // TODO: buffer in message queue first
+    public function sendMessageNotification(User $sender, User $recipient): bool
+    {
+        $email = new TemplatedEmail();
+        $email->from($this->getSenderAddress());
+        $email->to((string)$recipient->getEmail());
+        $email->subject('You received a message from ' . $sender->getName());
+        $email->htmlTemplate('_emails/notification_message.html.twig');
+        $email->context([
+            'username' => $recipient->getName(),
+            'sender' => $sender->getName(),
+            'senderId' => $sender->getId(),
+            'host' => $this->config->getHost(),
+            'lang' => $recipient->getLocale(),
+        ]);
+
+        return $this->sendEmail($email);
+    }
+
     private function sendEmail(TemplatedEmail $email): bool
     {
         try {
