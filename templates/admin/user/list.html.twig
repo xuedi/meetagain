@@ -24,7 +24,13 @@
                         <td>{{ user.name }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.locale }}</td>
-                        <td>{{ user.roles|join(' | ') }}</td>
+                        <td>
+                            <div class="hidden">{{ user.roles|join }}</div>
+                            {% set color = 'has-text-grey' %}
+                            {% if 'ROLE_MANAGER' in user.roles %}{% set color = 'has-text-info' %}{% endif %}
+                            {% if 'ROLE_ADMIN' in user.roles %}{% set color = 'has-text-success' %}{% endif %}
+                            <span class="icon {{ color }}"><i class="fa fa-user"></i></span>
+                        </td>
                         <td>{{ user.rsvpEvents|length }}</td>
                         <td>{{ user.createdAt|date('Y-m-d') }}</td>
                         <td>{{ user.createdAt|date('Y-m-d') }}</td>
