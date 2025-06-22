@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\NotFoundLog;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
+use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
@@ -27,6 +28,7 @@ class DashboardService
     public function __construct(
         private readonly EventRepository $eventRepo,
         private readonly UserRepository $userRepo,
+        private readonly EmailQueueRepository $mailRepo,
         private readonly NotFoundLogRepository $notFoundRepo,
         private readonly ActivityRepository $activityRepo,
     ) {
@@ -47,6 +49,7 @@ class DashboardService
         return [
             'memberCount' => $this->userRepo->count(),
             'eventCount' => $this->eventRepo->count(),
+            'weekMailCount' => $this->mailRepo->matching($this->timeCrit())->count(),
             'weekEventCount' => $this->eventRepo->matching($this->timeCrit('start'))->count(),
             'weekNotFoundCount' => $this->notFoundRepo->matching($this->timeCrit())->count(),
             'weekActivityCount' => $this->activityRepo->matching($this->timeCrit())->count(),
