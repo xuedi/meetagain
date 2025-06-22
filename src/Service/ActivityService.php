@@ -11,6 +11,8 @@ use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class ActivityService
 {
@@ -19,6 +21,7 @@ readonly class ActivityService
         private EntityManagerInterface $em,
         private ActivityRepository $repo,
         private NotificationService $notificationService,
+        private TagAwareCacheInterface $appCache,
     ) {
     }
 
@@ -40,7 +43,11 @@ readonly class ActivityService
 
     public function getUserList(User $user): array
     {
-        return $this->prepareActivityList($this->repo->findBy(['user' => $user]));
+        $key = sprintf('activity_list_%s', $user->getId());
+        return $this->appCache->get($key, function (ItemInterface $item) use ($user) {
+            $item->expiresAfter(300); // keep 5 min cached
+            return $this->prepareActivityList($this->repo->findBy(['user' => $user]));
+        });
     }
 
     public function getAdminList(): array
