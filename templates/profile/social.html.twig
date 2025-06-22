@@ -8,70 +8,55 @@
         <div class="container">
 
             <div class="columns">
-                <div class="column is-9">
+                <div class="column is-7">
                     <h2 class="title is-5">Activities</h2>
                     <p>
-                        activity stream of the people you follow (and share activities) and your friends. That can be
-                        posts,
-                        recent RSVPs, comments, likes, etc.
+                        This is your personal activity stream. You can see your activities and the ones of the people
+                        you follow. Like Rsvp's, image uploads, comments, etc.
                     </p>
-                    <hr>
-                    <ul>
+                    <div class="mt-5">
                         {% for activity in activities %}
-                            <li>{{ activity.createdAt|date('Y-m-d') }}: {{ activity.message }}</li>
+                            {% include 'profile/block/activity.html.twig' with { 'activity': activity} %}
                         {% endfor %}
-                    </ul>
+                    </div>
                 </div>
-                <div class="column is-3">
-                    <table class="table is-fullwidth mt-3">
-                        <tbody>
-                        <tr>
-                            <td class="has-text-grey has-text-centered" colspan="2">We follow each other</td>
-                        </tr>
-                        {% for user in friends %}
-                            <tr>
-                                <td>{{ user.name }}</td>
-                                <td class="has-text-right">
-                                    <a href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}"
-                                       class="button is-danger is-small">
-                                        <span class="icon"><i class="fa fa-minus"></i></span><span>Unfollow</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        <tr>
-                            <td class="has-text-grey has-text-centered pt-6" colspan="2">I am following</td>
-                        </tr>
-                        {% for user in following %}
-                            <tr>
-                                <td>{{ user.name }}</td>
-                                <td class="has-text-right">
-                                    <a href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}"
-                                       class="button is-danger is-small">
-                                        <span class="icon"><i class="fa fa-minus"></i></span><span>Unfollow</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        <tr>
-                            <td class="has-text-grey has-text-centered pt-6" colspan="2">People who follow me</td>
-                        </tr>
-                        {% for user in followers %}
-                            <tr>
-                                <td>{{ user.name }}</td>
-                                <td class="has-text-right">
-                                    <a href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}"
-                                       class="button is-success is-small">
-                                        <span class="icon"><i class="fa fa-plus"></i></span><span>Follow back</span>
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="column is-1">
+
+                </div>
+                <div class="column is-4">
+
+                    {%
+                        include 'profile/block/social_list.html.twig'
+                        with {
+                            'userlist': friends,
+                        'title': 'We follow each other',
+                            'buttonTitle': 'Unfollow',
+                            'buttonColor': 'is-danger'
+                        }
+                    %}
+
+                    {%
+                        include 'profile/block/social_list.html.twig'
+                        with {
+                            'userlist': following,
+                            'title': 'People i follow',
+                            'buttonTitle': 'Unfollow',
+                            'buttonColor': 'is-danger'
+                        }
+                    %}
+
+                    {%
+                        include 'profile/block/social_list.html.twig'
+                        with {
+                            'userlist': followers,
+                            'title': 'People who follow me',
+                            'buttonTitle': 'Follow back',
+                            'buttonColor': 'is-success'
+                        }
+                    %}
 
                     <p class="mt-4">
-                        Find more people to follow at the members page or ask for their username at next meetup.
+                        Find more people to follow at the member page or ask for their username at the next meetup.
                     </p>
 
                 </div>
@@ -79,5 +64,21 @@
 
         </div>
     </section>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            (document.querySelectorAll('.showMore') || []).forEach((trigger) => {
+                trigger.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.currentTarget.parentNode.parentNode.parentNode.querySelectorAll('.is-hidden').forEach(el => {
+                        el.classList.remove('is-hidden');
+                    });
+                    event.currentTarget.parentNode.parentNode.classList.add('is-hidden');
+                });
+            });
+        });
+
+    </script>
 
 {% endblock %}

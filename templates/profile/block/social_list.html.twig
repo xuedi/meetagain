@@ -1,0 +1,29 @@
+<table class="table is-fullwidth mt-3">
+    <tbody>
+    <tr>
+        <td class="has-text-grey has-text-centered pt-6" colspan="2">{{ title }}</td>
+    </tr>
+    {% for user in userlist %}
+        {% if loop.index == 6 %}
+            <tr>
+                <td class="has-text-centered" colspan="2">
+                    <a class="showMore" href="#">show more</a>
+                </td>
+            </tr>
+        {% endif %}
+        <tr class="{% if loop.index > 5 %}is-hidden{% endif %}">
+            <td>
+                <span class="icon">
+                    <a href="{{ path('app_profile_messages', {'id': user.id}) }}" class="fa fa-envelope has-text-grey-light"></a>
+                </span>
+                <a href="{{ path('app_member_view', {'id': user.id}) }}" class="has-text-dark">{{ user.name }}</a>
+            </td>
+            <td class="has-text-right">
+                <a href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}" class="button is-small {{ buttonColor }}">
+                    <span class="icon"><i class="fa fa-plus"></i></span><span>{{ buttonTitle }}</span>
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

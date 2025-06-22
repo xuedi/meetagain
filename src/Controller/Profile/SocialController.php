@@ -18,11 +18,12 @@ class SocialController extends AbstractController
     #[Route('/profile/social', name: 'app_profile_social')]
     public function social(UserRepository $repo, string $show = 'friends'): Response
     {
+        $list = $this->activityService->getUserList($this->getAuthedUser());
         return $this->render('profile/social.html.twig', [
             'followers' => $repo->getFollowers($this->getAuthedUser(), true),
             'following' => $repo->getFollowing($this->getAuthedUser(), true),
             'friends' => $repo->getFriends($this->getAuthedUser()),
-            'activities' => $this->activityService->getUserList($this->getAuthedUser()),
+            'activities' => $list,
             'user' => $this->getAuthedUser(),
             'show' => $show,
         ]);

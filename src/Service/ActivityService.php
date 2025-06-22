@@ -3,16 +3,14 @@
 namespace App\Service;
 
 use App\Entity\Activity;
+use App\Entity\ActivityType;
 use App\Entity\Event;
 use App\Entity\ImageReported;
 use App\Entity\User;
-use App\Entity\ActivityType;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class ActivityService
 {
@@ -21,8 +19,8 @@ readonly class ActivityService
         private EntityManagerInterface $em,
         private ActivityRepository $repo,
         private NotificationService $notificationService,
-        private TagAwareCacheInterface $appCache,
-    ) {
+    )
+    {
     }
 
     public function log(ActivityType $type, User $user, array $meta = []): void
@@ -43,11 +41,7 @@ readonly class ActivityService
 
     public function getUserList(User $user): array
     {
-        $key = sprintf('activity_list_%s', $user->getId());
-        return $this->appCache->get($key, function (ItemInterface $item) use ($user) {
-            $item->expiresAfter(300); // keep 5 min cached
-            return $this->prepareActivityList($this->repo->findBy(['user' => $user]));
-        });
+        return $this->prepareActivityList($this->repo->findBy(['user' => $user], ['createdAt' => 'DESC']));
     }
 
     public function getAdminList(): array
