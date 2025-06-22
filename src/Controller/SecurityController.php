@@ -28,6 +28,13 @@ class SecurityController extends AbstractController
 {
     const string LOGIN_ROUTE = 'app_login';
 
+    public function __construct(
+        private readonly ActivityService $activityService,
+        private readonly EmailService $emailService,
+    )
+    {
+    }
+
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
     public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
@@ -52,8 +59,6 @@ class SecurityController extends AbstractController
         UserPasswordHasherInterface $hasher,
         EntityManagerInterface $em,
         GlobalService $globalService,
-        EmailService $emailService,
-        ActivityService $activityService,
     ): Response
     {
         $user = new User();
@@ -78,9 +83,9 @@ class SecurityController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $activityService->log(ActivityType::Registered, $user, []);
+            $this->activityService->log(ActivityType::Registered, $user, []);
 
-            $emailService->sendConformationRequest($user, $request);
+            $this->emailService->sendConformationRequest($user, $request);
 
             return $this->render('security/register_email_send.html.twig');
         }
@@ -115,7 +120,10 @@ class SecurityController extends AbstractController
 
             $em->persist($msg);
             $em->flush();
+
         }
+
+        $this->activityService->log(ActivityType::ActivatedAccount, $user, []);
 
         return $this->render('security/register_success.html.twig');
     }
@@ -123,10 +131,8 @@ class SecurityController extends AbstractController
     #[Route(path: '/reset', name: 'app_reset')]
     public function reset(
         Request $request,
-        ActivityService $activityService,
         EntityManagerInterface $em,
         UserRepository $userRepo,
-        EmailService $emailService,
         CaptchaService $captchaService,
     ): Response
     {
@@ -150,11 +156,11 @@ class SecurityController extends AbstractController
             }
 
             if ($form->getErrors(true)->count() === 0) {
-                $activityService->log(ActivityType::PasswordResetRequest, $user);
+                $this->activityService->log(ActivityType::PasswordResetRequest, $user);
                 $user->setRegcode(sha1(random_bytes(128)));
                 $em->persist($user);
                 $em->flush();
-                $emailService->sendResetPasswordRequest($user, $request);
+                $this->emailService->sendResetPasswordRequest($user, $request);
 
                 return $this->render('security/reset_email_send.html.twig');
             } else {
@@ -177,7 +183,6 @@ class SecurityController extends AbstractController
         EntityManagerInterface $em,
         string $code,
         Request $request,
-        ActivityService $activityService,
         UserPasswordHasherInterface $hasher,
     ): Response
     {
@@ -196,7 +201,7 @@ class SecurityController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $activityService->log(ActivityType::PasswordReset, $user);
+            $this->activityService->log(ActivityType::PasswordReset, $user);
 
             return $this->render('security/reset_success.html.twig');
         }
