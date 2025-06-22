@@ -96,6 +96,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    // TODO: merge with findActiveMembers via param
     public function findActivePublicMembers(int $limit = 500, int $offset = 0): array
     {
         return $this->createQueryBuilder('u')
@@ -112,6 +113,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult();
     }
 
+    public function findActiveMembers(int $limit = 500, int $offset = 0): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u, i') // forces to fet all columns from user and image table
+            ->leftJoin('u.image', 'i')  // Assuming 'image' is the property name
+            ->where('u.status = :status')
+            ->andwhere('u.id <> 1')
+            ->setParameter('status', UserStatus::Active)
+            ->orderBy('u.createdAt', 'ASC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
+    }
+
+    // TODO: merge with getNumberOfActiveMembers via param
     public function getNumberOfActivePublicMembers(): int
     {
         return (int)$this->createQueryBuilder('u')
@@ -120,6 +137,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->andWhere('u.public = :public')
             ->setParameter('status', UserStatus::Active)
             ->setParameter('public', true)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getNumberOfActiveMembers(): int
+    {
+        return (int)$this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.status = :status')
+            ->andwhere('u.id <> 1')
+            ->setParameter('status', UserStatus::Active)
             ->getQuery()
             ->getSingleScalarResult();
     }

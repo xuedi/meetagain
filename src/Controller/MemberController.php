@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\FriendshipService;
 use App\Service\ImageService;
@@ -19,8 +20,13 @@ class MemberController extends AbstractController
     public function index(UserRepository $repo, int $page = 1): Response
     {
         $offset = ($page - 1) * self::PAGE_SIZE;
-        $userTotal = $repo->getNumberOfActivePublicMembers();
-        $users = $repo->findActivePublicMembers(self::PAGE_SIZE, $offset);
+        if ($this->getUser() instanceof User) {
+            $userTotal = $repo->getNumberOfActiveMembers();
+            $users = $repo->findActiveMembers(self::PAGE_SIZE, $offset);
+        } else {
+            $userTotal = $repo->getNumberOfActivePublicMembers();
+            $users = $repo->findActivePublicMembers(self::PAGE_SIZE, $offset);
+        }
         return $this->render('member/index.html.twig', [
             'users' => $users,
             'userTotal' => $userTotal,
