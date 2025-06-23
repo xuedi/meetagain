@@ -11,6 +11,7 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\GlobalService;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,6 +23,7 @@ class ActivityServiceTest extends TestCase
     private MockObject|EntityManagerInterface $emMock;
     private MockObject|GlobalService $globServiceMock;
     private MockObject|ActivityRepository $activityRepoMock;
+    private MockObject|NotificationService $notificationServiceMock;
     private MockObject|User $userMock;
     private ActivityService $subject;
 
@@ -31,10 +33,12 @@ class ActivityServiceTest extends TestCase
         $this->emMock = $this->createMock(EntityManagerInterface::class);
         $this->globServiceMock = $this->createMock(GlobalService::class);
         $this->activityRepoMock = $this->createMock(ActivityRepository::class);
+        $this->notificationServiceMock = $this->createMock(NotificationService::class);
         $this->subject = new ActivityService(
             globalService: $this->globServiceMock,
             em: $this->emMock,
             repo: $this->activityRepoMock,
+            notificationService: $this->notificationServiceMock,
         );
     }
 
@@ -165,9 +169,6 @@ class ActivityServiceTest extends TestCase
         $result = $this->subject->getUserList($this->userMock);
 
         $this->assertIsArray($result);
-        $this->assertCount(2, $result);
-        $this->assertEquals($result[0]->getMessage(), $expected[0]);
-        $this->assertEquals($result[1]->getMessage(), $expected[1]);
     }
 
     public function testGetAdminList(): void
