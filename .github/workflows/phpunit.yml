@@ -33,6 +33,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-
 
+      - name: Setup plugins
+        run: cp config/plugins.dist.php config/plugins.php
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
