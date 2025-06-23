@@ -31,8 +31,14 @@ class EmailQueue
     #[ORM\Column(length: 255)]
     private ?string $recipient = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $body = null;
+    #[ORM\Column(length: 2)]
+    private ?string $lang = null;
+
+    #[ORM\Column]
+    private array $context = [];
+
+    #[ORM\Column(length: 255)]
+    private ?string $template = null;
 
     public function getId(): ?int
     {
@@ -99,14 +105,38 @@ class EmailQueue
         return $this;
     }
 
-    public function getBody(): ?string
+    public function getLang(): ?string
     {
-        return $this->body;
+        return $this->lang;
     }
 
-    public function setBody(string $body): static
+    public function setLang(string $lang): static
     {
-        $this->body = $body;
+        $this->lang = $lang;
+
+        return $this;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
+    public function setContext(array $context): static
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    public function getTemplate(): ?string
+    {
+        return $this->template;
+    }
+
+    public function setTemplate(string $template): static
+    {
+        $this->template = $template;
 
         return $this;
     }

@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Entity\EmailQueue;
 use App\Entity\Event;
 use App\Entity\User;
+use App\Repository\EmailQueueRepository;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
@@ -13,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Part\AbstractPart;
 use Twig\Environment;
 
 readonly class EmailService
@@ -21,6 +24,7 @@ readonly class EmailService
         private MailerInterface $mailer,
         private ConfigService $config,
         private Environment $twig,
+        private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em
     )
     {
@@ -80,6 +84,7 @@ readonly class EmailService
         $email->to((string)$userRecipient->getEmail());
         $email->subject('A member you follow plans to attend an event');
         $email->htmlTemplate('_emails/notification_rsvp.html.twig');
+        $email->locale($language);
         $email->context([
             'username' => $userRecipient->getName(),
             'followedUserName' => $userRsvp->getName(),
@@ -112,6 +117,18 @@ readonly class EmailService
         return $this->sendEmail($email);
     }
 
+    public function sendQueue(): void
+    {
+        $mails = $this->mailRepo->findBy(['sendAt' => null], ['id' => 'ASC'], 1000);
+        foreach ($mails as $mail) {
+            $this->sendEmail($this->queueToTemplate($mail));
+            $mail->setSendAt(new DateTime());
+
+            $this->em->persist($mail);
+        }
+        $this->em->flush();
+    }
+
     private function sendEmail(TemplatedEmail $email): bool
     {
         try {
@@ -131,14 +148,13 @@ readonly class EmailService
 
     private function addToEmailQueue(TemplatedEmail $email): bool
     {
-        $renderer = new BodyRenderer($this->twig);
-        $renderer->render($email);
-
         $emailQueue = new EmailQueue();
         $emailQueue->setSender($email->getFrom()[0]->toString());
         $emailQueue->setRecipient($email->getTo()[0]->toString());
         $emailQueue->setSubject($email->getSubject());
-        $emailQueue->setBody($email->getHtmlBody());
+        $emailQueue->setTemplate($email->getHtmlTemplate());
+        $emailQueue->setLang($email->getLocale());
+        $emailQueue->setContext($email->getContext());
         $emailQueue->setCreatedAt(new DateTimeImmutable());
         $emailQueue->setSendAt(null);
 
@@ -146,5 +162,18 @@ readonly class EmailService
         $this->em->flush();
 
         return true;
+    }
+
+    private function queueToTemplate(EmailQueue $mail): TemplatedEmail
+    {
+        $template = new TemplatedEmail();
+        $template->addFrom($mail->getSender());
+        $template->addTo($mail->getRecipient());
+        $template->subject($mail->getSubject());
+        $template->htmlTemplate($mail->getTemplate());
+        $template->context($mail->getContext());
+        $template->locale($mail->getLang());
+
+        return $template;
     }
 }

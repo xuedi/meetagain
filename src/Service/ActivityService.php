@@ -4,9 +4,8 @@ namespace App\Service;
 
 use App\Entity\Activity;
 use App\Entity\ActivityType;
-use App\Entity\Event;
-use App\Entity\ImageReported;
 use App\Entity\User;
+use App\Factory\ActivityMessageFactory;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,24 +14,23 @@ use InvalidArgumentException;
 readonly class ActivityService
 {
     public function __construct(
-        private GlobalService $globalService,
         private EntityManagerInterface $em,
         private ActivityRepository $repo,
         private NotificationService $notificationService,
+        private ActivityMessageFactory $messageFactory,
     )
     {
     }
 
     public function log(ActivityType $type, User $user, array $meta = []): void
     {
-        $this->checkRequiredMetaData($type, $meta);
-
         $activity = new Activity();
         $activity->setCreatedAt(new DateTimeImmutable());
         $activity->setUser($user);
         $activity->setType($type);
         $activity->setMeta($meta);
 
+        $this->messageFactory->build($activity)->validate();
         $this->notificationService->notify($activity);
 
         $this->em->persist($activity);
@@ -41,7 +39,7 @@ readonly class ActivityService
 
     public function getUserList(User $user): array
     {
-        return $this->prepareActivityList($this->repo->getUserDisplay($user));
+        return $this->prepareActivityList($this->repo->getUserDisplay($user), true);
     }
 
     public function getAdminList(): array
@@ -49,85 +47,13 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->findBy([], ['createdAt' => 'DESC'], 250));
     }
 
-    private function prepareActivityList(array $list): array
+    private function prepareActivityList(array $list, ?bool $asHtml = false): array
     {
         $preparedList = [];
         foreach ($list as $activity) {
-            $preparedList[] = $this->prepareActivity($activity);
+            $preparedList[] = $activity->setMessage($this->messageFactory->build($activity)->render($asHtml));
         }
 
         return $preparedList;
-    }
-
-    // TODO: Translate messages
-    public function prepareActivity(Activity $activity): Activity
-    {
-        $cachedUserName = $this->em->getRepository(User::class)->getUserNameList();
-        $cachedEventName = $this->em->getRepository(Event::class)->getEventNameList($this->globalService->getCurrentLocale());
-        //$actingUser = $cachedUserName[$activity->getId()];
-
-        $meta = $activity->getMeta();
-        $msg = match ($activity->getType()->value) {
-            ActivityType::Login->value => "User logged in",
-            ActivityType::Registered->value => "User registered",
-            ActivityType::RegistrationEmailConfirmed->value => "User confirmed Email",
-            ActivityType::RsvpYes->value => sprintf('Going to event: %s', $cachedEventName[$meta['event_id']]),
-            ActivityType::RsvpNo->value => sprintf('Is skipping event: %s', $cachedEventName[$meta['event_id']]),
-            ActivityType::FollowedUser->value => sprintf('Started following: %s', $cachedUserName[$meta['user_id']]),
-            ActivityType::ChangedUsername->value => sprintf('Changed username from %s to %s', $meta['old'], $meta['new']),
-            ActivityType::EventImageUploaded->value => sprintf('uploaded %d images to the event %s', $meta['images'], $cachedEventName[$meta['event_id']]),
-            ActivityType::ReportedImage->value => sprintf('Reported image for reason: %s', ImageReported::from($meta['reason'])->name), //
-            ActivityType::SendMessage->value => sprintf('Send a message to: %s', $cachedUserName[$meta['user_id']]), //
-            default => '',
-        };
-
-        $activity->setMessage($msg);
-
-        return $activity;
-    }
-
-    private function checkRequiredMetaData(ActivityType $type, array $meta): void
-    {
-        switch ($type->value) {
-            case ActivityType::RsvpYes->value:
-                $this->ensureHasKey($meta, 'event_id', $type->name);
-                $this->ensureIsNumeric($meta, 'event_id', $type->name);
-                break;
-            case ActivityType::SendMessage->value:
-            case ActivityType::FollowedUser->value:
-                $this->ensureHasKey($meta, 'user_id', $type->name);
-                $this->ensureIsNumeric($meta, 'user_id', $type->name);
-                break;
-            case ActivityType::ChangedUsername->value:
-                $this->ensureHasKey($meta, 'old', $type->name);
-                $this->ensureHasKey($meta, 'new', $type->name);
-                break;
-            case ActivityType::EventImageUploaded->value:
-                $this->ensureHasKey($meta, 'event_id', $type->name);
-                $this->ensureIsNumeric($meta, 'event_id', $type->name);
-                $this->ensureHasKey($meta, 'images', $type->name);
-                $this->ensureIsNumeric($meta, 'images', $type->name);
-                break;
-            case ActivityType::ReportedImage->value:
-                $this->ensureHasKey($meta, 'image_id', $type->name);
-                $this->ensureIsNumeric($meta, 'image_id', $type->name);
-                $this->ensureHasKey($meta, 'reason', $type->name);
-                $this->ensureIsNumeric($meta, 'reason', $type->name);
-                break;
-        }
-    }
-
-    private function ensureHasKey(array $meta, string $key, string $type): void
-    {
-        if (!isset($meta[$key])) {
-            throw new InvalidArgumentException("Missing '$key' in meta in $type");
-        }
-    }
-
-    private function ensureIsNumeric(array $meta, string $key, string $type): void
-    {
-        if (!is_numeric($meta[$key])) {
-            throw new InvalidArgumentException("Value '$key' has to be numeric in $type");
-        }
     }
 }

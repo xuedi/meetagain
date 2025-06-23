@@ -9,10 +9,10 @@
         <div class="media-content">
             <div class="content">
                 <p>
-                    <strong>{{ activity.user.name }}</strong>
+                    <strong class="mr-2">{{ activity.user.name }}</strong>
                     <small>{{ activity.createdAt|time_diff }}</small>
                     <br />
-                    {{ activity.message }}
+                    {{ activity.message|raw }}
                 </p>
             </div>
         </div>
