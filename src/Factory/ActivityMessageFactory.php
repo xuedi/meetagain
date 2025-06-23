@@ -8,6 +8,7 @@ use App\Entity\Activity\Messages\ChangedUsername;
 use App\Entity\Activity\Messages\EventImageUploaded;
 use App\Entity\Activity\Messages\FollowedUser;
 use App\Entity\Activity\Messages\Login;
+use App\Entity\Activity\Messages\PasswordReset;
 use App\Entity\Activity\Messages\Registered;
 use App\Entity\Activity\Messages\RegistrationEmailConfirmed;
 use App\Entity\Activity\Messages\ReportedImage;
@@ -53,6 +54,7 @@ readonly class ActivityMessageFactory
             ActivityType::Login->value => new Login(...$params),
             ActivityType::Registered->value => new Registered(...$params),
             ActivityType::RegistrationEmailConfirmed->value => new RegistrationEmailConfirmed(...$params),
+            ActivityType::PasswordReset->value => new PasswordReset(...$params),
             default => throw new Exception('To be implemented: ' . $activity->getType()->name),
         };
     }
