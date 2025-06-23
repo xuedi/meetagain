@@ -68,6 +68,7 @@ class ActivityRepository extends ServiceEntityRepository
         return $qb->select('a')
             ->from(Activity::class, 'a')
             ->where($qb->expr()->in('a.id', ':ids'))
+            ->orderBy('a.createdAt', 'DESC')
             ->setParameter('ids', $activities)
             ->getQuery()
             ->getResult();
