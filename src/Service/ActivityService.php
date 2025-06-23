@@ -41,7 +41,7 @@ readonly class ActivityService
 
     public function getUserList(User $user): array
     {
-        return $this->prepareActivityList($this->repo->findBy(['user' => $user], ['createdAt' => 'DESC']));
+        return $this->prepareActivityList($this->repo->getUserDisplay($user));
     }
 
     public function getAdminList(): array
