@@ -26,7 +26,7 @@ class Activity
     private ?ActivityType $type = null;
 
     #[ORM\Column(nullable: true)]
-    private ?array $Meta = null;
+    private ?array $Meta = null; // TODO: do lower case
 
     public function getId(): ?int
     {
