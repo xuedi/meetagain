@@ -23,12 +23,12 @@ class ActivityServiceTest extends TestCase
         $this->emMock = $this->createMock(EntityManagerInterface::class);
         $this->activityRepoMock = $this->createMock(ActivityRepository::class);
         $this->notificationServiceMock = $this->createMock(NotificationService::class);
-        $this->messageFactory = $this->createMock(ActivityMessageFactory::class);
+        $this->messageFactoryMock = $this->createMock(ActivityMessageFactory::class);
         $this->subject = new ActivityService(
             em: $this->emMock,
             repo: $this->activityRepoMock,
             notificationService: $this->notificationServiceMock,
-            messageFactory: $this->messageFactory,
+            messageFactory: $this->messageFactoryMock,
         );
     }
 
