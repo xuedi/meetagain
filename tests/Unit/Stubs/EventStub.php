@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Unit\Stubs;
+namespace Test\Unit\Stubs;
 
 use App\Entity\Event;
 

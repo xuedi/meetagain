@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Unit\Service;
+namespace Test\Unit\Service;
 
 use App\Repository\ActivityRepository;
 use App\Service\Activity\MessageFactory;

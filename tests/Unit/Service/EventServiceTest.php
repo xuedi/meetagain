@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Unit\Service;
+namespace Test\Unit\Service;
 
 use App\Repository\EventRepository;
 use App\Service\EventService;
@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Unit\Stubs\EventStub;
+use Test\Unit\Stubs\EventStub;
 
 class EventServiceTest extends TestCase
 {
