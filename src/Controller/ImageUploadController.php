@@ -6,7 +6,6 @@ use App\Entity\CmsBlock;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
-use App\Form\CmsBlockImageType;
 use App\Form\ImageUploadType;
 use App\Service\ImageService;
 use DateTimeImmutable;
