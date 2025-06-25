@@ -2,11 +2,10 @@
 
 namespace App\Repository;
 
-use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Throwable;
 
 /**
  * @extends ServiceEntityRepository<CmsBlock>
@@ -25,7 +24,7 @@ class CmsBlockRepository extends ServiceEntityRepository
                 ->select('MAX(b.priority)')
                 ->getQuery()
                 ->getSingleScalarResult();
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return 1;
         }
     }

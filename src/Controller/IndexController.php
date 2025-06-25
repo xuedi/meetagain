@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\CmsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class IndexController extends AbstractController
 {
@@ -27,7 +27,7 @@ class IndexController extends AbstractController
 
         // set user preferences in DB
         $user = $this->getUser();
-        if ($user instanceof UserInterface) {
+        if ($user instanceof User) {
             $user->setLocale($locale);
             $entityManager->persist($user);
             $entityManager->flush();

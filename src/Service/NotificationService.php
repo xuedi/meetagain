@@ -42,7 +42,7 @@ readonly class NotificationService
 
     private function sendRsvp(?User $user, ?int $eventId = null): void
     {
-        if (!$user instanceof \App\Entity\User || $eventId === null) {
+        if (!$user instanceof User || $eventId === null) {
             return;
         }
         $event = $this->eventRepo->findOneBy(['id' => $eventId]);
@@ -75,7 +75,7 @@ readonly class NotificationService
 
     private function sendMessage(?User $user, ?int $userId = null): void
     {
-        if (!$user instanceof \App\Entity\User || $userId === null) {
+        if (!$user instanceof User || $userId === null) {
             return;
         }
         $recipient = $this->userRepo->findOneBy(['id' => $userId]);

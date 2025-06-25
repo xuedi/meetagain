@@ -5,8 +5,9 @@ namespace App\Controller\Profile;
 use App\Controller\AbstractController;
 use App\Entity\ActivityType;
 use App\Entity\Message;
-use App\Entity\User;
 use App\Form\CommentType;
+use App\Repository\MessageRepository;
+use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,20 +17,23 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MessageController extends AbstractController
 {
-    public function __construct(private readonly ActivityService $activityService)
+    public function __construct(
+        private readonly ActivityService $activityService,
+        private readonly EntityManagerInterface $em,
+        private readonly MessageRepository $msgRepo,
+        private readonly UserRepository $userRepo,
+    )
     {
     }
 
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
-    public function index(Request $request, EntityManagerInterface $em, ?int $id = null): Response
+    public function index(Request $request, ?int $id = null): Response
     {
         $form = null;
         $user = $this->getAuthedUser();
-        $msgRepo = $em->getRepository(Message::class);
-        $userRepo = $em->getRepository(User::class);
         $messages = null;
 
-        $conversationPartner = $userRepo->findOneBy(['id' => $id]);
+        $conversationPartner = $this->userRepo->findOneBy(['id' => $id]);
         if ($conversationPartner !== null) {
             $form = $this->createForm(CommentType::class);
             $form->handleRequest($request);
@@ -42,25 +46,25 @@ class MessageController extends AbstractController
                 $msg->setCreatedAt(new DateTimeImmutable());
                 $msg->setContent($form->getData()['comment']);
 
-                $em->persist($msg);
-                $em->flush();
+                $this->em->persist($msg);
+                $this->em->flush();
 
                 $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' => $conversationPartner->getId()]);
             }
             // preRender then flush when no new messages
-            $messages = $msgRepo->getMessages($user, $conversationPartner);
-            $msgRepo->markConversationRead($user, $conversationPartner);
-            if (!$msgRepo->hasNewMessages($user)) {
+            $messages = $this->msgRepo->getMessages($user, $conversationPartner);
+            $this->msgRepo->markConversationRead($user, $conversationPartner);
+            if (!$this->msgRepo->hasNewMessages($user)) {
                 $request->getSession()->set('hasNewMessage', false);
             }
         }
 
-        $userRepo->findOneBy(['id' => $id]);
+        $this->userRepo->findOneBy(['id' => $id]);
         return $this->render('profile/messages/index.html.twig', [
             'conversationsId' => $id,
-            'conversations' => $msgRepo->getConversations($user, $id),
+            'conversations' => $this->msgRepo->getConversations($user, $id),
             'messages' => $messages,
-            'friends' => $userRepo->getFriends($user),
+            'friends' => $this->userRepo->getFriends($user),
             'user' => $user,
             'form' => $form,
         ]);

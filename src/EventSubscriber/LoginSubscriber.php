@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
+use App\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
@@ -17,7 +18,7 @@ class LoginSubscriber implements EventSubscriberInterface
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
         $user = $event->getUser();
-        if (!$user->isOsmConsent()) {
+        if (!$user instanceof User || !$user->isOsmConsent()) {
             return;
         }
 
