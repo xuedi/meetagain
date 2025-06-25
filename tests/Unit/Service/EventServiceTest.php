@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Unit\Service\Stubs\EventStub;
+use Unit\Stubs\EventStub;
 
 class EventServiceTest extends TestCase
 {
