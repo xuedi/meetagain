@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -22,6 +23,7 @@ readonly class PluginService
         private PluginRepository $pluginRepo,
         private EntityManagerInterface $em,
         private KernelInterface $kernel,
+        private string $kernelProjectDir,
     )
     {
     }
@@ -95,9 +97,11 @@ readonly class PluginService
 
     public function installStep2(string $name): void
     {
-        // can't do this directly after writing kernel since the old kernel is still active without interface loaded
+        // can't do this directly after writing kernel since the old kernel (no interfaces yet)
         $pluginKernel = $this->getKernel($name);
         $pluginKernel->install();
+
+        $this->executeMigrations($name);
     }
 
     public function uninstall(string $name): void
@@ -167,6 +171,27 @@ readonly class PluginService
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
         $application->run($input);
+    }
+
+    private function executeMigrations(string $name): void
+    {
+        define('STDIN',fopen("php://stdin","r"));
+
+        $application = new Application($this->kernel);
+        $application->setAutoExit(false);
+
+        $config = sprintf('%s/plugins/%s/Config/packages/migration/config.yaml', $this->kernelProjectDir, $name);
+        $arguments = [
+            '--configuration' => $config,
+            '--em' => sprintf('em%s', $name),
+            '--no-interaction' => true,
+        ];
+
+        $output = new ConsoleOutput();
+        $input = new ArrayInput($arguments);
+
+        $command = $application->find('doctrine:migrations:migrate');
+        $command->run($input, $output);
     }
 
     private function verifySymfonyConfig(string $name): void

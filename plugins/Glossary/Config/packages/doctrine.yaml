@@ -1,21 +1,13 @@
 doctrine:
-    dbal:
-        connections:
-            cnGlossary:
-                url: '%env(resolve:DATABASE_URL)%'
     orm:
         entity_managers:
             emGlossary:
-                connection: cnGlossary
+                connection: default
                 naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
                 mappings:
-                    Plugin\Glossary\:
+                    Glossary:
                         dir: "%kernel.project_dir%/plugins/Glossary/Entity"
                         is_bundle: false
                         prefix: Plugin\Glossary\Entity
-                        alias: Plugin\Glossary
+                        alias: Glossary
 
-doctrine_migrations:
-    em: emGlossary
-    migrations_paths:
-        DoctrineMigrationsGlossary: "%kernel.project_dir%/plugins/Glossary/Migrations"
