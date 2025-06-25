@@ -7,15 +7,24 @@ use Symfony\Component\Routing\RouterInterface;
 
 abstract class MessageAbstract implements MessageInterface
 {
-    public function __construct(
-        protected RouterInterface $router,
-        protected ?array $meta = [],
-        protected array $userNames = [],
-        protected array $eventNames = [],
-        // TODO: add translator & language
-    )
-    {
+    protected RouterInterface $router;
+    protected ?array $meta = [];
+    protected array $userNames = [];
+    protected array $eventNames = [];
 
+    public function injectServices(
+        RouterInterface $router,
+        ?array $meta = [],
+        array $userNames = [],
+        array $eventNames = [],
+    ): self
+    {
+        $this->router = $router;
+        $this->meta = $meta;
+        $this->userNames = $userNames;
+        $this->eventNames = $eventNames;
+
+        return $this;
     }
 
     abstract protected function renderText(): string;

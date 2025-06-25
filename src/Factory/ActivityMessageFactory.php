@@ -21,11 +21,14 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\GlobalService;
 use Exception;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Routing\RouterInterface;
 
 readonly class ActivityMessageFactory
 {
     public function __construct(
+        #[AutowireIterator(MessageInterface::class)]
+        private iterable $messages,
         private RouterInterface $router,
         private UserRepository $userRepository,
         private EventRepository $eventRepository,
@@ -44,20 +47,11 @@ readonly class ActivityMessageFactory
             $this->eventRepository->getEventNameList($this->globalService->getCurrentLocale()),
         ];
 
-        return match ($activity->getType()->value) {
-            ActivityType::EventImageUploaded->value => new EventImageUploaded(...$params),
-            ActivityType::ReportedImage->value => new ReportedImage(...$params),
-            ActivityType::ChangedUsername->value => new ChangedUsername(...$params),
-            ActivityType::RsvpYes->value => new RsvpYes(...$params),
-            ActivityType::RsvpNo->value => new RsvpNo(...$params),
-            ActivityType::SendMessage->value => new SendMessage(...$params),
-            ActivityType::FollowedUser->value => new FollowedUser(...$params),
-            ActivityType::Login->value => new Login(...$params),
-            ActivityType::Registered->value => new Registered(...$params),
-            ActivityType::RegistrationEmailConfirmed->value => new RegistrationEmailConfirmed(...$params),
-            ActivityType::PasswordReset->value => new PasswordReset(...$params),
-            ActivityType::PasswordResetRequest->value => new PasswordResetRequest(...$params),
-            default => throw new Exception('To be implemented: ' . $activity->getType()->name),
-        };
+        foreach ($this->messages as $message) {
+            if ($message instanceof MessageInterface && $message->getType() === $activity->getType()) {
+                return $message->injectServices(...$params);
+            }
+        }
+        throw new Exception('Cound not find message for activity type: ' . $activity->getType()->name);
     }
 }
