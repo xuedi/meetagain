@@ -44,7 +44,11 @@ test:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
 
 migrationDiff +pluginName='':
-    {{JUST}} app doctrine:migrations:diff --configuration=plugins/{{pluginName}}/Config/packages/migration/config_cli.yaml --filter-expression=/^glossary/ --no-interaction --no-debug
+    {{JUST}} app doctrine:migrations:diff --configuration=plugins/{{pluginName}}/Config/packages/migration/config_cli.yaml --filter-expression=/^{{pluginName}}/i --no-interaction --no-debug
+
+migrationMigrate +pluginName='':
+    {{JUST}} app doctrine:migrations:migrate --configuration=plugins/{{pluginName}}/Config/packages/migration/config_cli.yaml --em=em{{pluginName}} --no-interaction
+    {{JUST}} clearCache
 
 check: test checkStan checkRector checkPhpcs checkPsalm
     {{PHP}} composer validate --strict

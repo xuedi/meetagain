@@ -4,3 +4,8 @@ em: emGlossary
 migrations_paths:
     'Plugin\Glossary\Migrations': 'plugins/Glossary/Migrations/'
 
+table_storage:
+    table_name: 'glossary_doctrine_migration_versions'
+    version_column_name: 'version'
+    version_column_length: 192
+    executed_at_column_name: 'executed_at'
