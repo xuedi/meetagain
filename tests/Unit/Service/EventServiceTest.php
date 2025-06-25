@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Unit\Service;
+namespace Unit\Service;
 
 use App\Repository\EventRepository;
 use App\Service\EventService;
-use App\Tests\Unit\Service\Stubs\EventStub;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Unit\Service\Stubs\EventStub;
 
 class EventServiceTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Unit\Service;
+namespace Unit\Service;
 
 use App\Entity\Activity;
 use App\Entity\Image;

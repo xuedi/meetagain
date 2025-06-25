@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Unit\Service;
+namespace Unit\Service;
 
-use App\Factory\MessageFactory;
 use App\Repository\ActivityRepository;
+use App\Service\Activity\MessageFactory;
 use App\Service\ActivityService;
 use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
