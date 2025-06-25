@@ -3,7 +3,7 @@
 [![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
 [![EUPL Licence](https://img.shields.io/badge/Roadmap-0.6-31c754.svg)](https://github.com/xuedi/meetAgain/milestones?sort=title&direction=asc)
 [![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/4e8c1edd8aec4982a3ff4d774f96cda3)](https://app.codacy.com/gh/xuedi/meetAgain/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=xuedi_meetAgain&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=xuedi_meetAgain)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
 
 ## Introduction
