@@ -29,10 +29,18 @@ class AdminPluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/install/{name}', name: 'admin_plugin_install')]
-    public function install(string $name): Response
+    #[Route('/admin/plugin/install/step1/{name}', name: 'admin_plugin_install')]
+    public function installStep1(string $name): Response
     {
-        $this->pluginService->install($name);
+        $this->pluginService->installStep1($name);
+
+        return $this->redirectToRoute('admin_plugin_install_step2', ['name' => $name]);
+    }
+
+    #[Route('/admin/plugin/install/step2/{name}', name: 'admin_plugin_install_step2')]
+    public function installStep2(string $name): Response
+    {
+        $this->pluginService->installStep2($name);
 
         return $this->redirectToRoute('app_admin_plugin');
     }

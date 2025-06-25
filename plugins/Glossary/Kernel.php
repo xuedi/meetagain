@@ -4,26 +4,17 @@ namespace Plugin\Glossary;
 
 use App\Plugin;
 
-class Manifest implements Plugin
+class Kernel implements Plugin
 {
     public function getName(): string
     {
         return 'Glossary';
     }
 
-    public function getVersion(): string
-    {
-        return '0.1';
-    }
-
-    public function getDescription(): string
-    {
-        return 'This allows users to add and maintain a multilingual glossary.';
-    }
-
     public function install(): void
     {
         // TODO: Implement install() method.
+        // run local migrations and so on
     }
 
     public function uninstall(): void

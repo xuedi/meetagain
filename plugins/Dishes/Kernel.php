@@ -4,26 +4,17 @@ namespace Plugin\Dishes;
 
 use App\Plugin;
 
-class Manifest implements Plugin
+class Kernel implements Plugin
 {
     public function getName(): string
     {
         return 'Dishes';
     }
 
-    public function getVersion(): string
-    {
-        return '0.1';
-    }
-
-    public function getDescription(): string
-    {
-        return 'This allows creating and social interaction about everything food.';
-    }
-
     public function install(): void
     {
         // TODO: Implement install() method.
+        // run local migrations and so on
     }
 
     public function uninstall(): void

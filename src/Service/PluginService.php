@@ -14,6 +14,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class PluginService
 {
+    public const string PLUGIN_DIR = __DIR__ . '/../../plugins';
+
     public function __construct(
         #[AutowireIterator(PluginInterface::class)]
         private iterable $plugins,
@@ -26,27 +28,49 @@ readonly class PluginService
 
     public function getAdminList(): array
     {
-        $list = $this->pluginRepo->findAllWithNameKey();
-        foreach ($this->plugins as $plugin) {
-            dump($plugin);
-            $name = $plugin->getName();
-            if (isset($list[$name])) {
-                $list[$name]->setDeleted(false);
+        $this->discoverPlugins();
+
+        $plugins = [];
+        foreach ($this->pluginRepo->findAll() as $plugin) {
+            if (!file_exists(self::PLUGIN_DIR . '/' . $plugin->getName() . '/manifest.json')) {
+                $plugin->setDeleted(true);
+            }
+            $plugins[] = $plugin;
+        }
+
+        return $plugins;
+    }
+
+    public function discoverPlugins(): void
+    {
+        $pluginDir = realpath(self::PLUGIN_DIR);
+        $plugins = glob($pluginDir . '/*', GLOB_ONLYDIR);
+        foreach ($plugins as $plugin) {
+            if ($plugin === '.' || $plugin === '..') {
                 continue;
             }
-            $newPlugin = new Plugin();
-            $newPlugin->setName($plugin->getName());
-            $newPlugin->setVersion($plugin->getVersion());
-            $newPlugin->setDescription($plugin->getDescription());
-            $newPlugin->setDeleted(false);
-            $newPlugin->setInstalled(false);
-            $newPlugin->setEnabled(false);
-
-            $list[$name] = $newPlugin;
+            $manifest = $plugin . '/manifest.json';
+            if (!file_exists($manifest)) {
+                continue;
+            }
+            $pluginData = json_decode(file_get_contents($manifest), true);
+            if (!isset($pluginData['name']) || !isset($pluginData['version']) || !isset($pluginData['description'])) {
+                continue;
+            }
+            $entity = $this->pluginRepo->findOneBy(['name' => $pluginData['name']]);
+            if ($entity === null) { // new plugin entry
+                $entity = new Plugin();
+                $entity->setSlug(strtolower($pluginData['name']));
+                $entity->setName($pluginData['name']);
+                $entity->setVersion($pluginData['version']);
+                $entity->setDescription($pluginData['description']);
+                $entity->setDeleted(false);
+                $entity->setInstalled(false);
+                $entity->setEnabled(false);
+                $this->em->persist($entity);
+                $this->em->flush();
+            }
         }
-        ksort($list);
-
-        return $list;
     }
 
     public function remove(int $id): void
@@ -55,41 +79,36 @@ readonly class PluginService
         $this->em->flush();
     }
 
-    public function install(string $name): void
+    public function installStep1(string $name): void
     {
-        $plugin = $this->getPlugin($name);
-        $plugin->install();
+        $this->verifySymfonyConfig($name);
 
-        $pluginEntity = new Plugin();
-        $pluginEntity->setName($plugin->getName());
-        $pluginEntity->setVersion($plugin->getVersion());
-        $pluginEntity->setDescription($plugin->getDescription());
+        $pluginEntity = $this->pluginRepo->findOneBy(['name' => $name]);
         $pluginEntity->setInstalled(true);
         $pluginEntity->setEnabled(false);
 
         $this->em->persist($pluginEntity);
         $this->em->flush();
 
-        $this->pluginMigration($name);
+        $this->generatePluginConfig(); // make available for symfony, just without routing
+    }
+
+    public function installStep2(string $name): void
+    {
+        // can't do this directly after writing kernel since the old kernel is still active without interface loaded
+        $pluginKernel = $this->getKernel($name);
+        $pluginKernel->install();
     }
 
     public function uninstall(string $name): void
     {
-        $plugin = $this->getPlugin($name);
+        $plugin = $this->getKernel($name);
         $plugin->uninstall();
 
         $this->em->remove($this->pluginRepo->findOneBy(['name' => $name]));
         $this->em->flush();
-    }
 
-    private function getPlugin(string $name): PluginInterface
-    {
-        foreach ($this->plugins as $plugin) {
-            if ($plugin->getName() === $name) {
-                return $plugin;
-            }
-        }
-        throw new Exception('Plugin not found');
+        $this->generatePluginConfig();
     }
 
     public function enable(string $name): void
@@ -118,14 +137,24 @@ readonly class PluginService
     {
         $nameList = [];
         $pluginConfigFile = __DIR__ . '/../../config/plugins.php';
-        $plugins = $this->pluginRepo->findBy(['enabled' => true]);
+        $plugins = $this->pluginRepo->findBy(['installed' => true]);
         foreach ($plugins as $plugin) {
-            $nameList[] = "'" . $plugin->getName() . "'";
+            $nameList[] = "'" . $plugin->getName() . "' => " . ($plugin->isEnabled() ? 'true' : 'false');
         }
         $content = "<?php declare(strict_types=1); return [" . implode(',', $nameList) . "];";
         file_put_contents($pluginConfigFile, $content);
 
         $this->clearCache();
+    }
+
+    private function getKernel(string $name): PluginInterface
+    {
+        foreach ($this->plugins as $plugin) {
+            if ($plugin->getName() === $name) {
+                return $plugin;
+            }
+        }
+        throw new Exception('Plugin kernel not found: ' . $name);
     }
 
     private function clearCache(): void
@@ -140,16 +169,8 @@ readonly class PluginService
         $application->run($input);
     }
 
-    private function pluginMigration(string $name): void
+    private function verifySymfonyConfig(string $name): void
     {
-        $input = new ArrayInput([
-            'command' => 'doctrine:migrations:migrate',
-            '--no-interaction' => true,
-            '--em' => 'em' . $name,
-        ]);
-
-        $application = new Application($this->kernel);
-        $application->setAutoExit(false);
-        $application->run($input);
+        // TODO: check valid yaml files, route prefix, syntax test, expected values
     }
 }

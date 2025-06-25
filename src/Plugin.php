@@ -9,10 +9,6 @@ interface Plugin
 {
     public function getName(): string;
 
-    public function getVersion(): string;
-
-    public function getDescription(): string;
-
     public function install(): void;
 
     public function uninstall(): void;

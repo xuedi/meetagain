@@ -28,7 +28,10 @@ class Plugin
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private ?bool $enabled = null;
 
-    private bool $deleted = true;
+    private bool $deleted = false;
+
+    #[ORM\Column(length: 255)]
+    private ?string $slug = null;
 
     public function isDeleted(): bool
     {
@@ -103,6 +106,18 @@ class Plugin
     public function setEnabled(bool $enabled): static
     {
         $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }

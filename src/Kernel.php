@@ -21,15 +21,15 @@ class Kernel extends BaseKernel
     public function getPluginConfigDirs(): iterable
     {
         $plugins = require $this->getProjectDir() . '/config/plugins.php';
-        foreach ($plugins as $plugin) {
-            yield $this->getProjectDir() . '/plugins/' . $plugin . '/Config';
+        foreach ($plugins as $pluginName => $pluginEnabled) {
+            yield $this->getProjectDir() . '/plugins/' . $pluginName . '/Config' => $pluginEnabled;
         }
     }
 
     protected function configureContainer(ContainerConfigurator $container): void
     {
         $this->doConfigureContainer($container, $this->getProjectDir() . '/config');
-        foreach ($this->getPluginConfigDirs() as $pluginConfigDir) {
+        foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
             $this->doConfigureContainer($container, $pluginConfigDir);
         }
     }
@@ -37,8 +37,10 @@ class Kernel extends BaseKernel
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $this->doConfigureRoutes($routes, $this->getConfigDir());
-        foreach ($this->getPluginConfigDirs() as $pluginConfigDir) {
-            $this->doConfigureRoutes($routes, $pluginConfigDir);
+        foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
+            if($pluginEnabled) {
+                $this->doConfigureRoutes($routes, $pluginConfigDir);
+            }
         }
     }
 
