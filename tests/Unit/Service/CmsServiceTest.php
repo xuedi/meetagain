@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Test\Unit\Service;
+namespace Tests\Unit\Service;
 
 use App\Entity\Activity;
 use App\Entity\Cms;
