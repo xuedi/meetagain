@@ -46,7 +46,6 @@ class ActivityRepository extends ServiceEntityRepository
         foreach ($userActivities as $userActivity) {
             $activityUserId = $userActivity->getUser()->getId();
             switch ($userActivity->getType()->value) {
-
                 // username change of people the user follows
                 case ActivityType::ChangedUsername->value:
                     if (in_array($activityUserId, $following)) {

@@ -14,16 +14,15 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class NotificationService
 {
-    private const HOUR = 3600;
-    private const EIGHT_HOURS = 28800;
+    private const int HOUR = 3600;
+    private const int EIGHT_HOURS = 28800;
 
     public function __construct(
         private EmailService $emailService,
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
-    )
-    {
+    ) {
     }
 
     public function notify(Activity $activity): void
@@ -43,7 +42,7 @@ readonly class NotificationService
 
     private function sendRsvp(?User $user, ?int $eventId = null): void
     {
-        if ($user === null || $eventId === null) {
+        if (!$user instanceof \App\Entity\User || $eventId === null) {
             return;
         }
         $event = $this->eventRepo->findOneBy(['id' => $eventId]);
@@ -68,7 +67,7 @@ readonly class NotificationService
                     $item->expiresAfter(self::HOUR);
                     return 'send';
                 });
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 //TODO: do some logging
             }
         }
@@ -76,7 +75,7 @@ readonly class NotificationService
 
     private function sendMessage(?User $user, ?int $userId = null): void
     {
-        if ($user === null || $userId === null) {
+        if (!$user instanceof \App\Entity\User || $userId === null) {
             return;
         }
         $recipient = $this->userRepo->findOneBy(['id' => $userId]);

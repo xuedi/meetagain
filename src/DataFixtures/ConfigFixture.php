@@ -37,7 +37,7 @@ class ConfigFixture extends Fixture implements DependentFixtureInterface
 
     private function getData(): array
     {
-        $importUser = $this->getReference('user_' . md5((string) 'import'), User::class);
+        $importUser = $this->getReference('user_' . md5('import'), User::class);
         return [
             ['pageUrl', 'http://localhost', ConfigType::String],
             ['recurringTargetMonths', '60', ConfigType::Integer],

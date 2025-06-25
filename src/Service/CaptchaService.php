@@ -45,7 +45,7 @@ class CaptchaService
     public function isValid(string $code): ?string
     {
         $code = strtolower($code);
-        $expected = strtolower($this->session->get('captcha_text' . $this->session->getId(), null));
+        $expected = strtolower((string) $this->session->get('captcha_text' . $this->session->getId(), null));
         if ($expected !== $code) {
             return sprintf("Wrong captcha code, got '%s' but expected '%s'", $code, $expected);
         }
@@ -66,8 +66,10 @@ class CaptchaService
             $y = $baseY + random_int(-6, 6);
             $draw = new ImagickDraw();
             $draw->setFont(__DIR__ . '/../../public/fonts/captcha.ttf');
-            $draw->setFontSize($size + random_int(-4, 6));;
-            $draw->setFillColor(sprintf('#%s0%s0%s0', random_int(0, 9), random_int(0, 9), random_int(0, 9)));;
+            $draw->setFontSize($size + random_int(-4, 6));
+            ;
+            $draw->setFillColor(sprintf('#%s0%s0%s0', random_int(0, 9), random_int(0, 9), random_int(0, 9)));
+            ;
             $image->annotateImage($draw, $x, $y, $angle, $char);
             $x += 20 + random_int(-4, 4);
         }

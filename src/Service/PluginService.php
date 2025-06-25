@@ -24,8 +24,7 @@ readonly class PluginService
         private EntityManagerInterface $em,
         private KernelInterface $kernel,
         private string $kernelProjectDir,
-    )
-    {
+    ) {
     }
 
     public function getAdminList(): array
@@ -62,7 +61,7 @@ readonly class PluginService
             $entity = $this->pluginRepo->findOneBy(['name' => $pluginData['name']]);
             if ($entity === null) { // new plugin entry
                 $entity = new Plugin();
-                $entity->setSlug(strtolower($pluginData['name']));
+                $entity->setSlug(strtolower((string) $pluginData['name']));
                 $entity->setName($pluginData['name']);
                 $entity->setVersion($pluginData['version']);
                 $entity->setDescription($pluginData['description']);
@@ -83,7 +82,7 @@ readonly class PluginService
 
     public function installStep1(string $name): void
     {
-        $this->verifySymfonyConfig($name);
+        $this->verifySymfonyConfig();
 
         $pluginEntity = $this->pluginRepo->findOneBy(['name' => $name]);
         $pluginEntity->setInstalled(true);
@@ -175,7 +174,7 @@ readonly class PluginService
 
     private function executeMigrations(string $name): void
     {
-        define('STDIN',fopen("php://stdin","r"));
+        define('STDIN', fopen("php://stdin", "r"));
 
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
@@ -194,7 +193,7 @@ readonly class PluginService
         $command->run($input, $output);
     }
 
-    private function verifySymfonyConfig(string $name): void
+    private function verifySymfonyConfig(): void
     {
         // TODO: check valid yaml files, route prefix, syntax test, expected values
     }

@@ -15,7 +15,7 @@ class Kernel extends BaseKernel
 
     public function getConfigDir(): string
     {
-        return $this->getProjectDir().'/config';
+        return $this->getProjectDir() . '/config';
     }
 
     public function getPluginConfigDirs(): iterable
@@ -38,7 +38,7 @@ class Kernel extends BaseKernel
     {
         $this->doConfigureRoutes($routes, $this->getConfigDir());
         foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
-            if($pluginEnabled) {
+            if ($pluginEnabled) {
                 $this->doConfigureRoutes($routes, $pluginConfigDir);
             }
         }
@@ -46,26 +46,26 @@ class Kernel extends BaseKernel
 
     private function doConfigureContainer(ContainerConfigurator $container, string $configDir): void
     {
-        $container->import($configDir.'/{packages}/*.{php,yaml}');
-        $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,yaml}');
+        $container->import($configDir . '/{packages}/*.{php,yaml}');
+        $container->import($configDir . '/{packages}/' . $this->environment . '/*.{php,yaml}');
 
-        if (is_file($configDir.'/services.yaml')) {
-            $container->import($configDir.'/services.yaml');
-            $container->import($configDir.'/{services}_'.$this->environment.'.yaml');
+        if (is_file($configDir . '/services.yaml')) {
+            $container->import($configDir . '/services.yaml');
+            $container->import($configDir . '/{services}_' . $this->environment . '.yaml');
         } else {
-            $container->import($configDir.'/{services}.php');
+            $container->import($configDir . '/{services}.php');
         }
     }
 
     private function doConfigureRoutes(RoutingConfigurator $routes, string $configDir): void
     {
-        $routes->import($configDir.'/{routes}/'.$this->environment.'/*.{php,yaml}');
-        $routes->import($configDir.'/{routes}/*.{php,yaml}');
+        $routes->import($configDir . '/{routes}/' . $this->environment . '/*.{php,yaml}');
+        $routes->import($configDir . '/{routes}/*.{php,yaml}');
 
-        if (is_file($configDir.'/routes.yaml')) {
-            $routes->import($configDir.'/routes.yaml');
+        if (is_file($configDir . '/routes.yaml')) {
+            $routes->import($configDir . '/routes.yaml');
         } else {
-            $routes->import($configDir.'/{routes}.php');
+            $routes->import($configDir . '/{routes}.php');
         }
 
         if (false !== ($fileName = new ReflectionObject($this)->getFileName())) {

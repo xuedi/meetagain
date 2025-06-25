@@ -393,11 +393,9 @@ class Event
 
     public function removeImage(Image $image): static
     {
-        if ($this->images->removeElement($image)) {
-            // set the owning side to null (unless already changed)
-            if ($image->getEvent() === $this) {
-                $image->setEvent(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->images->removeElement($image) && $image->getEvent() === $this) {
+            $image->setEvent(null);
         }
 
         return $this;

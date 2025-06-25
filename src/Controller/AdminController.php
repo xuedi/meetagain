@@ -9,7 +9,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class AdminController extends AbstractController
 {
-    public function __construct(private TagAwareCacheInterface $appCache)
+    public function __construct(private readonly TagAwareCacheInterface $appCache)
     {
         //
     }
@@ -33,15 +33,12 @@ class AdminController extends AbstractController
 
     private function cacheTest(): bool
     {
-        $expected = sprintf('This is a random number between 0 an 100: %d', random_int(0, 100));;
+        $expected = sprintf('This is a random number between 0 an 100: %d', random_int(0, 100));
+        ;
         $cacheKey = 'app_admin_test';
         $this->appCache->delete($cacheKey);
-        $this->appCache->get($cacheKey, function () use ($expected) {
-            return $expected;
-        });
-        $actual = $this->appCache->get($cacheKey, function () {
-            return 'failed';
-        });
+        $this->appCache->get($cacheKey, fn() => $expected);
+        $actual = $this->appCache->get($cacheKey, fn() => 'failed');
 
         return $expected === $actual;
     }

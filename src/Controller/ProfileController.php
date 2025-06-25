@@ -32,8 +32,7 @@ class ProfileController extends AbstractController
         MessageRepository $msgRepo,
         ImageService $imageService,
         EntityManagerInterface $entityManager,
-    ): Response
-    {
+    ): Response {
         $user = $this->getAuthedUser();
         $oldUserName = $user->getName();
 

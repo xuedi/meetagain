@@ -17,8 +17,7 @@ abstract class MessageAbstract implements MessageInterface
         ?array $meta = [],
         array $userNames = [],
         array $eventNames = [],
-    ): self
-    {
+    ): self {
         $this->router = $router;
         $this->meta = $meta;
         $this->userNames = $userNames;

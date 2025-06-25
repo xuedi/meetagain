@@ -17,8 +17,7 @@ readonly class GlobalService
         private TranslationService $translationService,
         private DashboardService $dashboardService,
         private PluginRepository $pluginRepo,
-    )
-    {
+    ) {
     }
 
     public function getCurrentLocale(): string
@@ -73,11 +72,7 @@ readonly class GlobalService
 
     public function getAdminAttention(): bool
     {
-        if (count($this->dashboardService->getNeedForApproval()) > 0) {
-            return true;
-        }
-
-        return false;
+        return count($this->dashboardService->getNeedForApproval()) > 0;
     }
 
     public function getAlternativeLanguageCodes(): array

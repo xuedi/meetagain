@@ -55,7 +55,7 @@ class MessageController extends AbstractController
             }
         }
 
-        $conversationPartner = $userRepo->findOneBy(['id' => $id]);
+        $userRepo->findOneBy(['id' => $id]);
         return $this->render('profile/messages/index.html.twig', [
             'conversationsId' => $id,
             'conversations' => $msgRepo->getConversations($user, $id),

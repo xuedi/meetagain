@@ -23,7 +23,6 @@ class ImageUploadController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly ImageService $imageService
     ) {
-
     }
 
     #[Route('/image/{entity}/{id}', name: 'app_image', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]

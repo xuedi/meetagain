@@ -165,7 +165,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->where($qb->expr()->isNotNull('u.regcode'))
             ->andWhere($qb->expr()->lt('u.createdAt', ':date'))
             ->andWhere($qb->expr()->eq('u.status', ':status'))
-            ->setParameter('date', new DateTime('-'.$int.' days'))
+            ->setParameter('date', new DateTime('-' . $int . ' days'))
             ->setParameter('status', UserStatus::Registered->value)
             ->getQuery()
             ->getResult();

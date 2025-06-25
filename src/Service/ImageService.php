@@ -24,8 +24,7 @@ readonly class ImageService
         private ConfigService $configService,
         private LoggerInterface $logger,
         private string $kernelProjectDir,
-    )
-    {
+    ) {
     }
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
@@ -59,7 +58,7 @@ readonly class ImageService
     {
         $cnt = 0;
         $source = $this->getSourceFile($image);
-        $imageType = $imageType ?? $image->getType();
+        $imageType ??= $image->getType();
         $sizes = $this->configService->getThumbnailSizes($imageType);
         foreach ($sizes as [$width, $height]) {
             $target = $this->getThumbnailFile($image, $width, $height);
@@ -77,7 +76,8 @@ readonly class ImageService
                 $imagick->writeImage($target);
                 $cnt++;
             } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));;
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));
+                ;
             }
         }
 
@@ -99,7 +99,8 @@ readonly class ImageService
                 $this->entityManager->persist($image);
                 $this->entityManager->flush();
             } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));;
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));
+                ;
             }
         }
     }

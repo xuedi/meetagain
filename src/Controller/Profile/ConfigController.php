@@ -45,22 +45,13 @@ class ConfigController extends AbstractController
     public function toggle(string $type): Response
     {
         $user = $this->getAuthedUser();
-        switch ($type) {
-            case 'osm':
-                $user->setOsmConsent(!$user->isOsmConsent());
-                break;
-            case 'tagging':
-                $user->setTagging(!$user->isTagging());
-                break;
-            case 'notification':
-                $user->setNotification(!$user->isNotification());
-                break;
-            case 'public':
-                $user->setPublic(!$user->isPublic());
-                break;
-            default:
-                throw new Exception('Invalid type');
-        }
+        match ($type) {
+            'osm' => $user->setOsmConsent(!$user->isOsmConsent()),
+            'tagging' => $user->setTagging(!$user->isTagging()),
+            'notification' => $user->setNotification(!$user->isNotification()),
+            'public' => $user->setPublic(!$user->isPublic()),
+            default => throw new Exception('Invalid type'),
+        };
 
         $this->em->persist($user);
         $this->em->flush();

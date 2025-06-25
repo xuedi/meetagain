@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Tests\Unit\Stubs\EventStub;
 
-
 class EventServiceTest extends TestCase
 {
     private MockObject|EventRepository $eventRepoMock;

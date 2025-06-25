@@ -36,5 +36,4 @@ class ActivityServiceTest extends TestCase
     {
         $this->markTestSkipped('wait until refactoring');
     }
-
 }

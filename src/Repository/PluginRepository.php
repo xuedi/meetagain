@@ -28,5 +28,4 @@ class PluginRepository extends ServiceEntityRepository
 
         return $result;
     }
-
 }

@@ -31,8 +31,7 @@ class SecurityController extends AbstractController
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly EmailService $emailService,
-    )
-    {
+    ) {
     }
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
@@ -59,8 +58,7 @@ class SecurityController extends AbstractController
         UserPasswordHasherInterface $hasher,
         EntityManagerInterface $em,
         GlobalService $globalService,
-    ): Response
-    {
+    ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
@@ -132,15 +130,13 @@ class SecurityController extends AbstractController
         EntityManagerInterface $em,
         UserRepository $userRepo,
         CaptchaService $captchaService,
-    ): Response
-    {
+    ): Response {
         $captchaService->setSession($request->getSession());
 
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $captcha = $form->get('captcha')->getData();
             $captchaError = $captchaService->isValid($captcha);
             if ($captchaError !== null) {
@@ -183,8 +179,7 @@ class SecurityController extends AbstractController
         string $code,
         Request $request,
         UserPasswordHasherInterface $hasher,
-    ): Response
-    {
+    ): Response {
         $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
         if ($user === null) {
             return $this->render('security/reset_error.html.twig');

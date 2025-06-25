@@ -22,8 +22,7 @@ readonly class UserChecker implements UserCheckerInterface
         private EntityManagerInterface $em,
         private RequestStack $requestStack,
         private MessageRepository $msgRepo,
-    )
-    {
+    ) {
     }
 
     #[\Override]

@@ -84,5 +84,4 @@ class NotificationSettings implements JsonSerializable
         }
         return $this;
     }
-
 }

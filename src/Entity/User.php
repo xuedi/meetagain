@@ -440,11 +440,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeMessagesSend(Message $messagesSend): static
     {
-        if ($this->messagesSend->removeElement($messagesSend)) {
-            // set the owning side to null (unless already changed)
-            if ($messagesSend->getSender() === $this) {
-                $messagesSend->setSender(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->messagesSend->removeElement($messagesSend) && $messagesSend->getSender() === $this) {
+            $messagesSend->setSender(null);
         }
 
         return $this;
@@ -470,11 +468,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeMessagesReceived(Message $messagesReceived): static
     {
-        if ($this->messagesReceived->removeElement($messagesReceived)) {
-            // set the owning side to null (unless already changed)
-            if ($messagesReceived->getReceiver() === $this) {
-                $messagesReceived->setReceiver(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->messagesReceived->removeElement($messagesReceived) && $messagesReceived->getReceiver() === $this) {
+            $messagesReceived->setReceiver(null);
         }
 
         return $this;

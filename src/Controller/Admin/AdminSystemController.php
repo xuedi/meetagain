@@ -5,14 +5,12 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractController;
 use App\Repository\ConfigRepository;
 use App\Repository\ImageRepository;
-use App\Repository\UserRepository;
 use App\Service\ImageService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminSystemController extends AbstractController
 {
-
     #[Route('/admin/system/config', name: 'app_admin_config')]
     public function configIndex(ConfigRepository $repo): Response
     {
@@ -28,7 +26,7 @@ class AdminSystemController extends AbstractController
         $startTime = microtime(true);
         $cnt = 0;
         foreach ($imageRepo->findAll() as $image) {
-            $cnt = $cnt + $upload->createThumbnails($image);
+            $cnt += $upload->createThumbnails($image);
         }
         // TODO: do for for all images, and get the config from the setting and loop all source
         $executionTime = microtime(true) - $startTime;

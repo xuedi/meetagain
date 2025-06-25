@@ -23,11 +23,9 @@ readonly class EmailService
     public function __construct(
         private MailerInterface $mailer,
         private ConfigService $config,
-        private Environment $twig,
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em
-    )
-    {
+    ) {
     }
 
     public function sendWelcome(User $user): bool
@@ -135,7 +133,7 @@ readonly class EmailService
             $this->mailer->send($email);
 
             return true;
-        } catch (TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface) {
             // TODO: add logging
             return false;
         }

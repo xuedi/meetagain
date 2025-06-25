@@ -25,7 +25,7 @@ class ImageRepository extends ServiceEntityRepository
             ->from(Image::class, 'i')
             ->where($qb->expr()->isNotNull('i.updatedAt'))
             ->andWhere($qb->expr()->lt('i.updatedAt', ':date'))
-            ->setParameter('date', new DateTime('-'.$int.' days'))
+            ->setParameter('date', new DateTime('-' . $int . ' days'))
             ->getQuery()
             ->getResult();
     }

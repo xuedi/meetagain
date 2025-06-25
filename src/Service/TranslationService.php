@@ -26,8 +26,7 @@ readonly class TranslationService
         private ParameterBagInterface $appParams,
         private KernelInterface $kernel,
         private string $kernelProjectDir,
-    )
-    {
+    ) {
     }
 
     /** TODO: move to repo */

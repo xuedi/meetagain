@@ -18,7 +18,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserCheckerTest extends TestCase
 {
-
     private MockObject|ActivityService $activityService;
     private MockObject|EntityManagerInterface $em;
     private MockObject|RequestStack $requestStack;

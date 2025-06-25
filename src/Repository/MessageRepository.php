@@ -65,7 +65,7 @@ class MessageRepository extends ServiceEntityRepository
 
     public function getMessages(User $user, User|null $partner = null): ?array
     {
-        if ($partner === null) {
+        if (!$partner instanceof \App\Entity\User) {
             return null;
         }
 

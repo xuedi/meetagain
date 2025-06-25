@@ -12,8 +12,7 @@ readonly class CleanupService
         private ImageRepository $imageRepo,
         private UserRepository $userRepo,
         private EntityManagerInterface $entityManager
-    )
-    {
+    ) {
     }
 
     public function removeImageCache(): void

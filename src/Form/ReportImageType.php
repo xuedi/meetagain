@@ -23,8 +23,7 @@ class ReportImageType extends AbstractType
             ->add('reported', ChoiceType::class, [
                     'label' => $this->translator->trans('report_image_reason'),
                     'choices' => ImageReported::getChoices($this->translator),
-                ]
-            );
+                ]);
     }
 
     #[\Override]

@@ -19,8 +19,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         private readonly ImageService $imageService,
         private readonly UserFixture $userFixture,
         private readonly EventFixture $eventFixture,
-    )
-    {
+    ) {
     }
 
     #[\Override]
@@ -33,7 +32,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         // add photos for cmdBlocks
         foreach ($this->cmsBlockFixture->getBlockReferenceForImages() as $blockId) {
             $imageFile = __DIR__ . "/CmsBlock/$blockId";
-            $reference = 'cmsBlock_' . md5($blockId);
+            $reference = 'cmsBlock_' . md5((string) $blockId);
             $cmsBlock = $this->getReference($reference, CmsBlock::class);
 
             // upload file & thumbnails

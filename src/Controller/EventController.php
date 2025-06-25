@@ -29,8 +29,7 @@ class EventController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService
-    )
-    {
+    ) {
     }
 
     #[Route('/events', name: 'app_event')]
@@ -107,7 +106,8 @@ class EventController extends AbstractController
 
             $this->activityService->log(
                 ActivityType::EventImageUploaded,
-                $user, [
+                $user,
+                [
                     'event_id' => $event->getId(),
                     'images' => count($files)
                 ]
