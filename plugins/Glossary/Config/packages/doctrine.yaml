@@ -11,3 +11,6 @@ doctrine:
                         prefix: Plugin\Glossary\Entity
                         alias: Glossary
 
+doctrine_migrations:
+    migrations_paths: # add for diff, migrate has own config for parameter
+        Plugin\Glossary\Migrations: "%kernel.project_dir%/plugins/Glossary/Migrations"

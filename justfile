@@ -43,6 +43,9 @@ dockerEnter:
 test:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
 
+migrationDiff +pluginName='':
+    {{JUST}} app doctrine:migrations:diff --configuration=plugins/{{pluginName}}/Config/packages/migration/config_cli.yaml --filter-expression=/^glossary/ --no-interaction --no-debug
+
 check: test checkStan checkRector checkPhpcs checkPsalm
     {{PHP}} composer validate --strict
     echo "Did run all checks successfully"

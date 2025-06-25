@@ -1,0 +1,6 @@
+# it's here, since it should not be auto-parsed by symfony
+
+em: emGlossary
+migrations_paths:
+    'Plugin\Glossary\Migrations': 'plugins/Glossary/Migrations/'
+

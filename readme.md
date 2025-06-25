@@ -39,7 +39,15 @@ COMPOSE_ENV_FILES=../.env # env parameter for phpstorm docker remote php interpr
 ### Collection of useful commands
 ```
 just app doctrine:migrations:diff --namespace=DoctrineMigrations            # main app migrations
-just app doctrine:migrations:diff --namespace=DoctrineMigrationsGlossary    # greate migrations for plugin
+
+just app doctrine:migrations:diff --namespace=Plugin\\Glossary\\Migrations --filter-expression=/^glossary/
+
+just app doctrine:migrations:diff --em=emGlossary --namespace=PluginGlossaryMigrations --filter-expression=/^glossary/
+
+just app doctrine:migrations:diff --configuration=plugins/MigrationConfig.php
+
+just app doctrine:migrations:diff --namespace=DoctrineMigrationsGlossary --filter-expression=/^glossary/
+just app doctrine:migrations:diff --em=emGlossary --configuration=plugins/MigrationConfig.php --namespace=DoctrineMigrationsGlossary
 ```
 
 ---
