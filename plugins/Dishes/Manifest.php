@@ -3,7 +3,6 @@
 namespace Plugin\Dishes;
 
 use App\Plugin;
-use Symfony\Component\HttpFoundation\Request;
 
 class Manifest implements Plugin
 {
