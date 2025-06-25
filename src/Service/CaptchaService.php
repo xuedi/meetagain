@@ -20,7 +20,7 @@ class CaptchaService
     public function generate(): string
     {
         $image = $this->session->get('captcha_image' . $this->session->getId(), null);
-        if($image !== null) {
+        if ($image !== null) {
             return $image;
         }
 
@@ -77,7 +77,7 @@ class CaptchaService
 
     public function reset(): void
     {
-        if($this->getRefreshCount() >= 7) {
+        if ($this->getRefreshCount() >= 7) {
             return;
         }
         $this->session->remove('captcha_text' . $this->session->getId());

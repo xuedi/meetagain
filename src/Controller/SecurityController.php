@@ -109,7 +109,7 @@ class SecurityController extends AbstractController
         $em->flush();
 
         $xuedi = $em->getRepository(User::class)->findOneBy(['email' => 'admin@beijingcode.org']);
-        if($xuedi !== null) {
+        if ($xuedi !== null) {
             $msg = new Message();
             $msg->setDeleted(false);
             $msg->setWasRead(false);
@@ -143,7 +143,7 @@ class SecurityController extends AbstractController
 
             $captcha = $form->get('captcha')->getData();
             $captchaError = $captchaService->isValid($captcha);
-            if($captchaError !== null) {
+            if ($captchaError !== null) {
                 $form->get('captcha')->addError(new FormError($captchaError));
             }
 

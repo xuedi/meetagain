@@ -17,7 +17,7 @@ class LoginSubscriber implements EventSubscriberInterface
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
         $user = $event->getUser();
-        if(!$user->isOsmConsent()) {
+        if (!$user->isOsmConsent()) {
             return;
         }
 

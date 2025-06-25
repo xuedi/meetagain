@@ -50,7 +50,7 @@ class MessageController extends AbstractController
             // preRender then flush when no new messages
             $messages = $msgRepo->getMessages($user, $conversationPartner);
             $msgRepo->markConversationRead($user, $conversationPartner);
-            if(!$msgRepo->hasNewMessages($user)) {
+            if (!$msgRepo->hasNewMessages($user)) {
                 $request->getSession()->set('hasNewMessage', false);
             }
         }
