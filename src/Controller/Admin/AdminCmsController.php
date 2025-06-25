@@ -27,6 +27,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminCmsController extends AbstractController
 {
+    private const string COUND_NOT_LOAD_BLOCK = 'Could not load block';
+
     public function __construct(
         private readonly CmsRepository $repo,
         private readonly EntityManagerInterface $em,
@@ -187,7 +189,7 @@ class AdminCmsController extends AbstractController
             $this->em->persist($block);
             $this->em->flush();
         } else {
-            throw new RuntimeException('Could not load block');
+            throw new RuntimeException(self::COUND_NOT_LOAD_BLOCK);
         }
 
         return $this->redirectToRoute('app_admin_cms_edit', [
@@ -205,7 +207,7 @@ class AdminCmsController extends AbstractController
             $this->em->remove($block);
             $this->em->flush();
         } else {
-            throw new RuntimeException('Could not load block');
+            throw new RuntimeException(self::COUND_NOT_LOAD_BLOCK);
         }
 
         return $this->redirectToRoute('app_admin_cms_edit', [
@@ -237,7 +239,7 @@ class AdminCmsController extends AbstractController
             $this->em->persist($block);
             $this->em->flush();
         } else {
-            throw new RuntimeException('Could not load block');
+            throw new RuntimeException(self::COUND_NOT_LOAD_BLOCK);
         }
 
         // rebuild order

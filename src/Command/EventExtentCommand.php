@@ -17,11 +17,6 @@ class EventExtentCommand extends Command
     }
 
     #[\Override]
-    protected function configure(): void
-    {
-    }
-
-    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->eventService->extentRecurringEvents();
