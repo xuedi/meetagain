@@ -28,10 +28,10 @@ class Plugin
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private ?bool $enabled = null;
 
-    private bool $deleted = false;
-
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
+
+    private bool $deleted = false;
 
     public function isDeleted(): bool
     {

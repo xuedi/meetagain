@@ -14,7 +14,7 @@ class IndexController extends AbstractSymfonyController
     #[Route('/glossary', name: 'app_plugin_glossary')]
     public function show(Request $request, ManagerRegistry $doctrine): Response
     {
-        $glossaryEntityManager = $doctrine->getManager('glossary_em');
+        $glossaryEntityManager = $doctrine->getManager('emGlossary');
         $glossaryEntityManager->getRepository(Glossary::class)->findAll();
 
         return $this->render('@Glossary/index.html.twig');
