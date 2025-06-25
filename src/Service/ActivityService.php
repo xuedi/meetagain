@@ -5,11 +5,10 @@ namespace App\Service;
 use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Entity\User;
-use App\Factory\ActivityMessageFactory;
 use App\Repository\ActivityRepository;
+use App\Service\Activity\MessageFactory;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
 
 readonly class ActivityService
 {
@@ -17,7 +16,7 @@ readonly class ActivityService
         private EntityManagerInterface $em,
         private ActivityRepository $repo,
         private NotificationService $notificationService,
-        private ActivityMessageFactory $messageFactory,
+        private MessageFactory $messageFactory,
     )
     {
     }

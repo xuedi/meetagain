@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity\Activity;
+namespace App\Service\Activity;
 
 use InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;

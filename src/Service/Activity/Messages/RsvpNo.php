@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity\Activity\Messages;
+namespace App\Service\Activity\Messages;
 
-use App\Entity\Activity\MessageAbstract;
+use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
 
-class RsvpYes extends MessageAbstract
+class RsvpNo extends MessageAbstract
 {
     public function getType(): ActivityType
     {
-        return ActivityType::RsvpYes;
+        return ActivityType::RsvpNo;
     }
 
     public function validate(): void
@@ -21,7 +21,7 @@ class RsvpYes extends MessageAbstract
     protected function renderText(): string
     {
         $eventId = $this->meta['event_id'];
-        $msgTemplate = 'Going to event: %s';
+        $msgTemplate = 'Is skipping event: %s';
         return sprintf(
             $msgTemplate,
             $this->eventNames[$eventId],
@@ -31,7 +31,7 @@ class RsvpYes extends MessageAbstract
     protected function renderHtml(): string
     {
         $eventId = $this->meta['event_id'];
-        $msgTemplate = 'Going to event: %s'; // TODO: link
+        $msgTemplate = 'Is skipping event: %s'; // TODO: link
         return sprintf(
             $msgTemplate,
             $this->eventNames[$eventId],

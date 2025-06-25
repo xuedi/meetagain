@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity\Activity\Messages;
+namespace App\Service\Activity\Messages;
 
-use App\Entity\Activity\MessageAbstract;
+use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
 
-class RegistrationEmailConfirmed extends MessageAbstract
+class Registered extends MessageAbstract
 {
     public function getType(): ActivityType
     {
-        return ActivityType::RegistrationEmailConfirmed;
+        return ActivityType::Registered;
     }
 
     public function validate(): void
@@ -19,11 +19,11 @@ class RegistrationEmailConfirmed extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'User confirmed Email';
+        return 'User registered';
     }
 
     protected function renderHtml(): string
     {
-        return 'User confirmed Email';
+        return 'User registered';
     }
 }

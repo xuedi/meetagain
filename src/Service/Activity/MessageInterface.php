@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity\Activity;
+namespace App\Service\Activity;
 
 use App\Entity\ActivityType;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;

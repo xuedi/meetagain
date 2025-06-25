@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity\Activity\Messages;
+namespace App\Service\Activity\Messages;
 
-use App\Entity\Activity\MessageAbstract;
+use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
 use App\Entity\ImageReported;
 

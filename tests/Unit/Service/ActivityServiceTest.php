@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Service;
 
-use App\Factory\ActivityMessageFactory;
+use App\Factory\MessageFactory;
 use App\Repository\ActivityRepository;
 use App\Service\ActivityService;
 use App\Service\NotificationService;
@@ -15,7 +15,7 @@ class ActivityServiceTest extends TestCase
     private MockObject|EntityManagerInterface $emMock;
     private MockObject|ActivityRepository $activityRepoMock;
     private MockObject|NotificationService $notificationServiceMock;
-    private MockObject|ActivityMessageFactory $messageFactoryMock;
+    private MockObject|MessageFactory $messageFactoryMock;
     private ActivityService $subject;
 
     protected function setUp(): void
@@ -23,7 +23,7 @@ class ActivityServiceTest extends TestCase
         $this->emMock = $this->createMock(EntityManagerInterface::class);
         $this->activityRepoMock = $this->createMock(ActivityRepository::class);
         $this->notificationServiceMock = $this->createMock(NotificationService::class);
-        $this->messageFactoryMock = $this->createMock(ActivityMessageFactory::class);
+        $this->messageFactoryMock = $this->createMock(MessageFactory::class);
         $this->subject = new ActivityService(
             em: $this->emMock,
             repo: $this->activityRepoMock,

@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity\Activity\Messages;
+namespace App\Service\Activity\Messages;
 
-use App\Entity\Activity\MessageAbstract;
+use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
 
-class PasswordResetRequest extends MessageAbstract
+class Login extends MessageAbstract
 {
     public function getType(): ActivityType
     {
-        return ActivityType::PasswordResetRequest;
+        return ActivityType::Login;
     }
 
     public function validate(): void
@@ -19,11 +19,11 @@ class PasswordResetRequest extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'Requested password reset';
+        return 'User logged in';
     }
 
     protected function renderHtml(): string
     {
-        return 'Requested password reset';
+        return 'User logged in';
     }
 }
