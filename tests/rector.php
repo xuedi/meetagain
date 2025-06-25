@@ -6,7 +6,7 @@ use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRec
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '/../assets',
+        __DIR__ . '/../plugins',
         __DIR__ . '/../config',
         __DIR__ . '/../public',
         __DIR__ . '/../src',
