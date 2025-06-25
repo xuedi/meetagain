@@ -15,8 +15,10 @@ class IndexController extends AbstractSymfonyController
     public function show(Request $request, ManagerRegistry $doctrine): Response
     {
         $glossaryEntityManager = $doctrine->getManager('emGlossary');
-        $glossaryEntityManager->getRepository(Glossary::class)->findAll();
+        $repo = $glossaryEntityManager->getRepository(Glossary::class);
 
-        return $this->render('@Glossary/index.html.twig');
+        return $this->render('@Glossary/index.html.twig', [
+            'glossary' => $repo->findAll(),
+        ]);
     }
 }

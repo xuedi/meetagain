@@ -7,7 +7,26 @@
     <section class="section">
         <div class="container">
 
-            Glossary index
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Phrases</th>
+                    <th>Translation</th>
+                    <th>Explanation</th>
+                    <th>Category</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in glossary %}
+                    <tr>
+                        <td>{{ item.phrase }}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
         </div>
     </section>
