@@ -33,7 +33,7 @@ class ImageController extends AbstractController
             'id' => $id,
             'image' => $image,
             'imageList' => $imageList,
-            'eventList' => $this->imageRepo->getEventList($this->getUser()),
+            'eventList' => $this->imageRepo->getEventList($this->getAuthedUser()),
         ]);
     }
 }
