@@ -17,6 +17,9 @@ class Glossary
     #[ORM\Column(length: 255)]
     private ?string $phrase = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $pinyin = null;
+
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
@@ -26,6 +29,9 @@ class Glossary
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
+
+    #[ORM\Column]
+    private ?int $suggestedBy = null;
 
     public function getId(): ?int
     {
@@ -40,6 +46,18 @@ class Glossary
     public function setPhrase(string $phrase): static
     {
         $this->phrase = $phrase;
+
+        return $this;
+    }
+
+    public function getPinyin(): ?string
+    {
+        return $this->pinyin;
+    }
+
+    public function setPinyin(?string $pinyin): static
+    {
+        $this->pinyin = $pinyin;
 
         return $this;
     }
@@ -76,6 +94,18 @@ class Glossary
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getSuggestedBy(): ?int
+    {
+        return $this->suggestedBy;
+    }
+
+    public function setSuggestedBy(?int $suggestedBy): static
+    {
+        $this->suggestedBy = $suggestedBy;
 
         return $this;
     }

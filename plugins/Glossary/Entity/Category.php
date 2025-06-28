@@ -6,12 +6,11 @@ use DateTimeImmutable;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: GlossaryRepository::class), ORM\Table(name: 'glossary_category')]
+#[ORM\Entity(repositoryClass: GlossaryRepository::class)]
+#[ORM\Table(name: 'glossary_category')]
 class Category
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column, ORM\GeneratedValue, ORM\Id]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -48,6 +47,18 @@ class Category
     public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): int
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?int $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

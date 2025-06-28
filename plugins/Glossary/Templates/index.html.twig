@@ -7,26 +7,50 @@
     <section class="section">
         <div class="container">
 
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Phrases</th>
-                    <th>Translation</th>
-                    <th>Explanation</th>
-                    <th>Category</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in glossary %}
-                    <tr>
-                        <td>{{ item.phrase }}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <div class="columns">
+                <div class="column is-6">
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Phrases</th>
+                            <th>PinYin</th>
+                            <th>Translation</th>
+                            <th>Explanation</th>
+                            <th>Category</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in glossary %}
+                            <tr>
+                                <td>{{ item.phrase }}</td>
+                                <td>{{ item.pinyin }}</td>
+                                <td></td>
+                                <td></td>
+                                <td>{{ item.category.name }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="column is-6">
+
+                    {{ form_start(form) }}
+
+
+                    {{ form_row(form.phrase) }}
+                    {{ form_row(form.pinyin) }}
+                    {{ form_row(form.category) }}
+
+
+                    <button class="button is-link">{{ "button_suggest" | trans }}</button>
+                    {{ form_end(form) }}
+
+                </div>
+            </div>
+
+
 
         </div>
     </section>
