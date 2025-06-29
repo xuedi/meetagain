@@ -9,9 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: GlossaryRepository::class)]
 class Glossary
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -26,12 +24,11 @@ class Glossary
     #[ORM\Column]
     private ?int $createdBy = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Category $category = null;
-
     #[ORM\Column]
-    private ?int $suggestedBy = null;
+    private bool $approved = false;
+
+    #[ORM\Column(enumType: Category::class)]
+    private ?Category $category = null;
 
     public function getId(): ?int
     {
@@ -98,14 +95,14 @@ class Glossary
         return $this;
     }
 
-    public function getSuggestedBy(): ?int
+    public function getApproved(): bool
     {
-        return $this->suggestedBy;
+        return $this->approved;
     }
 
-    public function setSuggestedBy(?int $suggestedBy): static
+    public function setApproved(bool $approved): static
     {
-        $this->suggestedBy = $suggestedBy;
+        $this->approved = $approved;
 
         return $this;
     }

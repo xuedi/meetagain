@@ -2,64 +2,22 @@
 
 namespace Plugin\Glossary\Entity;
 
-use DateTimeImmutable;
-use Plugin\Glossary\Repository\GlossaryRepository;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[ORM\Entity(repositoryClass: GlossaryRepository::class)]
-#[ORM\Table(name: 'glossary_category')]
-class Category
+enum Category: int
 {
-    #[ORM\Column, ORM\GeneratedValue, ORM\Id]
-    private ?int $id = null;
+    case Greeting = 0;
+    case Swearing = 1;
+    case Flirting = 2;
+    case InternetSlang = 3;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column]
-    private ?int $createdBy = null;
-
-    public function getId(): ?int
+    public static function getChoices(TranslatorInterface $translator): array
     {
-        return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): int
-    {
-        return $this->createdBy;
-    }
-
-    public function setCreatedBy(?int $createdBy): static
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
+        return [
+            $translator->trans('Greeting') => self::Greeting,
+            $translator->trans('Swearing') => self::Swearing,
+            $translator->trans('Flirting') => self::Flirting,
+            $translator->trans('InternetSlang') => self::InternetSlang,
+        ];
     }
 }

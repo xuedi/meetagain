@@ -2,6 +2,7 @@
 
 namespace Plugin\Glossary\Controller;
 
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Glossary\Entity\Glossary;
@@ -10,21 +11,28 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymf
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class IndexController extends AbstractSymfonyController
 {
-    #[Route('/glossary/{glossary}', name: 'app_plugin_glossary', methods: [ 'GET', 'POST'])]
-    public function show(Request $request, ManagerRegistry $doctrine, ?Glossary $glossary = null): Response
+    #[Route('/glossary', name: 'app_plugin_glossary', methods: [ 'GET', 'POST'])]
+    public function show(Request $request, ManagerRegistry $doctrine): Response
     {
         $glossaryEntityManager = $doctrine->getManager('emGlossary');
         $repo = $glossaryEntityManager->getRepository(Glossary::class);
+        $glossary = new Glossary();
 
         $form = $this->createForm(GlossaryType::class, $glossary);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $glossary->setSuggestedBy($this->getUser()->getId());
-            $glossary->setCreatedBy($this->getUser()->getId());
+            if (!$this->getUser() instanceof User) {
+                throw new AuthenticationException('Only for logged in users');
+            }
+            $userId = $this->getUser()->getId();
+
+            $glossary->setCreatedBy($userId);
             $glossary->setCreatedAt(new DateTimeImmutable());
+            $glossary->setApproved(false);
 
             $glossaryEntityManager->persist($glossary);
             $glossaryEntityManager->flush();

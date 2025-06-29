@@ -8,16 +8,17 @@
         <div class="container">
 
             <div class="columns">
-                <div class="column is-6">
+                <div class="column is-9">
 
                     <table class="table">
                         <thead>
                         <tr>
                             <th>Phrases</th>
                             <th>PinYin</th>
-                            <th>Translation</th>
                             <th>Explanation</th>
                             <th>Category</th>
+                            <th>Tags</th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -26,27 +27,30 @@
                                 <td>{{ item.phrase }}</td>
                                 <td>{{ item.pinyin }}</td>
                                 <td></td>
-                                <td></td>
                                 <td>{{ item.category.name }}</td>
+                                <td></td>
+                                <td>edit</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
 
                 </div>
-                <div class="column is-6">
+                <div class="column is-3">
+                    <div class="box">
 
-                    {{ form_start(form) }}
+                        {{ form_start(form) }}
 
+                        {{ form_row(form.phrase) }}
+                        {{ form_row(form.pinyin) }}
+                        {{ form_row(form.category) }}
+                        <div class="has-text-right">
+                            {{ form_row(form.button) }}
+                        </div>
 
-                    {{ form_row(form.phrase) }}
-                    {{ form_row(form.pinyin) }}
-                    {{ form_row(form.category) }}
+                        {{ form_end(form) }}
 
-
-                    <button class="button is-link">{{ "button_suggest" | trans }}</button>
-                    {{ form_end(form) }}
-
+                    </div>
                 </div>
             </div>
 
