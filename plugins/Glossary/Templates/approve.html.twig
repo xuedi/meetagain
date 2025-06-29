@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_plugin_glossary_new_title"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-9">
+                    {% include '@Glossary/blocks/list.html.twig' %}
+                </div>
+                <div class="column is-3">
+                    {% if is_granted('ROLE_USER') %}
+
+                        {% if approvalItem.suggestions is not defined or approvalItem.suggestions is null %}
+                        <div class="box">
+                            <h2 class="title is-5">Waiting for approval</h2>
+                            <p class="mb-5">
+                                Phrase: <b>{{ approvalItem.phrase }}</b><br>
+                                Pinyin: <b>{{ approvalItem.pinyin }}</b><br>
+                                Category: <b>{{ approvalItem.category.name }}</b><br>
+                                CreatedBy: <b>{{ approvalItem.createdBy }}</b><br>
+                                CreatedAt: <b>{{ approvalItem.createdAt | time_diff }}</b><br>
+                            </p>
+                            <div class="has-text-right">
+                                <a class="button is-success" href="{{ path('app_plugin_glossary_approve', {id: approvalItem.id}) }}">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a class="button is-danger" href="{{ path('app_plugin_glossary_delete', {id: approvalItem.id}) }}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                            <h2 class="title is-5">Changes for approval</h2>
+                            {% for suggestion in approvalItem.suggestions %}
+                            <div class="box">
+                                <p>
+                                    {{ suggestion.createdBy }} suggested {{ suggestion.createdAt | time_diff }} to change the
+                                    <b>{{ suggestion.field }}</b> to '<b>{{ suggestion.value }}</b>'
+                                </p>
+                                <div class="has-text-right mt-4">
+                                    <a class="button is-success is-small" href="{{ path('app_plugin_glossary_approve', {id: approvalItem.id}) }}">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a class="button is-danger is-small" href="{{ path('app_plugin_glossary_delete', {id: approvalItem.id}) }}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
+

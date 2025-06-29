@@ -30,6 +30,9 @@ class Glossary
     #[ORM\Column(enumType: Category::class)]
     private ?Category $category = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?array $suggestion = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -103,6 +106,22 @@ class Glossary
     public function setApproved(bool $approved): static
     {
         $this->approved = $approved;
+
+        return $this;
+    }
+
+    public function getSuggestions(): array
+    {
+        $suggestions = [];
+        foreach ($this->suggestion as $suggestion) {
+            $suggestions[] = Suggestion::fromJson($suggestion);
+        }
+        return $suggestions;
+    }
+
+    public function addSuggestions(Suggestion $suggestion): static
+    {
+        $this->suggestion[] = $suggestion->jsonSerialize();
 
         return $this;
     }

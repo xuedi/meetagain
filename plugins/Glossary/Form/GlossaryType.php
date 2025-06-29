@@ -5,7 +5,6 @@ namespace Plugin\Glossary\Form;
 use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\Glossary;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,9 +26,8 @@ class GlossaryType extends AbstractType
             ->add('category', ChoiceType::class, [
                 'data' => $builder->getData()?->getCategory(),
                 'choices' => Category::getChoices($this->translator),
-            ])->add('button', ButtonType::class, [
-                'label' => 'Add'
-            ]);
+                ]
+            );
     }
 
     #[\Override]

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_plugin_glossary_new_title"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-9">
+                    {% include '@Glossary/blocks/list.html.twig' %}
+                </div>
+                <div class="column is-3">
+                    {% if is_granted('ROLE_USER') %}
+                        <div class="box">
+
+                            <h2 class="title is-5">Suggest a new phrase</h2>
+                            {{ form_start(form) }}
+                            {{ form_row(form.phrase) }}
+                            {{ form_row(form.pinyin) }}
+                            {{ form_row(form.category) }}
+                            <div class="has-text-right mt-6">
+                                <a href="{{ path('app_plugin_glossary') }}" class="button">cancel</a>
+                                <button type="submit" class="button is-link">Suggest new</button>
+                            </div>
+                            {{ form_end(form) }}
+
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
+

@@ -1,0 +1,62 @@
+<table class="table is-fullwidth">
+    <thead>
+    <tr>
+        <th>Phrases</th>
+        <th>PinYin</th>
+        <th>Explanation</th>
+        <th>Category</th>
+        <th>Tags</th>
+        {% if is_granted('ROLE_USER') %}
+            <th>
+                <a href="{{ path('app_plugin_glossary_new') }}">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </th>
+        {% endif %}
+    </tr>
+    </thead>
+    <tbody>
+    {% if is_granted('ROLE_MANAGER') %}
+        {% for item in newPhrases %}
+            <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
+                <td>{{ item.phrase }}</td>
+                <td>{{ item.pinyin }}</td>
+                <td></td>
+                <td>{{ item.category.name }}</td>
+                <td></td>
+                <td>
+                    <a class="has-text-success" href="{{ path('app_plugin_glossary_approval_list', {id: item.id}) }}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+    {% for item in glossaryList %}
+        <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
+            <td>{{ item.phrase }}</td>
+            <td>{{ item.pinyin }}</td>
+            <td></td>
+            <td>{{ item.category.name }}</td>
+            <td></td>
+            <td>
+                {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_plugin_glossary_edit', {id: item.id}) }}">
+                    <i class="fas fa-edit"></i>
+                </a>
+                {% endif %}
+                {% if is_granted('ROLE_MANAGER') %}
+                    {% if item.suggestions is not null %}
+                        <a class="has-text-warning" href="{{ path('app_plugin_glossary_approval_list', {id: item.id}) }}">
+                            <i class="fa fa-circle-exclamation"></i>
+                        </a>
+                    {% endif %}
+                    <a class="has-text-danger" href="{{ path('app_plugin_glossary_delete_view', {id: item.id}) }}">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

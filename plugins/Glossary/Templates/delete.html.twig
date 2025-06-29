@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_plugin_glossary_delete_title"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-9">
+                    {% include '@Glossary/blocks/list.html.twig' %}
+                </div>
+                <div class="column is-3">
+                    {% if is_granted('ROLE_MANAGER') %}
+                        <div class="box has-background-danger-light">
+
+                            <h2 class="title is-5">Delete this phrase?</h2>
+                            <p class="mb-5">
+                                Phrase: <b>{{ deleteItem.phrase }}</b><br>
+                                Pinyin: <b>{{ deleteItem.pinyin }}</b><br>
+                                Category: <b>{{ deleteItem.category.name }}</b><br>
+                                CreatedBy: <b>{{ deleteItem.createdBy }}</b><br>
+                                CreatedAt: <b>{{ deleteItem.createdAt | time_diff }}</b><br>
+                            </p>
+                            <div class="has-text-right">
+                                <a class="button is-danger" href="{{ path('app_plugin_glossary_delete', {id: deleteItem.id}) }}">
+                                    <span class="icon">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span>Yes</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
+
