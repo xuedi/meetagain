@@ -18,8 +18,12 @@
                 <aside class="menu">
                     <p class="menu-label">Loggedin: {{ app.user.name }}</p>
                     <ul class="menu-list pl-3">
+                        <li><a href="{{ path('app_profile') }}">{{ "menu_profile_view_profile" | trans }}</a></li>
                         <li><a href="{{ path('app_profile_messages') }}">{{ "menu_profile_messages" | trans }}</a></li>
+                        <li><a href="{{ path('app_profile_social') }}">{{ "menu_profile_social" | trans }}</a></li>
+                        <li><a href="{{ path('app_profile_config') }}">{{ "menu_profile_config" | trans }}</a></li>
                     </ul>
+
                 </aside>
             </div>
         {% endif %}

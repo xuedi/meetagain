@@ -159,17 +159,10 @@
             </p>
         {% else %}
             {% for message in messages %}
-                {% if user.id == message.sender.id %}
-                    <div class="box has-text-right">
-                        <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
-                        <span class="breakText">{{ message.content }}</span>
-                    </div>
-                {% else %}
-                    <div class="box">
-                        <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
-                        <span class="breakText">{{ message.content }}</span>
-                    </div>
-                {% endif %}
+                <div class="box {% if user.id == message.sender.id %}has-background-link-light{% endif %}">
+                    <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
+                    <span class="breakText">{{ message.content }}</span>
+                </div>
             {% endfor %}
             <hr>
             {{ form_start(form) }}
