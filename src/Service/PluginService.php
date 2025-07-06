@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Plugin;
+use App\Entity\Plugin as PluginEntity;
 use App\Plugin as PluginInterface;
 use App\Repository\PluginRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,7 +56,7 @@ readonly class PluginService
             }
             $entity = $this->pluginRepo->findOneBy(['name' => $pluginData['name']]);
             if ($entity === null) { // new plugin entry
-                $entity = new Plugin();
+                $entity = new PluginEntity();
                 $entity->setSlug(strtolower((string)$pluginData['name']));
                 $entity->setName($pluginData['name']);
                 $entity->setVersion($pluginData['version']);

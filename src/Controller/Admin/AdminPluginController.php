@@ -2,8 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Plugin as PluginInterface;
 use App\Service\PluginService;
-use Psalm\Plugin\PluginInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Response;

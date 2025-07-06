@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
+use App\Plugin;
 use App\Service\Command\ClearCacheCommand;
 use App\Service\Command\CommandInterface;
 use App\Service\Command\ExecuteMigrationsCommand;
 use App\Service\Command\ExtractTranslationsCommand;
-use Psalm\Plugin\PluginInterface;
 use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -20,7 +20,7 @@ readonly class CommandService
     public function __construct(
         private KernelInterface $kernel,
         private string $kernelProjectDir,
-        #[AutowireIterator(PluginInterface::class)]
+        #[AutowireIterator(Plugin::class)]
         private iterable $plugins,
         private ParameterBagInterface $appParams,
     )
