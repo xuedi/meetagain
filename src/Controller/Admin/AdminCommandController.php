@@ -8,10 +8,12 @@ use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Stopwatch\Stopwatch;
 
-class CommandController extends AbstractController
+#[Route('/admin/command/')]
+class AdminCommandController extends AbstractController
 {
-    #[Route('/admin/command/', name: 'app_admin_command')]
+    #[Route('', name: 'app_admin_command')]
     public function index(): Response
     {
         return $this->render('admin/command/index.html.twig', [
@@ -20,9 +22,12 @@ class CommandController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/command/execute/{command}', name: 'app_admin_command_execute')]
+    #[Route('/execute/{command}', name: 'app_admin_command_execute')]
     public function execute(CommandService $service, string $command): Response
     {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('executeCommand');
+
         $output = match ($command) {
             CommandEnum::clearCache->name => $service->clearCache(),
             CommandEnum::executeMigrations->name => $service->executeMigrations(),
@@ -32,6 +37,7 @@ class CommandController extends AbstractController
 
         return $this->render('admin/command/execute.html.twig', [
             'active' => 'command',
+            'executionTime' => (string)$stopwatch->stop('executeCommand'),
             'command' => $command,
             'output' => $output,
         ]);

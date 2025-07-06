@@ -7,6 +7,7 @@ use App\Service\Command\CommandInterface;
 use App\Service\Command\ExecuteMigrationsCommand;
 use App\Service\Command\ExtractTranslationsCommand;
 use Psalm\Plugin\PluginInterface;
+use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -28,15 +29,17 @@ readonly class CommandService
 
     public function execute(CommandInterface $command): string
     {
+        $input = new ArrayInput($command->getParameter());
+        $output = new BufferedOutput();
+
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
-
-        $output = new BufferedOutput();
-        $input = new ArrayInput($command->getParameter());
-
         $application->run($input, $output);
 
-        return $output->fetch();
+        $converter = new AnsiToHtmlConverter();
+        $content = $output->fetch();
+
+        return $converter->convert($content);
     }
 
     public function clearCache(): string
