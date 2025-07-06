@@ -1,32 +1,25 @@
-<table class="table is-fullwidth">
-    <tbody>
-    {% for event in list %}
-        <tr>
-            <td>
-                <p class="has-text-grey">{{ event.start|date('Y-m-d') }}</p>
-            </td>
-            <td>
-                {% set title = event.title(globalService.currentLocale) %}
-                <span>{{ title|length > 36 ? title|slice(0, 36) ~ '...' : title }}</span>
-                <a class="icon is-small" target="_blank" href="{{ path('app_event_details', {id: event.id}) }}">
-                    <i class="fa fa-external-link" aria-hidden="true"></i>
-                </a>
-            </td>
-            <td class="is-right">
-                {% if isPast %}
-                    {% if event.rsvp.contains(user) %}
-                        <span class="tag is-small is-success is-light">{{ "toggle_yes"|trans }}</span>
-                    {% else %}
-                        <span class="tag is-small is-danger is-light">{{ "toggle_no"|trans }}</span>
-                    {% endif %}
+{% for event in list %}
+    <div class="field is-grouped">
+        <div class="control is-expanded">
+            {% set title = event.title(globalService.currentLocale) %}
+            <a class="has-text-dark" href="{{ path('app_event_details', {id: event.id}) }}">
+                {{ title|length > 36 ? title|slice(0, 36) ~ '...' : title }}
+            </a>
+            <span class="has-text-grey-light">{{ event.start|time_diff }}</span>
+        </div>
+        <div class="control">
+            {% if isPast %}
+                {% if event.rsvp.contains(user) %}
+                    <span class="tag is-small is-success is-light">{{ "toggle_yes"|trans }}</span>
                 {% else %}
-                    {% include '_block/toggle.html.twig' with {
-                        'link': path('app_profile_toggle_rsvp', {event: event.id}),
-                        'status': event.rsvp.contains(user)
-                    } %}
+                    <span class="tag is-small is-danger is-light">{{ "toggle_no"|trans }}</span>
                 {% endif %}
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+            {% else %}
+                {% include '_block/toggle.html.twig' with {
+                    'link': path('app_profile_toggle_rsvp', {event: event.id}),
+                    'status': event.rsvp.contains(user)
+                } %}
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}

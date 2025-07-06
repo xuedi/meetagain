@@ -12,63 +12,61 @@
 
                     <div class="box">
                         <h1 class="title is-5">Settings</h1>
-                        <table class="table is-fullwidth">
-                            <tr>
-                                <td>Enable eMail notification</td>
-                                <td>
-                                    {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle', {'type': 'notification'}),
-                                        'status': user.isNotification
-                                    } %}
-                                </td>
-                            </tr>
-                            {% if user.isNotification %}
+                        <div class="field is-grouped">
+                            <div class="control is-expanded">
+                                Enable eMail notification dfger
+                            </div>
+                            <div class="control">
+                                {% include '_block/toggle.html.twig' with {
+                                    'link': path('app_profile_config_toggle', {'type': 'notification'}),
+                                    'status': user.isNotification
+                                } %}
+                            </div>
+                        </div>
+                        {% if user.isNotification %}
                             {% for notification in user.notificationSettings.list %}
-                            <tr>
-                                <td>{{ notification.label }}</td>
-                                <td>
-                                    {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
-                                        'status': notification.value,
-                                    } %}
-                                </td>
-                            </tr>
+                                <div class="field is-grouped">
+                                    <div class="control is-expanded">{{ notification.label }}</div>
+                                    <div class="control">
+                                        {% include '_block/toggle.html.twig' with {
+                                            'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
+                                            'status': notification.value,
+                                        } %}
+                                    </div>
+                                </div>
                             {% endfor %}
-                            {% endif %}
-                        </table>
+                        {% endif %}
                     </div>
 
                     <div class="box">
                         <h2 class="title is-5">Privacy</h2>
-                        <table class="table is-fullwidth">
-                            <tr>
-                                <td>Show me on the members page for website guests</td>
-                                <td>
-                                    {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle', {'type': 'public'}),
-                                        'status': user.isPublic
-                                    } %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Can be tagged by others in photos</td>
-                                <td>
-                                    {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle', {'type': 'tagging'}),
-                                        'status': user.isTagging
-                                    } %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Enable osm maps on the event page</td>
-                                <td>
-                                    {% include '_block/toggle.html.twig' with {
-                                        'link': path('app_profile_config_toggle', {'type': 'osm'}),
-                                        'status': user.isOsmConsent
-                                    } %}
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="field is-grouped">
+                            <div class="control is-expanded">Show me on the members page for website guests</div>
+                            <div class="control">
+                                {% include '_block/toggle.html.twig' with {
+                                    'link': path('app_profile_config_toggle', {'type': 'public'}),
+                                    'status': user.isPublic
+                                } %}
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="control is-expanded">Can be tagged by others in photos</div>
+                            <div class="control">
+                                {% include '_block/toggle.html.twig' with {
+                                    'link': path('app_profile_config_toggle', {'type': 'tagging'}),
+                                    'status': user.isTagging
+                                } %}
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="control is-expanded">Enable osm maps on the event page</div>
+                            <div class="control">
+                                {% include '_block/toggle.html.twig' with {
+                                    'link': path('app_profile_config_toggle', {'type': 'osm'}),
+                                    'status': user.isOsmConsent
+                                } %}
+                            </div>
+                        </div>
                     </div>
 
                 </div>
