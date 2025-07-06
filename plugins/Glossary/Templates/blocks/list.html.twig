@@ -70,7 +70,14 @@
             <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
                 <td>{{ item.phrase }}</td>
                 <td>{{ item.pinyin }}</td>
-                <td>{{ item.explanation }}</td>
+                <td>
+                    {% if item.explanation|length > 80  %}
+                        <div class="showAllToggle">{{ item.explanation|slice(0, 80) }} ... <a class="is-link showAll">more</a></div>
+                        <div class="showAllToggle is-hidden">{{ item.explanation }}</div>
+                    {% else %}
+                        {{ item.explanation  }}
+                    {% endif %}
+                </td>
                 <td>{{ item.category.name }}</td>
                 {% if is_granted('ROLE_USER') %}
                     <td>

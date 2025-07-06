@@ -162,3 +162,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    (document.querySelectorAll('.showAll') || []).forEach((trigger) => {
+        trigger.addEventListener('click', event => {
+            event.preventDefault();
+            (event.currentTarget.parentNode.parentNode.querySelectorAll('.showAllToggle') || []).forEach((toggle) => {
+                toggle.classList.toggle('is-hidden');
+            })
+        });
+    });
+});
