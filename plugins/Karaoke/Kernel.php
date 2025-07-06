@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Dishes;
+namespace Plugin\Karaoke;
 
 use App\Plugin;
 
