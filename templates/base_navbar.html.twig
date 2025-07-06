@@ -12,7 +12,7 @@
                 <a class="navbar-item" href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a>
                 <a class="navbar-item" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
                 {% for plugin in globalService.plugins %}
-                    <a class="navbar-item" href="/{{ app.locale }}/{{ plugin.slug }}">{{ "menu_" ~ plugin.slug | trans }}</a>
+                    <a class="navbar-item" href="/{{ app.locale }}/{{ plugin.slug }}">{{ ("menu_" ~ plugin.slug) | trans }}</a>
                 {% endfor %}
                 {% if is_granted('ROLE_MANAGER') %}
                     <a class="navbar-item" href="{{ path('app_manage') }}">{{ "menu_manage" | trans }}</a>
