@@ -97,8 +97,8 @@ readonly class PluginService
     public function installStep2(string $name): void
     {
         // can't do this directly after writing kernel since the old kernel (no interfaces yet)
-        //$pluginKernel = $this->getKernel($name);
-        //$pluginKernel->install();
+        $pluginKernel = $this->getKernel($name);
+        $pluginKernel->install();
 
         $this->executeMigrations($name);
     }
@@ -162,14 +162,14 @@ readonly class PluginService
 
     private function clearCache(): void
     {
-        // TODO: Move into own class with the extract translations
-        $input = new ArrayInput([
-            'command' => 'cache:clear',
-        ]);
-
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
-        $application->run($input);
+
+        $output = new ConsoleOutput();
+        $input = new ArrayInput([]);
+
+        $command = $application->find('cache:clear');
+        $command->run($input, $output);
     }
 
     private function executeMigrations(string $name): void
