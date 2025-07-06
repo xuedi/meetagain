@@ -13,20 +13,40 @@
                 </div>
                 <div class="column is-3">
                     {% if is_granted('ROLE_USER') %}
+                        <h2 class="title is-5">Suggest a change</h2>
                         <div class="box">
 
-                            <h2 class="title is-5">Suggest a change</h2>
                             {{ form_start(form) }}
                             {{ form_row(form.phrase) }}
                             {{ form_row(form.pinyin) }}
                             {{ form_row(form.category) }}
                             <div class="has-text-right mt-6">
                                 <a href="{{ path('app_plugin_glossary') }}" class="button">cancel</a>
-                                <button type="submit" class="button is-link">Suggest change</button>
+                                {% if is_granted('ROLE_MANAGER') %}
+                                    <button type="submit" class="button is-link">Save</button>
+                                {% else %}
+                                    <button type="submit" class="button is-link">Suggest change</button>
+                                {% endif %}
                             </div>
                             {{ form_end(form) }}
 
                         </div>
+                    {% endif %}
+
+                    {% if editItem.suggestions is not empty %}
+                        <h2 class="title is-5">Waiting for approval</h2>
+                        {% for suggestion in editItem.suggestions %}
+                            {% set value = suggestion.value %}
+                            {% if suggestion.field.value == categoryFieldValue %}
+                                {% set value = categoryNames[suggestion.value] %}
+                            {% endif %}
+                            <div class="box has-background-info-light">
+                                <p>
+                                    <b>{{ globalService.getUserName(suggestion.createdBy) }}</b> suggested {{ suggestion.createdAt | time_diff }} to change the
+                                    <b>{{ suggestion.field.value }}</b> to '<b>{{ value }}</b>'
+                                </p>
+                            </div>
+                        {% endfor %}
                     {% endif %}
                 </div>
             </div>

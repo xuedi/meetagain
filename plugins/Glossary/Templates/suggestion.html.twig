@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_plugin_glossary_new_title"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-9">
+                    {% include '@Glossary/blocks/list.html.twig' %}
+                </div>
+                <div class="column is-3">
+                    {% if is_granted('ROLE_USER') %}
+
+                        <h2 class="title is-5">Changes for approval</h2>
+                        {% for suggestion in editItem.suggestions %}
+                            {% set value = suggestion.value %}
+                            {% if suggestion.field.value == categoryFieldValue %}
+                                {% set value = categoryNames[suggestion.value] %}
+                            {% endif %}
+                        <div class="box">
+                            <p>
+                                <b>{{ globalService.getUserName(suggestion.createdBy) }}</b> suggested {{ suggestion.createdAt | time_diff }} to change the
+                                <b>{{ suggestion.field.value }}</b> to '<b>{{ value }}</b>'
+                            </p>
+                            <div class="has-text-right mt-4">
+                                {% set applyLink = path('app_plugin_glossary_suggestion_apply', {id: editItem.id, hash: suggestion.hash}) %}
+                                {% set denyLink = path('app_plugin_glossary_suggestion_delete', {id: editItem.id, hash: suggestion.hash}) %}
+                                <a class="button is-success is-small" href="{{ applyLink }}">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a class="button is-danger is-small" href="{{ denyLink }}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
+

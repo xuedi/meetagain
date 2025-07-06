@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
 use App\Repository\PluginRepository;
+use App\Repository\UserRepository;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,6 +18,7 @@ readonly class GlobalService
         private TranslationService $translationService,
         private DashboardService $dashboardService,
         private PluginRepository $pluginRepo,
+        private UserRepository $userRepo,
     ) {
     }
 
@@ -38,6 +40,11 @@ readonly class GlobalService
     public function getPlugins(): array
     {
         return $this->pluginRepo->findBy(['enabled' => true], ['name' => 'ASC']);
+    }
+
+    public function getUserName(int $id): string
+    {
+        return $this->userRepo->findOneBy(['id' => $id])->getName();
     }
 
     public function hasNewMessages(): bool

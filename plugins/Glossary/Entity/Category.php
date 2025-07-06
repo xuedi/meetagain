@@ -20,4 +20,14 @@ enum Category: int
             $translator->trans('InternetSlang') => self::InternetSlang,
         ];
     }
+
+    public static function getNames(): array
+    {
+        return [
+            self::Greeting->value => 'Greeting',
+            self::Swearing->value => 'Swearing',
+            self::Flirting->value => 'Flirting',
+            self::InternetSlang->value => 'InternetSlang',
+        ];
+    }
 }

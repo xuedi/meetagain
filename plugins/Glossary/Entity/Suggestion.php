@@ -3,6 +3,7 @@
 namespace Plugin\Glossary\Entity;
 
 use DateTimeImmutable;
+use InvalidArgumentException;
 use JsonSerializable;
 
 class Suggestion implements JsonSerializable
@@ -17,7 +18,7 @@ class Suggestion implements JsonSerializable
         set => $this->createdAt = $value;
     }
 
-    public string $field {
+    public SuggestionField $field {
         get => $this->field;
         set => $this->field = $value;
     }
@@ -27,17 +28,36 @@ class Suggestion implements JsonSerializable
         set => $this->value = $value;
     }
 
-    public static function fromJson(?array $data): self
+    public static function fromJson(array $data): self
     {
-        return new self($data ?? []);
+        if ($data === []) {
+            throw new InvalidArgumentException('Invalid data');
+        }
+
+        return new self(
+            createdBy: $data['createdBy'],
+            createdAt: new DateTimeImmutable($data['createdAt']['date']),
+            field: SuggestionField::from($data['field']),
+            value: $data['value']
+        );
     }
 
-    public function __construct(array $data)
+    public static function fromParams(int $createdBy, DateTimeImmutable $createdAt, SuggestionField $field, string $value): self
     {
-        $this->createdBy = $data['createdBy'];
-        $this->createdAt = new DateTimeImmutable($data['createdAt']['date']);
-        $this->field = $data['field'];
-        $this->value = $data['value'];
+        return new self(
+            createdBy: $createdBy,
+            createdAt: $createdAt,
+            field: $field,
+            value: $value
+        );
+    }
+
+    private function __construct(int $createdBy, DateTimeImmutable $createdAt, SuggestionField $field, string $value)
+    {
+        $this->createdBy = $createdBy;
+        $this->createdAt = $createdAt;
+        $this->field = $field;
+        $this->value = $value;
     }
 
     public function jsonSerialize(): array
@@ -45,8 +65,13 @@ class Suggestion implements JsonSerializable
         return [
             'createdBy' => $this->createdBy,
             'createdAt' => $this->createdAt,
-            'field' => $this->field,
+            'field' => $this->field->value,
             'value' => $this->value,
         ];
+    }
+
+    public function getHash(): string
+    {
+        return sha1(json_encode($this->jsonSerialize()));
     }
 }

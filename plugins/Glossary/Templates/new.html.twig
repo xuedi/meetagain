@@ -13,9 +13,9 @@
                 </div>
                 <div class="column is-3">
                     {% if is_granted('ROLE_USER') %}
+                        <h2 class="title is-5">Suggest a new phrase</h2>
                         <div class="box">
 
-                            <h2 class="title is-5">Suggest a new phrase</h2>
                             {{ form_start(form) }}
                             {{ form_row(form.phrase) }}
                             {{ form_row(form.pinyin) }}

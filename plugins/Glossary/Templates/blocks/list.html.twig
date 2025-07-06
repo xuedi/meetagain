@@ -1,6 +1,7 @@
 <table class="table is-fullwidth">
     <thead>
     <tr>
+        <th>ID</th>
         <th>Phrases</th>
         <th>PinYin</th>
         <th>Explanation</th>
@@ -16,47 +17,84 @@
     </tr>
     </thead>
     <tbody>
+
     {% if is_granted('ROLE_MANAGER') %}
-        {% for item in newPhrases %}
+
+        {% for item in list %}{# action items for managers #}
+            {% if item.approved == false or item.suggestions is not empty %}
             <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
+                <td>{{ item.id }}</td>
                 <td>{{ item.phrase }}</td>
                 <td>{{ item.pinyin }}</td>
                 <td></td>
                 <td>{{ item.category.name }}</td>
                 <td></td>
                 <td>
+                    {% if item.approved == false %}
                     <a class="has-text-success" href="{{ path('app_plugin_glossary_approval_list', {id: item.id}) }}">
                         <i class="fas fa-edit"></i>
                     </a>
-                </td>
-            </tr>
-        {% endfor %}
-    {% endif %}
-    {% for item in glossaryList %}
-        <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
-            <td>{{ item.phrase }}</td>
-            <td>{{ item.pinyin }}</td>
-            <td></td>
-            <td>{{ item.category.name }}</td>
-            <td></td>
-            <td>
-                {% if is_granted('ROLE_USER') %}
-                <a href="{{ path('app_plugin_glossary_edit', {id: item.id}) }}">
-                    <i class="fas fa-edit"></i>
-                </a>
-                {% endif %}
-                {% if is_granted('ROLE_MANAGER') %}
-                    {% if item.suggestions is not null %}
-                        <a class="has-text-warning" href="{{ path('app_plugin_glossary_approval_list', {id: item.id}) }}">
-                            <i class="fa fa-circle-exclamation"></i>
+                    {% endif %}
+                    {% if item.suggestions is not empty %}
+                        <a class="has-text-warning" href="{{ path('app_plugin_glossary_suggestion_list', {id: item.id}) }}">
+                            <i class="fa fa-edit"></i>
                         </a>
                     {% endif %}
                     <a class="has-text-danger" href="{{ path('app_plugin_glossary_delete_view', {id: item.id}) }}">
                         <i class="fa fa-trash"></i>
                     </a>
-                {% endif %}
-            </td>
-        </tr>
-    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+
+        {% for item in list %} {# rest of list #}
+            {% if item.approved == true and item.suggestions is empty %}
+                <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.phrase }}</td>
+                    <td>{{ item.pinyin }}</td>
+                    <td></td>
+                    <td>{{ item.category.name }}</td>
+                    <td></td>
+                    <td>
+                        <a href="{{ path('app_plugin_glossary_edit', {id: item.id}) }}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a class="has-text-danger" href="{{ path('app_plugin_glossary_delete_view', {id: item.id}) }}">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+    {% else %}{# normal user #}
+
+        {% for item in list %}
+            {% if item.approved == true %}
+            <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
+                <td>{{ item.id }}</td>
+                <td>{{ item.phrase }}</td>
+                <td>{{ item.pinyin }}</td>
+                <td></td>
+                <td>{{ item.category.name }}</td>
+                <td></td>
+                <td>
+                    {% if is_granted('ROLE_USER') %}
+                    <a href="{{ path('app_plugin_glossary_edit', {id: item.id}) }}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                    {% if is_granted('ROLE_MANAGER') %}
+                        <a class="has-text-danger" href="{{ path('app_plugin_glossary_delete_view', {id: item.id}) }}">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     </tbody>
 </table>
