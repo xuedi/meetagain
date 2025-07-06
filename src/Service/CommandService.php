@@ -2,56 +2,65 @@
 
 namespace App\Service;
 
-use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
+use App\Service\Command\ClearCacheCommand;
+use App\Service\Command\CommandInterface;
+use App\Service\Command\ExecuteMigrationsCommand;
+use App\Service\Command\ExtractTranslationsCommand;
+use Psalm\Plugin\PluginInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class CommandService
 {
-    public function __construct(private KernelInterface $kernel, private string $kernelProjectDir)
+    public function __construct(
+        private KernelInterface $kernel,
+        private string $kernelProjectDir,
+        #[AutowireIterator(PluginInterface::class)]
+        private iterable $plugins,
+        private ParameterBagInterface $appParams,
+    )
     {
+    }
+
+    public function execute(CommandInterface $command): string
+    {
+        $application = new Application($this->kernel);
+        $application->setAutoExit(false);
+
+        $output = new BufferedOutput();
+        $input = new ArrayInput($command->getParameter());
+
+        $application->run($input, $output);
+
+        return $output->fetch();
     }
 
     public function clearCache(): string
     {
-        $application = new Application($this->kernel);
-        $application->setAutoExit(false);
-
-        $output = new BufferedOutput();
-        $input = new ArrayInput([]);
-
-        $command = $application->find('cache:clear');
-        $command->run($input, $output);
-
-        $converter = new AnsiToHtmlConverter();
-        $content = $output->fetch();
-
-        return $converter->convert($content);
+        return $this->execute(new ClearCacheCommand());
     }
 
-    public function executeMigrations(string $name): string
+    public function executeMigrations(): string
     {
-        define('STDIN', fopen("php://stdin", "r"));
+        $output = '';
+        foreach ($this->plugins as $plugin) {
+            $output .= $this->execute(new ExecuteMigrationsCommand($plugin->getName(), $this->kernelProjectDir)) . PHP_EOL;
+        }
 
-        $application = new Application($this->kernel);
-        $application->setAutoExit(false);
+        return $output;
+    }
 
-        $config = sprintf('%s/plugins/%s/Config/packages/migration/config.yaml', $this->kernelProjectDir, $name);
-        $arguments = [
-            '--configuration' => $config,
-            '--em' => sprintf('em%s', $name),
-            '--no-interaction' => true,
-        ];
+    public function extractTranslations(): string
+    {
+        $output = '';
+        foreach ($this->appParams->get('kernel.enabled_locales') as $locale) {
+            $output .= $this->execute(new ExtractTranslationsCommand($locale)) . PHP_EOL;
+        }
 
-        $output = new BufferedOutput();
-        $input = new ArrayInput($arguments);
-
-        $command = $application->find('doctrine:migrations:migrate');
-        $command->run($input, $output);
-
-        return $output->fetch();
+        return $output;
     }
 }

@@ -4,6 +4,11 @@
 
     <div class="container">
 
+        <div class="notification is-info">
+            Registered with the system: {{ loadedPlugins|join }}
+            {{ dump(loadedPlugins) }}
+        </div>
+
         <table class="table is-fullwidth">
             <thead>
             <tr>

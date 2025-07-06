@@ -3,26 +3,34 @@
 namespace App\Controller\Admin;
 
 use App\Service\PluginService;
+use Psalm\Plugin\PluginInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/admin/plugin')]
 class AdminPluginController extends AbstractController
 {
-    public function __construct(private readonly PluginService $pluginService)
+    public function __construct(
+        private readonly PluginService $pluginService,
+        #[AutowireIterator(PluginInterface::class)]
+        private readonly iterable $plugins,
+    )
     {
     }
 
-    #[Route('/admin/plugin', name: 'app_admin_plugin')]
+    #[Route('', name: 'app_admin_plugin')]
     public function list(): Response
     {
         return $this->render('admin/plugin/list.html.twig', [
-            'active' => 'plugin',
+            'loadedPlugins' => $this->plugins,
             'plugins' => $this->pluginService->getAdminList(),
+            'active' => 'plugin',
         ]);
     }
 
-    #[Route('/admin/plugin/remove/{id}', name: 'admin_plugin_remove')]
+    #[Route('/remove/{id}', name: 'admin_plugin_remove')]
     public function remove(int $id): Response
     {
         $this->pluginService->remove($id);
@@ -30,7 +38,7 @@ class AdminPluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/install/step1/{name}', name: 'admin_plugin_install')]
+    #[Route('/install/step1/{name}', name: 'admin_plugin_install')]
     public function installStep1(string $name): Response
     {
         $this->pluginService->installStep1($name);
@@ -38,7 +46,7 @@ class AdminPluginController extends AbstractController
         return $this->redirectToRoute('admin_plugin_install_step2', ['name' => $name]);
     }
 
-    #[Route('/admin/plugin/install/step2/{name}', name: 'admin_plugin_install_step2')]
+    #[Route('/install/step2/{name}', name: 'admin_plugin_install_step2')]
     public function installStep2(string $name): Response
     {
         $this->pluginService->installStep2($name);
@@ -46,7 +54,7 @@ class AdminPluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/uninstall/{name}', name: 'admin_plugin_uninstall')]
+    #[Route('/uninstall/{name}', name: 'admin_plugin_uninstall')]
     public function uninstall(string $name): Response
     {
         $this->pluginService->uninstall($name);
@@ -54,7 +62,7 @@ class AdminPluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/enable/{name}', name: 'admin_plugin_enable')]
+    #[Route('/enable/{name}', name: 'admin_plugin_enable')]
     public function enable(string $name): Response
     {
         $this->pluginService->enable($name);
@@ -62,7 +70,7 @@ class AdminPluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
-    #[Route('/admin/plugin/disable/{name}', name: 'admin_plugin_disable')]
+    #[Route('/disable/{name}', name: 'admin_plugin_disable')]
     public function disable(string $name): Response
     {
         $this->pluginService->disable($name);

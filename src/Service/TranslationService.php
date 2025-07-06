@@ -24,7 +24,7 @@ readonly class TranslationService
         private EntityManagerInterface $entityManager,
         private Filesystem $fs,
         private ParameterBagInterface $appParams,
-        private KernelInterface $kernel,
+        private CommandService $commandService,
         private string $kernelProjectDir,
     ) {
     }
@@ -238,15 +238,7 @@ readonly class TranslationService
         $stopwatch->start('action');
 
         foreach ($this->appParams->get('kernel.enabled_locales') as $locale) {
-            $application = new Application($this->kernel);
-            $application->setAutoExit(false);
-            $application->run(new ArrayInput([
-                'command' => 'translation:extract',
-                'fooArgument' => 'barValue',
-                '--format' => 'php',
-                '--force' => true,
-                $locale => true,
-            ]));
+            $this->commandService->extractTranslations($locale);
         }
 
         return (string)$stopwatch->stop('action');

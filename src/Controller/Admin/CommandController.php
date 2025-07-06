@@ -25,7 +25,8 @@ class CommandController extends AbstractController
     {
         $output = match ($command) {
             CommandEnum::clearCache->name => $service->clearCache(),
-            CommandEnum::executeMigrations->name => $service->executeMigrations('Glossary'),
+            CommandEnum::executeMigrations->name => $service->executeMigrations(),
+            CommandEnum::extractTranslations->name => $service->extractTranslations(),
             default => throw new InvalidArgumentException('Unknown command: ' . $command),
         };
 
