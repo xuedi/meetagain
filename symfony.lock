@@ -76,6 +76,18 @@
             "tests/bootstrap.php"
         ]
     },
+    "sensiolabs/ansi-to-html": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.2",
+            "ref": "d58d11d5b998f39260d387d3a0b50adc342db7e4"
+        },
+        "files": [
+            "config/packages/ansi_to_html.yaml"
+        ]
+    },
     "sentry/sentry-symfony": {
         "version": "5.2",
         "recipe": {

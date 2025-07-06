@@ -7,11 +7,7 @@ use App\Plugin as PluginInterface;
 use App\Repository\PluginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class PluginService
 {
@@ -22,9 +18,9 @@ readonly class PluginService
         private iterable $plugins,
         private PluginRepository $pluginRepo,
         private EntityManagerInterface $em,
-        private KernelInterface $kernel,
-        private string $kernelProjectDir,
-    ) {
+        private CommandService $commandService,
+    )
+    {
     }
 
     public function getAdminList(): array
@@ -61,7 +57,7 @@ readonly class PluginService
             $entity = $this->pluginRepo->findOneBy(['name' => $pluginData['name']]);
             if ($entity === null) { // new plugin entry
                 $entity = new Plugin();
-                $entity->setSlug(strtolower((string) $pluginData['name']));
+                $entity->setSlug(strtolower((string)$pluginData['name']));
                 $entity->setName($pluginData['name']);
                 $entity->setVersion($pluginData['version']);
                 $entity->setDescription($pluginData['description']);
@@ -100,7 +96,7 @@ readonly class PluginService
         $pluginKernel = $this->getKernel($name);
         $pluginKernel->install();
 
-        $this->executeMigrations($name);
+        $this->commandService->executeMigrations($name);
     }
 
     public function uninstall(string $name): void
@@ -147,7 +143,7 @@ readonly class PluginService
         $content = "<?php declare(strict_types=1); return [" . implode(',', $nameList) . "];";
         file_put_contents($pluginConfigFile, $content);
 
-        $this->clearCache();
+        $this->commandService->clearCache();
     }
 
     private function getKernel(string $name): PluginInterface
@@ -158,39 +154,6 @@ readonly class PluginService
             }
         }
         throw new Exception('Plugin kernel not found: ' . $name);
-    }
-
-    private function clearCache(): void
-    {
-        $application = new Application($this->kernel);
-        $application->setAutoExit(false);
-
-        $output = new ConsoleOutput();
-        $input = new ArrayInput([]);
-
-        $command = $application->find('cache:clear');
-        $command->run($input, $output);
-    }
-
-    private function executeMigrations(string $name): void
-    {
-        define('STDIN', fopen("php://stdin", "r"));
-
-        $application = new Application($this->kernel);
-        $application->setAutoExit(false);
-
-        $config = sprintf('%s/plugins/%s/Config/packages/migration/config.yaml', $this->kernelProjectDir, $name);
-        $arguments = [
-            '--configuration' => $config,
-            '--em' => sprintf('em%s', $name),
-            '--no-interaction' => true,
-        ];
-
-        $output = new ConsoleOutput();
-        $input = new ArrayInput($arguments);
-
-        $command = $application->find('doctrine:migrations:migrate');
-        $command->run($input, $output);
     }
 
     private function verifySymfonyConfig(): void

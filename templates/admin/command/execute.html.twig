@@ -1,0 +1,15 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h1 class="title is-5">Execute: {{ command }}</h1>
+        <p>
+            {{ output|raw|nl2br }}
+        </p>
+
+    </div>
+
+{% endblock %}
+
