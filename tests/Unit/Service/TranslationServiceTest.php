@@ -5,6 +5,7 @@ namespace Tests\Unit\Service;
 use App\Entity\Translation;
 use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
+use App\Service\CommandService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
@@ -20,6 +21,7 @@ class TranslationServiceTest extends TestCase
 {
     private MockObject|TranslationRepository $translationRepositoryMock;
     private MockObject|EntityManagerInterface $entityManagerMock;
+    private MockObject|CommandService $commandServiceMock;
     private MockObject|Request $requestMock;
     private TranslationService $subject;
 
@@ -33,6 +35,7 @@ class TranslationServiceTest extends TestCase
         $this->requestMock = $this->createMock(Request::class);
         $this->translationRepositoryMock = $this->createMock(TranslationRepository::class);
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
+        $this->commandServiceMock = $this->createMock(CommandService::class);
 
         $this->subject = new TranslationService(
             $this->translationRepositoryMock,
@@ -40,7 +43,7 @@ class TranslationServiceTest extends TestCase
             $this->entityManagerMock,
             $this->createMock(Filesystem::class),
             $this->createMock(ParameterBagInterface::class),
-            $this->createMock(KernelInterface::class),
+            $this->commandServiceMock,
             __DIR__ . '/tmp/'
         );
     }
