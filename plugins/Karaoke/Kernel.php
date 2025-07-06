@@ -8,7 +8,7 @@ class Kernel implements Plugin
 {
     public function getName(): string
     {
-        return 'Dishes';
+        return 'Karaoke';
     }
 
     public function install(): void

@@ -12,6 +12,7 @@ class AdminPluginController extends AbstractController
     public function __construct(private readonly PluginService $pluginService)
     {
     }
+
     #[Route('/admin/plugin', name: 'app_admin_plugin')]
     public function list(): Response
     {

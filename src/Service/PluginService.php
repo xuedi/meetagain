@@ -97,8 +97,8 @@ readonly class PluginService
     public function installStep2(string $name): void
     {
         // can't do this directly after writing kernel since the old kernel (no interfaces yet)
-        $pluginKernel = $this->getKernel($name);
-        $pluginKernel->install();
+        //$pluginKernel = $this->getKernel($name);
+        //$pluginKernel->install();
 
         $this->executeMigrations($name);
     }
