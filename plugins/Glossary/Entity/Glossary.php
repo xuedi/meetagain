@@ -3,6 +3,7 @@
 namespace Plugin\Glossary\Entity;
 
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use InvalidArgumentException;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,6 +35,9 @@ class Glossary
     #[ORM\Column(nullable: true)]
     private ?array $suggestion = null;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $explanation = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +63,18 @@ class Glossary
     public function setPinyin(?string $pinyin): static
     {
         $this->pinyin = $pinyin;
+
+        return $this;
+    }
+
+    public function getExplanation(): ?string
+    {
+        return $this->explanation;
+    }
+
+    public function setExplanation(?string $explanation): static
+    {
+        $this->explanation = $explanation;
 
         return $this;
     }

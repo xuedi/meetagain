@@ -61,6 +61,7 @@ class GlossaryService
             $current->setPhrase($newGlossary->getPhrase());
             $current->setPinyin($newGlossary->getPinyin());
             $current->setCategory($newGlossary->getCategory());
+            $current->setExplanation($newGlossary->getExplanation());
 
             $this->em->persist($current);
             $this->em->flush();
@@ -92,16 +93,24 @@ class GlossaryService
                 value: (string)$newGlossary->getCategory()->value,
             ));
         }
+        if ($current->getExplanation() !== $newGlossary->getExplanation()) {
+            $current->addSuggestions(Suggestion::fromParams(
+                createdBy: $userId,
+                createdAt: new DateTimeImmutable(),
+                field: SuggestionField::Explanation,
+                value: $newGlossary->getExplanation(),
+            ));
+        }
 
         $this->em->persist($current);
         $this->em->flush();
     }
 
-    public function createNew(Glossary $glossary, int $userId): void
+    public function createNew(Glossary $glossary, int $userId, bool $isManager): void
     {
         $glossary->setCreatedBy($userId);
         $glossary->setCreatedAt(new DateTimeImmutable());
-        $glossary->setApproved(false);
+        $glossary->setApproved($isManager);
 
         $this->em->persist($glossary);
         $this->em->flush();
@@ -119,7 +128,10 @@ class GlossaryService
                 $item->setPinyin($suggestion->value);
                 break;
             case SuggestionField::Category:
-                $item->setCategory(Category::from((int)$suggestion->value));;
+                $item->setCategory(Category::from((int)$suggestion->value));
+                break;
+            case SuggestionField::Explanation:
+                $item->setExplanation($suggestion->value);
                 break;
         }
         $leftOver = $item->removeSuggestion($hash);

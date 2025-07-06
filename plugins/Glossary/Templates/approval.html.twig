@@ -18,6 +18,7 @@
                             <p class="mb-5">
                                 Phrase: <b>{{ editItem.phrase }}</b><br>
                                 Pinyin: <b>{{ editItem.pinyin }}</b><br>
+                                Explanation: <b>{{ editItem.explanation }}</b><br>
                                 Category: <b>{{ editItem.category.name }}</b><br>
                                 CreatedBy: <b>{{ globalService.getUserName(editItem.createdBy) }}</b><br>
                                 CreatedAt: <b>{{ editItem.createdAt | time_diff }}</b><br>

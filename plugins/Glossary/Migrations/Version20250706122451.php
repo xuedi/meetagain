@@ -10,18 +10,18 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250629124539 extends AbstractMigration
+final class Version20250706122451 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'initial migration';
+        return 'add description to glossary';
     }
 
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            CREATE TABLE glossary (id INT AUTO_INCREMENT NOT NULL, phrase VARCHAR(255) NOT NULL, pinyin VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, created_by INT NOT NULL, approved TINYINT(1) NOT NULL, category INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4
+            ALTER TABLE glossary ADD explanation LONGTEXT NOT NULL
         SQL);
     }
 
@@ -29,7 +29,7 @@ final class Version20250629124539 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            DROP TABLE glossary
+            ALTER TABLE glossary DROP explanation
         SQL);
     }
 }

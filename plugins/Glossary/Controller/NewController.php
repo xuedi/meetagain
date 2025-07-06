@@ -24,7 +24,7 @@ class NewController extends AbstractGlossaryController
             if (!$this->getUser() instanceof User) {
                 throw new AuthenticationException('Only for logged in users');
             }
-            $this->service->createNew($glossary, $this->getUser()->getId());
+            $this->service->createNew($glossary, $this->getUser()->getId(), $this->isGranted('ROLE_MANAGER'));
 
             return $this->redirectToRoute('app_plugin_glossary');
         }

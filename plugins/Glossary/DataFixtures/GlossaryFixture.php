@@ -15,13 +15,14 @@ class GlossaryFixture extends Fixture implements FixtureGroupInterface
     public function load(ObjectManager $manager): void
     {
         echo 'Creating glossary ... ';
-        foreach ($this->getData() as [$phrase, $pinyin, $category, $user, $approved]) {
+        foreach ($this->getData() as [$phrase, $pinyin, $explanation, $category, $user, $approved]) {
             $glossary = new Glossary();
             $glossary->setCreatedAt(new DateTimeImmutable());
             $glossary->setCreatedBy($user);
             $glossary->setApproved($approved);
             $glossary->setPhrase($phrase);
             $glossary->setPinyin($pinyin);
+            $glossary->setExplanation($explanation);
             $glossary->setCategory($category);
 
             $manager->persist($glossary);
@@ -36,6 +37,7 @@ class GlossaryFixture extends Fixture implements FixtureGroupInterface
             [
                 '草泥马',
                 'cǎo ní mǎ',
+                'fuck off',
                 Category::Swearing,
                 1,
                 true,
@@ -43,6 +45,7 @@ class GlossaryFixture extends Fixture implements FixtureGroupInterface
             [
                 '干嘛',
                 'gàn má',
+                'how is it going?',
                 Category::Greeting,
                 2,
                 true,
@@ -50,6 +53,7 @@ class GlossaryFixture extends Fixture implements FixtureGroupInterface
             [
                 '你吃了吗？',
                 'nǐ chī le ma?',
+                'have you heating?',
                 Category::Greeting,
                 2,
                 true,
@@ -57,6 +61,7 @@ class GlossaryFixture extends Fixture implements FixtureGroupInterface
             [
                 '你好',
                 'nĭ hăo',
+                'hello nobody uses anymore, you can use when seeing your ex after 10 years',
                 Category::Greeting,
                 2,
                 false,

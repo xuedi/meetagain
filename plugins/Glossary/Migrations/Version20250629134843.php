@@ -14,7 +14,7 @@ final class Version20250629134843 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'add change suggestion to glossary';
     }
 
     public function up(Schema $schema): void

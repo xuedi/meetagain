@@ -7,4 +7,5 @@ enum SuggestionField: string
     case Phrase = 'phrase';
     case Pinyin = 'pinyin';
     case Category = 'category';
+    case Explanation = 'explanation';
 }
