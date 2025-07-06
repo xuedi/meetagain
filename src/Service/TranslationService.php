@@ -73,10 +73,13 @@ readonly class TranslationService
 
     public function extract(): array
     {
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('executeCommand');
+
         $numberTranslationCount = 0;
         $newTranslations = 0;
         $this->cleanUpTranslationFiles();
-        $extractionTime = $this->extractTranslationsFromFiles();
+        $output = $this->extractTranslationsFromFiles();
         $deletedTranslations = 0; //$this->deleteOrphanedTranslations();
 
         $path = $this->kernelProjectDir . '/translations/';
@@ -108,7 +111,8 @@ readonly class TranslationService
             'count' => $numberTranslationCount,
             'new' => $newTranslations,
             'deleted' => $deletedTranslations,
-            'extractionTime' => $extractionTime,
+            'extractionTime' => (string)$stopwatch->stop('executeCommand'),
+            'output' => $output,
         ];
     }
 
@@ -134,7 +138,6 @@ readonly class TranslationService
             }
             $this->fs->appendToFile($file, ');');
         }
-        //$this->just->command('clearCache');
 
         return [
             'cleanedUp' => $cleanedUp,
@@ -234,13 +237,6 @@ readonly class TranslationService
 
     private function extractTranslationsFromFiles(): string
     {
-        $stopwatch = new Stopwatch();
-        $stopwatch->start('action');
-
-        foreach ($this->appParams->get('kernel.enabled_locales') as $locale) {
-            $this->commandService->extractTranslations($locale);
-        }
-
-        return (string)$stopwatch->stop('action');
+        return $this->commandService->extractTranslations();
     }
 }
