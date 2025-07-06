@@ -4,7 +4,7 @@
 
 {% block body %}
 
-    <section class="section">
+    <section class="section is-hidden-touch">
         <div class="container">
 
             <div class="columns">
@@ -19,7 +19,7 @@
                         {% for conversation in conversations %}
                             <!-- TODO: is-active -->
                             <a class="panel-block is-block"
-                               {% if conversationsId == conversation.user.id %} style="background-color: aliceblue;" {% endif %}
+                                    {% if conversationsId == conversation.user.id %} style="background-color: aliceblue;" {% endif %}
                                href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}"
                             >
                                 <div class="level">
@@ -37,7 +37,7 @@
                                     <div class="level-right">
                                         <div class="content">
                                             {% if conversation.unread > 0 %}
-                                            <span class="tag has-background-danger-light">{{ conversation.unread }}</span>
+                                                <span class="tag has-background-danger-light">{{ conversation.unread }}</span>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -55,17 +55,19 @@
                 <div class="column is-8">
 
                     {% if messages is null %}
-                    <h1 class="title is-6">Hello,</h1>
-                    <p class="mb-2">
-                        this is your message overview. On the left are the people you exchanged messages with.
-                    </p>
-                    <p class="mb-2">
-                        You can only message to people you are friends with, or people who allow to be messages from everyone
-                    </p>
-                    <p class="mb-2">
-                        have a look at the members page, on the detail view of each member you have a message buttun until xuedi
-                        implements a kind addressbook here
-                    </p>
+                        <h1 class="title is-6">Hello,</h1>
+                        <p class="mb-2">
+                            this is your message overview. On the left are the people you exchanged messages with.
+                        </p>
+                        <p class="mb-2">
+                            You can only message to people you are friends with, or people who allow to be messages from
+                            everyone
+                        </p>
+                        <p class="mb-2">
+                            have a look at the members page, on the detail view of each member you have a message buttun
+                            until xuedi
+                            implements a kind addressbook here
+                        </p>
                     {% else %}
                         {% for message in messages %}
                             {% if user.id == message.sender.id %}
@@ -95,12 +97,12 @@
                                             </div>
                                         </div>
                                         {% if message.wasRead == false %}
-                                        <div class="level-item">
+                                            <div class="level-item">
                                             <span class="panel-icon has-text-danger">
                                                 <i class="fas fa-circle" aria-hidden="true"></i>
                                             </span>
-                                        </div>
-                                            {% endif %}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endif %}
@@ -109,18 +111,79 @@
                         {{ form_start(form) }}
                         <div class="level">
                             <div class="level-item">
-                                <input class="input" type="text" name="{{ field_name(form.comment) }}" placeholder="Message" />
+                                <input class="input" type="text" name="{{ field_name(form.comment) }}"
+                                       placeholder="Message"/>
                             </div>
                             <div class="level-right">
                                 <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
                             </div>
                         </div>
                         {{ form_end(form) }}
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
-
             </div>
+
+        </div>
+    </section>
+
+    <section class="section is-hidden-desktop">
+        <h1 class="title is-5">Messages</h1>
+        <div class="tabs is-boxed is-fullwidth is-small">
+            <ul>
+                {% for conversation in conversations %}
+                    <li class="{% if conversationsId == conversation.user.id %}is-active{% endif %}">
+                        <a href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}">
+                            <span class="ml-2">
+                                {{ conversation.user.name }}<br>
+                                <small>{{ conversation.lastMessage | time_diff }}</small>
+                            </span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if messages is null %}
+            <h1 class="title is-6">Hello,</h1>
+            <p class="mb-2">
+                this is your message overview. On the left are the people you exchanged messages with.
+            </p>
+            <p class="mb-2">
+                You can only message to people you are friends with, or people who allow to be messages from
+                everyone
+            </p>
+            <p class="mb-2">
+                have a look at the members page, on the detail view of each member you have a message buttun
+                until xuedi
+                implements a kind addressbook here
+            </p>
+        {% else %}
+            {% for message in messages %}
+                {% if user.id == message.sender.id %}
+                    <div class="box has-text-right">
+                        <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
+                        <span class="breakText">{{ message.content }}</span>
+                    </div>
+                {% else %}
+                    <div class="box">
+                        <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
+                        <span class="breakText">{{ message.content }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <hr>
+            {{ form_start(form) }}
+            <div class="field has-addons">
+                <div class="control">
+                    <input class="input" type="text" name="{{ field_name(form.comment) }}" placeholder="Message" />
+                </div>
+                <div class="control">
+                    <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        {% endif %}
+
     </section>
 
 {% endblock %}
