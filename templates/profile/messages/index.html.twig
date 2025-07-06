@@ -45,24 +45,6 @@
                             </a>
                         {% endfor %}
 
-                        {#
-                        <a class="panel-block">
-                            <span class="panel-icon">
-                                <i class="fas fa-search" aria-hidden="true"></i>
-                            </span>
-                            <div class="select is-link">
-                                <select>
-                                    <option>Message friends</option>
-                                    {% for user in friends %}
-                                        <a class="panel-block">
-                                            <option>{{ user.name }}</option>
-                                        </a>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </a>
-                        #}
-
                     </div>
                 </div>
 
@@ -109,7 +91,7 @@
                                         <div class="level-item">
                                             <div class="box">
                                                 <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
-                                                {{ message.content }}
+                                                <span class="breakText">{{ message.content }}</span>
                                             </div>
                                         </div>
                                         {% if message.wasRead == false %}
