@@ -72,6 +72,11 @@ class Glossary
         return $this->explanation;
     }
 
+    public function getExplanationShortened(int $length): ?string
+    {
+        return wordwrap($this->explanation, $length);
+    }
+
     public function setExplanation(?string $explanation): static
     {
         $this->explanation = $explanation;

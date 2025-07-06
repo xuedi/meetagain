@@ -1,3 +1,8 @@
+{% set maxLength = 110 %}
+{% if editItem is defined %}
+    {% set maxLength = 60 %}
+{% endif %}
+
 <table id="filteredTable" class="table is-fullwidth">
     <thead>
     <tr>
@@ -23,14 +28,7 @@
             <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
                 <td>{{ item.phrase }}</td>
                 <td>{{ item.pinyin }}</td>
-                <td>
-                    {% if item.explanation|length > 80  %}
-                        <div class="showAllToggle">{{ item.explanation|slice(0, 80) }} ... <a class="is-link showAll">more</a></div>
-                        <div class="showAllToggle is-hidden">{{ item.explanation }}</div>
-                    {% else %}
-                        {{ item.explanation  }}
-                    {% endif %}
-                </td>
+                <td>{{ item.getExplanationShortened(maxLength)|nl2br }}</td>
                 <td>{{ item.category.name }}</td>
                 <td>
                     {% if item.approved == false %}
@@ -56,14 +54,7 @@
                 <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
                     <td>{{ item.phrase }}</td>
                     <td>{{ item.pinyin }}</td>
-                    <td>
-                        {% if item.explanation|length > 80  %}
-                            <div class="showAllToggle">{{ item.explanation|slice(0, 80) }} ... <a class="is-link showAll">more</a></div>
-                            <div class="showAllToggle is-hidden">{{ item.explanation }}</div>
-                        {% else %}
-                            {{ item.explanation  }}
-                        {% endif %}
-                    </td>
+                    <td>{{ item.getExplanationShortened(maxLength)|nl2br }}</td>
                     <td>{{ item.category.name }}</td>
                     <td>
                         <a href="{{ path('app_plugin_glossary_edit', {id: item.id}) }}">
@@ -84,14 +75,7 @@
             <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
                 <td>{{ item.phrase }}</td>
                 <td>{{ item.pinyin }}</td>
-                <td>
-                    {% if item.explanation|length > 80  %}
-                        <div class="showAllToggle">{{ item.explanation|slice(0, 80) }} ... <a class="is-link showAll">more</a></div>
-                        <div class="showAllToggle is-hidden">{{ item.explanation }}</div>
-                    {% else %}
-                        {{ item.explanation  }}
-                    {% endif %}
-                </td>
+                <td>{{ item.getExplanationShortened(maxLength)|nl2br }}</td>
                 <td>{{ item.category.name }}</td>
                 {% if is_granted('ROLE_USER') %}
                     <td>
