@@ -19,6 +19,7 @@ class ReportController extends AbstractController
     #[Route('/report/image/{id}', name: 'app_report_image')]
     public function index(Request $request, ImageRepository $repo, ?int $id = null): Response
     {
+        $response = $this->getResponse();
         $user = $this->getAuthedUser();
         $image = $repo->findOneBy(['id' => $id]);
 
@@ -35,7 +36,7 @@ class ReportController extends AbstractController
         return $this->render('report/image.html.twig', [
             'image' => $image,
             'form' => $form,
-        ]);
+        ], $response);
     }
 
     #[Route('/report/success', name: 'app_report_success')]

@@ -33,6 +33,7 @@ class ProfileController extends AbstractController
         ImageService $imageService,
         EntityManagerInterface $entityManager,
     ): Response {
+        $response = $this->getResponse();
         $user = $this->getAuthedUser();
         $oldUserName = $user->getName();
 
@@ -80,7 +81,7 @@ class ProfileController extends AbstractController
             'upcoming' => $repo->getUpcomingEvents(10),
             'past' => $repo->getPastEvents(20),
             'form' => $form,
-        ]);
+        ], $response);
     }
 
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]

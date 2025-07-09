@@ -27,6 +27,7 @@ class ImageUploadController extends AbstractController
     #[Route('/image/{entity}/{id}', name: 'app_image', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
     public function index(string $entity, int $id): Response
     {
+        $response = $this->getResponse();
         $data = $this->prepare($entity, $id);
         $image = $data['image'];
         $gallery = $data['gallery'];
@@ -36,12 +37,13 @@ class ImageUploadController extends AbstractController
             'image' => $image,
             'entity' => $entity,
             'id' => $id,
-        ]);
+        ], $response);
     }
 
     #[Route('/image/modal/{entity}/{id}', name: 'app_image_modal', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
     public function modal(string $entity, int $id, bool $rotate = false): Response
     {
+        $response = $this->getResponse();
         $data = $this->prepare($entity, $id);
         $image = $data['image'];
         $gallery = $data['gallery'];
@@ -53,7 +55,7 @@ class ImageUploadController extends AbstractController
             'image' => $image,
             'entity' => $entity,
             'id' => $id,
-        ]);
+        ], $response);
     }
 
     #[Route('/image/rotate/{entity}/{id}', name: 'app_image_rotate', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'], methods: ['GET'])]

@@ -60,6 +60,7 @@ class EventController extends AbstractController
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
     public function details(EventRepository $repo, CommentRepository $comments, EntityManagerInterface $em, Request $request, ?int $id = null): Response
     {
+        $response = $this->getResponse();
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -84,13 +85,14 @@ class EventController extends AbstractController
             'comments' => $comments->findBy(['event' => $id]),
             'event' => $event,
             'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
-        ]);
+        ], $response);
     }
 
     #[Route('/event/upload/{event}', name: 'app_event_upload', methods: ['GET', 'POST'])]
     public function upload(Event $event, Request $request, ImageService $imageService, EntityManagerInterface $em): Response
     {
         $user = $this->getAuthedUser();
+        $response = $this->getResponse();
 
         $form = $this->createForm(EventUploadType::class);
         $form->handleRequest($request);
@@ -120,16 +122,17 @@ class EventController extends AbstractController
 
         return $this->render('events/upload.html.twig', [
             'form' => $form,
-        ]);
+        ], $response);
     }
 
     #[Route('/event/featured/', name: 'app_event_featured')]
     public function featured(EventRepository $repo): Response
     {
+        $response = $this->getResponse();
         return $this->render('events/featured.html.twig', [
             'featured' => $repo->findBy(['featured' => true], ['start' => 'ASC']),
             'last' => $repo->getPastEvents(),
-        ]);
+        ], $response);
     }
 
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]

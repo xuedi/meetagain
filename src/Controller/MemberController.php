@@ -19,6 +19,7 @@ class MemberController extends AbstractController
     #[Route('/members/{page}', name: 'app_member')]
     public function index(UserRepository $repo, int $page = 1): Response
     {
+        $response = $this->getResponse();
         $offset = ($page - 1) * self::PAGE_SIZE;
         if ($this->getUser() instanceof User) {
             $userTotal = $repo->getNumberOfActiveMembers();
@@ -33,12 +34,13 @@ class MemberController extends AbstractController
             'pageSize' => self::PAGE_SIZE,
             'pageCurrent' => $page,
             'pageTotal' => ceil($userTotal / self::PAGE_SIZE),
-        ]);
+        ], $response);
     }
 
     #[Route('/members/view/{id}', name: 'app_member_view')]
     public function view(UserRepository $repo, int $id): Response
     {
+        $response = $this->getResponse();
         try {
             $currentUser = $this->getAuthedUser();
             $userDetails = $repo->findOneBy(['id' => $id]);
@@ -47,7 +49,7 @@ class MemberController extends AbstractController
                 'currentUser' => $currentUser,
                 'userDetails' => $userDetails,
                 'isFollow' => $currentUser->getFollowing()->contains($userDetails),
-            ]);
+            ], $response);
         } catch (AuthenticationCredentialsNotFoundException) {
             return $this->render('member/403.html.twig');
         }
