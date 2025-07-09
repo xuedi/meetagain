@@ -14,7 +14,7 @@ class IndexController extends AbstractController
     #[Route('/', name: 'app_default')]
     public function index(Request $request, CmsService $cms): Response
     {
-        return $cms->handle($request->getLocale(), 'index');
+        return $cms->handle($request->getLocale(), 'index', $this->getResponse());
     }
 
     #[Route('/language/{locale}', name: 'app_default_language', requirements: ['locale' => 'en|de|cn'])]

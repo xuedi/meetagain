@@ -36,16 +36,7 @@ class EventController extends AbstractController
     #[Route('/events', name: 'app_event')]
     public function index(EventService $eventService, Request $request): Response
     {
-        $response = $this->sendEarlyHints([
-            new Link(href: '/stylesheet/bulma.min.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/fontawesome.min.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/fontawesome-solid.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/fonts.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/custom.css')->withAttribute('as', 'style'),
-            new Link(href: '/javascript/custom.js')->withAttribute('as', 'script'),
-            new Link(href: '/fonts/fa-solid-900.woff2')->withAttribute('as', 'font'),
-        ]);
-
+        $response = $this->getResponse();
         $form = $this->createForm(EventFilterType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

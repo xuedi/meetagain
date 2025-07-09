@@ -19,7 +19,7 @@ readonly class CmsService
         return $this->repo->findAll();
     }
 
-    public function handle(string $locale, string $slug): Response
+    public function handle(string $locale, string $slug, Response $response): Response
     {
         $cms = $this->repo->findOneBy([
             'slug' => $slug,
@@ -37,11 +37,17 @@ readonly class CmsService
             ]), Response::HTTP_NO_CONTENT);
         }
 
-        return new Response($this->twig->render('cms/index.html.twig', [
+        // actual CMS content
+        $content = $this->twig->render('cms/index.html.twig', [
             'title' => $cms->getPageTitle($locale) ?? 'No Title set',
             'blocks' => $blocks,
             'events' => $this->eventRepo->getUpcomingEvents(),
-        ]), Response::HTTP_OK);
+        ]);
+
+        $response->setContent($content);
+        $response->setStatusCode(Response::HTTP_OK);
+
+        return $response;
     }
 
     public function createNotFoundPage(): Response

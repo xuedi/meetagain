@@ -14,6 +14,6 @@ class DefaultController extends AbstractController
     #[Route('/{page}', name: 'app_catch_all', requirements: ['page' => Requirement::CATCH_ALL], priority: -20)]
     public function catchAll(Request $request, CmsService $cms, PluginService $pluginService, string $page): Response
     {
-        return $cms->handle($request->getLocale(), $page);
+        return $cms->handle($request->getLocale(), $page, $this->getResponse());
     }
 }
