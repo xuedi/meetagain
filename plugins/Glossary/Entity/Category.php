@@ -12,6 +12,7 @@ enum Category: int
     case Slang = 3;
     case Abbreviation = 4;
     case Regular = 5;
+    case Idioms = 6;
 
     public static function getChoices(TranslatorInterface $translator): array
     {
@@ -22,6 +23,7 @@ enum Category: int
             $translator->trans('Slang') => self::Slang,
             $translator->trans('Abbreviation') => self::Abbreviation,
             $translator->trans('Regular') => self::Regular,
+            $translator->trans('Idioms') => self::Idioms,
         ];
     }
 
@@ -34,6 +36,7 @@ enum Category: int
             self::Slang->value => 'Slang',
             self::Abbreviation->value => 'Abbreviation',
             self::Regular->value => 'Regular',
+            self::Idioms->value => 'Idioms',
         ];
     }
 }
