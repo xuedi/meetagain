@@ -30,6 +30,7 @@ class NewController extends AbstractGlossaryController
         }
 
         return $this->renderList('@Glossary/new.html.twig', [
+            'shortList' => true,
             'form' => $form,
         ]);
     }

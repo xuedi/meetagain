@@ -1,5 +1,5 @@
 {% set maxLength = 110 %}
-{% if editItem is defined %}
+{% if editItem is defined or shortList is defined %}
     {% set maxLength = 60 %}
 {% endif %}
 
