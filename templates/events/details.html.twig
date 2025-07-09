@@ -27,7 +27,9 @@
             <h1 class="title">{{ event.title(globalService.currentLocale) }}</h1>
             <div class="columns">
                 <div class="column is-9">
-                    {{ event.description(globalService.currentLocale)|nl2br }}
+                    <div class="content">
+                        {{ event.description(globalService.currentLocale)|raw|nl2br }}
+                    </div>
                     {% if is_granted('ROLE_USER') %}
                         <div class="mt-5 box">
                             {% include 'events/details/rsvp.html.twig'%}
