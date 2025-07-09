@@ -19,8 +19,8 @@ readonly class ExtractTranslationsCommand implements CommandInterface
         return [
             'command' => $this->getCommand(),
             '--format' => 'php',
-            '--force' => true,
-            $this->locale => true,
+            '--force' => null,
+            'locale' => $this->locale,
         ];
     }
 }
