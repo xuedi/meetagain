@@ -24,14 +24,15 @@ class EarlyHintSubscriber implements EventSubscriberInterface
         if (!$request->isMethod('GET')) {
             return;
         }
+
         $hints = [
-            '/stylesheet/bulma.min.css; rel=preload; as=style',
-            '/stylesheet/fontawesome.min.css; rel=preload; as=style',
-            '/stylesheet/fontawesome-solid.css; rel=preload; as=style',
-            '/stylesheet/fonts.css; rel=preload; as=style',
-            '/stylesheet/custom.css; rel=preload; as=style',
-            '/javascript/custom.js; rel=preload; as=script',
-            '/fonts/fa-solid-900.woff2; rel=preload; as=font',
+            '</stylesheet/bulma.min.css>; rel=preload; as=style',
+            '</stylesheet/fontawesome.min.css>; rel=preload; as=style',
+            '</stylesheet/fontawesome-solid.css>; rel=preload; as=style',
+            '</stylesheet/fonts.css>; rel=preload; as=style',
+            '</stylesheet/custom.css>; rel=preload; as=style',
+            '</javascript/custom.js>; rel=preload; as=script',
+            '</fonts/fa-solid-900.woff2>; rel=preload; as=font',
         ];
 
         // Create and send the 103 Early Hints response
