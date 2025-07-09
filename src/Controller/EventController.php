@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\WebLink\Link;
 
 class EventController extends AbstractController
 {
@@ -35,6 +36,16 @@ class EventController extends AbstractController
     #[Route('/events', name: 'app_event')]
     public function index(EventService $eventService, Request $request): Response
     {
+        $response = $this->sendEarlyHints([
+            new Link(href: '/stylesheet/bulma.min.css')->withAttribute('as', 'style'),
+            new Link(href: '/stylesheet/fontawesome.min.css')->withAttribute('as', 'style'),
+            new Link(href: '/stylesheet/fontawesome-solid.css')->withAttribute('as', 'style'),
+            new Link(href: '/stylesheet/fonts.css')->withAttribute('as', 'style'),
+            new Link(href: '/stylesheet/custom.css')->withAttribute('as', 'style'),
+            new Link(href: '/javascript/custom.js')->withAttribute('as', 'script'),
+            new Link(href: '/fonts/fa-solid-900.woff2')->withAttribute('as', 'font'),
+        ]);
+
         $form = $this->createForm(EventFilterType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -52,7 +63,7 @@ class EventController extends AbstractController
         return $this->render('events/index.html.twig', [
             'structuredList' => $eventService->getFilteredList($time, $sort, $type, $rsvp),
             'filter' => $form,
-        ]);
+        ], $response);
     }
 
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
