@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
 class CmsServiceTest extends TestCase
@@ -85,7 +86,7 @@ class CmsServiceTest extends TestCase
             ->with('cms/404.html.twig', $this->anything())
             ->willReturn($expectedContent);
 
-        $response = $this->subject->handle($locale, $slug);
+        $response = $this->subject->handle($locale, $slug, new Response());
 
         $this->assertEquals($expectedContent, $response->getContent());
         $this->assertEquals($expectedCode, $response->getStatusCode());
@@ -126,7 +127,7 @@ class CmsServiceTest extends TestCase
             ->with('cms/204.html.twig', $this->anything())
             ->willReturn($expectedContent);
 
-        $response = $this->subject->handle($locale, $slug);
+        $response = $this->subject->handle($locale, $slug, new Response());
 
         $this->assertEquals($expectedContent, $response->getContent());
         $this->assertEquals($expectedCode, $response->getStatusCode());
@@ -188,7 +189,7 @@ class CmsServiceTest extends TestCase
             ])
             ->willReturn($expectedContent);
 
-        $response = $this->subject->handle($locale, $slug);
+        $response = $this->subject->handle($locale, $slug, new Response());
 
         $this->assertEquals($expectedContent, $response->getContent());
         $this->assertEquals($expectedCode, $response->getStatusCode());
