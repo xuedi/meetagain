@@ -8,10 +8,8 @@ install:
     {{JUST}} start
     {{PHP}} composer install
     {{PHP}} php bin/console cache:clear
-    {{PHP}} php bin/console doctrine:schema:drop --force -q
-    {{PHP}} php bin/console doctrine:schema:create -q --em=default
-    {{PHP}} php bin/console doctrine:migrations:migrate -q --em=default
-    {{PHP}} php bin/console doctrine:fixtures:load --append -q --em=default
+    {{PHP}} php bin/console doctrine:migrations:migrate -q
+    {{PHP}} php bin/console doctrine:fixtures:load --append -q
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
 
@@ -43,17 +41,6 @@ dockerEnter:
 
 test:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
-
-migrationDiff pluginName:
-    {{JUST}} app doctrine:migrations:diff --configuration=plugins/{{pluginName}}/Config/packages/migration/config_cli.yaml --filter-expression=/^{{pluginName}}/i --no-interaction --no-debug
-
-migrationMigrate pluginName:
-    {{JUST}} app doctrine:migrations:migrate --configuration=plugins/{{pluginName}}/Config/packages/migration/config_cli.yaml --em=em{{pluginName}} --no-interaction
-    {{JUST}} clearCache
-
-migrationFixture pluginName:
-    {{JUST}} app doctrine:fixtures:load --em=em{{pluginName}} --group={{pluginName}} --no-interaction
-    {{JUST}} clearCache
 
 check: test checkStan checkRector checkPhpcs checkPsalm
     {{PHP}} composer validate --strict

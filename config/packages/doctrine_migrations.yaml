@@ -1,5 +1,4 @@
 doctrine_migrations:
-    em: default
     migrations_paths:
-        'DoctrineMigrations': '%kernel.project_dir%/migrations'
+        'AppMigrations': '%kernel.project_dir%/migrations'
 

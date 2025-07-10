@@ -1,9 +1,7 @@
 doctrine:
     orm:
         entity_managers:
-            emGlossary:
-                connection: default
-                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+            default:
                 mappings:
                     Glossary:
                         dir: "%kernel.project_dir%/plugins/Glossary/Entity"
@@ -13,4 +11,4 @@ doctrine:
 
 doctrine_migrations:
     migrations_paths: # add for diff, migrate has own config for parameter
-        Plugin\Glossary\Migrations: "%kernel.project_dir%/plugins/Glossary/Migrations"
+        PluginGlossaryMigrations: "%kernel.project_dir%/plugins/Glossary/Migrations"
