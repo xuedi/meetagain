@@ -19,7 +19,7 @@
             </thead>
             <tbody>
             {% for event in events %}
-                <tr>
+                <tr class="{% if event.id == nextEvent %}has-background-warning-light{% endif %}">
                     <td>{% if event.initial %}{{ event.user.name }}{% else %}auto{% endif %}</td>
                     <td>{{ event.start|date('Y-m-d') }}</td>
                     <td>{{ event.stop|date('Y-m-d') }}</td>

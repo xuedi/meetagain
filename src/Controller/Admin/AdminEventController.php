@@ -11,6 +11,7 @@ use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\TranslationService;
 use App\Service\ImageService;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,9 +33,22 @@ class AdminEventController extends AbstractController
     #[Route('/admin/event/', name: 'app_admin_event')]
     public function eventList(EventRepository $repo): Response
     {
+        $now = new DateTime()->setTime(0, 0, 0);
+        $nextEventId = 0;
+        $nextEventDate = new DateTime('-100 years')->setTime(0, 0, 0);
+        $eventList = $repo->findBy([], ['start' => 'ASC']);
+        foreach ($eventList as $event) {
+            $start = $event->getStart()->setTime(0, 0, 0);
+            if ($start > $nextEventDate && $start <= $now) {
+                $nextEventDate = $event->getStart()->setTime(0, 0, 0);;
+                $nextEventId = $event->getId();
+            }
+        }
+
         return $this->render('admin/event/list.html.twig', [
+            'nextEvent' => $nextEventId,
+            'events' => $eventList,
             'active' => 'event',
-            'events' => $repo->findBy([], ['start' => 'ASC']),
         ]);
     }
 
