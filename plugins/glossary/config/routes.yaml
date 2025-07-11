@@ -2,5 +2,5 @@ controllers:
     type: attribute
     prefix: /{_locale}
     resource:
-        path: ../Controller/
+        path: ../src/Controller/
         namespace: Plugin\Glossary\Controller

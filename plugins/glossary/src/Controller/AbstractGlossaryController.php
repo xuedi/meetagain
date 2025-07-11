@@ -2,13 +2,12 @@
 
 namespace Plugin\Glossary\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 
 abstract class AbstractGlossaryController extends AbstractSymfonyController
 {
-    public function __construct(ManagerRegistry $doctrine, protected GlossaryService $service)
+    public function __construct(protected GlossaryService $service)
     {
         //
     }

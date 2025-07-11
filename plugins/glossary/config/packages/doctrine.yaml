@@ -4,11 +4,11 @@ doctrine:
             default:
                 mappings:
                     Glossary:
-                        dir: "%kernel.project_dir%/plugins/Glossary/Entity"
+                        dir: "%kernel.project_dir%/plugins/glossary/src/Entity"
                         is_bundle: false
                         prefix: Plugin\Glossary\Entity
                         alias: Glossary
 
 doctrine_migrations:
     migrations_paths: # add for diff, migrate has own config for parameter
-        PluginGlossaryMigrations: "%kernel.project_dir%/plugins/Glossary/Migrations"
+        PluginGlossaryMigrations: "%kernel.project_dir%/plugins/glossary/migrations"

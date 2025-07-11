@@ -7,9 +7,5 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag]
 interface Plugin
 {
-    public function getName(): string;
-
-    public function install(): void;
-
-    public function uninstall(): void;
+    public function getPluginKey(): string;
 }

@@ -75,7 +75,9 @@
   "autoload": {
     "psr-4": {
       "App\\": "src/",
-      "Plugin\\": "plugins/"
+      "Plugin\\Glossary\\": "plugins/glossary/src/",
+      "Plugin\\Karaoke\\": "plugins/karaoke/src/",
+      "Plugin\\Dishes\\": "plugins/dishes/src/"
     }
   },
   "autoload-dev": {

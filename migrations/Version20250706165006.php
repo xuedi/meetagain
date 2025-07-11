@@ -66,9 +66,6 @@ final class Version20250706165006 extends AbstractMigration
             CREATE TABLE not_found_log (id INT AUTO_INCREMENT NOT NULL, url VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, ip VARCHAR(16) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE plugin (id INT AUTO_INCREMENT NOT NULL, version VARCHAR(16) NOT NULL, name VARCHAR(16) NOT NULL, description VARCHAR(255) NOT NULL, installed TINYINT(1) DEFAULT 0 NOT NULL, enabled TINYINT(1) DEFAULT 0 NOT NULL, slug VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4
-        SQL);
-        $this->addSql(<<<'SQL'
             CREATE TABLE translation (id INT AUTO_INCREMENT NOT NULL, created_at DATETIME NOT NULL, language VARCHAR(2) NOT NULL, placeholder VARCHAR(255) NOT NULL, translation VARCHAR(255) DEFAULT NULL, user_id INT NOT NULL, INDEX IDX_B469456FA76ED395 (user_id), UNIQUE INDEX UNIQ_B469456FD4DB71B5F5E69F02 (language, placeholder), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4
         SQL);
         $this->addSql(<<<'SQL'
@@ -270,9 +267,6 @@ final class Version20250706165006 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE not_found_log
-        SQL);
-        $this->addSql(<<<'SQL'
-            DROP TABLE plugin
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE translation

@@ -22,7 +22,7 @@ class Kernel extends BaseKernel
     {
         $plugins = require $this->getProjectDir() . '/config/plugins.php';
         foreach ($plugins as $pluginName => $pluginEnabled) {
-            yield $this->getProjectDir() . '/plugins/' . $pluginName . '/Config' => $pluginEnabled;
+            yield $this->getProjectDir() . '/plugins/' . $pluginName . '/config' => $pluginEnabled;
         }
     }
 

@@ -4,7 +4,6 @@ namespace Plugin\Glossary\Service;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Entity\Suggestion;
@@ -12,19 +11,10 @@ use Plugin\Glossary\Entity\SuggestionField;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use RuntimeException;
 
-class GlossaryService
+readonly class GlossaryService
 {
-    protected GlossaryRepository $repo;
-    protected EntityManagerInterface $em;
-
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(private EntityManagerInterface $em, private GlossaryRepository $repo)
     {
-        $em = $doctrine->getManager('emGlossary');
-        if (!$em instanceof EntityManagerInterface) {
-            throw new RuntimeException('emGlossary not of type EntityManagerInterface');
-        }
-        $this->em = $em;
-        $this->repo = $this->em->getRepository(Glossary::class);
     }
 
     public function approveNew(int $id): void

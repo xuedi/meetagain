@@ -4,4 +4,4 @@ services:
         autoconfigure: true
 
     Plugin\Glossary\:
-        resource: '../'
+        resource: '../src/'

@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
-use App\Repository\PluginRepository;
 use App\Repository\UserRepository;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,9 +16,10 @@ readonly class GlobalService
         private RequestStack $requestStack,
         private TranslationService $translationService,
         private DashboardService $dashboardService,
-        private PluginRepository $pluginRepo,
         private UserRepository $userRepo,
-    ) {
+        private PluginService $pluginService
+    )
+    {
     }
 
     public function getCurrentLocale(): string
@@ -37,9 +37,9 @@ readonly class GlobalService
         return $this->translationService->getLanguageCodes();
     }
 
-    public function getPlugins(): array
+    public function getPlugins(): iterable
     {
-        return $this->pluginRepo->findBy(['enabled' => true], ['name' => 'ASC']);
+        return $this->pluginService->getActiveList();
     }
 
     public function getUserName(int $id): string

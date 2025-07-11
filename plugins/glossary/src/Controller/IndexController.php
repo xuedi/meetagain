@@ -2,7 +2,6 @@
 
 namespace Plugin\Glossary\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -10,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class IndexController extends AbstractGlossaryController
 {
     #[Route('', name: 'app_plugin_glossary', methods: ['GET'])]
-    public function show(Request $request, ?int $id = null): Response
+    public function show(): Response
     {
         return $this->renderList('@Glossary/index.html.twig', []);
     }
