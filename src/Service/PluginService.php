@@ -116,7 +116,7 @@ readonly class PluginService
         $configPath = realpath(self::CONFIG_DIR);
         $configFile = $configPath . '/plugins.php';
 
-        return include $configFile;
+        return include_once $configFile;
     }
 
     public function setPluginConfig(array $config): void
