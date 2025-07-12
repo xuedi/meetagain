@@ -83,7 +83,7 @@
                                 {% if event.teaser(globalService.currentLocale) is not null and event.teaser(globalService.currentLocale) is not empty %}
                                     {{ event.teaser(globalService.currentLocale)|raw }}
                                 {% else %}
-                                    {{ event.description(globalService.currentLocale)|raw|slice(0, 240) }} ...
+                                    {{ event.description(globalService.currentLocale)|slice(0, 240)|raw }} ...
                                 {% endif %}
                                 {% if is_granted('ROLE_ADMIN') %}
                                 <a href="{{ path('app_admin_event_edit', {'id': event.id}) }}">
