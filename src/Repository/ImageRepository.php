@@ -52,4 +52,14 @@ class ImageRepository extends ServiceEntityRepository
         }
         return $return;
     }
+
+    public function getFileList(): array
+    {
+        $list = [];
+        foreach ($this->findAll() as $image) {
+            $list[$image->getHash()] = $image->getType();
+        }
+
+        return $list;
+    }
 }

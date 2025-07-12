@@ -38,6 +38,8 @@
                         </ul>
                     </li>
                     <li>Thumbnails: {{ mediaStats.thumbnailCount }}</li>
+                    <li>ThumbnailsMissing: {{ mediaStats.thumbnailMissingCount }}</li>
+                    <li>ThumbnailsObsolete: {{ mediaStats.thumbnailObsoleteCount }}</li>
                     <li>
                         ThumbnailsSizes:
                         <ul>
@@ -48,6 +50,13 @@
                     </li>
                 </ul>
 
+                {% if mediaStats.thumbnailMissingCount > 0 %}
+                    <a href="{{ path('app_admin_regenerate_thumbnails') }}" class="button is-link">Generate thumbs ({{ mediaStats.thumbnailMissingCount }})</a>
+                {% endif %}
+
+                {% if mediaStats.thumbnailObsoleteCount > 0 %}
+                    <a href="{{ path('app_admin_cleanup_thumbnails') }}" class="button is-link">Delete thumbs ({{ mediaStats.thumbnailObsoleteCount }})</a>
+                {% endif %}
 
             </div>
         </div>

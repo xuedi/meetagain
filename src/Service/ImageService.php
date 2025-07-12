@@ -75,6 +75,7 @@ readonly class ImageService
                 $imagick->autoOrient();
                 $imagick->cropThumbnailImage($width, $height);
                 $imagick->stripImage(); // metadata
+                $imagick->setFormat('webp');
                 $imagick->writeImage($target);
                 $cnt++;
             } catch (ImagickException $e) {
@@ -83,49 +84,6 @@ readonly class ImageService
         }
 
         return $cnt;
-    }
-
-    public function getStatistics(): array
-    {
-        $thumbList = [];
-        $sizeCount = [];
-        $imageList = [];
-        $imageTypes = [];
-
-        foreach ($this->imageRepo->findAll() as $image) {
-            $type = $image->getType()->name;
-            $imageTypes[$type] = ($imageTypes[$type] ?? 0) + 1;
-            $imageList[] = [
-                'hash' => $image->getHash(),
-                'type' => $type,
-            ];
-        }
-
-        $thumbCount = 0;
-        $dir = $this->kernelProjectDir . '/public/images/thumbnails/';
-        $files = scandir($dir);
-        foreach ($files as $file) {
-            if (str_starts_with($file, '.')) {
-                continue;
-            }
-            $thumbCount++;
-            list($fileName, $fileType) = explode('.', $file);
-            list($hash, $size) = explode('_', $fileName);
-            list($width, $height) = explode('x', $size);
-            $sizeCount[$size] = ($sizeCount[$size] ?? 0) + 1;
-            $thumbList[$hash] = [
-                'width' => $width,
-                'height' => $height,
-                'type' => $fileType,
-            ];
-        }
-        dump($thumbList);
-        return [
-            'imageTypeList' => $imageTypes,
-            'imageCount' => count($imageList),
-            'thumbnailSizeList' => $sizeCount,
-            'thumbnailCount' => $thumbCount,
-        ];
     }
 
     public function rotateThumbNail(Image $image): void
@@ -148,6 +106,78 @@ readonly class ImageService
         }
     }
 
+    public function getStatistics(): array
+    {
+
+        $thumpFileList = [];
+        $sizeListCount = $this->configService->getThumbnailSizeList();
+        foreach (scandir($this->getThumbnailDir()) as $file) {
+            if (str_starts_with($file, '.')) {
+                continue;
+            }
+            $thumpFileList[$file] = true;
+            $size = explode('_', explode('.', $file)[0])[1];
+            $sizeListCount[$size] = ($sizeListCount[$size] ?? 0) + 1;
+        }
+
+        $imageTypes = [];
+        $missingThumbnailsCount = 0;
+        foreach ($this->imageRepo->getFileList() as $hash => $type) {
+            $imageTypes[$type->name] = ($imageTypes[$type->name] ?? 0) + 1;
+            foreach ($this->configService->getThumbnailSizes($type) as [$width, $height]) {
+                $expected = $this->getThumbnailFileByHash($hash, $width, $height, true);
+                if (!isset($thumpFileList[$expected])) {
+                    $missingThumbnailsCount++;
+                }
+            }
+        }
+
+        return [
+            'imageCount' => $this->imageRepo->count(),
+            'imageTypeList' => $imageTypes,
+            'thumbnailSizeList' => $sizeListCount,
+            'thumbnailCount' => count($thumpFileList),
+            'thumbnailObsoleteCount' => count($this->getObsoleteThumbnails()),
+            'thumbnailMissingCount' => $missingThumbnailsCount,
+        ];
+    }
+
+    public function getObsoleteThumbnails(): array
+    {
+        $imageList = $this->imageRepo->getFileList();
+
+        $list = [];
+        foreach (scandir($this->getThumbnailDir()) as $file) {
+            if (str_starts_with($file, '.')) {
+                continue;
+            }
+            list($fileName, $fileType) = explode('.', $file);
+            list($hash, $size) = explode('_', $fileName);
+            list($width, $height) = explode('x', $size);
+            if(!isset($imageList[$hash])) {
+                $list[] = $file;
+                continue;
+            }
+            if(!$this->configService->isValidThumbnailSize($imageList[$hash], (int)$width, (int)$height)) {
+                $list[] = $file;
+            }
+        }
+
+        return $list;
+    }
+
+    public function deleteObsoleteThumbnails(): int
+    {
+        $cnt = 0;
+        foreach ($this->getObsoleteThumbnails() as $file) {
+            if ($this->filesystem->exists($this->getThumbnailDir() . $file)) {
+                $this->filesystem->remove($this->getThumbnailDir() . $file);
+            }
+        }
+
+        return $cnt;
+    }
+
     private function getSourceFile(Image $image): string
     {
         $path = $this->kernelProjectDir . '/data/images/';
@@ -156,7 +186,21 @@ readonly class ImageService
 
     private function getThumbnailFile(Image $image, int $width, int $height): string
     {
-        $path = $this->kernelProjectDir . '/public/images/thumbnails/';
-        return $path . $image->getHash() . '_' . $width . 'x' . $height . '.' . $image->getExtension(); // TODO: sprintf
+        return $this->getThumbnailFileByHash($image->getHash(), $width, $height);
+    }
+
+    private function getThumbnailFileByHash(string $hash, int $width, int $height, ?bool $justName = false): string
+    {
+        $filename = sprintf('%s_%sx%s.webp', $hash, $width, $height);
+        if ($justName) {
+            return $filename;
+        }
+
+        return $this->getThumbnailDir() . $filename;
+    }
+
+    private function getThumbnailDir(): string
+    {
+        return $this->kernelProjectDir . '/public/images/thumbnails/';
     }
 }

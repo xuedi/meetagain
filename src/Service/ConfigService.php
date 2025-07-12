@@ -17,6 +17,30 @@ readonly class ConfigService
         };
     }
 
+    public function getThumbnailSizeList(): array
+    {
+        return [
+            '1024x768' => 0, // gallery image bit
+            '600x400' => 0,  // event preview image
+            '432x432' => 0,  // cmsBlock image
+            '400x400' => 0,  // profile big
+            '210x140' => 0,  // gallery image preview
+            '80x80' => 0,    // ?
+            '50x50' => 0,    // ?
+        ];
+    }
+
+    public function isValidThumbnailSize(ImageType $type, int $checkWidth, int $checkHeight): bool
+    {
+        foreach ($this->getThumbnailSizes($type) as list($width, $height)) {
+            if ($checkWidth == $width && $checkHeight == $height) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getHost(): string
     {
         return $_ENV['APP_HOST'] ?? 'http://localhost';

@@ -32,14 +32,26 @@ class AdminSystemController extends AbstractController
     #[Route('/admin/system/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails')]
     public function regenerateThumbnails(): Response
     {
-        $startTime = microtime(true);
         $cnt = 0;
+        $startTime = microtime(true);
         foreach ($this->imageRepo->findAll() as $image) {
             $cnt += $this->imageService->createThumbnails($image);
         }
         $executionTime = microtime(true) - $startTime;
 
         $this->addFlash('success', 'Regenerated thumbnails for ' . $cnt . ' images in ' . $executionTime . ' seconds');
+
+        return $this->redirectToRoute('app_admin_system');
+    }
+
+    #[Route('/admin/system/cleanup_thumbnails', name: 'app_admin_cleanup_thumbnails')]
+    public function cleanupThumbnails(): Response
+    {
+        $startTime = microtime(true);
+        $cnt = $this->imageService->deleteObsoleteThumbnails();
+        $executionTime = microtime(true) - $startTime;
+
+        $this->addFlash('success', 'Deleted ' . $cnt . ' obsolete thumbnail in ' . $executionTime . ' seconds');
 
         return $this->redirectToRoute('app_admin_system');
     }
