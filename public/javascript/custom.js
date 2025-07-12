@@ -1,5 +1,3 @@
-
-
 // enable closing button for notification boxes
 document.addEventListener('DOMContentLoaded', () => {
     (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
@@ -47,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // expandable card
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.flashNotification') || []).forEach((trigger) => {
-        setTimeout(function() {
+        setTimeout(function () {
             trigger.style.display = 'none';
         }, 1700);
     });
@@ -125,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add a keyboard event to close all modals
     document.addEventListener('keydown', (event) => {
-        if(event.key === "Escape") {
+        if (event.key === "Escape") {
             closeAllModals();
         }
     });
@@ -180,5 +178,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 toggle.classList.toggle('is-hidden');
             })
         });
+    });
+});
+
+// attach all to body, so changed DOM will bubble up and match again
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('body').addEventListener('click', event => {
+        event.preventDefault();
+
+        if (event.target && event.target.matches("a.ajaxToggle")) {
+            let url = event.target.getAttribute('href');
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.send();
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    event.target.parentNode.outerHTML = xhr.responseText;
+                } else {
+                    location.reload();
+                }
+            };
+        }
+
     });
 });

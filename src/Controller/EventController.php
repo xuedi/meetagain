@@ -138,6 +138,10 @@ class EventController extends AbstractController
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {
+        if ($event->getStart() < new DateTimeImmutable()) {
+            $this->addFlash('error', 'You cannot RSVP to an event that has already happened.');
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
         $user = $this->getAuthedUser();
         $event->toggleRsvp($this->getAuthedUser());
         $em->persist($event);

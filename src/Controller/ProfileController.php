@@ -12,8 +12,10 @@ use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
 use App\Service\ActivityService;
 use App\Service\ImageService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -87,14 +89,23 @@ class ProfileController extends AbstractController
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {
+        if ($event->getStart() < new DateTimeImmutable()) { // does reload page for flashMessage to trigger
+            $this->addFlash('error', 'You cannot RSVP to an event that has already happened.');
+            return JsonResponse::fromJsonString('', Response::HTTP_LOCKED);
+        }
+
         $user = $this->getAuthedUser();
         $event->toggleRsvp($user);
         $em->persist($event);
         $em->flush();
 
-        $type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
-        $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
+        // TODO: to slow, need to save event data first, generate log & notification async
+        //$type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
+        //$this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
-        return $this->redirectToRoute('app_profile');
+        return $this->render('_block/toggle.html.twig', [
+            'link' => $this->generateUrl('app_profile_toggle_rsvp', ['event' => $event->getId()]),
+            'status' => $event->hasRsvp($user),
+        ]);
     }
 }
