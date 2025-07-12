@@ -3,7 +3,7 @@ services:
   php:
     build: php
     container_name: "ma-php"
-    user: ${DOCKER_HOST_UID}:${DOCKER_HOST_GID}
+    user: ${HOST_UID}:${HOST_GID}
     ports:
       - "80:80" # HTTP
       - "443:443" # HTTPS
@@ -13,6 +13,10 @@ services:
       - ./php/Caddyfile:/etc/frankenphp/Caddyfile:ro
       - ma-caddy_data:/data
       - ma-caddy_config:/config
+    environment:
+      - UID=${HOST_UID}
+      - GID=${HOST_GID}
+      - USERNAME=${HOST_USERNAME}
     tty: true
 
   mariadb:
@@ -32,7 +36,7 @@ services:
   mailhog:
     container_name: "ma-mailhog"
     image: mailhog/mailhog
-    user: ${DOCKER_HOST_UID}:${DOCKER_HOST_GID}
+    user: ${HOST_UID}:${HOST_GID}
     ports:
       - "1025:1025"
       - "8025:8025"
