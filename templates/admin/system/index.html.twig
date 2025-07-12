@@ -1,0 +1,58 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="columns">
+            <div class="column is-9">
+
+
+                <h1 class="title is-5">Website settings</h1>
+
+                <table class="table">
+                    <tbody>
+                    {% for item in config %}
+                        <tr>
+                            <th>{{ item.name }}</th>
+                            <th>{{ item.type.value }}</th>
+                            <th>{{ item.value }}</th>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+
+            </div>
+            <div class="column is-3 content">
+                <h1 class="title is-5">Media</h1>
+
+                <ul class="list">
+                    <li>Images: {{ mediaStats.imageCount }}</li>
+                    <li>
+                        ImageTypes:
+                        <ul>
+                        {% for name,count in mediaStats.imageTypeList %}
+                            <li>{{ name }}: {{ count }}</li>
+                        {% endfor %}
+                        </ul>
+                    </li>
+                    <li>Thumbnails: {{ mediaStats.thumbnailCount }}</li>
+                    <li>
+                        ThumbnailsSizes:
+                        <ul>
+                        {% for size,count in mediaStats.thumbnailSizeList %}
+                            <li>{{ size }}: {{ count }}</li>
+                        {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+

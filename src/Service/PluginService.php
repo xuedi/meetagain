@@ -95,16 +95,6 @@ readonly class PluginService
         $this->setPluginConfig($config);
     }
 
-    private function getKernel(string $name): PluginInterface
-    {
-        foreach ($this->plugins as $plugin) {
-            if ($plugin->getName() === $name) {
-                return $plugin;
-            }
-        }
-        throw new Exception('Plugin kernel not found: ' . $name);
-    }
-
     private function parsePluginDir(): array
     {
         $pluginDir = realpath(self::PLUGIN_DIR);

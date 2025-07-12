@@ -12,6 +12,7 @@ use Imagick;
 use ImagickException;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -24,7 +25,8 @@ readonly class ImageService
         private ConfigService $configService,
         private LoggerInterface $logger,
         private string $kernelProjectDir,
-    ) {
+    )
+    {
     }
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
@@ -76,12 +78,54 @@ readonly class ImageService
                 $imagick->writeImage($target);
                 $cnt++;
             } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));
-                ;
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));;
             }
         }
 
         return $cnt;
+    }
+
+    public function getStatistics(): array
+    {
+        $thumbList = [];
+        $sizeCount = [];
+        $imageList = [];
+        $imageTypes = [];
+
+        foreach ($this->imageRepo->findAll() as $image) {
+            $type = $image->getType()->name;
+            $imageTypes[$type] = ($imageTypes[$type] ?? 0) + 1;
+            $imageList[] = [
+                'hash' => $image->getHash(),
+                'type' => $type,
+            ];
+        }
+
+        $thumbCount = 0;
+        $dir = $this->kernelProjectDir . '/public/images/thumbnails/';
+        $files = scandir($dir);
+        foreach ($files as $file) {
+            if (str_starts_with($file, '.')) {
+                continue;
+            }
+            $thumbCount++;
+            list($fileName, $fileType) = explode('.', $file);
+            list($hash, $size) = explode('_', $fileName);
+            list($width, $height) = explode('x', $size);
+            $sizeCount[$size] = ($sizeCount[$size] ?? 0) + 1;
+            $thumbList[$hash] = [
+                'width' => $width,
+                'height' => $height,
+                'type' => $fileType,
+            ];
+        }
+        dump($thumbList);
+        return [
+            'imageTypeList' => $imageTypes,
+            'imageCount' => count($imageList),
+            'thumbnailSizeList' => $sizeCount,
+            'thumbnailCount' => $thumbCount,
+        ];
     }
 
     public function rotateThumbNail(Image $image): void
@@ -99,8 +143,7 @@ readonly class ImageService
                 $this->entityManager->persist($image);
                 $this->entityManager->flush();
             } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));
-                ;
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));;
             }
         }
     }

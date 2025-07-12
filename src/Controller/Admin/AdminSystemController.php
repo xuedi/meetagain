@@ -11,29 +11,36 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminSystemController extends AbstractController
 {
-    #[Route('/admin/system/config', name: 'app_admin_config')]
-    public function configIndex(ConfigRepository $repo): Response
+    public function __construct(
+        private readonly ImageService $imageService,
+        private readonly ImageRepository $imageRepo,
+        private readonly ConfigRepository $configRepo
+    )
     {
-        return $this->render('admin/config.html.twig', [
-            'active' => 'config',
-            'config' => $repo->findAll(),
+    }
+
+    #[Route('/admin/system', name: 'app_admin_system')]
+    public function index(): Response
+    {
+        return $this->render('admin/system/index.html.twig', [
+            'active' => 'system',
+            'config' => $this->configRepo->findAll(),
+            'mediaStats' => $this->imageService->getStatistics(),
         ]);
     }
 
-    #[Route('/admin/system/redo-thumbnails', name: 'app_admin_redo_thumbnails')]
-    public function thumbnailsIndex(ImageService $upload, ImageRepository $imageRepo): Response
+    #[Route('/admin/system/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails')]
+    public function regenerateThumbnails(): Response
     {
         $startTime = microtime(true);
         $cnt = 0;
-        foreach ($imageRepo->findAll() as $image) {
-            $cnt += $upload->createThumbnails($image);
+        foreach ($this->imageRepo->findAll() as $image) {
+            $cnt += $this->imageService->createThumbnails($image);
         }
-        // TODO: do for for all images, and get the config from the setting and loop all source
         $executionTime = microtime(true) - $startTime;
-        return $this->render('admin/thumbnails.html.twig', [
-            'active' => 'redo',
-            'count' => $cnt * 2, // 2 for each user,
-            'time' => round($executionTime, 2)
-        ]);
+
+        $this->addFlash('success', 'Regenerated thumbnails for ' . $cnt . ' images in ' . $executionTime . ' seconds');
+
+        return $this->redirectToRoute('app_admin_system');
     }
 }
