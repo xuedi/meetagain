@@ -138,6 +138,7 @@ readonly class TranslationService
             }
             $this->fs->appendToFile($file, ');');
         }
+        $this->commandService->clearCache();
 
         return [
             'cleanedUp' => $cleanedUp,
