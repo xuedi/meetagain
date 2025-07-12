@@ -104,6 +104,14 @@ class EventType extends AbstractType
                         'mimeTypesMessage' => 'Please upload a valid image, preferable 16x9 format',
                     ])
                 ],
+            ])->add('allFollowing', ChoiceType::class, [
+                'label' => 'Also update all following events',
+                'data' => false,
+                'mapped' => false,
+                'choices'  => [
+                    $this->translator->trans('yes') => true,
+                    $this->translator->trans('no') => false,
+                ],
             ]);
 
         $eventId = $event?->getId();
@@ -119,14 +127,14 @@ class EventType extends AbstractType
                     'label' => "description ($languageCode)",
                     'data' => $translation?->getDescription() ?? '',
                     'mapped' => false,
-                    'attr' => ['rows' => 14],
+                    'attr' => ['rows' => 15],
                 ]);
                 $builder->add("teaser-$languageCode", TextareaType::class, [
                     'label' => "Teaser ($languageCode)",
                     'data' => $translation?->getTeaser() ?? '',
                     'mapped' => false,
                     'required' => false,
-                    'attr' => ['rows' => 1],
+                    'attr' => ['rows' => 2],
                 ]);
             }
         }

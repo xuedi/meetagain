@@ -80,10 +80,6 @@
                 </div>
 
                 <div class="mt-5">
-                    {{ form_row(form.host) }}
-                </div>
-
-                <div class="mt-5">
                     {{ form_row(form.published) }}
                 </div>
 
@@ -91,7 +87,13 @@
                     {{ form_row(form.featured) }}
                 </div>
 
-                <br><br>
+                <div class="mt-5">
+                    {{ form_row(form.host) }}
+                </div>
+
+                <div class="mt-5 p-3 has-background-warning-light has-text-centered">
+                    {{ form_row(form.allFollowing) }}
+                </div>
 
                 <div class="mt-5">
                     <a class="button is-danger toggleTrigger" data-id="event-delete-warning"
