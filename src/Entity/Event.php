@@ -356,7 +356,7 @@ class Event
         return $this;
     }
 
-    private function findTranslation(string $language): ?EventTranslation
+    public function findTranslation(string $language): ?EventTranslation
     {
         foreach ($this->translations as $translation) {
             if ($translation->getLanguage() === $language) {

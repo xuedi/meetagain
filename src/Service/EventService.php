@@ -29,7 +29,8 @@ readonly class EventService
         EventFilterSort $sort,
         EventTypes $type,
         EventFilterRsvp $rsvp,
-    ): array {
+    ): array
+    {
         $criteria = new Criteria();
         $criteria->orderBy(['start' => $sort->value]);
         $criteria->where(match ($time) { // TODO: all should be a dummy, no idea how
@@ -55,6 +56,41 @@ readonly class EventService
         foreach ($events as $event) {
             $this->fillRecurringEvents($event);
         }
+    }
+
+    public function updateRecurringEvents(Event $event): int
+    {
+        if ($event->getRecurringRule() !== null) { // is recurring, must be the parent
+            $parent = clone $event;
+        } else {
+            if ($event->getRecurringOf() !== null) { // has parent, load parent
+                $parent = $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
+            } else { // no parent, no recurring, nothing to do
+                return 0;
+            }
+        }
+
+        $children = $this->repo->findFollowUpEvents(
+            parentEventId: $parent->getId(),
+            greaterThan: $event->getStart(),
+        );
+
+        foreach ($children as $child) {
+            $child->setLocation($event->getLocation());
+            $child->setPreviewImage($event->getPreviewImage());
+            foreach ($event->getTranslation() as $eventTranslation) {
+                $childTranslation = $child->findTranslation($eventTranslation->getLanguage());
+                $childTranslation->setTitle($eventTranslation->getTitle());
+                $childTranslation->setTeaser($eventTranslation->getTeaser());
+                $childTranslation->setDescription($eventTranslation->getDescription());
+
+                $this->em->persist($childTranslation);
+            }
+            $this->em->persist($child);
+        }
+        $this->em->flush();
+
+        return count($children);
     }
 
     private function fillRecurringEvents(Event $event): void
@@ -94,6 +130,10 @@ readonly class EventService
                 $skipFirst = false;
                 continue;
             }
+            if ($occurrence < new DateTime()) {
+                continue;
+            }
+
             $recurringEvent = new Event();
             $recurringEvent->setUser($event->getUser());
             $recurringEvent->setPublished($event->isPublished());
@@ -112,8 +152,9 @@ readonly class EventService
             foreach ($event->getTranslation() as $eventTranslation) {
                 $newEventTranslation = new EventTranslation();
                 $newEventTranslation->setEvent($eventTranslation->getEvent());
-                $newEventTranslation->setTitle($eventTranslation->getTitle());
                 $newEventTranslation->setLanguage($eventTranslation->getLanguage());
+                $newEventTranslation->setTitle($eventTranslation->getTitle());
+                $newEventTranslation->setTeaser($eventTranslation->getTeaser());
                 $newEventTranslation->setDescription($eventTranslation->getDescription());
 
                 $this->em->persist($newEventTranslation);

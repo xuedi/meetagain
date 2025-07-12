@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Event;
 use App\Entity\User;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -54,12 +55,30 @@ class EventRepository extends ServiceEntityRepository
     }
 
     // TODO: already preload translations
-    public function findAllRecurring()
+    public function findAllRecurring(): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $query = $qb->select('e')
             ->from(Event::class, 'e')
             ->where($qb->expr()->isNotNull('e.recurringRule'))
+            ->orderBy('e.start', 'ASC')
+            ->getQuery();
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return array<int, Event>
+     */
+    public function findFollowUpEvents(int $parentEventId, DateTimeInterface $greaterThan): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $query = $qb->select('e')
+            ->from(Event::class, 'e')
+            ->where('e.recurringOf = :parentEvent')
+            ->andWhere('e.start > :greaterThan')
+            ->setParameter('parentEvent', $parentEventId)
+            ->setParameter('greaterThan', $greaterThan)
             ->orderBy('e.start', 'ASC')
             ->getQuery();
 

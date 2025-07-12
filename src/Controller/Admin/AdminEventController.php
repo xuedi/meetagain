@@ -9,6 +9,7 @@ use App\Entity\ImageType;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
+use App\Service\EventService;
 use App\Service\TranslationService;
 use App\Service\ImageService;
 use DateTime;
@@ -27,6 +28,7 @@ class AdminEventController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
+        private readonly EventService $eventService,
     ) {
     }
 
@@ -75,9 +77,6 @@ class AdminEventController extends AbstractController
 
             // save translations
             foreach ($this->translationService->getLanguageCodes() as $languageCode) {
-                //$teaser = $form->get("teaser-$languageCode")->getData();
-                //$teaser = empty(trim($teaser)) ? null : $teaser;
-
                 $translation = $this->getTranslation($languageCode, $event->getId());
                 $translation->setEvent($event);
                 $translation->setLanguage($languageCode);
@@ -97,7 +96,13 @@ class AdminEventController extends AbstractController
                 $this->imageService->createThumbnails($image);
             }
 
-            $this->addFlash('success', 'Event saved');
+            $followUp = '';
+            if ($form->get("allFollowing")->getData() === true) {
+                $cnt = $this->eventService->updateRecurringEvents($event);
+                $followUp = " & updated $cnt follow-up events.";
+            }
+
+            $this->addFlash('success', 'Event saved' . $followUp);
         }
 
         return $this->render('admin/event/edit.html.twig', [
@@ -113,6 +118,7 @@ class AdminEventController extends AbstractController
         dump('delete');
         exit;
     }
+
     private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
     {
         $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);
