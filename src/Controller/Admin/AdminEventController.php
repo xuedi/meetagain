@@ -35,21 +35,9 @@ class AdminEventController extends AbstractController
     #[Route('/admin/event/', name: 'app_admin_event')]
     public function eventList(EventRepository $repo): Response
     {
-        $now = new DateTime()->setTime(0, 0, 0);
-        $nextEventId = 0;
-        $nextEventDate = new DateTime('-100 years')->setTime(0, 0, 0);
-        $eventList = $repo->findBy([], ['start' => 'ASC']);
-        foreach ($eventList as $event) {
-            $start = $event->getStart()->setTime(0, 0, 0);
-            if ($start > $nextEventDate && $start <= $now) {
-                $nextEventDate = $event->getStart()->setTime(0, 0, 0);;
-                $nextEventId = $event->getId();
-            }
-        }
-
         return $this->render('admin/event/list.html.twig', [
-            'nextEvent' => $nextEventId,
-            'events' => $eventList,
+            'nextEvent' => $repo->getNextEventId(),
+            'events' => $repo->findBy([], ['start' => 'ASC']),
             'active' => 'event',
         ]);
     }
@@ -137,6 +125,8 @@ class AdminEventController extends AbstractController
         $form->remove('image');
         $form->remove('user');
         $form->remove('published');
+        $form->remove('allFollowing');
+        $form->remove('featured');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

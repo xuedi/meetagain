@@ -84,4 +84,16 @@ class EventRepository extends ServiceEntityRepository
 
         return $query->getResult();
     }
+
+    public function getNextEventId(): ?int
+    {
+        $now = new DateTime()->setTime(0, 0, 0);
+        foreach ($this->findBy([], ['start' => 'ASC']) as $event) {
+            $start = $event->getStart()->setTime(0, 0);
+            if ($start > $now) { // first bigger than today
+                return $event->getId();
+            }
+        }
+        return null;
+    }
 }
