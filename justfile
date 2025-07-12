@@ -1,5 +1,5 @@
 DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
-PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php-fpm"
+PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 JUST := just_executable() + " --justfile=" + justfile()
 
 install:
@@ -34,10 +34,14 @@ stop:
 	{{DOCKER}} down
 
 dockerRebuild:
-    {{DOCKER}} build --no-cache php-fpm
+    {{DOCKER}} build --no-cache php
+
+dockerNukeAll: stop
+    docker system prune --all --force
+    docker volume prune --all --force
 
 dockerEnter:
-    {{DOCKER}} exec php-fpm bash
+    {{DOCKER}} exec php bash
 
 test:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml

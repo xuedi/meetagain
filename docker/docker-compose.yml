@@ -1,27 +1,25 @@
 services:
 
-  nginx:
-    build: nginx
-    container_name: "ma-web"
-    ports:
-      - "80:80"
-    volumes:
-      - ../:/var/www/html/
-
-  php-fpm:
-    build: php-fpm
+  php:
+    build: php
     container_name: "ma-php"
     user: ${DOCKER_HOST_UID}:${DOCKER_HOST_GID}
-    expose:
-      - 9000
+    ports:
+      - "80:80" # HTTP
+      - "443:443" # HTTPS
+      - "443:443/udp" # HTTP/3
     volumes:
       - ../:/var/www/html/
+      - ./php/Caddyfile:/etc/frankenphp/Caddyfile:ro
+      - ma-caddy_data:/data
+      - ma-caddy_config:/config
+    tty: true
 
   mariadb:
     image: mariadb
     container_name: "${MARIADB_HOST}"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ma-mysql-data:/var/lib/mysql
     ports:
       - "3306:3306"
     environment:
@@ -40,4 +38,6 @@ services:
       - "8025:8025"
 
 volumes:
-  mysql-data:
+  ma-mysql-data:
+  ma-caddy_data:
+  ma-caddy_config:
