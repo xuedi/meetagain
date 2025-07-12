@@ -9,7 +9,7 @@
         </div>
         <div class="message-body">
             <p>
-                If you delete this event, all recurring event are deleted as well, also all related data
+                If you delete this event, all recurring events are deleted as well, also all related data
                 like rsvp's, comments, event images and so on. Please consider deactivating the event instead.
             </p>
             <div class="has-text-right">
@@ -65,6 +65,7 @@
                     {% for locale in app.enabled_locales %}
                         <div class="div {% if locale != 'en' %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
                             {{ form_row(form.("title-"~locale)) }}
+                            {{ form_row(form.("teaser-"~locale)) }}
                             {{ form_row(form.("description-"~locale)) }}
                         </div>
                     {% endfor %}

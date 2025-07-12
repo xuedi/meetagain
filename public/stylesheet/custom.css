@@ -51,3 +51,11 @@ body {
     max-width: 720px !important;
     word-break: break-all;
 }
+
+.flashNotification {
+    position: absolute;
+    width: max-content;
+    left: 50%;
+    bottom: 0;
+    z-index: 1000;
+}

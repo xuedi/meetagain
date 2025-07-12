@@ -38,6 +38,7 @@ class EventType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $event = $options['data'] ?? null;
         $builder
             ->add('initial', HiddenType::class, [
                 'data' => true,
@@ -69,6 +70,7 @@ class EventType extends AbstractType
                 'required' => false,
                 'expanded' => false,
                 'multiple' => false,
+                'disabled' => ($event?->getRecurringOf() !== null) ? true : false,
             ])
             ->add('type', EnumType::class, [
                 'class' => EventTypes::class,
@@ -104,7 +106,7 @@ class EventType extends AbstractType
                 ],
             ]);
 
-        $eventId = $options['data']->getId();
+        $eventId = $event?->getId();
         if (null !== $eventId) { // not for new events
             foreach ($this->translationService->getLanguageCodes() as $languageCode) {
                 $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
@@ -117,7 +119,14 @@ class EventType extends AbstractType
                     'label' => "description ($languageCode)",
                     'data' => $translation?->getDescription() ?? '',
                     'mapped' => false,
-                    'attr' => ['rows' => 16],
+                    'attr' => ['rows' => 14],
+                ]);
+                $builder->add("teaser-$languageCode", TextareaType::class, [
+                    'label' => "Teaser ($languageCode)",
+                    'data' => $translation?->getTeaser() ?? '',
+                    'mapped' => false,
+                    'required' => false,
+                    'attr' => ['rows' => 1],
                 ]);
             }
         }

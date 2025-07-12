@@ -291,6 +291,11 @@ class Event
         return $this->findTranslation($language)?->getTitle() ?? '';
     }
 
+    public function getTeaser(string $language): string
+    {
+        return $this->findTranslation($language)?->getTeaser() ?? '';
+    }
+
     public function getDescription(string $language): string
     {
         return $this->findTranslation($language)?->getDescription() ?? '';

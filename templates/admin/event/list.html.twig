@@ -7,7 +7,7 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>CreatedBy</th>
+                <th>Title</th>
                 <th>Start date</th>
                 <th>Stop date</th>
                 <th>Recurring</th>
@@ -19,11 +19,24 @@
             </thead>
             <tbody>
             {% for event in events %}
-                <tr class="{% if event.id == nextEvent %}has-background-warning-light{% endif %}">
-                    <td>{% if event.initial %}{{ event.user.name }}{% else %}auto{% endif %}</td>
+                {% set textColor = '' %}
+                {% if event.recurringOf is not null %}
+                    {% set textColor = 'has-text-grey-light' %}
+                {% endif %}
+                {% if event.recurringRule is not null %}
+                    {% set textColor = 'has-background-info-light' %}
+                {% endif %}
+                <tr class="{{ textColor }} {% if event.id == nextEvent %}has-background-warning-light{% endif %}">
+                    <td>{{ event.title(globalService.currentLocale) }}</td>
                     <td>{{ event.start|date('Y-m-d') }}</td>
                     <td>{{ event.stop|date('Y-m-d') }}</td>
-                    <td>{% if event.recurringRule is null %}{{ 'No'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}</td>
+                    <td>
+                        {% if event.recurringOf is not null %}
+                            auto
+                        {% else %}
+                            {% if event.recurringRule is null %}{{ 'No'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}
+                        {% endif %}
+                    </td>
                     <td>{{ event.location.name }}</td>
                     <td>{{ event.rsvp|length }}</td>
                     <td>{{ event.type.name }}</td>
@@ -39,6 +52,18 @@
             {% endfor %}
             </tbody>
         </table>
+
+        <div class="mt-4 has-text-centered">
+            <span class="tag has-background-info-light">
+                <span>Recurring events</span>
+            </span>
+            <span class="tag is-white">
+                <span class="">One time events</span>
+            </span>
+            <span class="tag has-text-grey-light is-white">
+                <span>Automatic generated from a recurring event</span>
+            </span>
+        </div>
 
     </div>
 

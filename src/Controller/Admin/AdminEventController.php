@@ -75,10 +75,14 @@ class AdminEventController extends AbstractController
 
             // save translations
             foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+                //$teaser = $form->get("teaser-$languageCode")->getData();
+                //$teaser = empty(trim($teaser)) ? null : $teaser;
+
                 $translation = $this->getTranslation($languageCode, $event->getId());
                 $translation->setEvent($event);
                 $translation->setLanguage($languageCode);
                 $translation->setTitle($form->get("title-$languageCode")->getData());
+                $translation->setTeaser($form->get("teaser-$languageCode")->getData());
                 $translation->setDescription($form->get("description-$languageCode")->getData());
 
                 $this->entityManager->persist($translation);
@@ -92,6 +96,8 @@ class AdminEventController extends AbstractController
             if ($image instanceof Image) {
                 $this->imageService->createThumbnails($image);
             }
+
+            $this->addFlash('success', 'Event saved');
         }
 
         return $this->render('admin/event/edit.html.twig', [

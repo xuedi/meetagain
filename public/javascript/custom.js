@@ -44,6 +44,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+// expandable card
+document.addEventListener('DOMContentLoaded', function () {
+    (document.querySelectorAll('.flashNotification') || []).forEach((trigger) => {
+        setTimeout(function() {
+            trigger.style.display = 'none';
+        }, 1700);
+    });
+});
+
 // toggle is-hidden
 document.addEventListener('DOMContentLoaded', function () {
     let trigger = document.getElementsByClassName('toggleTrigger');

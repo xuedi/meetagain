@@ -24,6 +24,12 @@
 <body class="has-navbar-fixed-top mt-5">
 {% include 'base_navbar.html.twig' %}
 {% block body %}{% endblock %}
+{% for message in app.flashes('success') %}
+    <div class="notification is-success flashNotification">
+        <button class="delete"></button>
+        {{ message }}
+    </div>
+{% endfor %}
 {% include 'base_footer.html.twig' %}
 </body>
 </html>
