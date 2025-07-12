@@ -5,7 +5,12 @@
 {% else %}
     {% set no = 'is-danger' %}
 {% endif %}
+{% set ajaxToggle = 'ajaxToggle' %}
+{% if allowAjax is defined and allowAjax == false %}
+    {% set ajaxToggle = '' %}
+{% endif %}
+
 <div class="buttons has-addons is-right">
-    <a href="{{ link }}" class="button is-small ajaxToggle {{ yes }}">{{ "toggle_yes"|trans }}</a>
-    <a href="{{ link }}" class="button is-small ajaxToggle {{ no }}">{{ "toggle_no"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {{ ajaxToggle }} {{ yes }}">{{ "toggle_yes"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {{ ajaxToggle }} {{ no }}">{{ "toggle_no"|trans }}</a>
 </div>

@@ -184,12 +184,14 @@ document.addEventListener('DOMContentLoaded', function () {
 // attach all to body, so changed DOM will bubble up and match again
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('body').addEventListener('click', event => {
-        event.preventDefault();
 
         if (event.target && event.target.matches("a.ajaxToggle")) {
+            event.preventDefault();
+
             let url = event.target.getAttribute('href');
             let xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
+            xhr.setRequestHeader("X-Requested-With","XMLHttpRequest"); // for isXmlHttpRequest()
             xhr.send();
             xhr.onload = function () {
                 if (xhr.status === 200) {

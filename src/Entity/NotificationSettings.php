@@ -84,4 +84,13 @@ class NotificationSettings implements JsonSerializable
         }
         return $this;
     }
+
+    public function isActive(string $type): bool
+    {
+        return match ($type) {
+            'announcements' => $this->announcements,
+            'followingUpdates' => $this->followingUpdates,
+            'receivedMessage' => $this->receivedMessage,
+        };
+    }
 }

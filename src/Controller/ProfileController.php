@@ -87,11 +87,11 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]
-    public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
+    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
     {
         if ($event->getStart() < new DateTimeImmutable()) { // does reload page for flashMessage to trigger
             $this->addFlash('error', 'You cannot RSVP to an event that has already happened.');
-            return JsonResponse::fromJsonString('', Response::HTTP_LOCKED);
+            return new Response('', Response::HTTP_LOCKED);
         }
 
         $user = $this->getAuthedUser();
@@ -102,6 +102,10 @@ class ProfileController extends AbstractController
         // TODO: to slow, need to save event data first, generate log & notification async
         //$type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
         //$this->activityService->log($type, $user, ['event_id' => $event->getId()]);
+
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('app_profile');
+        }
 
         return $this->render('_block/toggle.html.twig', [
             'link' => $this->generateUrl('app_profile_toggle_rsvp', ['event' => $event->getId()]),

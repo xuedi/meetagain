@@ -42,7 +42,7 @@ class ConfigController extends AbstractController
     }
 
     #[Route('/profile/config/toggle/{type}', name: 'app_profile_config_toggle', requirements: ['type' => 'osm|tagging|notification|public'])]
-    public function toggle(string $type): Response
+    public function toggle(Request $request, string $type): Response
     {
         $user = $this->getAuthedUser();
         match ($type) {
@@ -50,17 +50,27 @@ class ConfigController extends AbstractController
             'tagging' => $user->setTagging(!$user->isTagging()),
             'notification' => $user->setNotification(!$user->isNotification()),
             'public' => $user->setPublic(!$user->isPublic()),
-            default => throw new Exception('Invalid type'),
         };
-
         $this->em->persist($user);
         $this->em->flush();
 
-        return $this->redirectToRoute('app_profile_config');
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('app_profile_config');
+        }
+
+        return $this->render('_block/toggle.html.twig', [
+            'link' => $this->generateUrl('app_profile_config_toggle', ['type' => $type]),
+            'status' => match ($type) {
+                'osm' => $user->isOsmConsent(),
+                'tagging' => $user->isTagging(),
+                'notification' => $user->isNotification(),
+                'public' => $user->isPublic(),
+            },
+        ]);
     }
 
     #[Route('/profile/config/toggleNotification/{type}', name: 'app_profile_config_toggle_notification')]
-    public function toggleNotification(string $type): Response
+    public function toggleNotification(Request $request, string $type): Response
     {
         $user = $this->getAuthedUser();
         $user->setNotificationSettings($user->getNotificationSettings()->toggle($type));
@@ -68,6 +78,13 @@ class ConfigController extends AbstractController
         $this->em->persist($user);
         $this->em->flush();
 
-        return $this->redirectToRoute('app_profile_config');
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('app_profile_config');
+        }
+
+        return $this->render('_block/toggle.html.twig', [
+            'link' => $this->generateUrl('app_profile_config_toggle_notification', ['type' => $type]),
+            'status' => $user->getNotificationSettings()->isActive($type),
+        ]);
     }
 }
