@@ -48,11 +48,7 @@
                     </div>
                 </div>
 
-
-                <div class="column is-1"></div>
-
-
-                <div class="column is-8">
+                <div class="column is-9">
 
                     {% if messages is null %}
                         <h1 class="title is-6">Hello,</h1>
@@ -69,56 +65,62 @@
                             implements a kind addressbook here
                         </p>
                     {% else %}
-                        {% for message in messages %}
-                            {% if user.id == message.sender.id %}
-                                <div class="level is-block">
-                                    <div class="level-right">
-                                        <div class="level-item">
-                                            <div class="box">
-                                                <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
-                                                <span class="breakText">{{ message.content }}</span>
+                        <div style="display: flex; flex-direction: column; height: 70vh;">
+                            <div class="pr-3" id="desktop-message-container" style="flex: 1; overflow-y: auto; margin-bottom: 1rem;">
+                                {% for message in messages %}
+                                    {% if user.id == message.sender.id %}
+                                        <div class="level is-block">
+                                            <div class="level-right">
+                                                <div class="level-item">
+                                                    <div class="box">
+                                                        <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
+                                                        <span class="breakText">{{ message.content }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="level-item">
+                                                    {% include '_block/image.html.twig' with {'image': message.sender.image, 'size': '50x50'} %}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="level-item">
-                                            {% include '_block/image.html.twig' with {'image': message.sender.image, 'size': '50x50'} %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="level">
-                                    <div class="level-left">
-                                        <div class="level-item">
-                                            {% include '_block/image.html.twig' with {'image': message.sender.image, 'size': '50x50'} %}
-                                        </div>
-                                        <div class="level-item">
-                                            <div class="box">
-                                                <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
-                                                <span class="breakText">{{ message.content }}</span>
+                                    {% else %}
+                                        <div class="level">
+                                            <div class="level-left">
+                                                <div class="level-item">
+                                                    {% include '_block/image.html.twig' with {'image': message.sender.image, 'size': '50x50'} %}
+                                                </div>
+                                                <div class="level-item">
+                                                    <div class="box">
+                                                        <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
+                                                        <span class="breakText">{{ message.content }}</span>
+                                                    </div>
+                                                </div>
+                                                {% if message.wasRead == false %}
+                                                    <div class="level-item">
+                                                    <span class="panel-icon has-text-danger">
+                                                        <i class="fas fa-circle" aria-hidden="true"></i>
+                                                    </span>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
-                                        {% if message.wasRead == false %}
-                                            <div class="level-item">
-                                            <span class="panel-icon has-text-danger">
-                                                <i class="fas fa-circle" aria-hidden="true"></i>
-                                            </span>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                        <hr>
-                        {{ form_start(form) }}
-                        <div class="level">
-                            <div class="level-item">
-                                <input class="input" type="text" name="{{ field_name(form.comment) }}"
-                                       placeholder="Message"/>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
-                            <div class="level-right">
-                                <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                            <div>
+                                <hr>
+                                {{ form_start(form) }}
+                                <div class="level">
+                                    <div class="level-item">
+                                        <input class="input" type="text" name="{{ field_name(form.comment) }}"
+                                               placeholder="Message"/>
+                                    </div>
+                                    <div class="level-right">
+                                        <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                                    </div>
+                                </div>
+                                {{ form_end(form) }}
                             </div>
                         </div>
-                        {{ form_end(form) }}
                     {% endif %}
                 </div>
             </div>
@@ -154,29 +156,51 @@
             </p>
             <p class="mb-2">
                 have a look at the members page, on the detail view of each member you have a message buttun
-                until xuedi
-                implements a kind addressbook here
+                until xuedi implements a kind addressbook here
             </p>
         {% else %}
-            {% for message in messages %}
-                <div class="box {% if user.id == message.sender.id %}has-background-link-light{% endif %}">
-                    <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
-                    <span class="breakText">{{ message.content }}</span>
+            <div style="display: flex; flex-direction: column; height: 60vh;">
+                <div id="mobile-message-container" style="flex: 1; overflow-y: auto; margin-bottom: 1rem;">
+                    {% for message in messages %}
+                        <div class="box {% if user.id == message.sender.id %}has-background-link-light{% endif %}">
+                            <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
+                            <span class="breakText">{{ message.content }}</span>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-            <hr>
-            {{ form_start(form) }}
-            <div class="field has-addons">
-                <div class="control is-expanded">
-                    <input class="input" type="text" name="{{ field_name(form.comment) }}" placeholder="Message" />
-                </div>
-                <div class="control">
-                    <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                <div>
+                    <hr>
+                    {{ form_start(form) }}
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <input class="input" type="text" name="{{ field_name(form.comment) }}" placeholder="Message" />
+                        </div>
+                        <div class="control">
+                            <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
                 </div>
             </div>
-            {{ form_end(form) }}
         {% endif %}
 
     </section>
 
+    {% if messages is not null %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Scroll desktop message container to bottom
+            const desktopContainer = document.getElementById('desktop-message-container');
+            if (desktopContainer) {
+                desktopContainer.scrollTop = desktopContainer.scrollHeight;
+            }
+
+            // Scroll mobile message container to bottom
+            const mobileContainer = document.getElementById('mobile-message-container');
+            if (mobileContainer) {
+                mobileContainer.scrollTop = mobileContainer.scrollHeight;
+            }
+        });
+    </script>
+    {% endif %}
 {% endblock %}
