@@ -5,8 +5,7 @@
     <div class="container">
 
         <div class="columns">
-            <div class="column is-9">
-
+            <div class="column is-6">
 
                 <h1 class="title is-5">Website settings</h1>
 
@@ -22,6 +21,14 @@
                     </tbody>
                 </table>
 
+            </div>
+            <div class="column is-3 content">
+
+                <h1 class="title is-5">Emails</h1>
+
+                <ul class="list">
+                    <li>Queued: {{ queuedEmails|length }}</li>
+                </ul>
 
             </div>
             <div class="column is-3 content">

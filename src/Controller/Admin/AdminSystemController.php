@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
 use App\Repository\ConfigRepository;
+use App\Repository\EmailQueueRepository;
 use App\Repository\ImageRepository;
 use App\Service\ImageService;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +15,8 @@ class AdminSystemController extends AbstractController
     public function __construct(
         private readonly ImageService $imageService,
         private readonly ImageRepository $imageRepo,
-        private readonly ConfigRepository $configRepo
+        private readonly ConfigRepository $configRepo,
+        private readonly EmailQueueRepository $emailQueueRepository
     )
     {
     }
@@ -26,6 +28,7 @@ class AdminSystemController extends AbstractController
             'active' => 'system',
             'config' => $this->configRepo->findAll(),
             'mediaStats' => $this->imageService->getStatistics(),
+            'queuedEmails' => $this->emailQueueRepository->findBy(['sendAt' => null], ['createdAt' => 'DESC']),
         ]);
     }
 
