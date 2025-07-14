@@ -1,3 +1,27 @@
+
+// backenders attempt to create a fetch wrapper
+function maFetch(url, isXml = false, formData) {
+    const options = (isXml) ? {
+        method: 'GET',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    } : (formData instanceof FormData) ? {
+        method: 'POST',
+        body: formData,
+        //headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    } : { // non xml & form --> simple get
+        method: 'GET',
+    };
+    return fetch(url, options).then(response => {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            return response.json();
+        } else {
+            return response.text();
+        }
+    });
+}
+
+
 // enable closing button for notification boxes
 document.addEventListener('DOMContentLoaded', () => {
     (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
@@ -72,16 +96,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let osmConsent = document.getElementById('osm_consent_checkbox');
             let url = event.currentTarget.dataset.url + '?osmConsent=' + osmConsent.checked;
-            console.log(url);
+            maFetch(url).then(response => {
+                location.reload();
+            });
 
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    location.reload();
-                }
-            }
-            xhr.send();
         });
     }
 });
@@ -129,6 +147,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
+
+
+// TODO:
+//  - currently it send the whole form
+//  - upload only the image and replace it with the returned value (retrigger)
+//  - if no javascript, open image upload form like in event images upload
+//  - unify image upload process with event and use in both with no JS form fallback
+//  - delete this thing and have form send my classic save button
+
+//            maFetch(url, false, formData).then(response => {
+//                location.reload();
+//            });
+
+//
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.fileUploadTrigger') || []).forEach((trigger) => {
         trigger.addEventListener('change', event => {
@@ -157,15 +190,10 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
 
             let url = event.currentTarget.getAttribute('href');
+            maFetch(url).then(response => {
+                location.reload();
+            });
 
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    location.reload();
-                }
-            }
-            xhr.send();
         });
     });
 });
@@ -181,26 +209,34 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// attach all to body, so changed DOM will bubble up and match again
+// triggerToggleBlock: toggle (yes/no) after ajax update parent for event delegation
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('body').addEventListener('click', event => {
-
-        if (event.target && event.target.matches("a.ajaxToggle")) {
+    (document.querySelectorAll('.triggerToggleBlock') || []).forEach((trigger) => {
+        trigger.addEventListener('click', event => {
             event.preventDefault();
 
             let url = event.target.getAttribute('href');
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.setRequestHeader("X-Requested-With","XMLHttpRequest"); // for isXmlHttpRequest()
-            xhr.send();
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    event.target.parentNode.outerHTML = xhr.responseText;
-                } else {
-                    location.reload();
-                }
-            };
-        }
+            maFetch(url, true).then(response => {
+                const toggleBlock = event.target.parentNode;
+                const links = toggleBlock.querySelectorAll('a');
+                links.forEach(link => {
+                    if(link.dataset.type === 'yes') {
+                        if(response.newStatus) {
+                            link.classList.add('is-success');
+                        } else {
+                            link.classList.remove('is-success');
+                        }
+                    }
+                    if(link.dataset.type === 'no') {
+                        if(response.newStatus) {
+                            link.classList.remove('is-danger');
+                        } else {
+                            link.classList.add('is-danger');
+                        }
+                    }
+                });
+            });
 
+        });
     });
 });

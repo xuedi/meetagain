@@ -95,7 +95,7 @@ class ProfileController extends AbstractController
         }
 
         $user = $this->getAuthedUser();
-        $event->toggleRsvp($user);
+        $status = $event->toggleRsvp($user);
         $em->persist($event);
         $em->flush();
 
@@ -107,9 +107,6 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
-        return $this->render('_block/toggle.html.twig', [
-            'link' => $this->generateUrl('app_profile_toggle_rsvp', ['event' => $event->getId()]),
-            'status' => $event->hasRsvp($user),
-        ]);
+        return new JsonResponse(['newStatus' => $status]);
     }
 }

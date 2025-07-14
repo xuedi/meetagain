@@ -6,6 +6,7 @@ use App\Controller\AbstractController;
 use App\Form\ChangePassword;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -45,11 +46,11 @@ class ConfigController extends AbstractController
     public function toggle(Request $request, string $type): Response
     {
         $user = $this->getAuthedUser();
-        match ($type) {
-            'osm' => $user->setOsmConsent(!$user->isOsmConsent()),
-            'tagging' => $user->setTagging(!$user->isTagging()),
-            'notification' => $user->setNotification(!$user->isNotification()),
-            'public' => $user->setPublic(!$user->isPublic()),
+        $newStatus = match ($type) {
+            'osm' => $user->setOsmConsent(!$user->isOsmConsent())->isOsmConsent(),
+            'tagging' => $user->setTagging(!$user->isTagging())->isTagging(),
+            'notification' => $user->setNotification(!$user->isNotification())->isNotification(),
+            'public' => $user->setPublic(!$user->isPublic())->isPublic(),
         };
         $this->em->persist($user);
         $this->em->flush();
@@ -58,22 +59,15 @@ class ConfigController extends AbstractController
             return $this->redirectToRoute('app_profile_config');
         }
 
-        return $this->render('_block/toggle.html.twig', [
-            'link' => $this->generateUrl('app_profile_config_toggle', ['type' => $type]),
-            'status' => match ($type) {
-                'osm' => $user->isOsmConsent(),
-                'tagging' => $user->isTagging(),
-                'notification' => $user->isNotification(),
-                'public' => $user->isPublic(),
-            },
-        ]);
+        return new JsonResponse(['newStatus' => $newStatus]);
     }
 
     #[Route('/profile/config/toggleNotification/{type}', name: 'app_profile_config_toggle_notification')]
     public function toggleNotification(Request $request, string $type): Response
     {
         $user = $this->getAuthedUser();
-        $user->setNotificationSettings($user->getNotificationSettings()->toggle($type));
+        $setting = $user->getNotificationSettings()->toggle($type);
+        $user->setNotificationSettings($setting);
 
         $this->em->persist($user);
         $this->em->flush();
@@ -82,9 +76,6 @@ class ConfigController extends AbstractController
             return $this->redirectToRoute('app_profile_config');
         }
 
-        return $this->render('_block/toggle.html.twig', [
-            'link' => $this->generateUrl('app_profile_config_toggle_notification', ['type' => $type]),
-            'status' => $user->getNotificationSettings()->isActive($type),
-        ]);
+        return new JsonResponse(['newStatus' => $setting->isActive($type)]);
     }
 }

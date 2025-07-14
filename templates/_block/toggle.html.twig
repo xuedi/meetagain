@@ -1,16 +1,13 @@
-{% set no = '' %}
-{% set yes = '' %}
+
 {% if status %}
     {% set yes = 'is-success' %}
+    {% set no = '' %}
 {% else %}
     {% set no = 'is-danger' %}
-{% endif %}
-{% set ajaxToggle = 'ajaxToggle' %}
-{% if allowAjax is defined and allowAjax == false %}
-    {% set ajaxToggle = '' %}
+    {% set yes = '' %}
 {% endif %}
 
-<div class="buttons has-addons is-right">
-    <a href="{{ link }}" class="button is-small {{ ajaxToggle }} {{ yes }}">{{ "toggle_yes"|trans }}</a>
-    <a href="{{ link }}" class="button is-small {{ ajaxToggle }} {{ no }}">{{ "toggle_no"|trans }}</a>
+<div class="buttons has-addons is-right triggerToggleBlock">
+    <a href="{{ link }}" class="button is-small {{ yes }}" data-type="yes">{{ "toggle_yes"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {{ no }}" data-type="no">{{ "toggle_no"|trans }}</a>
 </div>

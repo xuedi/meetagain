@@ -224,13 +224,16 @@ class Event
         return $this->rsvp;
     }
 
-    public function toggleRsvp(User $user): void
+    public function toggleRsvp(User $user): bool
     {
         if (!$this->rsvp->contains($user)) {
             $this->rsvp->add($user);
-        } else {
-            $this->rsvp->removeElement($user);
+
+            return true;
         }
+        $this->rsvp->removeElement($user);
+
+        return false;
     }
 
     public function addRsvp(User $user): static
