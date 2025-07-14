@@ -227,3 +227,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// TODO: markers [DONE] only for logic that is kind of final, clean & works well without JS completely
