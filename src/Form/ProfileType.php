@@ -38,6 +38,7 @@ class ProfileType extends AbstractType
             'mapped' => false,
             'required' => false,
             'label' => false,
+            'attr' => ['class' => 'is-hidden'],
             'constraints' => [
                 new File([
                     'maxSize' => '10M',
