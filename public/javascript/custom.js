@@ -1,4 +1,3 @@
-
 // backenders attempt to create a fetch wrapper
 function maFetch(url, isXml = false, formData) {
     const options = (isXml) ? {
@@ -148,8 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-
-
 // TODO:
 //  - currently it send the whole form
 //  - upload only the image and replace it with the returned value (retrigger)
@@ -220,23 +217,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 const toggleBlock = event.target.parentNode;
                 const links = toggleBlock.querySelectorAll('a');
                 links.forEach(link => {
-                    if(link.dataset.type === 'yes') {
-                        if(response.newStatus) {
-                            link.classList.add('is-success');
-                        } else {
-                            link.classList.remove('is-success');
-                        }
-                    }
-                    if(link.dataset.type === 'no') {
-                        if(response.newStatus) {
-                            link.classList.remove('is-danger');
-                        } else {
-                            link.classList.add('is-danger');
-                        }
+                    if (link.dataset.type === 'yes') {
+                        link.classList.toggle('is-success', response.newStatus);
+                    } else {
+                        link.classList.toggle('is-danger', !response.newStatus);
                     }
                 });
             });
-
         });
     });
 });
