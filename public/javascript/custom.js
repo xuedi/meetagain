@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// triggerToggleBlock: toggle (yes/no) after ajax update parent for event delegation
+// triggerToggleBlock: toggle (yes/no) after ajax update parent for event delegation [DONE]
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.triggerToggleBlock') || []).forEach((trigger) => {
         trigger.addEventListener('click', event => {

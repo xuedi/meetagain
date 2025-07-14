@@ -103,10 +103,10 @@ class ProfileController extends AbstractController
         //$type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
         //$this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
-        if (!$request->isXmlHttpRequest()) {
-            return $this->redirectToRoute('app_profile');
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['newStatus' => $status]);
         }
 
-        return new JsonResponse(['newStatus' => $status]);
+        return $this->redirectToRoute('app_profile');
     }
 }

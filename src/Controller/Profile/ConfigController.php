@@ -55,11 +55,11 @@ class ConfigController extends AbstractController
         $this->em->persist($user);
         $this->em->flush();
 
-        if (!$request->isXmlHttpRequest()) {
-            return $this->redirectToRoute('app_profile_config');
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['newStatus' => $newStatus]);
         }
 
-        return new JsonResponse(['newStatus' => $newStatus]);
+        return $this->redirectToRoute('app_profile_config');
     }
 
     #[Route('/profile/config/toggleNotification/{type}', name: 'app_profile_config_toggle_notification')]
@@ -72,10 +72,10 @@ class ConfigController extends AbstractController
         $this->em->persist($user);
         $this->em->flush();
 
-        if (!$request->isXmlHttpRequest()) {
-            return $this->redirectToRoute('app_profile_config');
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['newStatus' => $setting->isActive($type)]);
         }
 
-        return new JsonResponse(['newStatus' => $setting->isActive($type)]);
+        return $this->redirectToRoute('app_profile_config');
     }
 }
