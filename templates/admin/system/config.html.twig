@@ -6,9 +6,13 @@
             <td>
                 {# TODO: have new class as value entity handled by ConfigService #}
                 {% if item.type.value == 'boolean' %}
+                    {% set value = false %}
+                    {% if item.value == 'true' %}
+                        {% set value = true %}
+                    {% endif %}
                     {% include '_block/toggle.html.twig' with {
                         'link': path('app_admin_system_boolean', {'name': item.name}),
-                        'status': item.value
+                        'status': value
                     } %}
                 {% endif %}
             </td>
