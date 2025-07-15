@@ -6,7 +6,11 @@ use App\Controller\AbstractController;
 use App\Repository\ConfigRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\ImageRepository;
+use App\Service\ConfigService;
 use App\Service\ImageService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -16,7 +20,8 @@ class AdminSystemController extends AbstractController
         private readonly ImageService $imageService,
         private readonly ImageRepository $imageRepo,
         private readonly ConfigRepository $configRepo,
-        private readonly EmailQueueRepository $emailQueueRepository
+        private readonly EmailQueueRepository $emailQueueRepository,
+        private readonly EntityManagerInterface $em,
     )
     {
     }
@@ -55,6 +60,23 @@ class AdminSystemController extends AbstractController
         $executionTime = microtime(true) - $startTime;
 
         $this->addFlash('success', 'Deleted ' . $cnt . ' obsolete thumbnail in ' . $executionTime . ' seconds');
+
+        return $this->redirectToRoute('app_admin_system');
+    }
+
+    #[Route('/admin/system/boolean/{name}', name: 'app_admin_system_boolean')]
+    public function boolean(Request $request, string $name): Response
+    {
+        $config = $this->configRepo->findOneBy(['name' => $name]);
+        $value = $config->getValue() !== 'true';
+        $config->setValue($value ? 'true' : 'false');
+
+        $this->em->persist($config);
+        $this->em->flush();
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['newStatus' => $value]);
+        }
 
         return $this->redirectToRoute('app_admin_system');
     }

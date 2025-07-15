@@ -3,10 +3,15 @@
 namespace App\Service;
 
 use App\Entity\ImageType;
+use App\Repository\ConfigRepository;
 
 // TODO: add caches config repo stuff
 readonly class ConfigService
 {
+    public function __construct(private ConfigRepository $repo)
+    {
+    }
+
     public function getThumbnailSizes(ImageType $type): array
     {
         return match ($type) {
@@ -44,5 +49,16 @@ readonly class ConfigService
     public function getHost(): string
     {
         return $_ENV['APP_HOST'] ?? 'http://localhost';
+    }
+
+    // TODO: implement caching
+    public function getBoolean(string $name, bool $default = false): bool
+    {
+        $setting = $this->repo->findOneBy(['name' => $name]);
+        if ($setting === null) {
+            return $default;
+        }
+
+        return $setting->getValue() === 'true';
     }
 }

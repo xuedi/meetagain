@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_image_title"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column p-5">
+
+                    <div class="card has-background-success">
+                        <a href="/de/" class="card-image">
+                            <figure class="image p-5">
+                                <img src="/images/locations/germany.jpg " alt="Image of a typical german city" class="modal-button">
+                            </figure>
+                        </a>
+                        <div class="card-content has-text-centered">
+                            <div class="content">
+                                <h4>Willkommen!</h4>
+                                <p>
+                                    Unsere Seite ist mehrsprachig, bitte wähle, welche Sprache du bevorzugst.
+                                </p>
+                                <a href="/de/" class="button is-link">Auswählen</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="column p-5">
+
+                    <div class="card has-background-info">
+                        <a href="/en/" class="card-image">
+                            <figure class="image p-5">
+                                <img src="/images/locations/england.jpg" alt="Image of a typical english city" class="modal-button">
+                            </figure>
+                        </a>
+                        <div class="card-content has-text-centered">
+                            <div class="content">
+                                <h4>Welcome!</h4>
+                                <p>
+                                    Our site is multilingual, please select your preferred language.
+                                </p>
+                                <a href="/en/" class="button is-link">Select</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="column p-5">
+
+                    <div class="card has-background-danger">
+                        <a href="/cn/" class="card-image">
+                            <figure class="image p-5">
+                                <img src="/images/locations/china.jpg" alt="Image of a typical chinese city" class="modal-button">
+                            </figure>
+                        </a>
+                        <div class="card-content has-text-centered">
+                            <div class="content">
+                                <h4>欢迎!</h4>
+                                <p>
+                                    我们的网站支持多语言，<br>
+                                    请选择您偏好的语言
+                                </p>
+                                <a href="/cn/" class="button is-link">选择</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

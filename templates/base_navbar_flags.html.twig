@@ -1,21 +1,23 @@
-<div class="navbar-item dropdown is-hoverable pl-0">
-    <div class="dropdown-trigger is-hoverable">
-        <div class="button" aria-haspopup="true" aria-controls="dropdown-languages">
+{% if app.request.attributes.get('_route_params') is not null %}
+    <div class="navbar-item dropdown is-hoverable pl-0">
+        <div class="dropdown-trigger is-hoverable">
+            <div class="button" aria-haspopup="true" aria-controls="dropdown-languages">
             <span class="image is-32x32 mt-3">
-                <img class="is-flag" src="{{ '/images/flags/' ~ app.request.locale ~ '.png' }}" width="100" height="64" alt="Current locale flag: {{ app.request.locale }}"/>
+                <img class="is-flag" src="{{ '/images/flags/' ~ app.request.locale ~ '.png' }}" width="100" height="64"
+                     alt="Current locale flag: {{ app.request.locale }}"/>
             </span>
-            <span class="icon is-small"><i class="fas fa-angle-down" aria-hidden="true"></i></span>
+                <span class="icon is-small"><i class="fas fa-angle-down" aria-hidden="true"></i></span>
+            </div>
         </div>
-    </div>
-    {% if app.request.attributes.get('_route_params') is not null %}
         <div class="dropdown-menu" id="dropdown-languages" role="menu">
             <div class="dropdown-content">
                 {% for altLangCode, altLangLink in globalService.getAlternativeLanguageCodes %}
-                    <link rel=”alternate” hreflang="{{ altLangCode }}" href="{{ altLangLink }}" />
+                    <link rel=”alternate” hreflang="{{ altLangCode }}" href="{{ altLangLink }}"/>
                     <nobr>
                         <a class="navbar-item" href="{{ altLangLink }}">
                             <figure class="image is-32x32 mt-3">
-                                <img class="is-flag" src="{{ '/images/flags/' ~ altLangCode ~ '.png' }}" width="100" height="64" alt="Locale flag: {{ altLangCode }}"/>
+                                <img class="is-flag" src="{{ '/images/flags/' ~ altLangCode ~ '.png' }}" width="100"
+                                     height="64" alt="Locale flag: {{ altLangCode }}"/>
                             </figure>
                             <span class="ml-3">
                                 {{ ('language_'~altLangCode) | trans({}, "messages", altLangCode) }}
@@ -28,5 +30,5 @@
                 {% endfor %}
             </div>
         </div>
-    {% endif %}
-</div>
+    </div>
+{% endif %}

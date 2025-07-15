@@ -56,4 +56,9 @@ readonly class CmsService
             'message' => "These aren't the droids you're looking for!",
         ]), Response::HTTP_NOT_FOUND);
     }
+
+    public function createFrontpage(): Response
+    {
+        return new Response($this->twig->render('cms/frontpage.html.twig'), Response::HTTP_OK);
+    }
 }

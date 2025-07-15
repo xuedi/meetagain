@@ -5,23 +5,14 @@
     <div class="container">
 
         <div class="columns">
-            <div class="column is-6">
+            <div class="column is-5">
 
                 <h1 class="title is-5">Website settings</h1>
 
-                <table class="table">
-                    <tbody>
-                    {% for item in config %}
-                        <tr>
-                            <th>{{ item.name }}</th>
-                            <th>{{ item.type.value }}</th>
-                            <th>{{ item.value }}</th>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                {% include 'admin/system/config.html.twig' %}
 
             </div>
+            <div class="column is-1"></div>
             <div class="column is-3 content">
 
                 <h1 class="title is-5">Emails</h1>
@@ -39,9 +30,9 @@
                     <li>
                         ImageTypes:
                         <ul>
-                        {% for name,count in mediaStats.imageTypeList %}
-                            <li>{{ name }}: {{ count }}</li>
-                        {% endfor %}
+                            {% for name,count in mediaStats.imageTypeList %}
+                                <li>{{ name }}: {{ count }}</li>
+                            {% endfor %}
                         </ul>
                     </li>
                     <li>Thumbnails: {{ mediaStats.thumbnailCount }}</li>
@@ -50,19 +41,21 @@
                     <li>
                         ThumbnailsSizes:
                         <ul>
-                        {% for size,count in mediaStats.thumbnailSizeList %}
-                            <li>{{ size }}: {{ count }}</li>
-                        {% endfor %}
+                            {% for size,count in mediaStats.thumbnailSizeList %}
+                                <li>{{ size }}: {{ count }}</li>
+                            {% endfor %}
                         </ul>
                     </li>
                 </ul>
 
                 {% if mediaStats.thumbnailMissingCount > 0 %}
-                    <a href="{{ path('app_admin_regenerate_thumbnails') }}" class="button is-link">Generate thumbs ({{ mediaStats.thumbnailMissingCount }})</a>
+                    <a href="{{ path('app_admin_regenerate_thumbnails') }}" class="button is-link">Generate thumbs
+                        ({{ mediaStats.thumbnailMissingCount }})</a>
                 {% endif %}
 
                 {% if mediaStats.thumbnailObsoleteCount > 0 %}
-                    <a href="{{ path('app_admin_cleanup_thumbnails') }}" class="button is-link">Delete thumbs ({{ mediaStats.thumbnailObsoleteCount }})</a>
+                    <a href="{{ path('app_admin_cleanup_thumbnails') }}" class="button is-link">Delete thumbs
+                        ({{ mediaStats.thumbnailObsoleteCount }})</a>
                 {% endif %}
 
             </div>
