@@ -2,6 +2,9 @@ DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
 EXEC := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 JUST := just_executable() + " --justfile=" + justfile()
 
+default:
+    {{JUST}} --list
+
 install:
     cp --no-clobber .env.dist .env
     cp config/plugins.dist.php config/plugins.php
@@ -34,6 +37,17 @@ start:
 
 stop:
 	{{DOCKER}} down
+
+devMigrate:
+    {{EXEC}} php bin/console doctrine:migrations:migrate
+
+devFixtures:
+    {{EXEC}} php bin/console doctrine:fixtures:load
+
+devReset:
+    {{EXEC}} php bin/console doctrine:database:drop
+    {{EXEC}} php bin/console doctrine:database:create
+    {{JUST}} install
 
 dockerRebuild:
     {{DOCKER}} build --no-cache php
