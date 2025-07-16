@@ -38,10 +38,6 @@ stop:
 dockerRebuild:
     {{DOCKER}} build --no-cache php
 
-dockerNukeAll: stop
-    docker system prune --all --force
-    docker volume prune --all --force
-
 dockerEnter:
     {{DOCKER}} exec php bash
 
