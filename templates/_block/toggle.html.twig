@@ -1,5 +1,7 @@
 
-<div class="buttons has-addons is-right triggerToggleBlock">
+
+
+<div class="buttons has-addons is-right {% if noAjax is not defined %}triggerToggleBlock{% endif %}">
     <a href="{{ link }}" class="button is-small {% if status %}is-success{% endif %}" data-type="yes">{{ "toggle_yes"|trans }}</a>
     <a href="{{ link }}" class="button is-small {% if not status %}is-danger{% endif %}" data-type="no">{{ "toggle_no"|trans }}</a>
 </div>

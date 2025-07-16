@@ -20,7 +20,7 @@
                                 {% include '_block/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'notification'}),
                                     'status': user.isNotification,
-                                    'allowAjax': false
+                                    'noAjax': true
                                 } %}
                             </div>
                         </div>
