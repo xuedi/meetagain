@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\ImageType;
 use App\Repository\ConfigRepository;
 
-// TODO: add caches config repo stuff
 readonly class ConfigService
 {
     public function __construct(private ConfigRepository $repo)
@@ -51,8 +50,12 @@ readonly class ConfigService
         return $_ENV['APP_HOST'] ?? 'http://localhost';
     }
 
-    // TODO: implement caching
-    public function getBoolean(string $name, bool $default = false): bool
+    public function isShowFrontpage(): bool
+    {
+        return $this->getBoolean('show_frontpage', false);
+    }
+
+    private function getBoolean(string $name, bool $default = false): bool
     {
         $setting = $this->repo->findOneBy(['name' => $name]);
         if ($setting === null) {

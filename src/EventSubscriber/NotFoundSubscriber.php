@@ -4,12 +4,10 @@ namespace App\EventSubscriber;
 
 use App\Entity\NotFoundLog;
 use App\Service\CmsService;
-use App\Service\ConfigService;
 use App\Service\SitemapService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -24,7 +22,6 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
         private SitemapService $sitemapService,
         private RouterInterface $router,
         private EntityManagerInterface $em,
-        private ConfigService $configService,
     ) {
     }
 
@@ -51,7 +48,6 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
 
             // try stuff and special cases before actual 404
             $content = match (trim($path, '/')) {
-                '' => $this->handleFrontPage(),
                 'sitemap.xml' => $this->sitemapService->getContent('dragon-descendants.de'),
                 default => $this->cms->createNotFoundPage(),
             };
@@ -70,15 +66,5 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             $event->setResponse($content);
             $event->stopPropagation();
         }
-    }
-
-    private function handleFrontPage(): Response
-    {
-        if ($this->configService->getBoolean('show_frontpage', false)) {
-            return $this->cms->createFrontpage();
-        }
-
-        $url = $this->router->generate('app_default');
-        return new RedirectResponse($url)->setStatusCode(Response::HTTP_OK);
     }
 }

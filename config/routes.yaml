@@ -5,6 +5,10 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
 
+frontpage:
+    type: attribute
+    resource: ../src/Controller/NonLocale/FrontpageController.php
+
 api:
     type: attribute
     resource: ../src/Controller/NonLocale/ApiController.php
