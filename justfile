@@ -28,6 +28,8 @@ do +parameter='':
 
 start:
 	{{DOCKER}} up -d
+	{{EXEC}} mkdir -p var/log
+	{{EXEC}} touch var/log/dev.log
 	{{EXEC}} truncate -s 0 var/log/dev.log
 
 stop:
