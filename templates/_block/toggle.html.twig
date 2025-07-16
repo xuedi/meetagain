@@ -1,13 +1,5 @@
 
-{% if status %}
-    {% set yes = 'is-success' %}
-    {% set no = '' %}
-{% else %}
-    {% set no = 'is-danger' %}
-    {% set yes = '' %}
-{% endif %}
-
 <div class="buttons has-addons is-right triggerToggleBlock">
-    <a href="{{ link }}" class="button is-small {{ yes }}" data-type="yes">{{ "toggle_yes"|trans }}</a>
-    <a href="{{ link }}" class="button is-small {{ no }}" data-type="no">{{ "toggle_no"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {% if status %}is-success{% endif %}" data-type="yes">{{ "toggle_yes"|trans }}</a>
+    <a href="{{ link }}" class="button is-small {% if not status %}is-danger{% endif %}" data-type="no">{{ "toggle_no"|trans }}</a>
 </div>
