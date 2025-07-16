@@ -2,18 +2,15 @@
     <tbody>
     {% for item in config %}
         <tr>
-            <td>{{ item.name }}</td>
+            <td>{{ ("config_option_" ~ item.name)|trans }}</td>
             <td>
-                {# TODO: have new class as value entity handled by ConfigService #}
-                {% if item.type.value == 'boolean' %}
-                    {% set value = false %}
-                    {% if item.value == 'true' %}
-                        {% set value = true %}
-                    {% endif %}
+                {% if item.isBoolean %}
+
                     {% include '_block/toggle.html.twig' with {
                         'link': path('app_admin_system_boolean', {'name': item.name}),
-                        'status': value
+                        'status': item.getBoolean
                     } %}
+
                 {% endif %}
             </td>
         </tr>

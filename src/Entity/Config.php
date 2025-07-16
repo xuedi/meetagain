@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ConfigRepository;
 use Doctrine\ORM\Mapping as ORM;
+use LogicException;
 
 #[ORM\Entity(repositoryClass: ConfigRepository::class)]
 class Config
@@ -61,5 +62,19 @@ class Config
         $this->type = $type;
 
         return $this;
+    }
+
+    public function isBoolean(): bool
+    {
+        return $this->type === ConfigType::Boolean;
+    }
+
+    public function getBoolean(): bool
+    {
+        if (!$this->isBoolean()) {
+            throw new LogicException('Config is not boolean');
+        }
+
+        return $this->getValue() === 'true';
     }
 }
