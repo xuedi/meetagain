@@ -4,12 +4,10 @@ namespace App\DataFixtures;
 
 use App\Entity\Config;
 use App\Entity\ConfigType;
-use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class ConfigFixture extends Fixture implements DependentFixtureInterface
+class ConfigFixture extends Fixture
 {
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -27,23 +25,11 @@ class ConfigFixture extends Fixture implements DependentFixtureInterface
         echo 'OK' . PHP_EOL;
     }
 
-    #[\Override]
-    public function getDependencies(): array
-    {
-        return [
-            UserFixture::class,
-        ];
-    }
-
     private function getData(): array
     {
-        $importUser = $this->getReference('user_' . md5('import'), User::class);
         return [
-            ['pageUrl', 'http://localhost', ConfigType::String],
-            ['recurringTargetMonths', '60', ConfigType::Integer],
-            ['isOpenRegistration', 'true', ConfigType::Boolean],
-            ['isOffline', 'false', ConfigType::Boolean],
-            ['systemUser', $importUser->getEmail(), ConfigType::String],
+            ['automatic_registration', 'false', ConfigType::Boolean],
+            ['show_frontpage', 'false', ConfigType::Boolean],
         ];
     }
 }
