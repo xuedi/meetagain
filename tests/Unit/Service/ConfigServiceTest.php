@@ -3,16 +3,22 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\ImageType;
+use App\Repository\ConfigRepository;
 use App\Service\ConfigService;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ConfigServiceTest extends TestCase
 {
+    private MockObject|ConfigRepository $configRepoMock;
     private ConfigService $subject;
 
     protected function setUp(): void
     {
-        $this->subject = new ConfigService();
+        $this->configRepoMock = $this->createMock(ConfigRepository::class);
+        $this->subject = new ConfigService(
+            $this->configRepoMock
+        );
     }
 
     public function testGetThumbnailSizesForProfilePicture(): void
