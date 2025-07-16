@@ -6,6 +6,7 @@ use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
 use App\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 class LoginSubscriber implements EventSubscriberInterface
@@ -18,15 +19,19 @@ class LoginSubscriber implements EventSubscriberInterface
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
         $user = $event->getUser();
-        if (!$user instanceof User || !$user->isOsmConsent()) {
+        $request = $event->getRequest();
+        $session = $request->getSession();
+        if (!$user instanceof User) {
+            return;
+        }
+        $session->set('_locale', $user->getLocale());
+        if (!$user->isOsmConsent()) {
             return;
         }
 
-        $request = $event->getRequest();
-
-        $consent = Consent::getBySession($request->getSession());
+        $consent = Consent::getBySession($session);
         $consent->setOsm(ConsentType::Granted);
-        $request->getSession()->set('consent', $consent);
+        $session->set('consent', $consent);
         $consent->save($request->getSession());
 
         $response = $event->getResponse();
