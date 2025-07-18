@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.8.0-php8.4.10-bookworm
+FROM dunglas/frankenphp:1.9.0-php8.4.10-bookworm
 
 WORKDIR /var/www/html
 
