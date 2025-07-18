@@ -6,6 +6,7 @@ doctrine:
                 url: '%env(resolve:DATABASE_URL)%'
                 profiling_collect_backtrace: '%kernel.debug%'
                 use_savepoints: true
+                server_version: 'mariadb-11.8.2'
     orm:
         default_entity_manager: default
         auto_generate_proxy_classes: true

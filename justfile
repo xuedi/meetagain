@@ -45,7 +45,7 @@ devFixtures:
     {{EXEC}} php bin/console doctrine:fixtures:load
 
 devReset:
-    {{EXEC}} php bin/console doctrine:database:drop
+    {{EXEC}} php bin/console doctrine:database:drop --force
     {{EXEC}} php bin/console doctrine:database:create
     {{JUST}} install
 

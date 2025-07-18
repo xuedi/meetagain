@@ -20,8 +20,8 @@ services:
     tty: true
 
   mariadb:
-    image: mariadb
-    container_name: "${MARIADB_HOST}"
+    image: mariadb:11.8.2
+    container_name: "ma-db"
     volumes:
       - ma-mysql-data:/var/lib/mysql
     ports:
@@ -35,7 +35,7 @@ services:
 
   mailhog:
     container_name: "ma-mailhog"
-    image: mailhog/mailhog
+    image: mailhog/mailhog:v1.0.1
     user: ${HOST_UID}:${HOST_GID}
     ports:
       - "1025:1025"
