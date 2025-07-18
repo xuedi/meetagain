@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Message;
+use App\Entity\Session\Consent;
+use App\Entity\Session\ConsentType;
 use App\Entity\User;
 use App\Entity\ActivityType;
 use App\Entity\UserStatus;
@@ -17,6 +19,7 @@ use App\Service\GlobalService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +53,22 @@ class SecurityController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+
+    #[Route(path: '/logout', name: 'app_security_logout')]
+    public function logout(Security $security, Request $request): Response
+    {
+        $user = $this->getAuthedUser();
+        $osm = $user->isOsmConsent() ? ConsentType::Granted : ConsentType::Denied;
+
+        $security->logout(false);
+
+        $consent = Consent::createByCookies($request->cookies);
+        $consent->setCookies(ConsentType::Granted);
+        $consent->setOsm($osm);
+        $consent->save($request->getSession());
+
+        return $this->redirectToRoute('app_login');
     }
 
     #[Route('/register', name: 'app_register')]
