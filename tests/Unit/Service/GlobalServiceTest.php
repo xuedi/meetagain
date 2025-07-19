@@ -4,6 +4,9 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Config;
 use App\Entity\ImageType;
+use App\Entity\Session\Consent;
+use App\Entity\Session\ConsentType;
+use App\Entity\User;
 use App\Repository\ConfigRepository;
 use App\Repository\UserRepository;
 use App\Service\ConfigService;
@@ -15,9 +18,12 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class GlobalServiceTest extends TestCase
 {
@@ -92,5 +98,195 @@ class GlobalServiceTest extends TestCase
             ->willReturn($expectedPlugins);
 
         $this->assertEquals($expectedPlugins, $this->subject->getPlugins());
+    }
+
+    public function testGetUserName(): void
+    {
+        $userId = 42;
+        $expectedName = 'John Doe';
+        
+        $userMock = $this->createMock(User::class);
+        $userMock
+            ->method('getName')
+            ->willReturn($expectedName);
+            
+        $this->userRepositoryMock
+            ->method('findOneBy')
+            ->with(['id' => $userId])
+            ->willReturn($userMock);
+            
+        $this->assertEquals($expectedName, $this->subject->getUserName($userId));
+    }
+
+    public function testHasNewMessagesTrue(): void
+    {
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock
+            ->method('get')
+            ->with('hasNewMessage', false)
+            ->willReturn(true);
+
+        $requestMock = $this->createMock(Request::class);
+        $requestMock
+            ->method('getSession')
+            ->willReturn($sessionMock);
+
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
+
+        $this->assertTrue($this->subject->hasNewMessages());
+    }
+
+    public function testHasNewMessagesFalse(): void
+    {
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock
+            ->method('get')
+            ->with('hasNewMessage', false)
+            ->willReturn(false);
+
+        $requestMock = $this->createMock(Request::class);
+        $requestMock
+            ->method('getSession')
+            ->willReturn($sessionMock);
+
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
+
+        $this->assertFalse($this->subject->hasNewMessages());
+    }
+
+    public function testHasNewMessagesNoRequest(): void
+    {
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn(null);
+
+        $this->assertFalse($this->subject->hasNewMessages());
+    }
+
+    public function testGetShowCookieConsentNoSession(): void
+    {
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn(null);
+
+        $this->assertTrue($this->subject->getShowCookieConsent());
+    }
+
+    public function testGetShowCookieConsentUnknown(): void
+    {
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock
+            ->method('get')
+            ->willReturn('{}');
+
+        $requestMock = $this->createMock(Request::class);
+        $requestMock
+            ->method('getSession')
+            ->willReturn($sessionMock);
+
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
+
+        $this->assertTrue($this->subject->getShowCookieConsent());
+    }
+
+    public function testGetShowOsmNoSession(): void
+    {
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn(null);
+
+        $this->assertTrue($this->subject->getShowOsm());
+    }
+
+    public function testGetShowOsmNoSessionGranted(): void
+    {
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock
+            ->method('get')
+            ->willReturn( '{"consent_cookies_osm": "granted"}');
+
+        $requestMock = $this->createMock(Request::class);
+        $requestMock
+            ->method('getSession')
+            ->willReturn($sessionMock);
+
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
+
+        $this->assertTrue($this->subject->getShowOsm());
+    }
+
+    public function testGetAdminAttentionTrue(): void
+    {
+        $this->dashboardServiceMock
+            ->method('getNeedForApproval')
+            ->willReturn(['item1', 'item2']);
+
+        $this->assertTrue($this->subject->getAdminAttention());
+    }
+
+    public function testGetAdminAttentionFalse(): void
+    {
+        $this->dashboardServiceMock
+            ->method('getNeedForApproval')
+            ->willReturn([]);
+
+        $this->assertFalse($this->subject->getAdminAttention());
+    }
+
+    public function testGetAlternativeLanguageCodesNoRequest(): void
+    {
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn(null);
+
+        $this->assertEquals([], $this->subject->getAlternativeLanguageCodes());
+    }
+
+    public function testGetAlternativeLanguageCodesProfilerUri(): void
+    {
+        $requestMock = $this->createMock(Request::class);
+        $requestMock
+            ->method('getRequestUri')
+            ->willReturn('/_profiler/some/path');
+
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
+
+        $this->assertEquals([], $this->subject->getAlternativeLanguageCodes());
+    }
+
+    public function testGetAlternativeLanguageCodes(): void
+    {
+        $currentLocale = 'en';
+        $currentUri = '/some/path';
+        $expectedAltLangList = ['de' => '/de/some/path', 'fr' => '/fr/some/path'];
+
+        $requestMock = $this->createMock(Request::class);
+        $requestMock
+            ->method('getRequestUri')
+            ->willReturn($currentUri);
+        $requestMock
+            ->method('getLocale')
+            ->willReturn($currentLocale);
+
+        $this->requestStackMock
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
+
+        $this->translationServiceMock
+            ->method('getAltLangList')
+            ->with($currentLocale, $currentUri)
+            ->willReturn($expectedAltLangList);
+
+        $this->assertEquals($expectedAltLangList, $this->subject->getAlternativeLanguageCodes());
     }
 }
