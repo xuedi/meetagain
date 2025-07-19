@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,16 +13,15 @@ use Imagick;
 use ImagickException;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 readonly class ImageService
 {
     public function __construct(
         private ImageRepository $imageRepo,
-        private Filesystem $filesystem,
         private EntityManagerInterface $entityManager,
         private ConfigService $configService,
+        private ExtendedFilesystem $filesystem,
         private LoggerInterface $logger,
         private string $kernelProjectDir,
     )
@@ -63,7 +63,7 @@ readonly class ImageService
         $sizes = $this->configService->getThumbnailSizes($imageType);
         foreach ($sizes as [$width, $height]) {
             $target = $this->getThumbnailFile($image, $width, $height);
-            if (file_exists($target)) {
+            if ($this->filesystem->fileExists($target)) {
                 continue;
             }
 
@@ -110,7 +110,7 @@ readonly class ImageService
 
         $thumpFileList = [];
         $sizeListCount = $this->configService->getThumbnailSizeList();
-        foreach (scandir($this->getThumbnailDir()) as $file) {
+        foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
             if (str_starts_with($file, '.')) {
                 continue;
             }
@@ -146,7 +146,7 @@ readonly class ImageService
         $imageList = $this->imageRepo->getFileList();
 
         $list = [];
-        foreach (scandir($this->getThumbnailDir()) as $file) {
+        foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
             if (str_starts_with($file, '.')) {
                 continue;
             }
@@ -171,6 +171,7 @@ readonly class ImageService
         foreach ($this->getObsoleteThumbnails() as $file) {
             if ($this->filesystem->exists($this->getThumbnailDir() . $file)) {
                 $this->filesystem->remove($this->getThumbnailDir() . $file);
+                $cnt++;
             }
         }
 

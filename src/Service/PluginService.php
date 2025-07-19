@@ -2,20 +2,14 @@
 
 namespace App\Service;
 
-use App\Plugin as PluginInterface;
-use Exception;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use App\ExtendedFilesystem;
 
 readonly class PluginService
 {
     public const string CONFIG_DIR = __DIR__ . '/../../config';
     public const string PLUGIN_DIR = __DIR__ . '/../../plugins';
 
-    public function __construct(
-        #[AutowireIterator(PluginInterface::class)]
-        private iterable $plugins,
-        private CommandService $commandService,
-    )
+    public function __construct(private CommandService $commandService, private ExtendedFilesystem $filesystem)
     {
     }
 
@@ -26,10 +20,14 @@ readonly class PluginService
             $chunks = explode('/', $pluginPath);
             $pluginKey = end($chunks);
             $manifest = $pluginPath . '/manifest.json';
-            if (!file_exists($manifest)) {
+            if (!$this->filesystem->fileExists($manifest)) {
                 continue;
             }
-            $pluginData = json_decode(file_get_contents($manifest), true);
+            $manifestContent = $this->filesystem->getFileContents($manifest);
+            if ($manifestContent === false) {
+                continue;
+            }
+            $pluginData = json_decode($manifestContent, true);
             $plugins[] = [
                 'name' => $pluginData['name'],
                 'version' => $pluginData['version'],
@@ -97,13 +95,19 @@ readonly class PluginService
 
     private function parsePluginDir(): array
     {
-        $pluginDir = realpath(self::PLUGIN_DIR);
-        return glob($pluginDir . '/*', GLOB_ONLYDIR);
+        $pluginDir = $this->filesystem->getRealPath(self::PLUGIN_DIR);
+        if ($pluginDir === false) {
+            return [];
+        }
+        return $this->filesystem->glob($pluginDir . '/*', GLOB_ONLYDIR);
     }
 
     private function getPluginConfig(): array
     {
-        $configPath = realpath(self::CONFIG_DIR);
+        $configPath = $this->filesystem->getRealPath(self::CONFIG_DIR);
+        if ($configPath === false) {
+            return [];
+        }
         $configFile = $configPath . '/plugins.php';
 
         return include $configFile;
@@ -111,14 +115,17 @@ readonly class PluginService
 
     public function setPluginConfig(array $config): void
     {
-        $configPath = realpath(self::CONFIG_DIR);
+        $configPath = $this->filesystem->getRealPath(self::CONFIG_DIR);
+        if ($configPath === false) {
+            return;
+        }
         $configFile = $configPath . '/plugins.php';
         $configItems = [];
         foreach ($config as $key => $value) {
             $configItems[] = "'" . $key . "' => " . ($value ? 'true' : 'false');
         }
         $content = "<?php declare(strict_types=1); return [" . implode(',', $configItems) . "];";
-        file_put_contents($configFile, $content);
+        $this->filesystem->putFileContents($configFile, $content);
 
         $this->commandService->clearCache();
     }

@@ -2,13 +2,17 @@
 
 namespace App\Twig;
 
+use App\ExtendedFilesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class AssetExistsExtension extends AbstractExtension
 {
-    public function __construct(private readonly string $kernelProjectDir)
+    public function __construct(
+        private readonly string $kernelProjectDir,
+        private readonly ExtendedFilesystem $filesystem,
+    )
     {
     }
 
@@ -23,9 +27,12 @@ class AssetExistsExtension extends AbstractExtension
     public function assetExists($path): bool
     {
         $assets = $this->kernelProjectDir . '/assets/';
-        $toCheck = realpath($assets . $path);
+        $toCheck = $this->filesystem->getRealPath($assets . $path);
+        if ($toCheck === false) {
+            return false;
+        }
 
-        return is_file($toCheck);
+        return $this->filesystem->isFile($toCheck);
     }
 
     public function getName(): string

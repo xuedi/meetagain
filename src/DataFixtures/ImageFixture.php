@@ -6,6 +6,7 @@ use App\Entity\CmsBlock;
 use App\Entity\Event;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\ExtendedFilesystem;
 use App\Service\ImageService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -19,6 +20,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         private readonly ImageService $imageService,
         private readonly UserFixture $userFixture,
         private readonly EventFixture $eventFixture,
+        private readonly ExtendedFilesystem $filesystem,
     ) {
     }
 
@@ -119,11 +121,10 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
     private function getEventPhotos(): array
     {
         $path = __DIR__ . '/EventPhotos';
-        if (!is_dir($path)) {
+        if (!$this->filesystem->isDirectory($path)) {
             return [];
         }
 
-        $files = glob($path . '/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
-        return $files ?: [];
+        return $this->filesystem->glob($path . '/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
     }
 }
