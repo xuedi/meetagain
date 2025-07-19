@@ -17,13 +17,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class CommandService
 {
-    public function __construct(
-        private KernelInterface $kernel,
-        private string $kernelProjectDir,
-        #[AutowireIterator(Plugin::class)]
-        private iterable $plugins,
-        private ParameterBagInterface $appParams,
-    )
+    public function __construct(private KernelInterface $kernel, private ParameterBagInterface $appParams)
     {
     }
 
@@ -49,12 +43,7 @@ readonly class CommandService
 
     public function executeMigrations(): string
     {
-        $output = '';
-        foreach ($this->plugins as $plugin) {
-            $output .= $this->execute(new ExecuteMigrationsCommand($plugin->getName(), $this->kernelProjectDir)) . PHP_EOL;
-        }
-
-        return $output;
+        return $this->execute(new ExecuteMigrationsCommand()) . PHP_EOL;
     }
 
     public function extractTranslations(): string

@@ -2,18 +2,23 @@
 
 namespace App\Service\Command;
 
-readonly class ExecuteMigrationsCommand implements CommandInterface
+readonly class EchoCommand implements CommandInterface
 {
+    public function __construct(private string $message)
+    {
+
+    }
+
     public function getCommand(): string
     {
-        return 'doctrine:migrations:migrate';
+        return 'app:echo';
     }
 
     public function getParameter(): array
     {
         return [
             'command' => $this->getCommand(),
-            '--no-interaction' => true,
+            $this->message => null,
         ];
     }
 }

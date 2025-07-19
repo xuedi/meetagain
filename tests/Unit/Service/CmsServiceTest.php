@@ -2,18 +2,11 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\Activity;
 use App\Entity\Cms;
-use App\Entity\Image;
-use App\Entity\User;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
-use App\Repository\ImageRepository;
-use App\Repository\UserRepository;
-use App\Service\CleanupService;
 use App\Service\CmsService;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
