@@ -12,7 +12,6 @@ use Imagick;
 use ImagickException;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
