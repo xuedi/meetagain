@@ -35,5 +35,8 @@ smoothly with the docker container, the config has to be bent a bit.
 COMPOSE_ENV_FILES=../.env # env parameter for phpstorm docker remote php interpreter
 ```
 
+### Insights
+![Alt](https://repobeats.axiom.co/api/embed/e864b7990dd563003e91dc7f2d92bf09103aa917.svg "Repobeats analytics image")
+
 ---
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=76XY2B8VZPTXL)
