@@ -2,11 +2,18 @@
 
 namespace Tests\Unit\Service;
 
+use App\Entity\EventFilterRsvp;
+use App\Entity\EventFilterSort;
+use App\Entity\EventFilterTime;
+use App\Entity\EventTypes;
 use App\Repository\EventRepository;
 use App\Service\EventService;
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\LazyCriteriaCollection;
+use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -108,5 +115,44 @@ class EventServiceTest extends TestCase
             $expected->format('Y-m-d H:i:s'),
             $actual->format('Y-m-d H:i:s')
         );
+    }
+
+    #[DataProvider('getFilteredListMatrix')]
+    public function testGetFilteredList(
+        EventFilterTime $time,
+        EventFilterSort $sort,
+        EventTypes $types,
+        EventFilterRsvp $rsvp,
+        Criteria $expectedCriteria,
+    ): void
+    {
+        $collectionMock = $this->createMock(LazyCriteriaCollection::class);
+        $collectionMock
+            ->expects($this->once())
+            ->method('toArray')
+            ->willReturn([]);
+
+        $this->eventRepoMock
+            ->expects($this->once())
+            ->method('matching')
+            ->with($expectedCriteria)
+            ->willReturn($collectionMock);;
+
+        $this->subject->getFilteredList($time, $sort, $types, $rsvp);
+    }
+
+    public static function getFilteredListMatrix(): Generator
+    {
+        yield [
+            EventFilterTime::All,
+            EventFilterSort::NewToOld,
+            EventTypes::All,
+            EventFilterRsvp::All,
+            new Criteria()
+                ->orderBy(['start' => 'desc'])
+                ->where(Criteria::expr()->not(Criteria::expr()->eq('id', 0)))
+                ->andWhere(Criteria::expr()->not(Criteria::expr()->eq('id', 0)))
+                ->andWhere(Criteria::expr()->eq('published', true))
+        ];
     }
 }
