@@ -12,9 +12,9 @@ class Login extends MessageAbstract
         return ActivityType::Login;
     }
 
-    public function validate(): void
+    public function validate(): bool
     {
-        //
+        return true;
     }
 
     protected function renderText(): string

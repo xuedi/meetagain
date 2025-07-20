@@ -12,9 +12,9 @@ class PasswordReset extends MessageAbstract
         return ActivityType::PasswordReset;
     }
 
-    public function validate(): void
+    public function validate(): bool
     {
-        //
+        return true;
     }
 
     protected function renderText(): string

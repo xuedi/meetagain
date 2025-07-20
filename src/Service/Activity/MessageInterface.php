@@ -20,5 +20,5 @@ interface MessageInterface
 
     public function render(bool $asHtml = false): string;
 
-    public function validate(): void;
+    public function validate(): bool;
 }

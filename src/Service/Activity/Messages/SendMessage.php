@@ -12,10 +12,12 @@ class SendMessage extends MessageAbstract
         return ActivityType::SendMessage;
     }
 
-    public function validate(): void
+    public function validate(): bool
     {
         $this->ensureHasKey('user_id');
         $this->ensureIsNumeric('user_id');
+
+        return true;
     }
 
     protected function renderText(): string

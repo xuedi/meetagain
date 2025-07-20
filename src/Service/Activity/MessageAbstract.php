@@ -12,6 +12,7 @@ abstract class MessageAbstract implements MessageInterface
     protected array $userNames = [];
     protected array $eventNames = [];
 
+    // TODO: add translator
     public function injectServices(
         RouterInterface $router,
         ?array $meta = [],

@@ -12,9 +12,9 @@ class RegistrationEmailConfirmed extends MessageAbstract
         return ActivityType::RegistrationEmailConfirmed;
     }
 
-    public function validate(): void
+    public function validate(): bool
     {
-        //
+        return true;
     }
 
     protected function renderText(): string

@@ -13,12 +13,14 @@ class ReportedImage extends MessageAbstract
         return ActivityType::ReportedImage;
     }
 
-    public function validate(): void
+    public function validate(): bool
     {
         $this->ensureHasKey('image_id');
         $this->ensureIsNumeric('image_id');
         $this->ensureHasKey('reason');
         $this->ensureIsNumeric('reason');
+
+        return true;
     }
 
     protected function renderText(): string

@@ -12,10 +12,12 @@ class RsvpYes extends MessageAbstract
         return ActivityType::RsvpYes;
     }
 
-    public function validate(): void
+    public function validate(): bool
     {
         $this->ensureHasKey('event_id');
         $this->ensureIsNumeric('event_id');
+
+        return true;
     }
 
     protected function renderText(): string
