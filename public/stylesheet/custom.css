@@ -18,6 +18,12 @@ body {
     height: 40px;
 }
 
+.is-pulled-top-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
 #eventFilter {
     .field {
         display: inline;

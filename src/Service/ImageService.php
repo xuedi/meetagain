@@ -14,6 +14,7 @@ use ImagickException;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Twig\Environment;
 
 readonly class ImageService
 {
@@ -23,6 +24,7 @@ readonly class ImageService
         private ConfigService $configService,
         private ExtendedFilesystem $filesystem,
         private LoggerInterface $logger,
+        private Environment $twig,
         private string $kernelProjectDir,
     )
     {
@@ -153,11 +155,11 @@ readonly class ImageService
             list($fileName, $fileType) = explode('.', $file);
             list($hash, $size) = explode('_', $fileName);
             list($width, $height) = explode('x', $size);
-            if(!isset($imageList[$hash])) {
+            if (!isset($imageList[$hash])) {
                 $list[] = $file;
                 continue;
             }
-            if(!$this->configService->isValidThumbnailSize($imageList[$hash], (int)$width, (int)$height)) {
+            if (!$this->configService->isValidThumbnailSize($imageList[$hash], (int)$width, (int)$height)) {
                 $list[] = $file;
             }
         }
@@ -176,6 +178,15 @@ readonly class ImageService
         }
 
         return $cnt;
+    }
+
+    public function imageTemplateById(int $id): string
+    {
+        $image = $this->imageRepo->findOneBy(['id' => $id]);
+        return $this->twig->render('_block/image.html.twig', [
+            'image' => $image,
+            'size' => '50x50',
+        ]);
     }
 
     private function getSourceFile(Image $image): string

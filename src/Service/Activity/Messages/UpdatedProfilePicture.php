@@ -14,6 +14,11 @@ class UpdatedProfilePicture extends MessageAbstract
 
     public function validate(): bool
     {
+        $this->ensureHasKey('old');
+        $this->ensureIsNumeric('old');
+        $this->ensureHasKey('new');
+        $this->ensureIsNumeric('new');
+
         return true;
     }
 
@@ -24,6 +29,13 @@ class UpdatedProfilePicture extends MessageAbstract
 
     protected function renderHtml(): string
     {
-        return 'User changed their profile picture';
+        $box = '<div class="is-pulled-top-right">%s<i class="fa-solid fa-arrow-right"></i>%s</div>';
+        $msgTemplate = 'User changed their profile picture' . $box;
+
+        return sprintf(
+            $msgTemplate,
+            $this->imageService->imageTemplateById($this->meta['old']),
+            $this->imageService->imageTemplateById($this->meta['new'])
+        );
     }
 }

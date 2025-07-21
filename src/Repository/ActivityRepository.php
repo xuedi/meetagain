@@ -38,6 +38,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->setParameter('types', [
                 ActivityType::ChangedUsername->value,
                 ActivityType::EventImageUploaded->value,
+                ActivityType::UpdatedProfilePicture->value,
             ])
             ->getQuery()
             ->getResult();
@@ -46,6 +47,7 @@ class ActivityRepository extends ServiceEntityRepository
         foreach ($userActivities as $userActivity) {
             $activityUserId = $userActivity->getUser()->getId();
             switch ($userActivity->getType()->value) {
+
                 // username change of people the user follows
                 case ActivityType::ChangedUsername->value:
                     if (in_array($activityUserId, $following)) {
@@ -57,6 +59,13 @@ class ActivityRepository extends ServiceEntityRepository
                 case ActivityType::EventImageUploaded->value:
                     $eventId = $userActivity->getMeta()['event_id'];
                     if (in_array($activityUserId, $following) || in_array($eventId, $events)) {
+                        $activities[] = $userActivity->getId();
+                    }
+                    break;
+
+                // uploaded a new profile picture of the people I follow or mine
+                case ActivityType::UpdatedProfilePicture->value:
+                    if (in_array($activityUserId, $following) || $user->getId() === $activityUserId) {
                         $activities[] = $userActivity->getId();
                     }
                     break;

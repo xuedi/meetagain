@@ -21,8 +21,9 @@ class UpdatedProfilePictureTest extends TestCase
     {
         $expectedText = 'User changed their profile picture';
         $expectedHtml = 'User changed their profile picture';
+        $meta = ['old' => 0, 'new' => 1];;
 
-        $subject = new UpdatedProfilePicture()->injectServices($this->router);
+        $subject = new UpdatedProfilePicture()->injectServices($this->router, $meta);
 
         // check returns
         $this->assertTrue($subject->validate());

@@ -68,23 +68,27 @@ class ImageUploadController extends AbstractController
     #[Route('/image/{entity}/{id}/select/{newImage}', name: 'app_replace_image_select', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
     public function select(string $entity, int $id, int $newImage): Response
     {
-        $imageEntity = $this->prepare($entity, $id)['entity'];
-        $imageEntity->setImage($this->em->getRepository(Image::class)->findOneBy(['id' => $newImage]));
+        $entityName = $entity;
+        $entity = $this->prepare($entityName, $id)['entity'];
+        $previousImage = $entity?->getImage()?->getId() ?? 0;
+        $entity->setImage($this->em->getRepository(Image::class)->findOneBy(['id' => $newImage]));
 
-        $this->em->persist($imageEntity);
+        $this->em->persist($entity);
         $this->em->flush();
 
-        $this->logActivity($entity);
+        $this->logActivity($entityName, $previousImage, $newImage);
 
-        return $this->returnBackToImage($entity, $id);
+        return $this->returnBackToImage($entityName, $id);
     }
 
     #[Route('/image/{entity}/{id}/upload/replacement', name: 'app_replace_image_upload', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'], methods: ['POST'])]
     public function upload(Request $request, string $entity, int $id): Response
     {
-        $data = $this->prepare($entity, $id);
-        $imageEntity = $data['entity'];
+        $entityName = $entity;
+        $data = $this->prepare($entityName, $id);
+        $entity = $data['entity'];
         $imageType = $data['imageType'];
+        $previousImage = $entity?->getImage()?->getId() ?? 0;
 
         $form = $this->createForm(ImageUploadType::class);
         $form->handleRequest($request);
@@ -99,15 +103,15 @@ class ImageUploadController extends AbstractController
                 $this->em->flush();
 
                 // associate image with the entity
-                $imageEntity->setImage($image);
-                $this->em->persist($imageEntity);
+                $entity->setImage($image);
+                $this->em->persist($entity);
                 $this->em->flush();
 
-                $this->logActivity($entity);
+                $this->logActivity($entityName, $previousImage, $entity->getImage()->getId());
             }
         }
 
-        return $this->returnBackToImage($entity, $id);
+        return $this->returnBackToImage($entityName, $id);
     }
 
     #[Route('/add_image/{entity}/{id}', name: 'app_image_add', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
@@ -200,10 +204,13 @@ class ImageUploadController extends AbstractController
         }
     }
 
-    private function logActivity(string $entity): void
+    private function logActivity(string $entity, int $previous, int $new): void
     {
         if ($entity === 'user') {
-            $this->activityService->log(ActivityType::UpdatedProfilePicture, $this->getAuthedUser());
+            $this->activityService->log(ActivityType::UpdatedProfilePicture, $this->getAuthedUser(), [
+                'old' => $previous,
+                'new' => $new,
+            ]);
         }
     }
 }

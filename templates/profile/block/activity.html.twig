@@ -8,12 +8,12 @@
         </div>
         <div class="media-content">
             <div class="content">
-                <p>
+                <div class="is-relative">
                     <strong class="mr-2">{{ activity.user.name }}</strong>
                     <small>{{ activity.createdAt|time_diff }}</small>
-                    <br />
+                    <br>
                     {{ activity.message|raw }}
-                </p>
+                </div>
             </div>
         </div>
     </article>
