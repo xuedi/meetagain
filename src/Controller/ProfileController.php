@@ -42,12 +42,6 @@ class ProfileController extends AbstractController
         $form = $this->createForm(ProfileType::class, $this->getAuthedUser());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // ensure form has expected type
-            $image = null;
-            $imageData = $form->get('image')->getData();
-            if ($imageData instanceof UploadedFile) {
-                $image = $imageService->upload($imageData, $this->getAuthedUser(), ImageType::ProfilePicture);
-            }
 
             $newUserName = $form->get('name')->getData();
             if ($oldUserName !== $newUserName) {
@@ -60,20 +54,13 @@ class ProfileController extends AbstractController
             $user->setLocale($form->get('languages')->getData());
             $user->setPublic($form->get('public')->getData());
 
-            if ($image instanceof Image) {
-                $user->setImage($image);
-            }
-
             $entityManager->persist($user);
             $entityManager->flush();
-            if ($image instanceof Image) {
-                $imageService->createThumbnails($image);
-            }
 
             return $this->redirectToRoute('app_profile');
         }
 
-        $modal = $imageUploadController->modal('user', $user->getId(), true)->getContent();
+        $modal = $imageUploadController->imageReplaceModal('user', $user->getId(), true)->getContent();
 
         return $this->render('profile/index.html.twig', [
             'modal' => $modal,

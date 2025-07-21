@@ -21,6 +21,7 @@ use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 //TODO: move lots of logic to service
@@ -52,8 +53,10 @@ class AdminCmsController extends AbstractController
     }
 
     #[Route('/admin/cms/{id}/edit/{locale}/{blockId}', name: 'app_admin_cms_edit', requirements: ['locale' => 'en|de|cn'], methods: ['GET', 'POST'])]
-    public function cmsEdit(Request $request, Cms $cms, string $locale = 'en', ?int $blockId = null): Response
+    public function cmsEdit(Request $request, Cms $cms, string $locale = null, ?int $blockId = null): Response
     {
+        $locale = $this->getLastEditLocale($locale, $request->getSession());
+
         $form = $this->createForm(CmsType::class, $cms);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -255,5 +258,16 @@ class AdminCmsController extends AbstractController
             $this->em->persist($block);
         }
         $this->em->flush();
+    }
+
+    private function getLastEditLocale(?string $locale, SessionInterface $session): string
+    {
+        $lastEditLocaleKey = 'lastEditLocale';
+        if ($locale === null) {
+            $locale = $session->get($lastEditLocaleKey, 'en');
+        }
+        $session->set($lastEditLocaleKey, $locale);;
+
+        return $locale;
     }
 }

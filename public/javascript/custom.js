@@ -1,3 +1,5 @@
+
+
 // backenders attempt to create a fetch wrapper
 function maFetch(url, isXml = false, formData) {
     const options = (isXml) ? {
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// confirm cookie consent jia ajax
+// confirm cookie consent jia ajax TODO: use modern foreach
 document.addEventListener('DOMContentLoaded', function () {
     let cookieTrigger = document.getElementsByClassName('cookieTrigger');
     for (let i = 0; i < cookieTrigger.length; i++) {
@@ -103,46 +105,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// modals TODO use this clean style(?) of javascript for everything else
+// modal open and closer, independent of the content
 document.addEventListener('DOMContentLoaded', () => {
-    function openModal($el) {
-        $el.classList.add('is-active');
-    }
+    document.querySelectorAll('.modalTrigger').forEach((trigger) => {
+        trigger.addEventListener('click', event => {
+            event.preventDefault();
 
-    function closeModal($el) {
-        $el.classList.remove('is-active');
-    }
+            const modalSelector = event.currentTarget.dataset.target;
+            const modal = document.getElementById(modalSelector);
+            const modalClose = modal.querySelector('.modal-close');
 
-    function closeAllModals() {
-        (document.querySelectorAll('.modal') || []).forEach(($modal) => {
-            closeModal($modal);
+            modalClose.addEventListener('click', () => {
+                modal.classList.remove('is-active');
+            })
+
+            modal.classList.add('is-active');
         });
-    }
-
-    // Add a click event on buttons to open a specific modal
-    (document.querySelectorAll('.modalTrigger') || []).forEach(($trigger) => {
-        const modal = $trigger.dataset.target;
-        const $target = document.getElementById(modal);
-
-        $trigger.addEventListener('click', () => {
-            openModal($target);
-        });
-    });
-
-    // Add a click event on various child elements to close the parent modal
-    (document.querySelectorAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button') || []).forEach(($close) => {
-        const $target = $close.closest('.modal');
-
-        $close.addEventListener('click', () => {
-            closeModal($target);
-        });
-    });
-
-    // Add a keyboard event to close all modals
-    document.addEventListener('keydown', (event) => {
-        if (event.key === "Escape") {
-            closeAllModals();
-        }
     });
 });
 
@@ -158,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
 //                location.reload();
 //            });
 
-//
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.fileUploadTrigger') || []).forEach((trigger) => {
         trigger.addEventListener('change', event => {
