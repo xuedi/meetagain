@@ -9,10 +9,12 @@ use App\Repository\UserRepository;
 use App\Service\Activity\MessageFactory;
 use App\Service\Activity\MessageInterface;
 use App\Service\GlobalService;
+use App\Service\ImageService;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class MessageFactoryTest extends TestCase
 {
@@ -21,6 +23,7 @@ class MessageFactoryTest extends TestCase
     private MockObject|EventRepository $eventRepository;
     private MockObject|GlobalService $globalService;
     private MockObject|MessageInterface $message;
+    private MockObject|ImageService $imageService;
     private MockObject|Activity $activity;
     private array $messages;
 
@@ -32,6 +35,7 @@ class MessageFactoryTest extends TestCase
         $this->globalService = $this->createMock(GlobalService::class);
         $this->message = $this->createMock(MessageInterface::class);
         $this->activity = $this->createMock(Activity::class);
+        $this->imageService = $this->createMock(ImageService::class);
         $this->messages = [$this->message];
     }
 
@@ -58,7 +62,8 @@ class MessageFactoryTest extends TestCase
             $this->router,
             $this->userRepository,
             $this->eventRepository,
-            $this->globalService
+            $this->globalService,
+            $this->imageService
         );
 
         // Call the method under test
@@ -83,7 +88,8 @@ class MessageFactoryTest extends TestCase
             $this->router,
             $this->userRepository,
             $this->eventRepository,
-            $this->globalService
+            $this->globalService,
+            $this->imageService
         );
 
         // Expect exception

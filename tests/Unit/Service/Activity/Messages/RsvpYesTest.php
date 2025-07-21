@@ -8,14 +8,17 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use App\Service\ImageService;
 
 class RsvpYesTest extends TestCase
 {
     private MockObject|RouterInterface $router;
+    private MockObject|ImageService $imageService;
 
     public function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
+        $this->imageService = $this->createMock(ImageService::class);
     }
 
     public function testCanBuild(): void
@@ -29,7 +32,7 @@ class RsvpYesTest extends TestCase
         $eventNames = [$eventId => $eventName];
 
         $subject = new RsvpYes();
-        $subject->injectServices($this->router, $meta, [], $eventNames);
+        $subject->injectServices($this->router, $this->imageService, $meta, [], $eventNames);
 
         // check returns
         $this->assertTrue($subject->validate());
@@ -45,7 +48,7 @@ class RsvpYesTest extends TestCase
         );
 
         $subject = new RsvpYes();
-        $subject->injectServices($this->router, []);
+        $subject->injectServices($this->router, $this->imageService, []);
         $subject->validate();
     }
 
@@ -56,7 +59,7 @@ class RsvpYesTest extends TestCase
         );
 
         $subject = new RsvpYes();
-        $subject->injectServices($this->router, ['event_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number']);
         $subject->validate();
     }
 }

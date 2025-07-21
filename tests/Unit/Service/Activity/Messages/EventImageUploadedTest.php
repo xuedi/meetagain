@@ -8,14 +8,17 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use App\Service\ImageService;
 
 class EventImageUploadedTest extends TestCase
 {
     private MockObject|RouterInterface $router;
+    private MockObject|ImageService $imageService;
 
     public function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
+        $this->imageService = $this->createMock(ImageService::class);
     }
 
     public function testCanBuild(): void
@@ -36,7 +39,7 @@ class EventImageUploadedTest extends TestCase
             ->willReturn($eventUrl);
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $meta, [], $eventNames);
+        $subject->injectServices($this->router, $this->imageService, $meta, [], $eventNames);
 
         // check returns
         $this->assertTrue($subject->validate());
@@ -52,7 +55,7 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, ['images' => 3]);
+        $subject->injectServices($this->router, $this->imageService, ['images' => 3]);
         $subject->validate();
     }
 
@@ -63,7 +66,7 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, ['event_id' => 'not-a-number', 'images' => 3]);
+        $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number', 'images' => 3]);
         $subject->validate();
     }
 
@@ -74,7 +77,7 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, ['event_id' => 42]);
+        $subject->injectServices($this->router, $this->imageService, ['event_id' => 42]);
         $subject->validate();
     }
 
@@ -85,7 +88,7 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, ['event_id' => 42, 'images' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, ['event_id' => 42, 'images' => 'not-a-number']);
         $subject->validate();
     }
 }

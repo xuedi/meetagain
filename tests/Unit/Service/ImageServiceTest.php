@@ -15,6 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Twig\Environment;
 
 /**
  * Test for ImageService that uses the subject directly instead of mocking it.
@@ -29,6 +30,7 @@ class ImageServiceTest extends TestCase
     private MockObject|ConfigService $configServiceMock;
     private MockObject|ExtendedFilesystem $filesystemServiceMock;
     private MockObject|LoggerInterface $loggerMock;
+    private MockObject|Environment $twigMock;
     private string $kernelProjectDir;
     private ImageService $subject;
 
@@ -39,6 +41,7 @@ class ImageServiceTest extends TestCase
         $this->configServiceMock = $this->createMock(ConfigService::class);
         $this->filesystemServiceMock = $this->createMock(ExtendedFilesystem::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
+        $this->twigMock = $this->createMock(Environment::class);
         $this->kernelProjectDir = '/tmp/project';
 
         // Create a real instance of ImageService with mocked dependencies
@@ -48,6 +51,7 @@ class ImageServiceTest extends TestCase
             $this->configServiceMock,
             $this->filesystemServiceMock,
             $this->loggerMock,
+            $this->twigMock,
             $this->kernelProjectDir
         );
     }
@@ -180,6 +184,7 @@ class ImageServiceTest extends TestCase
                 $this->configServiceMock,
                 $this->filesystemServiceMock,
                 $this->loggerMock,
+                $this->twigMock,
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['createThumbnails'])
@@ -226,6 +231,7 @@ class ImageServiceTest extends TestCase
                 $this->configServiceMock,
                 $this->filesystemServiceMock,
                 $this->loggerMock,
+                $this->twigMock,
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['rotateThumbNail'])
@@ -300,6 +306,7 @@ class ImageServiceTest extends TestCase
                 $this->configServiceMock,
                 $this->filesystemServiceMock,
                 $this->loggerMock,
+                $this->twigMock,
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
@@ -390,6 +397,7 @@ class ImageServiceTest extends TestCase
                 $this->configServiceMock,
                 $this->filesystemServiceMock,
                 $this->loggerMock,
+                $this->twigMock,
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
@@ -430,5 +438,41 @@ class ImageServiceTest extends TestCase
         
         // Assert result
         $this->assertEquals(2, $result);
+    }
+
+    public function testImageTemplateById(): void
+    {
+        // Test data
+        $imageId = 123;
+        $expectedHtml = '<div>rendered template</div>';
+        
+        // Create mock image
+        $image = $this->createMock(Image::class);
+        
+        // Mock image repository to return the mock image
+        $this->imageRepoMock
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with(['id' => $imageId])
+            ->willReturn($image);
+            
+        // Mock twig environment to return expected HTML
+        $this->twigMock
+            ->expects($this->once())
+            ->method('render')
+            ->with(
+                '_block/image.html.twig',
+                [
+                    'image' => $image,
+                    'size' => '50x50',
+                ]
+            )
+            ->willReturn($expectedHtml);
+            
+        // Call the method
+        $result = $this->subject->imageTemplateById($imageId);
+        
+        // Assert result
+        $this->assertEquals($expectedHtml, $result);
     }
 }

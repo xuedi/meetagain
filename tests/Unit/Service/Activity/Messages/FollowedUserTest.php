@@ -8,14 +8,17 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use App\Service\ImageService;
 
 class FollowedUserTest extends TestCase
 {
     private MockObject|RouterInterface $router;
+    private MockObject|ImageService $imageService;
 
     public function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
+        $this->imageService = $this->createMock(ImageService::class);
     }
 
     public function testCanBuild(): void
@@ -29,7 +32,7 @@ class FollowedUserTest extends TestCase
         $userNames = [$userId => $userName];
 
         $subject = new FollowedUser();
-        $subject->injectServices($this->router, $meta, $userNames);
+        $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
 
         // check returns
         $this->assertTrue($subject->validate());
@@ -45,7 +48,7 @@ class FollowedUserTest extends TestCase
         );
 
         $subject = new FollowedUser();
-        $subject->injectServices($this->router, []);
+        $subject->injectServices($this->router, $this->imageService, []);
         $subject->validate();
     }
 
@@ -56,7 +59,7 @@ class FollowedUserTest extends TestCase
         );
 
         $subject = new FollowedUser();
-        $subject->injectServices($this->router, ['user_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, ['user_id' => 'not-a-number']);
         $subject->validate();
     }
 }
