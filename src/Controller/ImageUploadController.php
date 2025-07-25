@@ -92,7 +92,7 @@ class ImageUploadController extends AbstractController
 
         $form = $this->createForm(ImageUploadType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() || $form->isValid()) {
             $imageData = $form->get('newImage')->getData();
             if ($imageData instanceof UploadedFile) {
                 $image = $this->imageService->upload($imageData, $this->getAuthedUser(), $imageType);
@@ -108,8 +108,13 @@ class ImageUploadController extends AbstractController
                 $this->em->flush();
 
                 $this->logActivity($entityName, $previousImage, $entity->getImage()->getId());
+                $this->addFlash('success', 'Changed Image');
+
+                return $this->returnBackToImage($entityName, $id);
             }
         }
+
+        $this->addFlash('error', 'There was an error uploading the file.');
 
         return $this->returnBackToImage($entityName, $id);
     }

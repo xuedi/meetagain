@@ -7,14 +7,9 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Image;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImageUploadType extends AbstractType
 {
-    public function __construct(readonly TranslatorInterface $translator)
-    {
-    }
-
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -26,8 +21,6 @@ class ImageUploadType extends AbstractType
                 'constraints' => [
                     new Image([
                         'maxSize' => '10M',
-                        'minWidth' => 432,
-                        'minHeight' => 432,
                         'mimeTypes' => [
                             'image/*',
                         ],

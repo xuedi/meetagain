@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.flashNotification') || []).forEach((trigger) => {
         setTimeout(function () {
             trigger.style.display = 'none';
-        }, 1700);
+        }, 12000);
     });
 });
 
