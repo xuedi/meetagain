@@ -1,4 +1,4 @@
-{% if app.request.attributes.get('_route_params') is not null %}
+{% if app.request.attributes.get('_route_params') is not null and globalService.getAlternativeLanguageCodes  is not empty %}
     <div class="navbar-item dropdown is-hoverable pl-0">
         <div class="dropdown-trigger is-hoverable">
             <div class="button" aria-haspopup="true" aria-controls="dropdown-languages">
