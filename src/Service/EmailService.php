@@ -31,7 +31,7 @@ readonly class EmailService
     public function sendWelcome(User $user): bool
     {
         $email = new TemplatedEmail();
-        $email->from($this->getSenderAddress());
+        $email->from($this->config->getMailerAddress());
         $email->to((string)$user->getEmail());
         $email->subject('Welcome!');
         $email->htmlTemplate('_emails/welcome.html.twig');
@@ -42,7 +42,7 @@ readonly class EmailService
     public function sendConformationRequest(User $user, Request $request): bool
     {
         $email = new TemplatedEmail();
-        $email->from($this->getSenderAddress());
+        $email->from($this->config->getMailerAddress());
         $email->to((string)$user->getEmail());
         $email->subject('Please Confirm your Email');
         $email->htmlTemplate('_emails/verification_request.html.twig');
@@ -59,7 +59,7 @@ readonly class EmailService
     public function sendResetPasswordRequest(User $user, Request $request): bool
     {
         $email = new TemplatedEmail();
-        $email->from($this->getSenderAddress());
+        $email->from($this->config->getMailerAddress());
         $email->to((string)$user->getEmail());
         $email->subject('Password reset request');
         $email->htmlTemplate('_emails/password_reset_request.html.twig');
@@ -78,7 +78,7 @@ readonly class EmailService
         $language = $userRecipient->getLocale();
 
         $email = new TemplatedEmail();
-        $email->from($this->getSenderAddress());
+        $email->from($this->config->getMailerAddress());
         $email->to((string)$userRecipient->getEmail());
         $email->subject('A member you follow plans to attend an event');
         $email->htmlTemplate('_emails/notification_rsvp.html.twig');
@@ -100,7 +100,7 @@ readonly class EmailService
     public function sendMessageNotification(User $sender, User $recipient): bool
     {
         $email = new TemplatedEmail();
-        $email->from($this->getSenderAddress());
+        $email->from($this->config->getMailerAddress());
         $email->to((string)$recipient->getEmail());
         $email->subject('You received a message from ' . $sender->getName());
         $email->htmlTemplate('_emails/notification_message.html.twig');
@@ -137,11 +137,6 @@ readonly class EmailService
             // TODO: add logging
             return false;
         }
-    }
-
-    private function getSenderAddress(): Address
-    {
-        return new Address('service@dragon-descendants.de', 'Dragon Descendants Meetup');
     }
 
     private function addToEmailQueue(TemplatedEmail $email): bool
