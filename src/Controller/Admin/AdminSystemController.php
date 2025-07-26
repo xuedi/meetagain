@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Entity\ConfigType;
 use App\Form\SettingsType;
 use App\Repository\ConfigRepository;
 use App\Repository\EmailQueueRepository;
@@ -40,7 +41,7 @@ class AdminSystemController extends AbstractController
         return $this->render('admin/system/index.html.twig', [
             'active' => 'system',
             'form' =>  $form,
-            'config' => $this->configRepo->findAll(),
+            'config' => $this->configRepo->findBy(['type' => ConfigType::Boolean]),
         ]);
     }
 
