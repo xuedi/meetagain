@@ -49,7 +49,7 @@ readonly class ConfigService
 
     public function getHost(): string
     {
-        return $_ENV['APP_HOST'] ?? 'http://localhost';
+        return $this->getString('website_host', 'https://localhost');
     }
 
     public function getUrl(): string
@@ -73,6 +73,7 @@ readonly class ConfigService
     public function saveForm(array $formData): void
     {
         $this->setString('website_url', $formData['url']);
+        $this->setString('website_host', $formData['host']);
         $this->setString('email_sender_name', $formData['senderName']);
         $this->setString('email_sender_mail', $formData['senderEmail']);
     }

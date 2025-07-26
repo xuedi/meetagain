@@ -23,6 +23,10 @@ class SettingsType extends AbstractType
             'attr' => ['placeholder' => $this->configService->getUrl()],
             'data' => $this->configService->getUrl(),
             'label' => 'SiteUrl',
+        ])->add('host', TextType::class, [
+            'attr' => ['placeholder' => $this->configService->getHost()],
+            'data' => $this->configService->getHost(),
+            'label' => 'SiteHost',
         ])->add('senderName', TextType::class, [
             'attr' => ['placeholder' => $mailer->getName()],
             'data' => $mailer->getName(),
