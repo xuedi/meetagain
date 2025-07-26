@@ -2,8 +2,17 @@
 
 namespace App\Entity;
 
+use App\Entity\BlockType\BlockType;
+use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\Headline;
+use App\Entity\BlockType\Hero;
+use App\Entity\BlockType\Paragraph;
+use App\Entity\BlockType\Text;
+use App\Entity\BlockType\Image as ImageBlockType;
+use App\Entity\BlockType\Title;
 use App\Repository\CmsBlockRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 #[ORM\Entity(repositoryClass: CmsBlockRepository::class)]
 class CmsBlock
@@ -76,6 +85,11 @@ class CmsBlock
     public function getJson(): array
     {
         return $this->json;
+    }
+
+    public function getBlockObject(): BlockType
+    {
+        return CmsBlockTypes::buildObject($this->getType(), $this->getJson());
     }
 
     public function setJson(array $json): static

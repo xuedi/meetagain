@@ -113,16 +113,7 @@ class Cms
         $objects = [];
         foreach ($this->blocks as $block) {
             if ($block->getLanguage() === $language) {
-                $objects[] = match ($block->getType()) {
-                    CmsBlockTypes::Paragraph => ParagraphBlockType::fromJson($block->getJson()),
-                    CmsBlockTypes::Headline => HeadlineBlockType::fromJson($block->getJson()),
-                    CmsBlockTypes::Image => ImageBlockType::fromJson($block->getJson()),
-                    CmsBlockTypes::Text => TextBlockType::fromJson($block->getJson()),
-                    CmsBlockTypes::Hero => HeroBlockType::fromJson($block->getJson(), $block->getImage()),
-                    CmsBlockTypes::EventTeaser => EventTeaserType::fromJson($block->getJson(), $block->getImage()),
-                    CmsBlockTypes::Title => TitleType::fromJson($block->getJson()),
-                    default => throw new Exception('To be implemented'),
-                };
+                $objects[] = CmsBlockTypes::buildObject($block->getType(), $block->getJson(), $block->getImage());
             }
         }
 

@@ -13,6 +13,7 @@ class Hero implements BlockType
         public string $text,
         public string $buttonLink,
         public string $buttonText,
+        public string $color,
         public ?ImageEntity $image,
     ) {
     }
@@ -26,6 +27,7 @@ class Hero implements BlockType
             $json['text'],
             $json['buttonLink'],
             $json['buttonText'],
+            $json['color'] ?? '#f14668',
             $image,
         );
     }
@@ -45,6 +47,7 @@ class Hero implements BlockType
             'text' => $this->text,
             'buttonLink' => $this->buttonLink,
             'buttonText' => $this->buttonText,
+            'color' => $this->color,
             'image' => $this->image,
         ];
     }

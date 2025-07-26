@@ -62,7 +62,7 @@
                     <input type="hidden" name="id" value="{{ cms.id }}"/>
                     <input type="hidden" name="locale" value="{{ editLocale }}"/>
                     <input type="hidden" name="blockId" value="{{ block.id }}"/>
-                    <input type="hidden" name="blockType" value="{{ block.type.name }}"/>
+                    <input type="hidden" name="blockType" value="{{ block.type.value }}"/>
                     <div class="is-pulled-right">
                     {% if editBlock == block.id %}
                         <a class="button is-danger is-small" href="{{ deleteBlockLink }}">
@@ -82,9 +82,8 @@
                         {% endif %}
                     {% endif %}
                     </div>
-                    {# TODO: 'block': block.json should be 'blockData' #}
                     {% include 'admin/cms/blocks/' ~ block.type.name ~ '.html.twig' with {
-                        'block': block.json,
+                        'block': block.blockObject,
                         'blockId': block.id,
                         'blockImage': block.image,
                         'cmsId': cms.id,

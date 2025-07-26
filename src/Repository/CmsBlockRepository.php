@@ -28,4 +28,17 @@ class CmsBlockRepository extends ServiceEntityRepository
             return 1;
         }
     }
+
+    public function getBlocks(int $pageId, string $locale)
+    {
+        return $this->createQueryBuilder('cb')
+            ->select('cb') //
+            ->where('cb.page = :pageId')
+            ->andWhere('cb.language = :locale')
+            ->setParameter('pageId', $pageId)
+            ->setParameter('locale', $locale)
+            ->orderBy('cb.priority', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

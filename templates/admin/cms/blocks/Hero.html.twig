@@ -36,6 +36,13 @@
         </div>
     </div>
 
+    <div class="field">
+        <label class="label">Background Color</label>
+        <div class="control">
+            <input class="input" name="color" type="text" value="{% if block is defined %}{{ block.color }}{% endif %}">
+        </div>
+    </div>
+
 {% else %}
 
     <div class="has-text-centered"><span class="has-text-grey-light">Hero banner always shown on top</span></div>
@@ -45,6 +52,9 @@
             <h2 class="title is-6">{{ block.subHeadline }}</h2>
             <p>{{ block.text|nl2br }}</p>
             <span class="button">{{ block.buttonText }}</span>
+            <p class="mt-3">
+                Color: <span class="tag" style="background-color: {{ block.color }}">{{ block.color }}</span>
+            </p>
         </div>
         <div class="column is-1"></div>
         <div class="column is-4">

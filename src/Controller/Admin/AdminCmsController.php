@@ -12,6 +12,7 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
+use App\Entity\CmsBlockTypes;
 use App\Form\CmsType;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
@@ -65,11 +66,6 @@ class AdminCmsController extends AbstractController
             return $this->redirectToRoute('app_admin_cms');
         }
 
-        $blocks = $this->em->getRepository(CmsBlock::class)->findBy([
-            'page' => $cms->getId(),
-            'language' => $locale,
-        ], ['priority' => 'ASC']);
-
         $newBlocks = [
             Headline::getType()->name,
             Paragraph::getType()->name,
@@ -85,7 +81,7 @@ class AdminCmsController extends AbstractController
             'newBlocks' => $newBlocks,
             'editLocale' => $locale,
             'editBlock' => $blockId,
-            'blocks' => $blocks,
+            'blocks' => $this->blockRepo->getBlocks($cms->getId(), $locale),
             'form' => $form,
             'cms' => $cms,
         ]);
@@ -134,7 +130,7 @@ class AdminCmsController extends AbstractController
         $payload = $request->getPayload()->all();
         $locale = $request->get('editLocale');
         $blockType = $request->get('blockType');
-        $blockObject = $this->getBlock($blockType, $payload);
+        $blockObject = CmsBlockTypes::buildObject(CmsBlockTypes::from($blockType), $payload);
 
         $cmsBlock = new CmsBlock();
         $cmsBlock->setLanguage($locale);
@@ -188,7 +184,9 @@ class AdminCmsController extends AbstractController
         $repo = $this->em->getRepository(CmsBlock::class);
         $block = $repo->find($request->get('blockId'));
         if ($block !== null) {
-            $block->setJson($this->getBlock($request->get('blockType'), $request->getPayload()->all())->toArray());
+            $payload = $request->getPayload()->all();
+            $type = CmsBlockTypes::from((int)$request->get('blockType'));
+            $block->setJson(CmsBlockTypes::buildObject($type, $payload)->toArray());
             $this->em->persist($block);
             $this->em->flush();
         } else {
@@ -217,19 +215,6 @@ class AdminCmsController extends AbstractController
             'id' => $request->get('id'),
             'locale' => $request->get('locale'),
         ]);
-    }
-
-    private function getBlock(string $blockType, array $payload): BlockType
-    {
-        return match ($blockType) {
-            Headline::getType()->name => Headline::fromJson($payload),
-            Paragraph::getType()->name => Paragraph::fromJson($payload),
-            Text::getType()->name => Text::fromJson($payload),
-            Image::getType()->name => Image::fromJson($payload),
-            Hero::getType()->name => Hero::fromJson($payload),
-            EventTeaser::getType()->name => EventTeaser::fromJson($payload),
-            Title::getType()->name => Title::fromJson($payload),
-        };
     }
 
     private function adjustPriority(mixed $pageId, mixed $blockId, mixed $locale, float $value): void
