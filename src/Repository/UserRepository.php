@@ -119,7 +119,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->select('u, i') // forces to fet all columns from user and image table
             ->leftJoin('u.image', 'i')  // Assuming 'image' is the property name
             ->where('u.status = :status')
-            ->andwhere('u.id <> 1')
             ->setParameter('status', UserStatus::Active)
             ->orderBy('u.createdAt', 'ASC')
             ->setMaxResults($limit)
