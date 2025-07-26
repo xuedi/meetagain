@@ -1,8 +1,8 @@
-{% for name in newBlocks %}
-    <a class="toggleTrigger" data-id="new-block-{{ name }}" href="#">
+{% for newBlock in newBlocks %}
+    <a class="toggleTrigger" data-id="new-block-{{ newBlock.name }}" href="#">
         <button class="button">
             <span class="icon"><i class="fa fa-plus"></i></span>
-            <span>{{ ("block_" ~ name) | lower | trans }}</span>
+            <span>{{ ("block_" ~ newBlock.name) | lower | trans }}</span>
         </button>
     </a>
 {% endfor %}
@@ -11,18 +11,18 @@
 <br>
 
 
-{% for name in newBlocks %}
-    <article class="message is-success is-hidden" id="new-block-{{ name }}">
+{% for newBlock in newBlocks %}
+    <article class="message is-success is-hidden" id="new-block-{{ newBlock.name }}">
         <form method="post" action="{{ path('app_admin_cms_add_block', {'id': cms.id}) }}">
         <input type="hidden" name="editLocale" value="{{ editLocale }}"/>
-        <input type="hidden" name="blockType" value="{{ name }}"/>
+        <input type="hidden" name="blockType" value="{{ newBlock.value }}"/>
         <div class="message-header">
-            <p>Add new {{ ("block_" ~ name) | lower | trans }} block</p>
-            <button class="delete toggleTrigger" data-id="new-block-{{ name }}" aria-label="delete"></button>
+            <p>Add new {{ ("block_" ~ newBlock.name) | lower | trans }} block</p>
+            <button class="delete toggleTrigger" data-id="new-block-{{ newBlock.name }}" aria-label="delete"></button>
         </div>
         <div class="message-body">
             <p>
-                {% include 'admin/cms/blocks/' ~ name ~ '.html.twig' %}
+                {% include 'admin/cms/blocks/' ~ newBlock.name ~ '.html.twig' %}
             </p>
             <div class="has-text-right">
                 <button class="button">{{ "button_add" | trans }}</button>

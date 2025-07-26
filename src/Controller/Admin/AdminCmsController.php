@@ -67,13 +67,13 @@ class AdminCmsController extends AbstractController
         }
 
         $newBlocks = [
-            Headline::getType()->name,
-            Paragraph::getType()->name,
-            Text::getType()->name,
-            Image::getType()->name,
-            Hero::getType()->name,
-            EventTeaser::getType()->name,
-            Title::getType()->name,
+            Headline::getType(),
+            Paragraph::getType(),
+            Text::getType(),
+            Image::getType(),
+            Hero::getType(),
+            EventTeaser::getType(),
+            Title::getType(),
         ];
 
         return $this->render('admin/cms/edit.html.twig', [
