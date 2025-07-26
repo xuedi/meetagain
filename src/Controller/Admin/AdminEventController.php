@@ -134,6 +134,7 @@ class AdminEventController extends AbstractController
             $event->setPreviewImage(null);
             $event->setInitial(true);
             $event->setPublished(false);
+            $event->setFeatured(false);
             $event->setUser($this->getUser());
 
             $entityManager->persist($event);
