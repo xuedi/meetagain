@@ -34,7 +34,6 @@ class AdminController extends AbstractController
     private function cacheTest(): bool
     {
         $expected = sprintf('This is a random number between 0 an 100: %d', random_int(0, 100));
-        ;
         $cacheKey = 'app_admin_test';
         $this->appCache->delete($cacheKey);
         $this->appCache->get($cacheKey, fn() => $expected);

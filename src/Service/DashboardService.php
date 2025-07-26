@@ -47,12 +47,26 @@ class DashboardService
     public function getDetails(): array
     {
         return [
-            'memberCount' => $this->userRepo->count(),
-            'eventCount' => $this->eventRepo->count(),
-            'weekMailCount' => $this->mailRepo->matching($this->timeCrit())->count(),
-            'weekEventCount' => $this->eventRepo->matching($this->timeCrit('start'))->count(),
-            'weekNotFoundCount' => $this->notFoundRepo->matching($this->timeCrit())->count(),
-            'weekActivityCount' => $this->activityRepo->matching($this->timeCrit())->count(),
+            '404pages' => [
+                'count' => $this->notFoundRepo->count(),
+                'week' => $this->notFoundRepo->matching($this->timeCrit())->count(),
+            ],
+            'members' => [
+                'count' => $this->userRepo->count(),
+                'week' => $this->userRepo->matching($this->timeCrit())->count(),
+            ],
+            'activity' => [
+                'count' => $this->activityRepo->count(),
+                'week' => $this->activityRepo->matching($this->timeCrit())->count(),
+            ],
+            'events' => [
+                'count' => $this->eventRepo->count(),
+                'week' => $this->eventRepo->matching($this->timeCrit('start'))->count(),
+            ],
+            'emails' => [
+                'count' => $this->mailRepo->count(),
+                'week' => $this->mailRepo->matching($this->timeCrit())->count(),
+            ],
         ];
     }
 

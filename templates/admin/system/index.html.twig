@@ -5,58 +5,47 @@
     <div class="container">
 
         <div class="columns">
-            <div class="column is-5">
+            <div class="column is-6">
 
                 <h1 class="title is-5">Website settings</h1>
+                {{ form_start(form) }}
+                {{ form_row(form.url) }}
+                <div class="columns">
+                    <div class="column">
+                        {{ form_row(form.senderName) }}
+                    </div>
+                    <div class="column">
+                        {{ form_row(form.senderEmail) }}
+                    </div>
+                </div>
 
-                {% include 'admin/system/config.html.twig' %}
+                <button class="button is-link">{{ "button_save" | trans }}</button>
+                {{ form_end(form) }}
 
             </div>
             <div class="column is-1"></div>
-            <div class="column is-3 content">
+            <div class="column is-5 content">
 
-                <h1 class="title is-5">Emails</h1>
+                <h1 class="title is-5">On/Off settings</h1>
+                <table class="table is-fullwidth">
+                    <tbody>
+                    {% for item in config %}
+                        <tr>
+                            <td>{{ ("config_option_" ~ item.name)|trans }}</td>
+                            <td>
+                                {% if item.isBoolean %}
 
-                <ul class="list">
-                    <li>Queued: {{ queuedEmails|length }}</li>
-                </ul>
+                                    {% include '_block/toggle.html.twig' with {
+                                        'link': path('app_admin_system_boolean', {'name': item.name}),
+                                        'status': item.getBoolean
+                                    } %}
 
-            </div>
-            <div class="column is-3 content">
-                <h1 class="title is-5">Media</h1>
-
-                <ul class="list">
-                    <li>Images: {{ mediaStats.imageCount }}</li>
-                    <li>
-                        ImageTypes:
-                        <ul>
-                            {% for name,count in mediaStats.imageTypeList %}
-                                <li>{{ name }}: {{ count }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    <li>Thumbnails: {{ mediaStats.thumbnailCount }}</li>
-                    <li>ThumbnailsMissing: {{ mediaStats.thumbnailMissingCount }}</li>
-                    <li>ThumbnailsObsolete: {{ mediaStats.thumbnailObsoleteCount }}</li>
-                    <li>
-                        ThumbnailsSizes:
-                        <ul>
-                            {% for size,count in mediaStats.thumbnailSizeList %}
-                                <li>{{ size }}: {{ count }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                </ul>
-
-                {% if mediaStats.thumbnailMissingCount > 0 %}
-                    <a href="{{ path('app_admin_regenerate_thumbnails') }}" class="button is-link">Generate thumbs
-                        ({{ mediaStats.thumbnailMissingCount }})</a>
-                {% endif %}
-
-                {% if mediaStats.thumbnailObsoleteCount > 0 %}
-                    <a href="{{ path('app_admin_cleanup_thumbnails') }}" class="button is-link">Delete thumbs
-                        ({{ mediaStats.thumbnailObsoleteCount }})</a>
-                {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
 
             </div>
         </div>

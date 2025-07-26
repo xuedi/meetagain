@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Form\SettingsType;
 use App\Repository\ConfigRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\ImageRepository;
@@ -20,20 +21,26 @@ class AdminSystemController extends AbstractController
         private readonly ImageService $imageService,
         private readonly ImageRepository $imageRepo,
         private readonly ConfigRepository $configRepo,
-        private readonly EmailQueueRepository $emailQueueRepository,
+        private readonly ConfigService $configService,
         private readonly EntityManagerInterface $em,
     )
     {
     }
 
     #[Route('/admin/system', name: 'app_admin_system')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $form = $this->createForm(SettingsType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->configService->saveForm($form->getData());
+        }
+
         return $this->render('admin/system/index.html.twig', [
             'active' => 'system',
+            'form' =>  $form,
             'config' => $this->configRepo->findAll(),
-            'mediaStats' => $this->imageService->getStatistics(),
-            'queuedEmails' => $this->emailQueueRepository->findBy(['sendAt' => null], ['createdAt' => 'DESC']),
         ]);
     }
 
