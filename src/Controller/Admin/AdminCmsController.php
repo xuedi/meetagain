@@ -129,7 +129,7 @@ class AdminCmsController extends AbstractController
 
         $payload = $request->getPayload()->all();
         $locale = $request->get('editLocale');
-        $blockType = $request->get('blockType');
+        $blockType = (int)$request->get('blockType');
         $blockObject = CmsBlockTypes::buildObject(CmsBlockTypes::from($blockType), $payload);
 
         $cmsBlock = new CmsBlock();
