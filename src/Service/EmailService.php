@@ -35,6 +35,9 @@ readonly class EmailService
         $email->to((string)$user->getEmail());
         $email->subject('Welcome!');
         $email->htmlTemplate('_emails/welcome.html.twig');
+        $email->context([
+            'url' => $this->config->getUrl(),
+        ]);
 
         return $this->sendEmail($email);
     }
@@ -49,6 +52,7 @@ readonly class EmailService
         $email->context([
             'host' => $this->config->getHost(),
             'token' => $user->getRegcode(),
+            'url' => $this->config->getUrl(),
             'lang' => $request->getLocale(),
             'username' => $user->getName(),
         ]);
