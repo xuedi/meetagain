@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Config;
+use App\Entity\ConfigType;
 use App\Entity\ImageType;
 use App\Repository\ConfigRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -102,9 +104,10 @@ readonly class ConfigService
     {
         $setting = $this->repo->findOneBy(['name' => $name]);
         if ($setting === null) {
-            return;
+            $setting = new Config();
+            $setting->setName($name);
+            $setting->setType(ConfigType::String);
         }
-
         $setting->setValue($value);
 
         $this->em->persist($setting);
