@@ -16,7 +16,7 @@
 <div class="columns is-multiline mt-2">
     {% for image in event.images %}
         {% if image.reported is null %}
-            {% set href = '/images/thumbnails/' ~ image.hash ~ '_1024x768.' ~ image.extension %}
+            {% set href = '/images/thumbnails/' ~ image.hash ~ '_1024x768.webp' %}
             {% set Caption = 'You can <a href=' ~ path('app_report_image', {'id': image.id}) ~ '>report</a> an image if there is something wrong.' %}
             <div class="column is-2">
                 <a data-fancybox="gallery" data-caption="{{ Caption }}" href="{{ href }}">
