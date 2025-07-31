@@ -28,4 +28,10 @@ class ApiController extends AbstractController
     {
         return new JsonResponse('glossary');
     }
+
+    #[Route('/status', name: 'app_api_status', methods: ['GET'])]
+    public function statusIndex(): Response
+    {
+        return new JsonResponse('OK');
+    }
 }
