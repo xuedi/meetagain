@@ -6,6 +6,7 @@ use App\Entity\Config;
 use App\Entity\ImageType;
 use App\Repository\ConfigRepository;
 use App\Service\ConfigService;
+use Doctrine\ORM\EntityManagerInterface;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -14,13 +15,16 @@ use PHPUnit\Framework\TestCase;
 class ConfigServiceTest extends TestCase
 {
     private MockObject|ConfigRepository $configRepoMock;
+    private MockObject|EntityManagerInterface $entityManagerMock;
     private ConfigService $subject;
 
     protected function setUp(): void
     {
         $this->configRepoMock = $this->createMock(ConfigRepository::class);
+        $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->subject = new ConfigService(
-            $this->configRepoMock
+            repo: $this->configRepoMock,
+            em: $this->entityManagerMock
         );
     }
 
@@ -103,7 +107,7 @@ class ConfigServiceTest extends TestCase
 
     public function testHostGetter(): void
     {
-        $expected = 'http://localhost';
+        $expected = 'https://localhost';
         $this->assertSame(
             $expected,
             $this->subject->getHost()
