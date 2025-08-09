@@ -22,11 +22,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ProfileController extends AbstractController
 {
+    public const string ROUTE_PROFILE = 'app_profile';
+
     public function __construct(private readonly ActivityService $activityService)
     {
     }
 
-    #[Route('/profile/', name: 'app_profile')]
+    #[Route('/profile/', name: self::ROUTE_PROFILE)]
     public function index(
         ImageUploadController $imageUploadController,
         Request $request,

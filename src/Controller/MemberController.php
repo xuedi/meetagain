@@ -14,9 +14,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 
 class MemberController extends AbstractController
 {
+    public const string ROUTE_MEMBER = 'app_member';
     private const int PAGE_SIZE = 24;
 
-    #[Route('/members/{page}', name: 'app_member')]
+    #[Route('/members/{page}', name: self::ROUTE_MEMBER)]
     public function index(UserRepository $repo, int $page = 1): Response
     {
         $response = $this->getResponse();

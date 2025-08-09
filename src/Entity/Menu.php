@@ -15,9 +15,6 @@ class Menu
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $slug = null;
-
     #[ORM\Column(enumType: MenuLocation::class)]
     private ?MenuLocation $location = null;
 
@@ -27,8 +24,23 @@ class Menu
     #[ORM\Column]
     private ?float $priority = null;
 
-    #[ORM\Column]
-    private array $visibility = [];
+    #[ORM\Column(enumType: MenuVisibility::class)]
+    private ?MenuVisibility $visibility = null;
+
+    #[ORM\Column(enumType: MenuType::class)]
+    private ?MenuType $type = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $slug = null;
+
+    #[ORM\ManyToOne]
+    private ?Cms $cms = null;
+
+    #[ORM\ManyToOne]
+    private ?Event $event = null;
+
+    #[ORM\Column(nullable: true, enumType: MenuRoutes::class)]
+    private ?MenuRoutes $route = null;
 
     public function __construct()
     {
@@ -45,7 +57,7 @@ class Menu
         return $this->slug;
     }
 
-    public function setSlug(string $slug): static
+    public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
 
@@ -120,14 +132,62 @@ class Menu
         return $this;
     }
 
-    public function getVisibility(): array
+    public function getType(): ?MenuType
+    {
+        return $this->type;
+    }
+
+    public function setType(MenuType $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getCms(): ?Cms
+    {
+        return $this->cms;
+    }
+
+    public function setCms(?Cms $cms): static
+    {
+        $this->cms = $cms;
+
+        return $this;
+    }
+
+    public function getEvent(): ?Event
+    {
+        return $this->event;
+    }
+
+    public function setEvent(?Event $event): static
+    {
+        $this->event = $event;
+
+        return $this;
+    }
+
+    public function getVisibility(): ?MenuVisibility
     {
         return $this->visibility;
     }
 
-    public function setVisibility(array $visibility): static
+    public function setVisibility(MenuVisibility $visibility): static
     {
         $this->visibility = $visibility;
+
+        return $this;
+    }
+
+    public function getRoute(): ?MenuRoutes
+    {
+        return $this->route;
+    }
+
+    public function setRoute(?MenuRoutes $route): static
+    {
+        $this->route = $route;
 
         return $this;
     }

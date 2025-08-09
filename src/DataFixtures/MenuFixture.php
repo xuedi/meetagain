@@ -2,24 +2,38 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Config;
-use App\Entity\ConfigType;
+use App\Entity\Cms;
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
+use App\Entity\MenuRoutes;
 use App\Entity\MenuTranslation;
+use App\Entity\MenuType;
+use App\Entity\MenuVisibility;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MenuFixture extends Fixture
+class MenuFixture extends Fixture implements DependentFixtureInterface
 {
     #[\Override]
     public function load(ObjectManager $manager): void
     {
         echo 'Creating menu ... ';
-        foreach ($this->getData() as [$slug, $location, $translations]) {
+        foreach ($this->getData() as [$location, $visibility, $type, $value, $translations]) {
+            if (!isset($priority[$location->value])) {
+                $priority[$location->value] = 0;
+            }
+            $priority[$location->value] += 1;
+
             $menu = new Menu();
-            $menu->setSlug($slug);
             $menu->setLocation($location);
+            $menu->setVisibility($visibility);
+            $menu->setPriority($priority[$location->value]);
+            $menu->setType($type);
+            $menu->setSlug($type === MenuType::Slug ? $value : null);
+            $menu->setCms($type === MenuType::Cms ? $value : null);
+            $menu->setEvent($type === MenuType::Event ? $value : null);
+            $menu->setRoute($type === MenuType::Route ? $value : null);
 
             $manager->persist($menu);
 
@@ -37,12 +51,22 @@ class MenuFixture extends Fixture
         echo 'OK' . PHP_EOL;
     }
 
+    #[\Override]
+    public function getDependencies(): array
+    {
+        return [
+            CmsFixture::class,
+        ];
+    }
+
     private function getData(): array
     {
         return [
             [
-                'about',
                 MenuLocation::TopBar,
+                MenuVisibility::Everyone,
+                MenuType::Cms,
+                $this->getReference('cms_' . md5('about'), Cms::class),
                 [
                     'de' => 'Ueber uns',
                     'en' => 'About',
@@ -50,8 +74,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'events',
                 MenuLocation::TopBar,
+                MenuVisibility::Everyone,
+                MenuType::Route,
+                MenuRoutes::Events,
                 [
                     'de' => 'Events',
                     'en' => 'Events',
@@ -59,8 +85,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'members',
                 MenuLocation::TopBar,
+                MenuVisibility::Everyone,
+                MenuType::Route,
+                MenuRoutes::Members,
                 [
                     'de' => 'Mitglieder',
                     'en' => 'Members',
@@ -68,8 +96,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'index',
                 MenuLocation::BottomCol1,
+                MenuVisibility::Everyone,
+                MenuType::Cms,
+                $this->getReference('cms_' . md5('index'), Cms::class),
                 [
                     'de' => 'Startseite',
                     'en' => 'Homepage',
@@ -77,8 +107,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'about',
                 MenuLocation::BottomCol1,
+                MenuVisibility::Everyone,
+                MenuType::Cms,
+                $this->getReference('cms_' . md5('about'), Cms::class),
                 [
                     'de' => 'Ueber uns',
                     'en' => 'About',
@@ -86,8 +118,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'events',
                 MenuLocation::BottomCol2,
+                MenuVisibility::Everyone,
+                MenuType::Route,
+                MenuRoutes::Events,
                 [
                     'de' => 'Events',
                     'en' => 'Events',
@@ -95,8 +129,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'members',
                 MenuLocation::BottomCol2,
+                MenuVisibility::Everyone,
+                MenuType::Route,
+                MenuRoutes::Members,
                 [
                     'de' => 'Mitglieder',
                     'en' => 'Members',
@@ -104,8 +140,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'external',
                 MenuLocation::BottomCol3,
+                MenuVisibility::Everyone,
+                MenuType::Slug,
+                'https://meetup.com',
                 [
                     'de' => 'meetup.com',
                     'en' => 'meetup.com',
@@ -113,8 +151,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'instagram',
                 MenuLocation::BottomCol3,
+                MenuVisibility::Everyone,
+                MenuType::Slug,
+                'https://instagram.com',
                 [
                     'de' => 'Instagram',
                     'en' => 'Instagram',
@@ -122,8 +162,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'tiktok',
                 MenuLocation::BottomCol3,
+                MenuVisibility::Everyone,
+                MenuType::Slug,
+                'https://tiktok.com',
                 [
                     'de' => 'TikTok',
                     'en' => 'TikTok',
@@ -131,8 +173,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'imprint',
                 MenuLocation::BottomCol4,
+                MenuVisibility::Everyone,
+                MenuType::Cms,
+                $this->getReference('cms_' . md5('imprint'), Cms::class),
                 [
                     'de' => 'Impressum',
                     'en' => 'Imprint',
@@ -140,8 +184,10 @@ class MenuFixture extends Fixture
                 ],
             ],
             [
-                'privacy',
                 MenuLocation::BottomCol4,
+                MenuVisibility::Everyone,
+                MenuType::Cms,
+                $this->getReference('cms_' . md5('privacy'), Cms::class),
                 [
                     'de' => 'Datenschutz',
                     'en' => 'Privacy',

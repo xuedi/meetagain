@@ -28,12 +28,14 @@ use Symfony\Component\WebLink\Link;
 
 class EventController extends AbstractController
 {
+    public const string ROUTE_EVENT = 'app_event';
+
     public function __construct(
         private readonly ActivityService $activityService
     ) {
     }
 
-    #[Route('/events', name: 'app_event')]
+    #[Route('/events', name: self::ROUTE_EVENT)]
     public function index(EventService $eventService, Request $request): Response
     {
         $response = $this->getResponse();
