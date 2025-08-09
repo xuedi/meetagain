@@ -2,27 +2,18 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\Config;
-use App\Entity\ImageType;
-use App\Entity\Session\Consent;
-use App\Entity\Session\ConsentType;
 use App\Entity\User;
-use App\Repository\ConfigRepository;
+use App\Repository\MenuRepository;
 use App\Repository\UserRepository;
-use App\Service\ConfigService;
 use App\Service\DashboardService;
 use App\Service\GlobalService;
 use App\Service\PluginService;
 use App\Service\TranslationService;
-use Generator;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class GlobalServiceTest extends TestCase
@@ -31,6 +22,7 @@ class GlobalServiceTest extends TestCase
     private MockObject|TranslationService $translationServiceMock;
     private MockObject|DashboardService $dashboardServiceMock;
     private MockObject|UserRepository $userRepositoryMock;
+    private MockObject|MenuRepository $menuRepositoryMock;
     private MockObject|PluginService $pluginServiceMock;
     private GlobalService $subject;
 
@@ -40,6 +32,7 @@ class GlobalServiceTest extends TestCase
         $this->translationServiceMock = $this->createMock(TranslationService::class);
         $this->dashboardServiceMock = $this->createMock(DashboardService::class);
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
+        $this->menuRepositoryMock = $this->createMock(MenuRepository::class);
         $this->pluginServiceMock = $this->createMock(PluginService::class);
 
         $this->subject = new GlobalService(
@@ -47,7 +40,8 @@ class GlobalServiceTest extends TestCase
             translationService: $this->translationServiceMock,
             dashboardService: $this->dashboardServiceMock,
             userRepo: $this->userRepositoryMock,
-            pluginService: $this->pluginServiceMock
+            pluginService: $this->pluginServiceMock,
+            menuRepo: $this->menuRepositoryMock,
         );
     }
 
@@ -104,17 +98,17 @@ class GlobalServiceTest extends TestCase
     {
         $userId = 42;
         $expectedName = 'John Doe';
-        
+
         $userMock = $this->createMock(User::class);
         $userMock
             ->method('getName')
             ->willReturn($expectedName);
-            
+
         $this->userRepositoryMock
             ->method('findOneBy')
             ->with(['id' => $userId])
             ->willReturn($userMock);
-            
+
         $this->assertEquals($expectedName, $this->subject->getUserName($userId));
     }
 
@@ -209,7 +203,7 @@ class GlobalServiceTest extends TestCase
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock
             ->method('get')
-            ->willReturn( '{"consent_cookies_osm": "granted"}');
+            ->willReturn('{"consent_cookies_osm": "granted"}');
 
         $requestMock = $this->createMock(Request::class);
         $requestMock
