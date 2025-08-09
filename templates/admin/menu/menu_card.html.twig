@@ -1,0 +1,28 @@
+<div class="card mb-2">
+    <div class="card-content p-3">
+        <div class="content">
+            <div class="is-pulled-right has-text-right">
+                {% set link = path('app_admin_menu_up', {'id': item.id}) %}
+                <a href="{{ link }}">
+                    <span class="icon"><i class="fa fa-angle-up"></i></span>
+                </a>
+                <br>
+                {% set link = path('app_admin_menu_down', {'id': item.id}) %}
+                <a href="{{ link }}">
+                    <span class="icon"><i class="fa fa-angle-down"></i></span>
+                </a>
+            </div>
+            <p class="title is-6 mb-5">
+                {% set link = path('app_admin_menu', {'edit': item.id}) %}
+                <a href="{{ link }}" class="is-small is-link is-light">
+                    <span class="icon"><i class="fas fa-edit"></i></span>
+                </a>
+                {{ item.translatedName(app.locale) }}
+            </p>
+            <p class="subtitle is-6">
+                {% set link = '/' ~ app.locale ~ '/' ~ item.slug %}
+                Link: <a href="{{ link }}" target="_blank">/{{ item.slug }}</a>
+            </p>
+        </div>
+    </div>
+</div>
