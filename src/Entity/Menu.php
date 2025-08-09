@@ -120,6 +120,11 @@ class Menu
         return '';
     }
 
+    public function getName(string $language): string
+    {
+        return $this->findTranslation($language)?->getName() ?? '';
+    }
+
     public function getPriority(): ?float
     {
         return $this->priority;

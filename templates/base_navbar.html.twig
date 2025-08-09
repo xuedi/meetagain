@@ -8,9 +8,9 @@
         </div>
         <div id="navBarTop" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="/{{ app.locale }}/about">{{ "menu_about" | trans }}</a>
-                <a class="navbar-item" href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a>
-                <a class="navbar-item" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
+                {% for menu in globalService.menu('top') %}
+                    <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
+                {% endfor %}
                 {% for plugin in globalService.plugins %}
                     <a class="navbar-item" href="/{{ app.locale }}/{{ plugin }}">{{ ("menu_" ~ plugin) | trans }}</a>
                 {% endfor %}

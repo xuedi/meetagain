@@ -8,48 +8,41 @@
             <div class="column is-6-mobile">
                 <p>Static</p>
                 <ul>
-                    <li>
-                        <a class="is-size-5-mobile" href="{{ path('app_default') }}">{{ "menu_default" | trans }}</a>
-                    </li>
-                    <li>
-                        <a class="is-size-5-mobile" href="/{{ app.locale }}/about">{{ "menu_about" | trans }}</a>
-                    </li>
+                    {% for menu in globalService.menu('col1') %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
             <div class="column is-6-mobile">
                 <p>Dynamic</p>
                 <ul>
-                    <li>
-                        <a class="is-size-5-mobile" href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a>
-                    </li>
-                    <li>
-                        <a class="is-size-5-mobile" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
-                    </li>
+                    {% for menu in globalService.menu('col2') %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
             <div class="column is-6-mobile">
                 <p>Social</p>
                 <ul>
-                    <li>
-                        <a class="is-size-5-mobile" href="https://www.meetup.com/dragon-descendants/?eventOrigin=home_groups_you_organize" target="_blank">meetup.com</a>
-                    </li>
-                    <li>
-                        <a class="is-size-5-mobile" href="#" target="_blank">Instagram</a>
-                    </li>
-                    <li>
-                        <a class="is-size-5-mobile" href="#" target="_blank">TikTok</a>
-                    </li>
+                    {% for menu in globalService.menu('col3') %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
             <div class="column is-6-mobile">
                 <p>Legal</p>
                 <ul>
-                    <li>
-                        <a class="is-size-5-mobile" href="/{{ app.locale }}/imprint">{{ "menu_imprint" | trans }}</a>
-                    </li>
-                    <li>
-                        <a class="is-size-5-mobile" href="/{{ app.locale }}/privacy">{{ "menu_privacy" | trans }}</a>
-                    </li>
+                    {% for menu in globalService.menu('col4') %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>

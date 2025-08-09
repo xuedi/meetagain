@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Menu;
+use App\Entity\MenuLocation;
 use App\Entity\MenuType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,9 +19,17 @@ class MenuRepository extends ServiceEntityRepository
         parent::__construct($registry, Menu::class);
     }
 
-    public function getAllSlugified(string $locale = 'en'): array
+    public function getAllSlugified(string $locale = 'en', ?string $location = null): array
     {
-        $all = $this->findAll();
+        $criteria = match ($location) {
+            'top' => ['location' => MenuLocation::TopBar],
+            'col1' => ['location' => MenuLocation::BottomCol1],
+            'col2' => ['location' => MenuLocation::BottomCol2],
+            'col3' => ['location' => MenuLocation::BottomCol3],
+            'col4' => ['location' => MenuLocation::BottomCol4],
+            default => [],
+        };
+        $all = $this->findBy($criteria,['priority' => 'ASC']);
         $list = [];
         foreach ($all as $menu) {
             $menu->setSlug(match ($menu->getType()) {

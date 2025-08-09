@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
+use App\Repository\MenuRepository;
 use App\Repository\UserRepository;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,8 @@ readonly class GlobalService
         private TranslationService $translationService,
         private DashboardService $dashboardService,
         private UserRepository $userRepo,
-        private PluginService $pluginService
+        private PluginService $pluginService,
+        private MenuRepository $menuRepo,
     )
     {
     }
@@ -40,6 +42,16 @@ readonly class GlobalService
     public function getPlugins(): iterable
     {
         return $this->pluginService->getActiveList();
+    }
+
+    public function getMenu(string $type): array
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request instanceof Request) {
+            return $this->menuRepo->getAllSlugified($request->getLocale(), $type);
+        }
+
+        return $this->menuRepo->getAllSlugified('en');
     }
 
     public function getUserName(int $id): string

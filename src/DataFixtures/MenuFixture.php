@@ -96,28 +96,6 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 ],
             ],
             [
-                MenuLocation::TopBar,
-                MenuVisibility::Manager,
-                MenuType::Route,
-                MenuRoutes::Manage,
-                [
-                    'de' => 'Management',
-                    'en' => 'Manage',
-                    'cn' => '管理',
-                ],
-            ],
-            [
-                MenuLocation::TopBar,
-                MenuVisibility::Admin,
-                MenuType::Route,
-                MenuRoutes::Admin,
-                [
-                    'de' => 'Administration',
-                    'en' => 'Admin',
-                    'cn' => '行政',
-                ],
-            ],
-            [
                 MenuLocation::BottomCol1,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
