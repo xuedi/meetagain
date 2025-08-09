@@ -68,12 +68,14 @@ class MenuType extends AbstractType
             'mapped' => false,
             'label' => 'Cms pages',
             'choices' => $this->cmsRepo->getChoices(),
+            'data' => $menu?->getCms()?->getId() ?? 1,
         ]);
         $builder->add('event', ChoiceType::class, [
             'disabled' => !($typeSelect == EnumMenuType::Event),
             'mapped' => false,
             'label' => 'Events',
             'choices' => $this->eventRepo->getChoices('en'), // TODO: inject actual current locale
+            'data' => $menu?->getEvent()?->getId() ?? 1,
         ]);
         $builder->add('route', ChoiceType::class, [
             'disabled' => !($typeSelect == EnumMenuType::Route),

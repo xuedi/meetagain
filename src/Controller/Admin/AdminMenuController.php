@@ -4,9 +4,16 @@ namespace App\Controller\Admin;
 
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
+use App\Entity\MenuRoutes;
+use App\Entity\MenuTranslation;
 use App\Entity\MenuType as EnumMenuType;
+use App\Entity\MenuVisibility;
 use App\Form\MenuType;
+use App\Repository\CmsRepository;
+use App\Repository\EventRepository;
 use App\Repository\MenuRepository;
+use App\Repository\MenuTranslationRepository;
+use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +27,10 @@ class AdminMenuController extends AbstractController
         private readonly MenuRepository $repo,
         private readonly TranslatorInterface $translator,
         private readonly EntityManagerInterface $entityManager,
+        private readonly MenuTranslationRepository $menuTransRepo,
+        private readonly TranslationService $translationService,
+        private readonly EventRepository $eventRepo,
+        private readonly CmsRepository $cmsRepo,
     )
     {
     }
@@ -33,7 +44,38 @@ class AdminMenuController extends AbstractController
         $form = $this->createForm(MenuType::class, $menu);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $type = EnumMenuType::from($form->get('type')->getData());
+            $menu->setType($type);
+            $menu->setLocation(MenuLocation::from($form->get('location')->getData()));
+            $menu->setVisibility(MenuVisibility::from($form->get('visibility')->getData()));
+            $menu->setPriority(999);
+            switch ($type) {
+                case EnumMenuType::Url:
+                    $menu->setSlug($form->get('slug')->getData());
+                    break;
+                case EnumMenuType::Event:
+                    $menu->setEvent($this->eventRepo->findOneBy(['id' => $form->get('event')->getData()]));
+                    break;
+                case EnumMenuType::Route:
+                    $menu->setRoute(MenuRoutes::from($form->get('route')->getData()));
+                    break;
+                case EnumMenuType::Cms:
+                    $menu->setCms($this->cmsRepo->findOneBy(['id' => $form->get('cms')->getData()]));
+                    break;
+            }
+
+            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+                $translation = $this->getTranslation($languageCode, $menu->getId());
+                $translation->setMenu($menu);
+                $translation->setLanguage($languageCode);
+                $translation->setName($form->get("name-$languageCode")->getData());
+                $this->entityManager->persist($translation);
+            }
+
+            $this->entityManager->persist($menu);
             $this->entityManager->flush();
+
+            return $this->redirectToRoute('app_admin_menu', ['edit' => $menu->getId()]);
         }
 
         return $this->render('admin/menu/index.html.twig', [
@@ -57,5 +99,15 @@ class AdminMenuController extends AbstractController
     public function menuDown(int $id): Response
     {
         return $this->forward('app_admin_menu');
+    }
+
+    private function getTranslation(mixed $languageCode, ?int $getId): MenuTranslation
+    {
+        $translation = $this->menuTransRepo->findOneBy(['language' => $languageCode, 'menu' => $getId]);
+        if ($translation !== null) {
+            return $translation;
+        }
+
+        return new MenuTranslation();
     }
 }
