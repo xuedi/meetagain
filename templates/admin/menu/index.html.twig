@@ -64,6 +64,11 @@
                 {% else %}
                     <button class="button is-link">{{ "button_save" | trans }}</button>
                 {% endif %}
+                {% if edit is not null %}
+                    <a class="button is-danger" href="{{ path('app_admin_menu_delete', {'id': edit}) }}" title="Delete">
+                        <span class="icon"><i class="fa fa-trash"></i></span>
+                    </a>
+                {% endif %}
             </div>
         </div>
         {{ form_widget(form) }}
