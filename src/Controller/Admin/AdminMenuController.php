@@ -92,13 +92,17 @@ class AdminMenuController extends AbstractController
     #[Route('/admin/menu/{id}/up', name: 'app_admin_menu_up')]
     public function menuUp(int $id): Response
     {
-        return $this->forward('app_admin_menu');
+        $this->adjustPriority($id, -1.5);
+
+        return $this->redirectToRoute('app_admin_menu');
     }
 
     #[Route('/admin/menu/{id}/down', name: 'app_admin_menu_down')]
     public function menuDown(int $id): Response
     {
-        return $this->forward('app_admin_menu');
+        $this->adjustPriority($id, 1.5);
+
+        return $this->redirectToRoute('app_admin_menu');
     }
 
     private function getTranslation(mixed $languageCode, ?int $getId): MenuTranslation
@@ -109,5 +113,24 @@ class AdminMenuController extends AbstractController
         }
 
         return new MenuTranslation();
+    }
+
+    private function adjustPriority(int $menuId, float $value): void
+    {
+        // update half up or down
+        $subject = $this->repo->findOneBy(['id' => $menuId]);
+        $subject->setPriority($subject->getPriority() + $value);
+        $this->entityManager->persist($subject);
+        $this->entityManager->flush();
+
+        // loop through list and recount priority
+        $priority = 1;
+        $list = $this->repo->findBy(['location' => $subject->getLocation()], ['priority' => 'ASC']);
+        foreach ($list as $menu) {
+            $menu->setPriority($priority);
+            $priority++;
+            $this->entityManager->persist($menu);
+        }
+        $this->entityManager->flush();
     }
 }
