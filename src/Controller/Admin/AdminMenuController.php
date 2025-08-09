@@ -115,6 +115,22 @@ class AdminMenuController extends AbstractController
         return new MenuTranslation();
     }
 
+    #[Route('/admin/menu/{id}/delete', name: 'app_admin_menu_delete', methods: ['GET'])]
+    public function menuDelete(int $id): Response
+    {
+        $menu = $this->repo->findOneBy(['id' => $id]);
+        if ($menu !== null) {
+            $translations = $this->menuTransRepo->findBy(['menu' => $menu->getId()]);
+            foreach ($translations as $translation) {
+                $this->entityManager->remove($translation);
+            }
+            $this->entityManager->remove($menu);
+            $this->entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_admin_menu');
+    }
+
     private function adjustPriority(int $menuId, float $value): void
     {
         // update half up or down
@@ -132,22 +148,6 @@ class AdminMenuController extends AbstractController
             $this->entityManager->persist($menu);
         }
         $this->entityManager->flush();
-    }
-
-    #[Route('/admin/menu/{id}/delete', name: 'app_admin_menu_delete', methods: ['GET'])]
-    public function menuDelete(int $id): Response
-    {
-        $menu = $this->repo->findOneBy(['id' => $id]);
-        if ($menu !== null) {
-            $translations = $this->menuTransRepo->findBy(['menu' => $menu->getId()]);
-            foreach ($translations as $translation) {
-                $this->entityManager->remove($translation);
-            }
-            $this->entityManager->remove($menu);
-            $this->entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_admin_menu');
     }
 
     private function getMenuPriorityForLocation(?MenuLocation $getLocation): float
