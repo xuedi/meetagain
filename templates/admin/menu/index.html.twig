@@ -14,8 +14,10 @@
                                 <li>
                                     <div class="card mb-2">
                                         <div class="card-content p-3">
-                                            <p class="title is-5">{{ item.translatedName(app.locale) }}</p>
-                                            <p class="subtitle is-6">Link: <a href="/{{ app.locale }}/{{ item.slug }}" target="_blank">/{{ item.slug }}</a></p>
+                                            <div class="content">
+                                                <p class="title is-5">{{ item.translatedName(app.locale) }}</p>
+                                                <p class="subtitle is-6">Link: <a href="/{{ app.locale }}/{{ item.slug }}" target="_blank">{{ item.slug }}</a></p>
+                                            </div>
                                         </div>
                                     </div>
                                 </li>
