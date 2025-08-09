@@ -27,7 +27,7 @@ class MenuRepository extends ServiceEntityRepository
                 MenuType::Cms => '/' . $locale . '/' . $menu->getCms()->getSlug(),
                 MenuType::Event => '/' . $locale . '/events/' . $menu->getEvent()->getId(),
                 MenuType::Route => $this->router->generate($menu->getRoute()->value),
-                MenuType::Slug => $menu->getSlug(),
+                MenuType::Url => $menu->getSlug(),
             });
             $list[] = $menu;
         }

@@ -21,12 +21,12 @@
         </div>
     </div>
 
-    <div class="container mt-6">
+    <div class="container box mt-6">
         <div class="has-text-centered mb-4">
             {% if edit is null %}
-                <h1 class="title is-4">{{ "menu_add" | trans }}</h1>
+                <h1 class="title is-4">{{ "admin_menu_add" | trans }}</h1>
             {% else %}
-                <h1 class="title is-4">{{ "menu_edit" | trans }}</h1>
+                <h1 class="title is-4">{{ "admin_menu_edit" | trans }}</h1>
             {% endif %}
         </div>
         {{ form_start(form) }}
@@ -42,10 +42,10 @@
             <div class="column">
                 <div class="box">
                     <h1 class="title is-5">Type options</h1>
-                    {{ form_row(form.slug) }}
-                    {{ form_row(form.cms) }}
-                    {{ form_row(form.event) }}
-                    {{ form_row(form.route) }}
+                    {{ form_row(form.slug) }} {# menu_slug #}
+                    {{ form_row(form.cms) }} {# menu_cms #}
+                    {{ form_row(form.event) }} {# menu_event #}
+                    {{ form_row(form.route) }} {# menu_route #}
                 </div>
             </div>
             <div class="column">
@@ -57,8 +57,8 @@
                 </div>
             </div>
         </div>
-        <div class="mt-6">
-            <div class="has-text-centered mb-4">
+        <div class="mt-2">
+            <div class="has-text-centered">
                 {% if edit is null %}
                     <button class="button is-link">{{ "button_add" | trans }}</button>
                 {% else %}
@@ -69,6 +69,42 @@
         {{ form_widget(form) }}
         {{ form_end(form) }}
     </div>
+
+
+    <script type="text/javascript">
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('menu_type').addEventListener('change', event => {
+                event.preventDefault();
+
+                if (event.currentTarget.value === '0') {
+                    document.getElementById('menu_slug').removeAttribute('disabled');
+                } else {
+                    document.getElementById('menu_slug').setAttribute('disabled', 'disabled');
+                }
+
+                if (event.currentTarget.value === '1') {
+                    document.getElementById('menu_cms').removeAttribute('disabled');
+                } else {
+                    document.getElementById('menu_cms').setAttribute('disabled', 'disabled');
+                }
+
+                if (event.currentTarget.value === '2') {
+                    document.getElementById('menu_event').removeAttribute('disabled');
+                } else {
+                    document.getElementById('menu_event').setAttribute('disabled', 'disabled');
+                }
+
+                if (event.currentTarget.value === '3') {
+                    document.getElementById('menu_route').removeAttribute('disabled');
+                } else {
+                    document.getElementById('menu_route').setAttribute('disabled', 'disabled');
+                }
+
+            });
+        });
+
+    </script>
 
 
 {% endblock %}

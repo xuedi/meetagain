@@ -30,7 +30,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
             $menu->setVisibility($visibility);
             $menu->setPriority($priority[$location->value]);
             $menu->setType($type);
-            $menu->setSlug($type === MenuType::Slug ? $value : null);
+            $menu->setSlug($type === MenuType::Url ? $value : null);
             $menu->setCms($type === MenuType::Cms ? $value : null);
             $menu->setEvent($type === MenuType::Event ? $value : null);
             $menu->setRoute($type === MenuType::Route ? $value : null);
@@ -96,6 +96,28 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 ],
             ],
             [
+                MenuLocation::TopBar,
+                MenuVisibility::Manager,
+                MenuType::Route,
+                MenuRoutes::Manage,
+                [
+                    'de' => 'Management',
+                    'en' => 'Manage',
+                    'cn' => '管理',
+                ],
+            ],
+            [
+                MenuLocation::TopBar,
+                MenuVisibility::Admin,
+                MenuType::Route,
+                MenuRoutes::Admin,
+                [
+                    'de' => 'Administration',
+                    'en' => 'Admin',
+                    'cn' => '行政',
+                ],
+            ],
+            [
                 MenuLocation::BottomCol1,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
@@ -142,7 +164,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
             [
                 MenuLocation::BottomCol3,
                 MenuVisibility::Everyone,
-                MenuType::Slug,
+                MenuType::Url,
                 'https://meetup.com',
                 [
                     'de' => 'meetup.com',
@@ -153,7 +175,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
             [
                 MenuLocation::BottomCol3,
                 MenuVisibility::Everyone,
-                MenuType::Slug,
+                MenuType::Url,
                 'https://instagram.com',
                 [
                     'de' => 'Instagram',
@@ -164,7 +186,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
             [
                 MenuLocation::BottomCol3,
                 MenuVisibility::Everyone,
-                MenuType::Slug,
+                MenuType::Url,
                 'https://tiktok.com',
                 [
                     'de' => 'TikTok',

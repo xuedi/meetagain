@@ -7,7 +7,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ManageController extends AbstractController
 {
-    #[Route('/manage', name: 'app_manage')]
+    public const string ROUTE_MANAGE = 'app_manage';
+
+    #[Route('/manage', name: self::ROUTE_MANAGE)]
     public function index(): Response
     {
         return $this->render('manage/index.html.twig');

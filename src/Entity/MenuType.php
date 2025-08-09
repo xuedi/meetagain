@@ -6,7 +6,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum MenuType: int
 {
-    case Slug = 0;
+    case Url = 0;
     case Cms = 1;
     case Event = 2;
     case Route = 3;

@@ -59,7 +59,8 @@ class MenuType extends AbstractType
             'data' => $visibilitySelect->value,
         ]);
         $builder->add('slug', TextType::class, [
-            'disabled' => !($typeSelect == EnumMenuType::Slug),
+            'disabled' => !($typeSelect == EnumMenuType::Url),
+            'label' => 'Url for external links',
             'required' => false
         ]);
         $builder->add('cms', ChoiceType::class, [
