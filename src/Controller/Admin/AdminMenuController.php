@@ -23,9 +23,12 @@ class AdminMenuController extends AbstractController
     {
     }
 
-    #[Route('/admin/menu/', name: 'app_admin_menu')]
-    public function cmsList(Request $request, Menu $menu): Response
+    #[Route('/admin/menu/{edit}', name: 'app_admin_menu')]
+    public function menuList(Request $request, Menu $menu, int $edit = null): Response
     {
+        if ($edit !== null) {
+            $menu = $this->repo->find($edit);
+        }
         $form = $this->createForm(MenuType::class, $menu);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -35,8 +38,21 @@ class AdminMenuController extends AbstractController
         return $this->render('admin/menu/index.html.twig', [
             'active' => 'menu',
             'form' => $form,
+            'edit' => $edit,
             'items' => $this->repo->findAll(),
             'menu_locations' => MenuLocation::getTranslatedList($this->translator),
         ]);
+    }
+
+    #[Route('/admin/menu/{id}/up', name: 'app_admin_menu_up')]
+    public function menuUp(int $id): Response
+    {
+        return $this->forward('app_admin_menu');
+    }
+
+    #[Route('/admin/menu/{id}/down', name: 'app_admin_menu_down')]
+    public function menuDown(int $id): Response
+    {
+        return $this->forward('app_admin_menu');
     }
 }

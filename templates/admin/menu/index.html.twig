@@ -15,8 +15,28 @@
                                     <div class="card mb-2">
                                         <div class="card-content p-3">
                                             <div class="content">
-                                                <p class="title is-5">{{ item.translatedName(app.locale) }}</p>
-                                                <p class="subtitle is-6">Link: <a href="/{{ app.locale }}/{{ item.slug }}" target="_blank">{{ item.slug }}</a></p>
+                                                <div class="is-pulled-right has-text-right">
+                                                    {% set link = path('app_admin_menu_up', {'id': item.id}) %}
+                                                    <a href="{{ link }}">
+                                                        <span class="icon"><i class="fa fa-angle-up"></i></span>
+                                                    </a>
+                                                    <br>
+                                                    {% set link = path('app_admin_menu_down', {'id': item.id}) %}
+                                                    <a href="{{ link }}">
+                                                        <span class="icon"><i class="fa fa-angle-down"></i></span>
+                                                    </a>
+                                                </div>
+                                                <p class="title is-6 mb-5">
+                                                    {% set link = path('app_admin_menu', {'edit': item.id}) %}
+                                                    <a href="{{ link }}" class="is-small is-link is-light">
+                                                        <span class="icon"><i class="fas fa-edit"></i></span>
+                                                    </a>
+                                                    {{ item.translatedName(app.locale) }}
+                                                </p>
+                                                <p class="subtitle is-6">
+                                                    {% set link = '/' ~ app.locale ~ '/' ~ item.slug %}
+                                                    Link: <a href="{{ link }}" target="_blank">/{{ item.slug }}</a>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -31,20 +51,26 @@
     </div>
 
 
-    <div class="columns">
-        <div class="column is-4">
-            <div class="box mt-6">
-                {{ form_start(form) }}
+    <div class="box mt-6">
+        {{ form_start(form) }}
+        {{ form_row(form.slug) }} / cms / event
+        <br>
+        <br>
+        <div class="columns">
+            <div class="column is-7">
                 {{ form_widget(form) }}
-                <button class="button is-link">{{ "button_add" | trans }}</button>
-                {{ form_end(form) }}
+                {% if edit is null %}
+                    <button class="button is-link">{{ "button_add" | trans }}</button>
+                {% else %}
+                    <button class="button is-link">{{ "button_save" | trans }}</button>
+                {% endif %}
+
+            </div>
+            <div class="column is-5">
+                <label class="label required">Titles</label>
             </div>
         </div>
-        <div class="column is-8">
-            <div class="box mt-6">
-                pre selection all routes that are preselected as public
-            </div>
-        </div>
+        {{ form_end(form) }}
     </div>
 
 {% endblock %}
