@@ -15,4 +15,15 @@ class CmsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Cms::class);
     }
+
+    public function getChoices(): array
+    {
+        $all = $this->findAll();
+        $list = [];
+        foreach ($all as $cms) {
+            $list[$cms->getSlug()] = $cms->getId();
+        }
+
+        return $list;
+    }
 }

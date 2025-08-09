@@ -21,27 +21,54 @@
         </div>
     </div>
 
-    <div class="box mt-6">
+    <div class="container mt-6">
+        <div class="has-text-centered mb-4">
+            {% if edit is null %}
+                <h1 class="title is-4">{{ "menu_add" | trans }}</h1>
+            {% else %}
+                <h1 class="title is-4">{{ "menu_edit" | trans }}</h1>
+            {% endif %}
+        </div>
         {{ form_start(form) }}
-        {{ form_row(form.slug) }}
-        / cms / event / app_routelist (stored as an enum?)
-        <br>
-        <br>
         <div class="columns">
-            <div class="column is-7">
-                {{ form_widget(form) }}
+            <div class="column">
+                <div class="box">
+                    <h1 class="title is-5">Settings</h1>
+                    {{ form_row(form.type) }}
+                    {{ form_row(form.visibility) }}
+                    {{ form_row(form.location) }}
+                </div>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <h1 class="title is-5">Type options</h1>
+                    {{ form_row(form.slug) }}
+                    {{ form_row(form.cms) }}
+                    {{ form_row(form.event) }}
+                    {{ form_row(form.route) }}
+                </div>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <h1 class="title is-5">Titles translations</h1>
+                    {% for locale in globalService.languageCodes %}
+                        {{ form_row(form.("name-"~locale)) }}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="mt-6">
+            <div class="has-text-centered mb-4">
                 {% if edit is null %}
                     <button class="button is-link">{{ "button_add" | trans }}</button>
                 {% else %}
                     <button class="button is-link">{{ "button_save" | trans }}</button>
                 {% endif %}
-
-            </div>
-            <div class="column is-5">
-                <label class="label required">Titles</label>
             </div>
         </div>
+        {{ form_widget(form) }}
         {{ form_end(form) }}
     </div>
+
 
 {% endblock %}

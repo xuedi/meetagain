@@ -13,15 +13,16 @@
                 </a>
             </div>
             <p class="title is-6 mb-5">
-                {% set link = path('app_admin_menu', {'edit': item.id}) %}
-                <a href="{{ link }}" class="is-small is-link is-light">
-                    <span class="icon"><i class="fas fa-edit"></i></span>
-                </a>
                 {{ item.translatedName(app.locale) }}
             </p>
             <p class="subtitle is-6">
-                {% set link = '/' ~ app.locale ~ '/' ~ item.slug %}
-                Link: <a href="{{ link }}" target="_blank">/{{ item.slug }}</a>
+                {% set link = path('app_admin_menu', {'edit': item.id}) %}
+                <a href="{{ link }}" class="is-small is-link is-light">
+                    <span class="icon"><i class="fas fa-edit has-text-grey"></i></span>
+                </a>
+                <a href="{{ item.slug }}" target="_blank">
+                    <span class="icon"><i class="fas fa-arrow-up-right-from-square has-text-grey"></i></span>
+                </a>
             </p>
         </div>
     </div>

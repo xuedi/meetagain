@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
+use App\Entity\MenuType as EnumMenuType;
 use App\Form\MenuType;
 use App\Repository\MenuRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,7 +40,9 @@ class AdminMenuController extends AbstractController
             'active' => 'menu',
             'form' => $form,
             'edit' => $edit,
-            'items' => $this->repo->findAll(),
+            'menuTypeList' => EnumMenuType::getTranslatedList($this->translator),
+            'menuTypeActive' => $menu?->getType()?->value ?? 0,
+            'items' => $this->repo->getAllSlugified(),
             'menu_locations' => MenuLocation::getTranslatedList($this->translator),
         ]);
     }

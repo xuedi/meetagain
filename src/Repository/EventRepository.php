@@ -96,4 +96,15 @@ class EventRepository extends ServiceEntityRepository
         }
         return null;
     }
+
+    public function getChoices(string $locale): array
+    {
+        $all = $this->findBy(['initial' => true]);
+        $list = [];
+        foreach ($all as $event) {
+            $list[$event->getTitle($locale)] = $event->getId();
+        }
+
+        return $list;
+    }
 }
