@@ -15,6 +15,7 @@
     <p class="menu-label">CMS</p>
     <ul class="menu-list">
         <li><a class="{% if active == 'cms' %}is-active{% endif %}" href="{{ path('app_admin_cms') }}">{{ "menu_admin_cms" | trans }}</a></li>
+        <li><a class="{% if active == 'menu' %}is-active{% endif %}" href="{{ path('app_admin_menu') }}">{{ "menu_admin_menu" | trans }}</a></li>
     </ul>
     <p class="menu-label">Translation</p>
     <ul class="menu-list">

@@ -1,0 +1,43 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="columns">
+            {% for locationId, locationName in menu_locations %}
+            <div class="column">
+                <h2 class="title is-5">{{ locationName }}</h2>
+                <ul>
+                    {% for item in items %}
+                        {% if locationId == item.location.value %}
+                            <li>
+                                <div class="button">{{ item.translatedName(app.locale) }}</div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+
+    <div class="columns">
+        <div class="column is-4">
+            <div class="box mt-6">
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button class="button is-link">{{ "button_add" | trans }}</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+        <div class="column is-8">
+            <div class="box mt-6">
+                pre selection all routes that are preselected as public
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
