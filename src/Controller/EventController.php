@@ -29,6 +29,7 @@ use Symfony\Component\WebLink\Link;
 class EventController extends AbstractController
 {
     public const string ROUTE_EVENT = 'app_event';
+    public const string ROUTE_FEATURED = 'app_event_featured';
 
     public function __construct(
         private readonly ActivityService $activityService
@@ -127,7 +128,7 @@ class EventController extends AbstractController
         ], $response);
     }
 
-    #[Route('/event/featured/', name: 'app_event_featured')]
+    #[Route('/event/featured/', name: self::ROUTE_FEATURED)]
     public function featured(EventRepository $repo): Response
     {
         $response = $this->getResponse();

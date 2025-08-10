@@ -14,6 +14,7 @@ enum MenuRoutes: string
 {
     case Profile = ProfileController::ROUTE_PROFILE;
     case Events = EventController::ROUTE_EVENT;
+    case EventsFeatured = EventController::ROUTE_FEATURED;
     case Members = MemberController::ROUTE_MEMBER;
     case Manage = ManageController::ROUTE_MANAGE;
     case Admin = AdminController::ROUTE_ADMIN;
