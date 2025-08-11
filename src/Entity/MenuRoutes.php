@@ -8,6 +8,7 @@ use App\Controller\ManageController;
 use App\Controller\MemberController;
 use App\Controller\ProfileController;
 use App\Controller\SecurityController;
+use App\Controller\TranslationController;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 enum MenuRoutes: string
@@ -19,6 +20,7 @@ enum MenuRoutes: string
     case Manage = ManageController::ROUTE_MANAGE;
     case Admin = AdminController::ROUTE_ADMIN;
     case Login = SecurityController::LOGIN_ROUTE;
+    case Translation = TranslationController::ROUTE_MANAGE;
 
     public static function getChoices(TranslatorInterface $translator): array
     {
