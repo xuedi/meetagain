@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Dishes:
+                        dir: "%kernel.project_dir%/plugins/dishes/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Dishes\Entity
+                        alias: Dishes
+
+doctrine_migrations:
+    migrations_paths: # add for diff, migrate has own config for parameter
+        PluginDishesMigrations: "%kernel.project_dir%/plugins/dishes/migrations"
