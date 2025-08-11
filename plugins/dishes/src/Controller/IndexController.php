@@ -3,6 +3,7 @@
 namespace Plugin\Dishes\Controller;
 
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Form\DishType;
@@ -44,6 +45,9 @@ class IndexController extends AbstractController
             if (!$this->getUser() instanceof User) {
                 throw new AuthenticationException('Only for logged in users');
             }
+            $dish->setCreatedBy($this->getUser()->getId());
+            $dish->setCreatedAt(new DateTimeImmutable());
+            $dish->setApproved(false);
 
             $this->em->persist($dish);
             $this->em->flush();
