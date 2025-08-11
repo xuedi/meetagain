@@ -25,12 +25,12 @@
     "doctrine/doctrine-migrations-bundle": "^3.3",
     "doctrine/orm": "^3.3",
     "knplabs/knp-time-bundle": "^2.4",
-    "nikic/php-parser": "^5.3",
+    "nikic/php-parser": "^5",
     "phpdocumentor/reflection-docblock": "^5.4",
     "phpstan/phpdoc-parser": "^2.0",
     "rlanvin/php-rrule": "^2.5",
     "sensiolabs/ansi-to-html": "^2.0",
-    "sentry/sentry-symfony": "^5.2",
+    "sentry/sentry-symfony": "^5.3",
     "symfony/cache": "7.3.*",
     "symfony/console": "7.3.*",
     "symfony/dotenv": "7.3.*",
@@ -61,8 +61,8 @@
     "symfony/web-link": "7.3.*",
     "symfony/yaml": "7.3.*",
     "symfonycasts/verify-email-bundle": "^1.17",
-    "twig/extra-bundle": "^2.12|^3.0",
-    "twig/twig": "^2.12|^3.0"
+    "twig/extra-bundle": "^3",
+    "twig/twig": "^3"
   },
   "config": {
     "allow-plugins": {
