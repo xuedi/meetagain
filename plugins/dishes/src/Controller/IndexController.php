@@ -32,6 +32,14 @@ class IndexController extends AbstractController
         ]);
     }
 
+    #[Route('/view/{id}', name: 'plugin_dishes_item_show', methods: ['GET'])]
+    public function view(int $id): Response
+    {
+        return $this->render('@Dishes/view.html.twig', [
+            'dish' => $this->repo->findOneBy(['id' => $id]),
+        ]);
+    }
+
     #[Route('/edit/{id}', name: 'app_plugin_dishes_edit')]
     public function edit(Request $request, Dish $dish, ?int $id = null): Response
     {

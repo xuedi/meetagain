@@ -18,10 +18,9 @@ class DishType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('name', TextType::class, [
-                'label' => 'Dish name',
-            ]);
+        $builder->add('name', TextType::class, [
+            'label' => 'Dish name',
+        ]);
     }
 
     #[\Override]

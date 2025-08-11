@@ -8,5 +8,5 @@ enum ImageType: int
     case EventTeaser = 2;
     case EventUpload = 3;
     case CmsBlock = 4;
-    case PluginDishes = 5;
+    case PluginDishPreview = 5;
 }

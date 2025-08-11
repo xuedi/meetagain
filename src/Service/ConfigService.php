@@ -22,7 +22,7 @@ readonly class ConfigService
             ImageType::EventTeaser => [[1024, 768], [600, 400], [210, 140]], // included EventUpload
             ImageType::EventUpload => [[1024, 768], [210, 140]],
             ImageType::CmsBlock => [[432, 432], [80, 80]],
-            ImageType::PluginDishes => [[1024, 768], [400, 400]],
+            ImageType::PluginDishPreview => [[400, 400]],
         };
     }
 

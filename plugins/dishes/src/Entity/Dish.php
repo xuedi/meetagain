@@ -2,6 +2,7 @@
 
 namespace Plugin\Dishes\Entity;
 
+use App\Entity\Image;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,6 +28,9 @@ class Dish
 
     #[ORM\Column]
     private bool $approved = false;
+
+    #[ORM\ManyToOne]
+    private ?Image $previewImage = null;
 
     public function __construct()
     {
@@ -124,6 +128,18 @@ class Dish
     public function setApproved(bool $approved): static
     {
         $this->approved = $approved;
+
+        return $this;
+    }
+
+    public function getPreviewImage(): ?Image
+    {
+        return $this->previewImage;
+    }
+
+    public function setPreviewImage(?Image $previewImage): static
+    {
+        $this->previewImage = $previewImage;
 
         return $this;
     }

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_plugin_dishes_title_new"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <p>{{ dish.getTranslatedName(app.locale) }}</p>
+
+            {% include '_block/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
+
+        </div>
+    </section>
+
+{% endblock %}
+

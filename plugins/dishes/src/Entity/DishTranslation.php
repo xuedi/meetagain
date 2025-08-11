@@ -25,7 +25,7 @@ class DishTranslation
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $phonetic = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -77,7 +77,7 @@ class DishTranslation
         return $this->phonetic;
     }
 
-    public function setPhonetic(string $phonetic): static
+    public function setPhonetic(?string $phonetic): static
     {
         $this->phonetic = $phonetic;
 
