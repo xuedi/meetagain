@@ -11,7 +11,7 @@
                 {{ form_start(form) }}
                 {{ form_row(form.url) }}
                 {{ form_row(form.host) }}
-                <div class="columns">
+                <div class="columns mb-0">
                     <div class="column">
                         {{ form_row(form.senderName) }}
                     </div>
@@ -19,6 +19,7 @@
                         {{ form_row(form.senderEmail) }}
                     </div>
                 </div>
+                {{ form_row(form.systemUser) }}
 
                 <button class="button is-link">{{ "button_save" | trans }}</button>
                 {{ form_end(form) }}

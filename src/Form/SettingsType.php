@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Repository\UserRepository;
 use App\Service\ConfigService;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,7 +13,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SettingsType extends AbstractType
 {
-    public function __construct(private readonly ConfigService $configService)
+    public function __construct(
+        private readonly ConfigService $configService,
+        private readonly UserRepository $userRepo,
+    )
     {
     }
 
@@ -20,21 +25,26 @@ class SettingsType extends AbstractType
     {
         $mailer = $this->configService->getMailerAddress();
         $builder->add('url', TextType::class, [
+            'label' => 'SiteUrl',
             'attr' => ['placeholder' => $this->configService->getUrl()],
             'data' => $this->configService->getUrl(),
-            'label' => 'SiteUrl',
         ])->add('host', TextType::class, [
+            'label' => 'SiteHost',
             'attr' => ['placeholder' => $this->configService->getHost()],
             'data' => $this->configService->getHost(),
-            'label' => 'SiteHost',
         ])->add('senderName', TextType::class, [
+            'label' => 'Sender Name',
             'attr' => ['placeholder' => $mailer->getName()],
             'data' => $mailer->getName(),
-            'label' => 'Sender Name',
         ])->add('senderEmail', EmailType::class, [
+            'label' => 'Sender Email',
             'attr' => ['placeholder' => $mailer->getAddress()],
             'data' => $mailer->getAddress(),
-            'label' => 'Sender Email',
+        ])->add('systemUser', ChoiceType::class, [
+            'attr' => ['class' => 'is-fullwidth'],
+            'label' => 'System User',
+            'data' => $this->configService->getSystemUserId(),
+            'choices' => $this->userRepo->getAllUserChoice(),
         ]);
     }
 

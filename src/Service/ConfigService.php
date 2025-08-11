@@ -59,6 +59,11 @@ readonly class ConfigService
         return $this->getString('website_url', 'localhost');
     }
 
+    public function getSystemUserId(): int
+    {
+        return $this->getInt('system_user_id', 1);
+    }
+
     public function getMailerAddress(): Address
     {
         return new Address(
@@ -78,6 +83,7 @@ readonly class ConfigService
         $this->setString('website_host', $formData['host']);
         $this->setString('email_sender_name', $formData['senderName']);
         $this->setString('email_sender_mail', $formData['senderEmail']);
+        $this->setInt('system_user_id', $formData['systemUser']);
     }
 
     private function getBoolean(string $name, bool $default = false): bool
@@ -109,6 +115,30 @@ readonly class ConfigService
             $setting->setType(ConfigType::String);
         }
         $setting->setValue($value);
+
+        $this->em->persist($setting);
+        $this->em->flush();
+    }
+
+    private function getInt(string $name, int $default): int
+    {
+        $setting = $this->repo->findOneBy(['name' => $name]);
+        if ($setting === null) {
+            return $default;
+        }
+
+        return (int)$setting->getValue();
+    }
+
+    private function setInt(string $name, int $value): void
+    {
+        $setting = $this->repo->findOneBy(['name' => $name]);
+        if ($setting === null) {
+            $setting = new Config();
+            $setting->setName($name);
+            $setting->setType(ConfigType::Integer);
+        }
+        $setting->setValue((string)$value);
 
         $this->em->persist($setting);
         $this->em->flush();

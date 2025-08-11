@@ -169,4 +169,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getResult();
     }
+
+    public function getAllUserChoice(): array
+    {
+        $list = [];
+        foreach ($this->findAll() as $user) {
+            $list[$user->getName()] = $user->getId();
+        }
+
+        return $list;
+    }
 }

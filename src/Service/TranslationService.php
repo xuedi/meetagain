@@ -25,6 +25,7 @@ readonly class TranslationService
         private Filesystem $fs,
         private ParameterBagInterface $appParams,
         private CommandService $commandService,
+        private ConfigService $configService,
         private string $kernelProjectDir,
     ) {
     }
@@ -84,7 +85,7 @@ readonly class TranslationService
 
         $path = $this->kernelProjectDir . '/translations/';
         $dataBase = $this->translationRepo->getUniqueList();
-        $importUser = $this->userRepo->findOneBy(['email' => 'system@beijingcode.org']);
+        $importUser = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
 
         $finder = new Finder();
         $finder->files()->in($path)->depth(0)->name(['messages*.php']);
