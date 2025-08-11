@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_plugin_dishes_title_new"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <p>Add a new dish</p>
+
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button class="button is-link">{{ "button_add" | trans }}</button>
+            {{ form_end(form) }}
+
+        </div>
+    </section>
+
+{% endblock %}
+

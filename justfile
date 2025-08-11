@@ -7,7 +7,7 @@ default:
 
 install:
     cp --no-clobber .env.dist .env
-    cp config/plugins.dist.php config/plugins.php
+    cp --no-clobber config/plugins.dist.php config/plugins.php
     {{JUST}} start
     {{EXEC}} composer install
     {{EXEC}} php bin/console cache:clear

@@ -1,13 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_dishes_title"|trans }}{% endblock %}
+{% block title %}{{ "page_plugin_dishes_title_index"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            List of dishes looks like a menu
+            <p>List of dishes looks like a menu</p>
+
+            <table id="filteredTable" class="table is-fullwidth">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    {% if is_granted('ROLE_USER') %}
+                        <th>
+                            <a href="{{ path('app_plugin_dishes_edit') }}">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                        </th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in list %}{# action items for managers #}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        {% if is_granted('ROLE_USER') %}
+                            <th>
+                                <a href="{{ path('app_plugin_dishes_edit', {'id': item.id}) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </th>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
         </div>
     </section>

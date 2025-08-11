@@ -4,15 +4,15 @@ namespace Plugin\Dishes\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Plugin\Dishes\Entity\Dishes;
+use Plugin\Dishes\Entity\Dish;
 
 /**
- * @extends ServiceEntityRepository<Dishes>
+ * @extends ServiceEntityRepository<Dish>
  */
-class DishesRepository extends ServiceEntityRepository
+class DishRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Dishes::class);
+        parent::__construct($registry, Dish::class);
     }
 }

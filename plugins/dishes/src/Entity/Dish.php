@@ -2,11 +2,12 @@
 
 namespace Plugin\Dishes\Entity;
 
-use App\Repository\DishesRepository;
-use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: DishesRepository::class)]
-class Dishes
+use Doctrine\ORM\Mapping as ORM;
+use Plugin\Dishes\Repository\DishRepository;
+
+#[ORM\Entity(repositoryClass: DishRepository::class)]
+class Dish
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
