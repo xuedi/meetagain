@@ -20,7 +20,7 @@ services:
     tty: true
 
   mariadb:
-    image: mariadb:11.8.2
+    image: mariadb:12.0.2
     container_name: "ma-db"
     volumes:
       - ma-mysql-data:/var/lib/mysql
