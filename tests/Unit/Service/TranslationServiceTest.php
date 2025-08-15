@@ -6,6 +6,7 @@ use App\Entity\Translation;
 use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use App\Service\CommandService;
+use App\Service\ConfigService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
@@ -43,6 +44,7 @@ class TranslationServiceTest extends TestCase
             $this->createMock(Filesystem::class),
             $this->createMock(ParameterBagInterface::class),
             $this->commandServiceMock,
+            $this->createMock(ConfigService::class),
             __DIR__ . '/tmp/'
         );
     }
