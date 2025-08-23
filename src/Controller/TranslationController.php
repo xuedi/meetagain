@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Translation;
+use App\Entity\TranslationSuggestion;
 use App\Form\TranslationType;
 use App\Repository\TranslationRepository;
+use App\Repository\TranslationSuggestionRepository;
 use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +23,7 @@ class TranslationController extends AbstractController
         private readonly TranslationService $translationService,
         private readonly TranslationRepository $translationRepo,
         private readonly EntityManagerInterface $em,
+        private readonly TranslationSuggestionRepository $translationSuggestionRepo,
     )
     {
     }
@@ -48,19 +51,44 @@ class TranslationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $translation->setCreatedAt(new DateTimeImmutable());
-            $translation->setUser($this->getAuthedUser());
+            if ($this->getAuthedUser()->hasRole('ROLE_MANAGER')) {
+                $translation->setCreatedAt(new DateTimeImmutable());
+                $translation->setUser($this->getAuthedUser());
+    
+                $this->em->persist($translation);
+                $this->em->flush();
 
-            $this->em->persist($translation);
-            $this->em->flush();
+                $this->addFlash('success', 'Translation saved');
+            } else {
+                $this->addTranslationSuggestion($translation, $lang);
+                $this->addFlash('success', 'Suggested translation, waiting for approval');
+            }
 
-            return $this->redirectToRoute(self::ROUTE_MANAGE);
+            return $this->redirectToRoute('app_translation_edit', [
+                'id' => $translation->getId(),
+                'lang' => $translation->getLanguage(),
+            ]);
         }
 
         return $this->render('translation/edit.html.twig', [
             'translations' => $this->translationRepo->findBy(['placeholder' => $translation->getPlaceholder()]),
+            'suggestions' => $this->translationSuggestionRepo->findBy(['translation' => $translation]),
             'form' => $form->createView(),
+            'lang' => $lang,
             'item' => $translation,
         ]);
+    }
+
+    private function addTranslationSuggestion(Translation $translation, string $lang): void
+    {
+        $suggestion = new TranslationSuggestion();
+        $suggestion->setLanguage($lang);
+        $suggestion->setTranslation($translation);
+        $suggestion->setSuggestion($translation->getTranslation());
+        $suggestion->setCreatedBy($this->getAuthedUser());
+        $suggestion->setCreatedAt(new DateTimeImmutable());
+
+        $this->em->persist($suggestion);
+        $this->em->flush();
     }
 }

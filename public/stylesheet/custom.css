@@ -17,6 +17,9 @@ body {
 .is-flag {
     height: 40px;
 }
+.is-flag-mini {
+    height: 20px;
+}
 
 .is-pulled-top-right {
     position: absolute;

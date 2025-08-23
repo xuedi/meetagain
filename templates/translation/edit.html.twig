@@ -7,7 +7,7 @@
     <section class="section">
         <div class="container">
 
-            <h1 class="title">Edit Translation</h1>
+            <h1 class="title">{% if is_granted('ROLE_MANAGER') %}Edit{% else %}Suggest{% endif %} Translation</h1>
 
             <div class="columns">
                 <div class="column is-half">
@@ -34,7 +34,11 @@
                         </div>
                         <div class="field is-grouped">
                             <div class="control">
-                                {{ form_widget(form.save, { 'attr': {'class': 'is-link'} }) }}
+                                {% if is_granted('ROLE_MANAGER') %}
+                                    <button type="submit" class="button is-link">Save</button>
+                                {% else %}
+                                    <button type="submit" class="button is-link">Suggest</button>
+                                {% endif %}
                             </div>
                             <div class="control">
                                 <a class="button" href="{{ path('app_translation') }}">Back</a>
@@ -44,23 +48,32 @@
                     </div>
                 </div>
                 <div class="column is-half">
-                    <h3 class="subtitle">Examples in other Languages</h3>
-                    <table class="table is-fullwidth">
-                        <thead>
-                        <tr>
-                            <th>Language</th>
-                            <th>Translation</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for translation in translations %}
+                    <div class="box">
+                        <table class="table is-fullwidth">
+                            <thead>
                             <tr>
-                                <td>{{ translation.language }}</td>
-                                <td>{{ translation.translation }}</td>
+                                <th></th>
+                                <th>Examples in other Languages</th>
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for translation in translations %}
+                                {% if lang != translation.language and translation.translation is not empty %}
+                                    <tr>
+                                        <td>
+                                            <img class="is-flag-mini"
+                                                 src="{{ '/images/flags/' ~ translation.language ~ '.png' }}"/>
+                                        </td>
+                                        <td>{{ translation.translation }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="box">
+                        <h3 class="subtitle">History of changes</h3>
+                    </div>
                 </div>
             </div>
 

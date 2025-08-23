@@ -26,9 +26,6 @@ class TranslationType extends AbstractType
                 'label' => 'Translation',
                 'required' => false,
             ])
-            ->add('save', SubmitType::class, [
-                'label' => 'Save',
-            ])
         ;
     }
 
