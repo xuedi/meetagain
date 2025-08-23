@@ -1,0 +1,11 @@
+
+
+<div class="buttons has-addons is-centered">
+    {% for id, name in viewTypeList %}
+    <a class="button {% if viewType == id %} has-background-link has-text-light{% endif %}" href="{{ path('plugin_dishes_set_view_type', {'type': id}) }}">
+        <i class="fa-solid fa-{{ name }}"></i>
+    </a>
+    {% endfor %}
+</div>
+
+

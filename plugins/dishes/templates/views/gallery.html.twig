@@ -1,0 +1,25 @@
+{% for item in list %}
+    {% set href = '/images/thumbnails/' ~ item.previewImage.hash ~ '_1024x768.webp' %}
+    {% set Caption = 'You can <a href=' ~ path('app_report_image', {'id': item.previewImage.id}) ~ '>report</a> an image if there is something wrong.' %}
+    {% if loop.first %}
+        <a data-fancybox="gallery" data-caption="{{ item.getTranslatedName(app.locale) }}" href="{{ href }}">
+            {% include '_block/image.html.twig' with {'image': item.previewImage, 'size': '1024x768'} %}
+        </a>
+    {% else %}
+        <a data-fancybox="gallery" data-caption="{{ item.getTranslatedName(app.locale) }}" href="{{ href }}">
+            {% include '_block/image.html.twig' with {'image': item.previewImage, 'size': '100x100'} %}
+        </a>
+    {% endif %}
+{% endfor %}
+
+
+<script type="text/javascript">
+
+    Fancybox.bind('[data-fancybox="gallery"]', {
+        compact: true,
+    });
+
+
+    //Fancybox.show();
+
+</script>

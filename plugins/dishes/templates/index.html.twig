@@ -2,28 +2,29 @@
 
 {% block title %}{{ "page_plugin_dishes_title_index"|trans }}{% endblock %}
 
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ '/stylesheet/fancybox.css' }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ '/javascript/fancybox.umd.js' }}" ></script>
+{% endblock %}
+
+
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            <div class="columns is-multiline">
-                {% for item in list %}{# action items for managers #}
-                    <div class="column is-2">
-                        <a  href="{{ path('plugin_dishes_item_show', {'id': item.id}) }}">
-                            <div class="card">
-                                <div class="card-image">
-                                    <figure class="image">
-                                        {% include '_block/image.html.twig' with {'image': item.previewImage, 'size': '400x400'} %}
-                                    </figure>
-                                </div>
-                                <div class="card-content p-3 has-text-centered">
-                                    {{ item.getTranslatedName(app.locale) }}
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                {% endfor %}
+            <div class="columns">
+                <div class="column is-10">
+                    {% include '@Dishes/views/' ~ viewType ~ '.html.twig' %}
+                </div>
+
+                <div class="column is-2">
+                    {% include '@Dishes/sidebar.html.twig' %}
+                </div>
             </div>
 
         </div>

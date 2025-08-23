@@ -1,0 +1,11 @@
+<div class="columns is-multiline">
+    {% for item in list %}{# action items for managers #}
+        <div class="column is-1 p-1">
+            <a href="{{ path('plugin_dishes_item_show', {'id': item.id}) }}">
+                <figure class="image">
+                    {% include '_block/image.html.twig' with {'image': item.previewImage, 'size': '400x400'} %}
+                </figure>
+            </a>
+        </div>
+    {% endfor %}
+</div>

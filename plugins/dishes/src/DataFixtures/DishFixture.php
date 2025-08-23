@@ -29,6 +29,7 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
         echo 'Creating dishes ... ';
         foreach ($this->getData() as [$imagePreview, $translations]) {
             $dish = new Dish();
+            $dish->setOriginLang('cn');
             $dish->setApproved(true);
             $dish->setCreatedBy($importUser->getId());
             $dish->setCreatedAt(new DateTimeImmutable());
@@ -49,7 +50,6 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
             $imageFile = __DIR__ . "/dishes/$imagePreview";
             $uploadedImage = new UploadedFile($imageFile, $imagePreview);
             $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginDishPreview);
-//            $manager->flush();
             $this->imageService->createThumbnails($image);
 
             // associate image with a user
@@ -78,17 +78,17 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
                     'cn' => [
                         'name' => '炒饼',
                         'phonetic' => 'Chǎo bǐng',
-                        'description' => 'Description cn-1',
+                        'description' => 'Description cn',
                     ],
                     'en' => [
                         'name' => 'Stir-fried pancakes',
                         'phonetic' => null,
-                        'description' => 'Description en-1',
+                        'description' => 'Description en',
                     ],
                     'de' => [
                         'name' => 'Gebratener Fladen',
                         'phonetic' => null,
-                        'description' => 'Description de-1',
+                        'description' => 'Description de',
                     ],
                 ]
             ],
@@ -98,17 +98,17 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
                     'cn' => [
                         'name' => '麻婆豆腐',
                         'phonetic' => 'Má pó dòufu',
-                        'description' => 'Description cn-1',
+                        'description' => 'Description cn',
                     ],
                     'en' => [
                         'name' => 'Mapo tofu',
                         'phonetic' => null,
-                        'description' => 'Description en-1',
+                        'description' => 'Description en',
                     ],
                     'de' => [
                         'name' => 'Mapo-Tofu',
                         'phonetic' => null,
-                        'description' => 'Description de-1',
+                        'description' => 'Description de',
                     ],
                 ]
             ],
@@ -118,17 +118,17 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
                     'cn' => [
                         'name' => '宫保鸡丁',
                         'phonetic' => 'Gōng bǎo jī dīng',
-                        'description' => 'Description cn-1',
+                        'description' => 'Description cn',
                     ],
                     'en' => [
                         'name' => 'Kung Pao Chicken',
                         'phonetic' => null,
-                        'description' => 'Description en-1',
+                        'description' => 'Description en',
                     ],
                     'de' => [
                         'name' => 'Kung Pao Hühnchen',
                         'phonetic' => null,
-                        'description' => 'Description de-1',
+                        'description' => 'Description de',
                     ],
                 ]
             ],

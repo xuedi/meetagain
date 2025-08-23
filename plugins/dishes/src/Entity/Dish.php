@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Plugin\Dishes\Entity;
 
@@ -31,6 +31,9 @@ class Dish
 
     #[ORM\ManyToOne]
     private ?Image $previewImage = null;
+
+    #[ORM\Column(length: 2, nullable: true)]
+    private ?string $originLang = null;
 
     public function __construct()
     {
@@ -96,6 +99,16 @@ class Dish
         return '';
     }
 
+    public function getPhonetic(string $language): string
+    {
+        foreach ($this->translations as $translation) {
+            if ($translation->getLanguage() === $language) {
+                return $translation->getPhonetic() ?? '';
+            }
+        }
+        return '';
+    }
+
     public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
@@ -140,6 +153,18 @@ class Dish
     public function setPreviewImage(?Image $previewImage): static
     {
         $this->previewImage = $previewImage;
+
+        return $this;
+    }
+
+    public function getOriginLang(): ?string
+    {
+        return $this->originLang;
+    }
+
+    public function setOriginLang(?string $originLang): static
+    {
+        $this->originLang = $originLang;
 
         return $this;
     }

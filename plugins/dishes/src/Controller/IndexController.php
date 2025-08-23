@@ -6,6 +6,7 @@ use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dishes\Entity\Dish;
+use Plugin\Dishes\Entity\ViewType;
 use Plugin\Dishes\Form\DishType;
 use Plugin\Dishes\Repository\DishRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,19 +26,44 @@ class IndexController extends AbstractController
     }
 
     #[Route('', name: 'app_plugin_dishes', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $session = $request->getSession();
+
         return $this->render('@Dishes/index.html.twig', [
             'list' => $this->repo->findAll(),
+            'viewType' => $session->get('dishesViewType', ViewType::Tiles->value),
+            'viewTypeList' => [
+                ViewType::List->value => 'list',
+                ViewType::Tiles->value => 'grip',
+                ViewType::Grid->value => 'table-cells',
+                ViewType::Gallery->value => 'images'
+            ],
         ]);
     }
 
     #[Route('/view/{id}', name: 'plugin_dishes_item_show', methods: ['GET'])]
     public function view(int $id): Response
     {
-        return $this->render('@Dishes/view.html.twig', [
+        return $this->render('@Dishes/details.html.twig', [
             'dish' => $this->repo->findOneBy(['id' => $id]),
         ]);
+    }
+
+    #[Route('/filter/{name}/set/{value}', name: 'plugin_dishes_filter', methods: ['GET'])]
+    public function filter(ViewType $view): Response
+    {
+        // save settings to session and display
+        return $this->redirectToRoute('app_plugin_dishes');
+    }
+
+    #[Route('/set/view/{type}', name: 'plugin_dishes_set_view_type', methods: ['GET'])]
+    public function setViewType(Request $request, ViewType $type): Response
+    {
+        $session = $request->getSession();
+        $session->set('dishesViewType', $type->value);
+
+        return $this->redirectToRoute('app_plugin_dishes');
     }
 
     #[Route('/edit/{id}', name: 'app_plugin_dishes_edit')]

@@ -1,0 +1,23 @@
+<table id="filteredTable" class="table is-fullwidth">
+    <thead>
+    <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Phonetic</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in list %}{# action items for managers #}
+        <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
+            <td>
+                <a href="{{ path('plugin_dishes_item_show', {'id': item.id}) }}">
+                    {% include '_block/image.html.twig' with {'image': item.previewImage, 'size': '50x50'} %}
+                </a>
+            </td>
+            <td>{{ item.getTranslatedName(app.locale) }}</td>
+            <td>{{ item.getPhonetic(app.locale) }}</td>
+            <td>{{ item.getTranslatedDescription(app.locale) }}</td>
+        </tr>
+    {% endfor %}
+</table>
