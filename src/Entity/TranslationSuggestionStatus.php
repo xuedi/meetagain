@@ -4,11 +4,12 @@ namespace App\Entity;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum ImageReported: int
+enum TranslationSuggestionStatus: int
 {
-    case Privacy = 1;
-    case Copyright = 2;
-    case Inappropriate = 3;
+    case Requested = 0;
+    case Approved = 1;
+    case Denied = 2;
+    case Contested = 3;
 
     public static function getChoices(TranslatorInterface $translator): array
     {
@@ -19,7 +20,7 @@ enum ImageReported: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('image_report_reason_' . strtolower($case->name));
+            $choices[$case->value] = $translator->trans('translation_suggestion_status_' . strtolower($case->name));
         }
 
         return $choices;

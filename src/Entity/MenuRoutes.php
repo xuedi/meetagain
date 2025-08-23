@@ -31,7 +31,7 @@ enum MenuRoutes: string
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('menu_route_' . $case->name);
+            $choices[$case->value] = $translator->trans('menu_route_' . strtolower($case->name));
         }
 
         return $choices;

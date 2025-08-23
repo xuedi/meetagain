@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Translation;
 use App\Entity\TranslationSuggestion;
+use App\Entity\TranslationSuggestionStatus;
 use App\Form\TranslationType;
 use App\Repository\TranslationRepository;
 use App\Repository\TranslationSuggestionRepository;
@@ -46,6 +47,7 @@ class TranslationController extends AbstractController
         if (!$translation instanceof Translation) {
             throw $this->createNotFoundException('Translation not found');
         }
+        $before = $translation->getTranslation();
 
         $form = $this->createForm(TranslationType::class, $translation);
         $form->handleRequest($request);
@@ -60,7 +62,7 @@ class TranslationController extends AbstractController
 
                 $this->addFlash('success', 'Translation saved');
             } else {
-                $this->addTranslationSuggestion($translation, $lang);
+                $this->addTranslationSuggestion($translation, $lang, $before ?? '');
                 $this->addFlash('success', 'Suggested translation, waiting for approval');
             }
 
@@ -72,23 +74,76 @@ class TranslationController extends AbstractController
 
         return $this->render('translation/edit.html.twig', [
             'translations' => $this->translationRepo->findBy(['placeholder' => $translation->getPlaceholder()]),
-            'suggestions' => $this->translationSuggestionRepo->findBy(['translation' => $translation]),
+            'suggestions' => $this->translationSuggestionRepo->findBy(['translation' => $translation], ['createdAt' => 'DESC']),
             'form' => $form->createView(),
             'lang' => $lang,
             'item' => $translation,
         ]);
     }
 
-    private function addTranslationSuggestion(Translation $translation, string $lang): void
+    #[Route('/suggestion/deny/{id}', name: 'app_translation_suggestion_deny')]
+    public function suggestionDeny(int $id): Response
+    {
+        $suggestion = $this->getSuggestion($id);
+        $suggestion->setApprovedAt(new DateTimeImmutable());
+        $suggestion->setApprovedBy($this->getAuthedUser());
+        $suggestion->setStatus(TranslationSuggestionStatus::Denied);
+
+        $this->em->persist($suggestion);
+        $this->em->flush();
+
+        return $this->redirectToRoute('app_translation_edit', [
+            'id' => $suggestion->getTranslation()?->getId(),
+            'lang' => $suggestion->getLanguage(),
+        ]);
+    }
+
+    #[Route('/suggestion/approve/{id}', name: 'app_translation_suggestion_approve')]
+    public function suggestionApprove(int $id): Response
+    {
+        $suggestion = $this->getSuggestion($id);
+        $suggestion->setApprovedAt(new DateTimeImmutable());
+        $suggestion->setApprovedBy($this->getAuthedUser());
+        $suggestion->setStatus(TranslationSuggestionStatus::Approved);
+
+        $translation = $suggestion->getTranslation();
+        if (!$translation instanceof Translation) {
+            throw $this->createNotFoundException('Translation not found');
+        }
+        $translation->setTranslation($suggestion->getSuggestion());
+
+        $this->em->persist($suggestion);
+        $this->em->persist($translation);
+        $this->em->flush();
+
+        return $this->redirectToRoute('app_translation_edit', [
+            'id' => $suggestion->getTranslation()?->getId(),
+            'lang' => $suggestion->getLanguage(),
+        ]);
+    }
+
+    private function addTranslationSuggestion(Translation $translation, string $lang, string $before): void
     {
         $suggestion = new TranslationSuggestion();
         $suggestion->setLanguage($lang);
         $suggestion->setTranslation($translation);
+        $suggestion->setPrevious($before);
         $suggestion->setSuggestion($translation->getTranslation());
         $suggestion->setCreatedBy($this->getAuthedUser());
         $suggestion->setCreatedAt(new DateTimeImmutable());
+        $suggestion->setStatus(TranslationSuggestionStatus::Requested);
 
         $this->em->persist($suggestion);
         $this->em->flush();
+    }
+
+    private function getSuggestion(int $id): TranslationSuggestion
+    {
+        $suggestion = $this->translationSuggestionRepo->findOneBy(['id' => $id]);
+        if (!$suggestion instanceof TranslationSuggestion) {
+            throw $this->createNotFoundException('Translation suggestion not found');
+        }
+
+        return $suggestion;
     }
 }

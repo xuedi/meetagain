@@ -20,7 +20,7 @@ enum MenuVisibility: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('menu_visibility_' . $case->name);
+            $choices[$case->value] = $translator->trans('menu_visibility_' . strtolower($case->name));
         }
 
         return $choices;

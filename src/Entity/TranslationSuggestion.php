@@ -37,6 +37,12 @@ class TranslationSuggestion
     #[ORM\JoinColumn(nullable: false)]
     private ?Translation $translation = null;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $previous = null;
+
+    #[ORM\Column(enumType: TranslationSuggestionStatus::class)]
+    private ?TranslationSuggestionStatus $status = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +128,30 @@ class TranslationSuggestion
     public function setTranslation(?Translation $translation): static
     {
         $this->translation = $translation;
+
+        return $this;
+    }
+
+    public function getPrevious(): ?string
+    {
+        return $this->previous;
+    }
+
+    public function setPrevious(string $previous): static
+    {
+        $this->previous = $previous;
+
+        return $this;
+    }
+
+    public function getStatus(): ?TranslationSuggestionStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(TranslationSuggestionStatus $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

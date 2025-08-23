@@ -71,10 +71,45 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="box">
-                        <h3 class="subtitle">History of changes</h3>
-                    </div>
                 </div>
+            </div>
+
+            <h3 class="subtitle">Suggested Changes & history</h3>
+            <div class="box">
+
+                <table class="table is-fullwidth">
+                    <thead>
+                    <tr>
+                        <th>SuggestedAt</th>
+                        <th>SuggestedBy</th>
+                        <th>Before</th>
+                        <th>After</th>
+                        <th>CheckedBy</th>
+                        <th>CheckedAt</th>
+                        <th>CheckResult</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for suggestion in suggestions %}
+                        <tr>
+                            <td>{{ suggestion.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>{{ suggestion.createdBy.name }}</td>
+                            <td>{{ suggestion.previous }}</td>
+                            <td>{{ suggestion.suggestion }}</td>
+                            <td>{{ suggestion.approvedBy.name }}</td>
+                            <td>{{ suggestion.approvedAt|date('Y-m-d H:i') }}</td>
+                            {% if is_granted('ROLE_MANAGER') and suggestion.status.value == 0 %}
+                                <td>
+                                    <a class="button is-small is-danger" href="{{ path('app_translation_suggestion_deny', {id: suggestion.id}) }}">Deny</a>
+                                    <a class="button is-small is-success" href="{{ path('app_translation_suggestion_approve', {id: suggestion.id}) }}">Approve</a>
+                                </td>
+                            {% else %}
+                                <td>{{ suggestion.status.name }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
         </div>

@@ -20,7 +20,7 @@ enum MenuType: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('menu_type_' . $case->name);
+            $choices[$case->value] = $translator->trans('menu_type_' . strtolower($case->name));
         }
 
         return $choices;
