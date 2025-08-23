@@ -32,7 +32,7 @@
                             {% endif %}
                             <td class="{{ warning }}">
                                 {% if is_granted('ROLE_USER') %}
-                                <a href="{{ path('app_translation_edit', {'id': id}) }}">
+                                <a href="{{ path('app_translation_edit', {'id': id, 'lang': enabledLocale}) }}">
                                     <span class="icon is-small"><i class="fas fa-edit has-text-grey-light"></i></span>
                                 </a>
                                 {% endif %}

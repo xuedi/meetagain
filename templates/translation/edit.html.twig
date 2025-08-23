@@ -9,7 +9,60 @@
 
             <h1 class="title">Edit Translation</h1>
 
-            EDIT
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="box">
+                        {{ form_start(form) }}
+                        <div class="field">
+                            <label class="label">Placeholder</label>
+                            <div class="control">
+                                {{ form_widget(form.placeholder) }}
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Language</label>
+                            <div class="control">
+                                {{ form_widget(form.language) }}
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Translation</label>
+                            <div class="control">
+                                {{ form_widget(form.translation) }}
+                            </div>
+                            {{ form_errors(form.translation) }}
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="control">
+                                {{ form_widget(form.save, { 'attr': {'class': 'is-link'} }) }}
+                            </div>
+                            <div class="control">
+                                <a class="button" href="{{ path('app_translation') }}">Back</a>
+                            </div>
+                        </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <h3 class="subtitle">Examples in other Languages</h3>
+                    <table class="table is-fullwidth">
+                        <thead>
+                        <tr>
+                            <th>Language</th>
+                            <th>Translation</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for translation in translations %}
+                            <tr>
+                                <td>{{ translation.language }}</td>
+                                <td>{{ translation.translation }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
         </div>
     </section>
