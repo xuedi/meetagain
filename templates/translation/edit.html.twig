@@ -96,8 +96,8 @@
                             <td>{{ suggestion.createdBy.name }}</td>
                             <td>{{ suggestion.previous }}</td>
                             <td>{{ suggestion.suggestion }}</td>
-                            <td>{{ suggestion.approvedAt|date('Y-m-d H:i') }}</td>
-                            <td>{{ suggestion.approvedBy.name }}</td>
+                            <td>{{ suggestion.approvedAt is empty ? '' : suggestion.approvedAt|date('Y-m-d H:i') }}</td>
+                            <td>{{ suggestion.approvedByName }}</td>
                             {% if is_granted('ROLE_MANAGER') and suggestion.status.value == 0 %}
                                 <td>
                                     <a class="button is-small is-danger" href="{{ path('app_translation_suggestion_deny', {id: suggestion.id}) }}">Deny</a>

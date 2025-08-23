@@ -74,7 +74,7 @@ class TranslationController extends AbstractController
 
         return $this->render('translation/edit.html.twig', [
             'translations' => $this->translationRepo->findBy(['placeholder' => $translation->getPlaceholder()]),
-            'suggestions' => $this->translationSuggestionRepo->findBy(['translation' => $translation], ['createdAt' => 'DESC']),
+            'suggestions' => $this->translationSuggestionRepo->findBy(['translation' => $translation], ['createdAt' => 'ASC']),
             'form' => $form->createView(),
             'lang' => $lang,
             'item' => $translation,
@@ -139,6 +139,9 @@ class TranslationController extends AbstractController
 
     private function getSuggestion(int $id): TranslationSuggestion
     {
+        if (!$this->getAuthedUser()->hasRole('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException('Only managers can approve or deny suggestions');
+        }
         $suggestion = $this->translationSuggestionRepo->findOneBy(['id' => $id]);
         if (!$suggestion instanceof TranslationSuggestion) {
             throw $this->createNotFoundException('Translation suggestion not found');

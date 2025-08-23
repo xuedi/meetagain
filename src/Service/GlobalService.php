@@ -4,7 +4,9 @@ namespace App\Service;
 
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
+use App\Entity\TranslationSuggestionStatus;
 use App\Repository\MenuRepository;
+use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -21,6 +23,7 @@ readonly class GlobalService
         private UserRepository $userRepo,
         private PluginService $pluginService,
         private MenuRepository $menuRepo,
+        private TranslationSuggestionRepository $translationSuggestionRepo,
         private Security $security,
     )
     {
@@ -100,6 +103,11 @@ readonly class GlobalService
     public function getAdminAttention(): bool
     {
         return count($this->dashboardService->getNeedForApproval()) > 0;
+    }
+
+    public function getManagerAttention(): bool
+    {
+        return count($this->translationSuggestionRepo->findBy(['status' => TranslationSuggestionStatus::Requested])) > 0;
     }
 
     public function getAlternativeLanguageCodes(): array

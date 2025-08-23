@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TranslationSuggestionRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -15,14 +16,14 @@ class TranslationSuggestion
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $approvedAt = null;
+    private ?DateTimeImmutable $approvedAt = null;
 
     #[ORM\ManyToOne]
     private ?User $approvedBy = null;
@@ -48,12 +49,12 @@ class TranslationSuggestion
         return $this->id;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
@@ -72,12 +73,12 @@ class TranslationSuggestion
         return $this;
     }
 
-    public function getApprovedAt(): ?\DateTimeImmutable
+    public function getApprovedAt(): ?DateTimeImmutable
     {
         return $this->approvedAt;
     }
 
-    public function setApprovedAt(?\DateTimeImmutable $approvedAt): static
+    public function setApprovedAt(?DateTimeImmutable $approvedAt): static
     {
         $this->approvedAt = $approvedAt;
 
@@ -87,6 +88,11 @@ class TranslationSuggestion
     public function getApprovedBy(): ?User
     {
         return $this->approvedBy;
+    }
+
+    public function approvedByName(): string
+    {
+        return $this->approvedBy?->getName() ?? '';
     }
 
     public function setApprovedBy(?User $approvedBy): static

@@ -6,11 +6,46 @@
 
     <section class="section">
         <div class="container">
-            <h1>Management</h1>
+            <h1 class="title">Management</h1>
 
-            <p>Power users can approve images</p>
-            <p>create translation update requests</p>
-            <p>approve translation update requests</p>
+            <div class="box">
+                <h2 class="subtitle has-text-centered">Requested changes to the general translations</h2>
+                {% if translationSuggestions|length > 0 %}
+
+                <table class="table is-fullwidth">
+                    <thead>
+                    <tr>
+                        <th>SuggestedAt</th>
+                        <th>SuggestedBy</th>
+                        <th>Change from</th>
+                        <th>Change into</th>
+                        <th>Decision</th>
+                        <th>History</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for suggestion in translationSuggestions %}
+                        {% set translation = suggestion.translation %}
+                        <tr>
+                            <td>{{ suggestion.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>{{ suggestion.createdBy.name }}</td>
+                            <td>{{ suggestion.previous }}</td>
+                            <td>{{ suggestion.suggestion }}</td>
+                            <td>
+                                <a class="button is-small is-danger" href="{{ path('app_translation_suggestion_deny', {id: suggestion.id}) }}">Deny</a>
+                                <a class="button is-small is-success" href="{{ path('app_translation_suggestion_approve', {id: suggestion.id}) }}">Approve</a>
+                            </td>
+                            <td>
+                                <a class="button is-small" href="{{ path('app_translation_edit', {'id': translation.id, 'lang': translation.language}) }}">show</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="has-text-centered">nothing to approve at the moment</p>
+                {% endif %}
+            </div>
 
         </div>
     </section>
