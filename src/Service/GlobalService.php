@@ -7,6 +7,7 @@ use App\Entity\Session\ConsentType;
 use App\Repository\MenuRepository;
 use App\Repository\UserRepository;
 use RuntimeException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -20,6 +21,7 @@ readonly class GlobalService
         private UserRepository $userRepo,
         private PluginService $pluginService,
         private MenuRepository $menuRepo,
+        private Security $security,
     )
     {
     }
@@ -48,10 +50,16 @@ readonly class GlobalService
     {
         $request = $this->requestStack->getCurrentRequest();
         if ($request instanceof Request) {
-            return $this->menuRepo->getAllSlugified($request->getLocale(), $type);
+            return $this->menuRepo->getAllSlugified(
+                user: $this->security->getUser(),
+                locale: $request->getLocale(),
+                location: $type
+            );
         }
 
-        return $this->menuRepo->getAllSlugified('en');
+        return $this->menuRepo->getAllSlugified(
+            user: $this->security->getUser(),
+        );
     }
 
     public function getUserName(int $id): string

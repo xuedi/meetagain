@@ -5,9 +5,11 @@ namespace App\Repository;
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
 use App\Entity\MenuType;
+use App\Entity\MenuVisibility;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Menu>
@@ -19,7 +21,7 @@ class MenuRepository extends ServiceEntityRepository
         parent::__construct($registry, Menu::class);
     }
 
-    public function getAllSlugified(string $locale = 'en', ?string $location = null): array
+    public function getAllSlugified(?UserInterface $user = null, string $locale = 'en', ?string $location = null): array
     {
         $criteria = match ($location) {
             'top' => ['location' => MenuLocation::TopBar],
@@ -32,9 +34,12 @@ class MenuRepository extends ServiceEntityRepository
         $all = $this->findBy($criteria,['priority' => 'ASC']);
         $list = [];
         foreach ($all as $menu) {
+            if (!$this->isVisible($user, $menu->getVisibility())) {
+                continue;
+            }
             $menu->setSlug(match ($menu->getType()) {
-                MenuType::Cms => '/' . $locale . '/' . $menu->getCms()->getSlug(),
-                MenuType::Event => '/' . $locale . '/events/' . $menu->getEvent()->getId(),
+                MenuType::Cms => '/' . $locale . '/' . $menu->getCms()?->getSlug(),
+                MenuType::Event => '/' . $locale . '/events/' . $menu->getEvent()?->getId(),
                 MenuType::Route => $this->router->generate($menu->getRoute()->value),
                 MenuType::Url => $menu->getSlug(),
             });
@@ -42,5 +47,20 @@ class MenuRepository extends ServiceEntityRepository
         }
 
         return $list;
+    }
+
+    private function isVisible(?UserInterface $user, ?MenuVisibility $visibility): bool
+    {
+        if ($visibility === null) {
+            return true;
+        }
+
+        return match($visibility) {
+            MenuVisibility::Everyone => true,
+            MenuVisibility::User => ($user !== null && $user->hasRole('ROLE_USER')),
+            MenuVisibility::Manager => ($user !== null && $user->hasRole('ROLE_MANAGER')),
+            MenuVisibility::Admin => ($user !== null && $user->hasRole('ROLE_ADMIN')),
+            default => false,
+        };
     }
 }

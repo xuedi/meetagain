@@ -84,7 +84,7 @@ class AdminMenuController extends AbstractController
             'edit' => $edit,
             'menuTypeList' => EnumMenuType::getTranslatedList($this->translator),
             'menuTypeActive' => $menu?->getType()?->value ?? 0,
-            'items' => $this->repo->getAllSlugified(),
+            'items' => $this->repo->getAllSlugified($this->getUser()),
             'menu_locations' => MenuLocation::getTranslatedList($this->translator),
         ]);
     }
