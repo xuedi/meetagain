@@ -4,14 +4,17 @@ namespace Tests\Unit\Service;
 
 use App\Entity\User;
 use App\Repository\MenuRepository;
+use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use App\Service\DashboardService;
 use App\Service\GlobalService;
+use App\Service\ImageService;
 use App\Service\PluginService;
 use App\Service\TranslationService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -24,6 +27,8 @@ class GlobalServiceTest extends TestCase
     private MockObject|UserRepository $userRepositoryMock;
     private MockObject|MenuRepository $menuRepositoryMock;
     private MockObject|PluginService $pluginServiceMock;
+    private MockObject|TranslationSuggestionRepository $suggestionRepoMock;
+    private MockObject|Security $securityMock;
     private GlobalService $subject;
 
     protected function setUp(): void
@@ -33,7 +38,9 @@ class GlobalServiceTest extends TestCase
         $this->dashboardServiceMock = $this->createMock(DashboardService::class);
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
         $this->menuRepositoryMock = $this->createMock(MenuRepository::class);
+        $this->suggestionRepoMock = $this->createMock(TranslationSuggestionRepository::class);
         $this->pluginServiceMock = $this->createMock(PluginService::class);
+        $this->securityMock = $this->createMock(Security::class);
 
         $this->subject = new GlobalService(
             requestStack: $this->requestStackMock,
@@ -42,6 +49,8 @@ class GlobalServiceTest extends TestCase
             userRepo: $this->userRepositoryMock,
             pluginService: $this->pluginServiceMock,
             menuRepo: $this->menuRepositoryMock,
+            translationSuggestionRepo: $this->suggestionRepoMock,
+            security: $this->securityMock
         );
     }
 
