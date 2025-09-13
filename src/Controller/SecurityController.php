@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\EmailType\ResetPassword;
+use App\Entity\EmailType\VerificationRequest;
 use App\Entity\Message;
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
@@ -11,10 +13,10 @@ use App\Entity\UserStatus;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
+use App\Message\PrepareEmail;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\CaptchaService;
-use App\Service\EmailService;
 use App\Service\GlobalService;
 use DateTime;
 use DateTimeImmutable;
@@ -23,6 +25,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -33,7 +36,7 @@ class SecurityController extends AbstractController
 
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly EmailService $emailService,
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
@@ -102,7 +105,7 @@ class SecurityController extends AbstractController
             $em->flush();
 
             $this->activityService->log(ActivityType::Registered, $user, []);
-            $this->emailService->sendConformationRequest($user, $request);
+            $this->messageBus->dispatch(PrepareEmail::byType(VerificationRequest::create($user)));
 
             return $this->render('security/register_email_send.html.twig');
         }
@@ -174,7 +177,7 @@ class SecurityController extends AbstractController
                 $em->flush();
 
                 $this->activityService->log(ActivityType::PasswordResetRequest, $user);
-                $this->emailService->sendResetPasswordRequest($user, $request);
+                $this->messageBus->dispatch(PrepareEmail::byType(ResetPassword::create($user)));
 
                 return $this->render('security/reset_email_send.html.twig');
             } else {

@@ -5,10 +5,14 @@ namespace App\Service;
 use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Entity\User;
+use App\Message\NotificationRsvp;
+use App\Message\PrepareEmail;
+use App\Message\SendEmail;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -22,7 +26,9 @@ readonly class NotificationService
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
-    ) {
+        private MessageBusInterface $messageBus,
+    )
+    {
     }
 
     public function notify(Activity $activity): void
@@ -31,6 +37,10 @@ readonly class NotificationService
         switch ($activity->getType()->value) {
             case ActivityType::RsvpYes->value:
                 $this->sendRsvp($user, $activity->getMeta()['event_id']);
+                $eventId = $activity->getMeta()['event_id'];
+                if ($user instanceof User && $eventId !== null) {
+                    $this->messageBus->dispatch(NotificationRsvp::fromParameter($user, $eventId));
+                }
                 break;
             case ActivityType::SendMessage->value:
                 $this->sendMessage($user, $activity->getMeta()['user_id']);
@@ -40,12 +50,12 @@ readonly class NotificationService
         }
     }
 
-    private function sendRsvp(?User $user, ?int $eventId = null): void
+    public function sendRsvp(User $user, int $eventId): void
     {
-        if (!$user instanceof User || $eventId === null) {
+        $event = $this->eventRepo->findOneBy(['id' => $eventId]);
+        if ($event === null) {
             return;
         }
-        $event = $this->eventRepo->findOneBy(['id' => $eventId]);
         foreach ($user->getFollowers() as $follower) {
             try {
                 $key = sprintf('rsvp_notification_send_%s_%s_%s', $user->getId(), $follower->getId(), $event->getId());
@@ -58,11 +68,11 @@ readonly class NotificationService
                 if (!$follower->getNotificationSettings()->followingUpdates) {
                     continue;
                 }
-                $this->emailService->sendRsvpNotification(
-                    userRsvp: $user,
-                    userRecipient: $follower,
-                    event: $event
-                );
+                //$this->emailService->prepareRsvpNotification(
+                //    userRsvp: $user,
+                //    userRecipient: $follower,
+                //    event: $event
+                //);
                 $this->appCache->get($key, function (ItemInterface $item): string {
                     $item->expiresAfter(self::HOUR);
                     return 'send';
@@ -71,6 +81,7 @@ readonly class NotificationService
                 //TODO: do some logging
             }
         }
+        $this->messageBus->dispatch(new SendEmail());
     }
 
     private function sendMessage(?User $user, ?int $userId = null): void
@@ -79,6 +90,9 @@ readonly class NotificationService
             return;
         }
         $recipient = $this->userRepo->findOneBy(['id' => $userId]);
+        if ($recipient === null) {
+            return;
+        }
         $key = sprintf('message_send_%s_%s', $user->getId(), $recipient->getId());
         if ($this->appCache->hasItem($key)) {
             return;

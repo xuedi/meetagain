@@ -23,6 +23,7 @@ RUN set -eux; \
 	intl \
 	apcu \
     zip \
+    redis \
 	opcache
 
 RUN groupadd -g $GID -o $UNAME

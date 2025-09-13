@@ -17,6 +17,7 @@
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-imagick": "*",
+    "ext-redis": "*",
     "beberlei/doctrineextensions": "^1.5",
     "doctrine/data-fixtures": "^2",
     "doctrine/dbal": "^4",
@@ -28,9 +29,9 @@
     "nikic/php-parser": "^5",
     "phpdocumentor/reflection-docblock": "^5.4",
     "phpstan/phpdoc-parser": "^2.0",
-    "rlanvin/php-rrule": "^2.5",
+    "rlanvin/php-rrule": "^2.6",
     "sensiolabs/ansi-to-html": "^2.0",
-    "sentry/sentry-symfony": "^5.3",
+    "sentry/sentry-symfony": "^5.4",
     "symfony/cache": "7.3.*",
     "symfony/console": "7.3.*",
     "symfony/dotenv": "7.3.*",
@@ -43,6 +44,7 @@
     "symfony/intl": "7.3.*",
     "symfony/mailer": "7.3.*",
     "symfony/mailgun-mailer": "7.3.*",
+    "symfony/messenger": "7.3.*",
     "symfony/mime": "7.3.*",
     "symfony/monolog-bundle": "^3.10",
     "symfony/notifier": "7.3.*",
@@ -50,6 +52,7 @@
     "symfony/property-access": "7.3.*",
     "symfony/property-info": "7.3.*",
     "symfony/rate-limiter": "7.3.*",
+    "symfony/redis-messenger": "7.3.*",
     "symfony/runtime": "7.3.*",
     "symfony/security-bundle": "7.3.*",
     "symfony/serializer": "7.3.*",
@@ -118,9 +121,9 @@
     "squizlabs/php_codesniffer": "3.*",
     "symfony/browser-kit": "7.3.*",
     "symfony/debug-bundle": "7.3.*",
-    "symfony/maker-bundle": "^1.0",
+    "symfony/maker-bundle": "^1",
     "symfony/phpunit-bridge": "7.3.*",
     "symfony/web-profiler-bundle": "7.3.*",
-    "vimeo/psalm": "^6.10"
+    "vimeo/psalm": "^6"
   }
 }

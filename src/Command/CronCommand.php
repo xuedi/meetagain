@@ -21,7 +21,7 @@ class CronCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->write('Send out queued emails ... ');
-        $this->mailService->sendQueue();
+        //$this->mailService->sendQueue();
         $output->writeln('OK');
 
         return Command::SUCCESS;

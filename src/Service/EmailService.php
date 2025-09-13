@@ -28,63 +28,66 @@ readonly class EmailService
     ) {
     }
 
-    public function sendWelcome(User $user): bool
-    {
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string)$user->getEmail());
-        $email->subject('Welcome!');
-        $email->htmlTemplate('_emails/welcome.html.twig');
-        $email->context([
-            'url' => $this->config->getUrl(),
-        ]);
-
-        return $this->sendEmail($email);
-    }
-
-    public function sendConformationRequest(User $user, Request $request): bool
+    public function prepareVerificationRequest(User $user): bool
     {
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string)$user->getEmail());
         $email->subject('Please Confirm your Email');
         $email->htmlTemplate('_emails/verification_request.html.twig');
+        $email->locale($user->getLocale());
         $email->context([
             'host' => $this->config->getHost(),
             'token' => $user->getRegcode(),
             'url' => $this->config->getUrl(),
-            'lang' => $request->getLocale(),
             'username' => $user->getName(),
+            'lang' => $user->getLocale(),
         ]);
 
-        return $this->sendEmail($email);
+        return $this->addToEmailQueue($email);
     }
 
-    public function sendResetPasswordRequest(User $user, Request $request): bool
+    public function prepareWelcome(User $user): bool
+    {
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string)$user->getEmail());
+        $email->subject('Welcome!');
+        $email->htmlTemplate('_emails/welcome.html.twig');
+        $email->locale($user->getLocale());
+        $email->context([
+            'url' => $this->config->getUrl(),
+        ]);
+
+        return $this->addToEmailQueue($email);
+    }
+
+    public function prepareResetPassword(User $user): bool
     {
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string)$user->getEmail());
         $email->subject('Password reset request');
         $email->htmlTemplate('_emails/password_reset_request.html.twig');
+        $email->locale($user->getLocale());
         $email->context([
             'host' => $this->config->getHost(),
             'token' => $user->getRegcode(),
-            'lang' => $request->getLocale(),
+            'lang' => $user->getLocale(),
             'username' => $user->getName(),
         ]);
 
-        return $this->sendEmail($email);
+        return $this->addToEmailQueue($email);
     }
 
-    public function sendRsvpNotification(User $userRsvp, User $userRecipient, Event $event): bool
+    public function prepareRsvpNotification(User $userRsvp, User $userRecipient, Event $event): bool
     {
         $language = $userRecipient->getLocale();
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string)$userRecipient->getEmail());
-        $email->subject('A member you follow plans to attend an event');
+        $email->subject('A user you follow plans to attend an event');
         $email->htmlTemplate('_emails/notification_rsvp.html.twig');
         $email->locale($language);
         $email->context([
@@ -98,49 +101,44 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email); // TODO: implement for all message
+        return $this->addToEmailQueue($email);
     }
 
     public function sendMessageNotification(User $sender, User $recipient): bool
     {
+        $language = $recipient->getLocale();
+
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string)$recipient->getEmail());
         $email->subject('You received a message from ' . $sender->getName());
         $email->htmlTemplate('_emails/notification_message.html.twig');
+        $email->locale($language);
         $email->context([
             'username' => $recipient->getName(),
             'sender' => $sender->getName(),
             'senderId' => $sender->getId(),
             'host' => $this->config->getHost(),
-            'lang' => $recipient->getLocale(),
+            'lang' => $language,
         ]);
 
-        return $this->sendEmail($email);
+        return $this->addToEmailQueue($email);
     }
 
     public function sendQueue(): void
     {
         $mails = $this->mailRepo->findBy(['sendAt' => null], ['id' => 'ASC'], 1000);
         foreach ($mails as $mail) {
-            $this->sendEmail($this->queueToTemplate($mail));
-            $mail->setSendAt(new DateTime());
-
-            $this->em->persist($mail);
+            //try {
+                $this->mailer->send($this->queueToTemplate($mail));
+                $mail->setSendAt(new DateTime());
+                $this->em->persist($mail);
+            //} catch (TransportExceptionInterface $e) {
+            //    continue;
+            //    // TODO: add new entity for failed email send messages
+            //}
         }
         $this->em->flush();
-    }
-
-    private function sendEmail(TemplatedEmail $email): bool
-    {
-        try {
-            $this->mailer->send($email);
-
-            return true;
-        } catch (TransportExceptionInterface) {
-            // TODO: add logging
-            return false;
-        }
     }
 
     private function addToEmailQueue(TemplatedEmail $email): bool
@@ -150,7 +148,7 @@ readonly class EmailService
         $emailQueue->setRecipient($email->getTo()[0]->toString());
         $emailQueue->setSubject($email->getSubject());
         $emailQueue->setTemplate($email->getHtmlTemplate());
-        $emailQueue->setLang($email->getLocale());
+        $emailQueue->setLang($email->getLocale() ?? 'en');
         $emailQueue->setContext($email->getContext());
         $emailQueue->setCreatedAt(new DateTimeImmutable());
         $emailQueue->setSendAt(null);

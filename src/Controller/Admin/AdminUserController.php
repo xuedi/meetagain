@@ -2,18 +2,17 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\EmailType\Welcome;
 use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Form\UserType;
+use App\Message\PrepareEmail;
 use App\Repository\UserRepository;
-use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminUserController extends AbstractController
@@ -26,6 +25,7 @@ class AdminUserController extends AbstractController
             'users' => $repo->findBy([], ['createdAt' => 'desc']),
         ]);
     }
+
     #[Route('/admin/user/{id}', name: 'app_admin_user_edit', methods: ['GET', 'POST'])]
     public function userEdit(Request $request, User $user, EntityManagerInterface $em): Response
     {
@@ -44,18 +44,20 @@ class AdminUserController extends AbstractController
             'form' => $form,
         ]);
     }
+
     #[Route('/admin/user/{id}/approve', name: 'app_admin_user_approve', methods: ['GET'])]
-    public function userApprove(User $user, EntityManagerInterface $em, EmailService $emailService): Response
+    public function userApprove(User $user, EntityManagerInterface $em, MessageBusInterface $messageBus): Response
     {
         $user->setStatus(UserStatus::Active);
 
-        $emailService->sendWelcome($user);
+        $messageBus->dispatch(PrepareEmail::byType(Welcome::create($user)));
 
         $em->persist($user);
         $em->flush();
 
         return $this->redirectToRoute('app_admin');
     }
+
     #[Route('/admin/user/{id}/deny', name: 'app_admin_user_deny', methods: ['GET'])]
     public function userDeny(User $user, EntityManagerInterface $em): Response
     {
@@ -66,6 +68,7 @@ class AdminUserController extends AbstractController
 
         return $this->redirectToRoute('app_admin');
     }
+
     #[Route('/admin/user/{id}/delete', name: 'app_admin_user_delete', methods: ['GET'])]
     public function userDelete(User $user, EntityManagerInterface $em): Response
     {

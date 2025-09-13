@@ -17,6 +17,9 @@ services:
       - UID=${HOST_UID}
       - GID=${HOST_GID}
       - USERNAME=${HOST_USERNAME}
+      - REDIS_URL=redis://valkey:6379
+    depends_on:
+      - valkey
     tty: true
 
   mariadb:
@@ -43,15 +46,9 @@ services:
 
   valkey:
     container_name: "ma-valkey"
-    image: valkey/valkey:9.0
-    command: valkey-server --bind 0.0.0.0
-    volumes:
-      - ma-valkey-data:/data
-    ports:
-      - "6379:6379"
+    image: valkey/valkey:latest
 
 volumes:
-  ma-valkey-data:
   ma-mysql-data:
   ma-caddy_data:
   ma-caddy_config:
