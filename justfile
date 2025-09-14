@@ -68,6 +68,9 @@ check: test checkStan checkRector checkPhpcs checkPsalm
 checkStan:
     {{EXEC}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M
 
+checkMago +parameter='':
+    {{EXEC}} vendor/bin/mago --config tests/mago.toml {{parameter}}
+
 checkRector:
     {{EXEC}} vendor/bin/rector process src --dry-run -c tests/rector.php
 
