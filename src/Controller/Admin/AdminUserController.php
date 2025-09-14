@@ -2,17 +2,14 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\EmailType\Welcome;
 use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Form\UserType;
-use App\Message\PrepareEmail;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\EmailService;use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminUserController extends AbstractController
@@ -46,11 +43,11 @@ class AdminUserController extends AbstractController
     }
 
     #[Route('/admin/user/{id}/approve', name: 'app_admin_user_approve', methods: ['GET'])]
-    public function userApprove(User $user, EntityManagerInterface $em, MessageBusInterface $messageBus): Response
+    public function userApprove(User $user, EntityManagerInterface $em, EmailService $emailService): Response
     {
         $user->setStatus(UserStatus::Active);
 
-        $messageBus->dispatch(PrepareEmail::byType(Welcome::create($user)));
+        $emailService->prepareWelcome($user);
 
         $em->persist($user);
         $em->flush();

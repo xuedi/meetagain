@@ -5,14 +5,10 @@ namespace App\Service;
 use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Entity\User;
-use App\Message\NotificationRsvp;
-use App\Message\PrepareEmail;
-use App\Message\SendEmail;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -26,7 +22,6 @@ readonly class NotificationService
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
-        private MessageBusInterface $messageBus,
     )
     {
     }
@@ -39,7 +34,8 @@ readonly class NotificationService
                 $this->sendRsvp($user, $activity->getMeta()['event_id']);
                 $eventId = $activity->getMeta()['event_id'];
                 if ($user instanceof User && $eventId !== null) {
-                    $this->messageBus->dispatch(NotificationRsvp::fromParameter($user, $eventId));
+                    // TODO: save intend to table that later gets processed by cron for nightly emails
+                    //$this->messageBus->dispatch(NotificationRsvp::fromParameter($user, $eventId));
                 }
                 break;
             case ActivityType::SendMessage->value:
@@ -81,7 +77,6 @@ readonly class NotificationService
                 //TODO: do some logging
             }
         }
-        $this->messageBus->dispatch(new SendEmail());
     }
 
     private function sendMessage(?User $user, ?int $userId = null): void
@@ -106,7 +101,7 @@ readonly class NotificationService
         if ($recipient->getLastLogin() > new DateTime('-2 hours')) {
             return;
         }
-        $this->emailService->sendMessageNotification(
+        $this->emailService->prepareMessageNotification(
             sender: $user,
             recipient: $recipient
         );
