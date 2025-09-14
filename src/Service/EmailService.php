@@ -104,7 +104,7 @@ readonly class EmailService
         return $this->addToEmailQueue($email);
     }
 
-    public function sendMessageNotification(User $sender, User $recipient): bool
+    public function prepareMessageNotification(User $sender, User $recipient): bool
     {
         $language = $recipient->getLocale();
 

@@ -55,9 +55,6 @@ dockerRebuild:
 dockerEnter:
     {{DOCKER}} exec php bash
 
-startWorker:
-    {{EXEC}} php bin/console messenger:consume --all
-
 test:
     {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml
 
