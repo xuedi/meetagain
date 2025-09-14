@@ -12,14 +12,14 @@ class Translation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private null|\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private null|User $user = null;
 
     #[ORM\Column(length: 2)]
     private string $language;
@@ -28,19 +28,19 @@ class Translation
     private string $placeholder;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $translation = null;
+    private null|string $translation = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getUser(): null|User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(null|User $user): static
     {
         $this->user = $user;
 
@@ -59,19 +59,19 @@ class Translation
         return $this;
     }
 
-    public function getTranslation(): ?string
+    public function getTranslation(): null|string
     {
         return $this->translation;
     }
 
-    public function setTranslation(?string $translation): static
+    public function setTranslation(null|string $translation): static
     {
         $this->translation = $translation;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): null|\DateTimeImmutable
     {
         return $this->createdAt;
     }

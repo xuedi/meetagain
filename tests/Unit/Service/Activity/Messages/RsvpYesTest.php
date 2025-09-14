@@ -4,11 +4,11 @@ namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
 use App\Service\Activity\Messages\RsvpYes;
+use App\Service\ImageService;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
-use App\Service\ImageService;
 
 class RsvpYesTest extends TestCase
 {
@@ -43,9 +43,7 @@ class RsvpYesTest extends TestCase
 
     public function testCanCatchMissingEventId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'event_id' in meta in RsvpYes")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in RsvpYes"));
 
         $subject = new RsvpYes();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -54,9 +52,7 @@ class RsvpYesTest extends TestCase
 
     public function testCanCatchNonNumericEventId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'RsvpYes'")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'RsvpYes'"));
 
         $subject = new RsvpYes();
         $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number']);

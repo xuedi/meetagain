@@ -10,9 +10,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/plugin')]
 class AdminPluginController extends AbstractController
 {
-    public function __construct(private readonly PluginService $pluginService)
-    {
-    }
+    public function __construct(
+        private readonly PluginService $pluginService,
+    ) {}
 
     #[Route('', name: 'app_admin_plugin')]
     public function list(): Response

@@ -32,17 +32,27 @@ class EventServiceTest extends TestCase
         $this->emMock = $this->createMock(EntityManagerInterface::class);
         $this->subject = new EventService(
             repo: $this->eventRepoMock,
-            em: $this->emMock
+            em: $this->emMock,
         );
     }
 
     public function testCanStructureEventList(): void
     {
-        $event1 = new EventStub()->setId(1)->setStart(new DateTimeImmutable('2002-01-01'));
-        $event2 = new EventStub()->setId(2)->setStart(new DateTimeImmutable('2002-01-05'));
-        $event3 = new EventStub()->setId(3)->setStart(new DateTimeImmutable('2002-01-07'));
-        $event4 = new EventStub()->setId(4)->setStart(new DateTimeImmutable('2002-04-02'));
-        $event5 = new EventStub()->setId(5)->setStart(new DateTimeImmutable('2002-04-04'));
+        $event1 = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTimeImmutable('2002-01-01'));
+        $event2 = new EventStub()
+            ->setId(2)
+            ->setStart(new DateTimeImmutable('2002-01-05'));
+        $event3 = new EventStub()
+            ->setId(3)
+            ->setStart(new DateTimeImmutable('2002-01-07'));
+        $event4 = new EventStub()
+            ->setId(4)
+            ->setStart(new DateTimeImmutable('2002-04-02'));
+        $event5 = new EventStub()
+            ->setId(5)
+            ->setStart(new DateTimeImmutable('2002-04-04'));
 
         $eventListParameter = [$event4, $event1, $event3, $event5, $event2];
         $expectedResult = [
@@ -66,7 +76,7 @@ class EventServiceTest extends TestCase
     }
 
     #[DataProvider('getLastRecurringEventMatrix')]
-    public function testLastRecurringEvent(?string $dbResult, string $parameter, string $expected): void
+    public function testLastRecurringEvent(null|string $dbResult, string $parameter, string $expected): void
     {
         $returnValue = null;
         if ($dbResult !== null) {
@@ -89,12 +99,12 @@ class EventServiceTest extends TestCase
             [
                 '1' => '2017-04-26',
                 '2' => '2002-01-01',
-                '3' => '2017-04-26'
+                '3' => '2017-04-26',
             ],
             [
                 '1' => null,
                 '2' => '2002-01-01',
-                '3' => '2002-01-01'
+                '3' => '2002-01-01',
             ],
         ];
     }
@@ -111,10 +121,7 @@ class EventServiceTest extends TestCase
 
         $actual = $method->invoke($this->subject, $paraTarget, $paraOccurrence);
 
-        $this->assertEquals(
-            $expected->format('Y-m-d H:i:s'),
-            $actual->format('Y-m-d H:i:s')
-        );
+        $this->assertEquals($expected->format('Y-m-d H:i:s'), $actual->format('Y-m-d H:i:s'));
     }
 
     #[DataProvider('getFilteredListMatrix')]
@@ -124,19 +131,17 @@ class EventServiceTest extends TestCase
         EventTypes $types,
         EventFilterRsvp $rsvp,
         Criteria $expectedCriteria,
-    ): void
-    {
+    ): void {
         $collectionMock = $this->createMock(LazyCriteriaCollection::class);
-        $collectionMock
-            ->expects($this->once())
-            ->method('toArray')
-            ->willReturn([]);
+        $collectionMock->expects($this->once())->method('toArray')->willReturn([]);
 
         $this->eventRepoMock
             ->expects($this->once())
             ->method('matching')
             ->with($expectedCriteria)
-            ->willReturn($collectionMock);;
+            ->willReturn($collectionMock);
+
+        ;
 
         $this->subject->getFilteredList($time, $sort, $types, $rsvp);
     }
@@ -152,7 +157,7 @@ class EventServiceTest extends TestCase
                 ->orderBy(['start' => 'desc'])
                 ->where(Criteria::expr()->not(Criteria::expr()->eq('id', 0)))
                 ->andWhere(Criteria::expr()->not(Criteria::expr()->eq('id', 0)))
-                ->andWhere(Criteria::expr()->eq('published', true))
+                ->andWhere(Criteria::expr()->eq('published', true)),
         ];
     }
 }

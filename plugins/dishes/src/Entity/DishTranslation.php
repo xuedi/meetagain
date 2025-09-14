@@ -13,42 +13,42 @@ class DishTranslation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Dish $dish = null;
+    private null|Dish $dish = null;
 
     #[ORM\Column(length: 2)]
-    private ?string $language = null;
+    private null|string $language = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private null|string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $phonetic = null;
+    private null|string $phonetic = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
+    private null|string $description = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getDish(): ?Dish
+    public function getDish(): null|Dish
     {
         return $this->dish;
     }
 
-    public function setDish(?Dish $dish): static
+    public function setDish(null|Dish $dish): static
     {
         $this->dish = $dish;
 
         return $this;
     }
 
-    public function getLanguage(): ?string
+    public function getLanguage(): null|string
     {
         return $this->language;
     }
@@ -60,7 +60,7 @@ class DishTranslation
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): null|string
     {
         return $this->name;
     }
@@ -72,19 +72,19 @@ class DishTranslation
         return $this;
     }
 
-    public function getPhonetic(): ?string
+    public function getPhonetic(): null|string
     {
         return $this->phonetic;
     }
 
-    public function setPhonetic(?string $phonetic): static
+    public function setPhonetic(null|string $phonetic): static
     {
         $this->phonetic = $phonetic;
 
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): null|string
     {
         return $this->description;
     }

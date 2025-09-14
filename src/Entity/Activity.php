@@ -12,40 +12,40 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
-    private ?User $user = null;
+    private null|User $user = null;
 
-    private ?string $message = null;
+    private null|string $message = null;
 
     #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
+    private null|DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(enumType: ActivityType::class)]
-    private ?ActivityType $type = null;
+    private null|ActivityType $type = null;
 
     #[ORM\Column(nullable: true)]
-    private ?array $Meta = null; // TODO: do lower case
+    private null|array $Meta = null; // TODO: do lower case
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getUser(): null|User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(null|User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getMessage(): ?string
+    public function getMessage(): null|string
     {
         return $this->message;
     }
@@ -57,7 +57,7 @@ class Activity
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): null|DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -69,7 +69,7 @@ class Activity
         return $this;
     }
 
-    public function getType(): ?ActivityType
+    public function getType(): null|ActivityType
     {
         return $this->type;
     }
@@ -81,12 +81,12 @@ class Activity
         return $this;
     }
 
-    public function getMeta(): ?array
+    public function getMeta(): null|array
     {
         return $this->Meta;
     }
 
-    public function setMeta(?array $Meta): static
+    public function setMeta(null|array $Meta): static
     {
         $this->Meta = $Meta;
 

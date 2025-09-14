@@ -50,7 +50,7 @@ class GlobalServiceTest extends TestCase
             pluginService: $this->pluginServiceMock,
             menuRepo: $this->menuRepositoryMock,
             translationSuggestionRepo: $this->suggestionRepoMock,
-            security: $this->securityMock
+            security: $this->securityMock,
         );
     }
 
@@ -59,13 +59,9 @@ class GlobalServiceTest extends TestCase
         $expected = 'de';
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getLocale')
-            ->willReturn($expected);
+        $requestMock->method('getLocale')->willReturn($expected);
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         $this->assertEquals($expected, $this->subject->getCurrentLocale());
     }
@@ -74,20 +70,18 @@ class GlobalServiceTest extends TestCase
     {
         $this->expectExceptionObject(new RuntimeException('Cound not get current locale'));
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn(null);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
 
         $this->subject->getCurrentLocale();
     }
 
     public function testLanguageCodes(): void
     {
-        $expectedLanguageCodes = ['de', 'en', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'es', 'sv', 'tr', 'zh'];;
+        $expectedLanguageCodes = ['de', 'en', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'es', 'sv', 'tr', 'zh'];
 
-        $this->translationServiceMock
-            ->method('getLanguageCodes')
-            ->willReturn($expectedLanguageCodes);
+        ;
+
+        $this->translationServiceMock->method('getLanguageCodes')->willReturn($expectedLanguageCodes);
 
         $this->assertEquals($expectedLanguageCodes, $this->subject->getLanguageCodes());
     }
@@ -96,9 +90,7 @@ class GlobalServiceTest extends TestCase
     {
         $expectedPlugins = ['plugin1', 'plugin2'];
 
-        $this->pluginServiceMock
-            ->method('getActiveList')
-            ->willReturn($expectedPlugins);
+        $this->pluginServiceMock->method('getActiveList')->willReturn($expectedPlugins);
 
         $this->assertEquals($expectedPlugins, $this->subject->getPlugins());
     }
@@ -109,9 +101,7 @@ class GlobalServiceTest extends TestCase
         $expectedName = 'John Doe';
 
         $userMock = $this->createMock(User::class);
-        $userMock
-            ->method('getName')
-            ->willReturn($expectedName);
+        $userMock->method('getName')->willReturn($expectedName);
 
         $this->userRepositoryMock
             ->method('findOneBy')
@@ -124,19 +114,12 @@ class GlobalServiceTest extends TestCase
     public function testHasNewMessagesTrue(): void
     {
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock
-            ->method('get')
-            ->with('hasNewMessage', false)
-            ->willReturn(true);
+        $sessionMock->method('get')->with('hasNewMessage', false)->willReturn(true);
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getSession')
-            ->willReturn($sessionMock);
+        $requestMock->method('getSession')->willReturn($sessionMock);
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         $this->assertTrue($this->subject->hasNewMessages());
     }
@@ -144,37 +127,26 @@ class GlobalServiceTest extends TestCase
     public function testHasNewMessagesFalse(): void
     {
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock
-            ->method('get')
-            ->with('hasNewMessage', false)
-            ->willReturn(false);
+        $sessionMock->method('get')->with('hasNewMessage', false)->willReturn(false);
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getSession')
-            ->willReturn($sessionMock);
+        $requestMock->method('getSession')->willReturn($sessionMock);
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         $this->assertFalse($this->subject->hasNewMessages());
     }
 
     public function testHasNewMessagesNoRequest(): void
     {
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn(null);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
 
         $this->assertFalse($this->subject->hasNewMessages());
     }
 
     public function testGetShowCookieConsentNoSession(): void
     {
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn(null);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
 
         $this->assertTrue($this->subject->getShowCookieConsent());
     }
@@ -182,27 +154,19 @@ class GlobalServiceTest extends TestCase
     public function testGetShowCookieConsentUnknown(): void
     {
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock
-            ->method('get')
-            ->willReturn('{}');
+        $sessionMock->method('get')->willReturn('{}');
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getSession')
-            ->willReturn($sessionMock);
+        $requestMock->method('getSession')->willReturn($sessionMock);
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         $this->assertTrue($this->subject->getShowCookieConsent());
     }
 
     public function testGetShowOsmNoSession(): void
     {
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn(null);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
 
         $this->assertTrue($this->subject->getShowOsm());
     }
@@ -210,45 +174,33 @@ class GlobalServiceTest extends TestCase
     public function testGetShowOsmNoSessionGranted(): void
     {
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock
-            ->method('get')
-            ->willReturn('{"consent_cookies_osm": "granted"}');
+        $sessionMock->method('get')->willReturn('{"consent_cookies_osm": "granted"}');
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getSession')
-            ->willReturn($sessionMock);
+        $requestMock->method('getSession')->willReturn($sessionMock);
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         $this->assertTrue($this->subject->getShowOsm());
     }
 
     public function testGetAdminAttentionTrue(): void
     {
-        $this->dashboardServiceMock
-            ->method('getNeedForApproval')
-            ->willReturn(['item1', 'item2']);
+        $this->dashboardServiceMock->method('getNeedForApproval')->willReturn(['item1', 'item2']);
 
         $this->assertTrue($this->subject->getAdminAttention());
     }
 
     public function testGetAdminAttentionFalse(): void
     {
-        $this->dashboardServiceMock
-            ->method('getNeedForApproval')
-            ->willReturn([]);
+        $this->dashboardServiceMock->method('getNeedForApproval')->willReturn([]);
 
         $this->assertFalse($this->subject->getAdminAttention());
     }
 
     public function testGetAlternativeLanguageCodesNoRequest(): void
     {
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn(null);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
 
         $this->assertEquals([], $this->subject->getAlternativeLanguageCodes());
     }
@@ -256,13 +208,9 @@ class GlobalServiceTest extends TestCase
     public function testGetAlternativeLanguageCodesProfilerUri(): void
     {
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getRequestUri')
-            ->willReturn('/_profiler/some/path');
+        $requestMock->method('getRequestUri')->willReturn('/_profiler/some/path');
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         $this->assertEquals([], $this->subject->getAlternativeLanguageCodes());
     }
@@ -274,16 +222,10 @@ class GlobalServiceTest extends TestCase
         $expectedAltLangList = ['de' => '/de/some/path', 'fr' => '/fr/some/path'];
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getRequestUri')
-            ->willReturn($currentUri);
-        $requestMock
-            ->method('getLocale')
-            ->willReturn($currentLocale);
+        $requestMock->method('getRequestUri')->willReturn($currentUri);
+        $requestMock->method('getLocale')->willReturn($currentLocale);
 
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         $this->translationServiceMock
             ->method('getAltLangList')

@@ -12,19 +12,19 @@ class CookieController extends AbstractController
     public function index(): Response
     {
         /*
-        * TODO: do some old school formBuilder stuff
-                $consent = Consent::getBySession($request->getSession());
-                $consent->setCookies(ConsentType::Granted);
-                $consent->setOsm($request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
-                $consent->save($request->getSession());
-
-                $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
-                foreach ($consent->getHtmlCookies() as $cookie) {
-           $response->headers->setCookie($cookie);
-                }
-
-                return $response;
-        */
+         * TODO: do some old school formBuilder stuff
+         * $consent = Consent::getBySession($request->getSession());
+         * $consent->setCookies(ConsentType::Granted);
+         * $consent->setOsm($request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
+         * $consent->save($request->getSession());
+         *
+         * $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
+         * foreach ($consent->getHtmlCookies() as $cookie) {
+         * $response->headers->setCookie($cookie);
+         * }
+         *
+         * return $response;
+         */
         return $this->render('cookie/index.html.twig');
     }
 }

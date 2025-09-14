@@ -14,24 +14,23 @@ class EventUploadType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('files', FileType::class, [
-                'label' => 'Image upload',
-                'mapped' => false,
-                'required' => false,
-                'multiple' => true,
-                'constraints' => [
-                    new All([
-                        new File([
-                            'maxSize' => '10M',
-                            'mimeTypes' => [
-                                'image/*',
-                            ],
-                            'mimeTypesMessage' => 'Please upload a valid image, preferable a 4:3 format',
-                        ])
-                    ])
-                ],
-            ]);
+        $builder->add('files', FileType::class, [
+            'label' => 'Image upload',
+            'mapped' => false,
+            'required' => false,
+            'multiple' => true,
+            'constraints' => [
+                new All([
+                    new File([
+                        'maxSize' => '10M',
+                        'mimeTypes' => [
+                            'image/*',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image, preferable a 4:3 format',
+                    ]),
+                ]),
+            ],
+        ]);
     }
 
     #[\Override]

@@ -21,8 +21,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         private readonly UserFixture $userFixture,
         private readonly EventFixture $eventFixture,
         private readonly ExtendedFilesystem $filesystem,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -52,7 +51,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         // add user profile photos
         foreach ($this->userFixture->getUsernames() as $name) {
             $imageFile = __DIR__ . "/Avatars/$name.jpg";
-            $reference = 'user_' . md5((string)$name);
+            $reference = 'user_' . md5((string) $name);
             $user = $this->getReference($reference, User::class);
 
             // upload file & thumbnails
@@ -71,7 +70,7 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         // add event preview photos
         $eventList = $this->eventFixture->getEventNames();
         foreach ($eventList as $name) {
-            $reference = 'event_' . md5((string)$name);
+            $reference = 'event_' . md5((string) $name);
             $imageFile = __DIR__ . "/Events/$reference.jpg";
             $event = $this->getReference($reference, Event::class);
 
@@ -87,15 +86,15 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
             $manager->flush();
         }
         echo '.';
-        
+
         // add photos to 2 random events
         $eventPhotos = $this->getEventPhotos();
         $randomEvents = array_rand(array_flip($eventList), 4);
         foreach ($randomEvents as $name) {
-            $event = $this->getReference('event_' . md5((string)$name), Event::class);
+            $event = $this->getReference('event_' . md5((string) $name), Event::class);
             $randomPhotos = array_rand(array_flip($eventPhotos), random_int(6, 15));
             foreach ($randomPhotos as $imageFile) {
-                $uploadedImage = new UploadedFile($imageFile, "image.jpg");
+                $uploadedImage = new UploadedFile($imageFile, 'image.jpg');
                 $image = $this->imageService->upload($uploadedImage, $adminUser, ImageType::EventUpload);
                 $manager->flush();
                 $this->imageService->createThumbnails($image);

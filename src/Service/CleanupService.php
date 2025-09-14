@@ -11,9 +11,8 @@ readonly class CleanupService
     public function __construct(
         private ImageRepository $imageRepo,
         private UserRepository $userRepo,
-        private EntityManagerInterface $entityManager
-    ) {
-    }
+        private EntityManagerInterface $entityManager,
+    ) {}
 
     public function removeImageCache(): void
     {

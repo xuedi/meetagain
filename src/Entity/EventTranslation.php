@@ -13,42 +13,42 @@ class EventTranslation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Event $event = null;
+    private null|Event $event = null;
 
     #[ORM\Column(length: 2)]
-    private ?string $language = null;
+    private null|string $language = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    private null|string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
+    private null|string $description = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $teaser = null;
+    private null|string $teaser = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getEvent(): ?Event
+    public function getEvent(): null|Event
     {
         return $this->event;
     }
 
-    public function setEvent(?Event $event): static
+    public function setEvent(null|Event $event): static
     {
         $this->event = $event;
 
         return $this;
     }
 
-    public function getLanguage(): ?string
+    public function getLanguage(): null|string
     {
         return $this->language;
     }
@@ -60,7 +60,7 @@ class EventTranslation
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): null|string
     {
         return $this->title;
     }
@@ -72,7 +72,7 @@ class EventTranslation
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): null|string
     {
         return $this->description;
     }
@@ -84,12 +84,12 @@ class EventTranslation
         return $this;
     }
 
-    public function getTeaser(): ?string
+    public function getTeaser(): null|string
     {
         return $this->teaser;
     }
 
-    public function setTeaser(?string $teaser): static
+    public function setTeaser(null|string $teaser): static
     {
         $this->teaser = $teaser;
 

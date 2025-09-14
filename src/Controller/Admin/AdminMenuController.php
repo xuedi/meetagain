@@ -31,9 +31,7 @@ class AdminMenuController extends AbstractController
         private readonly TranslationService $translationService,
         private readonly EventRepository $eventRepo,
         private readonly CmsRepository $cmsRepo,
-    )
-    {
-    }
+    ) {}
 
     #[Route('/admin/menu/{edit}', name: 'app_admin_menu')]
     public function menuList(Request $request, Menu $menu, int $edit = null): Response
@@ -105,7 +103,7 @@ class AdminMenuController extends AbstractController
         return $this->redirectToRoute('app_admin_menu');
     }
 
-    private function getTranslation(mixed $languageCode, ?int $getId): MenuTranslation
+    private function getTranslation(mixed $languageCode, null|int $getId): MenuTranslation
     {
         $translation = $this->menuTransRepo->findOneBy(['language' => $languageCode, 'menu' => $getId]);
         if ($translation !== null) {
@@ -150,12 +148,9 @@ class AdminMenuController extends AbstractController
         $this->entityManager->flush();
     }
 
-    private function getMenuPriorityForLocation(?MenuLocation $getLocation): float
+    private function getMenuPriorityForLocation(null|MenuLocation $getLocation): float
     {
-        $menu = $this->repo->findOneBy(
-            ['location' => $getLocation],
-            ['priority' => 'DESC']
-        );
+        $menu = $this->repo->findOneBy(['location' => $getLocation], ['priority' => 'DESC']);
 
         return $menu?->getPriority() ?? 0;
     }

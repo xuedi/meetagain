@@ -24,9 +24,9 @@ class ProfileController extends AbstractController
 {
     public const string ROUTE_PROFILE = 'app_profile';
 
-    public function __construct(private readonly ActivityService $activityService)
-    {
-    }
+    public function __construct(
+        private readonly ActivityService $activityService,
+    ) {}
 
     #[Route('/profile/', name: self::ROUTE_PROFILE)]
     public function index(
@@ -44,12 +44,11 @@ class ProfileController extends AbstractController
         $form = $this->createForm(ProfileType::class, $this->getAuthedUser());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
             $newUserName = $form->get('name')->getData();
             if ($oldUserName !== $newUserName) {
                 $this->activityService->log(ActivityType::ChangedUsername, $user, [
                     'old' => $oldUserName,
-                    'new' => $newUserName
+                    'new' => $newUserName,
                 ]);
             }
             $user->setBio($form->get('bio')->getData());
@@ -64,15 +63,19 @@ class ProfileController extends AbstractController
 
         $modal = $imageUploadController->imageReplaceModal('user', $user->getId(), true)->getContent();
 
-        return $this->render('profile/index.html.twig', [
-            'modal' => $modal,
-            'lastLogin' => $request->getSession()->get('lastLogin', '-'),
-            'messageCount' => $msgRepo->getMessageCount($user),
-            'user' => $this->getAuthedUser(),
-            'upcoming' => $repo->getUpcomingEvents(10),
-            'past' => $repo->getPastEvents(20),
-            'form' => $form,
-        ], $response);
+        return $this->render(
+            'profile/index.html.twig',
+            [
+                'modal' => $modal,
+                'lastLogin' => $request->getSession()->get('lastLogin', '-'),
+                'messageCount' => $msgRepo->getMessageCount($user),
+                'user' => $this->getAuthedUser(),
+                'upcoming' => $repo->getUpcomingEvents(10),
+                'past' => $repo->getPastEvents(20),
+                'form' => $form,
+            ],
+            $response,
+        );
     }
 
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]

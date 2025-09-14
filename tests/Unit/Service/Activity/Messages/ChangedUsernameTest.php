@@ -5,11 +5,11 @@ namespace Tests\Unit\Service\Activity\Messages;
 use App\Entity\ActivityType;
 use App\Service\Activity\Messages\ChangedUsername;
 use App\Service\Activity\Messages\Login;
+use App\Service\ImageService;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
-use App\Service\ImageService;
 
 class ChangedUsernameTest extends TestCase
 {
@@ -41,9 +41,7 @@ class ChangedUsernameTest extends TestCase
 
     public function testCanCatchMissingOld(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'old' in meta in ChangedUsername")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'old' in meta in ChangedUsername"));
 
         $subject = new ChangedUsername();
         $subject->injectServices($this->router, $this->imageService, ['new' => 'newName']);
@@ -52,9 +50,7 @@ class ChangedUsernameTest extends TestCase
 
     public function testCanCatchMissingNew(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'new' in meta in ChangedUsername")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'new' in meta in ChangedUsername"));
 
         $subject = new ChangedUsername();
         $subject->injectServices($this->router, $this->imageService, ['old' => 'oldName']);

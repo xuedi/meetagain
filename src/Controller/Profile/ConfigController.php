@@ -14,9 +14,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ConfigController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
-    }
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+    ) {}
 
     #[Route('/profile/config', name: 'app_profile_config')]
     public function config(Request $request, UserPasswordHasherInterface $hasher): Response
@@ -42,7 +42,9 @@ class ConfigController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/config/toggle/{type}', name: 'app_profile_config_toggle', requirements: ['type' => 'osm|tagging|notification|public'])]
+    #[Route('/profile/config/toggle/{type}', name: 'app_profile_config_toggle', requirements: [
+        'type' => 'osm|tagging|notification|public',
+    ])]
     public function toggle(Request $request, string $type): Response
     {
         $user = $this->getAuthedUser();

@@ -21,7 +21,7 @@ class NewController extends AbstractGlossaryController
         $form = $this->createForm(GlossaryType::class, $glossary);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->getUser() instanceof User) {
+            if (!($this->getUser() instanceof User)) {
                 throw new AuthenticationException('Only for logged in users');
             }
             $this->service->createNew($glossary, $this->getUser()->getId(), $this->isGranted('ROLE_MANAGER'));

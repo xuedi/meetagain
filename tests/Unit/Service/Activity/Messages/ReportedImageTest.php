@@ -5,11 +5,11 @@ namespace Tests\Unit\Service\Activity\Messages;
 use App\Entity\ActivityType;
 use App\Entity\ImageReported;
 use App\Service\Activity\Messages\ReportedImage;
+use App\Service\ImageService;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
-use App\Service\ImageService;
 
 class ReportedImageTest extends TestCase
 {
@@ -62,9 +62,7 @@ class ReportedImageTest extends TestCase
 
     public function testCanCatchMissingImageId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'image_id' in meta in ReportedImage")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'image_id' in meta in ReportedImage"));
 
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, ['reason' => ImageReported::Privacy->value]);
@@ -74,22 +72,20 @@ class ReportedImageTest extends TestCase
     public function testCanCatchNonNumericImageId(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'image_id' has to be numeric in 'ReportedImage'")
+            new InvalidArgumentException("Value 'image_id' has to be numeric in 'ReportedImage'"),
         );
 
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, [
-            'image_id' => 'not-a-number', 
-            'reason' => ImageReported::Privacy->value
+            'image_id' => 'not-a-number',
+            'reason' => ImageReported::Privacy->value,
         ]);
         $subject->validate();
     }
 
     public function testCanCatchMissingReason(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'reason' in meta in ReportedImage")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'reason' in meta in ReportedImage"));
 
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, ['image_id' => 42]);
@@ -99,7 +95,7 @@ class ReportedImageTest extends TestCase
     public function testCanCatchNonNumericReason(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'reason' has to be numeric in 'ReportedImage'")
+            new InvalidArgumentException("Value 'reason' has to be numeric in 'ReportedImage'"),
         );
 
         $subject = new ReportedImage();

@@ -14,38 +14,38 @@ class EmailQueue
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
+    private null|DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?DateTime $sendAt = null;
+    private null|DateTime $sendAt = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $subject = null;
+    private null|string $subject = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $sender = null;
+    private null|string $sender = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $recipient = null;
+    private null|string $recipient = null;
 
     #[ORM\Column(length: 2)]
-    private ?string $lang = null;
+    private null|string $lang = null;
 
     #[ORM\Column]
     private array $context = [];
 
     #[ORM\Column(length: 255)]
-    private ?string $template = null;
+    private null|string $template = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): null|DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -57,19 +57,19 @@ class EmailQueue
         return $this;
     }
 
-    public function getSendAt(): ?DateTime
+    public function getSendAt(): null|DateTime
     {
         return $this->sendAt;
     }
 
-    public function setSendAt(?DateTime $sendAt): static
+    public function setSendAt(null|DateTime $sendAt): static
     {
         $this->sendAt = $sendAt;
 
         return $this;
     }
 
-    public function getSubject(): ?string
+    public function getSubject(): null|string
     {
         return $this->subject;
     }
@@ -81,7 +81,7 @@ class EmailQueue
         return $this;
     }
 
-    public function getSender(): ?string
+    public function getSender(): null|string
     {
         return $this->sender;
     }
@@ -93,7 +93,7 @@ class EmailQueue
         return $this;
     }
 
-    public function getRecipient(): ?string
+    public function getRecipient(): null|string
     {
         return $this->recipient;
     }
@@ -105,7 +105,7 @@ class EmailQueue
         return $this;
     }
 
-    public function getLang(): ?string
+    public function getLang(): null|string
     {
         return $this->lang;
     }
@@ -129,7 +129,7 @@ class EmailQueue
         return $this;
     }
 
-    public function getTemplate(): ?string
+    public function getTemplate(): null|string
     {
         return $this->template;
     }

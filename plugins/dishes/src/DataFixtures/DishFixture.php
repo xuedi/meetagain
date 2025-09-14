@@ -17,9 +17,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DishFixture extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
 {
-    public function __construct(private readonly ImageService $imageService)
-    {
-    }
+    public function __construct(
+        private readonly ImageService $imageService,
+    ) {}
 
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -90,7 +90,7 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
                         'phonetic' => null,
                         'description' => 'Description de',
                     ],
-                ]
+                ],
             ],
             [
                 '2.jpg',
@@ -110,7 +110,7 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
                         'phonetic' => null,
                         'description' => 'Description de',
                     ],
-                ]
+                ],
             ],
             [
                 '3.jpg',
@@ -130,7 +130,7 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
                         'phonetic' => null,
                         'description' => 'Description de',
                     ],
-                ]
+                ],
             ],
         ];
     }

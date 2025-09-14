@@ -29,13 +29,17 @@ class MemberController extends AbstractController
             $userTotal = $repo->getNumberOfActivePublicMembers();
             $users = $repo->findActivePublicMembers(self::PAGE_SIZE, $offset);
         }
-        return $this->render('member/index.html.twig', [
-            'users' => $users,
-            'userTotal' => $userTotal,
-            'pageSize' => self::PAGE_SIZE,
-            'pageCurrent' => $page,
-            'pageTotal' => ceil($userTotal / self::PAGE_SIZE),
-        ], $response);
+        return $this->render(
+            'member/index.html.twig',
+            [
+                'users' => $users,
+                'userTotal' => $userTotal,
+                'pageSize' => self::PAGE_SIZE,
+                'pageCurrent' => $page,
+                'pageTotal' => ceil($userTotal / self::PAGE_SIZE),
+            ],
+            $response,
+        );
     }
 
     #[Route('/members/view/{id}', name: 'app_member_view')]
@@ -46,11 +50,15 @@ class MemberController extends AbstractController
             $currentUser = $this->getAuthedUser();
             $userDetails = $repo->findOneBy(['id' => $id]);
 
-            return $this->render('member/view.html.twig', [
-                'currentUser' => $currentUser,
-                'userDetails' => $userDetails,
-                'isFollow' => $currentUser->getFollowing()->contains($userDetails),
-            ], $response);
+            return $this->render(
+                'member/view.html.twig',
+                [
+                    'currentUser' => $currentUser,
+                    'userDetails' => $userDetails,
+                    'isFollow' => $currentUser->getFollowing()->contains($userDetails),
+                ],
+                $response,
+            );
         } catch (AuthenticationCredentialsNotFoundException) {
             return $this->render('member/403.html.twig');
         }

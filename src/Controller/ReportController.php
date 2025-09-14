@@ -12,12 +12,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ReportController extends AbstractController
 {
-    public function __construct(private readonly ActivityService $activityService)
-    {
-    }
+    public function __construct(
+        private readonly ActivityService $activityService,
+    ) {}
 
     #[Route('/report/image/{id}', name: 'app_report_image')]
-    public function index(Request $request, ImageRepository $repo, ?int $id = null): Response
+    public function index(Request $request, ImageRepository $repo, null|int $id = null): Response
     {
         $response = $this->getResponse();
         $user = $this->getAuthedUser();
@@ -33,10 +33,14 @@ class ReportController extends AbstractController
             return $this->redirectToRoute('app_report_success');
         }
 
-        return $this->render('report/image.html.twig', [
-            'image' => $image,
-            'form' => $form,
-        ], $response);
+        return $this->render(
+            'report/image.html.twig',
+            [
+                'image' => $image,
+                'form' => $form,
+            ],
+            $response,
+        );
     }
 
     #[Route('/report/success', name: 'app_report_success')]

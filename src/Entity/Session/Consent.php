@@ -16,10 +16,9 @@ class Consent implements JsonSerializable
     public const string TYPE_OSM = 'consent_cookies_osm';
 
     public function __construct(
-        private ?ConsentType $cookies = ConsentType::Unknown,
-        private ?ConsentType $osm = ConsentType::Unknown
-    ) {
-    }
+        private null|ConsentType $cookies = ConsentType::Unknown,
+        private null|ConsentType $osm = ConsentType::Unknown,
+    ) {}
 
     public function getCookies(): ConsentType
     {

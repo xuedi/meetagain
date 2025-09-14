@@ -37,11 +37,17 @@ class DashboardService
 
     public function getTimeControl(): array
     {
-        return ['week' => $this->week, 'year' => $this->year, 'weekNext' => $this->weekNext, 'weekPrevious' => $this->weekPrevious, 'weekDetails' => sprintf(
-            "%s - %s",
-            $this->weekStartDate->format('Y-m-d'),
-            $this->weekStopDate->format('Y-m-d'),
-        )];
+        return [
+            'week' => $this->week,
+            'year' => $this->year,
+            'weekNext' => $this->weekNext,
+            'weekPrevious' => $this->weekPrevious,
+            'weekDetails' => sprintf(
+                '%s - %s',
+                $this->weekStartDate->format('Y-m-d'),
+                $this->weekStopDate->format('Y-m-d'),
+            ),
+        ];
     }
 
     public function getDetails(): array
@@ -73,14 +79,14 @@ class DashboardService
     public function getPagesNotFound(): array
     {
         return [
-            'list' => $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate)
+            'list' => $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate),
         ];
     }
 
-    public function setTime(?int $year, ?int $week): void
+    public function setTime(null|int $year, null|int $week): void
     {
-        $this->year = $year ?? (int)new DateTime()->format('Y');
-        $this->week = $week ?? (int)new DateTime()->format('W');
+        $this->year = $year ?? ((int) new DateTime()->format('Y'));
+        $this->week = $week ?? ((int) new DateTime()->format('W'));
 
         $tmpDate = new DateTime();
         $tmpDate->setISODate($this->year, $this->week);
@@ -92,7 +98,7 @@ class DashboardService
         $this->weekPrevious = $this->week - 1;
     }
 
-    private function timeCrit(?string $column = 'createdAt'): Criteria
+    private function timeCrit(null|string $column = 'createdAt'): Criteria
     {
         $start = $this->weekStartDate;
         $stop = $this->weekStopDate;

@@ -4,46 +4,46 @@ namespace Plugin\Glossary\Entity;
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 use Plugin\Glossary\Repository\GlossaryRepository;
-use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GlossaryRepository::class)]
 class Glossary
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $phrase = null;
+    private null|string $phrase = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $pinyin = null;
+    private null|string $pinyin = null;
 
     #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
+    private null|DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?int $createdBy = null;
+    private null|int $createdBy = null;
 
     #[ORM\Column]
     private bool $approved = false;
 
     #[ORM\Column(enumType: Category::class)]
-    private ?Category $category = null;
+    private null|Category $category = null;
 
     #[ORM\Column(nullable: true)]
-    private ?array $suggestion = null;
+    private null|array $suggestion = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $explanation = null;
+    private null|string $explanation = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getPhrase(): ?string
+    public function getPhrase(): null|string
     {
         return $this->phrase;
     }
@@ -55,36 +55,36 @@ class Glossary
         return $this;
     }
 
-    public function getPinyin(): ?string
+    public function getPinyin(): null|string
     {
         return $this->pinyin;
     }
 
-    public function setPinyin(?string $pinyin): static
+    public function setPinyin(null|string $pinyin): static
     {
         $this->pinyin = $pinyin;
 
         return $this;
     }
 
-    public function getExplanation(): ?string
+    public function getExplanation(): null|string
     {
         return $this->explanation;
     }
 
-    public function getExplanationShortened(int $length): ?string
+    public function getExplanationShortened(int $length): null|string
     {
         return wordwrap($this->explanation, $length);
     }
 
-    public function setExplanation(?string $explanation): static
+    public function setExplanation(null|string $explanation): static
     {
         $this->explanation = $explanation;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): null|DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -96,24 +96,24 @@ class Glossary
         return $this;
     }
 
-    public function getCreatedBy(): ?int
+    public function getCreatedBy(): null|int
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?int $createdBy): static
+    public function setCreatedBy(null|int $createdBy): static
     {
         $this->createdBy = $createdBy;
 
         return $this;
     }
 
-    public function getCategory(): ?Category
+    public function getCategory(): null|Category
     {
         return $this->category;
     }
 
-    public function setCategory(?Category $category): static
+    public function setCategory(null|Category $category): static
     {
         $this->category = $category;
 

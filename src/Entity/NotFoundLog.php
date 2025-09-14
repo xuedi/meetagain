@@ -11,23 +11,23 @@ class NotFoundLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $url = null;
+    private null|string $url = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private null|\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 16)]
-    private ?string $ip = null;
+    private null|string $ip = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getUrl(): ?string
+    public function getUrl(): null|string
     {
         return $this->url;
     }
@@ -39,7 +39,7 @@ class NotFoundLog
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): null|\DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -51,7 +51,7 @@ class NotFoundLog
         return $this;
     }
 
-    public function getIp(): ?string
+    public function getIp(): null|string
     {
         return $this->ip;
     }

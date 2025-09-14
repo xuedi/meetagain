@@ -21,7 +21,8 @@ class ImageRepository extends ServiceEntityRepository
     public function getOldImageUpdates(int $int): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        return $qb->select('i')
+        return $qb
+            ->select('i')
             ->from(Image::class, 'i')
             ->where($qb->expr()->isNotNull('i.updatedAt'))
             ->andWhere($qb->expr()->lt('i.updatedAt', ':date'))
@@ -34,7 +35,8 @@ class ImageRepository extends ServiceEntityRepository
     {
         $return = [];
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $result = $qb->select('i')
+        $result = $qb
+            ->select('i')
             ->from(Image::class, 'i')
             ->where('i.uploader = :user')
             ->andWhere('i.event is not null')

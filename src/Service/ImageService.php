@@ -26,11 +26,9 @@ readonly class ImageService
         private LoggerInterface $logger,
         private Environment $twig,
         private string $kernelProjectDir,
-    )
-    {
-    }
+    ) {}
 
-    public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
+    public function upload(UploadedFile $imageData, User $user, ImageType $type): null|Image
     {
         // load or create
         $hash = sha1($imageData->getContent());
@@ -57,7 +55,7 @@ readonly class ImageService
         return $image;
     }
 
-    public function createThumbnails(Image $image, ?ImageType $imageType = null): int
+    public function createThumbnails(Image $image, null|ImageType $imageType = null): int
     {
         $cnt = 0;
         $source = $this->getSourceFile($image);
@@ -81,6 +79,8 @@ readonly class ImageService
                 $cnt++;
             } catch (ImagickException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));;
+
+
             }
         }
 
@@ -103,13 +103,14 @@ readonly class ImageService
                 $this->entityManager->flush();
             } catch (ImagickException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));;
+
+
             }
         }
     }
 
     public function getStatistics(): array
     {
-
         $thumpFileList = [];
         $sizeListCount = $this->configService->getThumbnailSizeList();
         foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
@@ -159,7 +160,7 @@ readonly class ImageService
                 $list[] = $file;
                 continue;
             }
-            if (!$this->configService->isValidThumbnailSize($imageList[$hash], (int)$width, (int)$height)) {
+            if (!$this->configService->isValidThumbnailSize($imageList[$hash], (int) $width, (int) $height)) {
                 $list[] = $file;
             }
         }
@@ -200,7 +201,7 @@ readonly class ImageService
         return $this->getThumbnailFileByHash($image->getHash(), $width, $height);
     }
 
-    private function getThumbnailFileByHash(string $hash, int $width, int $height, ?bool $justName = false): string
+    private function getThumbnailFileByHash(string $hash, int $width, int $height, null|bool $justName = false): string
     {
         $filename = sprintf('%s_%sx%s.webp', $hash, $width, $height);
         if ($justName) {

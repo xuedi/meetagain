@@ -31,12 +31,7 @@ class UserCheckerTest extends TestCase
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->msgRepo = $this->createMock(MessageRepository::class);
 
-        $this->subject = new UserChecker(
-            $this->activityService,
-            $this->em,
-            $this->requestStack,
-            $this->msgRepo
-        );
+        $this->subject = new UserChecker($this->activityService, $this->em, $this->requestStack, $this->msgRepo);
     }
 
     public function testAbortCheckPreAuthWithNonUserObject(): void
@@ -90,34 +85,20 @@ class UserCheckerTest extends TestCase
     public function testSuccessfulOnPostAuth(): void
     {
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock
-            ->expects($this->exactly(2))
-            ->method('set');
+        $sessionMock->expects($this->exactly(2))->method('set');
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getSession')
-            ->willReturn($sessionMock);
+        $requestMock->method('getSession')->willReturn($sessionMock);
 
-        $this->requestStack
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $this->requestStack->method('getCurrentRequest')->willReturn($requestMock);
 
-        $this->em
-            ->expects($this->once())
-            ->method('persist');
+        $this->em->expects($this->once())->method('persist');
 
-        $this->em
-            ->expects($this->once())
-            ->method('flush');
+        $this->em->expects($this->once())->method('flush');
 
-        $this->em
-            ->expects($this->once())
-            ->method('flush');
+        $this->em->expects($this->once())->method('flush');
 
-        $this->activityService
-            ->expects($this->once())
-            ->method('log');
+        $this->activityService->expects($this->once())->method('log');
 
         $this->msgRepo
             ->expects($this->once())

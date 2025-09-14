@@ -18,8 +18,7 @@ readonly class SitemapService
         private CmsService $cms,
         private EventRepository $events,
         private ParameterBagInterface $appParams,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws RuntimeError
@@ -34,13 +33,17 @@ readonly class SitemapService
         foreach ($locales as $locale) {
             $sites = [
                 ...$sites,
-                ...$this->getAllSitesForLocale($host, $locale)
+                ...$this->getAllSitesForLocale($host, $locale),
             ];
         }
 
-        return new Response($this->twig->render('sitemap/index.xml.twig', [
-            'sites' => $sites,
-        ]), Response::HTTP_OK, ['Content-Type' => 'text/xml']);
+        return new Response(
+            $this->twig->render('sitemap/index.xml.twig', [
+                'sites' => $sites,
+            ]),
+            Response::HTTP_OK,
+            ['Content-Type' => 'text/xml'],
+        );
     }
 
     /**
@@ -51,10 +54,9 @@ readonly class SitemapService
         return [
             ...$this->getCmsPages($host, $locale),
             ...$this->getStaticPages($host, $locale),
-            ...$this->getEventPages($host, $locale)
+            ...$this->getEventPages($host, $locale),
         ];
     }
-
 
     private function getCmsPages(string $host, string $locale): array
     {

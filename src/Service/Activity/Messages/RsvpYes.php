@@ -2,8 +2,8 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageAbstract;
 
 class RsvpYes extends MessageAbstract
 {
@@ -24,19 +24,13 @@ class RsvpYes extends MessageAbstract
     {
         $eventId = $this->meta['event_id'];
         $msgTemplate = 'Going to event: %s';
-        return sprintf(
-            $msgTemplate,
-            $this->eventNames[$eventId],
-        );
+        return sprintf($msgTemplate, $this->eventNames[$eventId]);
     }
 
     protected function renderHtml(): string
     {
         $eventId = $this->meta['event_id'];
         $msgTemplate = 'Going to event: %s'; // TODO: link
-        return sprintf(
-            $msgTemplate,
-            $this->eventNames[$eventId],
-        );
+        return sprintf($msgTemplate, $this->eventNames[$eventId]);
     }
 }

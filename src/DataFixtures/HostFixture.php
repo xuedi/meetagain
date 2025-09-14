@@ -23,7 +23,7 @@ class HostFixture extends Fixture implements DependentFixtureInterface
 
             $manager->persist($host);
 
-            $this->addReference('host_' . md5((string)$name), $host);
+            $this->addReference('host_' . md5((string) $name), $host);
         }
         $manager->flush();
         echo 'OK' . PHP_EOL;
@@ -40,8 +40,8 @@ class HostFixture extends Fixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            ['admin', 'admin'],
-            ['Adem Lane', 'Adem Lane'],
+            ['admin',       'admin'],
+            ['Adem Lane',   'Adem Lane'],
             ['Crystal Liu', 'Crystal Liu'],
         ];
     }

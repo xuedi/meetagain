@@ -25,22 +25,24 @@ class UpdatedProfilePictureTest extends TestCase
         $expectedText = 'User changed their profile picture';
         $oldImageHtml = '<img src="old-image.jpg" alt="Old Image">';
         $newImageHtml = '<img src="new-image.jpg" alt="New Image">';
-        $expectedHtml = 'User changed their profile picture<div class="is-pulled-top-right">' . $oldImageHtml . '<i class="fa-solid fa-arrow-right"></i>' . $newImageHtml . '</div>';
+        $expectedHtml =
+            'User changed their profile picture<div class="is-pulled-top-right">' .
+            $oldImageHtml .
+            '<i class="fa-solid fa-arrow-right"></i>' .
+            $newImageHtml .
+            '</div>';
         $meta = ['old' => 0, 'new' => 1];
 
         // Set up expectations for imageTemplateById
-        $this->imageService->expects($this->exactly(2))
+        $this->imageService
+            ->expects($this->exactly(2))
             ->method('imageTemplateById')
             ->willReturnMap([
                 [0, $oldImageHtml],
-                [1, $newImageHtml]
+                [1, $newImageHtml],
             ]);
 
-        $subject = new UpdatedProfilePicture()->injectServices(
-            $this->router,
-            $this->imageService,
-            $meta
-        );
+        $subject = new UpdatedProfilePicture()->injectServices($this->router, $this->imageService, $meta);
 
         // check returns
         $this->assertTrue($subject->validate());

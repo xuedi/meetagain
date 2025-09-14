@@ -7,16 +7,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymf
 
 abstract class AbstractGlossaryController extends AbstractSymfonyController
 {
-    public function __construct(protected GlossaryService $service)
-    {
-        //
-    }
+    public function __construct(
+        protected GlossaryService $service,
+    ) {}
 
     protected function renderList(string $template, array $parameter = [])
     {
         return $this->render($template, [
             'list' => $this->service->getList(),
-            ...$parameter
+            ...$parameter,
         ]);
     }
 }

@@ -6,7 +6,7 @@ $badge = __DIR__ . '/badge/coverage.svg';
 
 if (!file_exists($cloverXml)) {
     echo "No coverage file found: $cloverXml" . PHP_EOL;
-    exit;
+    exit();
 }
 
 $xml = new SimpleXMLElement(file_get_contents($cloverXml));
@@ -15,8 +15,8 @@ $totalElements = 0;
 $checkedElements = 0;
 
 foreach ($metrics as $metric) {
-    $totalElements += (int)$metric['elements'];
-    $checkedElements += (int)$metric['coveredelements'];
+    $totalElements += (int) $metric['elements'];
+    $checkedElements += (int) $metric['coveredelements'];
 }
 $coverage = round(($checkedElements / $totalElements) * 100);
 
@@ -34,16 +34,15 @@ $color = match (true) {
 };
 
 $darkeningFactor = 1.2;
-$R = sprintf("%02X", floor(hexdec(substr($color, 0, 2)) / $darkeningFactor));
-$G = sprintf("%02X", floor(hexdec(substr($color, 2, 2)) / $darkeningFactor));
-$B = sprintf("%02X", floor(hexdec(substr($color, 4, 2)) / $darkeningFactor));
+$R = sprintf('%02X', floor(hexdec(substr($color, 0, 2)) / $darkeningFactor));
+$G = sprintf('%02X', floor(hexdec(substr($color, 2, 2)) / $darkeningFactor));
+$B = sprintf('%02X', floor(hexdec(substr($color, 4, 2)) / $darkeningFactor));
 
 $values = [
     'coverage' => $coverage,
     'colorStart' => $color,
     'colorStop' => $R . $G . $B,
 ];
-
 
 $svg = file_get_contents($template);
 foreach ($values as $search => $replace) {

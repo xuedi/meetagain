@@ -14,7 +14,7 @@ class LogEntry
     private readonly string $type;
     private readonly string $level;
     private string $message;
-    private ?string $json = null;
+    private null|string $json = null;
 
     public function __construct(string $line)
     {
@@ -60,7 +60,7 @@ class LogEntry
         return $this->message;
     }
 
-    public function getJson(): ?string
+    public function getJson(): null|string
     {
         return $this->json;
     }

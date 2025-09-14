@@ -27,11 +27,12 @@ class ImageUploadController extends AbstractController
         private readonly ImageService $imageService,
         private readonly CmsBlockRepository $cmsBlockRepo,
         private readonly ActivityService $activityService,
-    )
-    {
-    }
+    ) {}
 
-    #[Route('/replace_image/{entity}/{id}', name: 'app_image_replace', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
+    #[Route('/replace_image/{entity}/{id}', name: 'app_image_replace', requirements: [
+        'entity' => 'user|cmsBlock',
+        'id' => '\d+',
+    ])]
     public function imageReplace(string $entity, int $id): Response
     {
         $response = $this->getResponse();
@@ -39,15 +40,22 @@ class ImageUploadController extends AbstractController
         $image = $data['image'];
         $gallery = $data['gallery'];
 
-        return $this->render('image/index.html.twig', [
-            'imageUploadGallery' => $gallery,
-            'image' => $image,
-            'entity' => $entity,
-            'id' => $id,
-        ], $response);
+        return $this->render(
+            'image/index.html.twig',
+            [
+                'imageUploadGallery' => $gallery,
+                'image' => $image,
+                'entity' => $entity,
+                'id' => $id,
+            ],
+            $response,
+        );
     }
 
-    #[Route('/replace_image/modal/{entity}/{id}', name: 'app_image_replace_modal', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
+    #[Route('/replace_image/modal/{entity}/{id}', name: 'app_image_replace_modal', requirements: [
+        'entity' => 'user|cmsBlock',
+        'id' => '\d+',
+    ])]
     public function imageReplaceModal(string $entity, int $id, bool $rotate = false): Response
     {
         $response = $this->getResponse();
@@ -55,17 +63,24 @@ class ImageUploadController extends AbstractController
         $image = $data['image'];
         $gallery = $data['gallery'];
 
-        return $this->render('image/image_with_modal.html.twig', [
-            'imageUploadGallery' => $gallery,
-            'modal' => true,
-            'rotate' => ($image === null) ? false : $rotate,
-            'image' => $image,
-            'entity' => $entity,
-            'id' => $id,
-        ], $response);
+        return $this->render(
+            'image/image_with_modal.html.twig',
+            [
+                'imageUploadGallery' => $gallery,
+                'modal' => true,
+                'rotate' => $image === null ? false : $rotate,
+                'image' => $image,
+                'entity' => $entity,
+                'id' => $id,
+            ],
+            $response,
+        );
     }
 
-    #[Route('/image/{entity}/{id}/select/{newImage}', name: 'app_replace_image_select', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
+    #[Route('/image/{entity}/{id}/select/{newImage}', name: 'app_replace_image_select', requirements: [
+        'entity' => 'user|cmsBlock',
+        'id' => '\d+',
+    ])]
     public function select(string $entity, int $id, int $newImage): Response
     {
         $entityName = $entity;
@@ -81,7 +96,12 @@ class ImageUploadController extends AbstractController
         return $this->returnBackToImage($entityName, $id);
     }
 
-    #[Route('/image/{entity}/{id}/upload/replacement', name: 'app_replace_image_upload', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'], methods: ['POST'])]
+    #[Route(
+        '/image/{entity}/{id}/upload/replacement',
+        name: 'app_replace_image_upload',
+        requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'],
+        methods: ['POST'],
+    )]
     public function upload(Request $request, string $entity, int $id): Response
     {
         $entityName = $entity;
@@ -119,7 +139,10 @@ class ImageUploadController extends AbstractController
         return $this->returnBackToImage($entityName, $id);
     }
 
-    #[Route('/add_image/{entity}/{id}', name: 'app_image_add', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'])]
+    #[Route('/add_image/{entity}/{id}', name: 'app_image_add', requirements: [
+        'entity' => 'user|cmsBlock',
+        'id' => '\d+',
+    ])]
     public function imageAdd(string $entity, int $id): Response
     {
         // Upload multiple images and return
@@ -130,7 +153,12 @@ class ImageUploadController extends AbstractController
         ]);
     }
 
-    #[Route('/image/rotate/{entity}/{id}', name: 'app_image_rotate', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'], methods: ['GET'])]
+    #[Route(
+        '/image/rotate/{entity}/{id}',
+        name: 'app_image_rotate',
+        requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'],
+        methods: ['GET'],
+    )]
     public function rotate(string $entity, int $id): Response
     {
         $image = $this->prepare($entity, $id)['image'];
@@ -156,10 +184,12 @@ class ImageUploadController extends AbstractController
                 if ($entity !== $this->getAuthedUser()) {
                     throw new Exception('You cant change other user profile picture');
                 }
-                $gallery = $this->em->getRepository(Image::class)->findBy([
-                    'type' => ImageType::ProfilePicture,
-                    'uploader' => $entity,
-                ]);
+                $gallery = $this->em
+                    ->getRepository(Image::class)
+                    ->findBy([
+                        'type' => ImageType::ProfilePicture,
+                        'uploader' => $entity,
+                    ]);
                 break;
             case 'cmsBlock':
                 $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -183,7 +213,7 @@ class ImageUploadController extends AbstractController
                     'entity' => $entityString,
                     'id' => $id,
                     'newImage' => $item->getId(),
-                ])
+                ]),
             ];
         }
 
@@ -202,7 +232,10 @@ class ImageUploadController extends AbstractController
                 return $this->redirectToRoute('app_profile');
             case 'cmsBlock':
                 return $this->redirectToRoute('app_admin_cms_edit', [
-                    'id' => $this->cmsBlockRepo->findOneBy(['id' => $id])->getPage()->getId()
+                    'id' => $this->cmsBlockRepo
+                        ->findOneBy(['id' => $id])
+                        ->getPage()
+                        ->getId(),
                 ]);
             default:
                 throw new RuntimeException('Invalid entity');

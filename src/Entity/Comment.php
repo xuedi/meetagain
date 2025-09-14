@@ -12,52 +12,52 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    protected ?int $id = null;
+    protected null|int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Event $event = null;
+    private null|Event $event = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private null|User $user = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private null|\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
+    private null|string $content = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getEvent(): ?Event
+    public function getEvent(): null|Event
     {
         return $this->event;
     }
 
-    public function setEvent(?Event $event): static
+    public function setEvent(null|Event $event): static
     {
         $this->event = $event;
 
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): null|User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(null|User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): null|\DateTimeImmutable
     {
         return $this->created_at;
     }
@@ -69,7 +69,7 @@ class Comment
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): null|string
     {
         return $this->content;
     }

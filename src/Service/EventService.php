@@ -20,17 +20,17 @@ use RuntimeException;
 
 readonly class EventService
 {
-    public function __construct(private EventRepository $repo, private EntityManagerInterface $em)
-    {
-    }
+    public function __construct(
+        private EventRepository $repo,
+        private EntityManagerInterface $em,
+    ) {}
 
     public function getFilteredList(
         EventFilterTime $time,
         EventFilterSort $sort,
         EventTypes $type,
         EventFilterRsvp $rsvp,
-    ): array
-    {
+    ): array {
         $criteria = new Criteria();
         $criteria->orderBy(['start' => $sort->value]);
         $criteria->where(match ($time) { // TODO: all should be a dummy, no idea how
@@ -95,14 +95,14 @@ readonly class EventService
 
     private function fillRecurringEvents(Event $event): void
     {
-        if (!$event->getRecurringRule() instanceof EventIntervals) {
+        if (!($event->getRecurringRule() instanceof EventIntervals)) {
             return;
         }
 
         $skipFirst = true;
         $today = new DateTime();
         $recurringRule = $event->getRecurringRule();
-        $ruleInterval = (EventIntervals::BiMonthly === $recurringRule) ? 2 : 1;
+        $ruleInterval = EventIntervals::BiMonthly === $recurringRule ? 2 : 1;
         $ruleFrequency = match ($recurringRule) {
             EventIntervals::Daily => RRule::DAILY,
             EventIntervals::Weekly, EventIntervals::BiMonthly => RRule::WEEKLY,
@@ -117,12 +117,15 @@ readonly class EventService
             'dtstart' => $this->getLastRecurringEventDate($event),
             'until' => (match ($recurringRule) {
                 EventIntervals::Daily => $today->modify('+2 weeks'),
-                EventIntervals::Weekly, $today->modify('+3 weeks'),
-                EventIntervals::BiMonthly, $today->modify('+5 weeks'),
-                EventIntervals::Monthly => $today->modify('+3 months'),
+                EventIntervals::Weekly,
+                $today->modify('+3 weeks'),
+                EventIntervals::BiMonthly,
+                $today->modify('+5 weeks'),
+                EventIntervals::Monthly,
+                    => $today->modify('+3 months'),
                 EventIntervals::Yearly => $today->modify('+3 years'),
                 default => throw new RuntimeException('Unknown EventIntervals'),
-            })->format('Y-m-d')
+            })->format('Y-m-d'),
         ]);
 
         foreach ($rrule as $occurrence) {
@@ -170,9 +173,9 @@ readonly class EventService
     {
         $newDate = clone $target;
         $newDate->setDate(
-            year: (int)$occurrence->format('Y'),
-            month: (int)$occurrence->format('m'),
-            day: (int)$occurrence->format('d'),
+            year: (int) $occurrence->format('Y'),
+            month: (int) $occurrence->format('m'),
+            day: (int) $occurrence->format('d'),
         );
 
         return $newDate;

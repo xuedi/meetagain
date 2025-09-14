@@ -16,13 +16,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class MenuRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry, private readonly RouterInterface $router)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly RouterInterface $router,
+    ) {
         parent::__construct($registry, Menu::class);
     }
 
-    public function getAllSlugified(?UserInterface $user = null, string $locale = 'en', ?string $location = null): array
-    {
+    public function getAllSlugified(
+        null|UserInterface $user = null,
+        string $locale = 'en',
+        null|string $location = null,
+    ): array {
         $criteria = match ($location) {
             'top' => ['location' => MenuLocation::TopBar],
             'col1' => ['location' => MenuLocation::BottomCol1],
@@ -31,7 +36,7 @@ class MenuRepository extends ServiceEntityRepository
             'col4' => ['location' => MenuLocation::BottomCol4],
             default => [],
         };
-        $all = $this->findBy($criteria,['priority' => 'ASC']);
+        $all = $this->findBy($criteria, ['priority' => 'ASC']);
         $list = [];
         foreach ($all as $menu) {
             if (!$this->isVisible($user, $menu->getVisibility())) {
@@ -49,17 +54,17 @@ class MenuRepository extends ServiceEntityRepository
         return $list;
     }
 
-    private function isVisible(?UserInterface $user, ?MenuVisibility $visibility): bool
+    private function isVisible(null|UserInterface $user, null|MenuVisibility $visibility): bool
     {
         if ($visibility === null) {
             return true;
         }
 
-        return match($visibility) {
+        return match ($visibility) {
             MenuVisibility::Everyone => true,
-            MenuVisibility::User => ($user !== null && $user->hasRole('ROLE_USER')),
-            MenuVisibility::Manager => ($user !== null && $user->hasRole('ROLE_MANAGER')),
-            MenuVisibility::Admin => ($user !== null && $user->hasRole('ROLE_ADMIN')),
+            MenuVisibility::User => $user !== null && $user->hasRole('ROLE_USER'),
+            MenuVisibility::Manager => $user !== null && $user->hasRole('ROLE_MANAGER'),
+            MenuVisibility::Admin => $user !== null && $user->hasRole('ROLE_ADMIN'),
             default => false,
         };
     }

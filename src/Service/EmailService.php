@@ -24,15 +24,14 @@ readonly class EmailService
         private MailerInterface $mailer,
         private ConfigService $config,
         private EmailQueueRepository $mailRepo,
-        private EntityManagerInterface $em
-    ) {
-    }
+        private EntityManagerInterface $em,
+    ) {}
 
     public function prepareVerificationRequest(User $user): bool
     {
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
-        $email->to((string)$user->getEmail());
+        $email->to((string) $user->getEmail());
         $email->subject('Please Confirm your Email');
         $email->htmlTemplate('_emails/verification_request.html.twig');
         $email->locale($user->getLocale());
@@ -51,7 +50,7 @@ readonly class EmailService
     {
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
-        $email->to((string)$user->getEmail());
+        $email->to((string) $user->getEmail());
         $email->subject('Welcome!');
         $email->htmlTemplate('_emails/welcome.html.twig');
         $email->locale($user->getLocale());
@@ -66,7 +65,7 @@ readonly class EmailService
     {
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
-        $email->to((string)$user->getEmail());
+        $email->to((string) $user->getEmail());
         $email->subject('Password reset request');
         $email->htmlTemplate('_emails/password_reset_request.html.twig');
         $email->locale($user->getLocale());
@@ -86,7 +85,7 @@ readonly class EmailService
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
-        $email->to((string)$userRecipient->getEmail());
+        $email->to((string) $userRecipient->getEmail());
         $email->subject('A user you follow plans to attend an event');
         $email->htmlTemplate('_emails/notification_rsvp.html.twig');
         $email->locale($language);
@@ -110,7 +109,7 @@ readonly class EmailService
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
-        $email->to((string)$recipient->getEmail());
+        $email->to((string) $recipient->getEmail());
         $email->subject('You received a message from ' . $sender->getName());
         $email->htmlTemplate('_emails/notification_message.html.twig');
         $email->locale($language);
@@ -130,9 +129,10 @@ readonly class EmailService
         $mails = $this->mailRepo->findBy(['sendAt' => null], ['id' => 'ASC'], 1000);
         foreach ($mails as $mail) {
             //try {
-                $this->mailer->send($this->queueToTemplate($mail));
-                $mail->setSendAt(new DateTime());
-                $this->em->persist($mail);
+            $this->mailer->send($this->queueToTemplate($mail));
+            $mail->setSendAt(new DateTime());
+            $this->em->persist($mail);
+
             //} catch (TransportExceptionInterface $e) {
             //    continue;
             //    // TODO: add new entity for failed email send messages

@@ -17,9 +17,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class CommandService
 {
-    public function __construct(private KernelInterface $kernel, private ParameterBagInterface $appParams)
-    {
-    }
+    public function __construct(
+        private KernelInterface $kernel,
+        private ParameterBagInterface $appParams,
+    ) {}
 
     public function execute(CommandInterface $command): string
     {

@@ -38,17 +38,21 @@ class Suggestion implements JsonSerializable
             createdBy: $data['createdBy'],
             createdAt: new DateTimeImmutable($data['createdAt']['date']),
             field: SuggestionField::from($data['field']),
-            value: $data['value']
+            value: $data['value'],
         );
     }
 
-    public static function fromParams(int $createdBy, DateTimeImmutable $createdAt, SuggestionField $field, string $value): self
-    {
+    public static function fromParams(
+        int $createdBy,
+        DateTimeImmutable $createdAt,
+        SuggestionField $field,
+        string $value,
+    ): self {
         return new self(
             createdBy: $createdBy,
             createdAt: $createdAt,
             field: $field,
-            value: $value
+            value: $value,
         );
     }
 

@@ -21,7 +21,7 @@ class LoginSubscriber implements EventSubscriberInterface
         $user = $event->getUser();
         $request = $event->getRequest();
         $session = $request->getSession();
-        if (!$user instanceof User) {
+        if (!($user instanceof User)) {
             return;
         }
         $session->set('_locale', $user->getLocale());

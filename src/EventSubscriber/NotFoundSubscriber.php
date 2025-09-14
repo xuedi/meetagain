@@ -22,8 +22,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
         private SitemapService $sitemapService,
         private RouterInterface $router,
         private EntityManagerInterface $em,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function getSubscribedEvents(): array

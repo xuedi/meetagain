@@ -11,9 +11,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class EventTranslationFixture extends Fixture implements DependentFixtureInterface
 {
-    public function __construct(private readonly Filesystem $fs)
-    {
-    }
+    public function __construct(
+        private readonly Filesystem $fs,
+    ) {}
 
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -23,7 +23,7 @@ class EventTranslationFixture extends Fixture implements DependentFixtureInterfa
             [$language, $title, $description] = $data;
 
             $eventTranslation = new EventTranslation();
-            $eventTranslation->setEvent($this->getReference('event_' . md5((string)$title), Event::class));
+            $eventTranslation->setEvent($this->getReference('event_' . md5((string) $title), Event::class));
             $eventTranslation->setLanguage($language);
             $eventTranslation->setTitle($title);
             $eventTranslation->setDescription($description);

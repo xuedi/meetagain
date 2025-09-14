@@ -12,34 +12,34 @@ class Message
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private null|\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'messagesSend')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $sender = null;
+    private null|User $sender = null;
 
     #[ORM\ManyToOne(inversedBy: 'messagesReceived')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $receiver = null;
+    private null|User $receiver = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
+    private null|string $content = null;
 
     #[ORM\Column]
-    private ?bool $deleted = null;
+    private null|bool $deleted = null;
 
     #[ORM\Column]
-    private ?bool $wasRead = null;
+    private null|bool $wasRead = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): null|\DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -51,31 +51,31 @@ class Message
         return $this;
     }
 
-    public function getSender(): ?User
+    public function getSender(): null|User
     {
         return $this->sender;
     }
 
-    public function setSender(?User $sender): static
+    public function setSender(null|User $sender): static
     {
         $this->sender = $sender;
 
         return $this;
     }
 
-    public function getReceiver(): ?User
+    public function getReceiver(): null|User
     {
         return $this->receiver;
     }
 
-    public function setReceiver(?User $receiver): static
+    public function setReceiver(null|User $receiver): static
     {
         $this->receiver = $receiver;
 
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): null|string
     {
         return $this->content;
     }
@@ -87,7 +87,7 @@ class Message
         return $this;
     }
 
-    public function isDeleted(): ?bool
+    public function isDeleted(): null|bool
     {
         return $this->deleted;
     }
@@ -99,7 +99,7 @@ class Message
         return $this;
     }
 
-    public function isWasRead(): ?bool
+    public function isWasRead(): null|bool
     {
         return $this->wasRead;
     }

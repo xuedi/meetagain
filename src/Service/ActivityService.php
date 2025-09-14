@@ -17,8 +17,7 @@ readonly class ActivityService
         private ActivityRepository $repo,
         private NotificationService $notificationService,
         private MessageFactory $messageFactory,
-    ) {
-    }
+    ) {}
 
     public function log(ActivityType $type, User $user, array $meta = []): void
     {
@@ -45,7 +44,7 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->findBy([], ['createdAt' => 'DESC'], 250));
     }
 
-    private function prepareActivityList(array $list, ?bool $asHtml = false): array
+    private function prepareActivityList(array $list, null|bool $asHtml = false): array
     {
         $preparedList = [];
         foreach ($list as $activity) {

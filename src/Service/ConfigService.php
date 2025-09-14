@@ -11,9 +11,10 @@ use Symfony\Component\Mime\Address;
 
 readonly class ConfigService
 {
-    public function __construct(private ConfigRepository $repo, private EntityManagerInterface $em)
-    {
-    }
+    public function __construct(
+        private ConfigRepository $repo,
+        private EntityManagerInterface $em,
+    ) {}
 
     public function getThumbnailSizes(ImageType $type): array
     {
@@ -31,12 +32,12 @@ readonly class ConfigService
     {
         return [
             '1024x768' => 0, // gallery image bit
-            '600x400' => 0,  // event preview image
-            '432x432' => 0,  // cmsBlock image
-            '400x400' => 0,  // profile big
-            '210x140' => 0,  // gallery image preview
-            '80x80' => 0,    // ?
-            '50x50' => 0,    // ?
+            '600x400' => 0, // event preview image
+            '432x432' => 0, // cmsBlock image
+            '400x400' => 0, // profile big
+            '210x140' => 0, // gallery image preview
+            '80x80' => 0, // ?
+            '50x50' => 0, // ?
         ];
     }
 
@@ -129,7 +130,7 @@ readonly class ConfigService
             return $default;
         }
 
-        return (int)$setting->getValue();
+        return (int) $setting->getValue();
     }
 
     private function setInt(string $name, int $value): void
@@ -140,7 +141,7 @@ readonly class ConfigService
             $setting->setName($name);
             $setting->setType(ConfigType::Integer);
         }
-        $setting->setValue((string)$value);
+        $setting->setValue((string) $value);
 
         $this->em->persist($setting);
         $this->em->flush();

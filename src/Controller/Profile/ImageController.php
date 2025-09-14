@@ -9,12 +9,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ImageController extends AbstractController
 {
-    public function __construct(private readonly ImageRepository $imageRepo)
-    {
-    }
+    public function __construct(
+        private readonly ImageRepository $imageRepo,
+    ) {}
 
-    #[Route('/profile/images/{action}/{id}/{imageId}', name: 'app_profile_images', requirements: ['action' => 'profile|event'])]
-    public function images($action = 'profile', ?int $id = null, ?int $imageId = null): Response
+    #[Route('/profile/images/{action}/{id}/{imageId}', name: 'app_profile_images', requirements: [
+        'action' => 'profile|event',
+    ])]
+    public function images($action = 'profile', null|int $id = null, null|int $imageId = null): Response
     {
         $image = null;
         $imageList = null;

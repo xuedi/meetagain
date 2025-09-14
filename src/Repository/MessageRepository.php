@@ -18,14 +18,14 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    public function getConversations(User $user, ?int $id = null): array
+    public function getConversations(User $user, null|int $id = null): array
     {
         $list = [];
 
         $result = $this->createQueryBuilder('m')
             ->select('m.createdAt, us.id as senderId, ur.id as receiverId, m.wasRead') //
-            ->leftJoin('m.receiver', 'us')  // join user
-            ->leftJoin('m.sender', 'ur')  // join user
+            ->leftJoin('m.receiver', 'us') // join user
+            ->leftJoin('m.sender', 'ur') // join user
             ->where('m.sender = :user OR m.receiver = :user')
             ->setParameter('user', $user)
             ->orderBy('m.createdAt', 'DESC')
@@ -63,9 +63,9 @@ class MessageRepository extends ServiceEntityRepository
         return $list;
     }
 
-    public function getMessages(User $user, User|null $partner = null): ?array
+    public function getMessages(User $user, User|null $partner = null): null|array
     {
-        if (!$partner instanceof \App\Entity\User) {
+        if (!($partner instanceof \App\Entity\User)) {
             return null;
         }
 
@@ -80,12 +80,14 @@ class MessageRepository extends ServiceEntityRepository
 
     public function getMessageCount(User $user): int
     {
-        return count($this->createQueryBuilder('m')
-            ->where('m.receiver = :self')
-            ->setParameter('self', $user)
-            ->orderBy('m.createdAt', 'ASC')
-            ->getQuery()
-            ->getArrayResult());
+        return count(
+            $this->createQueryBuilder('m')
+                ->where('m.receiver = :self')
+                ->setParameter('self', $user)
+                ->orderBy('m.createdAt', 'ASC')
+                ->getQuery()
+                ->getArrayResult(),
+        );
     }
 
     public function hasNewMessages(User $user): bool

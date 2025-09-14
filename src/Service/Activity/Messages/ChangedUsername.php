@@ -2,8 +2,8 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageAbstract;
 
 class ChangedUsername extends MessageAbstract
 {
@@ -23,20 +23,12 @@ class ChangedUsername extends MessageAbstract
     protected function renderText(): string
     {
         $msgTemplate = 'Changed username from %s to %s';
-        return sprintf(
-            $msgTemplate,
-            $this->meta['old'],
-            $this->meta['new']
-        );
+        return sprintf($msgTemplate, $this->meta['old'], $this->meta['new']);
     }
 
     protected function renderHtml(): string
     {
         $msgTemplate = 'Changed username from <b>%s</b> to <b>%s</b>';
-        return sprintf(
-            $msgTemplate,
-            $this->meta['old'],
-            $this->meta['new']
-        );
+        return sprintf($msgTemplate, $this->meta['old'], $this->meta['new']);
     }
 }

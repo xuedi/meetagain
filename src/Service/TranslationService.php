@@ -27,8 +27,7 @@ readonly class TranslationService
         private CommandService $commandService,
         private ConfigService $configService,
         private string $kernelProjectDir,
-    ) {
-    }
+    ) {}
 
     /** TODO: move to repo */
     public function getMatrix(): array
@@ -91,7 +90,7 @@ readonly class TranslationService
         $finder->files()->in($path)->depth(0)->name(['messages*.php']);
         foreach ($finder as $file) {
             [$name, $lang, $ext] = explode('.', $file->getFilename());
-            $translations = $this->removeDuplicates(include($file->getPathname()));
+            $translations = $this->removeDuplicates(include $file->getPathname());
             foreach (array_keys($translations) as $placeholder) {
                 if (!in_array($placeholder, $dataBase[$lang], true)) {
                     $translation = new Translation();
@@ -112,7 +111,7 @@ readonly class TranslationService
             'count' => $numberTranslationCount,
             'new' => $newTranslations,
             'deleted' => $deletedTranslations,
-            'extractionTime' => (string)$stopwatch->stop('executeCommand'),
+            'extractionTime' => (string) $stopwatch->stop('executeCommand'),
             'output' => $output,
         ];
     }
@@ -130,11 +129,10 @@ readonly class TranslationService
             $this->fs->appendToFile($file, '<?php return array (');
             $translations = $this->translationRepo->findBy(['language' => $locale]);
             foreach ($translations as $translation) {
-                $this->fs->appendToFile($file, sprintf(
-                    "'%s' => '%s',",
-                    $translation->getPlaceholder(),
-                    $translation->getTranslation(),
-                ));
+                $this->fs->appendToFile(
+                    $file,
+                    sprintf("'%s' => '%s',", $translation->getPlaceholder(), $translation->getTranslation()),
+                );
                 $published++;
             }
             $this->fs->appendToFile($file, ');');
@@ -194,7 +192,7 @@ readonly class TranslationService
         $json = file_get_contents($apiUrl);
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
-        $this->entityManager->getConnection()->executeQuery(" TRUNCATE TABLE translation");
+        $this->entityManager->getConnection()->executeQuery(' TRUNCATE TABLE translation');
         $user = $this->userRepo->findOneBy(['email' => 'system@example.org']);
 
         foreach ($data as $item) {

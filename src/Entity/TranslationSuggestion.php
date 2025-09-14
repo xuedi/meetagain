@@ -13,43 +13,43 @@ class TranslationSuggestion
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
+    private null|DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $createdBy = null;
+    private null|User $createdBy = null;
 
     #[ORM\Column(nullable: true)]
-    private ?DateTimeImmutable $approvedAt = null;
+    private null|DateTimeImmutable $approvedAt = null;
 
     #[ORM\ManyToOne]
-    private ?User $approvedBy = null;
+    private null|User $approvedBy = null;
 
     #[ORM\Column(length: 2)]
-    private ?string $language = null;
+    private null|string $language = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $suggestion = null;
+    private null|string $suggestion = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Translation $translation = null;
+    private null|Translation $translation = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $previous = null;
+    private null|string $previous = null;
 
     #[ORM\Column(enumType: TranslationSuggestionStatus::class)]
-    private ?TranslationSuggestionStatus $status = null;
+    private null|TranslationSuggestionStatus $status = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): null|DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -61,31 +61,31 @@ class TranslationSuggestion
         return $this;
     }
 
-    public function getCreatedBy(): ?User
+    public function getCreatedBy(): null|User
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?User $createdBy): static
+    public function setCreatedBy(null|User $createdBy): static
     {
         $this->createdBy = $createdBy;
 
         return $this;
     }
 
-    public function getApprovedAt(): ?DateTimeImmutable
+    public function getApprovedAt(): null|DateTimeImmutable
     {
         return $this->approvedAt;
     }
 
-    public function setApprovedAt(?DateTimeImmutable $approvedAt): static
+    public function setApprovedAt(null|DateTimeImmutable $approvedAt): static
     {
         $this->approvedAt = $approvedAt;
 
         return $this;
     }
 
-    public function getApprovedBy(): ?User
+    public function getApprovedBy(): null|User
     {
         return $this->approvedBy;
     }
@@ -95,14 +95,14 @@ class TranslationSuggestion
         return $this->approvedBy?->getName() ?? '';
     }
 
-    public function setApprovedBy(?User $approvedBy): static
+    public function setApprovedBy(null|User $approvedBy): static
     {
         $this->approvedBy = $approvedBy;
 
         return $this;
     }
 
-    public function getLanguage(): ?string
+    public function getLanguage(): null|string
     {
         return $this->language;
     }
@@ -114,7 +114,7 @@ class TranslationSuggestion
         return $this;
     }
 
-    public function getSuggestion(): ?string
+    public function getSuggestion(): null|string
     {
         return $this->suggestion;
     }
@@ -126,19 +126,19 @@ class TranslationSuggestion
         return $this;
     }
 
-    public function getTranslation(): ?Translation
+    public function getTranslation(): null|Translation
     {
         return $this->translation;
     }
 
-    public function setTranslation(?Translation $translation): static
+    public function setTranslation(null|Translation $translation): static
     {
         $this->translation = $translation;
 
         return $this;
     }
 
-    public function getPrevious(): ?string
+    public function getPrevious(): null|string
     {
         return $this->previous;
     }
@@ -150,7 +150,7 @@ class TranslationSuggestion
         return $this;
     }
 
-    public function getStatus(): ?TranslationSuggestionStatus
+    public function getStatus(): null|TranslationSuggestionStatus
     {
         return $this->status;
     }

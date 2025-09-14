@@ -7,12 +7,14 @@ use App\Entity\Image as ImageEntity;
 
 class Paragraph implements BlockType
 {
-    private function __construct(public string $title, public string $content, public ?ImageEntity $image)
-    {
-    }
+    private function __construct(
+        public string $title,
+        public string $content,
+        public null|ImageEntity $image,
+    ) {}
 
     #[\Override]
-    public static function fromJson(array $json, ?ImageEntity $image = null): self
+    public static function fromJson(array $json, null|ImageEntity $image = null): self
     {
         return new self($json['title'], $json['content'], $image);
     }

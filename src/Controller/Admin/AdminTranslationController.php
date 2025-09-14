@@ -18,6 +18,7 @@ class AdminTranslationController extends AbstractController
             'translationMatrix' => $translationService->getMatrix(),
         ]);
     }
+
     #[Route('/admin/translations/save', name: 'app_admin_translation_save')]
     public function translationsSave(TranslationService $translationService, Request $request): Response
     {
@@ -27,6 +28,7 @@ class AdminTranslationController extends AbstractController
 
         return $this->redirectToRoute('app_admin_translation_edit');
     }
+
     #[Route('/admin/translations/extract', name: 'app_admin_translation_extract')]
     public function translationsExtract(TranslationService $translationService): Response
     {
@@ -35,6 +37,7 @@ class AdminTranslationController extends AbstractController
             'result' => $translationService->extract(),
         ]);
     }
+
     #[Route('/admin/translations/publish', name: 'app_admin_translation_publish')]
     public function translationsPublish(TranslationService $translationService): Response
     {

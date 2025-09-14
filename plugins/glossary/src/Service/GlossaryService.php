@@ -13,9 +13,10 @@ use RuntimeException;
 
 readonly class GlossaryService
 {
-    public function __construct(private EntityManagerInterface $em, private GlossaryRepository $repo)
-    {
-    }
+    public function __construct(
+        private EntityManagerInterface $em,
+        private GlossaryRepository $repo,
+    ) {}
 
     public function approveNew(int $id): void
     {
@@ -40,13 +41,17 @@ readonly class GlossaryService
     {
         $item = $this->repo->findOneBy(['id' => $id]);
 
-        $this->em->remove($item);;
+        $this->em->remove($item);
         $this->em->flush();
     }
 
     public function generateSuggestions(Glossary $newGlossary, int $id, int $userId, bool $isManager): void
     {
         $current = $this->repo->findOneBy(['id' => $id]);
+        if ($current === null) {
+            return;
+        }
+
         if ($isManager) {
             $current->setPhrase($newGlossary->getPhrase());
             $current->setPinyin($newGlossary->getPinyin());
@@ -80,7 +85,7 @@ readonly class GlossaryService
                 createdBy: $userId,
                 createdAt: new DateTimeImmutable(),
                 field: SuggestionField::Category,
-                value: (string)$newGlossary->getCategory()->value,
+                value: (string) $newGlossary->getCategory()->value,
             ));
         }
         if ($current->getExplanation() !== $newGlossary->getExplanation()) {
@@ -109,6 +114,10 @@ readonly class GlossaryService
     public function applySuggestion(int $id, string $hash): int
     {
         $item = $this->repo->findOneBy(['id' => $id]);
+        if ($item === null) {
+            throw new RuntimeException('Item not found');
+        }
+
         $suggestion = $item->getSuggestion($hash);
         switch ($suggestion->field) {
             case SuggestionField::Phrase:
@@ -118,7 +127,7 @@ readonly class GlossaryService
                 $item->setPinyin($suggestion->value);
                 break;
             case SuggestionField::Category:
-                $item->setCategory(Category::from((int)$suggestion->value));
+                $item->setCategory(Category::from((int) $suggestion->value));
                 break;
             case SuggestionField::Explanation:
                 $item->setExplanation($suggestion->value);
@@ -134,6 +143,10 @@ readonly class GlossaryService
     public function denySuggestion(int $id, string $hash): int
     {
         $item = $this->repo->findOneBy(['id' => $id]);
+        if ($item === null) {
+            throw new RuntimeException('Item not found');
+        }
+
         $leftOver = $item->removeSuggestion($hash);
         $this->em->persist($item);
         $this->em->flush();

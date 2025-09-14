@@ -25,9 +25,7 @@ class TranslationController extends AbstractController
         private readonly TranslationRepository $translationRepo,
         private readonly EntityManagerInterface $em,
         private readonly TranslationSuggestionRepository $translationSuggestionRepo,
-    )
-    {
-    }
+    ) {}
 
     #[Route('', name: self::ROUTE_MANAGE)]
     public function index(): Response
@@ -42,9 +40,9 @@ class TranslationController extends AbstractController
     {
         $translation = $this->translationRepo->findOneBy([
             'id' => $id,
-            'language' => $lang
+            'language' => $lang,
         ]);
-        if (!$translation instanceof Translation) {
+        if (!($translation instanceof Translation)) {
             throw $this->createNotFoundException('Translation not found');
         }
         $before = $translation->getTranslation();
@@ -56,7 +54,7 @@ class TranslationController extends AbstractController
             if ($this->getAuthedUser()->hasRole('ROLE_MANAGER')) {
                 $translation->setCreatedAt(new DateTimeImmutable());
                 $translation->setUser($this->getAuthedUser());
-    
+
                 $this->em->persist($translation);
                 $this->em->flush();
 
@@ -74,7 +72,10 @@ class TranslationController extends AbstractController
 
         return $this->render('translation/edit.html.twig', [
             'translations' => $this->translationRepo->findBy(['placeholder' => $translation->getPlaceholder()]),
-            'suggestions' => $this->translationSuggestionRepo->findBy(['translation' => $translation], ['createdAt' => 'ASC']),
+            'suggestions' => $this->translationSuggestionRepo->findBy(
+                ['translation' => $translation],
+                ['createdAt' => 'ASC'],
+            ),
             'form' => $form->createView(),
             'lang' => $lang,
             'item' => $translation,
@@ -107,7 +108,7 @@ class TranslationController extends AbstractController
         $suggestion->setStatus(TranslationSuggestionStatus::Approved);
 
         $translation = $suggestion->getTranslation();
-        if (!$translation instanceof Translation) {
+        if (!($translation instanceof Translation)) {
             throw $this->createNotFoundException('Translation not found');
         }
         $translation->setTranslation($suggestion->getSuggestion());
@@ -143,7 +144,7 @@ class TranslationController extends AbstractController
             throw $this->createAccessDeniedException('Only managers can approve or deny suggestions');
         }
         $suggestion = $this->translationSuggestionRepo->findOneBy(['id' => $id]);
-        if (!$suggestion instanceof TranslationSuggestion) {
+        if (!($suggestion instanceof TranslationSuggestion)) {
             throw $this->createNotFoundException('Translation suggestion not found');
         }
 

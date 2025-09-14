@@ -10,8 +10,8 @@ use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\EventService;
-use App\Service\TranslationService;
 use App\Service\ImageService;
+use App\Service\TranslationService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,8 +29,7 @@ class AdminEventController extends AbstractController
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly EventService $eventService,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/event/', name: 'app_admin_event')]
     public function eventList(EventRepository $repo): Response
@@ -45,7 +44,6 @@ class AdminEventController extends AbstractController
     #[Route('/admin/event/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function eventEdit(Request $request, Event $event): Response
     {
-
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -85,7 +83,7 @@ class AdminEventController extends AbstractController
             }
 
             $followUp = '';
-            if ($form->get("allFollowing")->getData() === true) {
+            if ($form->get('allFollowing')->getData() === true) {
                 $cnt = $this->eventService->updateRecurringEvents($event);
                 $followUp = " & updated $cnt follow-up events.";
             }
@@ -104,10 +102,10 @@ class AdminEventController extends AbstractController
     public function eventDelete(EventRepository $repo): Response
     {
         dump('delete');
-        exit;
+        exit();
     }
 
-    private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
+    private function getTranslation(mixed $languageCode, null|int $getId): EventTranslation
     {
         $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);
         if ($translation !== null) {

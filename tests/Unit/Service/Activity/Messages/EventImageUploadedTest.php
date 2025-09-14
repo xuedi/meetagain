@@ -4,11 +4,11 @@ namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
 use App\Service\Activity\Messages\EventImageUploaded;
+use App\Service\ImageService;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
-use App\Service\ImageService;
 
 class EventImageUploadedTest extends TestCase
 {
@@ -33,7 +33,8 @@ class EventImageUploadedTest extends TestCase
         $meta = ['event_id' => $eventId, 'images' => $imageCount];
         $eventNames = [$eventId => $eventName];
 
-        $this->router->expects($this->once())
+        $this->router
+            ->expects($this->once())
             ->method('generate')
             ->with('app_event_details', ['id' => $eventId])
             ->willReturn($eventUrl);
@@ -50,9 +51,7 @@ class EventImageUploadedTest extends TestCase
 
     public function testCanCatchMissingEventId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'event_id' in meta in EventImageUploaded")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in EventImageUploaded"));
 
         $subject = new EventImageUploaded();
         $subject->injectServices($this->router, $this->imageService, ['images' => 3]);
@@ -62,7 +61,7 @@ class EventImageUploadedTest extends TestCase
     public function testCanCatchNonNumericEventId(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'EventImageUploaded'")
+            new InvalidArgumentException("Value 'event_id' has to be numeric in 'EventImageUploaded'"),
         );
 
         $subject = new EventImageUploaded();
@@ -72,9 +71,7 @@ class EventImageUploadedTest extends TestCase
 
     public function testCanCatchMissingImages(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'images' in meta in EventImageUploaded")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'images' in meta in EventImageUploaded"));
 
         $subject = new EventImageUploaded();
         $subject->injectServices($this->router, $this->imageService, ['event_id' => 42]);
@@ -84,7 +81,7 @@ class EventImageUploadedTest extends TestCase
     public function testCanCatchNonNumericImages(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'images' has to be numeric in 'EventImageUploaded'")
+            new InvalidArgumentException("Value 'images' has to be numeric in 'EventImageUploaded'"),
         );
 
         $subject = new EventImageUploaded();

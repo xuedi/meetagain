@@ -13,21 +13,20 @@ class ImageUploadType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('newImage', FileType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => false,
-                'constraints' => [
-                    new Image([
-                        'maxSize' => '10M',
-                        'mimeTypes' => [
-                            'image/*',
-                        ],
-                        'mimeTypesMessage' => 'Please upload a valid image',
-                    ])
-                ],
-            ]);
+        $builder->add('newImage', FileType::class, [
+            'mapped' => false,
+            'required' => false,
+            'label' => false,
+            'constraints' => [
+                new Image([
+                    'maxSize' => '10M',
+                    'mimeTypes' => [
+                        'image/*',
+                    ],
+                    'mimeTypesMessage' => 'Please upload a valid image',
+                ]),
+            ],
+        ]);
     }
 
     #[\Override]
@@ -35,7 +34,7 @@ class ImageUploadType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
-            'csrf_protection' => false
+            'csrf_protection' => false,
         ]);
     }
 }
