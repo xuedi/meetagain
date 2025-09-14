@@ -45,7 +45,6 @@
     "symfony/mailer": "7.3.*",
     "symfony/mime": "7.3.*",
     "symfony/monolog-bundle": "^3.10",
-    "symfony/notifier": "7.3.*",
     "symfony/process": "7.3.*",
     "symfony/property-access": "7.3.*",
     "symfony/property-info": "7.3.*",
