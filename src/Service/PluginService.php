@@ -9,9 +9,10 @@ readonly class PluginService
     public const string CONFIG_DIR = __DIR__ . '/../../config';
     public const string PLUGIN_DIR = __DIR__ . '/../../plugins';
 
-    public function __construct(private CommandService $commandService, private ExtendedFilesystem $filesystem)
-    {
-    }
+    public function __construct(
+        private CommandService $commandService,
+        private ExtendedFilesystem $filesystem,
+    ) {}
 
     public function getAdminList(): array
     {
@@ -124,7 +125,7 @@ readonly class PluginService
         foreach ($config as $key => $value) {
             $configItems[] = "'" . $key . "' => " . ($value ? 'true' : 'false');
         }
-        $content = "<?php declare(strict_types=1); return [" . implode(',', $configItems) . "];";
+        $content = '<?php declare(strict_types=1); return [' . implode(',', $configItems) . '];';
         $this->filesystem->putFileContents($configFile, $content);
 
         $this->commandService->clearCache();

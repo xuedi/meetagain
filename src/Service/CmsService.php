@@ -10,9 +10,11 @@ use Twig\Environment;
 
 readonly class CmsService
 {
-    public function __construct(private Environment $twig, private CmsRepository $repo, private EventRepository $eventRepo)
-    {
-    }
+    public function __construct(
+        private Environment $twig,
+        private CmsRepository $repo,
+        private EventRepository $eventRepo,
+    ) {}
 
     public function getSites(): array
     {
@@ -23,7 +25,7 @@ readonly class CmsService
     {
         $cms = $this->repo->findOneBy([
             'slug' => $slug,
-            'published' => true
+            'published' => true,
         ]);
 
         if ($cms === null) {

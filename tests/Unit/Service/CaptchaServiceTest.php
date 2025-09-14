@@ -19,9 +19,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
 
         $this->subject = new CaptchaService();
-        $this->subject->setSession(
-            session: $this->sessionMock
-        );
+        $this->subject->setSession(session: $this->sessionMock);
     }
 
     public function testGenerateIsReturningExistingData(): void
@@ -29,9 +27,7 @@ class CaptchaServiceTest extends TestCase
         $expected = 'base64_image_data';
         $sessionId = 'test_session_id';
 
-        $this->sessionMock
-            ->method('getId')
-            ->willReturn($sessionId);
+        $this->sessionMock->method('getId')->willReturn($sessionId);
 
         $this->sessionMock
             ->method('get')
@@ -46,13 +42,9 @@ class CaptchaServiceTest extends TestCase
     {
         $sessionId = 'test_session_id';
 
-        $this->sessionMock
-            ->method('getId')
-            ->willReturn($sessionId);
+        $this->sessionMock->method('getId')->willReturn($sessionId);
 
-        $this->sessionMock
-            ->method('get')
-            ->willReturn(null);
+        $this->sessionMock->method('get')->willReturn(null);
 
         $this->sessionMock
             ->expects($this->exactly(3))
@@ -101,12 +93,12 @@ class CaptchaServiceTest extends TestCase
             [
                 'sessionReturn' => 'hgfw',
                 'code' => 'hgfw',
-                'expected' => null
+                'expected' => null,
             ],
             [
                 'sessionReturn' => 'jrdf',
                 'code' => 'hgfw',
-                'expected' => "Wrong captcha code, got 'hgfw' but expected 'jrdf'"
+                'expected' => "Wrong captcha code, got 'hgfw' but expected 'jrdf'",
             ],
         ];
     }
@@ -212,7 +204,7 @@ class CaptchaServiceTest extends TestCase
                 'sessionReturn' => [
                     new DateTimeImmutable(),
                 ],
-                'expected' => 1
+                'expected' => 1,
             ],
             [
                 'sessionReturn' => [
@@ -221,7 +213,7 @@ class CaptchaServiceTest extends TestCase
                     new DateTimeImmutable(),
                     new DateTimeImmutable(),
                 ],
-                'expected' => 4
+                'expected' => 4,
             ],
             [
                 'sessionReturn' => [
@@ -230,7 +222,7 @@ class CaptchaServiceTest extends TestCase
                     new DateTimeImmutable(),
                     new DateTimeImmutable('-1 hour'), // is timed out
                 ],
-                'expected' => 3
+                'expected' => 3,
             ],
         ];
     }
@@ -247,13 +239,9 @@ class CaptchaServiceTest extends TestCase
             new DateTimeImmutable(),
         ];
 
-        $this->sessionMock
-            ->expects($this->never())
-            ->method('remove');
+        $this->sessionMock->expects($this->never())->method('remove');
 
-        $this->sessionMock
-            ->method('get')
-            ->willReturn($sessionReturn);
+        $this->sessionMock->method('get')->willReturn($sessionReturn);
 
         $this->subject->reset();
     }
@@ -264,13 +252,9 @@ class CaptchaServiceTest extends TestCase
             new DateTimeImmutable(),
         ];
 
-        $this->sessionMock
-            ->expects($this->exactly(2))
-            ->method('remove');
+        $this->sessionMock->expects($this->exactly(2))->method('remove');
 
-        $this->sessionMock
-            ->method('get')
-            ->willReturn($sessionReturn);
+        $this->sessionMock->method('get')->willReturn($sessionReturn);
 
         $this->subject->reset();
     }

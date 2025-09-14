@@ -14,13 +14,10 @@ class HostType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('name')
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'name',
-            ])
-        ;
+        $builder->add('name')->add('user', EntityType::class, [
+            'class' => User::class,
+            'choice_label' => 'name',
+        ]);
     }
 
     #[\Override]

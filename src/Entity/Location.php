@@ -13,42 +13,42 @@ class Location
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private null|string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $description = null;
+    private null|string $description = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $street = null;
+    private null|string $street = null;
 
     #[ORM\Column(length: 32)]
-    private ?string $city = null;
+    private null|string $city = null;
 
     #[ORM\Column(length: 8)]
-    private ?string $postcode = null;
+    private null|string $postcode = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private null|User $user = null;
 
     #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
+    private null|DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    private ?string $longitude = null;
+    private null|string $longitude = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    private ?string $latitude = null;
+    private null|string $latitude = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): null|string
     {
         return $this->name;
     }
@@ -60,7 +60,7 @@ class Location
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): null|string
     {
         return $this->description;
     }
@@ -72,7 +72,7 @@ class Location
         return $this;
     }
 
-    public function getStreet(): ?string
+    public function getStreet(): null|string
     {
         return $this->street;
     }
@@ -84,7 +84,7 @@ class Location
         return $this;
     }
 
-    public function getCity(): ?string
+    public function getCity(): null|string
     {
         return $this->city;
     }
@@ -96,7 +96,7 @@ class Location
         return $this;
     }
 
-    public function getPostcode(): ?string
+    public function getPostcode(): null|string
     {
         return $this->postcode;
     }
@@ -108,19 +108,19 @@ class Location
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): null|User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(null|User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): null|DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -132,24 +132,24 @@ class Location
         return $this;
     }
 
-    public function getLongitude(): ?string
+    public function getLongitude(): null|string
     {
         return $this->longitude;
     }
 
-    public function setLongitude(?string $longitude): static
+    public function setLongitude(null|string $longitude): static
     {
         $this->longitude = $longitude;
 
         return $this;
     }
 
-    public function getLatitude(): ?string
+    public function getLatitude(): null|string
     {
         return $this->latitude;
     }
 
-    public function setLatitude(?string $latitude): static
+    public function setLatitude(null|string $latitude): static
     {
         $this->latitude = $latitude;
 

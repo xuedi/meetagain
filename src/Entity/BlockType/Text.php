@@ -7,12 +7,13 @@ use App\Entity\Image as ImageEntity;
 
 class Text implements BlockType
 {
-    private function __construct(public string $content, public ?ImageEntity $image)
-    {
-    }
+    private function __construct(
+        public string $content,
+        public null|ImageEntity $image,
+    ) {}
 
     #[\Override]
-    public static function fromJson(array $json, ?ImageEntity $image = null): self
+    public static function fromJson(array $json, null|ImageEntity $image = null): self
     {
         return new self($json['content'], $image);
     }

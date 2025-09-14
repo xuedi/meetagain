@@ -13,20 +13,16 @@ class TranslationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('placeholder', TextType::class, [
-                'label' => 'Placeholder',
-                'disabled' => true,
-            ])
-            ->add('language', TextType::class, [
-                'label' => 'Language',
-                'disabled' => true,
-            ])
-            ->add('translation', TextType::class, [
-                'label' => 'Translation',
-                'required' => false,
-            ])
-        ;
+        $builder->add('placeholder', TextType::class, [
+            'label' => 'Placeholder',
+            'disabled' => true,
+        ])->add('language', TextType::class, [
+            'label' => 'Language',
+            'disabled' => true,
+        ])->add('translation', TextType::class, [
+            'label' => 'Translation',
+            'required' => false,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

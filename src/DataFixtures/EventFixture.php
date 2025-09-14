@@ -35,18 +35,18 @@ class EventFixture extends Fixture implements DependentFixtureInterface
             $event->setRecurringOf($recOf);
             $event->setRecurringRule($recRules);
             $event->setUser($this->getReference('user_' . md5('import'), User::class));
-            $event->setLocation($this->getReference('location_' . md5((string)$location), Location::class));
+            $event->setLocation($this->getReference('location_' . md5((string) $location), Location::class));
             $event->setCreatedAt(new DateTimeImmutable());
             $event->setType($type);
             foreach ($hosts as $user) {
-                $event->addHost($this->getReference('host_' . md5((string)$user), Host::class));
+                $event->addHost($this->getReference('host_' . md5((string) $user), Host::class));
             }
             foreach ($rsvps as $user) {
-                $event->addRsvp($this->getReference('user_' . md5((string)$user), User::class));
+                $event->addRsvp($this->getReference('user_' . md5((string) $user), User::class));
             }
 
             $manager->persist($event);
-            $this->addReference('event_' . md5((string)$name), $event);
+            $this->addReference('event_' . md5((string) $name), $event);
         }
         $manager->flush();
         echo 'OK' . PHP_EOL;
@@ -84,7 +84,24 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'St. Oberholz',
                 ['Adem Lane', 'admin'],
-                ['Adil Floyd', 'Aston Hood', 'Bailey Richards', 'Bec Ferguson', 'Danyal Lester', 'Demi Wilkinson', 'Freya Browning', 'Kaitlin Hale', 'Molly Vaughan', 'Nic Fassbender', 'Orlando Diggs', 'Owen Garcia', 'axisbos audax', 'admin', 'Adem Lane', 'Crystal Liu'],
+                [
+                    'Adil Floyd',
+                    'Aston Hood',
+                    'Bailey Richards',
+                    'Bec Ferguson',
+                    'Danyal Lester',
+                    'Demi Wilkinson',
+                    'Freya Browning',
+                    'Kaitlin Hale',
+                    'Molly Vaughan',
+                    'Nic Fassbender',
+                    'Orlando Diggs',
+                    'Owen Garcia',
+                    'axisbos audax',
+                    'admin',
+                    'Adem Lane',
+                    'Crystal Liu',
+                ],
                 EventTypes::Regular,
                 true,
             ],
@@ -97,7 +114,17 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Grand Tang',
                 ['Adem Lane', 'admin'],
-                ['Adil Floyd', 'Lana Steiner', 'Leyton Fields', 'Lyle Kauffman', 'Zuzanna Burke', 'axisbos audax', 'admin', 'Adem Lane', 'Crystal Liu'],
+                [
+                    'Adil Floyd',
+                    'Lana Steiner',
+                    'Leyton Fields',
+                    'Lyle Kauffman',
+                    'Zuzanna Burke',
+                    'axisbos audax',
+                    'admin',
+                    'Adem Lane',
+                    'Crystal Liu',
+                ],
                 EventTypes::Dinner,
                 true,
             ],
@@ -110,7 +137,17 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Garten der Welt',
                 ['Adem Lane'],
-                ['Amanda Lowery', 'Anita Cruz', 'Florence Shaw', 'Jessie Meyton', 'Jonathan Kelly', 'Marco Kelly', 'Priya Shepard', 'admin', 'Adem Lane'],
+                [
+                    'Amanda Lowery',
+                    'Anita Cruz',
+                    'Florence Shaw',
+                    'Jessie Meyton',
+                    'Jonathan Kelly',
+                    'Marco Kelly',
+                    'Priya Shepard',
+                    'admin',
+                    'Adem Lane',
+                ],
                 EventTypes::Outdoor,
                 true,
             ],
@@ -123,7 +160,17 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Lao Xiang',
                 ['Adem Lane'],
-                ['Ayah Wilkinson', 'Billie Wright', 'Herbert Fowler', 'Jay Shepard', 'Leyton Fields', 'Maddison Gillespie', 'Marco Kelly', 'admin', 'Adem Lane'],
+                [
+                    'Ayah Wilkinson',
+                    'Billie Wright',
+                    'Herbert Fowler',
+                    'Jay Shepard',
+                    'Leyton Fields',
+                    'Maddison Gillespie',
+                    'Marco Kelly',
+                    'admin',
+                    'Adem Lane',
+                ],
                 EventTypes::Dinner,
                 true,
             ],
@@ -136,7 +183,17 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 self::NO_RECURRING_RULE,
                 'Himmelbeet',
                 ['admin', 'Adem Lane'],
-                ['Crystal Liu', 'Adil Floyd', 'Aston Hood', 'Ayah Wilkinson', 'Jay Shepard', 'Marco Gross', 'Phoenix Baker', 'Rory Huff', 'admin'],
+                [
+                    'Crystal Liu',
+                    'Adil Floyd',
+                    'Aston Hood',
+                    'Ayah Wilkinson',
+                    'Jay Shepard',
+                    'Marco Gross',
+                    'Phoenix Baker',
+                    'Rory Huff',
+                    'admin',
+                ],
                 EventTypes::Outdoor,
                 true,
             ],
@@ -149,7 +206,19 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 EventIntervals::BiMonthly,
                 'Volksbar',
                 ['Adem Lane', 'admin'],
-                ['Adil Floyd', 'Aysha Becker', 'Bailey Richards', 'Belle Woods', 'Benedict Doherty', 'Eduard Franz', 'Koray Okumus', 'Youssef Roberson', 'admin', 'Adem Lane', 'Crystal Liu'],
+                [
+                    'Adil Floyd',
+                    'Aysha Becker',
+                    'Bailey Richards',
+                    'Belle Woods',
+                    'Benedict Doherty',
+                    'Eduard Franz',
+                    'Koray Okumus',
+                    'Youssef Roberson',
+                    'admin',
+                    'Adem Lane',
+                    'Crystal Liu',
+                ],
                 EventTypes::Regular,
                 false,
             ],
@@ -162,14 +231,24 @@ class EventFixture extends Fixture implements DependentFixtureInterface
                 EventIntervals::Yearly,
                 'Volksbar',
                 ['Adem Lane', 'admin'],
-                ['Benedict Doherty', 'Byron Robertson', 'Isobel Fuller', 'Levi Rocha', 'Nala Goins', 'Priya Shepard', 'Zara Bush', 'admin', 'Adem Lane'],
+                [
+                    'Benedict Doherty',
+                    'Byron Robertson',
+                    'Isobel Fuller',
+                    'Levi Rocha',
+                    'Nala Goins',
+                    'Priya Shepard',
+                    'Zara Bush',
+                    'admin',
+                    'Adem Lane',
+                ],
                 EventTypes::Dinner,
                 true,
             ],
         ];
     }
 
-    private function setDateType(?string $text): ?DateTime
+    private function setDateType(null|string $text): null|DateTime
     {
         if ($text === null || $text === '' || $text === '0') {
             return null;

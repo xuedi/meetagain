@@ -14,12 +14,11 @@ class Hero implements BlockType
         public string $buttonLink,
         public string $buttonText,
         public string $color,
-        public ?ImageEntity $image,
-    ) {
-    }
+        public null|ImageEntity $image,
+    ) {}
 
     #[\Override]
-    public static function fromJson(array $json, ?ImageEntity $image = null): self
+    public static function fromJson(array $json, null|ImageEntity $image = null): self
     {
         return new self(
             $json['headline'],

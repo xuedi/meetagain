@@ -2,8 +2,8 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageAbstract;
 
 class UpdatedProfilePicture extends MessageAbstract
 {
@@ -35,7 +35,7 @@ class UpdatedProfilePicture extends MessageAbstract
         return sprintf(
             $msgTemplate,
             $this->imageService->imageTemplateById($this->meta['old']),
-            $this->imageService->imageTemplateById($this->meta['new'])
+            $this->imageService->imageTemplateById($this->meta['new']),
         );
     }
 }

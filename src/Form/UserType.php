@@ -21,8 +21,7 @@ class UserType extends AbstractType
     public function __construct(
         private readonly ParameterBagInterface $appParams,
         private readonly TranslatorInterface $translator,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -55,90 +54,57 @@ class UserType extends AbstractType
                 ],
             ])
             ->add('bio', TextareaType::class, [
-                'label' => 'Bio'
+                'label' => 'Bio',
             ])
-            ->add(
-                'roles',
-                ChoiceType::class,
-                [
-                    'choices' => [
-                        $this->translator->trans('role_system') => 'ROLE_SYSTEM',
-                        $this->translator->trans('role_admin') => 'ROLE_ADMIN',
-                        $this->translator->trans('role_manager') => 'ROLE_MANAGER',
-                        $this->translator->trans('role_user') => 'ROLE_USER',
-                    ],
-                    'expanded' => true,
-                    'multiple' => true,
-                ]
-            )
-            ->add(
-                'verified',
-                ChoiceType::class,
-                [
+            ->add('roles', ChoiceType::class, [
+                'choices' => [
+                    $this->translator->trans('role_system') => 'ROLE_SYSTEM',
+                    $this->translator->trans('role_admin') => 'ROLE_ADMIN',
+                    $this->translator->trans('role_manager') => 'ROLE_MANAGER',
+                    $this->translator->trans('role_user') => 'ROLE_USER',
+                ],
+                'expanded' => true,
+                'multiple' => true,
+            ])
+            ->add('verified', ChoiceType::class, [
                 'data' => $user->isVerified(),
                 'mapped' => false,
                 'label' => 'Verified Regular',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-                ]
-            )
-            ->add(
-                'restricted',
-                ChoiceType::class,
-                [
+            ])
+            ->add('restricted', ChoiceType::class, [
                 'data' => $user->isRestricted(),
                 'mapped' => false,
                 'label' => 'Restricted',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-                ]
-            )
-            ->add(
-                'osmConsent',
-                ChoiceType::class,
-                [
+            ])
+            ->add('osmConsent', ChoiceType::class, [
                 'data' => $user->isOsmConsent(),
                 'mapped' => false,
                 'label' => 'show Maps',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-                ]
-            )
-            ->add(
-                'public',
-                ChoiceType::class,
-                [
+            ])
+            ->add('public', ChoiceType::class, [
                 'data' => $user->isPublic(),
                 'mapped' => false,
                 'label' => 'isPublic',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-                ]
-            )
-            ->add(
-                'tagging',
-                ChoiceType::class,
-                [
+            ])
+            ->add('tagging', ChoiceType::class, [
                 'data' => $user->isTagging(),
                 'mapped' => false,
                 'label' => 'allowTagging',
                 'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-                ]
-            )
-            ->add(
-                'locale',
-                ChoiceType::class,
-                [
-                    'data' => $user->getLocale(),
-                    'label' => 'Locale',
-                    'choices' => $languageList,
-                ]
-            )
-            ->add(
-                'status',
-                ChoiceType::class,
-                [
-                    'data' => $user->getStatus(),
-                    'choices' => UserStatus::getChoices($this->translator),
-                ]
-            )
-        ;
+            ])
+            ->add('locale', ChoiceType::class, [
+                'data' => $user->getLocale(),
+                'label' => 'Locale',
+                'choices' => $languageList,
+            ])
+            ->add('status', ChoiceType::class, [
+                'data' => $user->getStatus(),
+                'choices' => UserStatus::getChoices($this->translator),
+            ]);
     }
 
     #[\Override]

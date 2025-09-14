@@ -11,9 +11,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class SocialController extends AbstractController
 {
-    public function __construct(private readonly ActivityService $activityService)
-    {
-    }
+    public function __construct(
+        private readonly ActivityService $activityService,
+    ) {}
 
     #[Route('/profile/social', name: 'app_profile_social')]
     public function social(UserRepository $repo, string $show = 'friends'): Response

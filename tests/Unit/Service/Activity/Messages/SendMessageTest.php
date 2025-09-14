@@ -4,11 +4,11 @@ namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
 use App\Service\Activity\Messages\SendMessage;
+use App\Service\ImageService;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
-use App\Service\ImageService;
 
 class SendMessageTest extends TestCase
 {
@@ -43,9 +43,7 @@ class SendMessageTest extends TestCase
 
     public function testCanCatchMissingUserId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'user_id' in meta in SendMessage")
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in SendMessage"));
 
         $subject = new SendMessage();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -55,7 +53,7 @@ class SendMessageTest extends TestCase
     public function testCanCatchNonNumericUserId(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'user_id' has to be numeric in 'SendMessage'")
+            new InvalidArgumentException("Value 'user_id' has to be numeric in 'SendMessage'"),
         );
 
         $subject = new SendMessage();

@@ -4,10 +4,10 @@ namespace App\Form;
 
 use App\Entity\Cms;
 use App\Entity\Menu;
+use App\Entity\MenuLocation as EnumMenuLocation;
+use App\Entity\MenuRoutes as EnumMenuRoutes;
 use App\Entity\MenuTranslation;
 use App\Entity\MenuType as EnumMenuType;
-use App\Entity\MenuRoutes as EnumMenuRoutes;
-use App\Entity\MenuLocation as EnumMenuLocation;
 use App\Entity\MenuVisibility as EnumMenuVisibility;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
@@ -29,9 +29,7 @@ class MenuType extends AbstractType
         private readonly MenuTranslationRepository $menuTransRepo,
         private readonly CmsRepository $cmsRepo,
         private readonly EventRepository $eventRepo,
-    )
-    {
-    }
+    ) {}
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -61,7 +59,7 @@ class MenuType extends AbstractType
         $builder->add('slug', TextType::class, [
             'disabled' => !($typeSelect == EnumMenuType::Url),
             'label' => 'Url for external links',
-            'required' => false
+            'required' => false,
         ]);
         $builder->add('cms', ChoiceType::class, [
             'disabled' => !($typeSelect == EnumMenuType::Cms),

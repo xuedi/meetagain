@@ -22,9 +22,7 @@ readonly class NotificationService
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
-    )
-    {
-    }
+    ) {}
 
     public function notify(Activity $activity): void
     {
@@ -79,9 +77,9 @@ readonly class NotificationService
         }
     }
 
-    private function sendMessage(?User $user, ?int $userId = null): void
+    private function sendMessage(null|User $user, null|int $userId = null): void
     {
-        if (!$user instanceof User || $userId === null) {
+        if (!($user instanceof User) || $userId === null) {
             return;
         }
         $recipient = $this->userRepo->findOneBy(['id' => $userId]);
@@ -103,7 +101,7 @@ readonly class NotificationService
         }
         $this->emailService->prepareMessageNotification(
             sender: $user,
-            recipient: $recipient
+            recipient: $recipient,
         );
         $this->appCache->get($key, function (ItemInterface $item): string {
             $item->expiresAfter(self::EIGHT_HOURS);

@@ -22,7 +22,7 @@ class NotificationSettings implements JsonSerializable
         set => $this->receivedMessage = $value;
     }
 
-    public static function fromJson(?array $notificationSettings): self
+    public static function fromJson(null|array $notificationSettings): self
     {
         if ($notificationSettings === null) {
             return new self([]);

@@ -42,7 +42,7 @@ class CaptchaService
         return $image;
     }
 
-    public function isValid(string $code): ?string
+    public function isValid(string $code): null|string
     {
         $code = strtolower($code);
         $expected = strtolower((string) $this->session->get('captcha_text' . $this->session->getId(), null));
@@ -55,7 +55,7 @@ class CaptchaService
     private function generateImage(string $code): string
     {
         $image = new Imagick();
-        $image->newImage(100, 60, new ImagickPixel("grey"));
+        $image->newImage(100, 60, new ImagickPixel('grey'));
         $image->setImageFormat('png');
 
         $x = 8;

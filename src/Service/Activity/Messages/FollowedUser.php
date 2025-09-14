@@ -2,8 +2,8 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageAbstract;
 
 class FollowedUser extends MessageAbstract
 {
@@ -24,19 +24,13 @@ class FollowedUser extends MessageAbstract
     {
         $userId = $this->meta['user_id'];
         $msgTemplate = 'Started following: %s';
-        return sprintf(
-            $msgTemplate,
-            $this->userNames[$userId],
-        );
+        return sprintf($msgTemplate, $this->userNames[$userId]);
     }
 
     protected function renderHtml(): string
     {
         $userId = $this->meta['user_id'];
         $msgTemplate = 'Started following: %s'; // TODO: link
-        return sprintf(
-            $msgTemplate,
-            $this->userNames[$userId],
-        );
+        return sprintf($msgTemplate, $this->userNames[$userId]);
     }
 }

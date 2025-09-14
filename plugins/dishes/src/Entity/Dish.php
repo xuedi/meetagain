@@ -5,9 +5,9 @@ namespace Plugin\Dishes\Entity;
 use App\Entity\Image;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Plugin\Dishes\Repository\DishRepository;
-use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: DishRepository::class)]
 class Dish
@@ -15,32 +15,32 @@ class Dish
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\OneToMany(targetEntity: DishTranslation::class, mappedBy: 'dish')]
     private Collection $translations;
 
     #[ORM\Column]
-    private ?DateTimeImmutable $createdAt = null;
+    private null|DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?int $createdBy = null;
+    private null|int $createdBy = null;
 
     #[ORM\Column]
     private bool $approved = false;
 
     #[ORM\ManyToOne]
-    private ?Image $previewImage = null;
+    private null|Image $previewImage = null;
 
     #[ORM\Column(length: 2, nullable: true)]
-    private ?string $originLang = null;
+    private null|string $originLang = null;
 
     public function __construct()
     {
         $this->translations = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
@@ -69,7 +69,7 @@ class Dish
         return $this;
     }
 
-    public function findTranslation(string $language): ?DishTranslation
+    public function findTranslation(string $language): null|DishTranslation
     {
         foreach ($this->translations as $translation) {
             if ($translation->getLanguage() === $language) {
@@ -109,7 +109,7 @@ class Dish
         return '';
     }
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): null|DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -121,12 +121,12 @@ class Dish
         return $this;
     }
 
-    public function getCreatedBy(): ?int
+    public function getCreatedBy(): null|int
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?int $createdBy): static
+    public function setCreatedBy(null|int $createdBy): static
     {
         $this->createdBy = $createdBy;
 
@@ -145,24 +145,24 @@ class Dish
         return $this;
     }
 
-    public function getPreviewImage(): ?Image
+    public function getPreviewImage(): null|Image
     {
         return $this->previewImage;
     }
 
-    public function setPreviewImage(?Image $previewImage): static
+    public function setPreviewImage(null|Image $previewImage): static
     {
         $this->previewImage = $previewImage;
 
         return $this;
     }
 
-    public function getOriginLang(): ?string
+    public function getOriginLang(): null|string
     {
         return $this->originLang;
     }
 
-    public function setOriginLang(?string $originLang): static
+    public function setOriginLang(null|string $originLang): static
     {
         $this->originLang = $originLang;
 

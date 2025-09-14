@@ -4,8 +4,9 @@ namespace App\Service\Command;
 
 readonly class ExtractTranslationsCommand implements CommandInterface
 {
-    public function __construct(private string $locale)
-    {
+    public function __construct(
+        private string $locale,
+    ) {
         //
     }
 

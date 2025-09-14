@@ -12,36 +12,36 @@ class MenuTranslation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Menu $menu = null;
+    private null|Menu $menu = null;
 
     #[ORM\Column(length: 2)]
-    private ?string $language = null;
+    private null|string $language = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private null|string $name = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getMenu(): ?Menu
+    public function getMenu(): null|Menu
     {
         return $this->menu;
     }
 
-    public function setMenu(?Menu $menu): static
+    public function setMenu(null|Menu $menu): static
     {
         $this->menu = $menu;
 
         return $this;
     }
 
-    public function getLanguage(): ?string
+    public function getLanguage(): null|string
     {
         return $this->language;
     }
@@ -53,7 +53,7 @@ class MenuTranslation
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): null|string
     {
         return $this->name;
     }

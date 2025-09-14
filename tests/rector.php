@@ -14,14 +14,22 @@ return RectorConfig::configure()
     ])
     ->withPhpSets(php84: true)
     ->withPHPStanConfigs([__DIR__ . '/phpstan.neon'])
-    ->withPreparedSets(deadCode: true, codeQuality: true)
-    ->withAttributesSets(symfony: true, doctrine: true, phpunit: true)
+    ->withPreparedSets(
+        deadCode: true,
+        codeQuality: true,
+    )
+    ->withAttributesSets(
+        symfony: true,
+        doctrine: true,
+        phpunit: true,
+    )
     ->withTypeCoverageLevel(0)
     ->withSymfonyContainerXml(__DIR__ . '/../var/cache/dev/App_KernelDevDebugContainer.xml')
     ->withSets([
         SymfonySetList::SYMFONY_71,
         SymfonySetList::SYMFONY_CODE_QUALITY,
-        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION
-    ])->withRules([
-        TypedPropertyFromStrictConstructorRector::class
+        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
+    ])
+    ->withRules([
+        TypedPropertyFromStrictConstructorRector::class,
     ]);

@@ -31,7 +31,7 @@ class AjaxController extends AbstractController
         foreach ($consent->getHtmlCookies() as $cookie) {
             $response->headers->setCookie($cookie);
         }
-        
+
         return $response;
     }
 

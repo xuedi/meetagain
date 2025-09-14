@@ -15,7 +15,7 @@ readonly class KernelRequestSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequest', 10]
+                ['onKernelRequest', 10],
             ],
         ];
     }

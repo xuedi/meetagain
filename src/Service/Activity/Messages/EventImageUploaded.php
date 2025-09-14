@@ -2,8 +2,8 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageAbstract;
 
 class EventImageUploaded extends MessageAbstract
 {
@@ -26,11 +26,7 @@ class EventImageUploaded extends MessageAbstract
     {
         $eventId = $this->meta['event_id'];
         $msgTemplate = 'uploaded %d images to the event %s';
-        return sprintf(
-            $msgTemplate,
-            $this->meta['images'],
-            $this->eventNames[$eventId]
-        );
+        return sprintf($msgTemplate, $this->meta['images'], $this->eventNames[$eventId]);
     }
 
     protected function renderHtml(): string
@@ -41,7 +37,7 @@ class EventImageUploaded extends MessageAbstract
             $msgTemplate,
             $this->meta['images'],
             $this->router->generate('app_event_details', ['id' => $eventId]),
-            $this->eventNames[$eventId]
+            $this->eventNames[$eventId],
         );
     }
 }

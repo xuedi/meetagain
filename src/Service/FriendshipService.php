@@ -20,8 +20,7 @@ readonly class FriendshipService
         private RouterInterface $router,
         private Security $security,
         private RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     public function toggleFollow(int $id, string $returnRoute): RedirectResponse
     {
@@ -39,7 +38,7 @@ readonly class FriendshipService
 
         $route = $this->router->generate($returnRoute, [
             '_locale' => $this->requestStack->getCurrentRequest()?->getLocale(),
-            'id' => $targetUser->getId()
+            'id' => $targetUser->getId(),
         ]);
 
         return new RedirectResponse($route);
@@ -48,9 +47,9 @@ readonly class FriendshipService
     private function getAuthedUser(): User
     {
         $user = $this->security->getUser();
-        if (!$user instanceof User) {
+        if (!($user instanceof User)) {
             throw new AuthenticationCredentialsNotFoundException(
-                "Should never happen, see: config/packages/security.yaml"
+                'Should never happen, see: config/packages/security.yaml',
             );
         }
 

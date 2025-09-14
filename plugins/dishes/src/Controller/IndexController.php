@@ -9,10 +9,10 @@ use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Entity\ViewType;
 use Plugin\Dishes\Form\DishType;
 use Plugin\Dishes\Repository\DishRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 #[Route('/dishes')]
@@ -20,10 +20,8 @@ class IndexController extends AbstractController
 {
     public function __construct(
         private readonly DishRepository $repo,
-        private readonly EntityManagerInterface $em
-    )
-    {
-    }
+        private readonly EntityManagerInterface $em,
+    ) {}
 
     #[Route('', name: 'app_plugin_dishes', methods: ['GET'])]
     public function index(Request $request): Response
@@ -37,7 +35,7 @@ class IndexController extends AbstractController
                 ViewType::List->value => 'list',
                 ViewType::Tiles->value => 'grip',
                 ViewType::Grid->value => 'table-cells',
-                ViewType::Gallery->value => 'images'
+                ViewType::Gallery->value => 'images',
             ],
         ]);
     }
@@ -67,7 +65,7 @@ class IndexController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: 'app_plugin_dishes_edit')]
-    public function edit(Request $request, Dish $dish, ?int $id = null): Response
+    public function edit(Request $request, Dish $dish, null|int $id = null): Response
     {
         if ($id !== null) {
             $dish = $this->repo->findOneBy(['id' => $id]);
@@ -76,7 +74,7 @@ class IndexController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->getUser() instanceof User) {
+            if (!($this->getUser() instanceof User)) {
                 throw new AuthenticationException('Only for logged in users');
             }
             $dish->setCreatedBy($this->getUser()->getId());

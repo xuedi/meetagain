@@ -29,8 +29,7 @@ class LocationType extends AbstractType
                 'class' => User::class,
                 'label' => 'CreatedBy',
                 'choice_label' => 'name',
-            ])
-        ;
+            ]);
     }
 
     #[\Override]

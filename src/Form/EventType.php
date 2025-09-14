@@ -32,8 +32,7 @@ class EventType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -45,14 +44,14 @@ class EventType extends AbstractType
             ])
             ->add('published', ChoiceType::class, [
                 'label' => 'Status',
-                'choices'  => [
+                'choices' => [
                     $this->translator->trans('published') => true,
                     $this->translator->trans('draft') => false,
                 ],
             ])
             ->add('featured', ChoiceType::class, [
                 'label' => 'Featured',
-                'choices'  => [
+                'choices' => [
                     $this->translator->trans('yes') => true,
                     $this->translator->trans('no') => false,
                 ],
@@ -70,7 +69,7 @@ class EventType extends AbstractType
                 'required' => false,
                 'expanded' => false,
                 'multiple' => false,
-                'disabled' => ($event?->getRecurringOf() !== null) ? true : false,
+                'disabled' => $event?->getRecurringOf() !== null ? true : false,
             ])
             ->add('type', EnumType::class, [
                 'class' => EventTypes::class,
@@ -102,13 +101,14 @@ class EventType extends AbstractType
                             'image/*',
                         ],
                         'mimeTypesMessage' => 'Please upload a valid image, preferable 16x9 format',
-                    ])
+                    ]),
                 ],
-            ])->add('allFollowing', ChoiceType::class, [
+            ])
+            ->add('allFollowing', ChoiceType::class, [
                 'label' => 'Also update all following events',
                 'data' => false,
                 'mapped' => false,
-                'choices'  => [
+                'choices' => [
                     $this->translator->trans('yes') => true,
                     $this->translator->trans('no') => false,
                 ],

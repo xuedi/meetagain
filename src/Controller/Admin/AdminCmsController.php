@@ -35,9 +35,7 @@ class AdminCmsController extends AbstractController
         private readonly CmsRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly CmsBlockRepository $blockRepo,
-    )
-    {
-    }
+    ) {}
 
     #[Route('/admin/cms/', name: 'app_admin_cms')]
     public function cmsList(): Response
@@ -53,8 +51,13 @@ class AdminCmsController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/cms/{id}/edit/{locale}/{blockId}', name: 'app_admin_cms_edit', requirements: ['locale' => 'en|de|cn'], methods: ['GET', 'POST'])]
-    public function cmsEdit(Request $request, Cms $cms, string $locale = null, ?int $blockId = null): Response
+    #[Route(
+        '/admin/cms/{id}/edit/{locale}/{blockId}',
+        name: 'app_admin_cms_edit',
+        requirements: ['locale' => 'en|de|cn'],
+        methods: ['GET', 'POST'],
+    )]
+    public function cmsEdit(Request $request, Cms $cms, string $locale = null, null|int $blockId = null): Response
     {
         $locale = $this->getLastEditLocale($locale, $request->getSession());
 
@@ -129,7 +132,7 @@ class AdminCmsController extends AbstractController
 
         $payload = $request->getPayload()->all();
         $locale = $request->get('editLocale');
-        $blockType = (int)$request->get('blockType');
+        $blockType = (int) $request->get('blockType');
         $blockObject = CmsBlockTypes::buildObject(CmsBlockTypes::from($blockType), $payload);
 
         $cmsBlock = new CmsBlock();
@@ -185,7 +188,7 @@ class AdminCmsController extends AbstractController
         $block = $repo->find($request->get('blockId'));
         if ($block !== null) {
             $payload = $request->getPayload()->all();
-            $type = CmsBlockTypes::from((int)$request->get('blockType'));
+            $type = CmsBlockTypes::from((int) $request->get('blockType'));
             $block->setJson(CmsBlockTypes::buildObject($type, $payload)->toArray());
             $this->em->persist($block);
             $this->em->flush();
@@ -232,10 +235,13 @@ class AdminCmsController extends AbstractController
 
         // rebuild order
         $priority = 1;
-        $blocks = $this->em->getRepository(CmsBlock::class)->findBy([
-            'page' => $pageId,
-            'language' => $locale,
-        ], ['priority' => 'ASC']);
+        $blocks = $this->em->getRepository(CmsBlock::class)->findBy(
+            [
+                'page' => $pageId,
+                'language' => $locale,
+            ],
+            ['priority' => 'ASC'],
+        );
 
         foreach ($blocks as $block) {
             $block->setPriority($priority);
@@ -245,13 +251,15 @@ class AdminCmsController extends AbstractController
         $this->em->flush();
     }
 
-    private function getLastEditLocale(?string $locale, SessionInterface $session): string
+    private function getLastEditLocale(null|string $locale, SessionInterface $session): string
     {
         $lastEditLocaleKey = 'lastEditLocale';
         if ($locale === null) {
             $locale = $session->get($lastEditLocaleKey, 'en');
         }
-        $session->set($lastEditLocaleKey, $locale);;
+        $session->set($lastEditLocaleKey, $locale);
+
+        ;
 
         return $locale;
     }

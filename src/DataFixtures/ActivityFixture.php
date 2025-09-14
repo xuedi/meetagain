@@ -3,8 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\Activity;
-use App\Entity\User;
 use App\Entity\ActivityType;
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -53,7 +53,12 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
             ['2025-01-17 09:00:00', 'admin', ActivityType::FollowedUser, ['user_id' => 3]],
             ['2025-02-01 10:00:00', 'Crystal Liu', ActivityType::Registered, null],
             ['2025-02-02 10:00:00', 'Crystal Liu', ActivityType::Login, null],
-            ['2025-02-03 10:00:00', 'Crystal Liu', ActivityType::ChangedUsername, ['old' => 'dalong', 'new' => 'xiaolong']],
+            [
+                '2025-02-03 10:00:00',
+                'Crystal Liu',
+                ActivityType::ChangedUsername,
+                ['old' => 'dalong', 'new' => 'xiaolong'],
+            ],
         ];
     }
 }

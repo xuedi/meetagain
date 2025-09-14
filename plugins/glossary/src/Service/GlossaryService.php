@@ -13,9 +13,10 @@ use RuntimeException;
 
 readonly class GlossaryService
 {
-    public function __construct(private EntityManagerInterface $em, private GlossaryRepository $repo)
-    {
-    }
+    public function __construct(
+        private EntityManagerInterface $em,
+        private GlossaryRepository $repo,
+    ) {}
 
     public function approveNew(int $id): void
     {
@@ -40,7 +41,8 @@ readonly class GlossaryService
     {
         $item = $this->repo->findOneBy(['id' => $id]);
 
-        $this->em->remove($item);;
+        $this->em->remove($item);
+        ;
         $this->em->flush();
     }
 
@@ -80,7 +82,7 @@ readonly class GlossaryService
                 createdBy: $userId,
                 createdAt: new DateTimeImmutable(),
                 field: SuggestionField::Category,
-                value: (string)$newGlossary->getCategory()->value,
+                value: (string) $newGlossary->getCategory()->value,
             ));
         }
         if ($current->getExplanation() !== $newGlossary->getExplanation()) {
@@ -118,7 +120,7 @@ readonly class GlossaryService
                 $item->setPinyin($suggestion->value);
                 break;
             case SuggestionField::Category:
-                $item->setCategory(Category::from((int)$suggestion->value));
+                $item->setCategory(Category::from((int) $suggestion->value));
                 break;
             case SuggestionField::Explanation:
                 $item->setExplanation($suggestion->value);

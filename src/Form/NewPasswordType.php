@@ -13,19 +13,18 @@ class NewPasswordType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('password', PasswordType::class, [
-                'mapped' => false,
-                'attr' => ['autocomplete' => 'new-password'],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a password',
-                    ]),
-                    new Length([
-                        'min' => 5,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                    ]),
-                ]
-            ]);
+        $builder->add('password', PasswordType::class, [
+            'mapped' => false,
+            'attr' => ['autocomplete' => 'new-password'],
+            'constraints' => [
+                new NotBlank([
+                    'message' => 'Please enter a password',
+                ]),
+                new Length([
+                    'min' => 5,
+                    'minMessage' => 'Your password should be at least {{ limit }} characters',
+                ]),
+            ],
+        ]);
     }
 }

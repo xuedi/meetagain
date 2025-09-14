@@ -2,9 +2,9 @@
 
 namespace Plugin\Glossary\Repository;
 
-use Plugin\Glossary\Entity\Glossary;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Plugin\Glossary\Entity\Glossary;
 
 /**
  * @extends ServiceEntityRepository<Glossary>

@@ -22,12 +22,10 @@ class MessageController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
-    )
-    {
-    }
+    ) {}
 
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
-    public function index(Request $request, ?int $id = null): Response
+    public function index(Request $request, null|int $id = null): Response
     {
         $form = null;
         $user = $this->getAuthedUser();
@@ -49,7 +47,8 @@ class MessageController extends AbstractController
                 $this->em->persist($msg);
                 $this->em->flush();
 
-                $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' => $conversationPartner->getId()]);
+                $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' =>
+                    $conversationPartner->getId()]);
             }
             // preRender then flush when no new messages
             $messages = $this->msgRepo->getMessages($user, $conversationPartner);

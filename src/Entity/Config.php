@@ -12,23 +12,23 @@ class Config
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column(length: 64)]
-    private ?string $name = null;
+    private null|string $name = null;
 
     #[ORM\Column(length: 128)]
-    private ?string $value = null;
+    private null|string $value = null;
 
     #[ORM\Column(enumType: ConfigType::class)]
-    private ?ConfigType $type = null;
+    private null|ConfigType $type = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): null|string
     {
         return $this->name;
     }
@@ -40,7 +40,7 @@ class Config
         return $this;
     }
 
-    public function getValue(): ?string
+    public function getValue(): null|string
     {
         return $this->value;
     }
@@ -52,7 +52,7 @@ class Config
         return $this;
     }
 
-    public function getType(): ?ConfigType
+    public function getType(): null|ConfigType
     {
         return $this->type;
     }

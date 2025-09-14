@@ -63,7 +63,7 @@ class MessageFactoryTest extends TestCase
             $this->userRepository,
             $this->eventRepository,
             $this->globalService,
-            $this->imageService
+            $this->imageService,
         );
 
         // Call the method under test
@@ -89,7 +89,7 @@ class MessageFactoryTest extends TestCase
             $this->userRepository,
             $this->eventRepository,
             $this->globalService,
-            $this->imageService
+            $this->imageService,
         );
 
         // Expect exception

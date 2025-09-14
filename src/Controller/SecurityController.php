@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\ActivityType;
 use App\Entity\Message;
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
 use App\Entity\User;
-use App\Entity\ActivityType;
 use App\Entity\UserStatus;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
@@ -34,8 +34,7 @@ class SecurityController extends AbstractController
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly EmailService $emailService,
-    ) {
-    }
+    ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
     public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
@@ -133,7 +132,7 @@ class SecurityController extends AbstractController
             $msg->setSender($xuedi);
             $msg->setReceiver($user);
             $msg->setCreatedAt(new DateTimeImmutable());
-            $msg->setContent("Welcome to the community! Feel free to ask me anything. Or suggest a new features.");
+            $msg->setContent('Welcome to the community! Feel free to ask me anything. Or suggest a new features.');
 
             $em->persist($msg);
             $em->flush();

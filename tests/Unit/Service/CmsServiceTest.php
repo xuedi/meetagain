@@ -28,7 +28,7 @@ class CmsServiceTest extends TestCase
         $this->subject = new CmsService(
             twig: $this->twigMock,
             repo: $this->cmsRepoMock,
-            eventRepo: $this->eventRepoMock
+            eventRepo: $this->eventRepoMock,
         );
     }
 
@@ -68,7 +68,7 @@ class CmsServiceTest extends TestCase
             ->method('findOneBy')
             ->with([
                 'slug' => $slug,
-                'published' => true
+                'published' => true,
             ])
             ->willReturn(null);
 
@@ -101,7 +101,7 @@ class CmsServiceTest extends TestCase
             ->method('findOneBy')
             ->with([
                 'slug' => $slug,
-                'published' => true
+                'published' => true,
             ])
             ->willReturn($cmsMock);
 
@@ -144,7 +144,7 @@ class CmsServiceTest extends TestCase
             ->method('findOneBy')
             ->with([
                 'slug' => $slug,
-                'published' => true
+                'published' => true,
             ])
             ->willReturn($cmsMock);
 
@@ -159,11 +159,7 @@ class CmsServiceTest extends TestCase
             ->willReturn($blocks);
 
         // Mock the getPageTitle method
-        $cmsMock
-            ->expects($this->once())
-            ->method('getPageTitle')
-            ->with($locale)
-            ->willReturn($pageTitle);
+        $cmsMock->expects($this->once())->method('getPageTitle')->with($locale)->willReturn($pageTitle);
 
         // Mock the eventRepo to return upcoming events
         $this->eventRepoMock

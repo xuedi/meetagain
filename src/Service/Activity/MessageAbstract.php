@@ -10,7 +10,7 @@ abstract class MessageAbstract implements MessageInterface
 {
     protected RouterInterface $router;
     protected ImageService $imageService;
-    protected ?array $meta = [];
+    protected null|array $meta = [];
     protected array $userNames = [];
     protected array $eventNames = [];
 
@@ -18,7 +18,7 @@ abstract class MessageAbstract implements MessageInterface
     public function injectServices(
         RouterInterface $router,
         ImageService $imageService,
-        ?array $meta = [],
+        null|array $meta = [],
         array $userNames = [],
         array $eventNames = [],
     ): self {
@@ -43,11 +43,7 @@ abstract class MessageAbstract implements MessageInterface
     protected function ensureHasKey(string $key): void
     {
         if (!isset($this->meta[$key])) {
-            throw new InvalidArgumentException(sprintf(
-                "Missing '%s' in meta in %s",
-                $key,
-                $this->getType()->name
-            ));
+            throw new InvalidArgumentException(sprintf("Missing '%s' in meta in %s", $key, $this->getType()->name));
         }
     }
 
@@ -57,7 +53,7 @@ abstract class MessageAbstract implements MessageInterface
             throw new InvalidArgumentException(sprintf(
                 "Value '%s' has to be numeric in '%s'",
                 $key,
-                $this->getType()->name
+                $this->getType()->name,
             ));
         }
     }

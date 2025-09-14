@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class EditController extends AbstractGlossaryController
 {
     #[Route('/{id}', name: 'app_plugin_glossary_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ?int $id = null): Response
+    public function edit(Request $request, null|int $id = null): Response
     {
         $newGlossary = $this->service->get($id);
 
@@ -23,14 +23,14 @@ class EditController extends AbstractGlossaryController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->service->detach($newGlossary); // dont auto save entity
-            if (!$this->getUser() instanceof User) {
+            if (!($this->getUser() instanceof User)) {
                 throw new AuthenticationException('Only for logged in users');
             }
             $this->service->generateSuggestions(
                 newGlossary: $newGlossary,
                 id: $id,
                 userId: $this->getUser()->getId(),
-                isManager: $this->isGranted('ROLE_MANAGER')
+                isManager: $this->isGranted('ROLE_MANAGER'),
             );
 
             return $this->redirectToRoute('app_plugin_glossary');

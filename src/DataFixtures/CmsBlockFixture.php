@@ -12,9 +12,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class CmsBlockFixture extends Fixture implements DependentFixtureInterface
 {
-    public function __construct(private readonly Filesystem $fs)
-    {
-    }
+    public function __construct(
+        private readonly Filesystem $fs,
+    ) {}
 
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -22,7 +22,7 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
         echo 'Creating cms blocks ... ';
         foreach ($this->getData() as [$page, $lang, $prio, $type, $json, $imageName]) {
             $block = new CmsBlock();
-            $block->setPage($this->getReference('cms_' . md5((string)$page), Cms::class));
+            $block->setPage($this->getReference('cms_' . md5((string) $page), Cms::class));
             $block->setLanguage($lang);
             $block->setPriority($prio);
             $block->setType($type);
@@ -62,15 +62,74 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
             ['about', 'de', 2, CmsBlockTypes::Text, ['content' => $this->getBlob('about_de')], null],
             ['about', 'cn', 1, CmsBlockTypes::Headline, ['title' => '关于我们'], null],
             ['about', 'cn', 2, CmsBlockTypes::Text, ['content' => $this->getBlob('about_cn')], null],
-            ['index', 'en', 1, CmsBlockTypes::Hero, ['headline' => 'headline-en', 'subHeadline' => 'subHeadline-en', 'text' => 'text-en', 'buttonLink' => 'buttonLink-en', 'buttonText' => 'buttonText-en'], 'hero-en.jpg'],
-            ['index', 'en', 2, CmsBlockTypes::EventTeaser, ['headline' => 'welcome_en', 'text' => 'text-en'], 'event-teaser-en.webp'],
-            ['index', 'de', 1, CmsBlockTypes::Hero, ['headline' => 'headline-de', 'subHeadline' => 'subHeadline-de', 'text' => 'text-de', 'buttonLink' => 'buttonLink-de', 'buttonText' => 'buttonText-de'], 'hero-de.jpg'],
-            ['index', 'de', 2, CmsBlockTypes::EventTeaser, ['headline' => 'welcome_de', 'text' => 'text-de'], 'event-teaser-de.webp'],
-            ['index', 'cn', 1, CmsBlockTypes::Hero, ['headline' => 'headline-cn', 'subHeadline' => 'subHeadline-cn', 'text' => 'text-cn', 'buttonLink' => 'buttonLink-cn', 'buttonText' => 'buttonText-cn'], 'hero-cn.jpg'],
-            ['index', 'cn', 2, CmsBlockTypes::EventTeaser, ['headline' => 'welcome_cn', 'text' => 'text-cn'], 'event-teaser-cn.webp'],
+            [
+                'index',
+                'en',
+                1,
+                CmsBlockTypes::Hero,
+                [
+                    'headline' => 'headline-en',
+                    'subHeadline' => 'subHeadline-en',
+                    'text' => 'text-en',
+                    'buttonLink' => 'buttonLink-en',
+                    'buttonText' => 'buttonText-en',
+                ],
+                'hero-en.jpg',
+            ],
+            [
+                'index',
+                'en',
+                2,
+                CmsBlockTypes::EventTeaser,
+                ['headline' => 'welcome_en', 'text' => 'text-en'],
+                'event-teaser-en.webp',
+            ],
+            [
+                'index',
+                'de',
+                1,
+                CmsBlockTypes::Hero,
+                [
+                    'headline' => 'headline-de',
+                    'subHeadline' => 'subHeadline-de',
+                    'text' => 'text-de',
+                    'buttonLink' => 'buttonLink-de',
+                    'buttonText' => 'buttonText-de',
+                ],
+                'hero-de.jpg',
+            ],
+            [
+                'index',
+                'de',
+                2,
+                CmsBlockTypes::EventTeaser,
+                ['headline' => 'welcome_de', 'text' => 'text-de'],
+                'event-teaser-de.webp',
+            ],
+            [
+                'index',
+                'cn',
+                1,
+                CmsBlockTypes::Hero,
+                [
+                    'headline' => 'headline-cn',
+                    'subHeadline' => 'subHeadline-cn',
+                    'text' => 'text-cn',
+                    'buttonLink' => 'buttonLink-cn',
+                    'buttonText' => 'buttonText-cn',
+                ],
+                'hero-cn.jpg',
+            ],
+            [
+                'index',
+                'cn',
+                2,
+                CmsBlockTypes::EventTeaser,
+                ['headline' => 'welcome_cn', 'text' => 'text-cn'],
+                'event-teaser-cn.webp',
+            ],
         ];
     }
-
 
     private function getBlob(string $string): string
     {

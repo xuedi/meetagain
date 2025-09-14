@@ -12,9 +12,9 @@ use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
  */
 class ExtendedFilesystem extends SymfonyFilesystem
 {
-    public function __construct(private readonly LoggerInterface $logger)
-    {
-    }
+    public function __construct(
+        private readonly LoggerInterface $logger,
+    ) {}
 
     public function fileExists(string $filename): bool
     {

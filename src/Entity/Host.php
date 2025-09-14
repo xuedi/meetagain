@@ -11,20 +11,20 @@ class Host
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private null|int $id = null;
 
     #[ORM\Column(length: 16)]
-    private ?string $name = null;
+    private null|string $name = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?User $user = null;
+    private null|User $user = null;
 
-    public function getId(): ?int
+    public function getId(): null|int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): null|string
     {
         return $this->name;
     }
@@ -36,12 +36,12 @@ class Host
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): null|User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(null|User $user): static
     {
         $this->user = $user;
 

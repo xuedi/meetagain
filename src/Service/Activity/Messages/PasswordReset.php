@@ -2,8 +2,8 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Service\Activity\MessageAbstract;
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageAbstract;
 
 class PasswordReset extends MessageAbstract
 {

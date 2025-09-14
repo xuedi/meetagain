@@ -54,26 +54,16 @@ class FriendshipServiceTest extends TestCase
         // Mock current user
         $currentUser = $this->createMock(User::class);
         $followingCollection = $this->createMock(Collection::class);
-        $followingCollection
-            ->method('contains')
-            ->willReturn(false);
-        $currentUser
-            ->method('getFollowing')
-            ->willReturn($followingCollection);
-        $currentUser
-            ->expects($this->once())
-            ->method('addFollowing');
+        $followingCollection->method('contains')->willReturn(false);
+        $currentUser->method('getFollowing')->willReturn($followingCollection);
+        $currentUser->expects($this->once())->method('addFollowing');
 
         // Mock target user
         $targetUser = $this->createMock(User::class);
-        $targetUser
-            ->method('getId')
-            ->willReturn($userId);
+        $targetUser->method('getId')->willReturn($userId);
 
         // Mock security to return current user
-        $this->securityMock
-            ->method('getUser')
-            ->willReturn($currentUser);
+        $this->securityMock->method('getUser')->willReturn($currentUser);
 
         // Mock user repository to return target user
         $this->userRepositoryMock
@@ -86,29 +76,20 @@ class FriendshipServiceTest extends TestCase
             ->expects($this->once())
             ->method('persist')
             ->with($currentUser);
-        $this->entityManagerMock
-            ->expects($this->once())
-            ->method('flush');
+        $this->entityManagerMock->expects($this->once())->method('flush');
 
         // Mock request
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getLocale')
-            ->willReturn($locale);
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $requestMock->method('getLocale')->willReturn($locale);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         // Mock router
         $this->routerMock
             ->method('generate')
-            ->with(
-                $returnRoute,
-                [
-                    '_locale' => $locale,
-                    'id' => $userId
-                ]
-            )
+            ->with($returnRoute, [
+                '_locale' => $locale,
+                'id' => $userId,
+            ])
             ->willReturn($generatedRoute);
 
         // Call the method
@@ -130,26 +111,16 @@ class FriendshipServiceTest extends TestCase
         // Mock current user
         $currentUser = $this->createMock(User::class);
         $followingCollection = $this->createMock(Collection::class);
-        $followingCollection
-            ->method('contains')
-            ->willReturn(true);
-        $currentUser
-            ->method('getFollowing')
-            ->willReturn($followingCollection);
-        $currentUser
-            ->expects($this->once())
-            ->method('removeFollowing');
+        $followingCollection->method('contains')->willReturn(true);
+        $currentUser->method('getFollowing')->willReturn($followingCollection);
+        $currentUser->expects($this->once())->method('removeFollowing');
 
         // Mock target user
         $targetUser = $this->createMock(User::class);
-        $targetUser
-            ->method('getId')
-            ->willReturn($userId);
+        $targetUser->method('getId')->willReturn($userId);
 
         // Mock security to return current user
-        $this->securityMock
-            ->method('getUser')
-            ->willReturn($currentUser);
+        $this->securityMock->method('getUser')->willReturn($currentUser);
 
         // Mock user repository to return target user
         $this->userRepositoryMock
@@ -162,29 +133,20 @@ class FriendshipServiceTest extends TestCase
             ->expects($this->once())
             ->method('persist')
             ->with($currentUser);
-        $this->entityManagerMock
-            ->expects($this->once())
-            ->method('flush');
+        $this->entityManagerMock->expects($this->once())->method('flush');
 
         // Mock request
         $requestMock = $this->createMock(Request::class);
-        $requestMock
-            ->method('getLocale')
-            ->willReturn($locale);
-        $this->requestStackMock
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
+        $requestMock->method('getLocale')->willReturn($locale);
+        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
 
         // Mock router
         $this->routerMock
             ->method('generate')
-            ->with(
-                $returnRoute,
-                [
-                    '_locale' => $locale,
-                    'id' => $userId
-                ]
-            )
+            ->with($returnRoute, [
+                '_locale' => $locale,
+                'id' => $userId,
+            ])
             ->willReturn($generatedRoute);
 
         // Call the method
@@ -202,9 +164,7 @@ class FriendshipServiceTest extends TestCase
         $returnRoute = 'app_profile_view';
 
         // Mock security to return null (unauthenticated)
-        $this->securityMock
-            ->method('getUser')
-            ->willReturn(null);
+        $this->securityMock->method('getUser')->willReturn(null);
 
         // Expect exception
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
@@ -224,9 +184,7 @@ class FriendshipServiceTest extends TestCase
         $nonUserMock = $this->createMock(\Symfony\Component\Security\Core\User\UserInterface::class);
 
         // Mock security to return a non-User object
-        $this->securityMock
-            ->method('getUser')
-            ->willReturn($nonUserMock);
+        $this->securityMock->method('getUser')->willReturn($nonUserMock);
 
         // Expect exception
         $this->expectException(AuthenticationCredentialsNotFoundException::class);

@@ -25,9 +25,7 @@ readonly class GlobalService
         private MenuRepository $menuRepo,
         private TranslationSuggestionRepository $translationSuggestionRepo,
         private Security $security,
-    )
-    {
-    }
+    ) {}
 
     public function getCurrentLocale(): string
     {
@@ -56,13 +54,11 @@ readonly class GlobalService
             return $this->menuRepo->getAllSlugified(
                 user: $this->security->getUser(),
                 locale: $request->getLocale(),
-                location: $type
+                location: $type,
             );
         }
 
-        return $this->menuRepo->getAllSlugified(
-            user: $this->security->getUser(),
-        );
+        return $this->menuRepo->getAllSlugified(user: $this->security->getUser());
     }
 
     public function getUserName(int $id): string
@@ -83,7 +79,7 @@ readonly class GlobalService
     public function getShowCookieConsent(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if (!$session instanceof SessionInterface) {
+        if (!($session instanceof SessionInterface)) {
             return true;
         }
 
@@ -93,7 +89,7 @@ readonly class GlobalService
     public function getShowOsm(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if (!$session instanceof SessionInterface) {
+        if (!($session instanceof SessionInterface)) {
             return true;
         }
 
@@ -107,7 +103,8 @@ readonly class GlobalService
 
     public function getManagerAttention(): bool
     {
-        return count($this->translationSuggestionRepo->findBy(['status' => TranslationSuggestionStatus::Requested])) > 0;
+        return count($this->translationSuggestionRepo->findBy(['status' => TranslationSuggestionStatus::Requested])) >
+        0;
     }
 
     public function getAlternativeLanguageCodes(): array

@@ -14,23 +14,21 @@ class PasswordResetType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('email', EmailType::class, [
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your email address.',
-                    ]),
-                    new Email([
-                        'message' => 'Please enter a valid email address.',
-                    ]),
-                ],
-            ])
-            ->add('captcha', TextType::class, [
-                'mapped' => false,
-                'label' => "Enter captcha code",
-                'constraints' => [
-                    new NotBlank([]),
-                ]
-            ]);
+        $builder->add('email', EmailType::class, [
+            'constraints' => [
+                new NotBlank([
+                    'message' => 'Please enter your email address.',
+                ]),
+                new Email([
+                    'message' => 'Please enter a valid email address.',
+                ]),
+            ],
+        ])->add('captcha', TextType::class, [
+            'mapped' => false,
+            'label' => 'Enter captcha code',
+            'constraints' => [
+                new NotBlank([]),
+            ],
+        ]);
     }
 }

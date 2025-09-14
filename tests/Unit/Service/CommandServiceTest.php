@@ -25,15 +25,10 @@ class CommandServiceTest extends TestCase
         $eventDispatcherMock = $this->createMock(EventDispatcher::class);
 
         $containerMock = $this->createMock(ContainerInterface::class);
-        $containerMock
-            ->method('get')
-            ->with('event_dispatcher')
-            ->willReturn($eventDispatcherMock);
+        $containerMock->method('get')->with('event_dispatcher')->willReturn($eventDispatcherMock);
 
         $this->kernelMock = $this->createMock(KernelInterface::class);
-        $this->kernelMock
-            ->method('getContainer')
-            ->willReturn($containerMock);
+        $this->kernelMock->method('getContainer')->willReturn($containerMock);
 
         $this->parameterMock = $this->createMock(ParameterBagInterface::class);
 
@@ -45,9 +40,7 @@ class CommandServiceTest extends TestCase
 
     public function testExecuteCommand(): void
     {
-        $this->assertNotEmpty(
-            $this->subject->execute(new EchoCommand('test'))
-        );
+        $this->assertNotEmpty($this->subject->execute(new EchoCommand('test')));
     }
 
     public function testClearCache(): void

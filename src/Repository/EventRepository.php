@@ -31,25 +31,27 @@ class EventRepository extends ServiceEntityRepository
     // TODO: already preload translations
     public function getUpcomingEvents(int $number = 3): array
     {
-        $query = $this->getEntityManager()->createQuery(
-            'SELECT e
+        $query = $this->getEntityManager()
+            ->createQuery('SELECT e
             FROM App\Entity\Event e
             WHERE e.start > :date
-            ORDER BY e.start ASC'
-        )->setParameter('date', new DateTime())->setMaxResults($number);
+            ORDER BY e.start ASC')
+            ->setParameter('date', new DateTime())
+            ->setMaxResults($number);
 
         return $query->getResult();
     }
 
     // TODO: already preload translations
-    public function getPastEvents(int $number = 3, ?User $user = null): array
+    public function getPastEvents(int $number = 3, null|User $user = null): array
     {
-        $query = $this->getEntityManager()->createQuery(
-            'SELECT e
+        $query = $this->getEntityManager()
+            ->createQuery('SELECT e
             FROM App\Entity\Event e
             WHERE e.start < :date
-            ORDER BY e.start DESC'
-        )->setParameter('date', new DateTime())->setMaxResults($number);
+            ORDER BY e.start DESC')
+            ->setParameter('date', new DateTime())
+            ->setMaxResults($number);
 
         return $query->getResult();
     }
@@ -58,7 +60,8 @@ class EventRepository extends ServiceEntityRepository
     public function findAllRecurring(): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $query = $qb->select('e')
+        $query = $qb
+            ->select('e')
             ->from(Event::class, 'e')
             ->where($qb->expr()->isNotNull('e.recurringRule'))
             ->orderBy('e.start', 'ASC')
@@ -73,7 +76,8 @@ class EventRepository extends ServiceEntityRepository
     public function findFollowUpEvents(int $parentEventId, DateTimeInterface $greaterThan): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $query = $qb->select('e')
+        $query = $qb
+            ->select('e')
             ->from(Event::class, 'e')
             ->where('e.recurringOf = :parentEvent')
             ->andWhere('e.start > :greaterThan')
@@ -85,7 +89,7 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function getNextEventId(): ?int
+    public function getNextEventId(): null|int
     {
         $now = new DateTime()->setTime(0, 0, 0);
         foreach ($this->findBy([], ['start' => 'ASC']) as $event) {

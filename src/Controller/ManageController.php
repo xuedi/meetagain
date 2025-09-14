@@ -17,9 +17,7 @@ class ManageController extends AbstractController
         private readonly TranslationRepository $translationRepo,
         private readonly EntityManagerInterface $em,
         private readonly TranslationSuggestionRepository $translationSuggestionRepo,
-    )
-    {
-    }
+    ) {}
 
     #[Route('/manage', name: self::ROUTE_MANAGE)]
     public function index(): Response
@@ -27,7 +25,7 @@ class ManageController extends AbstractController
         return $this->render('manage/index.html.twig', [
             'translationSuggestions' => $this->translationSuggestionRepo->findBy(
                 ['status' => TranslationSuggestionStatus::Requested],
-                ['createdAt' => 'DESC']
+                ['createdAt' => 'DESC'],
             ),
         ]);
     }

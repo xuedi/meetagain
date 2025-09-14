@@ -4,10 +4,10 @@ namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
 use App\Service\Activity\Messages\Login;
+use App\Service\ImageService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
-use App\Service\ImageService;
 
 class LoginTest extends TestCase
 {

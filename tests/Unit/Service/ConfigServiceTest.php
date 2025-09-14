@@ -24,43 +24,44 @@ class ConfigServiceTest extends TestCase
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->subject = new ConfigService(
             repo: $this->configRepoMock,
-            em: $this->entityManagerMock
+            em: $this->entityManagerMock,
         );
     }
 
     #[DataProvider('getThumbnailSizeMatrix')]
     public function testThumbnailSizesFetching(ImageType $imageType, array $expected): void
     {
-        $this->assertSame(
-            $expected,
-            $this->subject->getThumbnailSizes($imageType)
-        );
+        $this->assertSame($expected, $this->subject->getThumbnailSizes($imageType));
     }
 
     public static function getThumbnailSizeMatrix(): Generator
     {
         yield 'test profile picture' => [
-            ImageType::ProfilePicture, [
+            ImageType::ProfilePicture,
+            [
                 [400, 400],
                 [80, 80],
                 [50, 50],
             ],
         ];
         yield 'test event teaser' => [
-            ImageType::EventTeaser, [
+            ImageType::EventTeaser,
+            [
                 [1024, 768],
                 [600, 400],
                 [210, 140],
             ],
         ];
         yield 'test event upload' => [
-            ImageType::EventUpload, [
+            ImageType::EventUpload,
+            [
                 [1024, 768],
                 [210, 140],
             ],
         ];
         yield 'test cms block' => [
-            ImageType::CmsBlock, [
+            ImageType::CmsBlock,
+            [
                 [432, 432],
                 [80, 80],
             ],
@@ -78,19 +79,13 @@ class ConfigServiceTest extends TestCase
             '80x80' => 0,
             '50x50' => 0,
         ];
-        $this->assertSame(
-            $expected,
-            $this->subject->getThumbnailSizeList()
-        );
+        $this->assertSame($expected, $this->subject->getThumbnailSizeList());
     }
 
     #[DataProvider('getThumbnailSizeCheckerMatrix')]
     public function testThumbnailSizeChecker(ImageType $imageType, int $width, int $height, bool $expected): void
     {
-        $this->assertSame(
-            $expected,
-            $this->subject->isValidThumbnailSize($imageType, $width, $height)
-        );
+        $this->assertSame($expected, $this->subject->isValidThumbnailSize($imageType, $width, $height));
     }
 
     public static function getThumbnailSizeCheckerMatrix(): Generator
@@ -108,10 +103,7 @@ class ConfigServiceTest extends TestCase
     public function testHostGetter(): void
     {
         $expected = 'https://localhost';
-        $this->assertSame(
-            $expected,
-            $this->subject->getHost()
-        );
+        $this->assertSame($expected, $this->subject->getHost());
     }
 
     public function testFrontPageToggleOn(): void
@@ -127,18 +119,14 @@ class ConfigServiceTest extends TestCase
 
     public function testFrontPageToggleOff(): void
     {
-        $this->configRepoMock
-            ->method('findOneBy')
-            ->willReturn(new Config()->setValue('false'));
+        $this->configRepoMock->method('findOneBy')->willReturn(new Config()->setValue('false'));
 
         $this->assertFalse($this->subject->isShowFrontpage());
     }
 
     public function testFrontPageToggleWithDefault(): void
     {
-        $this->configRepoMock
-            ->method('findOneBy')
-            ->willReturn(null);
+        $this->configRepoMock->method('findOneBy')->willReturn(null);
 
         $this->assertFalse($this->subject->isShowFrontpage());
     }

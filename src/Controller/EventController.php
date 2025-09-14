@@ -32,9 +32,8 @@ class EventController extends AbstractController
     public const string ROUTE_FEATURED = 'app_event_featured';
 
     public function __construct(
-        private readonly ActivityService $activityService
-    ) {
-    }
+        private readonly ActivityService $activityService,
+    ) {}
 
     #[Route('/events', name: self::ROUTE_EVENT)]
     public function index(EventService $eventService, Request $request): Response
@@ -54,15 +53,24 @@ class EventController extends AbstractController
             $rsvp = EventFilterRsvp::All;
         }
 
-        return $this->render('events/index.html.twig', [
-            'structuredList' => $eventService->getFilteredList($time, $sort, $type, $rsvp),
-            'filter' => $form,
-        ], $response);
+        return $this->render(
+            'events/index.html.twig',
+            [
+                'structuredList' => $eventService->getFilteredList($time, $sort, $type, $rsvp),
+                'filter' => $form,
+            ],
+            $response,
+        );
     }
 
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
-    public function details(EventRepository $repo, CommentRepository $comments, EntityManagerInterface $em, Request $request, ?int $id = null): Response
-    {
+    public function details(
+        EventRepository $repo,
+        CommentRepository $comments,
+        EntityManagerInterface $em,
+        Request $request,
+        null|int $id = null,
+    ): Response {
         $response = $this->getResponse();
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
@@ -78,22 +86,30 @@ class EventController extends AbstractController
             $form = $this->createForm(CommentType::class);
         }
 
-        if (!$this->getUser() instanceof UserInterface) {
+        if (!($this->getUser() instanceof UserInterface)) {
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
         }
 
         $event = $repo->findOneBy(['id' => $id]);
-        return $this->render('events/details.html.twig', [
-            'commentForm' => $form,
-            'comments' => $comments->findBy(['event' => $id]),
-            'event' => $event,
-            'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
-        ], $response);
+        return $this->render(
+            'events/details.html.twig',
+            [
+                'commentForm' => $form,
+                'comments' => $comments->findBy(['event' => $id]),
+                'event' => $event,
+                'user' => ($this->getUser() instanceof UserInterface) ? $this->getAuthedUser() : null,
+            ],
+            $response,
+        );
     }
 
     #[Route('/event/upload/{event}', name: 'app_event_upload', methods: ['GET', 'POST'])]
-    public function upload(Event $event, Request $request, ImageService $imageService, EntityManagerInterface $em): Response
-    {
+    public function upload(
+        Event $event,
+        Request $request,
+        ImageService $imageService,
+        EntityManagerInterface $em,
+    ): Response {
         $user = $this->getAuthedUser();
         $response = $this->getResponse();
 
@@ -111,31 +127,35 @@ class EventController extends AbstractController
             $em->persist($event);
             $em->flush();
 
-            $this->activityService->log(
-                ActivityType::EventImageUploaded,
-                $user,
-                [
-                    'event_id' => $event->getId(),
-                    'images' => count($files)
-                ]
-            );
+            $this->activityService->log(ActivityType::EventImageUploaded, $user, [
+                'event_id' => $event->getId(),
+                'images' => count($files),
+            ]);
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
 
-        return $this->render('events/upload.html.twig', [
-            'form' => $form,
-        ], $response);
+        return $this->render(
+            'events/upload.html.twig',
+            [
+                'form' => $form,
+            ],
+            $response,
+        );
     }
 
     #[Route('/event/featured/', name: self::ROUTE_FEATURED)]
     public function featured(EventRepository $repo): Response
     {
         $response = $this->getResponse();
-        return $this->render('events/featured.html.twig', [
-            'featured' => $repo->findBy(['featured' => true], ['start' => 'ASC']),
-            'last' => $repo->getPastEvents(),
-        ], $response);
+        return $this->render(
+            'events/featured.html.twig',
+            [
+                'featured' => $repo->findBy(['featured' => true], ['start' => 'ASC']),
+                'last' => $repo->getPastEvents(),
+            ],
+            $response,
+        );
     }
 
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]
@@ -157,7 +177,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/{event}/deleteComment/{id}', name: 'app_event_delete_comment', requirements: ['id' => '\d+'])]
-    public function deleteComment(Event $event, EntityManagerInterface $em, ?int $id = null): Response
+    public function deleteComment(Event $event, EntityManagerInterface $em, null|int $id = null): Response
     {
         $commentRepo = $em->getRepository(Comment::class);
         $comment = $commentRepo->findOneBy(['id' => $id, 'user' => $this->getAuthedUser()]);

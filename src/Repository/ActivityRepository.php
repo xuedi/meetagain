@@ -32,7 +32,8 @@ class ActivityRepository extends ServiceEntityRepository
 
         // get all activities of the wanted types
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $userActivities = $qb->select('a')
+        $userActivities = $qb
+            ->select('a')
             ->from(Activity::class, 'a')
             ->where($qb->expr()->in('a.type', ':types'))
             ->setParameter('types', [
@@ -47,7 +48,6 @@ class ActivityRepository extends ServiceEntityRepository
         foreach ($userActivities as $userActivity) {
             $activityUserId = $userActivity->getUser()->getId();
             switch ($userActivity->getType()->value) {
-
                 // username change of people the user follows
                 case ActivityType::ChangedUsername->value:
                     if (in_array($activityUserId, $following)) {
@@ -73,7 +73,8 @@ class ActivityRepository extends ServiceEntityRepository
         }
 
         $qb = $this->getEntityManager()->createQueryBuilder();
-        return $qb->select('a')
+        return $qb
+            ->select('a')
             ->from(Activity::class, 'a')
             ->where($qb->expr()->in('a.id', ':ids'))
             ->orderBy('a.createdAt', 'DESC')

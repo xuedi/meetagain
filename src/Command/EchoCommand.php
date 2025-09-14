@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'app:echo', description: 'simple command for testing, echos parameter',)]
+#[AsCommand(name: 'app:echo', description: 'simple command for testing, echos parameter')]
 class EchoCommand extends Command
 {
     const string PARAMETER_MESSAGE = 'message';

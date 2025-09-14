@@ -14,9 +14,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GlossaryType extends AbstractType
 {
-    public function __construct(private readonly TranslatorInterface $translator)
-    {
-    }
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {}
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -28,8 +28,7 @@ class GlossaryType extends AbstractType
             ->add('category', ChoiceType::class, [
                 'data' => $builder->getData()?->getCategory(),
                 'choices' => Category::getChoices($this->translator),
-                ]
-            );
+            ]);
     }
 
     #[\Override]

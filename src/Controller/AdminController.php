@@ -11,13 +11,14 @@ class AdminController extends AbstractController
 {
     public const string ROUTE_ADMIN = 'app_admin';
 
-    public function __construct(private readonly TagAwareCacheInterface $appCache)
-    {
+    public function __construct(
+        private readonly TagAwareCacheInterface $appCache,
+    ) {
         //
     }
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
-    public function index(DashboardService $dashboard, ?int $year = null, ?int $week = null): Response
+    public function index(DashboardService $dashboard, null|int $year = null, null|int $week = null): Response
     {
         $dashboard->setTime($year, $week);
 
