@@ -42,13 +42,16 @@ readonly class GlossaryService
         $item = $this->repo->findOneBy(['id' => $id]);
 
         $this->em->remove($item);
-        ;
         $this->em->flush();
     }
 
     public function generateSuggestions(Glossary $newGlossary, int $id, int $userId, bool $isManager): void
     {
         $current = $this->repo->findOneBy(['id' => $id]);
+        if ($current === null) {
+            return;
+        }
+
         if ($isManager) {
             $current->setPhrase($newGlossary->getPhrase());
             $current->setPinyin($newGlossary->getPinyin());
@@ -111,6 +114,10 @@ readonly class GlossaryService
     public function applySuggestion(int $id, string $hash): int
     {
         $item = $this->repo->findOneBy(['id' => $id]);
+        if ($item === null) {
+            throw new RuntimeException('Item not found');
+        }
+
         $suggestion = $item->getSuggestion($hash);
         switch ($suggestion->field) {
             case SuggestionField::Phrase:
@@ -136,6 +143,10 @@ readonly class GlossaryService
     public function denySuggestion(int $id, string $hash): int
     {
         $item = $this->repo->findOneBy(['id' => $id]);
+        if ($item === null) {
+            throw new RuntimeException('Item not found');
+        }
+
         $leftOver = $item->removeSuggestion($hash);
         $this->em->persist($item);
         $this->em->flush();
