@@ -26,6 +26,9 @@ clearCache:
 app +parameter='':
     {{EXEC}} php bin/console {{parameter}}
 
+cron:
+    {{EXEC}} php bin/console app:cron
+
 do +parameter='':
     {{EXEC}} {{parameter}}
 
