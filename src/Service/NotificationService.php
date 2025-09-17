@@ -99,10 +99,8 @@ readonly class NotificationService
         if ($recipient->getLastLogin() > new DateTime('-2 hours')) {
             return;
         }
-        $this->emailService->prepareMessageNotification(
-            sender: $user,
-            recipient: $recipient,
-        );
+        $this->emailService->prepareMessageNotification(sender: $user, recipient: $recipient);
+        $this->emailService->sendQueue(); // TODO: use cron instead
         $this->appCache->get($key, function (ItemInterface $item): string {
             $item->expiresAfter(self::EIGHT_HOURS);
             return 'send';

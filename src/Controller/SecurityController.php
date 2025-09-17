@@ -102,6 +102,7 @@ class SecurityController extends AbstractController
 
             $this->activityService->log(ActivityType::Registered, $user, []);
             $this->emailService->prepareVerificationRequest($user);
+            $this->emailService->sendQueue(); // TODO: use cron instead
 
             return $this->render('security/register_email_send.html.twig');
         }
@@ -174,6 +175,7 @@ class SecurityController extends AbstractController
 
                 $this->activityService->log(ActivityType::PasswordResetRequest, $user);
                 $this->emailService->prepareResetPassword($user);
+                $this->emailService->sendQueue(); // TODO: use cron instead
 
                 return $this->render('security/reset_email_send.html.twig');
             } else {

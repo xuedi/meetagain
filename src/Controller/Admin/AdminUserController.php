@@ -49,6 +49,7 @@ class AdminUserController extends AbstractController
         $user->setStatus(UserStatus::Active);
 
         $emailService->prepareWelcome($user);
+        $emailService->sendQueue(); // TODO: use cron instead
 
         $em->persist($user);
         $em->flush();
