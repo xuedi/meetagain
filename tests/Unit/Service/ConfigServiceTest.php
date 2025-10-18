@@ -66,6 +66,22 @@ class ConfigServiceTest extends TestCase
                 [80, 80],
             ],
         ];
+        yield 'test plugin dish preview' => [
+            ImageType::PluginDishPreview,
+            [
+                [1024, 768],
+                [400, 400],
+                [100, 100],
+                [50, 50],
+            ],
+        ];
+        yield 'test plugin dish gallery' => [
+            ImageType::PluginDishGallery,
+            [
+                [1024, 768],
+                [400, 400],
+            ],
+        ];
     }
 
     public function testThumbnailSizeList(): void
@@ -90,6 +106,7 @@ class ConfigServiceTest extends TestCase
 
     public static function getThumbnailSizeCheckerMatrix(): Generator
     {
+        // Profile picture
         yield [ImageType::ProfilePicture, 1024, 768, false];
         yield [ImageType::ProfilePicture, 600, 400, false];
         yield [ImageType::ProfilePicture, 432, 432, false];
@@ -98,6 +115,28 @@ class ConfigServiceTest extends TestCase
         yield [ImageType::ProfilePicture, 80, 80, true];
         yield [ImageType::ProfilePicture, 50, 50, true];
         yield [ImageType::ProfilePicture, 128000, 51200, false];
+
+        // Event teaser
+        yield [ImageType::EventTeaser, 600, 400, true];
+        yield [ImageType::EventTeaser, 400, 400, false];
+
+        // Event upload
+        yield [ImageType::EventUpload, 210, 140, true];
+        yield [ImageType::EventUpload, 600, 400, false];
+
+        // CMS block
+        yield [ImageType::CmsBlock, 432, 432, true];
+        yield [ImageType::CmsBlock, 80, 80, true];
+        yield [ImageType::CmsBlock, 400, 400, false];
+
+        // Plugin dish preview
+        yield [ImageType::PluginDishPreview, 100, 100, true];
+        yield [ImageType::PluginDishPreview, 50, 50, true];
+        yield [ImageType::PluginDishPreview, 80, 80, false];
+
+        // Plugin dish gallery
+        yield [ImageType::PluginDishGallery, 400, 400, true];
+        yield [ImageType::PluginDishGallery, 50, 50, false];
     }
 
     public function testHostGetter(): void
@@ -129,5 +168,46 @@ class ConfigServiceTest extends TestCase
         $this->configRepoMock->method('findOneBy')->willReturn(null);
 
         $this->assertFalse($this->subject->isShowFrontpage());
+    }
+
+    public function testUrlGetter(): void
+    {
+        $this->assertSame('localhost', $this->subject->getUrl());
+    }
+
+    public function testSystemUserIdGetter(): void
+    {
+        $this->assertSame(1, $this->subject->getSystemUserId());
+    }
+
+    public function testMailerAddressDefaults(): void
+    {
+        $address = $this->subject->getMailerAddress();
+        $this->assertSame('sender@email.com', $address->getAddress());
+        $this->assertSame('email sender', $address->getName());
+    }
+
+    public function testSaveFormCreatesMissingSettings(): void
+    {
+        $this->configRepoMock->method('findOneBy')->willReturn(null);
+
+        $formData = [
+            'url' => 'example.com',
+            'host' => 'https://example.com',
+            'senderName' => 'Example Sender',
+            'senderEmail' => 'noreply@example.com',
+            'systemUser' => 42,
+        ];
+
+        $this->entityManagerMock
+            ->expects($this->exactly(5))
+            ->method('persist')
+            ->with($this->isInstanceOf(Config::class));
+
+        $this->entityManagerMock
+            ->expects($this->exactly(5))
+            ->method('flush');
+
+        $this->subject->saveForm($formData);
     }
 }
