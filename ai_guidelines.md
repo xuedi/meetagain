@@ -2,7 +2,7 @@
 
 This document sets expectations and guardrails for AI-assisted contributions to the MeetAgain repository. It is meant for both human contributors using AI tools and autonomous AI agents.
 
-Last updated: 2025-09-20 22:40 (local)
+Last updated: 2025-10-19 01:16 (local)
 
 ## Goals and Scope
 - Maintain code quality, security, and consistency across the project.
@@ -123,3 +123,20 @@ If you make a non-trivial decision, include in PR:
   - List all tests: vendor/bin/phpunit -c tests/phpunit.xml --list-tests
   - Run a single test method: vendor/bin/phpunit -c tests/phpunit.xml --filter 'ClassName::testMethodName'
   - Pretty output: add --testdox to any of the above.
+- Ignore the command `just update_coverage_badge` this is only for the CI to create badges for humans
+
+## Current Test Coverage Snapshot
+- Source: tests/reports/clover.xml (latest generated report)
+- Overall metrics:
+  - Files: 38
+  - Classes: 36
+  - Methods: 196 total, 143 covered → 73.0% method coverage
+  - Statements: 1090 total, 622 covered → 57.1% statement coverage
+  - Elements (methods + statements): 1286 total, 765 covered → 59.5% element coverage
+  - Branch/conditionals: not tracked in this report (0 conditionals reported)
+
+Guidance for contributors:
+- Maintain or improve coverage. Avoid merging changes that reduce overall statement coverage below 57.1% without justification.
+- When touching untested code, add unit/functional tests where appropriate.
+- Prefer tests around critical services, security, and data integrity paths.
+- If coverage locally shows as 0% or missing, ensure Xdebug is enabled or run via the provided Just recipe (see Running Tests section).
