@@ -192,7 +192,12 @@ readonly class TranslationService
         $json = file_get_contents($apiUrl);
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
-        $this->entityManager->getConnection()->executeQuery(' TRUNCATE TABLE translation');
+        // Clear suggestions first due to FK to translation, then clear translations
+        $conn = $this->entityManager->getConnection();
+        $conn->executeStatement('DELETE FROM translation_suggestion');
+        $conn->executeStatement('DELETE FROM translation');
+
+        // get import user
         $user = $this->userRepo->findOneBy(['email' => 'system@example.org']);
 
         foreach ($data as $item) {

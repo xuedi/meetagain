@@ -5,12 +5,9 @@ doctrine:
             default:
                 url: '%env(resolve:DATABASE_URL)%'
                 profiling_collect_backtrace: '%kernel.debug%'
-                use_savepoints: true
                 server_version: 'mariadb-11.8.2'
     orm:
         default_entity_manager: default
-        auto_generate_proxy_classes: true
-        enable_lazy_ghost_objects: true
         controller_resolver:
             auto_mapping: false
         entity_managers:
@@ -24,7 +21,6 @@ doctrine:
                         dir: '%kernel.project_dir%/src/Entity'
                         prefix: 'App\Entity'
                         alias: App
-                report_fields_where_declared: true
                 validate_xml_mapping: true
                 identity_generation_preferences:
                     Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
@@ -41,7 +37,6 @@ when@test:
 when@prod:
     doctrine:
         orm:
-            auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             query_cache_driver:
                 type: pool

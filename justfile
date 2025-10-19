@@ -12,7 +12,7 @@ install:
     {{EXEC}} composer install
     {{EXEC}} php bin/console cache:clear
     {{EXEC}} php bin/console doctrine:migrations:migrate -q
-    {{EXEC}} php bin/console doctrine:fixtures:load --append -q
+    {{EXEC}} php bin/console doctrine:fixtures:load -q
     {{EXEC}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{EXEC}} php bin/console app:event:extent
 
