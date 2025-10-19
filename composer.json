@@ -21,7 +21,7 @@
     "beberlei/doctrineextensions": "^1.5",
     "doctrine/data-fixtures": "^2",
     "doctrine/dbal": "^4",
-    "doctrine/doctrine-bundle": "^2.13",
+    "doctrine/doctrine-bundle": "^3.0",
     "doctrine/doctrine-fixtures-bundle": "^4",
     "doctrine/doctrine-migrations-bundle": "^3.3",
     "doctrine/orm": "^3.3",
