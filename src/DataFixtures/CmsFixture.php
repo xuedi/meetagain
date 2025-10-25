@@ -11,6 +11,11 @@ use Doctrine\Persistence\ObjectManager;
 
 class CmsFixture extends Fixture implements DependentFixtureInterface
 {
+    public const string INDEX = 'index';
+    public const string PRIVACY = 'privacy';
+    public const string ABOUT = 'about';
+    public const string IMPRINT = 'imprint';
+
     #[\Override]
     public function load(ObjectManager $manager): void
     {
@@ -19,11 +24,11 @@ class CmsFixture extends Fixture implements DependentFixtureInterface
             $cms = new Cms();
             $cms->setSlug($slug);
             $cms->setCreatedAt(new DateTimeImmutable());
-            $cms->setCreatedBy($this->getReference('user_' . md5('import'), User::class));
+            $cms->setCreatedBy($this->getReference('UserFixture::' . md5('import'), User::class));
             $cms->setPublished(true);
 
             $manager->persist($cms);
-            $this->addReference('cms_' . md5((string) $slug), $cms);
+            $this->addReference('CmsFixture::' . md5($slug), $cms);
         }
         $manager->flush();
         echo 'OK' . PHP_EOL;
@@ -40,10 +45,10 @@ class CmsFixture extends Fixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            ['imprint'],
-            ['privacy'],
-            ['about'],
-            ['index'],
+            [self::INDEX],
+            [self::PRIVACY],
+            [self::ABOUT],
+            [self::IMPRINT],
         ];
     }
 }

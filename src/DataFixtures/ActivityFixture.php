@@ -18,7 +18,7 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
         echo 'Creating activities ... ';
         foreach ($this->getData() as [$time, $userName, $type, $meta]) {
             $activity = new Activity();
-            $activity->setUser($this->getReference('user_' . md5((string) $userName), User::class));
+            $activity->setUser($this->getReference('UserFixture::' . md5((string) $userName), User::class));
             $activity->setCreatedAt(new DateTimeImmutable($time));
             $activity->setType($type);
             $activity->setMeta($meta);
@@ -40,24 +40,106 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            ['2025-01-01 10:00:00', 'admin', ActivityType::Registered, null],
-            ['2025-01-02 10:00:00', 'admin', ActivityType::Login, null],
-            ['2025-01-03 10:00:00', 'admin', ActivityType::RsvpYes, ['event_id' => 1]],
-            ['2025-01-04 10:00:00', 'admin', ActivityType::RsvpYes, ['event_id' => 2]],
-            ['2025-01-04 12:30:00', 'admin', ActivityType::RsvpYes, ['event_id' => 6]],
-            ['2025-01-11 10:00:00', 'Adem Lane', ActivityType::Registered, null],
-            ['2025-01-12 10:00:00', 'Adem Lane', ActivityType::Login, null],
-            ['2025-01-13 10:00:00', 'Adem Lane', ActivityType::RsvpYes, ['event_id' => 1]],
-            ['2025-01-13 12:30:00', 'Adem Lane', ActivityType::RsvpYes, ['event_id' => 6]],
-            ['2025-01-15 20:00:00', 'Adem Lane', ActivityType::FollowedUser, ['user_id' => 2]],
-            ['2025-01-17 09:00:00', 'admin', ActivityType::FollowedUser, ['user_id' => 3]],
-            ['2025-02-01 10:00:00', 'Crystal Liu', ActivityType::Registered, null],
-            ['2025-02-02 10:00:00', 'Crystal Liu', ActivityType::Login, null],
+            [
+                '2025-01-01 10:00:00',
+                UserFixture::ADMIN,
+                ActivityType::Registered,
+                null
+            ],
+            [
+                '2025-01-02 10:00:00',
+                UserFixture::ADMIN,
+                ActivityType::Login,
+                null
+            ],
+            [
+                '2025-01-03 10:00:00',
+                UserFixture::ADMIN,
+                ActivityType::RsvpYes,
+                [
+                    'event_id' => 1
+                ],
+            ],
+            [
+                '2025-01-04 10:00:00',
+                UserFixture::ADMIN,
+                ActivityType::RsvpYes,
+                [
+                    'event_id' => 2
+                ],
+            ],
+            [
+                '2025-01-04 12:30:00',
+                UserFixture::ADMIN,
+                ActivityType::RsvpYes,
+                [
+                    'event_id' => 6
+                ],
+            ],
+            [
+                '2025-01-11 10:00:00',
+                UserFixture::ADEM_LANE,
+                ActivityType::Registered,
+                null
+            ],
+            [
+                '2025-01-12 10:00:00',
+                UserFixture::ADEM_LANE,
+                ActivityType::Login,
+                null
+            ],
+            [
+                '2025-01-13 10:00:00',
+                UserFixture::ADEM_LANE,
+                ActivityType::RsvpYes,
+                [
+                    'event_id' => 1
+                ],
+            ],
+            [
+                '2025-01-13 12:30:00',
+                UserFixture::ADEM_LANE,
+                ActivityType::RsvpYes,
+                [
+                    'event_id' => 6
+                ],
+            ],
+            [
+                '2025-01-15 20:00:00',
+                UserFixture::ADEM_LANE,
+                ActivityType::FollowedUser,
+                [
+                    'user_id' => 2
+                ],
+            ],
+            [
+                '2025-01-17 09:00:00',
+                UserFixture::ADMIN,
+                ActivityType::FollowedUser,
+                [
+                    'user_id' => 3
+                ],
+            ],
+            [
+                '2025-02-01 10:00:00',
+                UserFixture::CRYSTAL_LIU,
+                ActivityType::Registered,
+                null
+            ],
+            [
+                '2025-02-02 10:00:00',
+                UserFixture::CRYSTAL_LIU,
+                ActivityType::Login,
+                null
+            ],
             [
                 '2025-02-03 10:00:00',
-                'Crystal Liu',
+                UserFixture::CRYSTAL_LIU,
                 ActivityType::ChangedUsername,
-                ['old' => 'dalong', 'new' => 'xiaolong'],
+                [
+                    'old' => 'dalong',
+                    'new' => 'xiaolong'
+                ],
             ],
         ];
     }

@@ -10,6 +10,12 @@ use Doctrine\Persistence\ObjectManager;
 
 class HostFixture extends Fixture implements DependentFixtureInterface
 {
+    public const string ADMIN = 'Admin';
+    public const string ADEM = 'Adem';
+    public const string CRYSTAL = 'Crystal';
+    public const string JESSIE = 'Jessie';
+    public const string MOLLIE = 'Mollie';
+
     #[\Override]
     public function load(ObjectManager $manager): void
     {
@@ -18,12 +24,12 @@ class HostFixture extends Fixture implements DependentFixtureInterface
             $host = new Host();
             $host->setName($name);
             if ($user) {
-                $host->setUser($this->getReference('user_' . md5((string) $user), User::class));
+                $host->setUser($this->getReference('UserFixture::' . md5((string)$user), User::class));
             }
 
             $manager->persist($host);
 
-            $this->addReference('host_' . md5((string) $name), $host);
+            $this->addReference('HostFixture::' . md5((string)$name), $host);
         }
         $manager->flush();
         echo 'OK' . PHP_EOL;
@@ -40,9 +46,11 @@ class HostFixture extends Fixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            ['admin',       'admin'],
-            ['Adem Lane',   'Adem Lane'],
-            ['Crystal Liu', 'Crystal Liu'],
+            [self::ADMIN, UserFixture::ADMIN],
+            [self::ADEM, UserFixture::ADEM_LANE],
+            [self::CRYSTAL, UserFixture::CRYSTAL_LIU],
+            [self::JESSIE, UserFixture::JESSIE_MEYTON],
+            [self::MOLLIE, UserFixture::MOLLIE_HALL],
         ];
     }
 }

@@ -28,12 +28,36 @@ class ConfigFixture extends Fixture
     private function getData(): array
     {
         return [
-            ['automatic_registration', 'false',             ConfigType::Boolean],
-            ['show_frontpage',         'false',             ConfigType::Boolean],
-            ['email_sender_mail',      'email@localhost',   ConfigType::String],
-            ['email_sender_name',      'localhost',         ConfigType::String],
-            ['website_url',            'localhost',         ConfigType::String],
-            ['website_host',           'https://localhost', ConfigType::String],
+            [
+                'automatic_registration',
+                'false',
+                ConfigType::Boolean
+            ],
+            [
+                'show_frontpage',
+                'false',
+                ConfigType::Boolean
+            ],
+            [
+                'email_sender_mail',
+                'email@localhost',
+                ConfigType::String
+            ],
+            [
+                'email_sender_name',
+                'localhost',
+                ConfigType::String
+            ],
+            [
+                'website_url',
+                'localhost',
+                ConfigType::String
+            ],
+            [
+                'website_host',
+                'https://localhost',
+                ConfigType::String
+            ],
         ];
     }
 }

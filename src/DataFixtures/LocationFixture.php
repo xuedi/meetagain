@@ -11,6 +11,13 @@ use Doctrine\Persistence\ObjectManager;
 
 class LocationFixture extends Fixture implements DependentFixtureInterface
 {
+    public const string CAFE_LINDENHOF = 'Cafe Lindenhof';
+    public const string KAFFEE_WERK = 'Kaffeewerk Mitte';
+    public const string SPREE_BLICK = 'Spreeblick Cafe';
+    public const string GRUNEWALD_CAMPING = 'Grunewald Camping';
+    public const string ICC_BERLIN = 'ICC Berlin';
+    public const string AIRPORT_BER = 'BER Flughafen';
+
     #[\Override]
     public function load(ObjectManager $manager): void
     {
@@ -22,14 +29,14 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
             $location->setCity($city);
             $location->setPostcode($postcode);
             $location->setDescription($description);
-            $location->setUser($this->getReference('user_' . md5('import'), User::class));
+            $location->setUser($this->getReference('UserFixture::' . md5('import'), User::class));
             $location->setLongitude($long);
             $location->setLatitude($lat);
             $location->setCreatedAt(new DateTimeImmutable());
 
             $manager->persist($location);
 
-            $this->addReference('location_' . md5((string) $name), $location);
+            $this->addReference('LocationFixture::' . md5((string)$name), $location);
         }
         $manager->flush();
         echo 'OK' . PHP_EOL;
@@ -46,28 +53,12 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            [
-                'Garten der Welt',
-                'Eisenacher Str. 99',
-                'Berlin',
-                '12685',
-                'BUS 195 stops right next to the entrance where we will meet. If you miss our meeting time, call me on (redacted) and I\'ll try to guide you to us.',
-                '52.5400197151975',
-                '13.576645889761176',
-            ],
-            ['St. Oberholz', 'Rosenthaler Straße 72', 'Berlin', '10119', '', '52.52953960746029', '13.401831300250606'],
-            ['Grand Tang', 'Pestalozzistr. 37', 'Berlin', '10627', '', '52.537911306794754', '13.423009677540934'],
-            ['Lao Xiang', 'Wichert Str 43', 'Berlin', '10439', '', '52.54645961826611', '13.427076146882994'],
-            ['Volksbar', 'Rosa-Luxemburg-Straße 39', 'Berlin', '10178', '', '52.52687270379576', '13.410462405310192'],
-            [
-                'Himmelbeet',
-                ' Gartenstraße / Ecke Grenzstaße',
-                'Berlin',
-                '13355',
-                '',
-                '52.54131106618176',
-                '13.378411012298372',
-            ],
+            [self::KAFFEE_WERK, 'Invalidenstraße 100', 'Berlin', '10115', '', '52.5321', '13.3799'],
+            [self::CAFE_LINDENHOF, 'Lindenstraße 45', 'Berlin', '10969', '', '52.5035', '13.4052'],
+            [self::SPREE_BLICK, 'Friedrichstraße 210a', 'Berlin', '10117', '', '52.5106', '13.3880'],
+            [self::GRUNEWALD_CAMPING, 'Im Gruenen 3', 'Berlin', '10137', '', '52.44934', '13.1687'],
+            [self::ICC_BERLIN, 'Messedamm 22', 'Berlin', '14055', '', '52.5070', '13.2729'],
+            [self::AIRPORT_BER, 'Willy-Brandt-Platz', 'Schönefeld', '12529', '', '52.3667', '13.5033'],
         ];
     }
 }
