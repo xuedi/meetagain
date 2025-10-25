@@ -18,15 +18,15 @@ abstract class AbstractFixture extends Fixture
         }
 
         $entityName = substr($methodName, 6);
-        $className = sprintf("App\Entity\%s", $entityName);
-        if (!class_exists($className)) {
-            throw new RuntimeException('Class ' . $className . ' does not exist!');
+        $fixtureClassName = sprintf("App\\DataFixtures\\%sFixture", $entityName);
+        if (!class_exists($fixtureClassName)) {
+            throw new RuntimeException('Class ' . $fixtureClassName . ' does not exist!');
         }
 
-        $key = sprintf('%s::%s', $entityName, md5((string)$params[0]));
+        $key = sprintf('%s::%s', $entityName . 'Fixture', md5((string)($params[0] ?? '')));
         switch (substr($methodName, 0, 6)) {
             case 'getRef':
-                return $this->getReference($key, $className);
+                return $this->getReference($key, $fixtureClassName);
             case 'addRef':
                 $this->addReference($key, $params[1]);
                 return null;
@@ -45,7 +45,7 @@ abstract class AbstractFixture extends Fixture
         return $this->fs->readFile($file);
     }
 
-    public function start(bool $dynamic = false): void
+    public function start($dynamic = false): void
     {
         echo 'Creating ' . $this->getClassName() . ' ...';
     }
