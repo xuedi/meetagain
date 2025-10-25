@@ -3,23 +3,21 @@
 namespace App\DataFixtures;
 
 use App\Entity\Message;
-use App\Entity\User;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MessageFixture extends Fixture implements DependentFixtureInterface
+class MessageFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating messages ... ';
+        $this->start();
         foreach ($this->getData() as [$time, $userSender, $userReceiver, $content, $wasRead]) {
             $msg = new Message();
             $msg->setCreatedAt(new DateTimeImmutable($time));
-            $msg->setSender($this->getReference('UserFixture::' . md5((string) $userSender), User::class));
-            $msg->setReceiver($this->getReference('UserFixture::' . md5((string) $userReceiver), User::class));
+            $msg->setSender($this->getRefUser($userSender));
+            $msg->setReceiver($this->getRefUser($userReceiver));
             $msg->setContent($content);
             $msg->setDeleted(false);
             $msg->setWasRead($wasRead);
@@ -27,10 +25,9 @@ class MessageFixture extends Fixture implements DependentFixtureInterface
             $manager->persist($msg);
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
     }
 
-    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -38,42 +35,47 @@ class MessageFixture extends Fixture implements DependentFixtureInterface
         ];
     }
 
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
+
     private function getData(): array
     {
         return [
             [
-                '2025-01-03 11:32:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'Hey, how are you doing?', 
+                '2025-01-03 11:32:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'Hey, how are you doing?',
                 true
             ],
             [
-                '2025-01-03 14:15:00', 
-                UserFixture::ABRAHAM_BAKER, 
-                UserFixture::ADMIN, 
-                'Hi! I\'m good, thanks for asking. How about you?', 
+                '2025-01-03 14:15:00',
+                UserFixture::ABRAHAM_BAKER,
+                UserFixture::ADMIN,
+                'Hi! I\'m good, thanks for asking. How about you?',
                 true
             ],
             [
-                '2025-01-03 15:20:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'I\'m doing great! Working on some new projects.', 
+                '2025-01-03 15:20:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'I\'m doing great! Working on some new projects.',
                 true
             ],
             [
-                '2025-01-04 09:45:00', 
-                UserFixture::ABRAHAM_BAKER, 
-                UserFixture::ADMIN, 
-                'That sounds interesting! What kind of projects?', 
+                '2025-01-04 09:45:00',
+                UserFixture::ABRAHAM_BAKER,
+                UserFixture::ADMIN,
+                'That sounds interesting! What kind of projects?',
                 true
             ],
             [
-                '2025-01-04 10:30:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'Mainly web development stuff. Pretty exciting!', 
+                '2025-01-04 10:30:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'Mainly web development stuff. Pretty exciting!',
                 true
             ],
             [
@@ -84,87 +86,87 @@ class MessageFixture extends Fixture implements DependentFixtureInterface
                 true,
             ],
             [
-                '2025-01-05 14:45:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'I can give you some tips if you\'d like', 
+                '2025-01-05 14:45:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'I can give you some tips if you\'d like',
                 true
             ],
             [
-                '2025-01-06 11:10:00', 
-                UserFixture::ABRAHAM_BAKER, 
-                UserFixture::ADMIN, 
-                'That would be great! When are you free?', 
+                '2025-01-06 11:10:00',
+                UserFixture::ABRAHAM_BAKER,
+                UserFixture::ADMIN,
+                'That would be great! When are you free?',
                 true
             ],
             [
-                '2025-01-06 12:30:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'How about next week?', 
+                '2025-01-06 12:30:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'How about next week?',
                 true
             ],
             [
-                '2025-01-07 09:15:00', 
-                UserFixture::ABRAHAM_BAKER, 
-                UserFixture::ADMIN, 
-                'Perfect! Any specific day you prefer?', 
+                '2025-01-07 09:15:00',
+                UserFixture::ABRAHAM_BAKER,
+                UserFixture::ADMIN,
+                'Perfect! Any specific day you prefer?',
                 true
             ],
             [
-                '2025-01-08 14:25:00', 
-                UserFixture::ABRAHAM_BAKER, 
-                UserFixture::ADMIN, 
-                'Tuesday? What time?', 
+                '2025-01-08 14:25:00',
+                UserFixture::ABRAHAM_BAKER,
+                UserFixture::ADMIN,
+                'Tuesday? What time?',
                 true
             ],
             [
-                '2025-01-08 15:30:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'How about 2 PM?', 
+                '2025-01-08 15:30:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'How about 2 PM?',
                 true
             ],
             [
-                '2025-01-09 11:45:00', 
-                UserFixture::ABRAHAM_BAKER, 
-                UserFixture::ADMIN, 
-                'Sounds good! Where should we meet?', 
+                '2025-01-09 11:45:00',
+                UserFixture::ABRAHAM_BAKER,
+                UserFixture::ADMIN,
+                'Sounds good! Where should we meet?',
                 true
             ],
             [
-                '2025-01-09 13:50:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'There\'s a nice cafe downtown', 
+                '2025-01-09 13:50:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'There\'s a nice cafe downtown',
                 true
             ],
             [
-                '2025-01-10 10:15:00', 
-                UserFixture::ABRAHAM_BAKER, 
-                UserFixture::ADMIN, 
-                'The one on Main Street?', 
+                '2025-01-10 10:15:00',
+                UserFixture::ABRAHAM_BAKER,
+                UserFixture::ADMIN,
+                'The one on Main Street?',
                 true
             ],
             [
-                '2025-01-10 11:20:00', 
-                UserFixture::ADMIN, 
-                UserFixture::ABRAHAM_BAKER, 
-                'Yes, that\'s the one!', 
+                '2025-01-10 11:20:00',
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'Yes, that\'s the one!',
                 true
             ],
             [
-                '2025-02-03 11:32:00', 
-                UserFixture::ADMIN, 
-                UserFixture::CRYSTAL_LIU, 
-                'hello, welcome to the group', 
+                '2025-02-03 11:32:00',
+                UserFixture::ADMIN,
+                UserFixture::CRYSTAL_LIU,
+                'hello, welcome to the group',
                 true
             ],
             [
-                '2025-02-03 11:33:15', 
-                UserFixture::CRYSTAL_LIU, 
-                UserFixture::ADMIN, 
-                'thank you for organizing the event', 
+                '2025-02-03 11:33:15',
+                UserFixture::CRYSTAL_LIU,
+                UserFixture::ADMIN,
+                'thank you for organizing the event',
                 true
             ],
             [

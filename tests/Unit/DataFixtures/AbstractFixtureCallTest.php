@@ -46,4 +46,11 @@ class AbstractFixtureCallTest extends TestCase
         $this->assertSame($expectedClass, $fixture->lastGetReferenceClass, 'Delegated class does not match');
         $this->assertSame($fixture->stubReturnedFromGetReference, $result, 'Return value should be passthrough from getReference');
     }
+
+    public function testDebugging(): void
+    {
+        $fixture = new DummyAbstractFixture();
+        $fixture->start('dfg');
+
+    }
 }

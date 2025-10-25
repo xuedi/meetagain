@@ -4,21 +4,19 @@ namespace App\DataFixtures;
 
 use App\Entity\Activity;
 use App\Entity\ActivityType;
-use App\Entity\User;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class ActivityFixture extends Fixture implements DependentFixtureInterface
+class ActivityFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating activities ... ';
+        $this->start();
         foreach ($this->getData() as [$time, $userName, $type, $meta]) {
             $activity = new Activity();
-            $activity->setUser($this->getReference('UserFixture::' . md5((string) $userName), User::class));
+            $activity->setUser($this->getRefUser($userName));
             $activity->setCreatedAt(new DateTimeImmutable($time));
             $activity->setType($type);
             $activity->setMeta($meta);
@@ -26,15 +24,19 @@ class ActivityFixture extends Fixture implements DependentFixtureInterface
             $manager->persist($activity);
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
     }
 
-    #[\Override]
     public function getDependencies(): array
     {
         return [
             UserFixture::class,
         ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
     }
 
     private function getData(): array

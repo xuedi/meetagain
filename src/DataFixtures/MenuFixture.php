@@ -2,23 +2,21 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Cms;
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
 use App\Entity\MenuRoutes;
 use App\Entity\MenuTranslation;
 use App\Entity\MenuType;
 use App\Entity\MenuVisibility;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MenuFixture extends Fixture implements DependentFixtureInterface
+class MenuFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating menu ... ';
+        $this->start();
         foreach ($this->getData() as [$location, $visibility, $type, $value, $translations]) {
             if (!isset($priority[$location->value])) {
                 $priority[$location->value] = 0;
@@ -48,15 +46,19 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
             }
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
     }
 
-    #[\Override]
     public function getDependencies(): array
     {
         return [
             CmsFixture::class,
         ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
     }
 
     private function getData(): array
@@ -66,7 +68,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuLocation::TopBar,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('CmsFixture::' . md5('about'), Cms::class),
+                $this->getRefCms(CmsFixture::ABOUT),
                 [
                     LanguageFixture::GERMAN => 'Ueber uns',
                     LanguageFixture::ENGLISH => 'About',
@@ -99,7 +101,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuLocation::BottomCol1,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('CmsFixture::' . md5('index'), Cms::class),
+                $this->getRefCms(CmsFixture::INDEX),
                 [
                     LanguageFixture::GERMAN => 'Startseite',
                     LanguageFixture::ENGLISH => 'Homepage',
@@ -110,7 +112,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuLocation::BottomCol1,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('CmsFixture::' . md5('about'), Cms::class),
+                $this->getRefCms(CmsFixture::ABOUT),
                 [
                     LanguageFixture::GERMAN => 'Ueber uns',
                     LanguageFixture::ENGLISH => 'About',
@@ -176,7 +178,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuLocation::BottomCol4,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('CmsFixture::' . md5('imprint'), Cms::class),
+                $this->getRefCms(CmsFixture::IMPRINT),
                 [
                     LanguageFixture::GERMAN => 'Impressum',
                     LanguageFixture::ENGLISH => 'Imprint',
@@ -187,7 +189,7 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuLocation::BottomCol4,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('CmsFixture::' . md5('privacy'), Cms::class),
+                $this->getRefCms(CmsFixture::PRIVACY),
                 [
                     LanguageFixture::GERMAN => 'Datenschutz',
                     LanguageFixture::ENGLISH => 'Privacy',

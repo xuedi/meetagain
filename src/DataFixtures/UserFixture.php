@@ -1,15 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\ImageType;
 use App\Entity\User;
 use App\Entity\UserStatus;
+use App\Service\ImageService;
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixture extends AbstractFixture
+class UserFixture extends AbstractFixture implements FixtureGroupInterface
 {
     public const string IMPORT = 'import';
     public const string ADMIN = 'admin';
@@ -162,12 +167,13 @@ class UserFixture extends AbstractFixture
 
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
-    ) {}
+        private readonly ImageService $imageService,
+    ) {
+    }
 
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating users ... ';
+        $this->start();
         foreach ($this->getData() as $data) {
             $name = $data['name'];
 
@@ -190,7 +196,17 @@ class UserFixture extends AbstractFixture
 
             $manager->persist($user);
 
-            $this->addRefUser($name);
+            // upload file and create thumbnails
+            $imageFile = __DIR__ . '/User/' . $name . '.jpg';
+            $uploadedImage = new UploadedFile($imageFile, $user->getId() . '.jpg');
+            $image = $this->imageService->upload($uploadedImage, $user, ImageType::CmsBlock);
+            $this->imageService->createThumbnails($image);
+
+            // associate image with a user
+            $user->setImage($image);
+            $manager->persist($user);
+
+            $this->addRefUser($name, $user);
         }
         $manager->flush();
 
@@ -207,7 +223,7 @@ class UserFixture extends AbstractFixture
             $manager->persist($user);
         }
         $manager->flush();
-        echo ' OK' . PHP_EOL;
+        $this->stop();
     }
 
     public function getUsernames(): array
@@ -218,6 +234,11 @@ class UserFixture extends AbstractFixture
         }
 
         return $nameList;
+    }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
     }
 
     private function getData(): array
@@ -1220,7 +1241,14 @@ class UserFixture extends AbstractFixture
                     self::YOUSSEF_ROBERSON,
                     self::ADEM_LANE,
                 ],
-                'followers' => [self::ADMIN, self::ALESHA_BARRY, self::COHEN_LOZANO, self::JAYA_WILLIS, self::JAY_SHEPARD, self::LYLE_KAUFFMAN],
+                'followers' => [
+                    self::ADMIN,
+                    self::ALESHA_BARRY,
+                    self::COHEN_LOZANO,
+                    self::JAYA_WILLIS,
+                    self::JAY_SHEPARD,
+                    self::LYLE_KAUFFMAN
+                ],
                 'restricted' => false,
             ],
             [
@@ -1699,7 +1727,13 @@ class UserFixture extends AbstractFixture
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
                 'status' => UserStatus::Active,
-                'following' => [self::CRYSTAL_LIU, self::DILLAN_NGUYEN, self::ISOBEL_CARROLL, self::RACHAEL_STRONG, self::ROSALEE_MELVIN],
+                'following' => [
+                    self::CRYSTAL_LIU,
+                    self::DILLAN_NGUYEN,
+                    self::ISOBEL_CARROLL,
+                    self::RACHAEL_STRONG,
+                    self::ROSALEE_MELVIN
+                ],
                 'followers' => [
                     self::ANAIAH_WHITTEN,
                     self::ANDI_LANE,
@@ -1925,7 +1959,13 @@ class UserFixture extends AbstractFixture
                 'roles' => ['ROLE_USER'],
                 'verified' => true,
                 'status' => UserStatus::Active,
-                'following' => [self::ASHWIN_SANTIAGO, self::CAMERON_YANG, self::EVE_LEROY, self::HARRIET_ROJAS, self::NOEL_BALDWIN],
+                'following' => [
+                    self::ASHWIN_SANTIAGO,
+                    self::CAMERON_YANG,
+                    self::EVE_LEROY,
+                    self::HARRIET_ROJAS,
+                    self::NOEL_BALDWIN
+                ],
                 'followers' => [
                     self::ADMIN,
                     self::BYRON_ROBERTSON,
@@ -2339,7 +2379,14 @@ class UserFixture extends AbstractFixture
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
                 'status' => UserStatus::Active,
-                'following' => [self::ADMIN, self::CAITLYN_KING, self::JOSHUA_WILSON, self::KADEN_SCOTT, self::KORAY_OKUMUS, self::RAYHAN_ZUA],
+                'following' => [
+                    self::ADMIN,
+                    self::CAITLYN_KING,
+                    self::JOSHUA_WILSON,
+                    self::KADEN_SCOTT,
+                    self::KORAY_OKUMUS,
+                    self::RAYHAN_ZUA
+                ],
                 'followers' => [
                     self::AYAH_WILKINSON,
                     self::AYSHA_BECKER,
@@ -2532,7 +2579,13 @@ class UserFixture extends AbstractFixture
                     self::MAXWELL_TAN,
                     self::ORLANDO_DIGGS,
                 ],
-                'followers' => [self::ASHTON_BLACKWELL, self::FLEUR_COOK, self::GENEVIEVE_MCLEAN, self::KYLA_CLAY, self::RACHAEL_STRONG],
+                'followers' => [
+                    self::ASHTON_BLACKWELL,
+                    self::FLEUR_COOK,
+                    self::GENEVIEVE_MCLEAN,
+                    self::KYLA_CLAY,
+                    self::RACHAEL_STRONG
+                ],
                 'restricted' => false,
             ],
             [
@@ -3377,7 +3430,13 @@ class UserFixture extends AbstractFixture
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
                 'status' => UserStatus::Active,
-                'following' => [self::FREYA_BROWNING, self::ISLA_ALLISON, self::OLLY_SCHROEDER, self::SALLY_MASON, self::ZAHRA_CHRISTENSEN],
+                'following' => [
+                    self::FREYA_BROWNING,
+                    self::ISLA_ALLISON,
+                    self::OLLY_SCHROEDER,
+                    self::SALLY_MASON,
+                    self::ZAHRA_CHRISTENSEN
+                ],
                 'followers' => [
                     self::DEMI_WILKINSON,
                     self::FLORENCE_SHAW,
@@ -3575,7 +3634,14 @@ class UserFixture extends AbstractFixture
                 'roles' => ['ROLE_USER'],
                 'verified' => false,
                 'status' => UserStatus::Active,
-                'following' => [self::AVA_BENTLEY, self::CLIFFORD_JENNINGS, self::ELSIE_ROY, self::SIENNA_HEWITT, self::ADMIN, self::ADEM_LANE],
+                'following' => [
+                    self::AVA_BENTLEY,
+                    self::CLIFFORD_JENNINGS,
+                    self::ELSIE_ROY,
+                    self::SIENNA_HEWITT,
+                    self::ADMIN,
+                    self::ADEM_LANE
+                ],
                 'followers' => [
                     self::ADRIANA_O_SULLIVAN,
                     self::AYSHA_BECKER,
@@ -4164,7 +4230,13 @@ class UserFixture extends AbstractFixture
                     self::SOPHIA_PEREZ,
                     self::ZAHRA_CHRISTENSEN,
                 ],
-                'followers' => [self::IMPORT, self::CANDICE_WU, self::ELENA_OWENS, self::HARRIET_ROJAS, self::ROSALEE_MELVIN],
+                'followers' => [
+                    self::IMPORT,
+                    self::CANDICE_WU,
+                    self::ELENA_OWENS,
+                    self::HARRIET_ROJAS,
+                    self::ROSALEE_MELVIN
+                ],
                 'restricted' => false,
             ],
             [

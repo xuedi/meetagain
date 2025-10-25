@@ -3,13 +3,12 @@
 namespace App\DataFixtures;
 
 use App\Entity\Location;
-use App\Entity\User;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class LocationFixture extends Fixture implements DependentFixtureInterface
+class LocationFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
     public const string CAFE_LINDENHOF = 'Cafe Lindenhof';
     public const string KAFFEE_WERK = 'Kaffeewerk Mitte';
@@ -18,10 +17,10 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
     public const string ICC_BERLIN = 'ICC Berlin';
     public const string AIRPORT_BER = 'BER Flughafen';
 
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating locations ... ';
+        $this->start();
+        $importUser = $this->getRefUser(UserFixture::IMPORT);
         foreach ($this->getData() as [$name, $street, $city, $postcode, $description, $long, $lat]) {
             $location = new Location();
             $location->setName($name);
@@ -29,25 +28,29 @@ class LocationFixture extends Fixture implements DependentFixtureInterface
             $location->setCity($city);
             $location->setPostcode($postcode);
             $location->setDescription($description);
-            $location->setUser($this->getReference('UserFixture::' . md5('import'), User::class));
+            $location->setUser($importUser);
             $location->setLongitude($long);
             $location->setLatitude($lat);
             $location->setCreatedAt(new DateTimeImmutable());
 
             $manager->persist($location);
 
-            $this->addReference('LocationFixture::' . md5((string)$name), $location);
+            $this->addRefLocation($name, $location);
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
     }
 
-    #[\Override]
     public function getDependencies(): array
     {
         return [
             UserFixture::class,
         ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
     }
 
     private function getData(): array

@@ -2,30 +2,31 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\ImageType;
+use App\Service\ImageService;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class CmsBlockFixture extends Fixture implements DependentFixtureInterface
+class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
     public function __construct(
-        private readonly Filesystem $fs,
+        private readonly ImageService $imageService,
     )
     {
     }
 
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating cms blocks ... ';
+        $this->start();
         $priority = 1; // it is OK to increase the priority of the blocks
+        $importUser = $this->getRefUser(UserFixture::IMPORT);
         foreach ($this->getData() as [$page, $lang, $type, $json, $imageName]) {
             $block = new CmsBlock();
-            $block->setPage($this->getReference('CmsFixture::' . md5((string)$page), Cms::class));
+            $block->setPage($this->getRefCms($page));
             $block->setLanguage($lang);
             $block->setPriority($priority);
             $block->setType($type);
@@ -33,21 +34,35 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
 
             $manager->persist($block);
             if ($imageName !== null) {
-                $this->addReference('CmsBlockFixture::' . md5($imageName), $block);
+
+                // upload file and create thumbnails
+                $imageFile = __DIR__ . "/CmsBlock/$imageName";
+                $uploadedImage = new UploadedFile($imageFile, $block->getId() . '.jpg');
+                $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
+                $this->imageService->createThumbnails($image);
+
+                // associate image with a user
+                $block->setImage($image);
+                $manager->persist($block);
             }
+
             $priority++;
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
     }
 
-    #[\Override]
     public function getDependencies(): array
     {
         return [
             CmsFixture::class,
             UserFixture::class,
         ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
     }
 
     private function getData(): array
@@ -134,7 +149,7 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
                 LanguageFixture::ENGLISH,
                 CmsBlockTypes::Text,
                 [
-                    'content' => $this->getBlob('about_en')
+                    'content' => $this->getText('about_en')
                 ],
                 null
             ],
@@ -152,7 +167,7 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
                 LanguageFixture::GERMAN,
                 CmsBlockTypes::Text,
                 [
-                    'content' => $this->getBlob('about_de')
+                    'content' => $this->getText('about_de')
                 ],
                 null
             ],
@@ -170,7 +185,7 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
                 LanguageFixture::CHINESE,
                 CmsBlockTypes::Text,
                 [
-                    'content' => $this->getBlob('about_cn')
+                    'content' => $this->getText('about_cn')
                 ],
                 null
             ],
@@ -179,11 +194,12 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
                 LanguageFixture::ENGLISH,
                 CmsBlockTypes::Hero,
                 [
-                    'headline' => 'headline-en',
-                    'subHeadline' => 'subHeadline-en',
-                    'text' => 'text-en',
-                    'buttonLink' => 'buttonLink-en',
-                    'buttonText' => 'buttonText-en',
+                    'headline' => 'International weiqi Club',
+                    'subHeadline' => 'learn, play and have fun',
+                    'text' => $this->getText('index_hero_en'),
+                    'buttonLink' => '/register',
+                    'buttonText' => 'Join us',
+                    'color' => '#0700da',
                 ],
                 'hero-en.jpg',
             ],
@@ -192,21 +208,22 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
                 LanguageFixture::ENGLISH,
                 CmsBlockTypes::EventTeaser,
                 [
-                    'headline' => 'welcome_en',
-                    'text' => 'text-en'
+                    'headline' => 'Welcome',
+                    'text' => $this->getText('index_events_lorem'),
                 ],
-                'event-teaser-en.webp',
+                'group-en.jpg',
             ],
             [
                 CmsFixture::INDEX,
                 LanguageFixture::GERMAN,
                 CmsBlockTypes::Hero,
                 [
-                    'headline' => 'headline-de',
-                    'subHeadline' => 'subHeadline-de',
-                    'text' => 'text-de',
-                    'buttonLink' => 'buttonLink-de',
-                    'buttonText' => 'buttonText-de',
+                    'headline' => 'Internationales weiqi Treffen',
+                    'subHeadline' => 'Spiel, Spass und lernen',
+                    'text' => $this->getText('index_hero_de'),
+                    'buttonLink' => '/register',
+                    'buttonText' => 'Mach mit',
+                    'color' => '#0700da',
                 ],
                 'hero-de.jpg',
             ],
@@ -215,21 +232,22 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
                 LanguageFixture::GERMAN,
                 CmsBlockTypes::EventTeaser,
                 [
-                    'headline' => 'welcome_de',
-                    'text' => 'text-de'
+                    'headline' => 'Willkommen',
+                    'text' => $this->getText('index_events_lorem'),
                 ],
-                'event-teaser-de.webp',
+                'group-de.jpg',
             ],
             [
                 CmsFixture::INDEX,
                 LanguageFixture::CHINESE,
                 CmsBlockTypes::Hero,
                 [
-                    'headline' => 'headline-cn',
-                    'subHeadline' => 'subHeadline-cn',
-                    'text' => 'text-cn',
-                    'buttonLink' => 'buttonLink-cn',
-                    'buttonText' => 'buttonText-cn',
+                    'headline' => '国际围棋大会',
+                    'subHeadline' => '游戏、娱乐和学习',
+                    'text' => $this->getText('index_hero_cn'),
+                    'buttonLink' => '/register',
+                    'buttonText' => '加入我们',
+                    'color' => '#0700da',
                 ],
                 'hero-cn.jpg',
             ],
@@ -238,28 +256,11 @@ class CmsBlockFixture extends Fixture implements DependentFixtureInterface
                 LanguageFixture::CHINESE,
                 CmsBlockTypes::EventTeaser,
                 [
-                    'headline' => 'welcome_cn',
-                    'text' => 'text-cn'
+                    'headline' => '欢迎光临',
+                    'text' => $this->getText('index_events_lorem'),
                 ],
-                'event-teaser-cn.webp',
+                'group-cn.jpg',
             ],
-        ];
-    }
-
-    private function getBlob(string $string): string
-    {
-        return $this->fs->readFile(__DIR__ . "/blobs/$string.txt");
-    }
-
-    public function getBlockReferenceForImages(): array
-    {
-        return [
-            'event-teaser-en.webp',
-            'event-teaser-de.webp',
-            'event-teaser-cn.webp',
-            'hero-en.jpg',
-            'hero-de.jpg',
-            'hero-cn.jpg',
         ];
     }
 }

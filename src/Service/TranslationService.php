@@ -198,7 +198,7 @@ readonly class TranslationService
         $conn->executeStatement('DELETE FROM translation');
 
         // get import user
-        $user = $this->userRepo->findOneBy(['email' => 'system@example.org']);
+        $user = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);;
 
         foreach ($data as $item) {
             $translation = new Translation();

@@ -1,18 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace App\DataFixtures;
 
 use App\Entity\Config;
 use App\Entity\ConfigType;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class ConfigFixture extends Fixture
+class ConfigFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating config ... ';
+        $this->start();
         foreach ($this->getData() as [$name, $value, $type]) {
             $user = new Config();
             $user->setName($name);
@@ -22,7 +23,19 @@ class ConfigFixture extends Fixture
             $manager->persist($user);
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            UserFixture::class,
+        ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
     }
 
     private function getData(): array
@@ -57,6 +70,11 @@ class ConfigFixture extends Fixture
                 'website_host',
                 'https://localhost',
                 ConfigType::String
+            ],
+            [
+                'system_user_id',
+                (string)$this->getRefUser(UserFixture::IMPORT)->getId(),
+                ConfigType::Integer
             ],
         ];
     }
