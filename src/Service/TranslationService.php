@@ -131,7 +131,11 @@ readonly class TranslationService
             foreach ($translations as $translation) {
                 $this->fs->appendToFile(
                     $file,
-                    sprintf("'%s' => '%s',", $translation->getPlaceholder(), $translation->getTranslation()),
+                    sprintf(
+                        "'%s' => '%s',",
+                        strtolower($translation->getPlaceholder()),
+                        $translation->getTranslation()
+                    ),
                 );
                 $published++;
             }

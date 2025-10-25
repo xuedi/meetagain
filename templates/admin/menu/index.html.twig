@@ -6,7 +6,7 @@
         <div class="columns">
             {% for locationId, locationName in menu_locations %}
                 <div class="column">
-                    <h2 class="title is-5">{{ locationName }}</h2>
+                    <h2 class="title is-5">{{ locationName | trans }}</h2>
                     <ul>
                         {% for item in items %}
                             {% if locationId == item.location.value %}
