@@ -6,6 +6,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Error;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
+use Throwable;
 
 abstract class AbstractFixture extends Fixture
 {
@@ -18,15 +19,26 @@ abstract class AbstractFixture extends Fixture
         }
 
         $entityName = substr($methodName, 6);
-        $fixtureClassName = sprintf("App\\DataFixtures\\%sFixture", $entityName);
-        if (!class_exists($fixtureClassName)) {
-            throw new RuntimeException('Class ' . $fixtureClassName . ' does not exist!');
+        $entityClass = sprintf("App\\Entity\\%s", $entityName);
+        if (!class_exists($entityClass)) {
+            throw new RuntimeException('Class ' . $entityClass . ' does not exist!');
         }
 
         $key = sprintf('%s::%s', $entityName . 'Fixture', md5((string)($params[0] ?? '')));
         switch (substr($methodName, 0, 6)) {
             case 'getRef':
-                return $this->getReference($key, $fixtureClassName);
+                try {
+                    return $this->getReference($key, $entityClass);
+                } catch (Throwable $exception) {
+                    throw new RuntimeException(
+                        sprintf(
+                            "Error retrieving reference '%s::%s' [%s]",
+                            $entityName,
+                            $params[0],
+                            $exception->getMessage()
+                        )
+                    );
+                }
             case 'addRef':
                 $this->addReference($key, $params[1]);
                 return null;
