@@ -20,17 +20,17 @@
                         {% endif %}
 
                         <div class="field">
-                            <label class="label">Email</label>
+                            <label class="label">{{ 'email' | trans }}</label>
                             <p class="control has-icons-left">
-                                <input type="email" name="_username" id="username" class="input" autocomplete="email" placeholder="Email">
+                                <input type="email" name="_username" id="username" class="input" autocomplete="email" placeholder="{{ 'email' | trans }}">
                                 <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
                             </p>
                         </div>
 
                         <div class="field">
-                            <label class="label">Password</label>
+                            <label class="label">{{ 'password' | trans }}</label>
                             <p class="control has-icons-left">
-                                <input type="password" name="_password" id="password" class="input" placeholder="Password">
+                                <input type="password" name="_password" id="password" class="input" placeholder="{{ 'password' | trans }}">
                                 <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
                             </p>
                         </div>
@@ -45,7 +45,7 @@
 
 
                     <p>
-                        {{ "page_login_reset"|trans }} <a href="{{ path('app_reset') }}">here</a>
+                        {{ "page_login_reset"|trans }} <a href="{{ path('app_reset') }}">{{ 'link_here' | trans }}</a>
                     </p>
 
                 </div>

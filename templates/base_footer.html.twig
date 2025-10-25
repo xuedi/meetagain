@@ -6,7 +6,7 @@
                 <span>powered by</span> <a target="_blank" href="https://github.com/xuedi/meetAgain">meetAgain</a>
             </div>
             <div class="column is-6-mobile">
-                <p>Static</p>
+                <p>{{ 'footer_col1' | trans }}</p>
                 <ul>
                     {% for menu in globalService.menu('col1') %}
                         <li>
@@ -16,7 +16,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>Dynamic</p>
+                <p>{{ 'footer_col2' | trans }}</p>
                 <ul>
                     {% for menu in globalService.menu('col2') %}
                         <li>
@@ -26,7 +26,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>Social</p>
+                <p>{{ 'footer_col3' | trans }}</p>
                 <ul>
                     {% for menu in globalService.menu('col3') %}
                         <li>
@@ -36,7 +36,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>Legal</p>
+                <p>{{ 'footer_col4' | trans }}</p>
                 <ul>
                     {% for menu in globalService.menu('col4') %}
                         <li>
