@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
@@ -31,13 +33,15 @@ class AdminMenuController extends AbstractController
         private readonly TranslationService $translationService,
         private readonly EventRepository $eventRepo,
         private readonly CmsRepository $cmsRepo,
-    ) {}
+    ) {
+    }
 
-    #[Route('/admin/menu/{edit}', name: 'app_admin_menu')]
-    public function menuList(Request $request, Menu $menu, int $edit = null): Response
+    #[Route('/admin/menu/{edit}', name: 'app_admin_menu', defaults: ['edit' => null])]
+    public function menuList(Request $request, ?int $edit = null): Response
     {
-        if ($edit !== null) {
-            $menu = $this->repo->find($edit);
+        $menu = $edit !== null ? $this->repo->find($edit) : new Menu();
+        if ($edit !== null && $menu === null) {
+            throw $this->createNotFoundException('Menu not found');
         }
         $form = $this->createForm(MenuType::class, $menu);
         $form->handleRequest($request);
