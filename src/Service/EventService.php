@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace App\Service;
 
@@ -20,10 +21,9 @@ use RuntimeException;
 
 readonly class EventService
 {
-    public function __construct(
-        private EventRepository $repo,
-        private EntityManagerInterface $em,
-    ) {}
+    public function __construct(private EventRepository $repo, private EntityManagerInterface $em)
+    {
+    }
 
     public function getFilteredList(
         EventFilterTime $time,
@@ -33,17 +33,21 @@ readonly class EventService
     ): array {
         $criteria = new Criteria();
         $criteria->orderBy(['start' => $sort->value]);
-        $criteria->where(match ($time) { // TODO: all should be a dummy, no idea how
-            EventFilterTime::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
-            EventFilterTime::Past => Criteria::expr()->lte('start', new DateTime()),
-            EventFilterTime::Future => Criteria::expr()->gte('start', new DateTime()),
-        });
-        $criteria->andWhere(match ($type) {
-            EventTypes::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
-            EventTypes::Regular => Criteria::expr()->eq('type', EventTypes::Regular->value),
-            EventTypes::Outdoor => Criteria::expr()->eq('type', EventTypes::Outdoor->value),
-            EventTypes::Dinner => Criteria::expr()->eq('type', EventTypes::Dinner->value),
-        });
+        $criteria->where(
+            match ($time) { // TODO: all should be a dummy, no idea how
+                EventFilterTime::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
+                EventFilterTime::Past => Criteria::expr()->lte('start', new DateTime()),
+                EventFilterTime::Future => Criteria::expr()->gte('start', new DateTime()),
+            }
+        );
+        $criteria->andWhere(
+            match ($type) {
+                EventTypes::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
+                EventTypes::Regular => Criteria::expr()->eq('type', EventTypes::Regular->value),
+                EventTypes::Outdoor => Criteria::expr()->eq('type', EventTypes::Outdoor->value),
+                EventTypes::Dinner => Criteria::expr()->eq('type', EventTypes::Dinner->value),
+            }
+        );
         $criteria->andWhere(Criteria::expr()->eq('published', true));
         $result = $this->repo->matching($criteria)->toArray();
 
@@ -122,7 +126,7 @@ readonly class EventService
                 EventIntervals::BiMonthly,
                 $today->modify('+5 weeks'),
                 EventIntervals::Monthly,
-                    => $today->modify('+3 months'),
+                => $today->modify('+3 months'),
                 EventIntervals::Yearly => $today->modify('+3 years'),
                 default => throw new RuntimeException('Unknown EventIntervals'),
             })->format('Y-m-d'),
@@ -173,9 +177,9 @@ readonly class EventService
     {
         $newDate = clone $target;
         $newDate->setDate(
-            year: (int) $occurrence->format('Y'),
-            month: (int) $occurrence->format('m'),
-            day: (int) $occurrence->format('d'),
+            year: (int)$occurrence->format('Y'),
+            month: (int)$occurrence->format('m'),
+            day: (int)$occurrence->format('d'),
         );
 
         return $newDate;

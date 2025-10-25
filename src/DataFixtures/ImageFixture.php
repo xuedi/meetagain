@@ -30,43 +30,6 @@ class ImageFixture extends Fixture implements DependentFixtureInterface
         $importUser = $this->getReference('user_' . md5('import'), User::class);
         $adminUser = $this->getReference('user_' . md5('admin'), User::class);
 
-        // add photos for cmdBlocks
-        foreach ($this->cmsBlockFixture->getBlockReferenceForImages() as $blockId) {
-            $imageFile = __DIR__ . "/CmsBlock/$blockId";
-            $reference = 'cmsBlock_' . md5((string) $blockId);
-            $cmsBlock = $this->getReference($reference, CmsBlock::class);
-
-            // upload file & thumbnails
-            $uploadedImage = new UploadedFile($imageFile, "$blockId.jpg");
-            $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
-            $manager->flush();
-            $this->imageService->createThumbnails($image);
-
-            // associate image with a user
-            $cmsBlock->setImage($image);
-            $manager->persist($cmsBlock);
-            $manager->flush();
-        }
-
-        // add user profile photos
-        foreach ($this->userFixture->getUsernames() as $name) {
-            $imageFile = __DIR__ . "/Avatars/$name.jpg";
-            $reference = 'user_' . md5((string) $name);
-            $user = $this->getReference($reference, User::class);
-
-            // upload file & thumbnails
-            $uploadedImage = new UploadedFile($imageFile, "$name.jpg");
-            $image = $this->imageService->upload($uploadedImage, $user, ImageType::ProfilePicture);
-            $manager->flush();
-            $this->imageService->createThumbnails($image);
-
-            // associate image with a user
-            $user->setImage($image);
-            $manager->persist($user);
-            $manager->flush();
-        }
-        echo '.';
-
         // add event preview photos
         $eventList = $this->eventFixture->getEventNames();
         foreach ($eventList as $name) {

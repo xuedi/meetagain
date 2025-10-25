@@ -2,23 +2,21 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Cms;
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
 use App\Entity\MenuRoutes;
 use App\Entity\MenuTranslation;
 use App\Entity\MenuType;
 use App\Entity\MenuVisibility;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MenuFixture extends Fixture implements DependentFixtureInterface
+class MenuFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating menu ... ';
+        $this->start();
         foreach ($this->getData() as [$location, $visibility, $type, $value, $translations]) {
             if (!isset($priority[$location->value])) {
                 $priority[$location->value] = 0;
@@ -48,15 +46,19 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
             }
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
     }
 
-    #[\Override]
     public function getDependencies(): array
     {
         return [
             CmsFixture::class,
         ];
+    }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
     }
 
     private function getData(): array
@@ -66,11 +68,11 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuLocation::TopBar,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('cms_' . md5('about'), Cms::class),
+                $this->getRefCms(CmsFixture::ABOUT),
                 [
-                    'de' => 'Ueber uns',
-                    'en' => 'About',
-                    'cn' => '关于',
+                    LanguageFixture::GERMAN => 'Ueber uns',
+                    LanguageFixture::ENGLISH => 'About',
+                    LanguageFixture::CHINESE => '关于',
                 ],
             ],
             [
@@ -79,9 +81,9 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuType::Route,
                 MenuRoutes::Events,
                 [
-                    'de' => 'Events',
-                    'en' => 'Events',
-                    'cn' => '活动',
+                    LanguageFixture::GERMAN => 'Events',
+                    LanguageFixture::ENGLISH => 'Events',
+                    LanguageFixture::CHINESE => '活动',
                 ],
             ],
             [
@@ -90,31 +92,31 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuType::Route,
                 MenuRoutes::Members,
                 [
-                    'de' => 'Mitglieder',
-                    'en' => 'Members',
-                    'cn' => '成员',
+                    LanguageFixture::GERMAN => 'Mitglieder',
+                    LanguageFixture::ENGLISH => 'Members',
+                    LanguageFixture::CHINESE => '成员',
                 ],
             ],
             [
                 MenuLocation::BottomCol1,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('cms_' . md5('index'), Cms::class),
+                $this->getRefCms(CmsFixture::INDEX),
                 [
-                    'de' => 'Startseite',
-                    'en' => 'Homepage',
-                    'cn' => '主页',
+                    LanguageFixture::GERMAN => 'Startseite',
+                    LanguageFixture::ENGLISH => 'Homepage',
+                    LanguageFixture::CHINESE => '主页',
                 ],
             ],
             [
                 MenuLocation::BottomCol1,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('cms_' . md5('about'), Cms::class),
+                $this->getRefCms(CmsFixture::ABOUT),
                 [
-                    'de' => 'Ueber uns',
-                    'en' => 'About',
-                    'cn' => '关于',
+                    LanguageFixture::GERMAN => 'Ueber uns',
+                    LanguageFixture::ENGLISH => 'About',
+                    LanguageFixture::CHINESE => '关于',
                 ],
             ],
             [
@@ -123,9 +125,9 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuType::Route,
                 MenuRoutes::Events,
                 [
-                    'de' => 'Events',
-                    'en' => 'Events',
-                    'cn' => '活动',
+                    LanguageFixture::GERMAN => 'Events',
+                    LanguageFixture::ENGLISH => 'Events',
+                    LanguageFixture::CHINESE => '活动',
                 ],
             ],
             [
@@ -134,9 +136,9 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuType::Route,
                 MenuRoutes::Members,
                 [
-                    'de' => 'Mitglieder',
-                    'en' => 'Members',
-                    'cn' => '成员',
+                    LanguageFixture::GERMAN => 'Mitglieder',
+                    LanguageFixture::ENGLISH => 'Members',
+                    LanguageFixture::CHINESE => '成员',
                 ],
             ],
             [
@@ -145,9 +147,9 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuType::Url,
                 'https://meetup.com',
                 [
-                    'de' => 'meetup.com',
-                    'en' => 'meetup.com',
-                    'cn' => 'meetup.com',
+                    LanguageFixture::GERMAN => 'meetup.com',
+                    LanguageFixture::ENGLISH => 'meetup.com',
+                    LanguageFixture::CHINESE => 'meetup.com',
                 ],
             ],
             [
@@ -156,9 +158,9 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuType::Url,
                 'https://instagram.com',
                 [
-                    'de' => 'Instagram',
-                    'en' => 'Instagram',
-                    'cn' => 'Instagram',
+                    LanguageFixture::GERMAN => 'Instagram',
+                    LanguageFixture::ENGLISH => 'Instagram',
+                    LanguageFixture::CHINESE => 'Instagram',
                 ],
             ],
             [
@@ -167,31 +169,31 @@ class MenuFixture extends Fixture implements DependentFixtureInterface
                 MenuType::Url,
                 'https://tiktok.com',
                 [
-                    'de' => 'TikTok',
-                    'en' => 'TikTok',
-                    'cn' => 'TikTok',
+                    LanguageFixture::GERMAN => 'TikTok',
+                    LanguageFixture::ENGLISH => 'TikTok',
+                    LanguageFixture::CHINESE => 'TikTok',
                 ],
             ],
             [
                 MenuLocation::BottomCol4,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('cms_' . md5('imprint'), Cms::class),
+                $this->getRefCms(CmsFixture::IMPRINT),
                 [
-                    'de' => 'Impressum',
-                    'en' => 'Imprint',
-                    'cn' => '印象深刻',
+                    LanguageFixture::GERMAN => 'Impressum',
+                    LanguageFixture::ENGLISH => 'Imprint',
+                    LanguageFixture::CHINESE => '印象深刻',
                 ],
             ],
             [
                 MenuLocation::BottomCol4,
                 MenuVisibility::Everyone,
                 MenuType::Cms,
-                $this->getReference('cms_' . md5('privacy'), Cms::class),
+                $this->getRefCms(CmsFixture::PRIVACY),
                 [
-                    'de' => 'Datenschutz',
-                    'en' => 'Privacy',
-                    'cn' => '数据保护',
+                    LanguageFixture::GERMAN => 'Datenschutz',
+                    LanguageFixture::ENGLISH => 'Privacy',
+                    LanguageFixture::CHINESE => '数据保护',
                 ],
             ],
         ];

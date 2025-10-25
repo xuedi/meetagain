@@ -12,7 +12,7 @@ install:
     {{EXEC}} composer install
     {{EXEC}} php bin/console cache:clear
     {{EXEC}} php bin/console doctrine:migrations:migrate -q
-    {{EXEC}} php bin/console doctrine:fixtures:load -q
+    {{EXEC}} php bin/console doctrine:fixtures:load -q --group=base
     {{EXEC}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{EXEC}} php bin/console app:event:extent
 
@@ -51,6 +51,7 @@ devReset:
     {{EXEC}} php bin/console doctrine:database:drop --force
     {{EXEC}} php bin/console doctrine:database:create
     {{JUST}} install
+    {{JUST}} clearCache
 
 dockerRebuild:
     {{DOCKER}} build --no-cache php

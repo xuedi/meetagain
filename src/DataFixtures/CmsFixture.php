@@ -3,33 +3,35 @@
 namespace App\DataFixtures;
 
 use App\Entity\Cms;
-use App\Entity\User;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class CmsFixture extends Fixture implements DependentFixtureInterface
+class CmsFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    #[\Override]
+    public const string INDEX = 'index';
+    public const string PRIVACY = 'privacy';
+    public const string ABOUT = 'about';
+    public const string IMPRINT = 'imprint';
+
     public function load(ObjectManager $manager): void
     {
-        echo 'Creating cms pages ... ';
+        $this->start();
         foreach ($this->getData() as [$slug]) {
             $cms = new Cms();
             $cms->setSlug($slug);
             $cms->setCreatedAt(new DateTimeImmutable());
-            $cms->setCreatedBy($this->getReference('user_' . md5('import'), User::class));
+            $cms->setCreatedBy($this->getRefUser(UserFixture::IMPORT));
             $cms->setPublished(true);
 
             $manager->persist($cms);
-            $this->addReference('cms_' . md5((string) $slug), $cms);
+            $this->addRefCms($slug, $cms);
         }
         $manager->flush();
-        echo 'OK' . PHP_EOL;
+        $this->stop();
     }
 
-    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -37,13 +39,18 @@ class CmsFixture extends Fixture implements DependentFixtureInterface
         ];
     }
 
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
+
     private function getData(): array
     {
         return [
-            ['imprint'],
-            ['privacy'],
-            ['about'],
-            ['index'],
+            [self::INDEX],
+            [self::PRIVACY],
+            [self::ABOUT],
+            [self::IMPRINT],
         ];
     }
 }

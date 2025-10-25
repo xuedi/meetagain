@@ -1,58 +1,92 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\EventIntervals;
+use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
-use App\Entity\Host;
-use App\Entity\Location;
-use App\Entity\User;
+use App\Entity\ImageType;
+use App\Service\ImageService;
 use DateTime;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class EventFixture extends Fixture implements DependentFixtureInterface
+class EventFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
-    private const bool IS_INITIAL = true;
-    private const null NO_RECURRING_OF = null;
-    private const null NO_RECURRING_RULE = null;
+    public const string WEDNESDAY_MEETUP = 'Regular Wednesday meetup';
 
-    #[\Override]
-    public function load(ObjectManager $manager): void
+    public function __construct(private readonly ImageService $imageService)
     {
-        echo 'Creating events ... ';
-        foreach ($this->getData() as $data) {
-            [$initial, $start, $stop, $name, $recOf, $recRules, $location, $hosts, $rsvps, $type, $featured] = $data;
-            $event = new Event();
-            $event->setInitial($initial);
-            $event->setPublished(true);
-            $event->setFeatured($featured);
-            $event->setStart($this->setDateType($start));
-            $event->setStop($this->setDateType($stop));
-            $event->setRecurringOf($recOf);
-            $event->setRecurringRule($recRules);
-            $event->setUser($this->getReference('user_' . md5('import'), User::class));
-            $event->setLocation($this->getReference('location_' . md5((string) $location), Location::class));
-            $event->setCreatedAt(new DateTimeImmutable());
-            $event->setType($type);
-            foreach ($hosts as $user) {
-                $event->addHost($this->getReference('host_' . md5((string) $user), Host::class));
-            }
-            foreach ($rsvps as $user) {
-                $event->addRsvp($this->getReference('user_' . md5((string) $user), User::class));
-            }
-
-            $manager->persist($event);
-            $this->addReference('event_' . md5((string) $name), $event);
-        }
-        $manager->flush();
-        echo 'OK' . PHP_EOL;
     }
 
-    #[\Override]
+    public function load(ObjectManager $manager): void
+    {
+        $this->start();
+        foreach ($this->getData() as $data) {
+            $event = new Event();
+            $event->setInitial(true);
+            $event->setPublished(true);
+            $event->setFeatured($data['featured'] ?? false);
+            $event->setStart($data['start']);
+            $event->setStop($data['stop']);
+            $event->setRecurringOf($data['recurringOf'] ?? null);
+            $event->setRecurringRule($data['recurringRule'] ?? null);
+            $event->setUser($data['createdBy']);
+            $event->setLocation($data['location']);
+            $event->setCreatedAt(new DateTimeImmutable());
+            $event->setType($data['type']);
+
+            foreach ($data['hosts'] as $host) {
+                $event->addHost($this->getRefHost($host));
+            }
+            foreach ($data['rsvps'] as $rsvpUser) {
+                $event->addRsvp($this->getRefUser($rsvpUser));
+            }
+
+            // upload file and create thumbnails
+            $imageFile = __DIR__ . "/Event/" . $data['previewImage'];
+            $uploadedImage = new UploadedFile($imageFile, $event->getId() . '.jpg');
+            $image = $this->imageService->upload($uploadedImage, $data['createdBy'], ImageType::EventTeaser);
+            $this->imageService->createThumbnails($image);
+            $event->setPreviewImage($image);
+            $manager->persist($event);
+
+            // add contents
+            foreach ($data['content'] as $language => $contentData) {
+                $eventTranslation = new EventTranslation();
+                $eventTranslation->setEvent($event);
+                $eventTranslation->setLanguage($language);
+                $eventTranslation->setTitle($contentData['title']);
+                $eventTranslation->setTeaser($contentData['teaser']);
+                $eventTranslation->setDescription($contentData['description']);
+                $manager->persist($eventTranslation);
+            }
+
+            // add comments
+            foreach ($data['comments'] as $commentData) {
+                $comment = new Comment();
+                $comment->setEvent($event);
+                $comment->setUser($this->getRefUser($commentData['user']));
+                $comment->setCreatedAt(DateTimeImmutable::createFromMutable($commentData['date']));
+                $comment->setContent($commentData['msg']);
+                $manager->persist($comment);
+            }
+
+
+            $manager->persist($event);
+            $this->addRefEvent($data['name'], $event);
+        }
+        $manager->flush();
+        $this->stop();
+    }
+
     public function getDependencies(): array
     {
         return [
@@ -62,198 +96,85 @@ class EventFixture extends Fixture implements DependentFixtureInterface
         ];
     }
 
-    public function getEventNames(): array
+    public static function getGroups(): array
     {
-        $nameList = [];
-        foreach ($this->getData() as $data) {
-            $nameList[] = $data[3];
-        }
-
-        return $nameList;
+        return ['base'];
     }
 
     private function getData(): array
     {
         return [
             [
-                self::IS_INITIAL,
-                '2015-02-26 19:30',
-                '2015-02-26 22:30',
-                'Let\'s meet up and talk Chinese!',
-                self::NO_RECURRING_OF,
-                self::NO_RECURRING_RULE,
-                'St. Oberholz',
-                ['Adem Lane', 'admin'],
-                [
-                    'Adil Floyd',
-                    'Aston Hood',
-                    'Bailey Richards',
-                    'Bec Ferguson',
-                    'Danyal Lester',
-                    'Demi Wilkinson',
-                    'Freya Browning',
-                    'Kaitlin Hale',
-                    'Molly Vaughan',
-                    'Nic Fassbender',
-                    'Orlando Diggs',
-                    'Owen Garcia',
-                    'axisbos audax',
-                    'admin',
-                    'Adem Lane',
-                    'Crystal Liu',
+                'start' => $this->getWednesdayMeetupDate(),
+                'stop' => $this->getWednesdayMeetupDate()->modify('+3 hour'),
+                'name' => self::WEDNESDAY_MEETUP,
+                'location' => $this->getRefLocation(LocationFixture::SPREE_BLICK),
+                'type' => EventTypes::Regular,
+                'featured' => true,
+                'recurringRule' => EventIntervals::Weekly,
+                'createdBy' => $this->getRefUser(UserFixture::ADEM_LANE),
+                'previewImage' => 'preview_wednesday_meetup.jpg',
+                'hosts' => [
+                    HostFixture::ADMIN,
+                    HostFixture::ADEM,
+                    HostFixture::CRYSTAL,
                 ],
-                EventTypes::Regular,
-                true,
-            ],
-            [
-                self::IS_INITIAL,
-                '2015-09-18 20:00',
-                '2015-09-18 22:30',
-                'Spicy Chinese dinner at a Sichuan restaurant',
-                self::NO_RECURRING_OF,
-                self::NO_RECURRING_RULE,
-                'Grand Tang',
-                ['Adem Lane', 'admin'],
-                [
-                    'Adil Floyd',
-                    'Lana Steiner',
-                    'Leyton Fields',
-                    'Lyle Kauffman',
-                    'Zuzanna Burke',
-                    'axisbos audax',
-                    'admin',
-                    'Adem Lane',
-                    'Crystal Liu',
+                'rsvps' => [
+                    UserFixture::ADMIN,
+                    UserFixture::CRYSTAL_LIU,
+                    UserFixture::ADEM_LANE,
+                    UserFixture::ALISA_HESTER,
+                    UserFixture::JESSIE_MEYTON,
+                    UserFixture::MOLLIE_HALL,
                 ],
-                EventTypes::Dinner,
-                true,
-            ],
-            [
-                self::IS_INITIAL,
-                '2015-09-26 17:00',
-                '2015-09-26 20:30',
-                '中秋节 - Mid Autumn festival',
-                self::NO_RECURRING_OF,
-                self::NO_RECURRING_RULE,
-                'Garten der Welt',
-                ['Adem Lane'],
-                [
-                    'Amanda Lowery',
-                    'Anita Cruz',
-                    'Florence Shaw',
-                    'Jessie Meyton',
-                    'Jonathan Kelly',
-                    'Marco Kelly',
-                    'Priya Shepard',
-                    'admin',
-                    'Adem Lane',
+                'content' => [
+                    'en' => [
+                        'title' => self::WEDNESDAY_MEETUP,
+                        'teaser' => $this->getText('wednesday_meetup_teaser_en'),
+                        'description' => $this->getText('wednesday_meetup_description_en'),
+                    ],
+                    'de' => [
+                        'title' => 'Mittwochs-Treffen',
+                        'teaser' => $this->getText('wednesday_meetup_teaser_de'),
+                        'description' => $this->getText('wednesday_meetup_description_de'),
+                    ],
+                    'cn' => [
+                        'title' => '周三聚会',
+                        'teaser' => $this->getText('wednesday_meetup_teaser_cn'),
+                        'description' => $this->getText('wednesday_meetup_description_cn'),
+                    ],
                 ],
-                EventTypes::Outdoor,
-                true,
-            ],
-            [
-                self::IS_INITIAL,
-                '2016-07-01 19:30',
-                '2016-07-01 20:30',
-                '下馆子！Let’s go eat!',
-                self::NO_RECURRING_OF,
-                self::NO_RECURRING_RULE,
-                'Lao Xiang',
-                ['Adem Lane'],
-                [
-                    'Ayah Wilkinson',
-                    'Billie Wright',
-                    'Herbert Fowler',
-                    'Jay Shepard',
-                    'Leyton Fields',
-                    'Maddison Gillespie',
-                    'Marco Kelly',
-                    'admin',
-                    'Adem Lane',
-                ],
-                EventTypes::Dinner,
-                true,
-            ],
-            [
-                self::IS_INITIAL,
-                '2020-09-03 19:00',
-                '2020-09-03 20:00',
-                'Outdoor Meetup at Himmelbeet',
-                self::NO_RECURRING_OF,
-                self::NO_RECURRING_RULE,
-                'Himmelbeet',
-                ['admin', 'Adem Lane'],
-                [
-                    'Crystal Liu',
-                    'Adil Floyd',
-                    'Aston Hood',
-                    'Ayah Wilkinson',
-                    'Jay Shepard',
-                    'Marco Gross',
-                    'Phoenix Baker',
-                    'Rory Huff',
-                    'admin',
-                ],
-                EventTypes::Outdoor,
-                true,
-            ],
-            [
-                self::IS_INITIAL,
-                '2024-09-19 19:00',
-                '2024-09-19 22:30',
-                '定期活动 - Regular meetup',
-                self::NO_RECURRING_OF,
-                EventIntervals::BiMonthly,
-                'Volksbar',
-                ['Adem Lane', 'admin'],
-                [
-                    'Adil Floyd',
-                    'Aysha Becker',
-                    'Bailey Richards',
-                    'Belle Woods',
-                    'Benedict Doherty',
-                    'Eduard Franz',
-                    'Koray Okumus',
-                    'Youssef Roberson',
-                    'admin',
-                    'Adem Lane',
-                    'Crystal Liu',
-                ],
-                EventTypes::Regular,
-                false,
-            ],
-            [
-                self::IS_INITIAL,
-                '2025-02-26 19:30',
-                '2025-02-26 22:30',
-                '生日快乐 - Meetup get one year older',
-                self::NO_RECURRING_OF,
-                EventIntervals::Yearly,
-                'Volksbar',
-                ['Adem Lane', 'admin'],
-                [
-                    'Benedict Doherty',
-                    'Byron Robertson',
-                    'Isobel Fuller',
-                    'Levi Rocha',
-                    'Nala Goins',
-                    'Priya Shepard',
-                    'Zara Bush',
-                    'admin',
-                    'Adem Lane',
-                ],
-                EventTypes::Dinner,
-                true,
+                'comments' => [
+                    [
+                        'date' => $this->getWednesdayMeetupDate()->modify('+18 hour'),
+                        'user' => UserFixture::ADMIN,
+                        'msg' => 'Cool event',
+                    ],
+                    [
+                        'date' => $this->getWednesdayMeetupDate()->modify('+20 hour'),
+                        'user' => UserFixture::ADEM_LANE,
+                        'msg' => 'it was, but very lonely',
+                    ],
+                    [
+                        'date' => $this->getWednesdayMeetupDate()->modify('+21 hour'),
+                        'user' => UserFixture::ADMIN,
+                        'msg' => '@Adem, we for sure won a lot',
+                    ],
+                    [
+                        'date' => $this->getWednesdayMeetupDate()->modify('+22 hour'),
+                        'user' => UserFixture::CRYSTAL_LIU,
+                        'msg' => 'Next time i will have my revenge',
+                    ],
+                ]
             ],
         ];
     }
 
-    private function setDateType(null|string $text): null|DateTime
+    private function getWednesdayMeetupDate(): DateTime
     {
-        if ($text === null || $text === '' || $text === '0') {
-            return null;
-        }
-
-        return new DateTime($text);
+        return new DateTime('now')
+            ->modify('-7 days')
+            ->modify('first wednesday')
+            ->setTime(18, 00);
     }
 }
