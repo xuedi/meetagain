@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.9.0-php8.4.10-bookworm
+FROM dunglas/frankenphp:1.9.0-php8.4.10-bookworm@sha256:0b6617c1cc1a77f49bebad093fa0d38e8a95d666facec7543f8f41e2ef17af24
 
 WORKDIR /var/www/html
 

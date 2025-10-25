@@ -23,7 +23,7 @@ services:
     tty: true
 
   mariadb:
-    image: mariadb:12.0.2
+    image: mariadb:12.0.2@sha256:5b6a1eac15b85b981a61afb89aea2a22bf76b5f58809d05f0bcc13ab6ec44cb8
     container_name: "ma-db"
     volumes:
       - ma-mysql-data:/var/lib/mysql
@@ -38,7 +38,7 @@ services:
 
   mailhog:
     container_name: "ma-mailhog"
-    image: mailhog/mailhog:v1.0.1
+    image: mailhog/mailhog:v1.0.1@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
     user: ${HOST_UID}:${HOST_GID}
     ports:
       - "1025:1025"
@@ -46,7 +46,7 @@ services:
 
   valkey:
     container_name: "ma-valkey"
-    image: valkey/valkey:latest
+    image: valkey/valkey:latest@sha256:4503e204c900a00ad393bec83c8c7c4c76b0529cd629e23b34b52011aefd1d27
 
 volumes:
   ma-mysql-data:
