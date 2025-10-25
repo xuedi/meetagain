@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_dishes_title_new"|trans }}{% endblock %}
+{% block title %}{{ "page_plugin_dishes_title_details"|trans }} - {{ dish.getTranslatedName(app.locale) }}{% endblock %}
 
 {% block body %}
 
