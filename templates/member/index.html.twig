@@ -5,7 +5,7 @@
 {% block body %}
     <section class="section">
         <div class="container">
-            <h1 class="title is-3">Members</h1>
+            <h1 class="title is-3">{{ 'page_title_member' | trans }}</h1>
 
             <div class="columns is-multiline">
                 {% for user in users %}
@@ -43,8 +43,11 @@
 
                 <div class="has-text-centered mt-4">
                     <p class="help">
-                        Showing page {{ pageCurrent }} of {{ pageTotal }}
-                        ({{ userTotal }} total members)
+                        {{ 'member_pageview_information' | trans ({
+                            '%pageCurrent%': pageCurrent,
+                            '%pageTotal%': pageTotal,
+                            '%userTotal%': userTotal
+                        }) }}
                     </p>
                 </div>
             {% endif %}
