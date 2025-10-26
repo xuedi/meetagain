@@ -196,6 +196,17 @@ class MenuFixture extends AbstractFixture implements DependentFixtureInterface, 
                     LanguageFixture::CHINESE => '数据保护',
                 ],
             ],
+            [
+                MenuLocation::BottomCol2,
+                MenuVisibility::User,
+                MenuType::Route,
+                MenuRoutes::Translation,
+                [
+                    LanguageFixture::GERMAN => 'Übersetzen',
+                    LanguageFixture::ENGLISH => 'Translate',
+                    LanguageFixture::CHINESE => '翻译',
+                ],
+            ],
         ];
     }
 }

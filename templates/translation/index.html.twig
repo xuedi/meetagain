@@ -23,21 +23,25 @@
                     <tr>
                         <td>{{ key }}</td>
                         {% for enabledLocale in app.enabled_locales %}
-                            {% set value = translation[enabledLocale]['value'] %}
-                            {% set id = translation[enabledLocale]['id'] %}
-                            {% if value is null or value is empty %}
-                                {% set warning = 'is-warning has-background-warning-light' %}
-                            {% else %}
-                                {% set warning = '' %}
-                            {% endif %}
-                            <td class="{{ warning }}">
-                                {% if is_granted('ROLE_USER') %}
-                                <a href="{{ path('app_translation_edit', {'id': id, 'lang': enabledLocale}) }}">
-                                    <span class="icon is-small"><i class="fas fa-edit has-text-grey-light"></i></span>
-                                </a>
+                            {% if translation[enabledLocale] is defined %}
+                                {% set value = translation[enabledLocale]['value'] ?? '' %}
+                                {% set id = translation[enabledLocale]['id'] %}
+                                {% if value is null or value is empty %}
+                                    {% set warning = 'is-warning has-background-warning-light' %}
+                                {% else %}
+                                    {% set warning = '' %}
                                 {% endif %}
-                                {{ value }}
-                            </td>
+                                <td class="{{ warning }}">
+                                    {% if is_granted('ROLE_USER') %}
+                                        <a href="{{ path('app_translation_edit', {'id': id, 'lang': enabledLocale}) }}">
+                                            <span class="icon is-small"><i class="fas fa-edit has-text-grey-light"></i></span>
+                                        </a>
+                                    {% endif %}
+                                    {{ value }}
+                                </td>
+                            {% else %}
+                                <td class="is-danger">Error on value not readable</td>
+                            {% endif %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
