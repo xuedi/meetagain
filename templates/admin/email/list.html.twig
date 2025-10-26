@@ -1,0 +1,35 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% for name,email in emails %}
+            <div class="columns">
+                <div class="column is-7">
+                    <div class="box">
+                        <p>Subject: <b>{{ email.subject }}</b></p>
+                        <br>
+                        <p>
+                            {% include email.template with email.context %}
+                        </p>
+                    </div>
+                </div>
+                <div class="column">
+                    <h4 class="heading">{{ name }}</h4>
+                    <table class="table is-narrow is-fullwidth">
+                        {% for key,value in email.context %}
+                            <tr>
+                                <th>{{ key }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}
+

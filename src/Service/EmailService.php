@@ -124,6 +124,68 @@ readonly class EmailService
         return $this->addToEmailQueue($email);
     }
 
+    public function getMockEmailList(): array
+    {
+        return [
+            'email_message_notification' => [
+                'subject' => 'You received a message from %senderName%',
+                'template' => '_emails/notification_message.html.twig',
+                'context' => [
+                    'username' => 'John Doe',
+                    'sender' => 'john.doe@example.org',
+                    'senderId' => 1,
+                    'host' => 'https://localhost/en',
+                    'lang' => 'en',
+                ]
+            ],
+            'email_rsvp_notification' => [
+                'subject' => 'A user you follow plans to attend an event',
+                'template' => '_emails/notification_rsvp.html.twig',
+                'context' => [
+                    'username' => 'John Doe',
+                    'followedUserName' => 'Denis Matrens',
+                    'eventLocation' => 'NightBar 64',
+                    'eventDate' => '2025-01-01',
+                    'eventId' => 1,
+                    'eventTitle' => 'Go tournament afterparty',
+                    'host' => 'https://localhost/en',
+                    'lang' => 'en',
+                ]
+            ],
+            'email_welcome' => [
+                'subject' => 'Welcome!',
+                'template' => '_emails/welcome.html.twig',
+                'context' => [
+                    'host' => 'https://localhost/en',
+                    'url' => 'https://localhost/en',
+                    'lang' => 'en',
+                ]
+            ],
+            'email_verification_request' => [
+                'subject' => 'Please Confirm your Email',
+                'template' => '_emails/verification_request.html.twig',
+                'context' => [
+                    'host' => 'https://localhost/en',
+                    'token' => '1234567890',
+                    'username' => 'John Doe',
+                    'url' => 'https://localhost/en',
+                    'lang' => 'en',
+                ]
+            ],
+            'email_password_reset_request' => [
+                'subject' => 'Password reset request',
+                'template' => '_emails/password_reset_request.html.twig',
+                'context' => [
+                    'host' => 'https://localhost/en',
+                    'token' => '1234567890',
+                    'lang' => 'en',
+                    'username' => 'John Doe',
+                ]
+            ]
+        ];
+    }
+
+
     public function sendQueue(): void
     {
         $mails = $this->mailRepo->findBy(['sendAt' => null], ['id' => 'ASC'], 1000);

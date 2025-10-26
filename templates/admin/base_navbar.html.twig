@@ -3,6 +3,7 @@
     <ul class="menu-list">
         <li><a class="{% if active == 'plugin' %}is-active{% endif %}" href="{{ path('app_admin_plugin') }}">{{ "menu_admin_plugin" | trans }}</a></li>
         <li><a class="{% if active == 'system' %}is-active{% endif %}" href="{{ path('app_admin_system') }}">{{ "menu_admin_system" | trans }}</a></li>
+        <li><a class="{% if active == 'email' %}is-active{% endif %}" href="{{ path('app_admin_email') }}">{{ "menu_admin_email" | trans }}</a></li>
     </ul>
     <p class="menu-label">Tables</p>
     <ul class="menu-list">
