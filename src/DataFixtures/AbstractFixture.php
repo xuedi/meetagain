@@ -21,7 +21,6 @@ abstract class AbstractFixture extends Fixture
         $entityName = substr($methodName, 6);
         $entityClass = sprintf("App\\Entity\\%s", $entityName);
         if (!class_exists($entityClass)) {
-            //$entityClass = sprintf("App\\DataFixtures\\%sFixture", $entityName);
             throw new RuntimeException('Class ' . $entityClass . ' does not exist!');
         }
 
@@ -58,17 +57,17 @@ abstract class AbstractFixture extends Fixture
         return $this->fs->readFile($file);
     }
 
-    public function start($dynamic = false): void
+    protected function start($dynamic = false): void
     {
         echo 'Creating ' . $this->getClassName() . ' ...';
     }
 
-    public function tick(): void
+    protected function tick(): void
     {
         echo '.';
     }
 
-    public function stop(): void
+    protected function stop(): void
     {
         echo ' OK' . PHP_EOL;
     }
