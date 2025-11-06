@@ -21,6 +21,7 @@ abstract class AbstractFixture extends Fixture
         $entityName = substr($methodName, 6);
         $entityClass = sprintf("App\\Entity\\%s", $entityName);
         if (!class_exists($entityClass)) {
+            //$entityClass = sprintf("App\\DataFixtures\\%sFixture", $entityName);
             throw new RuntimeException('Class ' . $entityClass . ' does not exist!');
         }
 
