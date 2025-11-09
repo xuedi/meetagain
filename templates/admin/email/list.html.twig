@@ -14,7 +14,7 @@
         </div>
 
         {% for name,email in emails %}
-            <div class="content has-background-grey-lighter p-3 mt-6 is-large">{{ name | trans }}</div>
+            <div class="content has-background-grey-lighter p-3 mt-6 is-large">{{ name | lower | trans }}</div>
             <div class="columns">
                 <div class="column is-7">
                     <div class="box">
