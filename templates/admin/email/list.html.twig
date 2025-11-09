@@ -4,7 +4,17 @@
 
     <div class="container">
 
+        <div class="content">
+            <h1 class="title">Email Templates</h1>
+            <p>
+                These are all the emails the website is sending out for various events, on the right
+                side are the variables that can be used inside the email templates. The functionality
+                to edit the email templates is not yet implemented. (coming soon)
+            </p>
+        </div>
+
         {% for name,email in emails %}
+            <div class="content has-background-grey-lighter p-3 mt-6 is-large">{{ name | trans }}</div>
             <div class="columns">
                 <div class="column is-7">
                     <div class="box">
@@ -16,7 +26,6 @@
                     </div>
                 </div>
                 <div class="column">
-                    <h4 class="heading">{{ name }}</h4>
                     <table class="table is-narrow is-fullwidth">
                         {% for key,value in email.context %}
                             <tr>
