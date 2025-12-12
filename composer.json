@@ -23,7 +23,7 @@
     "doctrine/dbal": "^4",
     "doctrine/doctrine-bundle": "^3.0",
     "doctrine/doctrine-fixtures-bundle": "^4",
-    "doctrine/doctrine-migrations-bundle": "^3.3",
+    "doctrine/doctrine-migrations-bundle": "^4",
     "doctrine/orm": "^3.3",
     "knplabs/knp-time-bundle": "^2.4",
     "nikic/php-parser": "^5",
