@@ -93,7 +93,9 @@ class EventRepository extends ServiceEntityRepository
     {
         $now = new DateTime()->setTime(0, 0, 0);
         foreach ($this->findBy([], ['start' => 'ASC']) as $event) {
-            $start = $event->getStart()->setTime(0, 0);
+            /** @var DateTime $start */
+            $start = clone $event->getStart();
+            $start->setTime(0, 0);
             if ($start > $now) { // first bigger than today
                 return $event->getId();
             }

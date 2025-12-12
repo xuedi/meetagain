@@ -13,8 +13,8 @@ class SocialController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly \App\Repository\UserRepository $repo,
-        private readonly \App\Service\FriendshipService $service,
+        private readonly UserRepository $repo,
+        private readonly FriendshipService $service,
     ) {
     }
 
@@ -34,7 +34,7 @@ class SocialController extends AbstractController
     #[Route('/profile/social/friends/', name: 'app_profile_social_friends')]
     public function socialFriends(): Response
     {
-        return $this->social($this->repo, 'friends');
+        return $this->social('friends');
     }
 
     #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow')]

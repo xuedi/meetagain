@@ -141,6 +141,11 @@ readonly class EventService
                 continue;
             }
 
+            /** @var DateTime $eventStart */
+            $eventStart = $event->getStart();
+            /** @var DateTime $eventStop */
+            $eventStop = $event->getStop();
+
             $recurringEvent = new Event();
             $recurringEvent->setUser($event->getUser());
             $recurringEvent->setPublished($event->isPublished());
@@ -148,8 +153,8 @@ readonly class EventService
             $recurringEvent->setLocation($event->getLocation());
             $recurringEvent->setPreviewImage($event->getPreviewImage());
             $recurringEvent->setInitial(false);
-            $recurringEvent->setStart($this->updateDate($event->getStart(), $occurrence));
-            $recurringEvent->setStop($this->updateDate($event->getStop(), $occurrence));
+            $recurringEvent->setStart($this->updateDate($eventStart, $occurrence));
+            $recurringEvent->setStop($this->updateDate($eventStop, $occurrence));
             $recurringEvent->setRecurringOf($event->getId());
             $recurringEvent->setRecurringRule(null);
             $recurringEvent->setCreatedAt(new DateTimeImmutable());
@@ -173,7 +178,7 @@ readonly class EventService
         }
     }
 
-    private function updateDate(DateTimeInterface $target, DateTime $occurrence): DateTimeInterface
+    private function updateDate(DateTime $target, DateTime $occurrence): DateTime
     {
         $newDate = clone $target;
         $newDate->setDate(

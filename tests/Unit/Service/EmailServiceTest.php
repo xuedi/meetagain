@@ -49,7 +49,7 @@ final class EmailServiceTest extends TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($entity) use ($user) {
+            ->with($this->callback(function ($entity) {
                 $this->assertInstanceOf(EmailQueue::class, $entity);
                 /** @var EmailQueue $entity */
                 $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
