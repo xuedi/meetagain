@@ -1,10 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
+use App\Entity\Event;
 use App\Repository\EventRepository;
 use App\Service\CmsService;
 use App\Service\SitemapService;
+use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -22,8 +26,8 @@ class SitemapServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->environmentMock = $this->createMock(Environment::class);
-        $this->cmsServiceMock = $this->createMock(CmsService::class);
-        $this->eventRepositoryMock = $this->createMock(EventRepository::class);
+        $this->cmsServiceMock = $this->createStub(CmsService::class);
+        $this->eventRepositoryMock = $this->createStub(EventRepository::class);
         $this->parameterBagInterfaceMock = $this->createMock(ParameterBagInterface::class);
 
         $this->subject = new SitemapService(
@@ -41,17 +45,17 @@ class SitemapServiceTest extends TestCase
         $locales = ['en', 'de'];
         $renderedContent = '<?xml version="1.0" encoding="UTF-8"?><urlset></urlset>';
 
-        // Mock CMS sites
-        $cmsSite = $this->createMock(\App\Entity\Cms::class);
+        // Use a stub for CMS sites (no interaction expectations needed)
+        $cmsSite = $this->createStub(\App\Entity\Cms::class);
         $cmsSite->method('getSlug')->willReturn('about');
-        $cmsSite->method('getCreatedAt')->willReturn(new \DateTimeImmutable('2025-01-01'));
+        $cmsSite->method('getCreatedAt')->willReturn(new DateTimeImmutable('2025-01-01'));
 
         $this->cmsServiceMock->method('getSites')->willReturn([$cmsSite]);
 
-        // Mock events
-        $event = $this->createMock(\App\Entity\Event::class);
+        // Use a stub for events (no interaction expectations needed)
+        $event = $this->createStub(Event::class);
         $event->method('getId')->willReturn(123);
-        $event->method('getStart')->willReturn(new \DateTime('2025-02-01'));
+        $event->method('getStart')->willReturn(new DateTime('2025-02-01'));
 
         $this->eventRepositoryMock->method('findAll')->willReturn([$event]);
 
@@ -112,7 +116,7 @@ class SitemapServiceTest extends TestCase
 
         $this->assertContains([
             'loc' => 'https://example.com/en/events',
-            'lastmod' => new \DateTime()->format('Y-m-d'),
+            'lastmod' => new DateTime()->format('Y-m-d'),
             'prio' => 0.9,
         ], $capturedSites);
     }

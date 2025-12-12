@@ -18,8 +18,8 @@ class PluginServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->commandServiceMock = $this->createMock(CommandService::class);
-        $this->filesystemMock = $this->createMock(ExtendedFilesystem::class);
+        $this->commandServiceMock = $this->createStub(CommandService::class);
+        $this->filesystemMock = $this->createStub(ExtendedFilesystem::class);
 
         // Create a temporary directory for testing
         $this->tempDir = sys_get_temp_dir() . '/plugin_service_test_' . uniqid();
@@ -65,9 +65,10 @@ class PluginServiceTest extends TestCase
         file_put_contents($pluginDir . '/plugin1/manifest.json', json_encode($manifest1));
         file_put_contents($pluginDir . '/plugin2/manifest.json', json_encode($manifest2));
 
-        // Mock plugin directory parsing
+        // Use a focused local mock to assert interactions for this test
         $pluginPaths = [$pluginDir . '/plugin1', $pluginDir . '/plugin2'];
-        $this->filesystemMock
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock
             ->method('getRealPath')
             ->willReturnCallback(function ($path) use ($pluginDir) {
                 if ($path === PluginService::PLUGIN_DIR) {
@@ -79,27 +80,29 @@ class PluginServiceTest extends TestCase
                 return false;
             });
 
-        $this->filesystemMock
+        $fsMock
             ->expects($this->once())
             ->method('glob')
             ->with($pluginDir . '/*', GLOB_ONLYDIR)
             ->willReturn($pluginPaths);
 
-        // Mock manifest file existence and content
-        $this->filesystemMock
+        // Manifest file existence and content
+        $fsMock
             ->method('fileExists')
             ->willReturnCallback(function ($path) {
                 return file_exists($path);
             });
 
-        $this->filesystemMock
+        $fsMock
             ->method('getFileContents')
             ->willReturnCallback(function ($path) {
                 return file_get_contents($path);
             });
 
+        $subject = new PluginService($this->commandServiceMock, $fsMock);
+
         // Call the method and verify the result
-        $result = $this->subject->getAdminList();
+        $result = $subject->getAdminList();
 
         // Assert that we got the expected plugins
         $this->assertCount(2, $result);
@@ -160,11 +163,13 @@ class PluginServiceTest extends TestCase
                 return true;
             });
 
-        // Verify that the commandService clearCache method will be called
-        $this->commandServiceMock->expects($this->once())->method('clearCache');
+        // Use a focused local mock to assert cache clear
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->once())->method('clearCache');
+        $subject = new PluginService($cmdMock, $this->filesystemMock);
 
         // Call the method
-        $this->subject->install('test-plugin');
+        $subject->install('test-plugin');
 
         // Verify that the plugin was installed (added to config file)
         $config = include $this->configFile;
@@ -261,7 +266,8 @@ class PluginServiceTest extends TestCase
     public function testUninstallEarlyReturnWhenNotInstalled(): void
     {
         // Mock filesystem methods
-        $this->filesystemMock
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock
             ->method('getRealPath')
             ->willReturnCallback(function ($path) {
                 if ($path === PluginService::CONFIG_DIR) {
@@ -270,14 +276,17 @@ class PluginServiceTest extends TestCase
                 return false;
             });
 
-        // Mock putFileContents to verify it's not called
-        $this->filesystemMock->expects($this->never())->method('putFileContents');
+        // putFileContents must not be called
+        $fsMock->expects($this->never())->method('putFileContents');
 
-        // Verify that the commandService clearCache method will not be called
-        $this->commandServiceMock->expects($this->never())->method('clearCache');
+        // CommandService clearCache must not be called
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->never())->method('clearCache');
+
+        $subject = new PluginService($cmdMock, $fsMock);
 
         // Try to uninstall a plugin that doesn't exist
-        $this->subject->uninstall('non-existent-plugin');
+        $subject->uninstall('non-existent-plugin');
 
         // Verify that the config file wasn't changed
         $config = include $this->configFile;
@@ -331,7 +340,8 @@ class PluginServiceTest extends TestCase
     public function testEnableEarlyReturnWhenNotInstalled(): void
     {
         // Mock filesystem methods
-        $this->filesystemMock
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock
             ->method('getRealPath')
             ->willReturnCallback(function ($path) {
                 if ($path === PluginService::CONFIG_DIR) {
@@ -340,14 +350,17 @@ class PluginServiceTest extends TestCase
                 return false;
             });
 
-        // Mock putFileContents to verify it's not called
-        $this->filesystemMock->expects($this->never())->method('putFileContents');
+        // putFileContents must not be called
+        $fsMock->expects($this->never())->method('putFileContents');
 
-        // Verify that the commandService clearCache method will not be called
-        $this->commandServiceMock->expects($this->never())->method('clearCache');
+        // CommandService clearCache must not be called
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->never())->method('clearCache');
+
+        $subject = new PluginService($cmdMock, $fsMock);
 
         // Try to enable a plugin that isn't installed
-        $this->subject->enable('non-existent-plugin');
+        $subject->enable('non-existent-plugin');
 
         // Verify that the config file wasn't changed
         $config = include $this->configFile;
@@ -446,7 +459,8 @@ class PluginServiceTest extends TestCase
     public function testDisableEarlyReturnWhenNotInstalled(): void
     {
         // Mock filesystem methods
-        $this->filesystemMock
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock
             ->method('getRealPath')
             ->willReturnCallback(function ($path) {
                 if ($path === PluginService::CONFIG_DIR) {
@@ -455,14 +469,17 @@ class PluginServiceTest extends TestCase
                 return false;
             });
 
-        // Mock putFileContents to verify it's not called
-        $this->filesystemMock->expects($this->never())->method('putFileContents');
+        // putFileContents must not be called
+        $fsMock->expects($this->never())->method('putFileContents');
 
-        // Verify that the commandService clearCache method will not be called
-        $this->commandServiceMock->expects($this->never())->method('clearCache');
+        // CommandService clearCache must not be called
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->never())->method('clearCache');
+
+        $subject = new PluginService($cmdMock, $fsMock);
 
         // Try to disable a plugin that isn't installed
-        $this->subject->disable('non-existent-plugin');
+        $subject->disable('non-existent-plugin');
 
         // Verify that the config file wasn't changed
         $config = include $this->configFile;
@@ -521,20 +538,21 @@ class PluginServiceTest extends TestCase
     public function testSetPluginConfigEarlyReturnWhenConfigPathIsFalse(): void
     {
         // Mock filesystem methods to return false for getRealPath
-        $this->filesystemMock = $this->createMock(ExtendedFilesystem::class);
-        $this->filesystemMock->method('getRealPath')->willReturn(false);
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock->method('getRealPath')->willReturn(false);
 
-        // Mock putFileContents to verify it's not called
-        $this->filesystemMock->expects($this->never())->method('putFileContents');
+        // putFileContents must not be called
+        $fsMock->expects($this->never())->method('putFileContents');
 
-        // Verify that the commandService clearCache method will not be called
-        $this->commandServiceMock->expects($this->never())->method('clearCache');
+        // CommandService clearCache must not be called
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->never())->method('clearCache');
 
         // Create a new subject with the mocked filesystem
-        $this->subject = new PluginService($this->commandServiceMock, $this->filesystemMock);
+        $subject = new PluginService($cmdMock, $fsMock);
 
         // Try to set plugin config
-        $this->subject->setPluginConfig(['test-plugin' => true]);
+        $subject->setPluginConfig(['test-plugin' => true]);
 
         // No assertion needed as we're verifying the methods are not called
     }

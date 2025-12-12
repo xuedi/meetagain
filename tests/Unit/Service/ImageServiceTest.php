@@ -40,8 +40,9 @@ class ImageServiceTest extends TestCase
         $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $this->configServiceMock = $this->createMock(ConfigService::class);
         $this->filesystemServiceMock = $this->createMock(ExtendedFilesystem::class);
-        $this->loggerMock = $this->createMock(LoggerInterface::class);
-        $this->twigMock = $this->createMock(Environment::class);
+        // Prefer stubs for passives; use focused local mocks in tests that assert interactions
+        $this->loggerMock = $this->createStub(LoggerInterface::class);
+        $this->twigMock = $this->createStub(Environment::class);
         $this->kernelProjectDir = '/tmp/project';
 
         // Create a real instance of ImageService with mocked dependencies
@@ -61,7 +62,7 @@ class ImageServiceTest extends TestCase
         // Test data
         $imageContent = 'test image content';
         $hash = sha1($imageContent);
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $type = ImageType::ProfilePicture;
 
         // Create existing image
@@ -89,7 +90,7 @@ class ImageServiceTest extends TestCase
             ->with($existingImage);
 
         // Mock uploaded file
-        $uploadedFile = $this->createMock(UploadedFile::class);
+        $uploadedFile = $this->createStub(UploadedFile::class);
         $uploadedFile->method('getContent')->willReturn($imageContent);
 
         // Call the method
@@ -108,7 +109,7 @@ class ImageServiceTest extends TestCase
         $extension = 'jpg';
         $size = 12345;
         $realPath = '/tmp/uploaded_file.jpg';
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $type = ImageType::ProfilePicture;
 
         // Mock image repository to return null (no existing image)
@@ -119,7 +120,7 @@ class ImageServiceTest extends TestCase
             ->willReturn(null);
 
         // Mock uploaded file
-        $uploadedFile = $this->createMock(UploadedFile::class);
+        $uploadedFile = $this->createStub(UploadedFile::class);
         $uploadedFile->method('getContent')->willReturn($imageContent);
         $uploadedFile->method('getMimeType')->willReturn($mimeType);
         $uploadedFile->method('guessExtension')->willReturn($extension);
@@ -166,12 +167,12 @@ class ImageServiceTest extends TestCase
         // Create a partial mock of ImageService to override Imagick-related functionality
         $subject = $this->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
-                $this->imageRepoMock,
-                $this->entityManagerMock,
-                $this->configServiceMock,
-                $this->filesystemServiceMock,
-                $this->loggerMock,
-                $this->twigMock,
+                $this->createStub(ImageRepository::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(ConfigService::class),
+                $this->createStub(ExtendedFilesystem::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['createThumbnails'])
@@ -183,7 +184,7 @@ class ImageServiceTest extends TestCase
         $thumbnailSizes = [[100, 100], [200, 200]];
 
         // Mock image
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
         $image->method('getHash')->willReturn($hash);
         $image->method('getExtension')->willReturn($extension);
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
@@ -203,12 +204,12 @@ class ImageServiceTest extends TestCase
         // Create a partial mock of ImageService to override Imagick-related functionality
         $subject = $this->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
-                $this->imageRepoMock,
-                $this->entityManagerMock,
-                $this->configServiceMock,
-                $this->filesystemServiceMock,
-                $this->loggerMock,
-                $this->twigMock,
+                $this->createStub(ImageRepository::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(ConfigService::class),
+                $this->createStub(ExtendedFilesystem::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['rotateThumbNail'])
@@ -218,7 +219,7 @@ class ImageServiceTest extends TestCase
         $hash = 'test_hash';
 
         // Mock image
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
         $image->method('getHash')->willReturn($hash);
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
 
@@ -272,11 +273,11 @@ class ImageServiceTest extends TestCase
         $subject = $this->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
                 $this->imageRepoMock,
-                $this->entityManagerMock,
+                $this->createStub(EntityManagerInterface::class),
                 $this->configServiceMock,
-                $this->filesystemServiceMock,
-                $this->loggerMock,
-                $this->twigMock,
+                $this->filesystemServiceMock, // keep mock, we assert interactions below
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
@@ -410,8 +411,8 @@ class ImageServiceTest extends TestCase
         $imageId = 123;
         $expectedHtml = '<div>rendered template</div>';
 
-        // Create mock image
-        $image = $this->createMock(Image::class);
+        // Create stub image (no interaction expectations required)
+        $image = $this->createStub(Image::class);
 
         // Mock image repository to return the mock image
         $this->imageRepoMock
@@ -420,8 +421,9 @@ class ImageServiceTest extends TestCase
             ->with(['id' => $imageId])
             ->willReturn($image);
 
-        // Mock twig environment to return expected HTML
-        $this->twigMock
+        // Use a focused local Twig mock to assert rendering
+        $twigMock = $this->createMock(Environment::class);
+        $twigMock
             ->expects($this->once())
             ->method('render')
             ->with('_block/image.html.twig', [
@@ -430,8 +432,18 @@ class ImageServiceTest extends TestCase
             ])
             ->willReturn($expectedHtml);
 
+        $subject = new ImageService(
+            $this->imageRepoMock,
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(ConfigService::class),
+            $this->createStub(ExtendedFilesystem::class),
+            $this->loggerMock,
+            $twigMock,
+            $this->kernelProjectDir,
+        );
+
         // Call the method
-        $result = $this->subject->imageTemplateById($imageId);
+        $result = $subject->imageTemplateById($imageId);
 
         // Assert result
         $this->assertEquals($expectedHtml, $result);

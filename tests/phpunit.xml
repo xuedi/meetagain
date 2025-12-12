@@ -10,6 +10,8 @@
          displayDetailsOnTestsThatTriggerNotices="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnPhpunitNotices="true"
+         displayDetailsOnAllIssues="true"
          failOnRisky="true"
          failOnWarning="true"
          colors="true">

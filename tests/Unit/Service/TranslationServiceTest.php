@@ -32,19 +32,19 @@ class TranslationServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->requestMock = $this->createMock(Request::class);
-        $this->translationRepositoryMock = $this->createMock(TranslationRepository::class);
-        $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $this->commandServiceMock = $this->createMock(CommandService::class);
+        $this->requestMock = $this->createStub(Request::class);
+        $this->translationRepositoryMock = $this->createStub(TranslationRepository::class);
+        $this->entityManagerMock = $this->createStub(EntityManagerInterface::class);
+        $this->commandServiceMock = $this->createStub(CommandService::class);
 
         $this->subject = new TranslationService(
             $this->translationRepositoryMock,
-            $this->createMock(UserRepository::class),
+            $this->createStub(UserRepository::class),
             $this->entityManagerMock,
-            $this->createMock(Filesystem::class),
-            $this->createMock(ParameterBagInterface::class),
+            $this->createStub(Filesystem::class),
+            $this->createStub(ParameterBagInterface::class),
             $this->commandServiceMock,
-            $this->createMock(ConfigService::class),
+            $this->createStub(ConfigService::class),
             __DIR__ . '/tmp/',
         );
     }
@@ -74,7 +74,8 @@ class TranslationServiceTest extends TestCase
             ],
         ];
 
-        $this->translationRepositoryMock
+        $repoMock = $this->createMock(TranslationRepository::class);
+        $repoMock
             ->expects($this->once())
             ->method('findAll')
             ->willReturn([
@@ -96,7 +97,19 @@ class TranslationServiceTest extends TestCase
                     ->setTranslation('Translation A-EN'),
             ]);
 
-        $actual = $this->subject->getMatrix();
+        $subject = new TranslationService(
+            $repoMock,
+            $this->createStub(UserRepository::class),
+            // Use a stub here since this test does not assert on EntityManager interactions
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(Filesystem::class),
+            $this->createStub(ParameterBagInterface::class),
+            $this->commandServiceMock,
+            $this->createStub(ConfigService::class),
+            __DIR__ . '/tmp/',
+        );
+
+        $actual = $subject->getMatrix();
 
         $this->assertEquals($expected, $actual);
     }
@@ -117,14 +130,26 @@ class TranslationServiceTest extends TestCase
 
         $this->requestMock->method('getPayload')->willReturn(new InputBag(['1' => 'new_value']));
 
-        $this->entityManagerMock
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock
             ->expects($this->once())
             ->method('persist')
             ->with($translationEntity);
 
-        $this->entityManagerMock->expects($this->once())->method('flush');
+        $emMock->expects($this->once())->method('flush');
 
-        $this->subject->saveMatrix($this->requestMock);
+        $subject = new TranslationService(
+            $this->translationRepositoryMock,
+            $this->createStub(UserRepository::class),
+            $emMock,
+            $this->createStub(Filesystem::class),
+            $this->createStub(ParameterBagInterface::class),
+            $this->commandServiceMock,
+            $this->createStub(ConfigService::class),
+            __DIR__ . '/tmp/',
+        );
+
+        $subject->saveMatrix($this->requestMock);
 
         $this->assertEquals('new_value', $translationEntity->getTranslation());
     }
@@ -135,11 +160,22 @@ class TranslationServiceTest extends TestCase
 
         $this->requestMock->method('getPayload')->willReturn(new InputBag(['1' => '']));
 
-        $this->entityManagerMock->expects($this->never())->method('persist');
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->never())->method('persist');
+        $emMock->expects($this->once())->method('flush');
 
-        $this->entityManagerMock->expects($this->once())->method('flush');
+        $subject = new TranslationService(
+            $this->translationRepositoryMock,
+            $this->createStub(UserRepository::class),
+            $emMock,
+            $this->createStub(Filesystem::class),
+            $this->createStub(ParameterBagInterface::class),
+            $this->commandServiceMock,
+            $this->createStub(ConfigService::class),
+            __DIR__ . '/tmp/',
+        );
 
-        $this->subject->saveMatrix($this->requestMock);
+        $subject->saveMatrix($this->requestMock);
     }
 
     public function testSaveMatrixSkipsNonExistingTranslationKey(): void
@@ -149,11 +185,22 @@ class TranslationServiceTest extends TestCase
 
         $this->requestMock->method('getPayload')->willReturn(new InputBag(['1' => 'new_value']));
 
-        $this->entityManagerMock->expects($this->never())->method('persist');
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->never())->method('persist');
+        $emMock->expects($this->once())->method('flush');
 
-        $this->entityManagerMock->expects($this->once())->method('flush');
+        $subject = new TranslationService(
+            $this->translationRepositoryMock,
+            $this->createStub(UserRepository::class),
+            $emMock,
+            $this->createStub(Filesystem::class),
+            $this->createStub(ParameterBagInterface::class),
+            $this->commandServiceMock,
+            $this->createStub(ConfigService::class),
+            __DIR__ . '/tmp/',
+        );
 
-        $this->subject->saveMatrix($this->requestMock);
+        $subject->saveMatrix($this->requestMock);
     }
 
     public function testSaveMatrixPersistsAndFlushesChanges(): void
@@ -172,14 +219,26 @@ class TranslationServiceTest extends TestCase
 
         $this->requestMock->method('getPayload')->willReturn(new InputBag(['1' => 'updated_value']));
 
-        $this->entityManagerMock
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock
             ->expects($this->once())
             ->method('persist')
             ->with($translationEntity);
 
-        $this->entityManagerMock->expects($this->once())->method('flush');
+        $emMock->expects($this->once())->method('flush');
 
-        $this->subject->saveMatrix($this->requestMock);
+        $subject = new TranslationService(
+            $this->translationRepositoryMock,
+            $this->createStub(UserRepository::class),
+            $emMock,
+            $this->createStub(Filesystem::class),
+            $this->createStub(ParameterBagInterface::class),
+            $this->commandServiceMock,
+            $this->createStub(ConfigService::class),
+            __DIR__ . '/tmp/',
+        );
+
+        $subject->saveMatrix($this->requestMock);
 
         $this->assertEquals('updated_value', $translationEntity->getTranslation());
     }
