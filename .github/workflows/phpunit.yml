@@ -13,10 +13,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: meetAgain_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
-      - uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           extensions: gd, xdebug, apcu, pdo_mysql, imagick, intl, opcache
@@ -26,7 +40,7 @@ jobs:
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache@v4
         with:
           path: vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -39,5 +53,20 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run test suite
-        run: composer run-script phpunit
+      - name: Setup test environment
+        env:
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
+        run: |
+          cp .env.dist .env
+          echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/meetAgain_test" >> .env
+          echo "APP_ENV=test" >> .env
+          php bin/console doctrine:migrations:migrate --no-interaction
+          php bin/console doctrine:fixtures:load --no-interaction --group=base
+
+      - name: Run unit tests
+        run: vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default
+
+      - name: Run functional tests
+        env:
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
+        run: vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional

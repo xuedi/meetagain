@@ -95,7 +95,7 @@ checkStan:
 
 # Run Mago linter (optional parameters supported)
 checkMago +parameter='':
-    {{EXEC}} vendor/bin/mago --config tests/mago.toml {{parameter}}
+    {{EXEC}} vendare the functional testor/bin/mago --config tests/mago.toml {{parameter}}
 
 # Run Rector in dry-run mode to check for code improvements without applying them
 checkRector:
