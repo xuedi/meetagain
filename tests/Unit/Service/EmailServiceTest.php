@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -9,12 +10,14 @@ use App\Service\ConfigService;
 use App\Service\EmailService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
+#[AllowMockObjectsWithoutExpectations]
 final class EmailServiceTest extends TestCase
 {
     private MailerInterface&MockObject $mailer;
@@ -49,26 +52,28 @@ final class EmailServiceTest extends TestCase
 
         $this->em->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($entity) {
-                $this->assertInstanceOf(EmailQueue::class, $entity);
-                /** @var EmailQueue $entity */
-                $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
-                $this->assertSame('user@example.com', $entity->getRecipient());
-                $this->assertSame('Please Confirm your Email', $entity->getSubject());
-                $this->assertSame('_emails/verification_request.html.twig', $entity->getTemplate());
-                $this->assertSame('en', $entity->getLang());
+            ->with(
+                $this->callback(function ($entity) {
+                    $this->assertInstanceOf(EmailQueue::class, $entity);
+                    /** @var EmailQueue $entity */
+                    $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
+                    $this->assertSame('user@example.com', $entity->getRecipient());
+                    $this->assertSame('Please Confirm your Email', $entity->getSubject());
+                    $this->assertSame('_emails/verification_request.html.twig', $entity->getTemplate());
+                    $this->assertSame('en', $entity->getLang());
 
-                $ctx = $entity->getContext();
-                $this->assertSame('https://example.com', $ctx['host']);
-                $this->assertSame('abc123', $ctx['token']);
-                $this->assertSame('example.com', $ctx['url']);
-                $this->assertSame('Alice', $ctx['username']);
-                $this->assertSame('en', $ctx['lang']);
+                    $ctx = $entity->getContext();
+                    $this->assertSame('https://example.com', $ctx['host']);
+                    $this->assertSame('abc123', $ctx['token']);
+                    $this->assertSame('example.com', $ctx['url']);
+                    $this->assertSame('Alice', $ctx['username']);
+                    $this->assertSame('en', $ctx['lang']);
 
-                $this->assertNotNull($entity->getCreatedAt());
-                $this->assertNull($entity->getSendAt());
-                return true;
-            }));
+                    $this->assertNotNull($entity->getCreatedAt());
+                    $this->assertNull($entity->getSendAt());
+                    return true;
+                })
+            );
         $this->em->expects($this->once())->method('flush');
 
         $ok = $this->service->prepareVerificationRequest($user);
@@ -109,18 +114,24 @@ final class EmailServiceTest extends TestCase
             ->with($this->isInstanceOf(TemplatedEmail::class));
 
         $this->em->expects($this->once())->method('persist')
-            ->with($this->callback(function ($entity) use ($queued) {
-                $this->assertSame($queued, $entity);
-                $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
-                return true;
-            }));
+            ->with(
+                $this->callback(function ($entity) use ($queued) {
+                    $this->assertSame($queued, $entity);
+                    $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
+                    return true;
+                })
+            );
         $this->em->expects($this->once())->method('flush');
 
         $this->service->sendQueue();
     }
 
-    private function makeUser(string $email, string $name = 'Alice', string $locale = 'en', string $regcode = 'token-123'): User
-    {
+    private function makeUser(
+        string $email,
+        string $name = 'Alice',
+        string $locale = 'en',
+        string $regcode = 'token-123'
+    ): User {
         $user = new User();
         $user->setEmail($email);
         $user->setName($name);

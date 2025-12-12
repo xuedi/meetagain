@@ -8,10 +8,12 @@ use App\Repository\ConfigRepository;
 use App\Service\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Generator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ConfigServiceTest extends TestCase
 {
     private MockObject|ConfigRepository $configRepoMock;

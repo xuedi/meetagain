@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -10,9 +11,11 @@ use App\Repository\UserRepository;
 use App\Service\CleanupService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class CleanupServiceTest extends TestCase
 {
     private MockObject|EntityManagerInterface $entityManagerMock;

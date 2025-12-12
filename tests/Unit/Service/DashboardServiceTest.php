@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -8,35 +10,39 @@ use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
 use App\Service\DashboardService;
-use DateTime;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\AbstractLazyCollection;
-use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Collections\ReadableCollection;
+use Doctrine\Common\Collections\Selectable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DashboardServiceTest extends TestCase
 {
     /**
      * Create a lazy, selectable collection that returns a fixed count,
      * satisfying Doctrine's intersection return type (AbstractLazyCollection & Selectable).
      */
-    private static function makeLazySelectableWithCount(int $count): AbstractLazyCollection&Selectable
+    private static function makeLazySelectableWithCount(int $count): AbstractLazyCollection
     {
         return new class ($count) extends AbstractLazyCollection implements Selectable {
             private int $count;
+
             public function __construct(int $count)
             {
                 $this->count = $count;
             }
+
             protected function doInitialize(): void
             {
                 $this->collection = new ArrayCollection(array_fill(0, $this->count, 1));
                 $this->initialized = true;
             }
+
             public function matching(Criteria $criteria): ReadableCollection&Selectable
             {
                 // already initialized to an ArrayCollection; forward call
@@ -46,6 +52,7 @@ final class DashboardServiceTest extends TestCase
             }
         };
     }
+
     private EventRepository&MockObject $eventRepo;
     private UserRepository&MockObject $userRepo;
     private EmailQueueRepository&MockObject $mailRepo;

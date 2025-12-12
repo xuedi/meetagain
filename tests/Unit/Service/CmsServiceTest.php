@@ -7,11 +7,13 @@ use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Service\CmsService;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
+#[AllowMockObjectsWithoutExpectations]
 class CmsServiceTest extends TestCase
 {
     private MockObject|Environment $twigMock;

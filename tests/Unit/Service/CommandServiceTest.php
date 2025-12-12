@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
 use App\Service\Command\EchoCommand;
 use App\Service\CommandService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -14,6 +16,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * does not test anything to be honest ^_^ maybe create a system test to test correct wrapping of command execution
  */
+#[AllowMockObjectsWithoutExpectations]
 class CommandServiceTest extends TestCase
 {
     private MockObject|KernelInterface $kernelMock;

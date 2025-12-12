@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -8,9 +9,9 @@ use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use App\Service\DashboardService;
 use App\Service\GlobalService;
-use App\Service\ImageService;
 use App\Service\PluginService;
 use App\Service\TranslationService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class GlobalServiceTest extends TestCase
 {
     private MockObject|RequestStack $requestStackMock;
@@ -77,9 +79,7 @@ class GlobalServiceTest extends TestCase
 
     public function testLanguageCodes(): void
     {
-        $expectedLanguageCodes = ['de', 'en', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'es', 'sv', 'tr', 'zh'];
-
-        ;
+        $expectedLanguageCodes = ['de', 'en', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'es', 'sv', 'tr', 'zh'];;
 
         $this->translationServiceMock->method('getLanguageCodes')->willReturn($expectedLanguageCodes);
 

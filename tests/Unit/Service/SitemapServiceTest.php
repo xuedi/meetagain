@@ -9,12 +9,14 @@ use App\Service\CmsService;
 use App\Service\SitemapService;
 use DateTime;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
+#[AllowMockObjectsWithoutExpectations]
 class SitemapServiceTest extends TestCase
 {
     private MockObject|Environment $environmentMock;

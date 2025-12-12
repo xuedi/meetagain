@@ -1,13 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
 use App\ExtendedFilesystem;
 use App\Service\CommandService;
 use App\Service\PluginService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class PluginServiceTest extends TestCase
 {
     private MockObject|CommandService $commandServiceMock;
@@ -553,7 +556,6 @@ class PluginServiceTest extends TestCase
 
         // Try to set plugin config
         $subject->setPluginConfig(['test-plugin' => true]);
-
         // No assertion needed as we're verifying the methods are not called
     }
 

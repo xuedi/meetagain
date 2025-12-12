@@ -11,6 +11,7 @@ use App\Service\ConfigService;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -23,6 +24,7 @@ use Twig\Environment;
  * For methods that use Imagick (which is difficult to mock), we use a partial mock
  * that only mocks the Imagick-related functionality.
  */
+#[AllowMockObjectsWithoutExpectations]
 class ImageServiceTest extends TestCase
 {
     private MockObject|ImageRepository $imageRepoMock;

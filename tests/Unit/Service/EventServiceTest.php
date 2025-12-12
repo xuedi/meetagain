@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -14,12 +15,14 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\LazyCriteriaCollection;
 use Generator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Tests\Unit\Stubs\EventStub;
 
+#[AllowMockObjectsWithoutExpectations]
 class EventServiceTest extends TestCase
 {
     private MockObject|EventRepository $eventRepoMock;
@@ -139,9 +142,7 @@ class EventServiceTest extends TestCase
             ->expects($this->once())
             ->method('matching')
             ->with($expectedCriteria)
-            ->willReturn($collectionMock);
-
-        ;
+            ->willReturn($collectionMock);;
 
         $this->subject->getFilteredList($time, $sort, $types, $rsvp);
     }

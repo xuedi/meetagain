@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -12,9 +13,11 @@ use App\Service\ActivityService;
 use App\Service\NotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ActivityServiceTest extends TestCase
 {
     private MockObject|EntityManagerInterface $emMock;
@@ -65,14 +68,16 @@ class ActivityServiceTest extends TestCase
         $em
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (Activity $activity) use ($type, $user, $meta) {
-                return (
-                    $activity->getType() === $type &&
-                    $activity->getUser() === $user &&
-                    $activity->getMeta() === $meta &&
-                    $activity->getCreatedAt() instanceof DateTimeImmutable
-                );
-            }));
+            ->with(
+                $this->callback(function (Activity $activity) use ($type, $user, $meta) {
+                    return (
+                        $activity->getType() === $type &&
+                        $activity->getUser() === $user &&
+                        $activity->getMeta() === $meta &&
+                        $activity->getCreatedAt() instanceof DateTimeImmutable
+                    );
+                })
+            );
 
         $em->expects($this->once())->method('flush');
 
