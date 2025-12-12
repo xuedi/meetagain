@@ -82,8 +82,8 @@ test: test-unit test-functional checkStan checkRector checkPhpcs checkPsalm
     echo "All tests and checks passed successfully"
 
 # Run only unit tests (faster, no database required)
-test-unit:
-    {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default
+test-unit +parameter='':
+    {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default {{parameter}}
 
 # Run only functional tests (click path / integration tests)
 test-functional:
