@@ -25,10 +25,11 @@ class ActivityServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->emMock = $this->createMock(EntityManagerInterface::class);
-        $this->activityRepoMock = $this->createMock(ActivityRepository::class);
-        $this->notificationServiceMock = $this->createMock(NotificationService::class);
-        $this->messageFactoryMock = $this->createMock(MessageFactory::class);
+        // Default to stubs to avoid PHPUnit notices for mocks without expectations.
+        $this->emMock = $this->createStub(EntityManagerInterface::class);
+        $this->activityRepoMock = $this->createStub(ActivityRepository::class);
+        $this->notificationServiceMock = $this->createStub(NotificationService::class);
+        $this->messageFactoryMock = $this->createStub(MessageFactory::class);
         $this->subject = new ActivityService(
             em: $this->emMock,
             repo: $this->activityRepoMock,
@@ -41,7 +42,7 @@ class ActivityServiceTest extends TestCase
     {
         // Test data
         $type = ActivityType::Login;
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $meta = ['key' => 'value'];
 
         // Mock message
@@ -49,16 +50,19 @@ class ActivityServiceTest extends TestCase
         $messageMock->expects($this->once())->method('validate');
 
         // Mock message factory
-        $this->messageFactoryMock
+        $messageFactory = $this->createMock(MessageFactory::class);
+        $messageFactory
             ->expects($this->once())
             ->method('build')
             ->willReturn($messageMock);
 
         // Mock notification service
-        $this->notificationServiceMock->expects($this->once())->method('notify');
+        $notificationService = $this->createMock(NotificationService::class);
+        $notificationService->expects($this->once())->method('notify');
 
         // Mock entity manager
-        $this->emMock
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em
             ->expects($this->once())
             ->method('persist')
             ->with($this->callback(function (Activity $activity) use ($type, $user, $meta) {
@@ -70,27 +74,31 @@ class ActivityServiceTest extends TestCase
                 );
             }));
 
-        $this->emMock->expects($this->once())->method('flush');
+        $em->expects($this->once())->method('flush');
 
         // Call the method
-        $this->subject->log($type, $user, $meta);
+        $subject = new ActivityService(
+            em: $em,
+            repo: $this->createStub(ActivityRepository::class),
+            notificationService: $notificationService,
+            messageFactory: $messageFactory,
+        );
+
+        $subject->log($type, $user, $meta);
     }
 
     public function testGetUserList(): void
     {
         // Test data
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $activities = [
-            $this->createMock(Activity::class),
-            $this->createMock(Activity::class),
-        ];
-        $preparedActivities = [
             $this->createMock(Activity::class),
             $this->createMock(Activity::class),
         ];
 
         // Mock repository
-        $this->activityRepoMock
+        $repo = $this->createMock(ActivityRepository::class);
+        $repo
             ->expects($this->once())
             ->method('getUserDisplay')
             ->with($user)
@@ -103,7 +111,8 @@ class ActivityServiceTest extends TestCase
         $message2 = $this->createMock(MessageInterface::class);
         $message2->expects($this->once())->method('render')->with(true)->willReturn('Message 2');
 
-        $this->messageFactoryMock->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls(
+        $messageFactory = $this->createMock(MessageFactory::class);
+        $messageFactory->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls(
             $message1,
             $message2,
         );
@@ -113,19 +122,26 @@ class ActivityServiceTest extends TestCase
             ->expects($this->once())
             ->method('setMessage')
             ->with('Message 1')
-            ->willReturn($preparedActivities[0]);
+            ->willReturn($activities[0]);
 
         $activities[1]
             ->expects($this->once())
             ->method('setMessage')
             ->with('Message 2')
-            ->willReturn($preparedActivities[1]);
+            ->willReturn($activities[1]);
 
         // Call the method
-        $result = $this->subject->getUserList($user);
+        $subject = new ActivityService(
+            em: $this->createStub(EntityManagerInterface::class),
+            repo: $repo,
+            notificationService: $this->createStub(NotificationService::class),
+            messageFactory: $messageFactory,
+        );
+
+        $result = $subject->getUserList($user);
 
         // Assert result
-        $this->assertSame($preparedActivities, $result);
+        $this->assertSame($activities, $result);
     }
 
     public function testGetAdminList(): void
@@ -135,13 +151,10 @@ class ActivityServiceTest extends TestCase
             $this->createMock(Activity::class),
             $this->createMock(Activity::class),
         ];
-        $preparedActivities = [
-            $this->createMock(Activity::class),
-            $this->createMock(Activity::class),
-        ];
 
         // Mock repository
-        $this->activityRepoMock
+        $repo = $this->createMock(ActivityRepository::class);
+        $repo
             ->expects($this->once())
             ->method('findBy')
             ->with([], ['createdAt' => 'DESC'], 250)
@@ -154,7 +167,8 @@ class ActivityServiceTest extends TestCase
         $message2 = $this->createMock(MessageInterface::class);
         $message2->expects($this->once())->method('render')->with(false)->willReturn('Message 2');
 
-        $this->messageFactoryMock->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls(
+        $messageFactory = $this->createMock(MessageFactory::class);
+        $messageFactory->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls(
             $message1,
             $message2,
         );
@@ -164,18 +178,25 @@ class ActivityServiceTest extends TestCase
             ->expects($this->once())
             ->method('setMessage')
             ->with('Message 1')
-            ->willReturn($preparedActivities[0]);
+            ->willReturn($activities[0]);
 
         $activities[1]
             ->expects($this->once())
             ->method('setMessage')
             ->with('Message 2')
-            ->willReturn($preparedActivities[1]);
+            ->willReturn($activities[1]);
 
         // Call the method
-        $result = $this->subject->getAdminList();
+        $subject = new ActivityService(
+            em: $this->createStub(EntityManagerInterface::class),
+            repo: $repo,
+            notificationService: $this->createStub(NotificationService::class),
+            messageFactory: $messageFactory,
+        );
+
+        $result = $subject->getAdminList();
 
         // Assert result
-        $this->assertSame($preparedActivities, $result);
+        $this->assertSame($activities, $result);
     }
 }
