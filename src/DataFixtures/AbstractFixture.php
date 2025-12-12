@@ -2,11 +2,36 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Cms;
+use App\Entity\Event;
+use App\Entity\Host;
+use App\Entity\Location;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Error;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Throwable;
+
+/**
+ * A bit of black magic to make fixtures more readable. And PHPStan
+ * helper annotations for the magic methods resolved via __call().
+ *
+ * @method User getRefUser(string $name)
+ * @method void addRefUser(string $name, User $entity)
+ *
+ * @method Host getRefHost(string $name)
+ * @method void addRefHost(string $name, Host $entity)
+ *
+ * @method Location getRefLocation(string $name)
+ * @method void addRefLocation(string $name, Location $entity)
+ *
+ * @method Cms getRefCms(string $name)
+ * @method void addRefCms(string $name, Cms $entity)
+ *
+ * @method Event getRefEvent(string $name)
+ * @method void addRefEvent(string $name, Event $entity)
+ */
 
 abstract class AbstractFixture extends Fixture
 {

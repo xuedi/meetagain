@@ -90,12 +90,8 @@ test-functional:
     {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional
 
 # Run PHPStan static analysis for type checking and bug detection
-checkStan:
-    {{EXEC}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M
-
-# Run Mago linter (optional parameters supported)
-checkMago +parameter='':
-    {{EXEC}} vendare the functional testor/bin/mago --config tests/mago.toml {{parameter}}
+checkStan +parameter='':
+    {{EXEC}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M {{parameter}}
 
 # Run Rector in dry-run mode to check for code improvements without applying them
 checkRector:
