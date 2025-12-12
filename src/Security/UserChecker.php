@@ -11,6 +11,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,7 +23,8 @@ readonly class UserChecker implements UserCheckerInterface
         private EntityManagerInterface $em,
         private RequestStack $requestStack,
         private MessageRepository $msgRepo,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function checkPreAuth(UserInterface $user): void
@@ -37,7 +39,7 @@ readonly class UserChecker implements UserCheckerInterface
     }
 
     #[\Override]
-    public function checkPostAuth(UserInterface $user): void
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
         if (!($user instanceof User)) {
             return;

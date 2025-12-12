@@ -26,9 +26,12 @@ final class DashboardServiceTest extends TestCase
      */
     private static function makeLazySelectableWithCount(int $count): AbstractLazyCollection&Selectable
     {
-        return new class($count) extends AbstractLazyCollection implements Selectable {
+        return new class ($count) extends AbstractLazyCollection implements Selectable {
             private int $count;
-            public function __construct(int $count) { $this->count = $count; }
+            public function __construct(int $count)
+            {
+                $this->count = $count;
+            }
             protected function doInitialize(): void
             {
                 $this->collection = new ArrayCollection(array_fill(0, $this->count, 1));

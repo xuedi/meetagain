@@ -27,7 +27,8 @@ readonly class TranslationService
         private CommandService $commandService,
         private ConfigService $configService,
         private string $kernelProjectDir,
-    ) {}
+    ) {
+    }
 
     /** TODO: move to repo */
     public function getMatrix(): array
@@ -202,7 +203,8 @@ readonly class TranslationService
         $conn->executeStatement('DELETE FROM translation');
 
         // get import user
-        $user = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);;
+        $user = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
+        ;
 
         foreach ($data as $item) {
             $translation = new Translation();
@@ -223,8 +225,8 @@ readonly class TranslationService
     {
         $cleanedList = [];
         foreach ($translations as $key => $translation) {
-            if (!isset($cleanedList[strtolower($key)])) {
-                $cleanedList[strtolower($key)] = $translation;
+            if (!isset($cleanedList[strtolower((string) $key)])) {
+                $cleanedList[strtolower((string) $key)] = $translation;
             }
         }
         return $cleanedList;

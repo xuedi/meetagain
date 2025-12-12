@@ -22,7 +22,8 @@ readonly class MessageFactory
         private EventRepository $eventRepository,
         private GlobalService $globalService,
         private ImageService $imageService,
-    ) {}
+    ) {
+    }
 
     public function build(Activity $activity): MessageInterface
     {

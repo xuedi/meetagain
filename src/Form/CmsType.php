@@ -14,7 +14,8 @@ class CmsType extends AbstractType
 {
     public function __construct(
         readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

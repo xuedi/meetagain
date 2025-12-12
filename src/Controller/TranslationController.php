@@ -15,27 +15,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/translation')]
 class TranslationController extends AbstractController
 {
     public const string ROUTE_MANAGE = 'app_translation';
-
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly TranslationRepository $translationRepo,
         private readonly EntityManagerInterface $em,
         private readonly TranslationSuggestionRepository $translationSuggestionRepo,
-    ) {}
-
-    #[Route('', name: self::ROUTE_MANAGE)]
+    ) {
+    }
+    #[Route('/translation', name: self::ROUTE_MANAGE)]
     public function index(): Response
     {
         return $this->render('translation/index.html.twig', [
             'translationMatrix' => $this->translationService->getMatrix(),
         ]);
     }
-
-    #[Route('/edit/{id}/{lang}', name: 'app_translation_edit')]
+    #[Route('/translation/edit/{id}/{lang}', name: 'app_translation_edit')]
     public function edit(Request $request, int $id, string $lang): Response
     {
         $translation = $this->translationRepo->findOneBy([
@@ -81,8 +78,7 @@ class TranslationController extends AbstractController
             'item' => $translation,
         ]);
     }
-
-    #[Route('/suggestion/deny/{id}', name: 'app_translation_suggestion_deny')]
+    #[Route('/translation/suggestion/deny/{id}', name: 'app_translation_suggestion_deny')]
     public function suggestionDeny(int $id): Response
     {
         $suggestion = $this->getSuggestion($id);
@@ -98,8 +94,7 @@ class TranslationController extends AbstractController
             'lang' => $suggestion->getLanguage(),
         ]);
     }
-
-    #[Route('/suggestion/approve/{id}', name: 'app_translation_suggestion_approve')]
+    #[Route('/translation/suggestion/approve/{id}', name: 'app_translation_suggestion_approve')]
     public function suggestionApprove(int $id): Response
     {
         $suggestion = $this->getSuggestion($id);
@@ -122,7 +117,6 @@ class TranslationController extends AbstractController
             'lang' => $suggestion->getLanguage(),
         ]);
     }
-
     private function addTranslationSuggestion(Translation $translation, string $lang, string $before): void
     {
         $suggestion = new TranslationSuggestion();
@@ -137,7 +131,6 @@ class TranslationController extends AbstractController
         $this->em->persist($suggestion);
         $this->em->flush();
     }
-
     private function getSuggestion(int $id): TranslationSuggestion
     {
         if (!$this->getAuthedUser()->hasRole('ROLE_MANAGER')) {

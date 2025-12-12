@@ -25,7 +25,8 @@ readonly class EmailService
         private ConfigService $config,
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
-    ) {}
+    ) {
+    }
 
     public function prepareVerificationRequest(User $user): bool
     {

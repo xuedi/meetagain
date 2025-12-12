@@ -12,7 +12,8 @@ class AssetExistsExtension extends AbstractExtension
     public function __construct(
         private readonly string $kernelProjectDir,
         private readonly ExtendedFilesystem $filesystem,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function getFunctions(): array

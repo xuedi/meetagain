@@ -14,7 +14,8 @@ class ExtendedFilesystem extends SymfonyFilesystem
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     public function fileExists(string $filename): bool
     {

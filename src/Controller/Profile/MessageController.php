@@ -22,7 +22,8 @@ class MessageController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
-    ) {}
+    ) {
+    }
 
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
     public function index(Request $request, null|int $id = null): Response

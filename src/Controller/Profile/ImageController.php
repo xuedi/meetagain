@@ -11,7 +11,8 @@ class ImageController extends AbstractController
 {
     public function __construct(
         private readonly ImageRepository $imageRepo,
-    ) {}
+    ) {
+    }
 
     #[Route('/profile/images/{action}/{id}/{imageId}', name: 'app_profile_images', requirements: [
         'action' => 'profile|event',

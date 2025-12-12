@@ -16,12 +16,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class ImageFixture extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
-        private readonly CmsBlockFixture $cmsBlockFixture,
         private readonly ImageService $imageService,
-        private readonly UserFixture $userFixture,
         private readonly EventFixture $eventFixture,
         private readonly ExtendedFilesystem $filesystem,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function load(ObjectManager $manager): void

@@ -18,7 +18,8 @@ class Consent implements JsonSerializable
     public function __construct(
         private null|ConsentType $cookies = ConsentType::Unknown,
         private null|ConsentType $osm = ConsentType::Unknown,
-    ) {}
+    ) {
+    }
 
     public function getCookies(): ConsentType
     {

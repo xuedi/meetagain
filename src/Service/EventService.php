@@ -64,14 +64,14 @@ readonly class EventService
 
     public function updateRecurringEvents(Event $event): int
     {
-        if ($event->getRecurringRule() !== null) { // is recurring, must be the parent
+        if ($event->getRecurringRule() instanceof \App\Entity\EventIntervals) {
+            // is recurring, must be the parent
             $parent = clone $event;
-        } else {
-            if ($event->getRecurringOf() !== null) { // has parent, load parent
-                $parent = $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
-            } else { // no parent, no recurring, nothing to do
-                return 0;
-            }
+        } elseif ($event->getRecurringOf() !== null) {
+            // has parent, load parent
+            $parent = $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
+        } else { // no parent, no recurring, nothing to do
+            return 0;
         }
 
         $children = $this->repo->findFollowUpEvents(

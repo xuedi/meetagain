@@ -10,40 +10,43 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminTranslationController extends AbstractController
 {
+    public function __construct(private readonly \App\Service\TranslationService $translationService)
+    {
+    }
     #[Route('/admin/translations/edit', name: 'app_admin_translation_edit')]
-    public function translationsIndex(TranslationService $translationService): Response
+    public function translationsIndex(): Response
     {
         return $this->render('admin/translations/list.html.twig', [
             'active' => 'edit',
-            'translationMatrix' => $translationService->getMatrix(),
+            'translationMatrix' => $this->translationService->getMatrix(),
         ]);
     }
 
     #[Route('/admin/translations/save', name: 'app_admin_translation_save')]
-    public function translationsSave(TranslationService $translationService, Request $request): Response
+    public function translationsSave(Request $request): Response
     {
         // todo check token
-        $translationService->saveMatrix($request);
+        $this->translationService->saveMatrix($request);
         // flash message
 
         return $this->redirectToRoute('app_admin_translation_edit');
     }
 
     #[Route('/admin/translations/extract', name: 'app_admin_translation_extract')]
-    public function translationsExtract(TranslationService $translationService): Response
+    public function translationsExtract(): Response
     {
         return $this->render('admin/translations/extract.html.twig', [
             'active' => 'extract',
-            'result' => $translationService->extract(),
+            'result' => $this->translationService->extract(),
         ]);
     }
 
     #[Route('/admin/translations/publish', name: 'app_admin_translation_publish')]
-    public function translationsPublish(TranslationService $translationService): Response
+    public function translationsPublish(): Response
     {
         return $this->render('admin/translations/publish.html.twig', [
             'active' => 'publish',
-            'result' => $translationService->publish(),
+            'result' => $this->translationService->publish(),
         ]);
     }
 }

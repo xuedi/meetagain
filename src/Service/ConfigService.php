@@ -14,7 +14,8 @@ readonly class ConfigService
     public function __construct(
         private ConfigRepository $repo,
         private EntityManagerInterface $em,
-    ) {}
+    ) {
+    }
 
     public function getThumbnailSizes(ImageType $type): array
     {
@@ -43,7 +44,7 @@ readonly class ConfigService
 
     public function isValidThumbnailSize(ImageType $type, int $checkWidth, int $checkHeight): bool
     {
-        foreach ($this->getThumbnailSizes($type) as list($width, $height)) {
+        foreach ($this->getThumbnailSizes($type) as [$width, $height]) {
             if ($checkWidth == $width && $checkHeight == $height) {
                 return true;
             }

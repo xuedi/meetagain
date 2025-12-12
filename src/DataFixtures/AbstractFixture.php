@@ -14,30 +14,28 @@ abstract class AbstractFixture extends Fixture
 
     public function __call($methodName, $params = null)
     {
-        if (!in_array(substr($methodName, 0, 6), ['getRef', 'addRef'])) {
+        if (!in_array(substr((string) $methodName, 0, 6), ['getRef', 'addRef'])) {
             throw new Error('Call to undefined method: ' . static::class . '::' . $methodName);
         }
 
-        $entityName = substr($methodName, 6);
+        $entityName = substr((string) $methodName, 6);
         $entityClass = sprintf("App\\Entity\\%s", $entityName);
         if (!class_exists($entityClass)) {
             throw new RuntimeException('Class ' . $entityClass . ' does not exist!');
         }
 
         $key = sprintf('%s::%s', $entityName . 'Fixture', md5((string)($params[0] ?? '')));
-        switch (substr($methodName, 0, 6)) {
+        switch (substr((string) $methodName, 0, 6)) {
             case 'getRef':
                 try {
                     return $this->getReference($key, $entityClass);
                 } catch (Throwable $exception) {
-                    throw new RuntimeException(
-                        sprintf(
-                            "Error retrieving reference '%s::%s' [%s]",
-                            $entityName,
-                            $params[0],
-                            $exception->getMessage()
-                        )
-                    );
+                    throw new RuntimeException(sprintf(
+                        "Error retrieving reference '%s::%s' [%s]",
+                        $entityName,
+                        $params[0],
+                        $exception->getMessage()
+                    ), $exception->getCode(), $exception);
                 }
             case 'addRef':
                 $this->addReference($key, $params[1]);
@@ -49,7 +47,7 @@ abstract class AbstractFixture extends Fixture
 
     protected function getText(string $fileName): string
     {
-        if ($this->fs === null) {
+        if (!$this->fs instanceof \Symfony\Component\Filesystem\Filesystem) {
             $this->fs = new Filesystem();
         }
         $file = sprintf('%s/%s/%s.txt', __DIR__, $this->getClassName(), $fileName);
@@ -74,7 +72,7 @@ abstract class AbstractFixture extends Fixture
     
     private function getClassName(): string
     {
-        $chunks = explode('\\', get_class($this));
+        $chunks = explode('\\', static::class);
 
         return str_replace('Fixture', '', end($chunks));
     }

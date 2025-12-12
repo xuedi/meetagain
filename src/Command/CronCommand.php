@@ -5,7 +5,8 @@ namespace App\Command;
 use App\Service\EmailService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Command\LockableTrait;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'app:cron', description: 'cron manager to be called often, maybe every 5 min or so')]

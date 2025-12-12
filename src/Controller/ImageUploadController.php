@@ -27,7 +27,8 @@ class ImageUploadController extends AbstractController
         private readonly ImageService $imageService,
         private readonly CmsBlockRepository $cmsBlockRepo,
         private readonly ActivityService $activityService,
-    ) {}
+    ) {
+    }
 
     #[Route('/replace_image/{entity}/{id}', name: 'app_image_replace', requirements: [
         'entity' => 'user|cmsBlock',
@@ -227,19 +228,16 @@ class ImageUploadController extends AbstractController
 
     private function returnBackToImage(string $entity, int $id): Response
     {
-        switch ($entity) {
-            case 'user':
-                return $this->redirectToRoute('app_profile');
-            case 'cmsBlock':
-                return $this->redirectToRoute('app_admin_cms_edit', [
-                    'id' => $this->cmsBlockRepo
-                        ->findOneBy(['id' => $id])
-                        ->getPage()
-                        ->getId(),
-                ]);
-            default:
-                throw new RuntimeException('Invalid entity');
-        }
+        return match ($entity) {
+            'user' => $this->redirectToRoute('app_profile'),
+            'cmsBlock' => $this->redirectToRoute('app_admin_cms_edit', [
+                'id' => $this->cmsBlockRepo
+                    ->findOneBy(['id' => $id])
+                    ->getPage()
+                    ->getId(),
+            ]),
+            default => throw new RuntimeException('Invalid entity'),
+        };
     }
 
     private function logActivity(string $entity, int $previous, int $new): void

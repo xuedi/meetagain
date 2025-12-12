@@ -10,9 +10,12 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 class DefaultController extends AbstractController
 {
-    #[Route('/{page}', name: 'app_catch_all', requirements: ['page' => Requirement::CATCH_ALL], priority: -20)]
-    public function catchAll(Request $request, CmsService $cms, string $page): Response
+    public function __construct(private readonly \App\Service\CmsService $cms)
     {
-        return $cms->handle($request->getLocale(), $page, $this->getResponse());
+    }
+    #[Route('/{page}', name: 'app_catch_all', requirements: ['page' => Requirement::CATCH_ALL], priority: -20)]
+    public function catchAll(Request $request, string $page): Response
+    {
+        return $this->cms->handle($request->getLocale(), $page, $this->getResponse());
     }
 }

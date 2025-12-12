@@ -14,7 +14,8 @@ class ReportImageType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -9,11 +9,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminVisitorsController extends AbstractController
 {
+    public function __construct(private readonly \App\Repository\NotFoundLogRepository $repo)
+    {
+    }
     #[Route('/admin/visitors/', name: 'app_admin_visitors')]
-    public function notFoundVisits(NotFoundLogRepository $repo): Response
+    public function notFoundVisits(): Response
     {
         return $this->render('admin/visitors/index.html.twig', [
-            'notFound' => $repo->findAll(),
+            'notFound' => $this->repo->findAll(),
         ]);
     }
 }

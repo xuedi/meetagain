@@ -10,7 +10,8 @@ class RenderImageModalExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ImageUploadController $imageUploadController,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function getFunctions(): array

@@ -22,7 +22,8 @@ readonly class NotificationService
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
-    ) {}
+    ) {
+    }
 
     public function notify(Activity $activity): void
     {

@@ -13,15 +13,18 @@ class SocialController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,
-    ) {}
+        private readonly \App\Repository\UserRepository $repo,
+        private readonly \App\Service\FriendshipService $service,
+    ) {
+    }
 
     #[Route('/profile/social', name: 'app_profile_social')]
-    public function social(UserRepository $repo, string $show = 'friends'): Response
+    public function social(string $show = 'friends'): Response
     {
         return $this->render('profile/social.html.twig', [
-            'followers' => $repo->getFollowers($this->getAuthedUser(), true),
-            'following' => $repo->getFollowing($this->getAuthedUser(), true),
-            'friends' => $repo->getFriends($this->getAuthedUser()),
+            'followers' => $this->repo->getFollowers($this->getAuthedUser(), true),
+            'following' => $this->repo->getFollowing($this->getAuthedUser(), true),
+            'friends' => $this->repo->getFriends($this->getAuthedUser()),
             'activities' => $this->activityService->getUserList($this->getAuthedUser()),
             'user' => $this->getAuthedUser(),
             'show' => $show,
@@ -29,14 +32,14 @@ class SocialController extends AbstractController
     }
 
     #[Route('/profile/social/friends/', name: 'app_profile_social_friends')]
-    public function socialFriends(UserRepository $repo): Response
+    public function socialFriends(): Response
     {
-        return $this->social($repo, 'friends');
+        return $this->social($this->repo, 'friends');
     }
 
     #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow')]
-    public function toggleFollow(FriendshipService $service, int $id): Response
+    public function toggleFollow(int $id): Response
     {
-        return $service->toggleFollow($id, 'app_profile_social');
+        return $this->service->toggleFollow($id, 'app_profile_social');
     }
 }

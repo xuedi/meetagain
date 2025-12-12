@@ -13,6 +13,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AjaxController extends AbstractController
 {
+    public function __construct(private readonly \App\Service\CaptchaService $captchaService)
+    {
+    }
     #[Route('/ajax/', name: 'app_ajax', methods: ['GET'])]
     public function index(): Response
     {
@@ -51,12 +54,12 @@ class AjaxController extends AbstractController
     }
 
     #[Route('/ajax/get-captcha-count', name: 'app_ajax_get_captcha_count', methods: ['GET'])]
-    public function getCaptchaCountIndex(Request $request, CaptchaService $captchaService): Response
+    public function getCaptchaCountIndex(Request $request): Response
     {
-        $captchaService->setSession($request->getSession());
+        $this->captchaService->setSession($request->getSession());
         return new JsonResponse([
-            'count' => $captchaService->getRefreshCount(),
-            'next' => $captchaService->getRefreshTime(),
+            'count' => $this->captchaService->getRefreshCount(),
+            'next' => $this->captchaService->getRefreshTime(),
         ]);
     }
 }

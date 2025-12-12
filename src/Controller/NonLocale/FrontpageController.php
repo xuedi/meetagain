@@ -9,16 +9,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-#[Route('/')]
 class FrontpageController extends AbstractController
 {
-    #[Route('/', name: 'app_frontpage')]
-    public function index(ConfigService $configService, RouterInterface $router): Response
+    public function __construct(private readonly \App\Service\ConfigService $configService, private readonly \Symfony\Component\Routing\RouterInterface $router)
     {
-        if ($configService->isShowFrontpage() === false) {
-            return new RedirectResponse($router->generate('app_default'));
+    }
+    #[Route('//', name: 'app_frontpage')]
+    public function index(): Response
+    {
+        if ($this->configService->isShowFrontpage() === false) {
+            return new RedirectResponse($this->router->generate('app_default'));
         }
-
         return $this->render('cms/frontpage.html.twig');
     }
 }

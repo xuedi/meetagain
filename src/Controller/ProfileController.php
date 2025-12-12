@@ -26,15 +26,15 @@ class ProfileController extends AbstractController
 
     public function __construct(
         private readonly ActivityService $activityService,
-    ) {}
+        private readonly \App\Controller\ImageUploadController $imageUploadController,
+        private readonly \App\Repository\EventRepository $repo,
+        private readonly \App\Repository\MessageRepository $msgRepo,
+    ) {
+    }
 
     #[Route('/profile/', name: self::ROUTE_PROFILE)]
     public function index(
-        ImageUploadController $imageUploadController,
         Request $request,
-        EventRepository $repo,
-        MessageRepository $msgRepo,
-        ImageService $imageService,
         EntityManagerInterface $entityManager,
     ): Response {
         $response = $this->getResponse();
@@ -61,17 +61,17 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
-        $modal = $imageUploadController->imageReplaceModal('user', $user->getId(), true)->getContent();
+        $modal = $this->imageUploadController->imageReplaceModal('user', $user->getId(), true)->getContent();
 
         return $this->render(
             'profile/index.html.twig',
             [
                 'modal' => $modal,
                 'lastLogin' => $request->getSession()->get('lastLogin', '-'),
-                'messageCount' => $msgRepo->getMessageCount($user),
+                'messageCount' => $this->msgRepo->getMessageCount($user),
                 'user' => $this->getAuthedUser(),
-                'upcoming' => $repo->getUpcomingEvents(10),
-                'past' => $repo->getPastEvents(20),
+                'upcoming' => $this->repo->getUpcomingEvents(10),
+                'past' => $this->repo->getPastEvents(20),
                 'form' => $form,
             ],
             $response,

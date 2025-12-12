@@ -14,10 +14,9 @@ class ManageController extends AbstractController
     public const string ROUTE_MANAGE = 'app_manage';
 
     public function __construct(
-        private readonly TranslationRepository $translationRepo,
-        private readonly EntityManagerInterface $em,
         private readonly TranslationSuggestionRepository $translationSuggestionRepo,
-    ) {}
+    ) {
+    }
 
     #[Route('/manage', name: self::ROUTE_MANAGE)]
     public function index(): Response

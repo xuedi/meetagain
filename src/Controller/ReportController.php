@@ -14,14 +14,16 @@ class ReportController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,
-    ) {}
+        private readonly \App\Repository\ImageRepository $repo,
+    ) {
+    }
 
     #[Route('/report/image/{id}', name: 'app_report_image')]
-    public function index(Request $request, ImageRepository $repo, null|int $id = null): Response
+    public function index(Request $request, null|int $id = null): Response
     {
         $response = $this->getResponse();
         $user = $this->getAuthedUser();
-        $image = $repo->findOneBy(['id' => $id]);
+        $image = $this->repo->findOneBy(['id' => $id]);
 
         $form = $this->createForm(ReportImageType::class, $image);
         $form->handleRequest($request);

@@ -29,7 +29,8 @@ class MenuType extends AbstractType
         private readonly MenuTranslationRepository $menuTransRepo,
         private readonly CmsRepository $cmsRepo,
         private readonly EventRepository $eventRepo,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -57,26 +58,26 @@ class MenuType extends AbstractType
             'data' => $visibilitySelect->value,
         ]);
         $builder->add('slug', TextType::class, [
-            'disabled' => !($typeSelect == EnumMenuType::Url),
+            'disabled' => $typeSelect != EnumMenuType::Url,
             'label' => 'Url for external links',
             'required' => false,
         ]);
         $builder->add('cms', ChoiceType::class, [
-            'disabled' => !($typeSelect == EnumMenuType::Cms),
+            'disabled' => $typeSelect != EnumMenuType::Cms,
             'mapped' => false,
             'label' => 'Cms pages',
             'choices' => $this->cmsRepo->getChoices(),
             'data' => $menu?->getCms()?->getId() ?? 1,
         ]);
         $builder->add('event', ChoiceType::class, [
-            'disabled' => !($typeSelect == EnumMenuType::Event),
+            'disabled' => $typeSelect != EnumMenuType::Event,
             'mapped' => false,
             'label' => 'Events',
             'choices' => $this->eventRepo->getChoices('en'), // TODO: inject actual current locale
             'data' => $menu?->getEvent()?->getId() ?? 1,
         ]);
         $builder->add('route', ChoiceType::class, [
-            'disabled' => !($typeSelect == EnumMenuType::Route),
+            'disabled' => $typeSelect != EnumMenuType::Route,
             'mapped' => false,
             'label' => 'AppRoute',
             'choices' => EnumMenuRoutes::getChoices($this->translator),

@@ -10,12 +10,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminEmailController extends AbstractController
 {
+    public function __construct(private readonly \App\Service\EmailService $emailService)
+    {
+    }
     #[Route('/admin/email/', name: 'app_admin_email')]
-    public function hostList(EmailService $emailService): Response
+    public function hostList(): Response
     {
         return $this->render('admin/email/list.html.twig', [
             'active' => 'email',
-            'emails' => $emailService->getMockEmailList(),
+            'emails' => $this->emailService->getMockEmailList(),
         ]);
     }
 }

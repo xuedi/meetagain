@@ -14,12 +14,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminLocationController extends AbstractController
 {
+    public function __construct(private readonly \App\Repository\LocationRepository $repo)
+    {
+    }
     #[Route('/admin/location/', name: 'app_admin_location')]
-    public function locationList(LocationRepository $repo): Response
+    public function locationList(): Response
     {
         return $this->render('admin/location/list.html.twig', [
             'active' => 'location',
-            'locations' => $repo->findAll(),
+            'locations' => $this->repo->findAll(),
         ]);
     }
 

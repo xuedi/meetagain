@@ -12,13 +12,14 @@ readonly class PluginService
     public function __construct(
         private CommandService $commandService,
         private ExtendedFilesystem $filesystem,
-    ) {}
+    ) {
+    }
 
     public function getAdminList(): array
     {
         $plugins = [];
         foreach ($this->parsePluginDir() as $pluginPath) {
-            $chunks = explode('/', $pluginPath);
+            $chunks = explode('/', (string) $pluginPath);
             $pluginKey = end($chunks);
             $manifest = $pluginPath . '/manifest.json';
             if (!$this->filesystem->fileExists($manifest)) {
@@ -134,11 +135,7 @@ readonly class PluginService
     private function isInstalled(string $pluginKey): bool
     {
         $config = $this->getPluginConfig();
-        if (!isset($config[$pluginKey])) {
-            return false;
-        }
-
-        return true;
+        return isset($config[$pluginKey]);
     }
 
     private function isEnabled(string $pluginKey): bool
@@ -147,10 +144,6 @@ readonly class PluginService
         if (!isset($config[$pluginKey])) {
             return false;
         }
-        if ($config[$pluginKey] !== true) {
-            return false;
-        }
-
-        return true;
+        return $config[$pluginKey] === true;
     }
 }

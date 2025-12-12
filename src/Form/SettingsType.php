@@ -16,7 +16,8 @@ class SettingsType extends AbstractType
     public function __construct(
         private readonly ConfigService $configService,
         private readonly UserRepository $userRepo,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

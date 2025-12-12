@@ -15,12 +15,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminUserController extends AbstractController
 {
+    public function __construct(private readonly \App\Repository\UserRepository $repo, private readonly \App\Service\EmailService $emailService)
+    {
+    }
     #[Route('/admin/user/', name: 'app_admin_user')]
-    public function userList(UserRepository $repo): Response
+    public function userList(): Response
     {
         return $this->render('admin/user/list.html.twig', [
             'active' => 'user',
-            'users' => $repo->findBy([], ['createdAt' => 'desc']),
+            'users' => $this->repo->findBy([], ['createdAt' => 'desc']),
         ]);
     }
 
@@ -44,12 +47,12 @@ class AdminUserController extends AbstractController
     }
 
     #[Route('/admin/user/{id}/approve', name: 'app_admin_user_approve', methods: ['GET'])]
-    public function userApprove(User $user, EntityManagerInterface $em, EmailService $emailService): Response
+    public function userApprove(User $user, EntityManagerInterface $em): Response
     {
         $user->setStatus(UserStatus::Active);
 
-        $emailService->prepareWelcome($user);
-        $emailService->sendQueue(); // TODO: use cron instead
+        $this->emailService->prepareWelcome($user);
+        $this->emailService->sendQueue(); // TODO: use cron instead
 
         $em->persist($user);
         $em->flush();

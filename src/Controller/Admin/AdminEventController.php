@@ -29,14 +29,16 @@ class AdminEventController extends AbstractController
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly EventService $eventService,
-    ) {}
+        private readonly \App\Repository\EventRepository $repo,
+    ) {
+    }
 
     #[Route('/admin/event/', name: 'app_admin_event')]
-    public function eventList(EventRepository $repo): Response
+    public function eventList(): Response
     {
         return $this->render('admin/event/list.html.twig', [
-            'nextEvent' => $repo->getNextEventId(),
-            'events' => $repo->findBy([], ['start' => 'ASC']),
+            'nextEvent' => $this->repo->getNextEventId(),
+            'events' => $this->repo->findBy([], ['start' => 'ASC']),
             'active' => 'event',
         ]);
     }
@@ -99,7 +101,7 @@ class AdminEventController extends AbstractController
     }
 
     #[Route('/admin/event/{id}/delete', name: 'app_admin_event_delete')]
-    public function eventDelete(EventRepository $repo): Response
+    public function eventDelete(): Response
     {
         dump('delete');
         exit();

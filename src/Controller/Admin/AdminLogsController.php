@@ -11,12 +11,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminLogsController extends AbstractController
 {
+    public function __construct(private readonly \App\Service\ActivityService $activityService, private readonly \App\Repository\NotFoundLogRepository $foundLogRepo)
+    {
+    }
     #[Route('/admin/logs/activity', name: 'app_admin_logs_activity')]
-    public function activityList(ActivityService $activityService): Response
+    public function activityList(): Response
     {
         return $this->render('admin/logs/activity_list.html.twig', [
             'active' => 'activity',
-            'activities' => $activityService->getAdminList(),
+            'activities' => $this->activityService->getAdminList(),
         ]);
     }
 
@@ -30,11 +33,11 @@ class AdminLogsController extends AbstractController
     }
 
     #[Route('/admin/logs/404', name: 'app_admin_logs_not_found')]
-    public function notFoundLogs(NotFoundLogRepository $foundLogRepo): Response
+    public function notFoundLogs(): Response
     {
         return $this->render('admin/logs/notFound_list.html.twig', [
             'active' => '404',
-            'list' => $foundLogRepo->getTop100(),
+            'list' => $this->foundLogRepo->getTop100(),
         ]);
     }
 

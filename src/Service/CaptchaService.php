@@ -19,7 +19,7 @@ class CaptchaService
 
     public function generate(): string
     {
-        $image = $this->session->get('captcha_image' . $this->session->getId(), null);
+        $image = $this->session->get('captcha_image' . $this->session->getId());
         if ($image !== null) {
             return $image;
         }
@@ -45,7 +45,7 @@ class CaptchaService
     public function isValid(string $code): null|string
     {
         $code = strtolower($code);
-        $expected = strtolower((string) $this->session->get('captcha_text' . $this->session->getId(), null));
+        $expected = strtolower((string) $this->session->get('captcha_text' . $this->session->getId()));
         if ($expected !== $code) {
             return sprintf("Wrong captcha code, got '%s' but expected '%s'", $code, $expected);
         }

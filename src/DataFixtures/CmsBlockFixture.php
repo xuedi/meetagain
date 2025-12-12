@@ -15,8 +15,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
 {
     public function __construct(
         private readonly ImageService $imageService,
-    )
-    {
+    ) {
     }
 
     public function load(ObjectManager $manager): void
@@ -34,7 +33,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
 
             $manager->persist($block);
             if ($imageName !== null) {
-
                 // upload file and create thumbnails
                 $imageFile = __DIR__ . "/CmsBlock/$imageName";
                 $uploadedImage = new UploadedFile($imageFile, $block->getId() . '.jpg');

@@ -34,16 +34,23 @@ class SecurityController extends AbstractController
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly EmailService $emailService,
-    ) {}
+        private readonly \Symfony\Component\Security\Http\Authentication\AuthenticationUtils $authenticationUtils,
+        private readonly \Symfony\Bundle\SecurityBundle\Security $security,
+        private readonly \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher,
+        private readonly \App\Service\GlobalService $globalService,
+        private readonly \App\Repository\UserRepository $userRepo,
+        private readonly \App\Service\CaptchaService $captchaService,
+    ) {
+    }
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
-    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
+    public function login(Request $request): Response
     {
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $error = $this->authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $this->authenticationUtils->getLastUsername();
 
         $redirectPath = $this->generateUrl('app_profile');
-        if (null !== $request->getSession()->get('redirectUrl', null)) {
+        if (null !== $request->getSession()->get('redirectUrl')) {
             $redirectPath = $request->getSession()->get('redirectUrl');
         }
 
@@ -55,12 +62,12 @@ class SecurityController extends AbstractController
     }
 
     #[Route(path: '/logout', name: 'app_security_logout')]
-    public function logout(Security $security, Request $request): Response
+    public function logout(Request $request): Response
     {
         $user = $this->getAuthedUser();
         $osm = $user->isOsmConsent() ? ConsentType::Granted : ConsentType::Denied;
 
-        $security->logout(false);
+        $this->security->logout(false);
 
         $consent = Consent::createByCookies($request->cookies);
         $consent->setCookies(ConsentType::Granted);
@@ -73,9 +80,7 @@ class SecurityController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request,
-        UserPasswordHasherInterface $hasher,
         EntityManagerInterface $em,
-        GlobalService $globalService,
     ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationType::class, $user);
@@ -84,7 +89,7 @@ class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $form->get('plainPassword')->getData();
 
-            $user->setPassword($hasher->hashPassword($user, $plainPassword));
+            $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
             $user->setRoles(['ROLE_USER']);
             $user->setNotification(true);
             $user->setStatus(UserStatus::Registered);
@@ -95,7 +100,7 @@ class SecurityController extends AbstractController
             $user->setLastLogin(new DateTime());
             $user->setCreatedAt(new DateTimeImmutable());
             $user->setBio(null);
-            $user->setOsmConsent($globalService->getShowOsm());
+            $user->setOsmConsent($this->globalService->getShowOsm());
 
             $em->persist($user);
             $em->flush();
@@ -147,23 +152,21 @@ class SecurityController extends AbstractController
     public function reset(
         Request $request,
         EntityManagerInterface $em,
-        UserRepository $userRepo,
-        CaptchaService $captchaService,
     ): Response {
-        $captchaService->setSession($request->getSession());
+        $this->captchaService->setSession($request->getSession());
 
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $captcha = $form->get('captcha')->getData();
-            $captchaError = $captchaService->isValid($captcha);
+            $captchaError = $this->captchaService->isValid($captcha);
             if ($captchaError !== null) {
                 $form->get('captcha')->addError(new FormError($captchaError));
             }
 
             $email = $form->get('email')->getData();
-            $user = $userRepo->findOneBy(['email' => $email]);
+            $user = $this->userRepo->findOneBy(['email' => $email]);
             if (null === $user) {
                 $form->get('email')->addError(new FormError('No valid user found'));
             }
@@ -179,16 +182,16 @@ class SecurityController extends AbstractController
 
                 return $this->render('security/reset_email_send.html.twig');
             } else {
-                $captchaService->reset();
+                $this->captchaService->reset();
             }
         } else {
-            $captchaService->reset();
+            $this->captchaService->reset();
         }
 
         return $this->render('security/reset.html.twig', [
-            'captcha' => $captchaService->generate(),
-            'refreshCount' => $captchaService->getRefreshCount(),
-            'refreshTime' => $captchaService->getRefreshTime(),
+            'captcha' => $this->captchaService->generate(),
+            'refreshCount' => $this->captchaService->getRefreshCount(),
+            'refreshTime' => $this->captchaService->getRefreshTime(),
             'form' => $form,
         ]);
     }
@@ -198,7 +201,6 @@ class SecurityController extends AbstractController
         EntityManagerInterface $em,
         string $code,
         Request $request,
-        UserPasswordHasherInterface $hasher,
     ): Response {
         $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
         if ($user === null) {
@@ -209,7 +211,7 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($hasher->hashPassword($user, $form->get('password')->getData()));
+            $user->setPassword($this->hasher->hashPassword($user, $form->get('password')->getData()));
             $user->setRegcode(null);
 
             $em->persist($user);

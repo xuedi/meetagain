@@ -10,7 +10,8 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private string $defaultLocale = 'en',
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public static function getSubscribedEvents(): array

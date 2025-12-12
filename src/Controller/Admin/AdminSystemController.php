@@ -24,7 +24,8 @@ class AdminSystemController extends AbstractController
         private readonly ConfigRepository $configRepo,
         private readonly ConfigService $configService,
         private readonly EntityManagerInterface $em,
-    ) {}
+    ) {
+    }
 
     #[Route('/admin/system', name: 'app_admin_system')]
     public function index(Request $request): Response

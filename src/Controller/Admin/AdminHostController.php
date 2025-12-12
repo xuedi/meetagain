@@ -13,12 +13,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminHostController extends AbstractController
 {
+    public function __construct(private readonly \App\Repository\HostRepository $repo)
+    {
+    }
     #[Route('/admin/host/', name: 'app_admin_host')]
-    public function hostList(HostRepository $repo): Response
+    public function hostList(): Response
     {
         return $this->render('admin/host/list.html.twig', [
             'active' => 'host',
-            'hosts' => $repo->findAll(),
+            'hosts' => $this->repo->findAll(),
         ]);
     }
 

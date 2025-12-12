@@ -26,7 +26,8 @@ readonly class ImageService
         private LoggerInterface $logger,
         private Environment $twig,
         private string $kernelProjectDir,
-    ) {}
+    ) {
+    }
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): null|Image
     {
@@ -78,9 +79,8 @@ readonly class ImageService
                 $imagick->writeImage($target);
                 $cnt++;
             } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));;
-
-
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));
+                ;
             }
         }
 
@@ -102,9 +102,8 @@ readonly class ImageService
                 $this->entityManager->persist($image);
                 $this->entityManager->flush();
             } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));;
-
-
+                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));
+                ;
             }
         }
     }
@@ -114,11 +113,11 @@ readonly class ImageService
         $thumpFileList = [];
         $sizeListCount = $this->configService->getThumbnailSizeList();
         foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
-            if (str_starts_with($file, '.')) {
+            if (str_starts_with((string) $file, '.')) {
                 continue;
             }
             $thumpFileList[$file] = true;
-            $size = explode('_', explode('.', $file)[0])[1];
+            $size = explode('_', explode('.', (string) $file)[0])[1];
             $sizeListCount[$size] = ($sizeListCount[$size] ?? 0) + 1;
         }
 
@@ -150,12 +149,12 @@ readonly class ImageService
 
         $list = [];
         foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
-            if (str_starts_with($file, '.')) {
+            if (str_starts_with((string) $file, '.')) {
                 continue;
             }
-            list($fileName, $fileType) = explode('.', $file);
-            list($hash, $size) = explode('_', $fileName);
-            list($width, $height) = explode('x', $size);
+            [$fileName, $fileType] = explode('.', (string) $file);
+            [$hash, $size] = explode('_', $fileName);
+            [$width, $height] = explode('x', $size);
             if (!isset($imageList[$hash])) {
                 $list[] = $file;
                 continue;

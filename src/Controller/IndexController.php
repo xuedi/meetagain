@@ -11,10 +11,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class IndexController extends AbstractController
 {
-    #[Route('/', name: 'app_default')]
-    public function index(Request $request, CmsService $cms): Response
+    public function __construct(private readonly \App\Service\CmsService $cms)
     {
-        return $cms->handle($request->getLocale(), 'index', $this->getResponse());
+    }
+    #[Route('/', name: 'app_default')]
+    public function index(Request $request): Response
+    {
+        return $this->cms->handle($request->getLocale(), 'index', $this->getResponse());
     }
 
     #[Route('/language/{locale}', name: 'app_default_language', requirements: ['locale' => 'en|de|cn'])]

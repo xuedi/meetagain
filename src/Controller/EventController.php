@@ -33,10 +33,15 @@ class EventController extends AbstractController
 
     public function __construct(
         private readonly ActivityService $activityService,
-    ) {}
+        private readonly \App\Service\EventService $eventService,
+        private readonly \App\Repository\EventRepository $repo,
+        private readonly \App\Repository\CommentRepository $comments,
+        private readonly \App\Service\ImageService $imageService,
+    ) {
+    }
 
     #[Route('/events', name: self::ROUTE_EVENT)]
-    public function index(EventService $eventService, Request $request): Response
+    public function index(Request $request): Response
     {
         $response = $this->getResponse();
         $form = $this->createForm(EventFilterType::class);
@@ -56,7 +61,7 @@ class EventController extends AbstractController
         return $this->render(
             'events/index.html.twig',
             [
-                'structuredList' => $eventService->getFilteredList($time, $sort, $type, $rsvp),
+                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp),
                 'filter' => $form,
             ],
             $response,
@@ -65,8 +70,6 @@ class EventController extends AbstractController
 
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
     public function details(
-        EventRepository $repo,
-        CommentRepository $comments,
         EntityManagerInterface $em,
         Request $request,
         null|int $id = null,
@@ -77,7 +80,7 @@ class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $comment = new Comment();
             $comment->setUser($this->getAuthedUser());
-            $comment->setEvent($repo->find($id));
+            $comment->setEvent($this->repo->find($id));
             $comment->setContent($form->getData()['comment']);
             $comment->setCreatedAt(new DateTimeImmutable());
             $em->persist($comment);
@@ -90,12 +93,12 @@ class EventController extends AbstractController
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
         }
 
-        $event = $repo->findOneBy(['id' => $id]);
+        $event = $this->repo->findOneBy(['id' => $id]);
         return $this->render(
             'events/details.html.twig',
             [
                 'commentForm' => $form,
-                'comments' => $comments->findBy(['event' => $id]),
+                'comments' => $this->comments->findBy(['event' => $id]),
                 'event' => $event,
                 'user' => ($this->getUser() instanceof UserInterface) ? $this->getAuthedUser() : null,
             ],
@@ -107,7 +110,6 @@ class EventController extends AbstractController
     public function upload(
         Event $event,
         Request $request,
-        ImageService $imageService,
         EntityManagerInterface $em,
     ): Response {
         $user = $this->getAuthedUser();
@@ -118,11 +120,11 @@ class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $files = $form->get('files')->getData();
             foreach ($files as $uploadedFile) {
-                $image = $imageService->upload($uploadedFile, $user, ImageType::EventUpload);
+                $image = $this->imageService->upload($uploadedFile, $user, ImageType::EventUpload);
                 $em->persist($image);
                 $em->flush();
                 $event->addImage($image);
-                $imageService->createThumbnails($image);
+                $this->imageService->createThumbnails($image);
             }
             $em->persist($event);
             $em->flush();
@@ -145,14 +147,14 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/featured/', name: self::ROUTE_FEATURED)]
-    public function featured(EventRepository $repo): Response
+    public function featured(): Response
     {
         $response = $this->getResponse();
         return $this->render(
             'events/featured.html.twig',
             [
-                'featured' => $repo->findBy(['featured' => true], ['start' => 'ASC']),
-                'last' => $repo->getPastEvents(),
+                'featured' => $this->repo->findBy(['featured' => true], ['start' => 'ASC']),
+                'last' => $this->repo->getPastEvents(),
             ],
             $response,
         );

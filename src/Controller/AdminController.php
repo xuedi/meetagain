@@ -13,21 +13,22 @@ class AdminController extends AbstractController
 
     public function __construct(
         private readonly TagAwareCacheInterface $appCache,
+        private readonly \App\Service\DashboardService $dashboard,
     ) {
         //
     }
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
-    public function index(DashboardService $dashboard, null|int $year = null, null|int $week = null): Response
+    public function index(null|int $year = null, null|int $week = null): Response
     {
-        $dashboard->setTime($year, $week);
+        $this->dashboard->setTime($year, $week);
 
         return $this->render('admin/index.html.twig', [
             'active' => 'dashboard',
-            'needForApproval' => $dashboard->getNeedForApproval(),
-            'time' => $dashboard->getTimeControl(),
-            'details' => $dashboard->getDetails(),
-            'pagesNotFound' => $dashboard->getPagesNotFound(),
+            'needForApproval' => $this->dashboard->getNeedForApproval(),
+            'time' => $this->dashboard->getTimeControl(),
+            'details' => $this->dashboard->getDetails(),
+            'pagesNotFound' => $this->dashboard->getPagesNotFound(),
             'tests' => [
                 'cache' => $this->cacheTest(),
             ],

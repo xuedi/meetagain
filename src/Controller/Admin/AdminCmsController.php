@@ -35,7 +35,8 @@ class AdminCmsController extends AbstractController
         private readonly CmsRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly CmsBlockRepository $blockRepo,
-    ) {}
+    ) {
+    }
 
     #[Route('/admin/cms/', name: 'app_admin_cms')]
     public function cmsList(): Response
@@ -57,7 +58,7 @@ class AdminCmsController extends AbstractController
         requirements: ['locale' => 'en|de|cn'],
         methods: ['GET', 'POST'],
     )]
-    public function cmsEdit(Request $request, Cms $cms, string $locale = null, null|int $blockId = null): Response
+    public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, null|int $blockId = null): Response
     {
         $locale = $this->getLastEditLocale($locale, $request->getSession());
 

@@ -9,12 +9,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminImageController extends AbstractController
 {
+    public function __construct(private readonly \App\Repository\ImageRepository $repo)
+    {
+    }
     #[Route('/admin/image/', name: 'app_admin_image')]
-    public function imageList(ImageRepository $repo): Response
+    public function imageList(): Response
     {
         return $this->render('admin/image/list.html.twig', [
             'active' => 'image',
-            'images' => $repo->findAll(),
+            'images' => $this->repo->findAll(),
         ]);
     }
 }

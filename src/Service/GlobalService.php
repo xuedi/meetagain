@@ -25,7 +25,8 @@ readonly class GlobalService
         private MenuRepository $menuRepo,
         private TranslationSuggestionRepository $translationSuggestionRepo,
         private Security $security,
-    ) {}
+    ) {
+    }
 
     public function getCurrentLocale(): string
     {

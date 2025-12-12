@@ -20,7 +20,8 @@ readonly class FriendshipService
         private RouterInterface $router,
         private Security $security,
         private RequestStack $requestStack,
-    ) {}
+    ) {
+    }
 
     public function toggleFollow(int $id, string $returnRoute): RedirectResponse
     {

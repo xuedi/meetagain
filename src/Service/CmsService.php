@@ -14,7 +14,8 @@ readonly class CmsService
         private Environment $twig,
         private CmsRepository $repo,
         private EventRepository $eventRepo,
-    ) {}
+    ) {
+    }
 
     public function getSites(): array
     {

@@ -32,7 +32,8 @@ class EventType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -69,7 +70,7 @@ class EventType extends AbstractType
                 'required' => false,
                 'expanded' => false,
                 'multiple' => false,
-                'disabled' => $event?->getRecurringOf() !== null ? true : false,
+                'disabled' => $event?->getRecurringOf() !== null,
             ])
             ->add('type', EnumType::class, [
                 'class' => EventTypes::class,

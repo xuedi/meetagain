@@ -16,17 +16,19 @@ class ConfigController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-    ) {}
+        private readonly \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher,
+    ) {
+    }
 
     #[Route('/profile/config', name: 'app_profile_config')]
-    public function config(Request $request, UserPasswordHasherInterface $hasher): Response
+    public function config(Request $request): Response
     {
         $form = $this->createForm(ChangePassword::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getAuthedUser();
-            if ($hasher->isPasswordValid($user, $form->get('oldPassword')->getData())) {
-                $user->setPassword($hasher->hashPassword($user, $form->get('newPassword')->getData()));
+            if ($this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData())) {
+                $user->setPassword($this->hasher->hashPassword($user, $form->get('newPassword')->getData()));
 
                 $this->em->persist($user);
                 $this->em->flush();

@@ -174,9 +174,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @see UserInterface
+     * Clear any temporary, sensitive data on the user.
+     * Note: eraseCredentials() was removed from UserInterface in Symfony 8.
      */
-    #[\Override]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here

@@ -56,15 +56,15 @@ class MenuRepository extends ServiceEntityRepository
 
     private function isVisible(null|UserInterface $user, null|MenuVisibility $visibility): bool
     {
-        if ($visibility === null) {
+        if (!$visibility instanceof \App\Entity\MenuVisibility) {
             return true;
         }
 
         return match ($visibility) {
             MenuVisibility::Everyone => true,
-            MenuVisibility::User => $user !== null && $user->hasRole('ROLE_USER'),
-            MenuVisibility::Manager => $user !== null && $user->hasRole('ROLE_MANAGER'),
-            MenuVisibility::Admin => $user !== null && $user->hasRole('ROLE_ADMIN'),
+            MenuVisibility::User => $user instanceof \Symfony\Component\Security\Core\User\UserInterface && $user->hasRole('ROLE_USER'),
+            MenuVisibility::Manager => $user instanceof \Symfony\Component\Security\Core\User\UserInterface && $user->hasRole('ROLE_MANAGER'),
+            MenuVisibility::Admin => $user instanceof \Symfony\Component\Security\Core\User\UserInterface && $user->hasRole('ROLE_ADMIN'),
             default => false,
         };
     }

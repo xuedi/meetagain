@@ -10,7 +10,8 @@ class Text implements BlockType
     private function __construct(
         public string $content,
         public null|ImageEntity $image,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public static function fromJson(array $json, null|ImageEntity $image = null): self
