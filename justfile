@@ -1,4 +1,6 @@
 # Docker configuration - all commands run inside containers
+# Read the comments in this file to understand what each command does.
+# Always use `just test` to run tests, not `just do "vendor/bin/phpunit ..."`.
 DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
 EXEC := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 JUST := just_executable() + " --justfile=" + justfile()
