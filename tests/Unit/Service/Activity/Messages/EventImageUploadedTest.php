@@ -17,8 +17,8 @@ class EventImageUploadedTest extends TestCase
 
     public function setUp(): void
     {
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->imageService = $this->createMock(ImageService::class);
+        $this->router = $this->createStub(RouterInterface::class);
+        $this->imageService = $this->createStub(ImageService::class);
     }
 
     public function testCanBuild(): void
@@ -33,14 +33,16 @@ class EventImageUploadedTest extends TestCase
         $meta = ['event_id' => $eventId, 'images' => $imageCount];
         $eventNames = [$eventId => $eventName];
 
-        $this->router
+        // Use a focused local mock for router to assert interaction
+        $router = $this->createMock(RouterInterface::class);
+        $router
             ->expects($this->once())
             ->method('generate')
             ->with('app_event_details', ['id' => $eventId])
             ->willReturn($eventUrl);
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $this->imageService, $meta, [], $eventNames);
+        $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
 
         // check returns
         $this->assertTrue($subject->validate());

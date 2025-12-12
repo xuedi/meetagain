@@ -16,7 +16,8 @@ class UpdatedProfilePictureTest extends TestCase
 
     public function setUp(): void
     {
-        $this->router = $this->createMock(RouterInterface::class);
+        $this->router = $this->createStub(RouterInterface::class);
+        // keep ImageService as a mock because interaction is asserted
         $this->imageService = $this->createMock(ImageService::class);
     }
 

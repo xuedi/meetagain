@@ -29,13 +29,13 @@ class MessageFactoryTest extends TestCase
 
     public function setUp(): void
     {
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->userRepository = $this->createMock(UserRepository::class);
-        $this->eventRepository = $this->createMock(EventRepository::class);
-        $this->globalService = $this->createMock(GlobalService::class);
-        $this->message = $this->createMock(MessageInterface::class);
-        $this->activity = $this->createMock(Activity::class);
-        $this->imageService = $this->createMock(ImageService::class);
+        $this->router = $this->createStub(RouterInterface::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->eventRepository = $this->createStub(EventRepository::class);
+        $this->globalService = $this->createStub(GlobalService::class);
+        $this->message = $this->createStub(MessageInterface::class);
+        $this->activity = $this->createStub(Activity::class);
+        $this->imageService = $this->createStub(ImageService::class);
         $this->messages = [$this->message];
     }
 

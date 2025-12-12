@@ -18,8 +18,8 @@ class ChangedUsernameTest extends TestCase
 
     public function setUp(): void
     {
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->imageService = $this->createMock(ImageService::class);
+        $this->router = $this->createStub(RouterInterface::class);
+        $this->imageService = $this->createStub(ImageService::class);
     }
 
     public function testCanBuild(): void
