@@ -27,7 +27,7 @@ class AjaxController extends AbstractController
     {
         $consent = Consent::getBySession($request->getSession());
         $consent->setCookies(ConsentType::Granted);
-        $consent->setOsm($request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
+        $consent->setOsm($request->query->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
         $consent->save($request->getSession());
 
         $response = new JsonResponse('Saved preferences', Response::HTTP_OK);

@@ -108,7 +108,7 @@ class AdminCmsController extends AbstractController
     public function cmsAdd(Request $request): Response
     {
         $newPage = new Cms();
-        $newPage->setSlug($request->get('cms')['slug']);
+        $newPage->setSlug($request->request->all('cms')['slug']);
         $newPage->setPublished(false);
         $newPage->setCreatedBy($this->getUser());
         $newPage->setCreatedAt(new DateTimeImmutable());
@@ -132,8 +132,8 @@ class AdminCmsController extends AbstractController
         }
 
         $payload = $request->getPayload()->all();
-        $locale = $request->get('editLocale');
-        $blockType = (int) $request->get('blockType');
+        $locale = $request->request->get('editLocale');
+        $blockType = (int) $request->request->get('blockType');
         $blockObject = CmsBlockTypes::buildObject(CmsBlockTypes::from($blockType), $payload);
 
         $cmsBlock = new CmsBlock();
@@ -155,9 +155,9 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
     public function cmsBlockMoveDown(Request $request): Response
     {
-        $pageId = $request->get('id');
-        $blockId = $request->get('blockId');
-        $locale = $request->get('locale');
+        $pageId = $request->query->get('id');
+        $blockId = $request->query->get('blockId');
+        $locale = $request->query->get('locale');
 
         $this->adjustPriority($pageId, $blockId, $locale, 1.5);
 
@@ -170,9 +170,9 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
     public function cmsBlockMoveUp(Request $request): Response
     {
-        $pageId = $request->get('id');
-        $blockId = $request->get('blockId');
-        $locale = $request->get('locale');
+        $pageId = $request->query->get('id');
+        $blockId = $request->query->get('blockId');
+        $locale = $request->query->get('locale');
 
         $this->adjustPriority($pageId, $blockId, $locale, -1.5);
 
@@ -186,10 +186,10 @@ class AdminCmsController extends AbstractController
     public function cmsBlockSave(Request $request): Response
     {
         $repo = $this->em->getRepository(CmsBlock::class);
-        $block = $repo->find($request->get('blockId'));
+        $block = $repo->find($request->request->get('blockId'));
         if ($block !== null) {
             $payload = $request->getPayload()->all();
-            $type = CmsBlockTypes::from((int) $request->get('blockType'));
+            $type = CmsBlockTypes::from((int) $request->request->get('blockType'));
             $block->setJson(CmsBlockTypes::buildObject($type, $payload)->toArray());
             $this->em->persist($block);
             $this->em->flush();
@@ -198,8 +198,8 @@ class AdminCmsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $request->get('id'),
-            'locale' => $request->get('locale'),
+            'id' => $request->request->get('id'),
+            'locale' => $request->request->get('locale'),
         ]);
     }
 
@@ -207,7 +207,7 @@ class AdminCmsController extends AbstractController
     public function cmsBlockDelete(Request $request): Response
     {
         $repo = $this->em->getRepository(CmsBlock::class);
-        $block = $repo->find($request->get('blockId'));
+        $block = $repo->find($request->query->get('blockId'));
         if ($block !== null) {
             $this->em->remove($block);
             $this->em->flush();
@@ -216,8 +216,8 @@ class AdminCmsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $request->get('id'),
-            'locale' => $request->get('locale'),
+            'id' => $request->query->get('id'),
+            'locale' => $request->query->get('locale'),
         ]);
     }
 

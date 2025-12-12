@@ -15,7 +15,7 @@ class CookieController extends AbstractController
          * TODO: do some old school formBuilder stuff
          * $consent = Consent::getBySession($request->getSession());
          * $consent->setCookies(ConsentType::Granted);
-         * $consent->setOsm($request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
+         * $consent->setOsm($request->request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
          * $consent->save($request->getSession());
          *
          * $response = new JsonResponse('Saved preferences', Response::HTTP_OK);

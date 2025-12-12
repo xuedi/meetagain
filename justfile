@@ -74,14 +74,18 @@ devReset:
     {{JUST}} install
     {{JUST}} clearCache
 
-# Run PHPUnit test suite with code coverage
-test:
-    {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml
-
-# Run all code quality checks: tests, PHPStan, Rector, PHPCS, Psalm, and composer validate
-check: test checkStan checkRector checkPhpcs checkPsalm
+# Run all tests and code quality checks
+test: test-unit test-functional checkStan checkRector checkPhpcs checkPsalm
     {{EXEC}} composer validate --strict
-    echo "Did run all checks successfully"
+    echo "All tests and checks passed successfully"
+
+# Run only unit tests (faster, no database required)
+test-unit:
+    {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default
+
+# Run only functional tests (click path / integration tests)
+test-functional:
+    {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional
 
 # Run PHPStan static analysis for type checking and bug detection
 checkStan:
