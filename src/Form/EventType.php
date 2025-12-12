@@ -96,13 +96,11 @@ class EventType extends AbstractType
                 'required' => false,
                 'label' => 'Preview Image',
                 'constraints' => [
-                    new File([
-                        'maxSize' => '5000k',
-                        'mimeTypes' => [
-                            'image/*',
-                        ],
-                        'mimeTypesMessage' => 'Please upload a valid image, preferable 16x9 format',
-                    ]),
+                    new File(
+                        maxSize: '5000k',
+                        mimeTypes: ['image/*'],
+                        mimeTypesMessage: 'Please upload a valid image, preferable 16x9 format',
+                    ),
                 ],
             ])
             ->add('allFollowing', ChoiceType::class, [

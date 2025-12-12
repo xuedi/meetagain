@@ -41,22 +41,20 @@ class ProfileType extends AbstractType
                 'label' => false,
                 'attr' => ['class' => 'is-hidden'],
                 'constraints' => [
-                    new File([
-                        'maxSize' => '10M',
-                        'mimeTypes' => [
-                            'image/*',
-                        ],
-                        'mimeTypesMessage' => 'Please upload a valid image, preferable a square format',
-                    ]),
+                    new File(
+                        maxSize: '10M',
+                        mimeTypes: ['image/*'],
+                        mimeTypesMessage: 'Please upload a valid image, preferable a square format',
+                    ),
                 ],
             ])
             ->add('name', TextType::class, [
                 'label' => 'Username',
                 'constraints' => [
-                    new Length([
-                        'maxMessage' => 'usernames cant be longer than 64 characters (less with chinese)',
-                        'max' => 64,
-                    ]),
+                    new Length(
+                        max: 64,
+                        maxMessage: 'usernames cant be longer than 64 characters (less with chinese)',
+                    ),
                 ],
             ])
             ->add('public', ChoiceType::class, [

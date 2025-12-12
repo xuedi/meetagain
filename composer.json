@@ -34,6 +34,7 @@
     "sentry/sentry-symfony": "^5.4",
     "symfony/cache": "8.0.*",
     "symfony/console": "8.0.*",
+    "symfony/css-selector": "8.0.*",
     "symfony/dotenv": "8.0.*",
     "symfony/expression-language": "8.0.*",
     "symfony/filesystem": "8.0.*",

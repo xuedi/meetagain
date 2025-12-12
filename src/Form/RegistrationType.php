@@ -23,42 +23,38 @@ class RegistrationType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Username',
                 'constraints' => [
-                    new Length([
-                        'maxMessage' => 'usernames cant be longer than 64 characters (less with chinese)',
-                        'max' => 64,
-                    ]),
+                    new Length(
+                        max: 64,
+                        maxMessage: 'usernames cant be longer than 64 characters (less with chinese)',
+                    ),
                 ],
             ])
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new Length([
-                        'maxMessage' => 'emails cant be longer than 180 characters',
-                        'max' => 180,
-                    ]),
+                    new Length(
+                        max: 180,
+                        maxMessage: 'emails cant be longer than 180 characters',
+                    ),
                 ],
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'constraints' => [
-                    new IsTrue([
-                        'message' => 'You should agree to our terms.',
-                    ]),
+                    new IsTrue(message: 'You should agree to our terms.'),
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a password',
-                    ]),
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        'max' => 254,
-                    ]),
+                    new NotBlank(message: 'Please enter a password'),
+                    new Length(
+                        min: 6,
+                        max: 254,
+                        minMessage: 'Your password should be at least {{ limit }} characters',
+                    ),
                 ],
-            ])//->add('save',SubmitType::class,array('label'=>'Insert Image','attr'=>array('class'=>'btn btn-primary','style'=>'margin-bottom:15px')))
+            ])
         ;
     }
 

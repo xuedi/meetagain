@@ -16,18 +16,14 @@ class PasswordResetType extends AbstractType
     {
         $builder->add('email', EmailType::class, [
             'constraints' => [
-                new NotBlank([
-                    'message' => 'Please enter your email address.',
-                ]),
-                new Email([
-                    'message' => 'Please enter a valid email address.',
-                ]),
+                new NotBlank(message: 'Please enter your email address.'),
+                new Email(message: 'Please enter a valid email address.'),
             ],
         ])->add('captcha', TextType::class, [
             'mapped' => false,
             'label' => 'Enter captcha code',
             'constraints' => [
-                new NotBlank([]),
+                new NotBlank(),
             ],
         ]);
     }

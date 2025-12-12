@@ -39,19 +39,19 @@ class UserType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Name',
                 'constraints' => [
-                    new Length([
-                        'maxMessage' => 'usernames cant be longer than 64 characters (less with chinese)',
-                        'max' => 64,
-                    ]),
+                    new Length(
+                        max: 64,
+                        maxMessage: 'usernames cant be longer than 64 characters (less with chinese)',
+                    ),
                 ],
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
                 'constraints' => [
-                    new Length([
-                        'maxMessage' => 'emails cant be longer than 180 characters',
-                        'max' => 180,
-                    ]),
+                    new Length(
+                        max: 180,
+                        maxMessage: 'emails cant be longer than 180 characters',
+                    ),
                 ],
             ])
             ->add('bio', TextareaType::class, [

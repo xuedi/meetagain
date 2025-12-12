@@ -21,13 +21,11 @@ class EventUploadType extends AbstractType
             'multiple' => true,
             'constraints' => [
                 new All([
-                    new File([
-                        'maxSize' => '10M',
-                        'mimeTypes' => [
-                            'image/*',
-                        ],
-                        'mimeTypesMessage' => 'Please upload a valid image, preferable a 4:3 format',
-                    ]),
+                    new File(
+                        maxSize: '10M',
+                        mimeTypes: ['image/*'],
+                        mimeTypesMessage: 'Please upload a valid image, preferable a 4:3 format',
+                    ),
                 ]),
             ],
         ]);
