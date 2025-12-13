@@ -10,9 +10,10 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 class DefaultController extends AbstractController
 {
-    public function __construct(private readonly \App\Service\CmsService $cms)
+    public function __construct(private readonly CmsService $cms)
     {
     }
+
     #[Route('/{page}', name: 'app_catch_all', requirements: ['page' => Requirement::CATCH_ALL], priority: -20)]
     public function catchAll(Request $request, string $page): Response
     {

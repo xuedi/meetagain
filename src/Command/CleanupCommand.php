@@ -11,9 +11,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:cleanup', description: 'does certain cleanup tasks')]
 class CleanupCommand extends Command
 {
-    public function __construct(
-        private readonly CleanupService $cleanupService,
-    ) {
+    public function __construct(private readonly CleanupService $cleanupService)
+    {
         parent::__construct();
     }
 

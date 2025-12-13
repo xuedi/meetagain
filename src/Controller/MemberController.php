@@ -16,8 +16,13 @@ class MemberController extends AbstractController
 {
     public const string ROUTE_MEMBER = 'app_member';
     private const int PAGE_SIZE = 24;
-    public function __construct(private readonly \App\Repository\UserRepository $repo, private readonly \App\Service\FriendshipService $service, private readonly \App\Service\ImageService $imageService, private readonly \Symfony\Bundle\SecurityBundle\Security $security)
-    {
+
+    public function __construct(
+        private readonly UserRepository $repo,
+        private readonly FriendshipService $service,
+        private readonly ImageService $imageService,
+        private readonly Security $security
+    ) {
     }
 
     #[Route('/members/{page}', name: self::ROUTE_MEMBER)]

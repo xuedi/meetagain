@@ -11,9 +11,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:event:extent', description: 'extent all recurring events')]
 class EventExtentCommand extends Command
 {
-    public function __construct(
-        private readonly EventService $eventService,
-    ) {
+    public function __construct(private readonly EventService $eventService)
+    {
         parent::__construct();
     }
 

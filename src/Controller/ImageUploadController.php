@@ -20,6 +20,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * TODO: refactor logic from here into the ImageService, so this controller is not called at other services anymore
+ */
 class ImageUploadController extends AbstractController
 {
     public function __construct(

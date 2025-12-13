@@ -14,9 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventFilterType extends AbstractType
 {
-    public function __construct(
-        readonly TranslatorInterface $translator,
-    ) {
+    public function __construct(readonly TranslatorInterface $translator)
+    {
     }
 
     #[\Override]

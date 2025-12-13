@@ -14,9 +14,8 @@ class CronCommand extends Command
 {
     use LockableTrait;
 
-    public function __construct(
-        private readonly EmailService $mailService,
-    ) {
+    public function __construct(private readonly EmailService $mailService)
+    {
         parent::__construct();
     }
 

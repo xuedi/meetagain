@@ -14,7 +14,7 @@ class ReportController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly \App\Repository\ImageRepository $repo,
+        private readonly ImageRepository $repo,
     ) {
     }
 

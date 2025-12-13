@@ -34,12 +34,12 @@ class SecurityController extends AbstractController
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly EmailService $emailService,
-        private readonly \Symfony\Component\Security\Http\Authentication\AuthenticationUtils $authenticationUtils,
-        private readonly \Symfony\Bundle\SecurityBundle\Security $security,
-        private readonly \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher,
-        private readonly \App\Service\GlobalService $globalService,
-        private readonly \App\Repository\UserRepository $userRepo,
-        private readonly \App\Service\CaptchaService $captchaService,
+        private readonly AuthenticationUtils $authenticationUtils,
+        private readonly Security $security,
+        private readonly UserPasswordHasherInterface $hasher,
+        private readonly GlobalService $globalService,
+        private readonly UserRepository $userRepo,
+        private readonly CaptchaService $captchaService,
     ) {
     }
 

@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\WebLink\Link;
 
 class EventController extends AbstractController
 {
@@ -33,10 +32,10 @@ class EventController extends AbstractController
 
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly \App\Service\EventService $eventService,
-        private readonly \App\Repository\EventRepository $repo,
-        private readonly \App\Repository\CommentRepository $comments,
-        private readonly \App\Service\ImageService $imageService,
+        private readonly EventService $eventService,
+        private readonly EventRepository $repo,
+        private readonly CommentRepository $comments,
+        private readonly ImageService $imageService,
     ) {
     }
 

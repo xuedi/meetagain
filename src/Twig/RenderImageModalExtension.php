@@ -8,9 +8,8 @@ use Twig\TwigFunction;
 
 class RenderImageModalExtension extends AbstractExtension
 {
-    public function __construct(
-        private readonly ImageUploadController $imageUploadController,
-    ) {
+    public function __construct(private readonly ImageUploadController $imageUploadController)
+    {
     }
 
     #[\Override]
@@ -23,7 +22,7 @@ class RenderImageModalExtension extends AbstractExtension
 
     public function render(...$parameters): string
     {
-        return $this->imageUploadController->imageReplaceModal((string) $parameters[0], $parameters[1])->getContent();
+        return $this->imageUploadController->imageReplaceModal((string)$parameters[0], $parameters[1])->getContent();
     }
 
     public function getName(): string

@@ -6,16 +6,14 @@ use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
 use App\Entity\ImageType;
 use App\Service\ImageService;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterface
 {
-    public function __construct(
-        private readonly ImageService $imageService,
-    ) {
+    public function __construct(private readonly ImageService $imageService)
+    {
     }
 
     public function load(ObjectManager $manager): void

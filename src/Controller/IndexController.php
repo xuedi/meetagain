@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class IndexController extends AbstractController
 {
-    public function __construct(private readonly \App\Service\CmsService $cms)
+    public function __construct(private readonly CmsService $cms)
     {
     }
     #[Route('/', name: 'app_default')]
