@@ -123,6 +123,7 @@
     "symfony/debug-bundle": "8.0.*",
     "symfony/maker-bundle": "^1",
     "symfony/phpunit-bridge": "8.0.*",
-    "symfony/web-profiler-bundle": "8.0.*"
+    "symfony/web-profiler-bundle": "8.0.*",
+    "psalm/phar": "^6"
   }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a9dd88e9f2b120e906c1761877ef78db",
+    "content-hash": "53ca4bb2fed0e00619f472a6cfcdc170",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -9191,6 +9191,41 @@
                 }
             ],
             "time": "2025-12-11T08:52:59+00:00"
+        },
+        {
+            "name": "psalm/phar",
+            "version": "6.14.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/psalm/phar.git",
+                "reference": "57ec52ce25ece3a00371a6d08ade8e36a61ca783"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/psalm/phar/zipball/57ec52ce25ece3a00371a6d08ade8e36a61ca783",
+                "reference": "57ec52ce25ece3a00371a6d08ade8e36a61ca783",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "conflict": {
+                "vimeo/psalm": "*"
+            },
+            "bin": [
+                "psalm.phar"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Composer-based Psalm Phar",
+            "support": {
+                "issues": "https://github.com/psalm/phar/issues",
+                "source": "https://github.com/psalm/phar/tree/6.14.1"
+            },
+            "time": "2025-12-10T09:38:52+00:00"
         },
         {
             "name": "rector/rector",
