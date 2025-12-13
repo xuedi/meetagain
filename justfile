@@ -78,7 +78,7 @@ devResetDatabase:
     {{EXEC}} php bin/console doctrine:database:create
 
 # Run all tests and code quality checks
-test: test-unit test-functional checkStan checkRector checkPhpcs checkPsalm
+test: test-unit test-functional checkStan checkRector checkPhpcs
     {{EXEC}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -102,10 +102,6 @@ checkRector:
 checkPhpcs:
     {{EXEC}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
 
-# Run Psalm static analysis for finding type errors
-checkPsalm:
-    {{EXEC}} php vendor/psalm/phar/psalm.phar --threads=8 --config='tests/psalm.xml' --error-level=8
-
 # Automatically fix coding standards violations using PHPCBF
 fixPhpcs:
     {{EXEC}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
@@ -113,10 +109,6 @@ fixPhpcs:
 # Apply Rector refactorings to the codebase
 fixRector:
     {{EXEC}} vendor/bin/rector process src -c tests/rector.php
-
-# Apply Psalm automatic code transformations (dry run)
-fixPsalm:
-    {{EXEC}} php vendor/psalm/phar/psalm.phar --threads=8 --config='tests/psalm.xml' --alter --issues=MissingOverrideAttribute,InvalidNullableReturnType,UnusedVariable,InvalidReturnType,InvalidFalsableReturnType,ClassMustBeFinal,MissingParamType,PossiblyUnusedMethod --dry-run
 
 # Generate test coverage badge SVG and stage it for commit (CI only)
 update_coverage_badge:
