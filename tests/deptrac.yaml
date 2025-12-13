@@ -56,51 +56,110 @@ deptrac:
           value: src/DataFixtures/.*
 
   ruleset:
+    # Controllers: thin, delegate to services
     Controller:
       - Service
       - Entity
       - Form
-      - Repository
       - Security
+      - Repository  # TODO: refactor to use services instead
 
+    # Services: business logic, can use repositories
     Service:
       - Repository
       - Entity
 
-    Entity:
-      - Repository
-      - Controller
+    # Entities: pure data objects, no dependencies
+    Entity: []
 
+    # Repositories: data access, only know entities
     Repository:
       - Entity
 
+    # Forms: can use entities and services for validation/choices
     Form:
       - Entity
       - Service
       - Repository
 
+    # Commands: CLI entry points, similar to controllers
     Command:
       - Service
       - Entity
-      - Repository
 
+    # Security: authentication/authorization logic
     Security:
       - Entity
       - Repository
       - Service
 
+    # Twig extensions: presentation helpers
     Twig:
       - Entity
       - Service
-      - Controller
 
+    # Event subscribers: react to system events
     EventSubscriber:
       - Service
       - Entity
-      - Repository
-      - Controller
 
+    # Fixtures: test data, allowed more flexibility
     DataFixtures:
       - Entity
       - Repository
       - Service
+
+  skip_violations:
+    # Doctrine ORM requires entities to reference their repository class in the attribute
+    App\Entity\Activity:
+      - App\Repository\ActivityRepository
+    App\Entity\Cms:
+      - App\Repository\CmsRepository
+    App\Entity\CmsBlock:
+      - App\Repository\CmsBlockRepository
+    App\Entity\Comment:
+      - App\Repository\CommentRepository
+    App\Entity\Config:
+      - App\Repository\ConfigRepository
+    App\Entity\EmailQueue:
+      - App\Repository\EmailQueueRepository
+    App\Entity\EventTranslation:
+      - App\Repository\EventTranslationRepository
+    App\Entity\Host:
+      - App\Repository\HostRepository
+    App\Entity\Image:
+      - App\Repository\ImageRepository
+    App\Entity\Location:
+      - App\Repository\LocationRepository
+    App\Entity\Menu:
+      - App\Repository\MenuRepository
+    App\Entity\MenuTranslation:
+      - App\Repository\MenuTranslationRepository
+    App\Entity\Message:
+      - App\Repository\MessageRepository
+    App\Entity\NotFoundLog:
+      - App\Repository\NotFoundLogRepository
+    App\Entity\Translation:
+      - App\Repository\TranslationRepository
+    App\Entity\TranslationSuggestion:
+      - App\Repository\TranslationSuggestionRepository
+    App\Entity\User:
+      - App\Repository\UserRepository
+
+    # TODO: MenuRoutes enum references controllers for route names - consider refactoring
+    App\Entity\MenuRoutes:
+      - App\Controller\ProfileController
+      - App\Controller\EventController
+      - App\Controller\MemberController
+      - App\Controller\ManageController
+      - App\Controller\AdminController
+      - App\Controller\SecurityController
+      - App\Controller\TranslationController
+
+    # TODO: EventSubscriber references controller for route comparison - consider using route names
+    App\EventSubscriber\KernelRequestSubscriber:
+      - App\Controller\SecurityController
+
+    # TODO: Twig extension references controller - consider refactoring
+    App\Twig\RenderImageModalExtension:
+      - App\Controller\ImageUploadController
