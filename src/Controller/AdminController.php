@@ -13,7 +13,7 @@ class AdminController extends AbstractController
 
     public function __construct(
         private readonly TagAwareCacheInterface $appCache,
-        private readonly \App\Service\DashboardService $dashboard,
+        private readonly DashboardService $dashboard,
     ) {
         //
     }
