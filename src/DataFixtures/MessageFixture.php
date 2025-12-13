@@ -8,7 +8,7 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MessageFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class MessageFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -33,11 +33,6 @@ class MessageFixture extends AbstractFixture implements DependentFixtureInterfac
         return [
             UserFixture::class,
         ];
-    }
-
-    public static function getGroups(): array
-    {
-        return ['base'];
     }
 
     private function getData(): array

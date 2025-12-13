@@ -12,7 +12,7 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class MenuFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class MenuFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -54,11 +54,6 @@ class MenuFixture extends AbstractFixture implements DependentFixtureInterface, 
         return [
             CmsFixture::class,
         ];
-    }
-
-    public static function getGroups(): array
-    {
-        return ['base'];
     }
 
     private function getData(): array

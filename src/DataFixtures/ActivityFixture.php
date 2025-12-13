@@ -9,7 +9,7 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class ActivityFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class ActivityFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -32,11 +32,6 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
         return [
             UserFixture::class,
         ];
-    }
-
-    public static function getGroups(): array
-    {
-        return ['base'];
     }
 
     private function getData(): array

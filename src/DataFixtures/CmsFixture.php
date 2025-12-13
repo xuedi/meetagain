@@ -8,7 +8,7 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class CmsFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class CmsFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public const string INDEX = 'index';
     public const string PRIVACY = 'privacy';
@@ -22,7 +22,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface, F
             $cms = new Cms();
             $cms->setSlug($slug);
             $cms->setCreatedAt(new DateTimeImmutable());
-            $cms->setCreatedBy($this->getRefUser(UserFixture::IMPORT));
+            $cms->setCreatedBy($this->getRefUser(SystemUserFixture::IMPORT));
             $cms->setPublished(true);
 
             $manager->persist($cms);
@@ -37,11 +37,6 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface, F
         return [
             UserFixture::class,
         ];
-    }
-
-    public static function getGroups(): array
-    {
-        return ['base'];
     }
 
     private function getData(): array

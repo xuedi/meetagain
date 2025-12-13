@@ -14,8 +14,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Throwable;
 
 /**
- * A bit of black magic to make fixtures more readable. And PHPStan
- * helper annotations for the magic methods resolved via __call().
+ * A bit of black magic to make fixtures more readable.
+ * Also, method definitions for magic calls for phpStan
  *
  * @method User getRefUser(string $name)
  * @method void addRefUser(string $name, User $entity)

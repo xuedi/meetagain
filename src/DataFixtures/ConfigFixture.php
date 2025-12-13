@@ -29,13 +29,13 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
     public function getDependencies(): array
     {
         return [
-            UserFixture::class,
+            SystemUserFixture::class,
         ];
     }
 
     public static function getGroups(): array
     {
-        return ['base'];
+        return ['install'];
     }
 
     private function getData(): array
@@ -73,7 +73,7 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
             ],
             [
                 'system_user_id',
-                (string)$this->getRefUser(UserFixture::IMPORT)->getId(),
+                (string)$this->getRefUser(SystemUserFixture::IMPORT)->getId(),
                 ConfigType::Integer
             ],
         ];

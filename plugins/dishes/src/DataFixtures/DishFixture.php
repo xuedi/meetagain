@@ -2,6 +2,8 @@
 
 namespace Plugin\Dishes\DataFixtures;
 
+use App\DataFixtures\AbstractFixture;
+use App\DataFixtures\SystemUserFixture;
 use App\DataFixtures\UserFixture;
 use App\Entity\ImageType;
 use App\Entity\User;
@@ -15,7 +17,7 @@ use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Entity\DishTranslation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class DishFixture extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
+class DishFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
 {
     public function __construct(
         private readonly ImageService $imageService,
@@ -24,7 +26,7 @@ class DishFixture extends Fixture implements FixtureGroupInterface, DependentFix
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $importUser = $this->getReference('user_' . md5('import'), User::class);
+        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
 
         echo 'Creating dishes ... ';
         foreach ($this->getData() as [$imagePreview, $translations]) {

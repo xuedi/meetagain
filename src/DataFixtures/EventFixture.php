@@ -13,12 +13,11 @@ use App\Entity\ImageType;
 use App\Service\ImageService;
 use DateTime;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class EventFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class EventFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public const string WEDNESDAY_MEETUP = 'Regular Wednesday meetup';
 
@@ -96,11 +95,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface,
         ];
     }
 
-    public static function getGroups(): array
-    {
-        return ['base'];
-    }
-
     private function getData(): array
     {
         return [
@@ -153,7 +147,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface,
                     [
                         'date' => $this->getWednesdayMeetupDate()->modify('+20 hour'),
                         'user' => UserFixture::ADEM_LANE,
-                        'msg' => 'it was, but very lonely',
+                        'msg' => 'it was, i was on the run',
                     ],
                     [
                         'date' => $this->getWednesdayMeetupDate()->modify('+21 hour'),

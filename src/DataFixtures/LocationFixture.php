@@ -8,7 +8,7 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class LocationFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class LocationFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public const string CAFE_LINDENHOF = 'Cafe Lindenhof';
     public const string KAFFEE_WERK = 'Kaffeewerk Mitte';
@@ -20,7 +20,7 @@ class LocationFixture extends AbstractFixture implements DependentFixtureInterfa
     public function load(ObjectManager $manager): void
     {
         $this->start();
-        $importUser = $this->getRefUser(UserFixture::IMPORT);
+        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
         foreach ($this->getData() as [$name, $street, $city, $postcode, $description, $long, $lat]) {
             $location = new Location();
             $location->setName($name);
@@ -46,11 +46,6 @@ class LocationFixture extends AbstractFixture implements DependentFixtureInterfa
         return [
             UserFixture::class,
         ];
-    }
-
-    public static function getGroups(): array
-    {
-        return ['base'];
     }
 
     private function getData(): array

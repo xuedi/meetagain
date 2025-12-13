@@ -9,7 +9,7 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class HostFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class HostFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public const string ADMIN = 'Admin';
     public const string ADEM = 'Adem';
@@ -39,11 +39,6 @@ class HostFixture extends AbstractFixture implements DependentFixtureInterface, 
         return [
             UserFixture::class,
         ];
-    }
-
-    public static function getGroups(): array
-    {
-        return ['base'];
     }
 
     private function getData(): array

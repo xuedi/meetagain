@@ -11,7 +11,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public function __construct(
         private readonly ImageService $imageService,
@@ -22,7 +22,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
     {
         $this->start();
         $priority = 1; // it is OK to increase the priority of the blocks
-        $importUser = $this->getRefUser(UserFixture::IMPORT);
+        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
         foreach ($this->getData() as [$page, $lang, $type, $json, $imageName]) {
             $block = new CmsBlock();
             $block->setPage($this->getRefCms($page));
@@ -56,11 +56,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             CmsFixture::class,
             UserFixture::class,
         ];
-    }
-
-    public static function getGroups(): array
-    {
-        return ['base'];
     }
 
     private function getData(): array

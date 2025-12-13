@@ -9,14 +9,12 @@ use App\Entity\UserStatus;
 use App\Service\ImageService;
 use DateTime;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixture extends AbstractFixture implements FixtureGroupInterface
+class UserFixture extends AbstractFixture
 {
-    public const string IMPORT = 'import';
     public const string ADMIN = 'admin';
     public const string ABRAHAM_BAKER = 'Abraham Baker';
     public const string ADEM_LANE = 'Adem Lane';
@@ -183,7 +181,7 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
             $user->setName($name);
             $user->setEmail($data['email']);
             $user->setPassword($data['password'] ? $this->hasher->hashPassword($user, $data['password']) : '');
-            $user->setPublic($name !== self::IMPORT);
+            $user->setPublic(true);
             $user->setTagging(true);
             $user->setRestricted(false);
             $user->setNotification(true);
@@ -236,61 +234,9 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
         return $nameList;
     }
 
-    public static function getGroups(): array
-    {
-        return ['base'];
-    }
-
     private function getData(): array
     {
         return [
-            [
-                'language' => 'en',
-                'name' => self::IMPORT,
-                'email' => self::IMPORT . '@example.org',
-                'password' => null,
-                'roles' => ['ROLE_SYSTEM'],
-                'verified' => false,
-                'status' => UserStatus::Active,
-                'following' => [
-                    self::ANITA_CRUZ,
-                    self::BEC_FERGUSON,
-                    self::BYRON_ROBERTSON,
-                    self::COURTNEY_TURNER,
-                    self::FERGUS_GRAY,
-                    self::HERBERT_FOWLER,
-                    self::JULIUS_VAUGHAN,
-                    self::KELSEY_LOWE,
-                    self::LUQMAN_ANTHONY,
-                    self::MADELEINE_PITTS,
-                    self::MARCO_KELLY,
-                    self::OWEN_HARDING,
-                    self::SARAH_PAGE,
-                    self::ZARA_BUSH,
-                    self::ADMIN,
-                    self::CRYSTAL_LIU,
-                ],
-                'followers' => [
-                    self::IMPORT,
-                    self::ALI_MAHDI,
-                    self::AVA_WRIGHT,
-                    self::AYAH_WILKINSON,
-                    self::BEC_FERGUSON,
-                    self::COURTNEY_TURNER,
-                    self::EVA_BOND,
-                    self::GENEVIEVE_MCLEAN,
-                    self::HARRY_BENDER,
-                    self::JAY_SHEPARD,
-                    self::LUCY_BOND,
-                    self::MARCO_KELLY,
-                    self::NICOLA_HARRIS,
-                    self::NICOLAS_WANG,
-                    self::ADMIN,
-                    self::ADEM_LANE,
-                    self::CRYSTAL_LIU,
-                ],
-                'restricted' => false,
-            ],
             [
                 'language' => 'de',
                 'name' => self::ADMIN,
@@ -353,7 +299,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::ANGELICA_WALLACE,
                     self::BYRON_ROBERTSON,
                     self::ETHAN_CAMPBELL,
@@ -788,7 +733,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::AYAH_WILKINSON,
                     self::BELLE_WOODS,
                     self::FLORENCE_SHAW,
@@ -1013,7 +957,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                     self::CRYSTAL_LIU,
                 ],
                 'followers' => [
-                    self::IMPORT,
                     self::ASHTON_BLACKWELL,
                     self::ASHWIN_SANTIAGO,
                     self::JAYA_WILLIS,
@@ -1196,7 +1139,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => true,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::AMANDA_LOWERY,
                     self::AMELIE_LAURENT,
                     self::AYSHA_BECKER,
@@ -1435,7 +1377,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::ADMIN,
                     self::ASTON_HOOD,
                     self::AVA_WRIGHT,
@@ -1654,7 +1595,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::ALESHA_BARRY,
                     self::ALI_MAHDI,
                     self::BAILEY_RICHARDS,
@@ -2894,7 +2834,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                     self::CRYSTAL_LIU,
                 ],
                 'followers' => [
-                    self::IMPORT,
                     self::ABRAHAM_BAKER,
                     self::HERBERT_FOWLER,
                     self::JONATHAN_KELLY,
@@ -3259,7 +3198,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                     self::CRYSTAL_LIU,
                 ],
                 'followers' => [
-                    self::IMPORT,
                     self::ELISA_NISHIKAWA,
                     self::ETHAN_VALDEZ,
                     self::LEYTON_FIELDS,
@@ -3606,7 +3544,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                     self::ADMIN,
                 ],
                 'followers' => [
-                    self::IMPORT,
                     self::ALIAH_LANE,
                     self::AMELIE_LAURENT,
                     self::ANAIAH_WHITTEN,
@@ -3927,7 +3864,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::ADIL_FLOYD,
                     self::BRIANNA_WARE,
                     self::ELENA_OWENS,
@@ -4231,7 +4167,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                     self::ZAHRA_CHRISTENSEN,
                 ],
                 'followers' => [
-                    self::IMPORT,
                     self::CANDICE_WU,
                     self::ELENA_OWENS,
                     self::HARRIET_ROJAS,
@@ -4286,7 +4221,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::ALISA_HESTER,
                     self::AMELIE_BENNETT,
                     self::AVA_WRIGHT,
@@ -4502,7 +4436,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                     self::ORLANDO_DIGGS,
                 ],
                 'followers' => [
-                    self::IMPORT,
                     self::ANDI_LANE,
                     self::ANITA_CRUZ,
                     self::HERBERT_FOWLER,
@@ -4638,7 +4571,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                     self::ADEM_LANE,
                 ],
                 'followers' => [
-                    self::IMPORT,
                     self::ABRAHAM_BAKER,
                     self::AMANDA_LOWERY,
                     self::BENEDICT_DOHERTY,
@@ -4659,7 +4591,6 @@ class UserFixture extends AbstractFixture implements FixtureGroupInterface
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
-                    self::IMPORT,
                     self::CANDICE_WU,
                     self::HARRIET_ROJAS,
                     self::LIAM_HOOD,

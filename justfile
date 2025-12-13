@@ -14,12 +14,10 @@ install:
     cp --no-clobber .env.dist .env
     cp --no-clobber config/plugins.dist.php config/plugins.php
     {{JUST}} start
-    {{EXEC}} composer install
-    {{EXEC}} php bin/console cache:clear
-    {{EXEC}} php bin/console doctrine:migrations:migrate -q
-    {{EXEC}} php bin/console doctrine:fixtures:load -q --group=base
+    {{JUST}} clearCache
+    {{JUST}} migrate
+    {{EXEC}} php bin/console doctrine:fixtures:load -q --group=install
     {{EXEC}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
-    {{EXEC}} php bin/console app:event:extent
 
 # Start all Docker containers in detached mode and prepare log directory
 start:
@@ -62,19 +60,22 @@ clearCache:
     {{EXEC}} php bin/console cache:clear
 
 # Run pending database migrations (interactive)
-devMigrate:
-    {{EXEC}} php bin/console doctrine:migrations:migrate
-
-# Load database fixtures (interactive, will purge existing data)
-devFixtures:
-    {{EXEC}} php bin/console doctrine:fixtures:load
+migrate:
+    {{EXEC}} php bin/console doctrine:migrations:migrate -q
 
 # Complete database reset: drops DB, recreates it, runs install and clears cache
 devReset:
+    {{JUST}} clearCache
+    {{JUST}} devResetDatabase
+    {{JUST}} migrate
+    {{EXEC}} php bin/console doctrine:fixtures:load -q
+    {{EXEC}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
+    {{EXEC}} php bin/console app:event:extent
+
+# delete and recreate the database
+devResetDatabase:
     {{EXEC}} php bin/console doctrine:database:drop --force
     {{EXEC}} php bin/console doctrine:database:create
-    {{JUST}} install
-    {{JUST}} clearCache
 
 # Run all tests and code quality checks
 test: test-unit test-functional checkStan checkRector checkPhpcs checkPsalm
