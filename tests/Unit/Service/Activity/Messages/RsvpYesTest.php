@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\RsvpYes;
 use App\Service\ImageService;
 use InvalidArgumentException;
@@ -35,7 +36,7 @@ class RsvpYesTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta, [], $eventNames);
 
         // check returns
-        $this->assertTrue($subject->validate());
+        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
         $this->assertEquals(ActivityType::RsvpYes, $subject->getType());
         $this->assertEquals($expectedText, $subject->render());
         $this->assertEquals($expectedHtml, $subject->render(true));

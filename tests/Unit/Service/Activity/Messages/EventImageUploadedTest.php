@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\EventImageUploaded;
 use App\Service\ImageService;
 use InvalidArgumentException;
@@ -45,7 +46,7 @@ class EventImageUploadedTest extends TestCase
         $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
 
         // check returns
-        $this->assertTrue($subject->validate());
+        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
         $this->assertEquals(ActivityType::EventImageUploaded, $subject->getType());
         $this->assertEquals($expectedText, $subject->render());
         $this->assertEquals($expectedHtml, $subject->render(true));

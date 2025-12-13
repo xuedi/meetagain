@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\ChangedUsername;
 use App\Service\Activity\Messages\Login;
 use App\Service\ImageService;
@@ -33,7 +34,7 @@ class ChangedUsernameTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta);
 
         // check returns
-        $this->assertTrue($subject->validate());
+        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
         $this->assertEquals(ActivityType::ChangedUsername, $subject->getType());
         $this->assertEquals($expectedText, $subject->render());
         $this->assertEquals($expectedHtml, $subject->render(true));

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\FollowedUser;
 use App\Service\ImageService;
 use InvalidArgumentException;
@@ -35,7 +36,7 @@ class FollowedUserTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
 
         // check returns
-        $this->assertTrue($subject->validate());
+        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
         $this->assertEquals(ActivityType::FollowedUser, $subject->getType());
         $this->assertEquals($expectedText, $subject->render());
         $this->assertEquals($expectedHtml, $subject->render(true));

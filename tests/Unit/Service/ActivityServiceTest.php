@@ -13,6 +13,7 @@ use App\Service\NotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class ActivityServiceTest extends TestCase
 {
@@ -59,6 +60,7 @@ class ActivityServiceTest extends TestCase
             repo: $this->createStub(ActivityRepository::class),
             notificationService: $notificationServiceMock,
             messageFactory: $messageFactoryMock,
+            logger: $this->createStub(LoggerInterface::class),
         );
 
         // Act: log the activity
@@ -117,6 +119,7 @@ class ActivityServiceTest extends TestCase
             repo: $repoMock,
             notificationService: $this->createStub(NotificationService::class),
             messageFactory: $messageFactoryMock,
+            logger: $this->createStub(LoggerInterface::class),
         );
 
         // Act: get user activity list
@@ -173,6 +176,7 @@ class ActivityServiceTest extends TestCase
             repo: $repoMock,
             notificationService: $this->createStub(NotificationService::class),
             messageFactory: $messageFactoryMock,
+            logger: $this->createStub(LoggerInterface::class),
         );
 
         // Act: get admin activity list

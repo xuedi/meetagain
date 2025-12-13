@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service\Activity\Messages;
 
 use App\Entity\ActivityType;
+use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\PasswordResetRequest;
 use App\Service\ImageService;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,7 +30,7 @@ class PasswordResetRequestTest extends TestCase
         $subject->injectServices($this->router, $this->imageService);
 
         // check returns
-        $this->assertTrue($subject->validate());
+        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
         $this->assertEquals(ActivityType::PasswordResetRequest, $subject->getType());
         $this->assertEquals($expectedText, $subject->render());
         $this->assertEquals($expectedHtml, $subject->render(true));
