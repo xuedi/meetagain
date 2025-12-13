@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -10,47 +9,21 @@ use App\Service\ConfigService;
 use App\Service\EmailService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 
-#[AllowMockObjectsWithoutExpectations]
 final class EmailServiceTest extends TestCase
 {
-    private MailerInterface&MockObject $mailer;
-    private ConfigService&MockObject $config;
-    private EmailQueueRepository&MockObject $mailRepo;
-    private EntityManagerInterface&MockObject $em;
-
-    private EmailService $service;
-
-    protected function setUp(): void
-    {
-        $this->mailer = $this->createMock(MailerInterface::class);
-        $this->config = $this->createMock(ConfigService::class);
-        $this->mailRepo = $this->createMock(EmailQueueRepository::class);
-        $this->em = $this->createMock(EntityManagerInterface::class);
-
-        $this->service = new EmailService(
-            $this->mailer,
-            $this->config,
-            $this->mailRepo,
-            $this->em,
-        );
-
-        $this->config->method('getMailerAddress')->willReturn(new Address('sender@email.com', 'email sender'));
-        $this->config->method('getHost')->willReturn('https://example.com');
-        $this->config->method('getUrl')->willReturn('example.com');
-    }
-
     public function testPrepareVerificationRequestEnqueuesEmailWithExpectedData(): void
     {
+        // Arrange: create user and mock entity manager to verify email queue entity
         $user = $this->makeUser('user@example.com', 'Alice', 'en', 'abc123');
 
-        $this->em->expects($this->once())
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())
             ->method('persist')
             ->with(
                 $this->callback(function ($entity) {
@@ -74,26 +47,36 @@ final class EmailServiceTest extends TestCase
                     return true;
                 })
             );
-        $this->em->expects($this->once())->method('flush');
+        $emMock->expects($this->once())->method('flush');
 
-        $ok = $this->service->prepareVerificationRequest($user);
+        $service = $this->createService(em: $emMock);
+
+        // Act: prepare verification request
+        $ok = $service->prepareVerificationRequest($user);
+
+        // Assert: returns true
         $this->assertTrue($ok);
     }
 
     public function testPrepareWelcomeAndResetPasswordAlsoEnqueue(): void
     {
+        // Arrange: mock entity manager to verify persist/flush calls
         $user = $this->makeUser('bob@example.com', 'Bob', 'de', 'reg-999');
 
-        // persist called twice (welcome + reset)
-        $this->em->expects($this->exactly(2))->method('persist');
-        $this->em->expects($this->exactly(2))->method('flush');
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->exactly(2))->method('persist');
+        $emMock->expects($this->exactly(2))->method('flush');
 
-        $this->assertTrue($this->service->prepareWelcome($user));
-        $this->assertTrue($this->service->prepareResetPassword($user));
+        $service = $this->createService(em: $emMock);
+
+        // Act & Assert: both methods enqueue emails successfully
+        $this->assertTrue($service->prepareWelcome($user));
+        $this->assertTrue($service->prepareResetPassword($user));
     }
 
     public function testSendQueueSendsPendingEmailsAndMarksAsSent(): void
     {
+        // Arrange: create queued email
         $queued = (new EmailQueue())
             ->setSender('"email sender" <sender@email.com>')
             ->setRecipient('user@example.com')
@@ -102,18 +85,24 @@ final class EmailServiceTest extends TestCase
             ->setLang('en')
             ->setContext(['k' => 'v']);
 
-        $this->mailRepo
+        // Arrange: mock mail repository to return pending email
+        $mailRepoMock = $this->createMock(EmailQueueRepository::class);
+        $mailRepoMock
             ->expects($this->once())
             ->method('findBy')
             ->with(['sendAt' => null], ['id' => 'ASC'], 1000)
             ->willReturn([$queued]);
 
-        $this->mailer
+        // Arrange: mock mailer to verify send is called
+        $mailerMock = $this->createMock(MailerInterface::class);
+        $mailerMock
             ->expects($this->once())
             ->method('send')
             ->with($this->isInstanceOf(TemplatedEmail::class));
 
-        $this->em->expects($this->once())->method('persist')
+        // Arrange: mock entity manager to verify persist/flush
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')
             ->with(
                 $this->callback(function ($entity) use ($queued) {
                     $this->assertSame($queued, $entity);
@@ -121,9 +110,37 @@ final class EmailServiceTest extends TestCase
                     return true;
                 })
             );
-        $this->em->expects($this->once())->method('flush');
+        $emMock->expects($this->once())->method('flush');
 
-        $this->service->sendQueue();
+        $service = $this->createService(
+            mailer: $mailerMock,
+            mailRepo: $mailRepoMock,
+            em: $emMock,
+        );
+
+        // Act: send queue
+        $service->sendQueue();
+    }
+
+    private function createService(
+        ?MailerInterface $mailer = null,
+        ?ConfigService $config = null,
+        ?EmailQueueRepository $mailRepo = null,
+        ?EntityManagerInterface $em = null,
+    ): EmailService {
+        if ($config === null) {
+            $config = $this->createStub(ConfigService::class);
+            $config->method('getMailerAddress')->willReturn(new Address('sender@email.com', 'email sender'));
+            $config->method('getHost')->willReturn('https://example.com');
+            $config->method('getUrl')->willReturn('example.com');
+        }
+
+        return new EmailService(
+            mailer: $mailer ?? $this->createStub(MailerInterface::class),
+            config: $config,
+            mailRepo: $mailRepo ?? $this->createStub(EmailQueueRepository::class),
+            em: $em ?? $this->createStub(EntityManagerInterface::class),
+        );
     }
 
     private function makeUser(

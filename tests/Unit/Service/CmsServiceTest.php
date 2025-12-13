@@ -7,170 +7,179 @@ use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Service\CmsService;
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-#[AllowMockObjectsWithoutExpectations]
 class CmsServiceTest extends TestCase
 {
-    private MockObject|Environment $twigMock;
-    private MockObject|CmsRepository $cmsRepoMock;
-    private MockObject|EventRepository $eventRepoMock;
-    private CmsService $subject;
-
-    protected function setUp(): void
+    public function testCreateNotFoundPageReturns404Response(): void
     {
-        $this->twigMock = $this->createMock(Environment::class);
-        $this->cmsRepoMock = $this->createMock(CmsRepository::class);
-        $this->eventRepoMock = $this->createMock(EventRepository::class);
-
-        $this->subject = new CmsService(
-            twig: $this->twigMock,
-            repo: $this->cmsRepoMock,
-            eventRepo: $this->eventRepoMock,
-        );
-    }
-
-    public function testCanCreateNotFoundPage(): void
-    {
-        $expectedCode = 404;
+        // Arrange: mock Twig to render 404 template
         $expectedContent = '404 page content';
 
-        $this->twigMock
+        $twigMock = $this->createMock(Environment::class);
+        $twigMock
             ->expects($this->once())
             ->method('render')
-            ->with('cms/404.html.twig')
+            ->with('cms/404.html.twig', ['message' => "These aren't the droids you're looking for!"])
             ->willReturn($expectedContent);
 
-        $response = $this->subject->createNotFoundPage();
+        $subject = new CmsService(
+            twig: $twigMock,
+            repo: $this->createStub(CmsRepository::class),
+            eventRepo: $this->createStub(EventRepository::class),
+        );
 
-        $this->assertEquals($expectedContent, $response->getContent());
-        $this->assertEquals($expectedCode, $response->getStatusCode());
+        // Act: create not found page
+        $response = $subject->createNotFoundPage();
+
+        // Assert: returns 404 response with rendered content
+        $this->assertSame($expectedContent, $response->getContent());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
-    public function testCanGetSites(): void
+    public function testGetSitesReturnsAllCmsPages(): void
     {
-        $this->cmsRepoMock->expects($this->once())->method('findAll');
-        $this->subject->getSites();
+        // Arrange: mock repository to return list of CMS pages
+        $expectedSites = [
+            $this->createStub(Cms::class),
+            $this->createStub(Cms::class),
+        ];
+
+        $cmsRepoMock = $this->createMock(CmsRepository::class);
+        $cmsRepoMock
+            ->expects($this->once())
+            ->method('findAll')
+            ->willReturn($expectedSites);
+
+        $subject = new CmsService(
+            twig: $this->createStub(Environment::class),
+            repo: $cmsRepoMock,
+            eventRepo: $this->createStub(EventRepository::class),
+        );
+
+        // Act: get all sites
+        $result = $subject->getSites();
+
+        // Assert: returns array of CMS pages
+        $this->assertSame($expectedSites, $result);
     }
 
-    public function testHandleReturnsNotFoundPageWhenCmsPageNotFound(): void
+    public function testHandleReturns404WhenPageNotFound(): void
     {
+        // Arrange: mock repository to return null (page not found)
         $locale = 'en';
         $slug = 'non-existent-page';
-        $expectedCode = 404;
         $expectedContent = '404 page content';
 
-        // Mock the repository to return null (page not found)
-        $this->cmsRepoMock
+        $cmsRepoMock = $this->createMock(CmsRepository::class);
+        $cmsRepoMock
             ->expects($this->once())
             ->method('findOneBy')
-            ->with([
-                'slug' => $slug,
-                'published' => true,
-            ])
+            ->with(['slug' => $slug, 'published' => true])
             ->willReturn(null);
 
-        // Mock the twig render for 404 page
-        $this->twigMock
+        $twigMock = $this->createMock(Environment::class);
+        $twigMock
             ->expects($this->once())
             ->method('render')
             ->with('cms/404.html.twig', $this->anything())
             ->willReturn($expectedContent);
 
-        $response = $this->subject->handle($locale, $slug, new Response());
+        $subject = new CmsService(
+            twig: $twigMock,
+            repo: $cmsRepoMock,
+            eventRepo: $this->createStub(EventRepository::class),
+        );
 
-        $this->assertEquals($expectedContent, $response->getContent());
-        $this->assertEquals($expectedCode, $response->getStatusCode());
+        // Act: handle request for non-existent page
+        $response = $subject->handle($locale, $slug, new Response());
+
+        // Assert: returns 404 response
+        $this->assertSame($expectedContent, $response->getContent());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
-    public function testHandleReturnsNoContentWhenPageHasNoContentInRequestedLanguage(): void
+    public function testHandleReturns204WhenPageHasNoContentInRequestedLanguage(): void
     {
+        // Arrange: mock CMS page with no content blocks for requested locale
         $locale = 'en';
         $slug = 'existing-page';
-        $expectedCode = 204;
         $expectedContent = '204 page content';
 
-        // Create a mock Cms entity
         $cmsMock = $this->createMock(Cms::class);
-
-        // Mock the repository to return the mock Cms entity
-        $this->cmsRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with([
-                'slug' => $slug,
-                'published' => true,
-            ])
-            ->willReturn($cmsMock);
-
-        // Mock the getLanguageFilteredBlockJsonList method to return an empty collection
-        $emptyCollection = new ArrayCollection();
         $cmsMock
             ->expects($this->once())
             ->method('getLanguageFilteredBlockJsonList')
             ->with($locale)
-            ->willReturn($emptyCollection);
+            ->willReturn(new ArrayCollection());
 
-        // Mock the twig render for 204 page
-        $this->twigMock
+        $cmsRepoMock = $this->createMock(CmsRepository::class);
+        $cmsRepoMock
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with(['slug' => $slug, 'published' => true])
+            ->willReturn($cmsMock);
+
+        $twigMock = $this->createMock(Environment::class);
+        $twigMock
             ->expects($this->once())
             ->method('render')
-            ->with('cms/204.html.twig', $this->anything())
+            ->with('cms/204.html.twig', ['message' => 'page was found but is has no content in this language'])
             ->willReturn($expectedContent);
 
-        $response = $this->subject->handle($locale, $slug, new Response());
+        $subject = new CmsService(
+            twig: $twigMock,
+            repo: $cmsRepoMock,
+            eventRepo: $this->createStub(EventRepository::class),
+        );
 
-        $this->assertEquals($expectedContent, $response->getContent());
-        $this->assertEquals($expectedCode, $response->getStatusCode());
+        // Act: handle request for page without content in requested language
+        $response = $subject->handle($locale, $slug, new Response());
+
+        // Assert: returns 204 No Content response
+        $this->assertSame($expectedContent, $response->getContent());
+        $this->assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
-    public function testHandleReturnsPageContentWhenPageHasContentInRequestedLanguage(): void
+    public function testHandleReturns200WithContentWhenPageExists(): void
     {
+        // Arrange: mock CMS page with content blocks
         $locale = 'en';
         $slug = 'existing-page';
         $pageTitle = 'Page Title';
-        $expectedCode = 200;
-        $expectedContent = 'page content';
+        $expectedContent = 'rendered page content';
         $upcomingEvents = ['event1', 'event2'];
-
-        // Create a mock Cms entity
-        $cmsMock = $this->createMock(Cms::class);
-
-        // Mock the repository to return the mock Cms entity
-        $this->cmsRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with([
-                'slug' => $slug,
-                'published' => true,
-            ])
-            ->willReturn($cmsMock);
-
-        // Create a non-empty collection of blocks
         $blocks = new ArrayCollection(['block1', 'block2']);
 
-        // Mock the getLanguageFilteredBlockJsonList method to return the non-empty collection
+        $cmsMock = $this->createMock(Cms::class);
         $cmsMock
             ->expects($this->once())
             ->method('getLanguageFilteredBlockJsonList')
             ->with($locale)
             ->willReturn($blocks);
+        $cmsMock
+            ->expects($this->once())
+            ->method('getPageTitle')
+            ->with($locale)
+            ->willReturn($pageTitle);
 
-        // Mock the getPageTitle method
-        $cmsMock->expects($this->once())->method('getPageTitle')->with($locale)->willReturn($pageTitle);
+        $cmsRepoMock = $this->createMock(CmsRepository::class);
+        $cmsRepoMock
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with(['slug' => $slug, 'published' => true])
+            ->willReturn($cmsMock);
 
-        // Mock the eventRepo to return upcoming events
-        $this->eventRepoMock
+        $eventRepoMock = $this->createMock(EventRepository::class);
+        $eventRepoMock
             ->expects($this->once())
             ->method('getUpcomingEvents')
             ->willReturn($upcomingEvents);
 
-        // Mock the twig render for the page content
-        $this->twigMock
+        $twigMock = $this->createMock(Environment::class);
+        $twigMock
             ->expects($this->once())
             ->method('render')
             ->with('cms/index.html.twig', [
@@ -180,9 +189,63 @@ class CmsServiceTest extends TestCase
             ])
             ->willReturn($expectedContent);
 
-        $response = $this->subject->handle($locale, $slug, new Response());
+        $subject = new CmsService(
+            twig: $twigMock,
+            repo: $cmsRepoMock,
+            eventRepo: $eventRepoMock,
+        );
 
-        $this->assertEquals($expectedContent, $response->getContent());
-        $this->assertEquals($expectedCode, $response->getStatusCode());
+        // Act: handle request for page with content
+        $response = $subject->handle($locale, $slug, new Response());
+
+        // Assert: returns 200 OK response with rendered content
+        $this->assertSame($expectedContent, $response->getContent());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testHandleUsesDefaultTitleWhenPageTitleIsNull(): void
+    {
+        // Arrange: mock CMS page with null title
+        $locale = 'en';
+        $slug = 'page-without-title';
+        $expectedContent = 'rendered page content';
+        $blocks = new ArrayCollection(['block1']);
+
+        // Arrange: stub CMS entity to return blocks and null title
+        $cmsStub = $this->createStub(Cms::class);
+        $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn($blocks);
+        $cmsStub->method('getPageTitle')->willReturn(null);
+
+        // Arrange: stub repository to return the CMS entity
+        $cmsRepoStub = $this->createStub(CmsRepository::class);
+        $cmsRepoStub->method('findOneBy')->willReturn($cmsStub);
+
+        // Arrange: stub event repository to return empty events
+        $eventRepoStub = $this->createStub(EventRepository::class);
+        $eventRepoStub->method('getUpcomingEvents')->willReturn([]);
+
+        // Arrange: mock Twig to verify default title is used
+        $twigMock = $this->createMock(Environment::class);
+        $twigMock
+            ->expects($this->once())
+            ->method('render')
+            ->with('cms/index.html.twig', [
+                'title' => 'No Title set',
+                'blocks' => $blocks,
+                'events' => [],
+            ])
+            ->willReturn($expectedContent);
+
+        $subject = new CmsService(
+            twig: $twigMock,
+            repo: $cmsRepoStub,
+            eventRepo: $eventRepoStub,
+        );
+
+        // Act: handle request for page without title
+        $response = $subject->handle($locale, $slug, new Response());
+
+        // Assert: uses default title "No Title set"
+        $this->assertSame($expectedContent, $response->getContent());
     }
 }

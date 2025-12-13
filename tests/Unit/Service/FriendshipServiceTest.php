@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -8,8 +7,6 @@ use App\Repository\UserRepository;
 use App\Service\FriendshipService;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -17,182 +14,175 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-#[AllowMockObjectsWithoutExpectations]
 class FriendshipServiceTest extends TestCase
 {
-    private MockObject|UserRepository $userRepositoryMock;
-    private MockObject|EntityManagerInterface $entityManagerMock;
-    private MockObject|RouterInterface $routerMock;
-    private MockObject|Security $securityMock;
-    private MockObject|RequestStack $requestStackMock;
-    private FriendshipService $subject;
-
-    protected function setUp(): void
+    public function testToggleFollowAddsUserWhenNotFollowing(): void
     {
-        $this->userRepositoryMock = $this->createMock(UserRepository::class);
-        $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $this->routerMock = $this->createMock(RouterInterface::class);
-        $this->securityMock = $this->createMock(Security::class);
-        $this->requestStackMock = $this->createMock(RequestStack::class);
-
-        $this->subject = new FriendshipService(
-            repo: $this->userRepositoryMock,
-            em: $this->entityManagerMock,
-            router: $this->routerMock,
-            security: $this->securityMock,
-            requestStack: $this->requestStackMock,
-        );
-    }
-
-    public function testToggleFollowAddUser(): void
-    {
-        // Test data
+        // Arrange: set up current user not following target user
         $userId = 42;
         $returnRoute = 'app_profile_view';
         $locale = 'en';
         $generatedRoute = '/en/profile/42';
 
-        // Mock current user
-        $currentUser = $this->createMock(User::class);
-        $followingCollection = $this->createMock(Collection::class);
+        $followingCollection = $this->createStub(Collection::class);
         $followingCollection->method('contains')->willReturn(false);
-        $currentUser->method('getFollowing')->willReturn($followingCollection);
-        $currentUser->expects($this->once())->method('addFollowing');
 
-        // Mock target user
-        $targetUser = $this->createMock(User::class);
+        $currentUserMock = $this->createMock(User::class);
+        $currentUserMock->method('getFollowing')->willReturn($followingCollection);
+        $currentUserMock->expects($this->once())->method('addFollowing');
+
+        $targetUser = $this->createStub(User::class);
         $targetUser->method('getId')->willReturn($userId);
 
-        // Mock security to return current user
-        $this->securityMock->method('getUser')->willReturn($currentUser);
+        $securityStub = $this->createStub(Security::class);
+        $securityStub->method('getUser')->willReturn($currentUserMock);
 
-        // Mock user repository to return target user
-        $this->userRepositoryMock
+        $userRepoMock = $this->createMock(UserRepository::class);
+        $userRepoMock
+            ->expects($this->once())
             ->method('findOneBy')
             ->with(['id' => $userId])
             ->willReturn($targetUser);
 
-        // Mock entity manager
-        $this->entityManagerMock
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with($currentUserMock);
+        $emMock->expects($this->once())->method('flush');
+
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getLocale')->willReturn($locale);
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+
+        $routerMock = $this->createMock(RouterInterface::class);
+        $routerMock
             ->expects($this->once())
-            ->method('persist')
-            ->with($currentUser);
-        $this->entityManagerMock->expects($this->once())->method('flush');
-
-        // Mock request
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getLocale')->willReturn($locale);
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
-
-        // Mock router
-        $this->routerMock
             ->method('generate')
-            ->with($returnRoute, [
-                '_locale' => $locale,
-                'id' => $userId,
-            ])
+            ->with($returnRoute, ['_locale' => $locale, 'id' => $userId])
             ->willReturn($generatedRoute);
 
-        // Call the method
-        $response = $this->subject->toggleFollow($userId, $returnRoute);
+        $subject = new FriendshipService(
+            repo: $userRepoMock,
+            em: $emMock,
+            router: $routerMock,
+            security: $securityStub,
+            requestStack: $requestStackStub,
+        );
 
-        // Assert response
+        // Act: toggle follow
+        $response = $subject->toggleFollow($userId, $returnRoute);
+
+        // Assert: returns redirect to generated route
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals($generatedRoute, $response->getTargetUrl());
+        $this->assertSame($generatedRoute, $response->getTargetUrl());
     }
 
-    public function testToggleFollowRemoveUser(): void
+    public function testToggleFollowRemovesUserWhenAlreadyFollowing(): void
     {
-        // Test data
+        // Arrange: set up current user already following target user
         $userId = 42;
         $returnRoute = 'app_profile_view';
         $locale = 'en';
         $generatedRoute = '/en/profile/42';
 
-        // Mock current user
-        $currentUser = $this->createMock(User::class);
-        $followingCollection = $this->createMock(Collection::class);
+        $followingCollection = $this->createStub(Collection::class);
         $followingCollection->method('contains')->willReturn(true);
-        $currentUser->method('getFollowing')->willReturn($followingCollection);
-        $currentUser->expects($this->once())->method('removeFollowing');
 
-        // Mock target user
-        $targetUser = $this->createMock(User::class);
+        $currentUserMock = $this->createMock(User::class);
+        $currentUserMock->method('getFollowing')->willReturn($followingCollection);
+        $currentUserMock->expects($this->once())->method('removeFollowing');
+
+        $targetUser = $this->createStub(User::class);
         $targetUser->method('getId')->willReturn($userId);
 
-        // Mock security to return current user
-        $this->securityMock->method('getUser')->willReturn($currentUser);
+        $securityStub = $this->createStub(Security::class);
+        $securityStub->method('getUser')->willReturn($currentUserMock);
 
-        // Mock user repository to return target user
-        $this->userRepositoryMock
+        $userRepoMock = $this->createMock(UserRepository::class);
+        $userRepoMock
+            ->expects($this->once())
             ->method('findOneBy')
             ->with(['id' => $userId])
             ->willReturn($targetUser);
 
-        // Mock entity manager
-        $this->entityManagerMock
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with($currentUserMock);
+        $emMock->expects($this->once())->method('flush');
+
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getLocale')->willReturn($locale);
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+
+        $routerMock = $this->createMock(RouterInterface::class);
+        $routerMock
             ->expects($this->once())
-            ->method('persist')
-            ->with($currentUser);
-        $this->entityManagerMock->expects($this->once())->method('flush');
-
-        // Mock request
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getLocale')->willReturn($locale);
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
-
-        // Mock router
-        $this->routerMock
             ->method('generate')
-            ->with($returnRoute, [
-                '_locale' => $locale,
-                'id' => $userId,
-            ])
+            ->with($returnRoute, ['_locale' => $locale, 'id' => $userId])
             ->willReturn($generatedRoute);
 
-        // Call the method
-        $response = $this->subject->toggleFollow($userId, $returnRoute);
+        $subject = new FriendshipService(
+            repo: $userRepoMock,
+            em: $emMock,
+            router: $routerMock,
+            security: $securityStub,
+            requestStack: $requestStackStub,
+        );
 
-        // Assert response
+        // Act: toggle follow
+        $response = $subject->toggleFollow($userId, $returnRoute);
+
+        // Assert: returns redirect to generated route
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals($generatedRoute, $response->getTargetUrl());
+        $this->assertSame($generatedRoute, $response->getTargetUrl());
     }
 
-    public function testToggleFollowUnauthenticatedUser(): void
+    public function testToggleFollowThrowsExceptionWhenNotAuthenticated(): void
     {
-        // Test data
-        $userId = 42;
-        $returnRoute = 'app_profile_view';
+        // Arrange: security returns null (unauthenticated)
+        $securityStub = $this->createStub(Security::class);
+        $securityStub->method('getUser')->willReturn(null);
 
-        // Mock security to return null (unauthenticated)
-        $this->securityMock->method('getUser')->willReturn(null);
+        $subject = new FriendshipService(
+            repo: $this->createStub(UserRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
+            router: $this->createStub(RouterInterface::class),
+            security: $securityStub,
+            requestStack: $this->createStub(RequestStack::class),
+        );
 
-        // Expect exception
+        // Assert: expect authentication exception
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
         $this->expectExceptionMessage('Should never happen, see: config/packages/security.yaml');
 
-        // Call the method
-        $this->subject->toggleFollow($userId, $returnRoute);
+        // Act: toggle follow without authentication
+        $subject->toggleFollow(42, 'app_profile_view');
     }
 
-    public function testToggleFollowNonUserAuthenticated(): void
+    public function testToggleFollowThrowsExceptionWhenUserIsNotUserEntity(): void
     {
-        // Test data
-        $userId = 42;
-        $returnRoute = 'app_profile_view';
+        // Arrange: security returns non-User object implementing UserInterface
+        $nonUserMock = $this->createStub(UserInterface::class);
 
-        // Create a mock that implements UserInterface but is not a User
-        $nonUserMock = $this->createMock(\Symfony\Component\Security\Core\User\UserInterface::class);
+        $securityStub = $this->createStub(Security::class);
+        $securityStub->method('getUser')->willReturn($nonUserMock);
 
-        // Mock security to return a non-User object
-        $this->securityMock->method('getUser')->willReturn($nonUserMock);
+        $subject = new FriendshipService(
+            repo: $this->createStub(UserRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
+            router: $this->createStub(RouterInterface::class),
+            security: $securityStub,
+            requestStack: $this->createStub(RequestStack::class),
+        );
 
-        // Expect exception
+        // Assert: expect authentication exception
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
         $this->expectExceptionMessage('Should never happen, see: config/packages/security.yaml');
 
-        // Call the method
-        $this->subject->toggleFollow($userId, $returnRoute);
+        // Act: toggle follow with non-User object
+        $subject->toggleFollow(42, 'app_profile_view');
     }
 }

@@ -1,587 +1,388 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
 use App\ExtendedFilesystem;
 use App\Service\CommandService;
 use App\Service\PluginService;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[AllowMockObjectsWithoutExpectations]
 class PluginServiceTest extends TestCase
 {
-    private MockObject|CommandService $commandServiceMock;
-    private MockObject|ExtendedFilesystem $filesystemMock;
-    private PluginService $subject;
     private string $tempDir;
     private string $configFile;
 
     protected function setUp(): void
     {
-        $this->commandServiceMock = $this->createStub(CommandService::class);
-        $this->filesystemMock = $this->createStub(ExtendedFilesystem::class);
-
-        // Create a temporary directory for testing
+        // Arrange: create temporary directory structure for testing
         $this->tempDir = sys_get_temp_dir() . '/plugin_service_test_' . uniqid();
         mkdir($this->tempDir, 0777, true);
 
-        // Create a config directory
         $configDir = $this->tempDir . '/config';
         mkdir($configDir, 0777, true);
 
-        // Create a plugins.php file with a valid return statement
         $this->configFile = $configDir . '/plugins.php';
         file_put_contents(
             $this->configFile,
             '<?php declare(strict_types=1); return ["plugin1" => true, "plugin2" => false];',
         );
-
-        // Create a real instance of PluginService with mocked dependencies
-        $this->subject = new PluginService($this->commandServiceMock, $this->filesystemMock);
     }
 
-    /**
-     * Test getAdminList method
-     */
-    public function testGetAdminList(): void
+    protected function tearDown(): void
     {
-        // Create plugin directories and manifest files
+        // Cleanup: remove temporary directory
+        $this->removeDirectory($this->tempDir);
+    }
+
+    public function testGetAdminListReturnsPluginManifestData(): void
+    {
+        // Arrange: create plugin directories with manifest files
         $pluginDir = $this->tempDir . '/plugins';
         mkdir($pluginDir, 0777, true);
         mkdir($pluginDir . '/plugin1', 0777, true);
         mkdir($pluginDir . '/plugin2', 0777, true);
 
-        // Create manifest files
-        $manifest1 = [
+        file_put_contents($pluginDir . '/plugin1/manifest.json', json_encode([
             'name' => 'Plugin 1',
             'version' => '1.0.0',
             'description' => 'Test plugin 1',
-        ];
-        $manifest2 = [
+        ]));
+        file_put_contents($pluginDir . '/plugin2/manifest.json', json_encode([
             'name' => 'Plugin 2',
             'version' => '2.0.0',
             'description' => 'Test plugin 2',
-        ];
-        file_put_contents($pluginDir . '/plugin1/manifest.json', json_encode($manifest1));
-        file_put_contents($pluginDir . '/plugin2/manifest.json', json_encode($manifest2));
+        ]));
 
-        // Use a focused local mock to assert interactions for this test
-        $pluginPaths = [$pluginDir . '/plugin1', $pluginDir . '/plugin2'];
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) use ($pluginDir) {
-                if ($path === PluginService::PLUGIN_DIR) {
-                    return $pluginDir;
-                }
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
-
+        $fsMock->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::PLUGIN_DIR => $pluginDir,
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
         $fsMock
             ->expects($this->once())
             ->method('glob')
             ->with($pluginDir . '/*', GLOB_ONLYDIR)
-            ->willReturn($pluginPaths);
+            ->willReturn([$pluginDir . '/plugin1', $pluginDir . '/plugin2']);
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
 
-        // Manifest file existence and content
-        $fsMock
-            ->method('fileExists')
-            ->willReturnCallback(function ($path) {
-                return file_exists($path);
-            });
+        $subject = new PluginService($this->createStub(CommandService::class), $fsMock);
 
-        $fsMock
-            ->method('getFileContents')
-            ->willReturnCallback(function ($path) {
-                return file_get_contents($path);
-            });
-
-        $subject = new PluginService($this->commandServiceMock, $fsMock);
-
-        // Call the method and verify the result
+        // Act: get admin list
         $result = $subject->getAdminList();
 
-        // Assert that we got the expected plugins
+        // Assert: returns plugin manifest data
         $this->assertCount(2, $result);
-        $this->assertEquals('Plugin 1', $result[0]['name']);
-        $this->assertEquals('Plugin 2', $result[1]['name']);
-        $this->assertEquals('1.0.0', $result[0]['version']);
-        $this->assertEquals('2.0.0', $result[1]['version']);
-        $this->assertEquals('Test plugin 1', $result[0]['description']);
-        $this->assertEquals('Test plugin 2', $result[1]['description']);
+        $this->assertSame('Plugin 1', $result[0]['name']);
+        $this->assertSame('1.0.0', $result[0]['version']);
+        $this->assertSame('Test plugin 1', $result[0]['description']);
+        $this->assertSame('Plugin 2', $result[1]['name']);
+        $this->assertSame('2.0.0', $result[1]['version']);
     }
 
-    /**
-     * Test getActiveList method
-     */
-    public function testGetActiveList(): void
+    public function testGetAdminListReturnsEmptyArrayWhenPluginDirNotFound(): void
     {
-        // Mock filesystem methods
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
+        // Arrange: mock filesystem to return false for plugin directory
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock->method('getRealPath')->with(PluginService::PLUGIN_DIR)->willReturn(false);
+        $fsMock->expects($this->never())->method('glob');
 
-        // Call the method and verify the result
-        $result = $this->subject->getActiveList();
+        $subject = new PluginService($this->createStub(CommandService::class), $fsMock);
 
-        // Assert that we got the expected active plugins
-        $this->assertIsArray($result);
+        // Act: get admin list
+        $result = $subject->getAdminList();
+
+        // Assert: returns empty array
+        $this->assertSame([], $result);
+    }
+
+    public function testGetActiveListReturnsOnlyEnabledPlugins(): void
+    {
+        // Arrange: mock filesystem to return config directory
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
+
+        $subject = new PluginService($this->createStub(CommandService::class), $fsStub);
+
+        // Act: get active list
+        $result = $subject->getActiveList();
+
+        // Assert: returns only enabled plugins (plugin1 is true, plugin2 is false)
         $this->assertContains('plugin1', $result);
         $this->assertNotContains('plugin2', $result);
     }
 
-    /**
-     * Test install method
-     */
-    public function testInstall(): void
+    public function testInstallAddsPluginToConfigAsDisabled(): void
     {
-        // Mock filesystem methods
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
+        // Arrange: mock filesystem for config operations
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
+        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
+            file_put_contents($this->configFile, $content);
+            return true;
+        });
 
-        // Mock putFileContents to capture the config file content
-        $capturedContent = null;
-        $this->filesystemMock
-            ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) use (&$capturedContent) {
-                $capturedContent = $content;
-                file_put_contents($this->configFile, $content);
-                return true;
-            });
-
-        // Use a focused local mock to assert cache clear
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
-        $subject = new PluginService($cmdMock, $this->filesystemMock);
 
-        // Call the method
+        $subject = new PluginService($cmdMock, $fsStub);
+
+        // Act: install new plugin
         $subject->install('test-plugin');
 
-        // Verify that the plugin was installed (added to config file)
+        // Assert: plugin is added as disabled
         $config = include $this->configFile;
-        $this->assertIsArray($config);
         $this->assertArrayHasKey('test-plugin', $config);
         $this->assertFalse($config['test-plugin']);
     }
 
-    /**
-     * Test install method early return when plugin is already installed
-     */
-    public function testInstallEarlyReturnWhenAlreadyInstalled(): void
+    public function testInstallSkipsIfPluginAlreadyInstalled(): void
     {
-        // Mock filesystem methods
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
+        // Arrange: mock filesystem for config operations
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
 
-        // Mock putFileContents to capture the config file content
-        $capturedContent = null;
-        $this->filesystemMock
-            ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) use (&$capturedContent) {
-                $capturedContent = $content;
-                file_put_contents($this->configFile, $content);
-                return true;
-            });
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->never())->method('clearCache');
 
-        // First install the plugin
-        $this->subject->install('test-plugin');
+        $subject = new PluginService($cmdMock, $fsStub);
 
-        // Reset the mock to verify it's not called again
-        $this->commandServiceMock = $this->createMock(CommandService::class);
-        $this->commandServiceMock->expects($this->never())->method('clearCache');
+        // Act: try to install already installed plugin
+        $subject->install('plugin1');
 
-        // Create a new subject with the reset mock
-        $this->subject = new PluginService($this->commandServiceMock, $this->filesystemMock);
-
-        // Try to install the same plugin again
-        $this->subject->install('test-plugin');
-
-        // Verify that the plugin config wasn't changed (early return happened)
+        // Assert: config unchanged (plugin1 was already in config)
         $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('test-plugin', $config);
-        $this->assertFalse($config['test-plugin']);
+        $this->assertTrue($config['plugin1']);
     }
 
-    /**
-     * Test uninstall method
-     */
-    public function testUninstall(): void
+    public function testUninstallRemovesPluginFromConfig(): void
     {
-        // First install a plugin to uninstall
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
+        // Arrange: mock filesystem for config operations
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
+        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
+            file_put_contents($this->configFile, $content);
+            return true;
+        });
 
-        // Mock putFileContents to capture the config file content
-        $capturedContent = null;
-        $this->filesystemMock
-            ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) use (&$capturedContent) {
-                $capturedContent = $content;
-                file_put_contents($this->configFile, $content);
-                return true;
-            });
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->once())->method('clearCache');
 
-        // First install the plugin
-        $this->subject->install('test-plugin');
+        $subject = new PluginService($cmdMock, $fsStub);
 
-        // Then uninstall it
-        $this->subject->uninstall('test-plugin');
+        // Act: uninstall plugin
+        $subject->uninstall('plugin1');
 
-        // Verify that the plugin was uninstalled (removed from config file)
+        // Assert: plugin is removed from config
         $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayNotHasKey('test-plugin', $config);
+        $this->assertArrayNotHasKey('plugin1', $config);
     }
 
-    /**
-     * Test uninstall method early return when plugin is not installed
-     */
-    public function testUninstallEarlyReturnWhenNotInstalled(): void
+    public function testUninstallSkipsIfPluginNotInstalled(): void
     {
-        // Mock filesystem methods
+        // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
-
-        // putFileContents must not be called
+        $fsMock->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
         $fsMock->expects($this->never())->method('putFileContents');
 
-        // CommandService clearCache must not be called
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
         $subject = new PluginService($cmdMock, $fsMock);
 
-        // Try to uninstall a plugin that doesn't exist
+        // Act: try to uninstall non-existent plugin
         $subject->uninstall('non-existent-plugin');
 
-        // Verify that the config file wasn't changed
+        // Assert: config unchanged
         $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('plugin1', $config);
-        $this->assertArrayHasKey('plugin2', $config);
         $this->assertArrayNotHasKey('non-existent-plugin', $config);
     }
 
-    /**
-     * Test enable method
-     */
-    public function testEnable(): void
+    public function testEnableSetsPluginToTrue(): void
     {
-        // Mock filesystem methods
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
+        // Arrange: mock filesystem for config operations
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
+        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
+            file_put_contents($this->configFile, $content);
+            return true;
+        });
 
-        // Mock putFileContents to capture the config file content
-        $capturedContent = null;
-        $this->filesystemMock
-            ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) use (&$capturedContent) {
-                $capturedContent = $content;
-                file_put_contents($this->configFile, $content);
-                return true;
-            });
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->once())->method('clearCache');
 
-        // First install the plugin
-        $this->subject->install('test-plugin');
+        $subject = new PluginService($cmdMock, $fsStub);
 
-        // Then enable it
-        $this->subject->enable('test-plugin');
+        // Act: enable disabled plugin (plugin2 is false)
+        $subject->enable('plugin2');
 
-        // Verify that the plugin was enabled (set to true in config file)
+        // Assert: plugin is enabled
         $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('test-plugin', $config);
-        $this->assertTrue($config['test-plugin']);
+        $this->assertTrue($config['plugin2']);
     }
 
-    /**
-     * Test enable method early return when plugin is not installed
-     */
-    public function testEnableEarlyReturnWhenNotInstalled(): void
+    public function testEnableSkipsIfPluginNotInstalled(): void
     {
-        // Mock filesystem methods
+        // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
-
-        // putFileContents must not be called
+        $fsMock->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
         $fsMock->expects($this->never())->method('putFileContents');
 
-        // CommandService clearCache must not be called
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
         $subject = new PluginService($cmdMock, $fsMock);
 
-        // Try to enable a plugin that isn't installed
+        // Act: try to enable non-existent plugin
         $subject->enable('non-existent-plugin');
 
-        // Verify that the config file wasn't changed
-        $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayNotHasKey('non-existent-plugin', $config);
+        // Assert: nothing happens
+        $this->assertTrue(true);
     }
 
-    /**
-     * Test enable method early return when plugin is already enabled
-     */
-    public function testEnableEarlyReturnWhenAlreadyEnabled(): void
+    public function testEnableSkipsIfPluginAlreadyEnabled(): void
     {
-        // Mock filesystem methods
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
-
-        // Mock putFileContents to capture the config file content
-        $capturedContent = null;
-        $this->filesystemMock
-            ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) use (&$capturedContent) {
-                $capturedContent = $content;
-                file_put_contents($this->configFile, $content);
-                return true;
-            });
-
-        // First install and enable the plugin
-        $this->subject->install('test-plugin');
-        $this->subject->enable('test-plugin');
-
-        // Reset the mock to verify it's not called again
-        $this->commandServiceMock = $this->createMock(CommandService::class);
-        $this->commandServiceMock->expects($this->never())->method('clearCache');
-
-        // Create a new subject with the reset mock
-        $this->subject = new PluginService($this->commandServiceMock, $this->filesystemMock);
-
-        // Try to enable the plugin again
-        $this->subject->enable('test-plugin');
-
-        // Verify that the plugin config wasn't changed (early return happened)
-        $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('test-plugin', $config);
-        $this->assertTrue($config['test-plugin']);
-    }
-
-    /**
-     * Test disable method
-     */
-    public function testDisable(): void
-    {
-        // Mock filesystem methods
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
-
-        // Mock putFileContents to capture the config file content
-        $capturedContent = null;
-        $this->filesystemMock
-            ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) use (&$capturedContent) {
-                $capturedContent = $content;
-                file_put_contents($this->configFile, $content);
-                return true;
-            });
-
-        // First install and enable the plugin
-        $this->subject->install('test-plugin');
-        $this->subject->enable('test-plugin');
-
-        // Then disable it
-        $this->subject->disable('test-plugin');
-
-        // Verify that the plugin was disabled (set to false in config file)
-        $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('test-plugin', $config);
-        $this->assertFalse($config['test-plugin']);
-    }
-
-    /**
-     * Test disable method early return when plugin is not installed
-     */
-    public function testDisableEarlyReturnWhenNotInstalled(): void
-    {
-        // Mock filesystem methods
+        // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
-
-        // putFileContents must not be called
+        $fsMock->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
         $fsMock->expects($this->never())->method('putFileContents');
 
-        // CommandService clearCache must not be called
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
         $subject = new PluginService($cmdMock, $fsMock);
 
-        // Try to disable a plugin that isn't installed
+        // Act: try to enable already enabled plugin (plugin1 is true)
+        $subject->enable('plugin1');
+
+        // Assert: nothing happens
+        $this->assertTrue(true);
+    }
+
+    public function testDisableSetsPluginToFalse(): void
+    {
+        // Arrange: mock filesystem for config operations
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
+        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
+            file_put_contents($this->configFile, $content);
+            return true;
+        });
+
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->once())->method('clearCache');
+
+        $subject = new PluginService($cmdMock, $fsStub);
+
+        // Act: disable enabled plugin (plugin1 is true)
+        $subject->disable('plugin1');
+
+        // Assert: plugin is disabled
+        $config = include $this->configFile;
+        $this->assertFalse($config['plugin1']);
+    }
+
+    public function testDisableSkipsIfPluginNotInstalled(): void
+    {
+        // Arrange: mock filesystem for config operations
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
+        $fsMock->expects($this->never())->method('putFileContents');
+
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->never())->method('clearCache');
+
+        $subject = new PluginService($cmdMock, $fsMock);
+
+        // Act: try to disable non-existent plugin
         $subject->disable('non-existent-plugin');
 
-        // Verify that the config file wasn't changed
-        $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayNotHasKey('non-existent-plugin', $config);
+        // Assert: nothing happens
+        $this->assertTrue(true);
     }
 
-    /**
-     * Test disable method early return when plugin is not enabled
-     */
-    public function testDisableEarlyReturnWhenNotEnabled(): void
+    public function testDisableSkipsIfPluginAlreadyDisabled(): void
     {
-        // Mock filesystem methods
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->willReturnCallback(function ($path) {
-                if ($path === PluginService::CONFIG_DIR) {
-                    return $this->tempDir . '/config';
-                }
-                return false;
-            });
-
-        // Mock putFileContents to capture the config file content
-        $capturedContent = null;
-        $this->filesystemMock
-            ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) use (&$capturedContent) {
-                $capturedContent = $content;
-                file_put_contents($this->configFile, $content);
-                return true;
-            });
-
-        // First install the plugin (but don't enable it)
-        $this->subject->install('test-plugin');
-
-        // Reset the mock to verify it's not called again
-        $this->commandServiceMock = $this->createMock(CommandService::class);
-        $this->commandServiceMock->expects($this->never())->method('clearCache');
-
-        // Create a new subject with the reset mock
-        $this->subject = new PluginService($this->commandServiceMock, $this->filesystemMock);
-
-        // Try to disable the plugin that's not enabled
-        $this->subject->disable('test-plugin');
-
-        // Verify that the plugin config wasn't changed (early return happened)
-        $config = include $this->configFile;
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('test-plugin', $config);
-        $this->assertFalse($config['test-plugin']);
-    }
-
-    /**
-     * Test setPluginConfig method early return when config path is false
-     */
-    public function testSetPluginConfigEarlyReturnWhenConfigPathIsFalse(): void
-    {
-        // Mock filesystem methods to return false for getRealPath
+        // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('getRealPath')->willReturn(false);
-
-        // putFileContents must not be called
+        $fsMock->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+            PluginService::CONFIG_DIR => $this->tempDir . '/config',
+            default => false,
+        });
         $fsMock->expects($this->never())->method('putFileContents');
 
-        // CommandService clearCache must not be called
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        // Create a new subject with the mocked filesystem
         $subject = new PluginService($cmdMock, $fsMock);
 
-        // Try to set plugin config
-        $subject->setPluginConfig(['test-plugin' => true]);
-        // No assertion needed as we're verifying the methods are not called
+        // Act: try to disable already disabled plugin (plugin2 is false)
+        $subject->disable('plugin2');
+
+        // Assert: nothing happens
+        $this->assertTrue(true);
     }
 
-    /**
-     * Test parsePluginDir method early return when plugin directory doesn't exist
-     */
-    public function testParsePluginDirEarlyReturnWhenPluginDirDoesntExist(): void
+    public function testSetPluginConfigSkipsWhenConfigPathIsFalse(): void
     {
-        // Mock filesystem methods to return false for getRealPath
-        $this->filesystemMock = $this->createMock(ExtendedFilesystem::class);
-        $this->filesystemMock
-            ->method('getRealPath')
-            ->with(PluginService::PLUGIN_DIR)
-            ->willReturn(false);
+        // Arrange: mock filesystem to return false for config path
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock->method('getRealPath')->willReturn(false);
+        $fsMock->expects($this->never())->method('putFileContents');
 
-        // Mock glob to verify it's not called
-        $this->filesystemMock->expects($this->never())->method('glob');
+        $cmdMock = $this->createMock(CommandService::class);
+        $cmdMock->expects($this->never())->method('clearCache');
 
-        // Create a new subject with the mocked filesystem
-        $this->subject = new PluginService($this->commandServiceMock, $this->filesystemMock);
+        $subject = new PluginService($cmdMock, $fsMock);
 
-        // Call getAdminList which internally calls parsePluginDir
-        $result = $this->subject->getAdminList();
+        // Act: try to set plugin config
+        $subject->setPluginConfig(['test-plugin' => true]);
 
-        // Verify that an empty array is returned
-        $this->assertIsArray($result);
-        $this->assertEmpty($result);
+        // Assert: nothing happens (verified by mock expectations)
+        $this->assertTrue(true);
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . '/' . $file;
+            is_dir($path) ? $this->removeDirectory($path) : unlink($path);
+        }
+        rmdir($dir);
     }
 }

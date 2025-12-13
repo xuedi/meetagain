@@ -11,73 +11,45 @@ use App\Service\ConfigService;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Twig\Environment;
 
-/**
- * Test for ImageService that uses the subject directly instead of mocking it.
- *
- * For methods that use Imagick (which is difficult to mock), we use a partial mock
- * that only mocks the Imagick-related functionality.
- */
-#[AllowMockObjectsWithoutExpectations]
 class ImageServiceTest extends TestCase
 {
-    private MockObject|ImageRepository $imageRepoMock;
-    private MockObject|EntityManagerInterface $entityManagerMock;
-    private MockObject|ConfigService $configServiceMock;
-    private MockObject|ExtendedFilesystem $filesystemServiceMock;
-    private MockObject|LoggerInterface $loggerMock;
-    private MockObject|Environment $twigMock;
-    private string $kernelProjectDir;
-    private ImageService $subject;
+    private string $kernelProjectDir = '/tmp/project';
 
-    protected function setUp(): void
-    {
-        $this->imageRepoMock = $this->createMock(ImageRepository::class);
-        $this->entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $this->configServiceMock = $this->createMock(ConfigService::class);
-        $this->filesystemServiceMock = $this->createMock(ExtendedFilesystem::class);
-        // Prefer stubs for passives; use focused local mocks in tests that assert interactions
-        $this->loggerMock = $this->createStub(LoggerInterface::class);
-        $this->twigMock = $this->createStub(Environment::class);
-        $this->kernelProjectDir = '/tmp/project';
-
-        // Create a real instance of ImageService with mocked dependencies
-        $this->subject = new ImageService(
-            $this->imageRepoMock,
-            $this->entityManagerMock,
-            $this->configServiceMock,
-            $this->filesystemServiceMock,
-            $this->loggerMock,
-            $this->twigMock,
+    private function createService(
+        ?ImageRepository $imageRepo = null,
+        ?EntityManagerInterface $entityManager = null,
+        ?ConfigService $configService = null,
+        ?ExtendedFilesystem $filesystemService = null,
+        ?LoggerInterface $logger = null,
+        ?Environment $twig = null,
+    ): ImageService {
+        return new ImageService(
+            $imageRepo ?? $this->createStub(ImageRepository::class),
+            $entityManager ?? $this->createStub(EntityManagerInterface::class),
+            $configService ?? $this->createStub(ConfigService::class),
+            $filesystemService ?? $this->createStub(ExtendedFilesystem::class),
+            $logger ?? $this->createStub(LoggerInterface::class),
+            $twig ?? $this->createStub(Environment::class),
             $this->kernelProjectDir,
         );
     }
 
     public function testUploadExistingImage(): void
     {
-        // Test data
+        // Arrange: test data
         $imageContent = 'test image content';
         $hash = sha1($imageContent);
         $user = $this->createStub(User::class);
         $type = ImageType::ProfilePicture;
 
-        // Create existing image
+        // Arrange: mock existing image to verify setUpdatedAt is called
         $existingImage = $this->createMock(Image::class);
-
-        // Mock image repository to return existing image
-        $this->imageRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['hash' => $hash])
-            ->willReturn($existingImage);
-
-        // Mock existing image to set updated date
         $existingImage
             ->expects($this->once())
             ->method('setUpdatedAt')
@@ -85,26 +57,40 @@ class ImageServiceTest extends TestCase
                 return $date instanceof DateTimeImmutable;
             }));
 
-        // Mock entity manager
-        $this->entityManagerMock
+        // Arrange: mock image repository to return existing image
+        $imageRepoMock = $this->createMock(ImageRepository::class);
+        $imageRepoMock
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with(['hash' => $hash])
+            ->willReturn($existingImage);
+
+        // Arrange: mock entity manager to verify persist
+        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
+        $entityManagerMock
             ->expects($this->once())
             ->method('persist')
             ->with($existingImage);
 
-        // Mock uploaded file
+        // Arrange: stub uploaded file
         $uploadedFile = $this->createStub(UploadedFile::class);
         $uploadedFile->method('getContent')->willReturn($imageContent);
 
-        // Call the method
-        $result = $this->subject->upload($uploadedFile, $user, $type);
+        $subject = $this->createService(
+            imageRepo: $imageRepoMock,
+            entityManager: $entityManagerMock,
+        );
 
-        // Assert result
+        // Act: upload existing image
+        $result = $subject->upload($uploadedFile, $user, $type);
+
+        // Assert: returns existing image
         $this->assertSame($existingImage, $result);
     }
 
     public function testUploadNewImage(): void
     {
-        // Test data
+        // Arrange: test data
         $imageContent = 'test image content';
         $hash = sha1($imageContent);
         $mimeType = 'image/jpeg';
@@ -114,14 +100,15 @@ class ImageServiceTest extends TestCase
         $user = $this->createStub(User::class);
         $type = ImageType::ProfilePicture;
 
-        // Mock image repository to return null (no existing image)
-        $this->imageRepoMock
+        // Arrange: mock image repository to return null (no existing image)
+        $imageRepoMock = $this->createMock(ImageRepository::class);
+        $imageRepoMock
             ->expects($this->once())
             ->method('findOneBy')
             ->with(['hash' => $hash])
             ->willReturn(null);
 
-        // Mock uploaded file
+        // Arrange: stub uploaded file
         $uploadedFile = $this->createStub(UploadedFile::class);
         $uploadedFile->method('getContent')->willReturn($imageContent);
         $uploadedFile->method('getMimeType')->willReturn($mimeType);
@@ -129,14 +116,16 @@ class ImageServiceTest extends TestCase
         $uploadedFile->method('getSize')->willReturn($size);
         $uploadedFile->method('getRealPath')->willReturn($realPath);
 
-        // Mock filesystem service
-        $this->filesystemServiceMock->expects($this->once())->method('copy')->with(
+        // Arrange: mock filesystem service to verify copy
+        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
+        $filesystemMock->expects($this->once())->method('copy')->with(
             $realPath,
             $this->kernelProjectDir . '/data/images/' . $hash . '.' . $extension,
         );
 
-        // Mock entity manager
-        $this->entityManagerMock
+        // Arrange: mock entity manager to verify persist with correct image data
+        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
+        $entityManagerMock
             ->expects($this->once())
             ->method('persist')
             ->with($this->callback(function (Image $image) use ($hash, $mimeType, $extension, $type, $size, $user) {
@@ -151,10 +140,16 @@ class ImageServiceTest extends TestCase
                 );
             }));
 
-        // Call the method
-        $result = $this->subject->upload($uploadedFile, $user, $type);
+        $subject = $this->createService(
+            imageRepo: $imageRepoMock,
+            entityManager: $entityManagerMock,
+            filesystemService: $filesystemMock,
+        );
 
-        // Assert result
+        // Act: upload new image
+        $result = $subject->upload($uploadedFile, $user, $type);
+
+        // Assert: returns new image with correct properties
         $this->assertInstanceOf(Image::class, $result);
         $this->assertEquals($hash, $result->getHash());
         $this->assertEquals($mimeType, $result->getMimeType());
@@ -166,7 +161,7 @@ class ImageServiceTest extends TestCase
 
     public function testCreateThumbnails(): void
     {
-        // Create a partial mock of ImageService to override Imagick-related functionality
+        // Arrange: create a partial mock to override Imagick-related functionality
         $subject = $this->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
@@ -180,30 +175,25 @@ class ImageServiceTest extends TestCase
             ->onlyMethods(['createThumbnails'])
             ->getMock();
 
-        // Test data
-        $hash = 'test_hash';
-        $extension = 'jpg';
-        $thumbnailSizes = [[100, 100], [200, 200]];
-
-        // Mock image
+        // Arrange: stub image
         $image = $this->createStub(Image::class);
-        $image->method('getHash')->willReturn($hash);
-        $image->method('getExtension')->willReturn($extension);
+        $image->method('getHash')->willReturn('test_hash');
+        $image->method('getExtension')->willReturn('jpg');
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
 
-        // Set up expectations for the createThumbnails method
+        // Arrange: set up expectations for the createThumbnails method
         $subject->expects($this->once())->method('createThumbnails')->with($image)->willReturn(2);
 
-        // Call the method
+        // Act: create thumbnails
         $result = $subject->createThumbnails($image);
 
-        // Assert result
+        // Assert: returns expected thumbnail count
         $this->assertEquals(2, $result);
     }
 
     public function testRotateThumbNail(): void
     {
-        // Create a partial mock of ImageService to override Imagick-related functionality
+        // Arrange: create a partial mock to override Imagick-related functionality
         $subject = $this->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
@@ -217,53 +207,27 @@ class ImageServiceTest extends TestCase
             ->onlyMethods(['rotateThumbNail'])
             ->getMock();
 
-        // Test data
-        $hash = 'test_hash';
-
-        // Mock image
+        // Arrange: stub image
         $image = $this->createStub(Image::class);
-        $image->method('getHash')->willReturn($hash);
+        $image->method('getHash')->willReturn('test_hash');
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
 
-        // Set up expectations for the rotateThumbNail method
+        // Arrange: set up expectations for the rotateThumbNail method
         $subject->expects($this->once())->method('rotateThumbNail')->with($image);
 
-        // Call the method
+        // Act: rotate thumbnail
         $subject->rotateThumbNail($image);
-
-        // No assertions needed as we're just verifying the method was called with the correct parameters
     }
 
     public function testGetStatistics(): void
     {
-        // Mock config service to return thumbnail size list
-        $this->configServiceMock
+        // Arrange: mock config service to return thumbnail size list
+        $configServiceMock = $this->createMock(ConfigService::class);
+        $configServiceMock
             ->expects($this->once())
             ->method('getThumbnailSizeList')
             ->willReturn(['100x100' => 0, '200x200' => 0]);
-
-        // Mock filesystem service to return directory contents
-        $this->filesystemServiceMock
-            ->expects($this->once())
-            ->method('scanDirectory')
-            ->with($this->kernelProjectDir . '/public/images/thumbnails/')
-            ->willReturn(['.', '..', 'hash1_100x100.webp', 'hash2_200x200.webp']);
-
-        // Mock image repository to return file list and count
-        $this->imageRepoMock
-            ->expects($this->once())
-            ->method('getFileList')
-            ->willReturn([
-                'hash1' => ImageType::ProfilePicture,
-                'hash2' => ImageType::EventTeaser,
-            ]);
-        $this->imageRepoMock
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(2);
-
-        // Mock config service to return thumbnail sizes for each image type
-        $this->configServiceMock
+        $configServiceMock
             ->expects($this->exactly(2))
             ->method('getThumbnailSizes')
             ->willReturnMap([
@@ -271,13 +235,35 @@ class ImageServiceTest extends TestCase
                 [ImageType::EventTeaser, [[200, 200]]],
             ]);
 
-        // Create a partial mock to avoid calling getObsoleteThumbnails which would require more mocking
+        // Arrange: mock filesystem service to return directory contents
+        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
+        $filesystemMock
+            ->expects($this->once())
+            ->method('scanDirectory')
+            ->with($this->kernelProjectDir . '/public/images/thumbnails/')
+            ->willReturn(['.', '..', 'hash1_100x100.webp', 'hash2_200x200.webp']);
+
+        // Arrange: mock image repository to return file list and count
+        $imageRepoMock = $this->createMock(ImageRepository::class);
+        $imageRepoMock
+            ->expects($this->once())
+            ->method('getFileList')
+            ->willReturn([
+                'hash1' => ImageType::ProfilePicture,
+                'hash2' => ImageType::EventTeaser,
+            ]);
+        $imageRepoMock
+            ->expects($this->once())
+            ->method('count')
+            ->willReturn(2);
+
+        // Arrange: create partial mock to avoid calling getObsoleteThumbnails
         $subject = $this->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
-                $this->imageRepoMock,
+                $imageRepoMock,
                 $this->createStub(EntityManagerInterface::class),
-                $this->configServiceMock,
-                $this->filesystemServiceMock, // keep mock, we assert interactions below
+                $configServiceMock,
+                $filesystemMock,
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(Environment::class),
                 $this->kernelProjectDir,
@@ -287,10 +273,10 @@ class ImageServiceTest extends TestCase
 
         $subject->expects($this->once())->method('getObsoleteThumbnails')->willReturn([]);
 
-        // Call the method
+        // Act: get statistics
         $result = $subject->getStatistics();
 
-        // Assert result
+        // Assert: returns expected structure with correct values
         $this->assertIsArray($result);
         $this->assertArrayHasKey('imageCount', $result);
         $this->assertArrayHasKey('imageTypeList', $result);
@@ -308,8 +294,9 @@ class ImageServiceTest extends TestCase
 
     public function testGetObsoleteThumbnails(): void
     {
-        // Mock image repository to return file list
-        $this->imageRepoMock
+        // Arrange: mock image repository to return file list
+        $imageRepoMock = $this->createMock(ImageRepository::class);
+        $imageRepoMock
             ->expects($this->once())
             ->method('getFileList')
             ->willReturn([
@@ -317,8 +304,9 @@ class ImageServiceTest extends TestCase
                 'hash2' => ImageType::EventTeaser,
             ]);
 
-        // Mock filesystem service to return directory contents
-        $this->filesystemServiceMock
+        // Arrange: mock filesystem service to return directory contents
+        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
+        $filesystemMock
             ->expects($this->once())
             ->method('scanDirectory')
             ->with($this->kernelProjectDir . '/public/images/thumbnails/')
@@ -331,8 +319,12 @@ class ImageServiceTest extends TestCase
                 'hash1_300x300.webp', // Obsolete (invalid size)
             ]);
 
-        // Mock config service to check if thumbnail size is valid
-        $this->configServiceMock
+        // Arrange: mock config service to check if thumbnail size is valid
+        // Note: isValidThumbnailSize is only called for hashes that exist in the file list
+        // hash3 is not in the list, so we only get 3 calls (hash1_100x100, hash2_200x200, hash1_300x300)
+        $configServiceMock = $this->createMock(ConfigService::class);
+        $configServiceMock
+            ->expects($this->exactly(3))
             ->method('isValidThumbnailSize')
             ->willReturnCallback(function (ImageType $type, int $width, int $height) {
                 if ($type === ImageType::ProfilePicture && $width === 100 && $height === 100) {
@@ -344,13 +336,19 @@ class ImageServiceTest extends TestCase
                 if ($type === ImageType::EventTeaser && $width === 200 && $height === 200) {
                     return true;
                 }
-                return false; // Default case
+                return false;
             });
 
-        // Call the method
-        $result = $this->subject->getObsoleteThumbnails();
+        $subject = $this->createService(
+            imageRepo: $imageRepoMock,
+            configService: $configServiceMock,
+            filesystemService: $filesystemMock,
+        );
 
-        // Assert result
+        // Act: get obsolete thumbnails
+        $result = $subject->getObsoleteThumbnails();
+
+        // Assert: returns only obsolete thumbnails
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
         $this->assertContains('hash3_100x100.webp', $result);
@@ -359,26 +357,27 @@ class ImageServiceTest extends TestCase
 
     public function testDeleteObsoleteThumbnails(): void
     {
-        // Create a partial mock to control getObsoleteThumbnails
+        // Arrange: create partial mock to control getObsoleteThumbnails
+        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
+
         $subject = $this->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
-                $this->imageRepoMock,
-                $this->entityManagerMock,
-                $this->configServiceMock,
-                $this->filesystemServiceMock,
-                $this->loggerMock,
-                $this->twigMock,
+                $this->createStub(ImageRepository::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(ConfigService::class),
+                $filesystemMock,
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
 
-        // Set up the mock to return specific obsolete thumbnails
         $obsoleteThumbnails = ['hash3_100x100.webp', 'hash1_300x300.webp'];
         $subject->expects($this->once())->method('getObsoleteThumbnails')->willReturn($obsoleteThumbnails);
 
-        // Mock filesystem service to check if files exist and remove them
-        $this->filesystemServiceMock
+        // Arrange: mock filesystem service to check and remove files
+        $filesystemMock
             ->expects($this->exactly(2))
             ->method('exists')
             ->willReturnMap([
@@ -386,9 +385,8 @@ class ImageServiceTest extends TestCase
                 [$this->kernelProjectDir . '/public/images/thumbnails/hash1_300x300.webp', true],
             ]);
 
-        // Track which files were removed
         $removedFiles = [];
-        $this->filesystemServiceMock
+        $filesystemMock
             ->expects($this->exactly(2))
             ->method('remove')
             ->willReturnCallback(function ($path) use (&$removedFiles) {
@@ -396,58 +394,47 @@ class ImageServiceTest extends TestCase
                 return true;
             });
 
-        // Call the method
+        // Act: delete obsolete thumbnails
         $result = $subject->deleteObsoleteThumbnails();
 
-        // Assert that the correct files were removed
+        // Assert: correct files were removed
         $this->assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash3_100x100.webp', $removedFiles);
         $this->assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash1_300x300.webp', $removedFiles);
-
-        // Assert result
         $this->assertEquals(2, $result);
     }
 
     public function testImageTemplateById(): void
     {
-        // Test data
+        // Arrange: stub image
         $imageId = 123;
         $expectedHtml = '<div>rendered template</div>';
-
-        // Create stub image (no interaction expectations required)
         $image = $this->createStub(Image::class);
 
-        // Mock image repository to return the mock image
-        $this->imageRepoMock
+        // Arrange: mock image repository to return image
+        $imageRepoMock = $this->createMock(ImageRepository::class);
+        $imageRepoMock
             ->expects($this->once())
             ->method('findOneBy')
             ->with(['id' => $imageId])
             ->willReturn($image);
 
-        // Use a focused local Twig mock to assert rendering
+        // Arrange: mock Twig to render template
         $twigMock = $this->createMock(Environment::class);
         $twigMock
             ->expects($this->once())
             ->method('render')
-            ->with('_block/image.html.twig', [
-                'image' => $image,
-                'size' => '50x50',
-            ])
+            ->with('_block/image.html.twig', ['image' => $image, 'size' => '50x50'])
             ->willReturn($expectedHtml);
 
-        $subject = new ImageService(
-            $this->imageRepoMock,
-            $this->createStub(EntityManagerInterface::class),
-            $this->createStub(ConfigService::class),
-            $this->createStub(ExtendedFilesystem::class),
-            $this->loggerMock,
-            $twigMock,
-            $this->kernelProjectDir,
+        $subject = $this->createService(
+            imageRepo: $imageRepoMock,
+            twig: $twigMock,
         );
 
-        // Call the method
+        // Act: get image template
         $result = $subject->imageTemplateById($imageId);
 
-        // Assert result
+        // Assert: returns rendered HTML
         $this->assertEquals($expectedHtml, $result);
     }
 }

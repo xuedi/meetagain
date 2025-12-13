@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Unit\Security;
+namespace Tests\Unit\Security;
 
 use App\Entity\User;
 use App\Entity\UserStatus;
@@ -8,8 +8,6 @@ use App\Repository\MessageRepository;
 use App\Security\UserChecker;
 use App\Service\ActivityService;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,98 +15,154 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[AllowMockObjectsWithoutExpectations]
 class UserCheckerTest extends TestCase
 {
-    private MockObject|ActivityService $activityService;
-    private MockObject|EntityManagerInterface $em;
-    private MockObject|RequestStack $requestStack;
-    private MockObject|MessageRepository $msgRepo;
-    private UserChecker $subject;
-
-    protected function setUp(): void
+    public function testCheckPreAuthSkipsNonUserObjects(): void
     {
-        $this->activityService = $this->createMock(ActivityService::class);
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
-        $this->msgRepo = $this->createMock(MessageRepository::class);
+        // Arrange: create non-User object implementing UserInterface
+        $nonUserObject = $this->createStub(UserInterface::class);
 
-        $this->subject = new UserChecker($this->activityService, $this->em, $this->requestStack, $this->msgRepo);
-    }
+        $subject = $this->createSubject();
 
-    public function testAbortCheckPreAuthWithNonUserObject(): void
-    {
-        $nonUserObject = $this->createMock(UserInterface::class);
-        $this->subject->checkPreAuth($nonUserObject);
-
+        // Act & Assert: should complete without exception for non-User objects
+        $subject->checkPreAuth($nonUserObject);
         $this->assertTrue(true);
     }
 
-    public function testCheckPreAuthWithActiveUser(): void
+    public function testCheckPreAuthAllowsActiveUsers(): void
     {
-        $activeUser = $this->createMock(User::class);
+        // Arrange: create active user
+        $activeUser = $this->createStub(User::class);
         $activeUser->method('getStatus')->willReturn(UserStatus::Active);
 
-        $this->subject->checkPreAuth($activeUser);
+        $subject = $this->createSubject();
 
+        // Act & Assert: should complete without exception for active users
+        $subject->checkPreAuth($activeUser);
         $this->assertTrue(true);
     }
 
-    public function testCheckPreAuthWithNonActiveUser(): void
+    public function testCheckPreAuthThrowsExceptionForNonActiveUsers(): void
     {
-        // Create a mock of User with non-Active status (e.g., Registered)
-        $nonActiveUser = $this->createMock(User::class);
+        // Arrange: create user with non-active status (Registered)
+        $nonActiveUser = $this->createStub(User::class);
         $nonActiveUser->method('getStatus')->willReturn(UserStatus::Registered);
 
-        // This should throw a CustomUserMessageAccountStatusException
+        $subject = $this->createSubject();
+
+        // Assert: expect exception with specific message
         $this->expectException(CustomUserMessageAccountStatusException::class);
         $this->expectExceptionMessage('The user is not anymore or not jet active');
 
-        $this->subject->checkPreAuth($nonActiveUser);
+        // Act: check pre-auth for non-active user
+        $subject->checkPreAuth($nonActiveUser);
     }
 
-    public function testWillAbortInFailureOfGettingUser(): void
+    public function testCheckPostAuthSkipsNonUserObjects(): void
     {
-        $nonUserObject = $this->createMock(UserInterface::class);
-        $this->subject->checkPostAuth($nonUserObject);
+        // Arrange: create non-User object implementing UserInterface
+        $nonUserObject = $this->createStub(UserInterface::class);
 
+        $subject = $this->createSubject();
+
+        // Act & Assert: should complete without exception for non-User objects
+        $subject->checkPostAuth($nonUserObject);
         $this->assertTrue(true);
     }
 
-    public function testWillAbortInFailureOfGettingRequest(): void
+    public function testCheckPostAuthSkipsWhenNoRequest(): void
     {
-        $this->requestStack->method('getCurrentRequest')->willReturn(null);
+        // Arrange: request stack returns null
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn(null);
 
-        $this->subject->checkPostAuth($this->createMock(User::class));
+        $subject = $this->createSubject(requestStack: $requestStackStub);
 
+        // Act & Assert: should complete without exception when no request
+        $subject->checkPostAuth($this->createStub(User::class));
         $this->assertTrue(true);
     }
 
-    public function testSuccessfulOnPostAuth(): void
+    public function testCheckPostAuthUpdatesUserLoginAndLogsActivity(): void
     {
+        // Arrange: mock session to verify lastLogin and hasNewMessage are set
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->exactly(2))->method('set');
+        $sessionMock
+            ->expects($this->exactly(2))
+            ->method('set')
+            ->willReturnCallback(function (string $key) {
+                $this->assertContains($key, ['lastLogin', 'hasNewMessage']);
+            });
 
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getSession')->willReturn($sessionMock);
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getSession')->willReturn($sessionMock);
 
-        $this->requestStack->method('getCurrentRequest')->willReturn($requestMock);
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
-        $this->em->expects($this->once())->method('persist');
+        // Arrange: mock entity manager to verify user is persisted and flushed
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with($this->isInstanceOf(User::class));
+        $emMock->expects($this->once())->method('flush');
 
-        $this->em->expects($this->once())->method('flush');
+        // Arrange: mock activity service to verify login is logged
+        $activityServiceMock = $this->createMock(ActivityService::class);
+        $activityServiceMock->expects($this->once())->method('log');
 
-        $this->em->expects($this->once())->method('flush');
+        // Arrange: mock message repository to return true for new messages
+        $msgRepoMock = $this->createMock(MessageRepository::class);
+        $msgRepoMock->expects($this->once())->method('hasNewMessages')->willReturn(true);
 
-        $this->activityService->expects($this->once())->method('log');
+        $subject = $this->createSubject(
+            activityService: $activityServiceMock,
+            em: $emMock,
+            requestStack: $requestStackStub,
+            msgRepo: $msgRepoMock,
+        );
 
-        $this->msgRepo
+        // Act: check post-auth
+        $subject->checkPostAuth($this->createStub(User::class));
+    }
+
+    public function testCheckPostAuthDoesNotSetNewMessageFlagWhenNoNewMessages(): void
+    {
+        // Arrange: mock session to verify only lastLogin is set (not hasNewMessage)
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock
             ->expects($this->once())
-            ->method('hasNewMessages')
-            ->willReturn(true);
+            ->method('set')
+            ->with('lastLogin', $this->anything());
 
-        $this->subject->checkPostAuth($this->createMock(User::class));
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getSession')->willReturn($sessionMock);
 
-        $this->assertTrue(true);
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+
+        // Arrange: mock message repository to return false for new messages
+        $msgRepoStub = $this->createStub(MessageRepository::class);
+        $msgRepoStub->method('hasNewMessages')->willReturn(false);
+
+        $subject = $this->createSubject(
+            requestStack: $requestStackStub,
+            msgRepo: $msgRepoStub,
+        );
+
+        // Act: check post-auth
+        $subject->checkPostAuth($this->createStub(User::class));
+    }
+
+    private function createSubject(
+        ?ActivityService $activityService = null,
+        ?EntityManagerInterface $em = null,
+        ?RequestStack $requestStack = null,
+        ?MessageRepository $msgRepo = null,
+    ): UserChecker {
+        return new UserChecker(
+            activityService: $activityService ?? $this->createStub(ActivityService::class),
+            em: $em ?? $this->createStub(EntityManagerInterface::class),
+            requestStack: $requestStack ?? $this->createStub(RequestStack::class),
+            msgRepo: $msgRepo ?? $this->createStub(MessageRepository::class),
+        );
     }
 }

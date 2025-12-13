@@ -1,8 +1,8 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
+use App\Entity\TranslationSuggestionStatus;
 use App\Entity\User;
 use App\Repository\MenuRepository;
 use App\Repository\TranslationSuggestionRepository;
@@ -11,8 +11,6 @@ use App\Service\DashboardService;
 use App\Service\GlobalService;
 use App\Service\PluginService;
 use App\Service\TranslationService;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -20,218 +18,416 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-#[AllowMockObjectsWithoutExpectations]
 class GlobalServiceTest extends TestCase
 {
-    private MockObject|RequestStack $requestStackMock;
-    private MockObject|TranslationService $translationServiceMock;
-    private MockObject|DashboardService $dashboardServiceMock;
-    private MockObject|UserRepository $userRepositoryMock;
-    private MockObject|MenuRepository $menuRepositoryMock;
-    private MockObject|PluginService $pluginServiceMock;
-    private MockObject|TranslationSuggestionRepository $suggestionRepoMock;
-    private MockObject|Security $securityMock;
-    private GlobalService $subject;
-
-    protected function setUp(): void
+    public function testGetCurrentLocaleReturnsRequestLocale(): void
     {
-        $this->requestStackMock = $this->createMock(RequestStack::class);
-        $this->translationServiceMock = $this->createMock(TranslationService::class);
-        $this->dashboardServiceMock = $this->createMock(DashboardService::class);
-        $this->userRepositoryMock = $this->createMock(UserRepository::class);
-        $this->menuRepositoryMock = $this->createMock(MenuRepository::class);
-        $this->suggestionRepoMock = $this->createMock(TranslationSuggestionRepository::class);
-        $this->pluginServiceMock = $this->createMock(PluginService::class);
-        $this->securityMock = $this->createMock(Security::class);
+        // Arrange: mock request with German locale
+        $expectedLocale = 'de';
 
-        $this->subject = new GlobalService(
-            requestStack: $this->requestStackMock,
-            translationService: $this->translationServiceMock,
-            dashboardService: $this->dashboardServiceMock,
-            userRepo: $this->userRepositoryMock,
-            pluginService: $this->pluginServiceMock,
-            menuRepo: $this->menuRepositoryMock,
-            translationSuggestionRepo: $this->suggestionRepoMock,
-            security: $this->securityMock,
-        );
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getLocale')->willReturn($expectedLocale);
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act: get current locale
+        $result = $subject->getCurrentLocale();
+
+        // Assert: returns locale from request
+        $this->assertSame($expectedLocale, $result);
     }
 
-    public function testCurrentLocale(): void
+    public function testGetCurrentLocaleThrowsExceptionWhenNoRequest(): void
     {
-        $expected = 'de';
+        // Arrange: request stack returns null
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn(null);
 
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getLocale')->willReturn($expected);
+        $subject = $this->createSubject(requestStack: $requestStackStub);
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
+        // Assert: throws RuntimeException
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cound not get current locale');
 
-        $this->assertEquals($expected, $this->subject->getCurrentLocale());
+        // Act: get current locale without request
+        $subject->getCurrentLocale();
     }
 
-    public function testCatchUnknownCurrentLocale(): void
+    public function testGetLanguageCodesReturnsFromTranslationService(): void
     {
-        $this->expectExceptionObject(new RuntimeException('Cound not get current locale'));
+        // Arrange: mock translation service to return language codes
+        $expectedCodes = ['de', 'en', 'fr'];
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
+        $translationServiceStub = $this->createStub(TranslationService::class);
+        $translationServiceStub->method('getLanguageCodes')->willReturn($expectedCodes);
 
-        $this->subject->getCurrentLocale();
+        $subject = $this->createSubject(translationService: $translationServiceStub);
+
+        // Act: get language codes
+        $result = $subject->getLanguageCodes();
+
+        // Assert: returns codes from translation service
+        $this->assertSame($expectedCodes, $result);
     }
 
-    public function testLanguageCodes(): void
+    public function testGetPluginsReturnsActivePlugins(): void
     {
-        $expectedLanguageCodes = ['de', 'en', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'es', 'sv', 'tr', 'zh'];
-
-        $this->translationServiceMock->method('getLanguageCodes')->willReturn($expectedLanguageCodes);
-
-        $this->assertEquals($expectedLanguageCodes, $this->subject->getLanguageCodes());
-    }
-
-    public function testPlugins(): void
-    {
+        // Arrange: mock plugin service to return active plugins
         $expectedPlugins = ['plugin1', 'plugin2'];
 
-        $this->pluginServiceMock->method('getActiveList')->willReturn($expectedPlugins);
+        $pluginServiceStub = $this->createStub(PluginService::class);
+        $pluginServiceStub->method('getActiveList')->willReturn($expectedPlugins);
 
-        $this->assertEquals($expectedPlugins, $this->subject->getPlugins());
+        $subject = $this->createSubject(pluginService: $pluginServiceStub);
+
+        // Act: get plugins
+        $result = $subject->getPlugins();
+
+        // Assert: returns active plugins
+        $this->assertSame($expectedPlugins, $result);
     }
 
-    public function testGetUserName(): void
+    public function testGetUserNameReturnsUserName(): void
     {
+        // Arrange: mock user repository to return user with name
         $userId = 42;
         $expectedName = 'John Doe';
 
-        $userMock = $this->createMock(User::class);
-        $userMock->method('getName')->willReturn($expectedName);
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getName')->willReturn($expectedName);
 
-        $this->userRepositoryMock
+        $userRepoMock = $this->createMock(UserRepository::class);
+        $userRepoMock
+            ->expects($this->once())
             ->method('findOneBy')
             ->with(['id' => $userId])
-            ->willReturn($userMock);
+            ->willReturn($userStub);
 
-        $this->assertEquals($expectedName, $this->subject->getUserName($userId));
+        $subject = $this->createSubject(userRepo: $userRepoMock);
+
+        // Act: get user name
+        $result = $subject->getUserName($userId);
+
+        // Assert: returns user's name
+        $this->assertSame($expectedName, $result);
     }
 
-    public function testHasNewMessagesTrue(): void
+    public function testHasNewMessagesReturnsTrueWhenSessionHasFlag(): void
     {
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->method('get')->with('hasNewMessage', false)->willReturn(true);
+        // Arrange: mock session with new message flag set to true
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->with('hasNewMessage', false)->willReturn(true);
 
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getSession')->willReturn($sessionMock);
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getSession')->willReturn($sessionStub);
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
-        $this->assertTrue($this->subject->hasNewMessages());
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: has new messages
+        $this->assertTrue($subject->hasNewMessages());
     }
 
-    public function testHasNewMessagesFalse(): void
+    public function testHasNewMessagesReturnsFalseWhenSessionHasNoFlag(): void
     {
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->method('get')->with('hasNewMessage', false)->willReturn(false);
+        // Arrange: mock session with new message flag set to false
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->with('hasNewMessage', false)->willReturn(false);
 
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getSession')->willReturn($sessionMock);
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getSession')->willReturn($sessionStub);
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
-        $this->assertFalse($this->subject->hasNewMessages());
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: no new messages
+        $this->assertFalse($subject->hasNewMessages());
     }
 
-    public function testHasNewMessagesNoRequest(): void
+    public function testHasNewMessagesReturnsFalseWhenNoRequest(): void
     {
-        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
+        // Arrange: request stack returns null
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn(null);
 
-        $this->assertFalse($this->subject->hasNewMessages());
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: returns false when no request available
+        $this->assertFalse($subject->hasNewMessages());
     }
 
-    public function testGetShowCookieConsentNoSession(): void
+    public function testGetShowCookieConsentReturnsTrueWhenNoSession(): void
     {
-        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
+        // Arrange: request stack returns null (no session)
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn(null);
 
-        $this->assertTrue($this->subject->getShowCookieConsent());
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: show consent when no session
+        $this->assertTrue($subject->getShowCookieConsent());
     }
 
-    public function testGetShowCookieConsentUnknown(): void
+    public function testGetShowCookieConsentReturnsTrueWhenConsentUnknown(): void
     {
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->method('get')->willReturn('{}');
+        // Arrange: session with unknown consent status
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->willReturn('{}');
 
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getSession')->willReturn($sessionMock);
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getSession')->willReturn($sessionStub);
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
-        $this->assertTrue($this->subject->getShowCookieConsent());
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: show consent when status unknown
+        $this->assertTrue($subject->getShowCookieConsent());
     }
 
-    public function testGetShowOsmNoSession(): void
+    public function testGetShowOsmReturnsTrueWhenNoSession(): void
     {
-        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
+        // Arrange: request stack returns null (no session)
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn(null);
 
-        $this->assertTrue($this->subject->getShowOsm());
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: show OSM by default when no session
+        $this->assertTrue($subject->getShowOsm());
     }
 
-    public function testGetShowOsmNoSessionGranted(): void
+    public function testGetShowOsmReturnsTrueWhenConsentGranted(): void
     {
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->method('get')->willReturn('{"consent_cookies_osm": "granted"}');
+        // Arrange: session with OSM consent granted
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->willReturn('{"consent_cookies_osm": "granted"}');
 
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getSession')->willReturn($sessionMock);
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getSession')->willReturn($sessionStub);
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
-        $this->assertTrue($this->subject->getShowOsm());
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: show OSM when consent granted
+        $this->assertTrue($subject->getShowOsm());
     }
 
-    public function testGetAdminAttentionTrue(): void
+    public function testGetAdminAttentionReturnsTrueWhenItemsNeedApproval(): void
     {
-        $this->dashboardServiceMock->method('getNeedForApproval')->willReturn(['item1', 'item2']);
+        // Arrange: dashboard service returns items needing approval
+        $dashboardServiceStub = $this->createStub(DashboardService::class);
+        $dashboardServiceStub->method('getNeedForApproval')->willReturn(['item1', 'item2']);
 
-        $this->assertTrue($this->subject->getAdminAttention());
+        $subject = $this->createSubject(dashboardService: $dashboardServiceStub);
+
+        // Act & Assert: admin attention needed
+        $this->assertTrue($subject->getAdminAttention());
     }
 
-    public function testGetAdminAttentionFalse(): void
+    public function testGetAdminAttentionReturnsFalseWhenNoItemsNeedApproval(): void
     {
-        $this->dashboardServiceMock->method('getNeedForApproval')->willReturn([]);
+        // Arrange: dashboard service returns empty array
+        $dashboardServiceStub = $this->createStub(DashboardService::class);
+        $dashboardServiceStub->method('getNeedForApproval')->willReturn([]);
 
-        $this->assertFalse($this->subject->getAdminAttention());
+        $subject = $this->createSubject(dashboardService: $dashboardServiceStub);
+
+        // Act & Assert: no admin attention needed
+        $this->assertFalse($subject->getAdminAttention());
     }
 
-    public function testGetAlternativeLanguageCodesNoRequest(): void
+    public function testGetManagerAttentionReturnsTrueWhenSuggestionsRequested(): void
     {
-        $this->requestStackMock->method('getCurrentRequest')->willReturn(null);
+        // Arrange: suggestion repo returns requested suggestions
+        $suggestionRepoMock = $this->createMock(TranslationSuggestionRepository::class);
+        $suggestionRepoMock
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['status' => TranslationSuggestionStatus::Requested])
+            ->willReturn(['suggestion1']);
 
-        $this->assertEquals([], $this->subject->getAlternativeLanguageCodes());
+        $subject = $this->createSubject(translationSuggestionRepo: $suggestionRepoMock);
+
+        // Act & Assert: manager attention needed
+        $this->assertTrue($subject->getManagerAttention());
     }
 
-    public function testGetAlternativeLanguageCodesProfilerUri(): void
+    public function testGetManagerAttentionReturnsFalseWhenNoSuggestionsRequested(): void
     {
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getRequestUri')->willReturn('/_profiler/some/path');
+        // Arrange: suggestion repo returns empty array
+        $suggestionRepoMock = $this->createMock(TranslationSuggestionRepository::class);
+        $suggestionRepoMock
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['status' => TranslationSuggestionStatus::Requested])
+            ->willReturn([]);
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
+        $subject = $this->createSubject(translationSuggestionRepo: $suggestionRepoMock);
 
-        $this->assertEquals([], $this->subject->getAlternativeLanguageCodes());
+        // Act & Assert: no manager attention needed
+        $this->assertFalse($subject->getManagerAttention());
     }
 
-    public function testGetAlternativeLanguageCodes(): void
+    public function testGetAlternativeLanguageCodesReturnsEmptyWhenNoRequest(): void
     {
+        // Arrange: request stack returns null
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn(null);
+
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: returns empty array when no request
+        $this->assertSame([], $subject->getAlternativeLanguageCodes());
+    }
+
+    public function testGetAlternativeLanguageCodesReturnsEmptyForProfilerUri(): void
+    {
+        // Arrange: request with profiler URI
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getRequestUri')->willReturn('/_profiler/some/path');
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert: returns empty array for profiler URIs
+        $this->assertSame([], $subject->getAlternativeLanguageCodes());
+    }
+
+    public function testGetAlternativeLanguageCodesReturnsAlternativeLanguages(): void
+    {
+        // Arrange: mock request and translation service for alternative languages
         $currentLocale = 'en';
         $currentUri = '/some/path';
         $expectedAltLangList = ['de' => '/de/some/path', 'fr' => '/fr/some/path'];
 
-        $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getRequestUri')->willReturn($currentUri);
-        $requestMock->method('getLocale')->willReturn($currentLocale);
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getRequestUri')->willReturn($currentUri);
+        $requestStub->method('getLocale')->willReturn($currentLocale);
 
-        $this->requestStackMock->method('getCurrentRequest')->willReturn($requestMock);
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
-        $this->translationServiceMock
+        $translationServiceMock = $this->createMock(TranslationService::class);
+        $translationServiceMock
+            ->expects($this->once())
             ->method('getAltLangList')
             ->with($currentLocale, $currentUri)
             ->willReturn($expectedAltLangList);
 
-        $this->assertEquals($expectedAltLangList, $this->subject->getAlternativeLanguageCodes());
+        $subject = $this->createSubject(
+            requestStack: $requestStackStub,
+            translationService: $translationServiceMock,
+        );
+
+        // Act: get alternative language codes
+        $result = $subject->getAlternativeLanguageCodes();
+
+        // Assert: returns alternative language URLs
+        $this->assertSame($expectedAltLangList, $result);
+    }
+
+    public function testGetMenuReturnsMenuForCurrentLocaleAndType(): void
+    {
+        // Arrange: mock request with locale and menu repository
+        $locale = 'de';
+        $menuType = 'main';
+        $user = $this->createStub(User::class);
+        $expectedMenu = [['name' => 'Home', 'slug' => 'home']];
+
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getLocale')->willReturn($locale);
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+
+        $securityStub = $this->createStub(Security::class);
+        $securityStub->method('getUser')->willReturn($user);
+
+        $menuRepoMock = $this->createMock(MenuRepository::class);
+        $menuRepoMock
+            ->expects($this->once())
+            ->method('getAllSlugified')
+            ->with(user: $user, locale: $locale, location: $menuType)
+            ->willReturn($expectedMenu);
+
+        $subject = $this->createSubject(
+            requestStack: $requestStackStub,
+            menuRepo: $menuRepoMock,
+            security: $securityStub,
+        );
+
+        // Act: get menu
+        $result = $subject->getMenu($menuType);
+
+        // Assert: returns menu items
+        $this->assertSame($expectedMenu, $result);
+    }
+
+    public function testGetMenuReturnsDefaultMenuWhenNoRequest(): void
+    {
+        // Arrange: request stack returns null
+        $menuType = 'main';
+        $user = $this->createStub(User::class);
+        $expectedMenu = [['name' => 'Home', 'slug' => 'home']];
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn(null);
+
+        $securityStub = $this->createStub(Security::class);
+        $securityStub->method('getUser')->willReturn($user);
+
+        $menuRepoMock = $this->createMock(MenuRepository::class);
+        $menuRepoMock
+            ->expects($this->once())
+            ->method('getAllSlugified')
+            ->with(user: $user)
+            ->willReturn($expectedMenu);
+
+        $subject = $this->createSubject(
+            requestStack: $requestStackStub,
+            menuRepo: $menuRepoMock,
+            security: $securityStub,
+        );
+
+        // Act: get menu without request
+        $result = $subject->getMenu($menuType);
+
+        // Assert: returns default menu
+        $this->assertSame($expectedMenu, $result);
+    }
+
+    private function createSubject(
+        ?RequestStack $requestStack = null,
+        ?TranslationService $translationService = null,
+        ?DashboardService $dashboardService = null,
+        ?UserRepository $userRepo = null,
+        ?PluginService $pluginService = null,
+        ?MenuRepository $menuRepo = null,
+        ?TranslationSuggestionRepository $translationSuggestionRepo = null,
+        ?Security $security = null,
+    ): GlobalService {
+        return new GlobalService(
+            requestStack: $requestStack ?? $this->createStub(RequestStack::class),
+            translationService: $translationService ?? $this->createStub(TranslationService::class),
+            dashboardService: $dashboardService ?? $this->createStub(DashboardService::class),
+            userRepo: $userRepo ?? $this->createStub(UserRepository::class),
+            pluginService: $pluginService ?? $this->createStub(PluginService::class),
+            menuRepo: $menuRepo ?? $this->createStub(MenuRepository::class),
+            translationSuggestionRepo: $translationSuggestionRepo ?? $this->createStub(TranslationSuggestionRepository::class),
+            security: $security ?? $this->createStub(Security::class),
+        );
     }
 }

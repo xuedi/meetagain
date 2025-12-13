@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -15,146 +14,150 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\LazyCriteriaCollection;
 use Generator;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Tests\Unit\Stubs\EventStub;
 
-#[AllowMockObjectsWithoutExpectations]
 class EventServiceTest extends TestCase
 {
-    private MockObject|EventRepository $eventRepoMock;
-    private MockObject|EntityManagerInterface $emMock;
-    private EventService $subject;
-
-    protected function setUp(): void
+    public function testStructureListGroupsEventsByYearAndMonth(): void
     {
-        $this->eventRepoMock = $this->createMock(EventRepository::class);
-        $this->emMock = $this->createMock(EntityManagerInterface::class);
-        $this->subject = new EventService(
-            repo: $this->eventRepoMock,
-            em: $this->emMock,
+        // Arrange: create events across different months
+        $event1 = (new EventStub())->setId(1)->setStart(new DateTimeImmutable('2002-01-01'));
+        $event2 = (new EventStub())->setId(2)->setStart(new DateTimeImmutable('2002-01-05'));
+        $event3 = (new EventStub())->setId(3)->setStart(new DateTimeImmutable('2002-01-07'));
+        $event4 = (new EventStub())->setId(4)->setStart(new DateTimeImmutable('2002-04-02'));
+        $event5 = (new EventStub())->setId(5)->setStart(new DateTimeImmutable('2002-04-04'));
+
+        $eventList = [$event4, $event1, $event3, $event5, $event2];
+
+        $subject = new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
         );
+
+        // Act: invoke private structureList method via reflection
+        $method = (new ReflectionClass($subject))->getMethod('structureList');
+
+        $result = $method->invoke($subject, $eventList);
+
+        // Assert: events are grouped by year-month with correct structure
+        $this->assertArrayHasKey('2002-01', $result);
+        $this->assertArrayHasKey('2002-04', $result);
+
+        $this->assertSame('2002', $result['2002-01']['year']);
+        $this->assertSame('January', $result['2002-01']['month']);
+        $this->assertCount(3, $result['2002-01']['events']);
+
+        $this->assertSame('2002', $result['2002-04']['year']);
+        $this->assertSame('April', $result['2002-04']['month']);
+        $this->assertCount(2, $result['2002-04']['events']);
     }
 
-    public function testCanStructureEventList(): void
-    {
-        $event1 = new EventStub()
-            ->setId(1)
-            ->setStart(new DateTimeImmutable('2002-01-01'));
-        $event2 = new EventStub()
-            ->setId(2)
-            ->setStart(new DateTimeImmutable('2002-01-05'));
-        $event3 = new EventStub()
-            ->setId(3)
-            ->setStart(new DateTimeImmutable('2002-01-07'));
-        $event4 = new EventStub()
-            ->setId(4)
-            ->setStart(new DateTimeImmutable('2002-04-02'));
-        $event5 = new EventStub()
-            ->setId(5)
-            ->setStart(new DateTimeImmutable('2002-04-04'));
+    #[DataProvider('lastRecurringEventDataProvider')]
+    public function testGetLastRecurringEventDateReturnsCorrectDate(
+        ?string $dbResultDate,
+        string $eventStartDate,
+        string $expectedDate,
+    ): void {
+        // Arrange: mock repository to return last recurring event or null
+        $returnValue = $dbResultDate !== null
+            ? (new EventStub())->setStart(new DateTimeImmutable($dbResultDate))
+            : null;
 
-        $eventListParameter = [$event4, $event1, $event3, $event5, $event2];
-        $expectedResult = [
-            '2002-01' => [
-                'year' => '2002',
-                'month' => 'January',
-                'events' => [$event1, $event3, $event2],
-            ],
-            '2002-04' => [
-                'year' => '2002',
-                'month' => 'April',
-                'events' => [$event4, $event5],
-            ],
+        $repoStub = $this->createStub(EventRepository::class);
+        $repoStub->method('findOneBy')->willReturn($returnValue);
+
+        $event = (new EventStub())->setStart(new DateTimeImmutable($eventStartDate));
+
+        $subject = new EventService(
+            repo: $repoStub,
+            em: $this->createStub(EntityManagerInterface::class),
+        );
+
+        // Act: invoke private getLastRecurringEventDate method via reflection
+        $method = (new ReflectionClass($subject))->getMethod('getLastRecurringEventDate');
+
+        $result = $method->invoke($subject, $event);
+
+        // Assert: returns correct date string
+        $this->assertSame($expectedDate, $result);
+    }
+
+    public static function lastRecurringEventDataProvider(): Generator
+    {
+        yield 'returns last recurring event date when exists' => [
+            'dbResultDate' => '2017-04-26',
+            'eventStartDate' => '2002-01-01',
+            'expectedDate' => '2017-04-26',
         ];
-
-        $reflection = new ReflectionClass($this->subject);
-        $method = $reflection->getMethod('structureList');
-        $method->setAccessible(true);
-
-        $this->assertEquals($expectedResult, $method->invoke($this->subject, $eventListParameter));
-    }
-
-    #[DataProvider('getLastRecurringEventMatrix')]
-    public function testLastRecurringEvent(null|string $dbResult, string $parameter, string $expected): void
-    {
-        $returnValue = null;
-        if ($dbResult !== null) {
-            $returnValue = new EventStub()->setStart(new DateTimeImmutable($dbResult));
-        }
-        $this->eventRepoMock->method('findOneBy')->willReturn($returnValue);
-
-        $parameter = new EventStub()->setStart(new DateTimeImmutable($parameter));
-
-        $reflection = new ReflectionClass($this->subject);
-        $method = $reflection->getMethod('getLastRecurringEventDate');
-        $method->setAccessible(true);
-
-        $this->assertEquals($expected, $method->invoke($this->subject, $parameter));
-    }
-
-    public static function getLastRecurringEventMatrix(): array
-    {
-        return [
-            [
-                '1' => '2017-04-26',
-                '2' => '2002-01-01',
-                '3' => '2017-04-26',
-            ],
-            [
-                '1' => null,
-                '2' => '2002-01-01',
-                '3' => '2002-01-01',
-            ],
+        yield 'returns event start date when no recurring events exist' => [
+            'dbResultDate' => null,
+            'eventStartDate' => '2002-01-01',
+            'expectedDate' => '2002-01-01',
         ];
     }
 
-    public function testCanUpdateDatetime(): void
+    public function testUpdateDatePreservesTimeButChangesDate(): void
     {
-        $paraTarget = new DateTime('2010-10-10 10:10:10');
-        $paraOccurrence = new DateTime('2002-02-02 20:20:20');
-        $expected = new DateTime('2002-02-02 10:10:10');
+        // Arrange: create target datetime with specific time and occurrence with different date
+        $targetDateTime = new DateTime('2010-10-10 10:10:10');
+        $occurrenceDateTime = new DateTime('2002-02-02 20:20:20');
 
-        $reflection = new ReflectionClass($this->subject);
-        $method = $reflection->getMethod('updateDate');
-        $method->setAccessible(true);
+        $subject = new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
+        );
 
-        $actual = $method->invoke($this->subject, $paraTarget, $paraOccurrence);
+        // Act: invoke private updateDate method via reflection
+        $method = (new ReflectionClass($subject))->getMethod('updateDate');
 
-        $this->assertEquals($expected->format('Y-m-d H:i:s'), $actual->format('Y-m-d H:i:s'));
+        $result = $method->invoke($subject, $targetDateTime, $occurrenceDateTime);
+
+        // Assert: date is from occurrence, time is from target
+        $this->assertSame('2002-02-02 10:10:10', $result->format('Y-m-d H:i:s'));
     }
 
-    #[DataProvider('getFilteredListMatrix')]
-    public function testGetFilteredList(
+    #[DataProvider('filteredListDataProvider')]
+    public function testGetFilteredListAppliesCorrectCriteria(
         EventFilterTime $time,
         EventFilterSort $sort,
         EventTypes $types,
         EventFilterRsvp $rsvp,
         Criteria $expectedCriteria,
     ): void {
+        // Arrange: mock repository to verify criteria and return empty collection
         $collectionMock = $this->createMock(LazyCriteriaCollection::class);
         $collectionMock->expects($this->once())->method('toArray')->willReturn([]);
 
-        $this->eventRepoMock
+        $repoMock = $this->createMock(EventRepository::class);
+        $repoMock
             ->expects($this->once())
             ->method('matching')
             ->with($expectedCriteria)
             ->willReturn($collectionMock);
 
-        $this->subject->getFilteredList($time, $sort, $types, $rsvp);
+        $subject = new EventService(
+            repo: $repoMock,
+            em: $this->createStub(EntityManagerInterface::class),
+        );
+
+        // Act: get filtered list
+        $result = $subject->getFilteredList($time, $sort, $types, $rsvp);
+
+        // Assert: returns structured (empty) list
+        $this->assertSame([], $result);
     }
 
-    public static function getFilteredListMatrix(): Generator
+    public static function filteredListDataProvider(): Generator
     {
-        yield [
-            EventFilterTime::All,
-            EventFilterSort::NewToOld,
-            EventTypes::All,
-            EventFilterRsvp::All,
-            new Criteria()
+        yield 'all events sorted newest first' => [
+            'time' => EventFilterTime::All,
+            'sort' => EventFilterSort::NewToOld,
+            'types' => EventTypes::All,
+            'rsvp' => EventFilterRsvp::All,
+            'expectedCriteria' => (new Criteria())
                 ->orderBy(['start' => 'desc'])
                 ->where(Criteria::expr()->not(Criteria::expr()->eq('id', 0)))
                 ->andWhere(Criteria::expr()->not(Criteria::expr()->eq('id', 0)))

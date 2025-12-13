@@ -1,271 +1,264 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
 use App\Service\CaptchaService;
 use DateTimeImmutable;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-#[AllowMockObjectsWithoutExpectations]
 class CaptchaServiceTest extends TestCase
 {
-    private MockObject|SessionInterface $sessionMock;
-    private CaptchaService $subject;
+    private const string SESSION_ID = 'test_session_id';
 
-    protected function setUp(): void
+    public function testGenerateReturnsExistingImageFromSession(): void
     {
-        $this->sessionMock = $this->createMock(SessionInterface::class);
+        // Arrange: set up session stub to return existing captcha image
+        $expectedImage = 'base64_image_data';
 
-        $this->subject = new CaptchaService();
-        $this->subject->setSession(session: $this->sessionMock);
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('getId')->willReturn(self::SESSION_ID);
+        $sessionStub->method('get')->willReturn($expectedImage);
+
+        $subject = new CaptchaService();
+        $subject->setSession($sessionStub);
+
+        // Act: generate captcha
+        $result = $subject->generate();
+
+        // Assert: returns existing image from session
+        $this->assertSame($expectedImage, $result);
     }
 
-    public function testGenerateIsReturningExistingData(): void
+    public function testGenerateCreatesNewImageWhenNoneExists(): void
     {
-        $expected = 'base64_image_data';
-        $sessionId = 'test_session_id';
+        // Arrange: mock session to verify new captcha data is stored
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $sessionMock->method('get')->willReturn(null);
 
-        $this->sessionMock->method('getId')->willReturn($sessionId);
-
-        $this->sessionMock
-            ->method('get')
-            ->with('captcha_image' . $sessionId)
-            ->willReturn($expected);
-
-        $result = $this->subject->generate();
-        $this->assertEquals($expected, $result);
-    }
-
-    public function testGenerateNewImage(): void
-    {
-        $sessionId = 'test_session_id';
-
-        $this->sessionMock->method('getId')->willReturn($sessionId);
-
-        $this->sessionMock->method('get')->willReturn(null);
-
-        $this->sessionMock
+        // Assert: verify session stores refresh timestamps, captcha text, and image
+        $sessionMock
             ->expects($this->exactly(3))
             ->method('set')
-            ->willReturnCallback(function (string $key, mixed $value) use ($sessionId) {
-                switch ($key) {
-                    case 'captcha_refresh' . $sessionId:
-                        $this->assertCount(1, $value);
-                        break;
-                    case 'captcha_text' . $sessionId:
-                        $this->assertTrue(strlen($value) == 4);
-                        break;
-                    case 'captcha_image' . $sessionId:
-                        $this->assertTrue(strlen($value) >= 200);
-                        $this->assertBase64($value);
-                        break;
-                }
+            ->willReturnCallback(function (string $key, mixed $value) {
+                match (true) {
+                    str_contains($key, 'captcha_refresh') => $this->assertCount(1, $value),
+                    str_contains($key, 'captcha_text') => $this->assertSame(4, strlen($value)),
+                    str_contains($key, 'captcha_image') => $this->assertValidBase64Image($value),
+                    default => $this->fail("Unexpected session key: $key"),
+                };
             });
 
-        $this->subject->generate();
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
+
+        // Act: generate new captcha
+        $subject->generate();
     }
 
-    #[DataProvider('getIsValidMatrix')]
-    public function testIsValid(string $sessionReturn, string $code, mixed $expected): void
+    #[DataProvider('validationDataProvider')]
+    public function testIsValid(string $storedCode, string $inputCode, ?string $expectedError): void
     {
-        $sessionId = 'test_session_id';
-
-        $this->sessionMock
+        // Arrange: set up session mock to return stored captcha code
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock
             ->expects($this->once())
             ->method('getId')
-            ->willReturn($sessionId);
-
-        $this->sessionMock
+            ->willReturn(self::SESSION_ID);
+        $sessionMock
             ->expects($this->once())
             ->method('get')
-            ->with('captcha_text' . $sessionId)
-            ->willReturn($sessionReturn);
+            ->with('captcha_text' . self::SESSION_ID)
+            ->willReturn($storedCode);
 
-        $result = $this->subject->isValid($code);
-        $this->assertEquals($expected, $result);
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
+
+        // Act: validate user input
+        $result = $subject->isValid($inputCode);
+
+        // Assert: returns null on success, error message on failure
+        $this->assertSame($expectedError, $result);
     }
 
-    public static function getIsValidMatrix(): array
+    public static function validationDataProvider(): Generator
     {
-        return [
-            [
-                'sessionReturn' => 'hgfw',
-                'code' => 'hgfw',
-                'expected' => null,
-            ],
-            [
-                'sessionReturn' => 'jrdf',
-                'code' => 'hgfw',
-                'expected' => "Wrong captcha code, got 'hgfw' but expected 'jrdf'",
-            ],
+        yield 'matching code returns null' => [
+            'storedCode' => 'hgfw',
+            'inputCode' => 'hgfw',
+            'expectedError' => null,
+        ];
+        yield 'mismatched code returns error message' => [
+            'storedCode' => 'jrdf',
+            'inputCode' => 'hgfw',
+            'expectedError' => "Wrong captcha code, got 'hgfw' but expected 'jrdf'",
         ];
     }
 
-    public function testGetRefreshTimeOnEmpty(): void
+    public function testGetRefreshTimeReturnsZeroWhenNoRefreshHistory(): void
     {
-        $sessionId = 'test_session_id';
-        $sessionReturn = [];
-        $expected = 0;
-
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($sessionId);
-
-        $this->sessionMock
+        // Arrange: session returns empty refresh history
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->expects($this->once())->method('getId')->willReturn(self::SESSION_ID);
+        $sessionMock
             ->expects($this->once())
             ->method('get')
-            ->with('captcha_refresh' . $sessionId)
-            ->willReturn($sessionReturn);
+            ->with('captcha_refresh' . self::SESSION_ID)
+            ->willReturn([]);
 
-        $result = $this->subject->getRefreshTime();
-        $this->assertEquals($expected, $result);
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
+
+        // Act: get refresh time
+        $result = $subject->getRefreshTime();
+
+        // Assert: returns zero when no refresh history exists
+        $this->assertSame(0, $result);
     }
 
-    public function testGetRefreshTimSingle(): void
+    public function testGetRefreshTimeReturnsSecondsUntilNextRefresh(): void
     {
-        $sessionId = 'test_session_id';
-        $sessionReturn = [
-            new DateTimeImmutable(),
-        ];
-        $expectedGreaterThan = 5; // give phpunit 5 seconds to execute the test
-
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($sessionId);
-
-        $this->sessionMock
+        // Arrange: session returns single recent refresh timestamp
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->expects($this->once())->method('getId')->willReturn(self::SESSION_ID);
+        $sessionMock
             ->expects($this->once())
             ->method('get')
-            ->with('captcha_refresh' . $sessionId)
-            ->willReturn($sessionReturn);
+            ->with('captcha_refresh' . self::SESSION_ID)
+            ->willReturn([new DateTimeImmutable()]);
 
-        $result = $this->subject->getRefreshTime();
-        $this->assertGreaterThan($expectedGreaterThan, $result);
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
+
+        // Act: get refresh time
+        $result = $subject->getRefreshTime();
+
+        // Assert: returns remaining seconds (with 5 second tolerance for test execution)
+        $this->assertGreaterThan(5, $result);
     }
 
-    public function testGetRefreshTimGetSmallest(): void
+    public function testGetRefreshTimeReturnsSmallestRemainingTime(): void
     {
-        $sessionId = 'test_session_id';
-        $sessionReturn = [
+        // Arrange: session returns multiple refresh timestamps, oldest determines wait time
+        $refreshHistory = [
             new DateTimeImmutable('-10 seconds'),
-            new DateTimeImmutable('-35 seconds'), // expected, 25 or smaller
+            new DateTimeImmutable('-35 seconds'), // oldest - determines smallest remaining time
             new DateTimeImmutable('-20 seconds'),
         ];
-        $expectedGreaterThan = 25;
 
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($sessionId);
-
-        $this->sessionMock
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->expects($this->once())->method('getId')->willReturn(self::SESSION_ID);
+        $sessionMock
             ->expects($this->once())
             ->method('get')
-            ->with('captcha_refresh' . $sessionId)
-            ->willReturn($sessionReturn);
+            ->with('captcha_refresh' . self::SESSION_ID)
+            ->willReturn($refreshHistory);
 
-        $result = $this->subject->getRefreshTime();
-        $this->assertLessThanOrEqual($expectedGreaterThan, $result);
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
+
+        // Act: get refresh time
+        $result = $subject->getRefreshTime();
+
+        // Assert: returns time based on oldest timestamp (35 seconds ago = ~25 seconds remaining)
+        $this->assertLessThanOrEqual(25, $result);
     }
 
-    #[DataProvider('getRefreshCountMatrix')]
-    public function testGetRefreshCount(array $sessionReturn, int $expected): void
+    #[DataProvider('refreshCountDataProvider')]
+    public function testGetRefreshCount(array $refreshHistory, int $expectedCount): void
     {
-        $sessionId = 'test_session_id';
-
-        $this->sessionMock
-            ->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn($sessionId);
-
-        $this->sessionMock
+        // Arrange: mock session to return refresh history and expect cleanup
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->expects($this->exactly(2))->method('getId')->willReturn(self::SESSION_ID);
+        $sessionMock
+            ->expects($this->once())
+            ->method('get')
+            ->with('captcha_refresh' . self::SESSION_ID)
+            ->willReturn($refreshHistory);
+        $sessionMock
             ->expects($this->once())
             ->method('set')
-            ->with('captcha_refresh' . $sessionId);
+            ->with('captcha_refresh' . self::SESSION_ID);
 
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('get')
-            ->with('captcha_refresh' . $sessionId)
-            ->willReturn($sessionReturn);
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
 
-        $result = $this->subject->getRefreshCount();
-        $this->assertEquals($expected, $result);
+        // Act: get refresh count
+        $result = $subject->getRefreshCount();
+
+        // Assert: returns count of non-expired refresh attempts
+        $this->assertSame($expectedCount, $result);
     }
 
-    public static function getRefreshCountMatrix(): array
+    public static function refreshCountDataProvider(): Generator
     {
-        return [
-            [
-                'sessionReturn' => [
-                    new DateTimeImmutable(),
-                ],
-                'expected' => 1,
+        yield 'single refresh' => [
+            'refreshHistory' => [new DateTimeImmutable()],
+            'expectedCount' => 1,
+        ];
+        yield 'multiple recent refreshes' => [
+            'refreshHistory' => [
+                new DateTimeImmutable(),
+                new DateTimeImmutable(),
+                new DateTimeImmutable(),
+                new DateTimeImmutable(),
             ],
-            [
-                'sessionReturn' => [
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable(),
-                ],
-                'expected' => 4,
+            'expectedCount' => 4,
+        ];
+        yield 'excludes expired refresh (older than 1 hour)' => [
+            'refreshHistory' => [
+                new DateTimeImmutable(),
+                new DateTimeImmutable(),
+                new DateTimeImmutable(),
+                new DateTimeImmutable('-1 hour'),
             ],
-            [
-                'sessionReturn' => [
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable(),
-                    new DateTimeImmutable('-1 hour'), // is timed out
-                ],
-                'expected' => 3,
-            ],
+            'expectedCount' => 3,
         ];
     }
 
-    public function testResetFails(): void
+    public function testResetDoesNotClearSessionWhenTooManyRefreshAttempts(): void
     {
-        $sessionReturn = [
-            new DateTimeImmutable(),
-            new DateTimeImmutable(),
-            new DateTimeImmutable(),
-            new DateTimeImmutable(),
-            new DateTimeImmutable(),
-            new DateTimeImmutable(),
-            new DateTimeImmutable(),
-        ];
+        // Arrange: session has 7 refresh attempts (exceeds limit)
+        $refreshHistory = array_fill(0, 7, new DateTimeImmutable());
 
-        $this->sessionMock->expects($this->never())->method('remove');
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')->willReturn($refreshHistory);
 
-        $this->sessionMock->method('get')->willReturn($sessionReturn);
+        // Assert: session remove should never be called when limit exceeded
+        $sessionMock->expects($this->never())->method('remove');
 
-        $this->subject->reset();
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
+
+        // Act: attempt reset
+        $subject->reset();
     }
 
-    public function testResetSucceed(): void
+    public function testResetClearsSessionWhenRefreshAttemptsWithinLimit(): void
     {
-        $sessionReturn = [
-            new DateTimeImmutable(),
-        ];
+        // Arrange: session has only 1 refresh attempt (within limit)
+        $refreshHistory = [new DateTimeImmutable()];
 
-        $this->sessionMock->expects($this->exactly(2))->method('remove');
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')->willReturn($refreshHistory);
 
-        $this->sessionMock->method('get')->willReturn($sessionReturn);
+        // Assert: session should clear captcha text and image
+        $sessionMock->expects($this->exactly(2))->method('remove');
 
-        $this->subject->reset();
+        $subject = new CaptchaService();
+        $subject->setSession($sessionMock);
+
+        // Act: reset captcha
+        $subject->reset();
     }
 
-    private function assertBase64(mixed $value): void
+    private function assertValidBase64Image(mixed $value): void
     {
-        if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value)) {
-            $this->fail('Value is not base64 encoded');
-        }
+        $this->assertIsString($value);
+        $this->assertGreaterThanOrEqual(200, strlen($value));
+        $this->assertMatchesRegularExpression('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value);
     }
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -16,11 +14,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ReadableCollection;
 use Doctrine\Common\Collections\Selectable;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[AllowMockObjectsWithoutExpectations]
 final class DashboardServiceTest extends TestCase
 {
     /**
@@ -45,7 +40,6 @@ final class DashboardServiceTest extends TestCase
 
             public function matching(Criteria $criteria): ReadableCollection&Selectable
             {
-                // already initialized to an ArrayCollection; forward call
                 $this->initialize();
                 \assert($this->collection instanceof Selectable);
                 return $this->collection->matching($criteria);
@@ -53,79 +47,92 @@ final class DashboardServiceTest extends TestCase
         };
     }
 
-    private EventRepository&MockObject $eventRepo;
-    private UserRepository&MockObject $userRepo;
-    private EmailQueueRepository&MockObject $mailRepo;
-    private NotFoundLogRepository&MockObject $notFoundRepo;
-    private ActivityRepository&MockObject $activityRepo;
-
-    private DashboardService $service;
-
-    protected function setUp(): void
-    {
-        $this->eventRepo = $this->createMock(EventRepository::class);
-        $this->userRepo = $this->createMock(UserRepository::class);
-        $this->mailRepo = $this->createMock(EmailQueueRepository::class);
-        $this->notFoundRepo = $this->createMock(NotFoundLogRepository::class);
-        $this->activityRepo = $this->createMock(ActivityRepository::class);
-
-        $this->service = new DashboardService(
-            $this->eventRepo,
-            $this->userRepo,
-            $this->mailRepo,
-            $this->notFoundRepo,
-            $this->activityRepo,
+    private function createService(
+        ?EventRepository $eventRepo = null,
+        ?UserRepository $userRepo = null,
+        ?EmailQueueRepository $mailRepo = null,
+        ?NotFoundLogRepository $notFoundRepo = null,
+        ?ActivityRepository $activityRepo = null,
+    ): DashboardService {
+        $service = new DashboardService(
+            $eventRepo ?? $this->createStub(EventRepository::class),
+            $userRepo ?? $this->createStub(UserRepository::class),
+            $mailRepo ?? $this->createStub(EmailQueueRepository::class),
+            $notFoundRepo ?? $this->createStub(NotFoundLogRepository::class),
+            $activityRepo ?? $this->createStub(ActivityRepository::class),
         );
 
         // Fix the time window deterministically (ISO week 10 of 2024)
-        $this->service->setTime(2024, 10);
+        $service->setTime(2024, 10);
+
+        return $service;
     }
 
     public function testGetTimeControlReturnsExpectedStructure(): void
     {
-        $time = $this->service->getTimeControl();
+        // Arrange: create service with default stubs
+        $service = $this->createService();
 
+        // Act: get time control data
+        $time = $service->getTimeControl();
+
+        // Assert: expected week values and date range
         $this->assertSame(10, $time['week']);
         $this->assertSame(2024, $time['year']);
         $this->assertSame(11, $time['weekNext']);
         $this->assertSame(9, $time['weekPrevious']);
-
-        // Week 10 of 2024 starts on 2024-03-04 and ends on 2024-03-10
         $this->assertSame('2024-03-04 - 2024-03-10', $time['weekDetails']);
     }
 
     public function testGetDetailsAggregatesCountsAndWeeklyCounts(): void
     {
-        // Arrange generic expectations for repositories
-        $this->notFoundRepo->expects($this->once())->method('count')->willReturn(7);
-        $this->notFoundRepo->expects($this->once())->method('matching')
+        // Arrange: mock notFound repository to return count and weekly matching
+        $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
+        $notFoundRepo->expects($this->once())->method('count')->willReturn(7);
+        $notFoundRepo->expects($this->once())->method('matching')
             ->with($this->isInstanceOf(Criteria::class))
-            ->willReturn(self::makeLazySelectableWithCount(2)); // week=2
+            ->willReturn(self::makeLazySelectableWithCount(2));
 
-        $this->userRepo->expects($this->once())->method('count')->willReturn(5);
-        $this->userRepo->expects($this->once())->method('matching')
+        // Arrange: mock user repository to return count and weekly matching
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo->expects($this->once())->method('count')->willReturn(5);
+        $userRepo->expects($this->once())->method('matching')
             ->with($this->isInstanceOf(Criteria::class))
-            ->willReturn(self::makeLazySelectableWithCount(3)); // week=3
+            ->willReturn(self::makeLazySelectableWithCount(3));
 
-        $this->activityRepo->expects($this->once())->method('count')->willReturn(12);
-        $this->activityRepo->expects($this->once())->method('matching')
+        // Arrange: mock activity repository to return count and weekly matching
+        $activityRepo = $this->createMock(ActivityRepository::class);
+        $activityRepo->expects($this->once())->method('count')->willReturn(12);
+        $activityRepo->expects($this->once())->method('matching')
             ->with($this->isInstanceOf(Criteria::class))
-            ->willReturn(self::makeLazySelectableWithCount(1)); // week=1
+            ->willReturn(self::makeLazySelectableWithCount(1));
 
-        $this->eventRepo->expects($this->once())->method('count')->willReturn(9);
-        $this->eventRepo->expects($this->once())->method('matching')
+        // Arrange: mock event repository to return count and weekly matching
+        $eventRepo = $this->createMock(EventRepository::class);
+        $eventRepo->expects($this->once())->method('count')->willReturn(9);
+        $eventRepo->expects($this->once())->method('matching')
             ->with($this->isInstanceOf(Criteria::class))
-            ->willReturn(self::makeLazySelectableWithCount(4)); // week=4
+            ->willReturn(self::makeLazySelectableWithCount(4));
 
-        $this->mailRepo->expects($this->once())->method('count')->willReturn(11);
-        $this->mailRepo->expects($this->once())->method('matching')
+        // Arrange: mock mail repository to return count and weekly matching
+        $mailRepo = $this->createMock(EmailQueueRepository::class);
+        $mailRepo->expects($this->once())->method('count')->willReturn(11);
+        $mailRepo->expects($this->once())->method('matching')
             ->with($this->isInstanceOf(Criteria::class))
-            ->willReturn(self::makeLazySelectableWithCount(5)); // week=5
+            ->willReturn(self::makeLazySelectableWithCount(5));
 
-        // Act
-        $details = $this->service->getDetails();
+        $service = $this->createService(
+            eventRepo: $eventRepo,
+            userRepo: $userRepo,
+            mailRepo: $mailRepo,
+            notFoundRepo: $notFoundRepo,
+            activityRepo: $activityRepo,
+        );
 
-        // Assert
+        // Act: get details
+        $details = $service->getDetails();
+
+        // Assert: counts and weekly counts are aggregated correctly
         $this->assertSame(['count' => 7, 'week' => 2], $details['404pages']);
         $this->assertSame(['count' => 5, 'week' => 3], $details['members']);
         $this->assertSame(['count' => 12, 'week' => 1], $details['activity']);
@@ -135,6 +142,7 @@ final class DashboardServiceTest extends TestCase
 
     public function testGetPagesNotFoundDelegatesToRepository(): void
     {
+        // Arrange: mock notFound repository to return week summary
         $expected = [
             'Monday' => 1,
             'Tuesday' => 0,
@@ -145,7 +153,8 @@ final class DashboardServiceTest extends TestCase
             'Sunday' => 0,
         ];
 
-        $this->notFoundRepo
+        $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
+        $notFoundRepo
             ->expects($this->once())
             ->method('getWeekSummary')
             ->with(
@@ -154,20 +163,29 @@ final class DashboardServiceTest extends TestCase
             )
             ->willReturn($expected);
 
-        $result = $this->service->getPagesNotFound();
+        $service = $this->createService(notFoundRepo: $notFoundRepo);
 
+        // Act: get pages not found
+        $result = $service->getPagesNotFound();
+
+        // Assert: returns week summary in expected format
         $this->assertSame(['list' => $expected], $result);
     }
 
     public function testGetNeedForApprovalUsesCorrectFilterAndOrder(): void
     {
+        // Arrange: mock user repository to return users needing approval
         $users = ['u1', 'u2'];
-        $this->userRepo
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo
             ->expects($this->once())
             ->method('findBy')
             ->with(['status' => 1], ['createdAt' => 'desc'])
             ->willReturn($users);
 
-        $this->assertSame($users, $this->service->getNeedForApproval());
+        $service = $this->createService(userRepo: $userRepo);
+
+        // Act & Assert: returns users needing approval
+        $this->assertSame($users, $service->getNeedForApproval());
     }
 }
