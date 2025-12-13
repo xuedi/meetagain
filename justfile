@@ -78,7 +78,7 @@ devResetDatabase:
     {{EXEC}} php bin/console doctrine:database:create
 
 # Run all tests and code quality checks
-test: test-unit test-functional checkStan checkRector checkPhpcs
+test: test-unit test-functional checkStan checkRector checkPhpcs checkDeptrac
     {{EXEC}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -101,6 +101,10 @@ checkRector:
 # Run PHP CodeSniffer to check coding standards compliance
 checkPhpcs:
     {{EXEC}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+
+# Run Deptrac to check architectural layer dependencies
+checkDeptrac:
+    {{EXEC}} vendor/bin/deptrac analyse --config-file=tests/deptrac.yaml
 
 # Automatically fix coding standards violations using PHPCBF
 fixPhpcs:

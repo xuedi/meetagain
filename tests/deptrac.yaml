@@ -1,0 +1,106 @@
+deptrac:
+  paths:
+    - ../src
+
+  cache_file: var/cache/deptrac.cache
+
+  layers:
+    - name: Controller
+      collectors:
+        - type: directory
+          value: src/Controller/.*
+
+    - name: Service
+      collectors:
+        - type: directory
+          value: src/Service/.*
+
+    - name: Repository
+      collectors:
+        - type: directory
+          value: src/Repository/.*
+
+    - name: Entity
+      collectors:
+        - type: directory
+          value: src/Entity/.*
+
+    - name: Form
+      collectors:
+        - type: directory
+          value: src/Form/.*
+
+    - name: Command
+      collectors:
+        - type: directory
+          value: src/Command/.*
+
+    - name: Security
+      collectors:
+        - type: directory
+          value: src/Security/.*
+
+    - name: Twig
+      collectors:
+        - type: directory
+          value: src/Twig/.*
+
+    - name: EventSubscriber
+      collectors:
+        - type: directory
+          value: src/EventSubscriber/.*
+
+    - name: DataFixtures
+      collectors:
+        - type: directory
+          value: src/DataFixtures/.*
+
+  ruleset:
+    Controller:
+      - Service
+      - Entity
+      - Form
+      - Repository
+      - Security
+
+    Service:
+      - Repository
+      - Entity
+
+    Entity:
+      - Repository
+      - Controller
+
+    Repository:
+      - Entity
+
+    Form:
+      - Entity
+      - Service
+      - Repository
+
+    Command:
+      - Service
+      - Entity
+      - Repository
+
+    Security:
+      - Entity
+      - Repository
+      - Service
+
+    Twig:
+      - Entity
+      - Service
+      - Controller
+
+    EventSubscriber:
+      - Service
+      - Entity
+      - Repository
+      - Controller
+
+    DataFixtures:
+      - Entity
+      - Repository
+      - Service
