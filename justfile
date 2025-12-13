@@ -104,12 +104,13 @@ checkPhpcs:
 
 # Run Psalm static analysis for finding type errors
 checkPsalm:
-    {{EXEC}} php vendor/psalm/phar/psalm.phar --threads=8 --config='tests/psalm.xml' --show-info=true
+    {{EXEC}} php vendor/psalm/phar/psalm.phar --threads=8 --config='tests/psalm.xml' --error-level=8
 
 # Automatically fix code style issues (PHPCBF) and apply Rector refactorings
 checkAutoFix:
     {{EXEC}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
     {{EXEC}} vendor/bin/rector process src -c tests/rector.php
+    {{JUST}} checkPsalm --alter --ignore-baseline
 
 # Generate test coverage badge SVG and stage it for commit (CI only)
 update_coverage_badge:
