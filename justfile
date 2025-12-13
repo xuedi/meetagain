@@ -106,11 +106,17 @@ checkPhpcs:
 checkPsalm:
     {{EXEC}} php vendor/psalm/phar/psalm.phar --threads=8 --config='tests/psalm.xml' --error-level=8
 
-# Automatically fix code style issues (PHPCBF) and apply Rector refactorings
-checkAutoFix:
+# Automatically fix coding standards violations using PHPCBF
+fixPhpcs:
     {{EXEC}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+
+# Apply Rector refactorings to the codebase
+fixRector:
     {{EXEC}} vendor/bin/rector process src -c tests/rector.php
-    {{JUST}} checkPsalm --alter --ignore-baseline
+
+# Apply Psalm automatic code transformations (dry run)
+fixPsalm:
+    {{EXEC}} php vendor/psalm/phar/psalm.phar --threads=8 --config='tests/psalm.xml' --alter --issues=MissingOverrideAttribute,InvalidNullableReturnType,UnusedVariable,InvalidReturnType,InvalidFalsableReturnType,ClassMustBeFinal,MissingParamType,PossiblyUnusedMethod --dry-run
 
 # Generate test coverage badge SVG and stage it for commit (CI only)
 update_coverage_badge:
