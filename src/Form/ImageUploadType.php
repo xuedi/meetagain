@@ -18,13 +18,13 @@ class ImageUploadType extends AbstractType
             'required' => false,
             'label' => false,
             'constraints' => [
-                new Image([
-                    'maxSize' => '10M',
-                    'mimeTypes' => [
+                new Image(
+                    maxSize: '10M',
+                    mimeTypes: [
                         'image/*',
                     ],
-                    'mimeTypesMessage' => 'Please upload a valid image',
-                ]),
+                    mimeTypesMessage: 'Please upload a valid image',
+                ),
             ],
         ]);
     }
