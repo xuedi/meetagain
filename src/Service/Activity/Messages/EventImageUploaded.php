@@ -12,14 +12,14 @@ class EventImageUploaded extends MessageAbstract
         return ActivityType::EventImageUploaded;
     }
 
-    public function validate(): bool
+    public function validate(): MessageAbstract
     {
         $this->ensureHasKey('event_id');
         $this->ensureIsNumeric('event_id');
         $this->ensureHasKey('images');
         $this->ensureIsNumeric('images');
 
-        return true;
+        return $this;
     }
 
     protected function renderText(): string

@@ -12,12 +12,12 @@ class ChangedUsername extends MessageAbstract
         return ActivityType::ChangedUsername;
     }
 
-    public function validate(): bool
+    public function validate(): MessageAbstract
     {
         $this->ensureHasKey('old');
         $this->ensureHasKey('new');
 
-        return true;
+        return $this;
     }
 
     protected function renderText(): string

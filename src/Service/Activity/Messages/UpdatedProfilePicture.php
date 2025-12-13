@@ -12,14 +12,14 @@ class UpdatedProfilePicture extends MessageAbstract
         return ActivityType::UpdatedProfilePicture;
     }
 
-    public function validate(): bool
+    public function validate(): MessageAbstract
     {
         $this->ensureHasKey('old');
         $this->ensureIsNumeric('old');
         $this->ensureHasKey('new');
         $this->ensureIsNumeric('new');
 
-        return true;
+        return $this;
     }
 
     protected function renderText(): string

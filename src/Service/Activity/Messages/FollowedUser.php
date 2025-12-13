@@ -12,12 +12,12 @@ class FollowedUser extends MessageAbstract
         return ActivityType::FollowedUser;
     }
 
-    public function validate(): bool
+    public function validate(): MessageAbstract
     {
         $this->ensureHasKey('user_id');
         $this->ensureIsNumeric('user_id');
 
-        return true;
+        return $this;
     }
 
     protected function renderText(): string
