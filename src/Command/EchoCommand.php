@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:echo', description: 'simple command for testing, echos parameter')]
 class EchoCommand extends Command
 {
-    const string PARAMETER_MESSAGE = 'message';
+    private const string PARAMETER_MESSAGE = 'message';
 
     #[\Override]
     protected function configure(): void

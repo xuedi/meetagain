@@ -30,7 +30,7 @@ class SystemUserFixture extends AbstractFixture implements FixtureGroupInterface
             $user->setStatus(UserStatus::Active);
             $user->setName($userName);
             $user->setEmail($userName . '@example.com');
-            $user->setPassword($this->hasher->hashPassword($user, (string) random_bytes(128)));
+            $user->setPassword($this->hasher->hashPassword($user, random_bytes(128)));
             $user->setPublic(false);
             $user->setTagging(false);
             $user->setRestricted(false);

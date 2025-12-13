@@ -142,7 +142,7 @@ class EventServiceTest extends TestCase
             ->expects($this->once())
             ->method('matching')
             ->with($expectedCriteria)
-            ->willReturn($collectionMock);;
+            ->willReturn($collectionMock);
 
         $this->subject->getFilteredList($time, $sort, $types, $rsvp);
     }

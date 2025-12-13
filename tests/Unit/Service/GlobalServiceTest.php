@@ -79,7 +79,7 @@ class GlobalServiceTest extends TestCase
 
     public function testLanguageCodes(): void
     {
-        $expectedLanguageCodes = ['de', 'en', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'es', 'sv', 'tr', 'zh'];;
+        $expectedLanguageCodes = ['de', 'en', 'fr', 'it', 'nl', 'pl', 'pt', 'ru', 'es', 'sv', 'tr', 'zh'];
 
         $this->translationServiceMock->method('getLanguageCodes')->willReturn($expectedLanguageCodes);
 
