@@ -15,4 +15,21 @@ class CommentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Comment::class);
     }
+
+    /**
+     * @return array<Comment>
+     */
+    public function findByEventWithUser(int $eventId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.user', 'u')
+            ->addSelect('u')
+            ->leftJoin('u.image', 'i')
+            ->addSelect('i')
+            ->where('c.event = :eventId')
+            ->setParameter('eventId', $eventId)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

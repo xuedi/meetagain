@@ -33,18 +33,17 @@ class ImageRepository extends ServiceEntityRepository
 
     public function getEventList(User $user): array
     {
-        $return = [];
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $result = $qb
-            ->select('i')
-            ->from(Image::class, 'i')
+        $result = $this->createQueryBuilder('i')
+            ->leftJoin('i.event', 'e')
+            ->addSelect('e')
             ->where('i.uploader = :user')
-            ->andWhere('i.event is not null')
+            ->andWhere('i.event IS NOT NULL')
             ->setParameter('user', $user)
             ->groupBy('i.event')
             ->getQuery()
             ->getResult();
 
+        $return = [];
         foreach ($result as $item) {
             $event = $item->getEvent();
             $return[] = [

@@ -20,38 +20,45 @@ class MessageRepository extends ServiceEntityRepository
 
     public function getConversations(User $user, null|int $id = null): array
     {
-        $list = [];
-
-        $result = $this->createQueryBuilder('m')
-            ->select('m.createdAt, us.id as senderId, ur.id as receiverId, m.wasRead') //
-            ->leftJoin('m.receiver', 'us') // join user
-            ->leftJoin('m.sender', 'ur') // join user
+        $messages = $this->createQueryBuilder('m')
+            ->leftJoin('m.sender', 's')
+            ->addSelect('s')
+            ->leftJoin('s.image', 'si')
+            ->addSelect('si')
+            ->leftJoin('m.receiver', 'r')
+            ->addSelect('r')
+            ->leftJoin('r.image', 'ri')
+            ->addSelect('ri')
             ->where('m.sender = :user OR m.receiver = :user')
             ->setParameter('user', $user)
             ->orderBy('m.createdAt', 'DESC')
             ->getQuery()
-            ->getArrayResult();
+            ->getResult();
 
-        $userRepo = $this->getEntityManager()->getRepository(User::class);
-        foreach ($result as $item) {
-            $partnerId = $user->getId() === $item['senderId'] ? $item['receiverId'] : $item['senderId'];
+        $list = [];
+        foreach ($messages as $message) {
+            $partner = $message->getSender()->getId() === $user->getId()
+                ? $message->getReceiver()
+                : $message->getSender();
+            $partnerId = $partner->getId();
+
             if (!isset($list[$partnerId])) {
                 $list[$partnerId] = [
                     'messages' => 1,
-                    'unread' => $item['wasRead'] === false ? 1 : 0,
-                    'lastMessage' => $item['createdAt'],
-                    'user' => $userRepo->findOneBy(['id' => $partnerId]),
+                    'unread' => $message->isWasRead() === false ? 1 : 0,
+                    'lastMessage' => $message->getCreatedAt(),
+                    'user' => $partner,
                 ];
             } else {
                 $list[$partnerId]['messages']++;
-                if ($item['wasRead'] === false) {
+                if ($message->isWasRead() === false) {
                     $list[$partnerId]['unread']++;
                 }
             }
         }
 
-        // add a new conversation partner for a new message
         if ($id !== null && !isset($list[$id])) {
+            $userRepo = $this->getEntityManager()->getRepository(User::class);
             $list[] = [
                 'messages' => 0,
                 'unread' => 0,

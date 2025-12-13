@@ -181,4 +181,47 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         return $list;
     }
+
+    /**
+     * Get social counts for a user without loading full collections.
+     * @return array{following: int, followers: int, rsvp: int}
+     */
+    public function getSocialCounts(User $user): array
+    {
+        $em = $this->getEntityManager();
+        $userId = $user->getId();
+
+        $followingCount = (int) $em->createQueryBuilder()
+            ->select('COUNT(f.id)')
+            ->from('App\Entity\User', 'u')
+            ->innerJoin('u.following', 'f')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $followersCount = (int) $em->createQueryBuilder()
+            ->select('COUNT(f.id)')
+            ->from('App\Entity\User', 'u')
+            ->innerJoin('u.followers', 'f')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $rsvpCount = (int) $em->createQueryBuilder()
+            ->select('COUNT(e.id)')
+            ->from('App\Entity\Event', 'e')
+            ->innerJoin('e.rsvp', 'u')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return [
+            'following' => $followingCount,
+            'followers' => $followersCount,
+            'rsvp' => $rsvpCount,
+        ];
+    }
 }

@@ -20,22 +20,33 @@ class ActivityRepository extends ServiceEntityRepository
 
     public function getUserDisplay(User $user): array
     {
-        $events = [];
-        foreach ($user->getRsvpEvents() as $event) {
-            $events[] = $event->getId();
-        }
+        $em = $this->getEntityManager();
 
-        $following = [];
-        foreach ($user->getFollowing() as $followedUser) {
-            $following[] = $followedUser->getId();
-        }
+        // Get RSVP event IDs with a single query instead of lazy-loading collection
+        $events = $em->createQueryBuilder()
+            ->select('e.id')
+            ->from('App\Entity\Event', 'e')
+            ->innerJoin('e.rsvp', 'u')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getSingleColumnResult();
 
-        // get all activities of the wanted types
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $userActivities = $qb
-            ->select('a')
-            ->from(Activity::class, 'a')
-            ->where($qb->expr()->in('a.type', ':types'))
+        // Get following user IDs with a single query instead of lazy-loading collection
+        $following = $em->createQueryBuilder()
+            ->select('f.id')
+            ->from('App\Entity\User', 'u')
+            ->innerJoin('u.following', 'f')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        // Get all activities of the wanted types with user eager-loaded
+        $userActivities = $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')
+            ->addSelect('u')
+            ->where('a.type IN (:types)')
             ->setParameter('types', [
                 ActivityType::ChangedUsername->value,
                 ActivityType::EventImageUploaded->value,
@@ -44,41 +55,43 @@ class ActivityRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        $activities = [];
+        $activityIds = [];
         foreach ($userActivities as $userActivity) {
             $activityUserId = $userActivity->getUser()->getId();
             switch ($userActivity->getType()->value) {
-                // username change of people the user follows
                 case ActivityType::ChangedUsername->value:
                     if (in_array($activityUserId, $following)) {
-                        $activities[] = $userActivity->getId();
+                        $activityIds[] = $userActivity->getId();
                     }
                     break;
 
-                // uploaded images of the people the user follows, or if he attended the event
                 case ActivityType::EventImageUploaded->value:
                     $eventId = $userActivity->getMeta()['event_id'];
                     if (in_array($activityUserId, $following) || in_array($eventId, $events)) {
-                        $activities[] = $userActivity->getId();
+                        $activityIds[] = $userActivity->getId();
                     }
                     break;
 
-                // uploaded a new profile picture of the people I follow or mine
                 case ActivityType::UpdatedProfilePicture->value:
                     if (in_array($activityUserId, $following) || $user->getId() === $activityUserId) {
-                        $activities[] = $userActivity->getId();
+                        $activityIds[] = $userActivity->getId();
                     }
                     break;
             }
         }
 
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        return $qb
-            ->select('a')
-            ->from(Activity::class, 'a')
-            ->where($qb->expr()->in('a.id', ':ids'))
+        if (empty($activityIds)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')
+            ->addSelect('u')
+            ->leftJoin('u.image', 'i')
+            ->addSelect('i')
+            ->where('a.id IN (:ids)')
             ->orderBy('a.createdAt', 'DESC')
-            ->setParameter('ids', $activities)
+            ->setParameter('ids', $activityIds)
             ->getQuery()
             ->getResult();
     }

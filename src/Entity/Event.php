@@ -66,7 +66,7 @@ class Event
     /**
      * @var Collection<int, EventTranslation>
      */
-    #[ORM\OneToMany(targetEntity: EventTranslation::class, mappedBy: 'event')]
+    #[ORM\OneToMany(targetEntity: EventTranslation::class, mappedBy: 'event', fetch: 'EAGER')]
     private Collection $translations;
 
     /**

@@ -1,20 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Controller\Profile\ImageController;
 use App\Entity\ActivityType;
 use App\Entity\Event;
-use App\Entity\Image;
-use App\Entity\ImageType;
 use App\Form\ProfileType;
 use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
+use App\Repository\UserRepository;
 use App\Service\ActivityService;
-use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,9 +23,10 @@ class ProfileController extends AbstractController
 
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly \App\Controller\ImageUploadController $imageUploadController,
-        private readonly \App\Repository\EventRepository $repo,
-        private readonly \App\Repository\MessageRepository $msgRepo,
+        private readonly ImageUploadController $imageUploadController,
+        private readonly EventRepository $repo,
+        private readonly MessageRepository $msgRepo,
+        private readonly UserRepository $userRepo,
     ) {
     }
 
@@ -69,6 +67,7 @@ class ProfileController extends AbstractController
                 'modal' => $modal,
                 'lastLogin' => $request->getSession()->get('lastLogin', '-'),
                 'messageCount' => $this->msgRepo->getMessageCount($user),
+                'socialCounts' => $this->userRepo->getSocialCounts($user),
                 'user' => $this->getAuthedUser(),
                 'upcoming' => $this->repo->getUpcomingEvents(10),
                 'past' => $this->repo->getPastEvents(20),

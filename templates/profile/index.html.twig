@@ -34,10 +34,10 @@
                         <p>Joined: {{ user.createdAt|date('Y-m-d') }}</p>
                         <p>LastLogin: {{ lastLogin|date('Y-m-d') }}</p>
                         <p>Email: {{ user.email }}</p>
-                        <p>Following: {{ user.following|length }}</p>
-                        <p>Followers: {{ user.followers|length }}</p>
+                        <p>Following: {{ socialCounts.following }}</p>
+                        <p>Followers: {{ socialCounts.followers }}</p>
                         <p>Messages: {{ messageCount }}</p>
-                        <p>RSVP: {{ user.getRsvpEvents|length }}</p>
+                        <p>RSVP: {{ socialCounts.rsvp }}</p>
                     </div>
 
                     {{ form_end(form) }}

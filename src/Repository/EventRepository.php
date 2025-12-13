@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Event;
-use App\Entity\User;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -17,57 +16,66 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-    // TODO: get via builder straight as keyValue
     public function getEventNameList(string $language): array
     {
+        $events = $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->getQuery()
+            ->getResult();
+
         $list = [];
-        foreach ($this->findAll() as $event) {
+        foreach ($events as $event) {
             $list[$event->getId()] = $event->getTitle($language);
         }
 
         return $list;
     }
 
-    // TODO: already preload translations
+    /**
+     * @return array<Event>
+     */
     public function getUpcomingEvents(int $number = 3): array
     {
-        $query = $this->getEntityManager()
-            ->createQuery('SELECT e
-            FROM App\Entity\Event e
-            WHERE e.start > :date
-            ORDER BY e.start ASC')
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.start > :date')
             ->setParameter('date', new DateTime())
-            ->setMaxResults($number);
-
-        return $query->getResult();
+            ->orderBy('e.start', 'ASC')
+            ->setMaxResults($number)
+            ->getQuery()
+            ->getResult();
     }
 
-    // TODO: already preload translations
-    public function getPastEvents(int $number = 3, null|User $user = null): array
+    /**
+     * @return array<Event>
+     */
+    public function getPastEvents(int $number = 3): array
     {
-        $query = $this->getEntityManager()
-            ->createQuery('SELECT e
-            FROM App\Entity\Event e
-            WHERE e.start < :date
-            ORDER BY e.start DESC')
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.start < :date')
             ->setParameter('date', new DateTime())
-            ->setMaxResults($number);
-
-        return $query->getResult();
+            ->orderBy('e.start', 'DESC')
+            ->setMaxResults($number)
+            ->getQuery()
+            ->getResult();
     }
 
-    // TODO: already preload translations
+    /**
+     * @return array<Event>
+     */
     public function findAllRecurring(): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $query = $qb
-            ->select('e')
-            ->from(Event::class, 'e')
-            ->where($qb->expr()->isNotNull('e.recurringRule'))
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.recurringRule IS NOT NULL')
             ->orderBy('e.start', 'ASC')
-            ->getQuery();
-
-        return $query->getResult();
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -105,9 +113,16 @@ class EventRepository extends ServiceEntityRepository
 
     public function getChoices(string $locale): array
     {
-        $all = $this->findBy(['initial' => true]);
+        $events = $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.initial = :initial')
+            ->setParameter('initial', true)
+            ->getQuery()
+            ->getResult();
+
         $list = [];
-        foreach ($all as $event) {
+        foreach ($events as $event) {
             $list[$event->getTitle($locale)] = $event->getId();
         }
 
