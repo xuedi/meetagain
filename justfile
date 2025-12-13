@@ -1,6 +1,8 @@
 # Docker configuration - all commands run inside containers
 # Read the comments in this file to understand what each command does.
 # Always use `just test` to run tests, not `just do "vendor/bin/phpunit ..."`.
+set dotenv-load
+
 DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
 EXEC := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 JUST := just_executable() + " --justfile=" + justfile()
@@ -85,6 +87,22 @@ test: test-unit test-functional checkStan checkRector checkPhpcs checkDeptrac
 # Run only unit tests (faster, no database required)
 test-unit +parameter='':
     {{EXEC}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default {{parameter}}
+
+# Create test database (requires root privileges - run once after container recreation)
+test-db-create:
+    {{DOCKER}} exec -T mariadb mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
+
+# Initialize test database schema and load fixtures (run once or after schema changes)
+test-db-setup:
+    {{EXEC}} php bin/console doctrine:database:create --env=test --if-not-exists
+    {{EXEC}} php bin/console doctrine:schema:drop --env=test --force
+    {{EXEC}} php bin/console doctrine:schema:create --env=test
+    {{EXEC}} php bin/console doctrine:fixtures:load --env=test -q
+
+# Drop and recreate test database
+test-db-reset:
+    {{EXEC}} php bin/console doctrine:database:drop --env=test --force --if-exists
+    {{JUST}} test-db-setup
 
 # Run only functional tests (click path / integration tests)
 test-functional:

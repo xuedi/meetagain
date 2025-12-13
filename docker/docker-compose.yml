@@ -27,6 +27,7 @@ services:
     container_name: "ma-db"
     volumes:
       - ma-mysql-data:/var/lib/mysql
+      - ./mariadb/init:/docker-entrypoint-initdb.d:ro
     ports:
       - "3306:3306"
     environment:

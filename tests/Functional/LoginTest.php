@@ -2,6 +2,10 @@
 
 namespace Tests\Functional;
 
+use App\Entity\Activity;
+use App\Entity\ActivityType;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -41,8 +45,22 @@ class LoginTest extends WebTestCase
         ]);
 
         $client->submit($form);
-
         $this->assertResponseRedirects();
+        $client->followRedirect();
+
+        // Verify user is authenticated by checking security token
+        $user = $client->getContainer()->get('security.token_storage')->getToken()?->getUser();
+        $this->assertInstanceOf(User::class, $user);
+        $this->assertEqualsIgnoringCase(self::ADMIN_EMAIL, $user->getEmail());
+
+        // Verify login activity was recorded in the database
+        $em = $client->getContainer()->get(EntityManagerInterface::class);
+        $activity = $em->getRepository(Activity::class)->findOneBy([
+            'user' => $user,
+            'type' => ActivityType::Login,
+        ]);
+        $this->assertNotNull($activity, 'Login activity should be recorded in the database');
+        $this->assertSame(ActivityType::Login, $activity->getType());
     }
 
     public function testLoginWithInvalidCredentials(): void

@@ -15,6 +15,9 @@
          failOnRisky="true"
          failOnWarning="true"
          colors="true">
+    <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    </extensions>
     <testsuites>
         <testsuite name="default">
             <directory>./Unit</directory>
