@@ -9258,12 +9258,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "3590218a227633a3efd9c7c6aee158a13c693246"
+                "reference": "1553067758ae7f3df13df7c7e232c62d928e1d23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/3590218a227633a3efd9c7c6aee158a13c693246",
-                "reference": "3590218a227633a3efd9c7c6aee158a13c693246",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/1553067758ae7f3df13df7c7e232c62d928e1d23",
+                "reference": "1553067758ae7f3df13df7c7e232c62d928e1d23",
                 "shasum": ""
             },
             "conflict": {
@@ -9735,6 +9735,7 @@
                 "microsoft/microsoft-graph-core": "<2.0.2",
                 "microweber/microweber": "<=2.0.19",
                 "mikehaertl/php-shellcommand": "<1.6.1",
+                "mineadmin/mineadmin": "<=3.0.9",
                 "miniorange/miniorange-saml": "<1.4.3",
                 "mittwald/typo3_forum": "<1.2.1",
                 "mobiledetect/mobiledetectlib": "<2.8.32",
@@ -10253,7 +10254,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-12T17:05:55+00:00"
+            "time": "2025-12-12T23:06:01+00:00"
         },
         {
             "name": "sebastian/cli-parser",
