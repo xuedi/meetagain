@@ -38,6 +38,7 @@ readonly class ActivityService
             $this->em->persist($activity);
             $this->em->flush();
         } catch (Throwable $exception) {
+            // TODO: check why this error still persist on uploading images to events
             $this->logger->error("Could not log Activity", [
                 'error' => $exception->getMessage()
             ]);
