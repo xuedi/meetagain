@@ -1,29 +1,30 @@
 
-
-// backenders attempt to create a fetch wrapper
+// maFetch: thin fetch wrapper supporting XML (XHR-like) and FormData requests
 function maFetch(url, isXml = false, formData) {
-    const options = (isXml) ? {
-        method: 'GET',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    } : (formData instanceof FormData) ? {
-        method: 'POST',
-        body: formData,
-        //headers: {"Content-Type": "application/x-www-form-urlencoded"},
-    } : { // non xml & form --> simple get
-        method: 'GET',
-    };
-    return fetch(url, options).then(response => {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            return response.json();
-        } else {
-            return response.text();
+    const options = (formData instanceof FormData)
+        ? { method: 'POST', body: formData }
+        : { method: 'GET' };
+
+    if (isXml) {
+        options.headers = { 'X-Requested-With': 'XMLHttpRequest' };
+    }
+
+    return fetch(url, options).then(async (response) => {
+        const contentType = response.headers.get('content-type') || '';
+        const isJson = contentType.includes('application/json');
+        const payload = isJson ? await response.json() : await response.text();
+        if (!response.ok) {
+            const err = new Error('Request failed');
+            err.response = response;
+            err.payload = payload;
+            throw err;
         }
+        return payload;
     });
 }
 
 
-// enable closing button for notification boxes
+// Notifications: enable close button on Bulma .notification
 document.addEventListener('DOMContentLoaded', () => {
     (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
         const $notification = $delete.parentNode;
@@ -35,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// burger menu
+// Navbar burger: toggle mobile menu (Bulma)
 document.addEventListener('DOMContentLoaded', () => {
 
     // Get all "navbar-burger" elements
@@ -57,17 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// expandable card
+// Card toggles: toggle specific card content section
 document.addEventListener('DOMContentLoaded', function () {
-    let cardToggles = document.getElementsByClassName('card-toggle');
-    for (let i = 0; i < cardToggles.length; i++) {
-        cardToggles[i].addEventListener('click', e => {
+    Array.from(document.getElementsByClassName('card-toggle')).forEach((el) => {
+        el.addEventListener('click', (e) => {
+            // Keep original structure assumption to avoid breaking changes
             e.currentTarget.parentElement.parentElement.childNodes[3].classList.toggle('is-hidden');
         });
-    }
+    });
 });
 
-// expandable card
+// Flash notifications: auto-hide after a short delay
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.flashNotification') || []).forEach((trigger) => {
         setTimeout(function () {
@@ -76,36 +77,32 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// toggle is-hidden
+// Generic toggle: toggle .is-hidden on target id from data-id
 document.addEventListener('DOMContentLoaded', function () {
-    let trigger = document.getElementsByClassName('toggleTrigger');
-    for (let i = 0; i < trigger.length; i++) {
-        trigger[i].addEventListener('click', event => {
+    Array.from(document.getElementsByClassName('toggleTrigger')).forEach((el) => {
+        el.addEventListener('click', (event) => {
             event.preventDefault();
-            let target = event.currentTarget.getAttribute('data-id');
-            document.getElementById(target).classList.toggle('is-hidden');
+            const target = event.currentTarget.getAttribute('data-id');
+            const node = document.getElementById(target);
+            if (node) node.classList.toggle('is-hidden');
         });
-    }
+    });
 });
 
-// confirm cookie consent jia ajax TODO: use modern foreach
+// Cookie consent: confirm via ajax and reload (modern forEach)
 document.addEventListener('DOMContentLoaded', function () {
-    let cookieTrigger = document.getElementsByClassName('cookieTrigger');
-    for (let i = 0; i < cookieTrigger.length; i++) {
-        cookieTrigger[i].addEventListener('click', event => {
+    (document.querySelectorAll('.cookieTrigger') || []).forEach((el) => {
+        el.addEventListener('click', (event) => {
             event.preventDefault();
-
-            let osmConsent = document.getElementById('osm_consent_checkbox');
-            let url = event.currentTarget.dataset.url + '?osmConsent=' + osmConsent.checked;
-            maFetch(url).then(response => {
-                location.reload();
-            });
-
+            const osmConsent = document.getElementById('osm_consent_checkbox');
+            const base = event.currentTarget.dataset.url;
+            const url = base + '?osmConsent=' + (osmConsent && osmConsent.checked);
+            maFetch(url).then(() => location.reload());
         });
-    }
+    });
 });
 
-// modal open and closer, independent of the content
+// Modal: open by trigger and close via .modal-close
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.modalTrigger').forEach((trigger) => {
         trigger.addEventListener('click', event => {
@@ -113,77 +110,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const modalSelector = event.currentTarget.dataset.target;
             const modal = document.getElementById(modalSelector);
+            if (!modal) return;
             const modalClose = modal.querySelector('.modal-close');
 
-            modalClose.addEventListener('click', () => {
-                modal.classList.remove('is-active');
-            })
+            if (modalClose) {
+                modalClose.addEventListener('click', () => {
+                    modal.classList.remove('is-active');
+                });
+            }
 
             modal.classList.add('is-active');
         });
     });
 });
 
-
-// TODO:
-//  - currently it send the whole form
-//  - upload only the image and replace it with the returned value (retrigger)
-//  - if no javascript, open image upload form like in event images upload
-//  - unify image upload process with event and use in both with no JS form fallback
-//  - delete this thing and have form send my classic save button
-
-//            maFetch(url, false, formData).then(response => {
-//                location.reload();
-//            });
-
+// File upload: send selected file via ajax and reload on success
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.fileUploadTrigger') || []).forEach((trigger) => {
-        trigger.addEventListener('change', event => {
+        trigger.addEventListener('change', (event) => {
             event.preventDefault();
+            const url = event.currentTarget.getAttribute('data-url');
+            const file = event.currentTarget.files && event.currentTarget.files[0];
+            if (!url || !file) return;
 
-            let url = event.currentTarget.getAttribute('data-url');
+            const formData = new FormData();
+            formData.append('image_upload[newImage]', file);
 
-            let formData = new FormData();
-            formData.append('image_upload[newImage]', event.currentTarget.files[0]);
-
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", url, true);
-            xhr.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    location.reload();
-                }
-            }
-            xhr.send(formData);
+            maFetch(url, false, formData)
+                .then(() => location.reload())
+                .catch(() => location.reload());
         });
     });
 });
 
+// File actions: select/rotate via ajax and then reload
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.fileSelectTrigger, .fileRotateTrigger') || []).forEach((trigger) => {
-        trigger.addEventListener('click', event => {
+        trigger.addEventListener('click', (event) => {
             event.preventDefault();
-
-            let url = event.currentTarget.getAttribute('href');
-            maFetch(url).then(response => {
-                location.reload();
-            });
-
+            const url = event.currentTarget.getAttribute('href');
+            if (!url) return;
+            maFetch(url).then(() => location.reload());
         });
     });
 });
 
+// Show-all: toggle all siblings with .showAllToggle within container
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.showAll') || []).forEach((trigger) => {
-        trigger.addEventListener('click', event => {
+        trigger.addEventListener('click', (event) => {
             event.preventDefault();
             (event.currentTarget.parentNode.parentNode.querySelectorAll('.showAllToggle') || []).forEach((toggle) => {
                 toggle.classList.toggle('is-hidden');
-            })
+            });
         });
     });
 });
 
-// triggerToggleBlock: toggle (yes/no) after ajax update parent for event delegation [DONE]
+// Toggle block: ajax yes/no toggle and update button styles
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.triggerToggleBlock') || []).forEach((trigger) => {
         trigger.addEventListener('click', event => {
@@ -204,5 +188,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-// TODO: markers [DONE] only for logic that is kind of final, clean & works well without JS completely
