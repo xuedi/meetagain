@@ -6,10 +6,61 @@
 
     <section class="section">
         <div class="container">
-            <h1 class="title is-3">{{ "menu_cookie_consent_button" | trans }}</h1>
-            <p>
-                If you choose to not accept cookies like the open street map cookie, you can always change your opinion when you suppose to see a map :-)
-            </p>
+            <h1 class="title is-3">{{ "page_title_cookie" | trans }}</h1>
+
+            <div class="columns">
+                <div class="column is-8">
+                    {{ form_start(form, {'attr': {'class': 'box'}}) }}
+                        <p class="mb-4">{{ "menu_cookie_consent_text" | trans }}</p>
+
+                        <div class="field">
+                            <label class="checkbox">
+                                {{ form_widget(form.cookies) }}
+                                <p class="help has-text-grey">{{ "cookie_consent_cookies_text" | trans }}</p>
+                            </label>
+                        </div>
+
+                        <div class="field">
+                            <label class="checkbox">
+                                {{ form_widget(form.osm) }}
+                            </label>
+                            <p class="help has-text-grey">{{ "menu_cookie_consent_option_osm_text" | trans }}</p>
+                        </div>
+
+                        <div class="field mt-4">
+                            {{ form_widget(form.save) }}
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+
+                <div class="column is-4">
+                    <div class="box">
+                        <p class="has-text-weight-bold mb-2">{{ "cookie_consent_current_status"|trans }}</p>
+                        <ul>
+                            <li>
+                                {{ "cookie_consent_cookies"|trans }}:
+                                {% if consent.cookies.value == 'granted' %}
+                                    <span class="tag is-success">{{ "cookie_consent_status_granted"|trans }}</span>
+                                {% elseif consent.cookies.value == 'denied' %}
+                                    <span class="tag is-danger">{{ "cookie_consent_status_denied"|trans }}</span>
+                                {% else %}
+                                    <span class="tag is-warning">{{ "cookie_consent_status_unknown"|trans }}</span>
+                                {% endif %}
+                            </li>
+                            <li>
+                                {{ "menu_cookie_consent_option_osm"|trans }}:
+                                {% if consent.osm.value == 'granted' %}
+                                    <span class="tag is-success">{{ "cookie_consent_status_granted"|trans }}</span>
+                                {% elseif consent.osm.value == 'denied' %}
+                                    <span class="tag is-danger">{{ "cookie_consent_status_denied"|trans }}</span>
+                                {% else %}
+                                    <span class="tag is-warning">{{ "cookie_consent_status_unknown"|trans }}</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

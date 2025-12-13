@@ -146,4 +146,65 @@ class CookieConsentTest extends WebTestCase
         $this->assertJson($response->getContent());
         $this->assertStringContainsString('Saved preferences', $response->getContent());
     }
+
+    public function testCookiePageLoads(): void
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET', '/en/cookie/');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('form', 'Cookie consent form should be displayed');
+    }
+
+    public function testCookiePageFormSubmitAccept(): void
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET', '/en/cookie/');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('cookie_consent_save')->form([
+            'cookie_consent[cookies]' => true,
+            'cookie_consent[osm]' => true,
+        ]);
+        $client->submit($form);
+
+        $this->assertResponseRedirects('/en/cookie/');
+
+        $cookies = $client->getCookieJar();
+        $consentCookie = $cookies->get(Consent::TYPE_COOKIES);
+        $osmCookie = $cookies->get(Consent::TYPE_OSM);
+
+        $this->assertNotNull($consentCookie);
+        $this->assertSame('granted', $consentCookie->getValue());
+        $this->assertNotNull($osmCookie);
+        $this->assertSame('granted', $osmCookie->getValue());
+    }
+
+    public function testCookiePageFormSubmitDeny(): void
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET', '/en/cookie/');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('cookie_consent_save')->form([
+            'cookie_consent[cookies]' => false,
+        ]);
+        $client->submit($form);
+
+        $this->assertResponseRedirects('/en/cookie/');
+    }
+
+    public function testBannerFormActionPointsToCookiePage(): void
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET', '/en/');
+
+        $form = $crawler->filter('#dropdown-cookie form');
+        $this->assertCount(1, $form, 'Cookie banner form should exist');
+        $this->assertStringContainsString('/en/cookie/', $form->attr('action'));
+    }
 }
