@@ -7,20 +7,11 @@ use JsonSerializable;
 
 class NotificationSettings implements JsonSerializable
 {
-    public bool $announcements {
-        get => $this->announcements;
-        set => $this->announcements = $value;
-    }
+    public bool $announcements;
 
-    public bool $followingUpdates {
-        get => $this->followingUpdates;
-        set => $this->followingUpdates = $value;
-    }
+    public bool $followingUpdates;
 
-    public bool $receivedMessage {
-        get => $this->receivedMessage;
-        set => $this->receivedMessage = $value;
-    }
+    public bool $receivedMessage;
 
     public static function fromJson(null|array $notificationSettings): self
     {

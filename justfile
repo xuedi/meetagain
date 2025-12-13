@@ -104,7 +104,7 @@ checkPhpcs:
 
 # Run Psalm static analysis for finding type errors (currently disabled - no Symfony 8 support)
 checkPsalm:
-    {{EXEC}} vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
+#    {{EXEC}} vendor/bin/psalm --threads=8 --config='tests/psalm.xml' --show-info=true
 
 # Automatically fix code style issues (PHPCBF) and apply Rector refactorings
 checkAutoFix:

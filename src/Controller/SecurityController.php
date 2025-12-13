@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    const string LOGIN_ROUTE = 'app_login';
+    public const string LOGIN_ROUTE = 'app_login';
 
     public function __construct(
         private readonly ActivityService $activityService,
