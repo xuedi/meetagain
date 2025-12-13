@@ -10,6 +10,7 @@ use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
 use App\Entity\ImageType;
+use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
 use App\Form\EventUploadType;
@@ -20,6 +21,7 @@ use App\Service\EventService;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -111,7 +113,20 @@ class EventController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
     ): Response {
-        $user = $this->getAuthedUser();
+        // Get user and ensure it's properly managed
+        $sessionUser = $this->getAuthedUser();
+
+        // Debug: Check if email is null in the session user
+        if ($sessionUser->getEmail() === null) {
+            throw new RuntimeException('Session user email is null! ID: ' . $sessionUser->getId());
+        }
+
+        // Find fresh user from database instead of relying on session user
+        $user = $em->find(User::class, $sessionUser->getId());
+        if ($user === null) {
+            throw new RuntimeException('User not found in database! ID: ' . $sessionUser->getId());
+        }
+
         $response = $this->getResponse();
 
         $form = $this->createForm(EventUploadType::class);
