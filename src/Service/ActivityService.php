@@ -9,6 +9,8 @@ use App\Repository\ActivityRepository;
 use App\Service\Activity\MessageFactory;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 readonly class ActivityService
 {
@@ -17,6 +19,7 @@ readonly class ActivityService
         private ActivityRepository $repo,
         private NotificationService $notificationService,
         private MessageFactory $messageFactory,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -28,11 +31,18 @@ readonly class ActivityService
         $activity->setType($type);
         $activity->setMeta($meta);
 
-        $this->messageFactory->build($activity)->validate();
-        $this->notificationService->notify($activity);
+        try {
+            $this->messageFactory->build($activity)->validate();
+            $this->notificationService->notify($activity);
 
-        $this->em->persist($activity);
-        $this->em->flush();
+            $this->em->persist($activity);
+            $this->em->flush();
+        } catch (Throwable $exception) {
+            $this->logger->error("Could not log Activity", [
+                'error' => $exception->getMessage()
+            ]);
+        }
+
     }
 
     public function getUserList(User $user): array
