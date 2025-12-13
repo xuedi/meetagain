@@ -28,7 +28,7 @@ class CommentRepository extends ServiceEntityRepository
             ->addSelect('i')
             ->where('c.event = :eventId')
             ->setParameter('eventId', $eventId)
-            ->orderBy('c.createdAt', 'DESC')
+            ->orderBy('c.created_at', 'DESC')
             ->getQuery()
             ->getResult();
     }
