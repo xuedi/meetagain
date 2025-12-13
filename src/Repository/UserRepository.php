@@ -193,7 +193,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $followingCount = (int) $em->createQueryBuilder()
             ->select('COUNT(f.id)')
-            ->from('App\Entity\User', 'u')
+            ->from(\App\Entity\User::class, 'u')
             ->innerJoin('u.following', 'f')
             ->where('u.id = :userId')
             ->setParameter('userId', $userId)
@@ -202,7 +202,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $followersCount = (int) $em->createQueryBuilder()
             ->select('COUNT(f.id)')
-            ->from('App\Entity\User', 'u')
+            ->from(\App\Entity\User::class, 'u')
             ->innerJoin('u.followers', 'f')
             ->where('u.id = :userId')
             ->setParameter('userId', $userId)
@@ -211,7 +211,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $rsvpCount = (int) $em->createQueryBuilder()
             ->select('COUNT(e.id)')
-            ->from('App\Entity\Event', 'e')
+            ->from(\App\Entity\Event::class, 'e')
             ->innerJoin('e.rsvp', 'u')
             ->where('u.id = :userId')
             ->setParameter('userId', $userId)

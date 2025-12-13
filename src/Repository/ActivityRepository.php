@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Activity;
 use App\Entity\ActivityType;
+use App\Entity\Event;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -25,7 +26,7 @@ class ActivityRepository extends ServiceEntityRepository
         // Get RSVP event IDs with a single query instead of lazy-loading collection
         $events = $em->createQueryBuilder()
             ->select('e.id')
-            ->from('App\Entity\Event', 'e')
+            ->from(Event::class, 'e')
             ->innerJoin('e.rsvp', 'u')
             ->where('u.id = :userId')
             ->setParameter('userId', $user->getId())
@@ -35,7 +36,7 @@ class ActivityRepository extends ServiceEntityRepository
         // Get following user IDs with a single query instead of lazy-loading collection
         $following = $em->createQueryBuilder()
             ->select('f.id')
-            ->from('App\Entity\User', 'u')
+            ->from(User::class, 'u')
             ->innerJoin('u.following', 'f')
             ->where('u.id = :userId')
             ->setParameter('userId', $user->getId())
@@ -80,7 +81,7 @@ class ActivityRepository extends ServiceEntityRepository
             }
         }
 
-        if (empty($activityIds)) {
+        if ($activityIds === []) {
             return [];
         }
 
