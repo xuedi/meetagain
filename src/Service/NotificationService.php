@@ -54,22 +54,19 @@ readonly class NotificationService
         foreach ($user->getFollowers() as $follower) {
             try {
                 $key = sprintf('rsvp_notification_send_%s_%s_%s', $user->getId(), $follower->getId(), $event->getId());
-                if ($this->appCache->hasItem($key)) {
-                    continue;
-                }
-                if (!$follower->isNotification()) {
-                    continue;
-                }
-                if (!$follower->getNotificationSettings()->followingUpdates) {
-                    continue;
-                }
-                //$this->emailService->prepareRsvpNotification(
-                //    userRsvp: $user,
-                //    userRecipient: $follower,
-                //    event: $event
-                //);
-                $this->appCache->get($key, function (ItemInterface $item): string {
+                $this->appCache->get($key, function (ItemInterface $item) use ($follower): string {
                     $item->expiresAfter(self::HOUR);
+                    if (!$follower->isNotification()) {
+                        return 'skip';
+                    }
+                    if (!$follower->getNotificationSettings()->followingUpdates) {
+                        return 'skip';
+                    }
+                    // $this->emailService->prepareRsvpNotification(
+                    //     userRsvp: $user,
+                    //     userRecipient: $follower,
+                    //     event: $event
+                    // );
                     return 'send';
                 });
             } catch (InvalidArgumentException) {
@@ -88,22 +85,19 @@ readonly class NotificationService
             return;
         }
         $key = sprintf('message_send_%s_%s', $user->getId(), $recipient->getId());
-        if ($this->appCache->hasItem($key)) {
-            return;
-        }
-        if (!$recipient->isNotification()) {
-            return;
-        }
-        if (!$recipient->getNotificationSettings()->receivedMessage) {
-            return;
-        }
-        if ($recipient->getLastLogin() > new DateTime('-2 hours')) {
-            return;
-        }
-        $this->emailService->prepareMessageNotification(sender: $user, recipient: $recipient);
-        $this->emailService->sendQueue(); // TODO: use cron instead
-        $this->appCache->get($key, function (ItemInterface $item): string {
+        $this->appCache->get($key, function (ItemInterface $item) use ($user, $recipient): string {
             $item->expiresAfter(self::EIGHT_HOURS);
+            if (!$recipient->isNotification()) {
+                return 'skip';
+            }
+            if (!$recipient->getNotificationSettings()->receivedMessage) {
+                return 'skip';
+            }
+            if ($recipient->getLastLogin() > new DateTime('-2 hours')) {
+                return 'skip';
+            }
+            $this->emailService->prepareMessageNotification(sender: $user, recipient: $recipient);
+            $this->emailService->sendQueue(); // TODO: use cron instead
             return 'send';
         });
     }
