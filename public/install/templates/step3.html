@@ -1,0 +1,89 @@
+<div class="box">
+    <h2 class="title is-4">Step 3: Site Settings &amp; Admin Account</h2>
+
+    {% if errors %}
+    <div class="notification is-danger">
+        <button class="delete" onclick="this.parentElement.remove()"></button>
+        {% for error in errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="notification is-warning is-light">
+        <strong>Note:</strong> This step will run composer install and database migrations. This may take a few minutes.
+    </div>
+
+    <form method="post" action="">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="step3">
+
+        <h3 class="title is-5 mt-5">Site Settings</h3>
+
+        <div class="field">
+            <label class="label">Site URL</label>
+            <div class="control">
+                <input class="input" type="url" name="site_url" value="{{ site_url }}" placeholder="https://example.com" required>
+            </div>
+            <p class="help">The full URL where MeetAgain will be accessible</p>
+        </div>
+
+        <div class="field">
+            <label class="label">Site Name</label>
+            <div class="control">
+                <input class="input" type="text" name="site_name" value="{{ site_name }}" placeholder="MeetAgain" required>
+            </div>
+            <p class="help">Used in emails and notifications</p>
+        </div>
+
+        <h3 class="title is-5 mt-5">Admin Account</h3>
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label">Admin Email</label>
+                    <div class="control">
+                        <input class="input" type="email" name="admin_email" value="{{ admin_email }}" placeholder="admin@example.com" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Admin Display Name</label>
+                    <div class="control">
+                        <input class="input" type="text" name="admin_name" value="{{ admin_name }}" placeholder="Admin" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" name="admin_password" minlength="8" required>
+                    </div>
+                    <p class="help">Minimum 8 characters</p>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Confirm Password</label>
+                    <div class="control">
+                        <input class="input" type="password" name="admin_password_confirm" minlength="8" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field mt-5">
+            <div class="control">
+                <a href="?step=2" class="button is-light">Back</a>
+                <button type="submit" class="button is-primary is-medium">
+                    Install MeetAgain
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

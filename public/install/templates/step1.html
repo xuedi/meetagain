@@ -1,0 +1,93 @@
+<div class="box">
+    <h2 class="title is-4">Step 1: Database Configuration</h2>
+
+    {% if errors %}
+    <div class="notification is-danger">
+        <button class="delete" onclick="this.parentElement.remove()"></button>
+        {% for error in errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="content mb-5">
+        <h3 class="title is-5">System Requirements</h3>
+        <div class="requirements-list">
+            {% for req in requirements %}
+            <div class="requirement-item">
+                <span>{{ req.name }}</span>
+                <span class="tag {% if req.passed %}is-success{% else %}is-danger{% endif %}">
+                    {{ req.current }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <form method="post" action="">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="step1">
+
+        <div class="columns">
+            <div class="column is-8">
+                <div class="field">
+                    <label class="label">Database Host</label>
+                    <div class="control">
+                        <input class="input" type="text" name="db_host" value="{{ db_host }}" placeholder="localhost">
+                    </div>
+                    <p class="help">Use "ma-db" for Docker setup, "localhost" for local MySQL</p>
+                </div>
+            </div>
+            <div class="column is-4">
+                <div class="field">
+                    <label class="label">Port</label>
+                    <div class="control">
+                        <input class="input" type="number" name="db_port" value="{{ db_port }}" placeholder="3306">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Database Name</label>
+            <div class="control">
+                <input class="input" type="text" name="db_name" value="{{ db_name }}" placeholder="meetAgain">
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label">Database User</label>
+                    <div class="control">
+                        <input class="input" type="text" name="db_user" value="{{ db_user }}" placeholder="meetAgain" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Database Password</label>
+                    <div class="control">
+                        <input class="input" type="password" name="db_password" value="{{ db_password }}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">MariaDB Root Password (for Docker)</label>
+            <div class="control">
+                <input class="input" type="password" name="db_root_password" value="{{ db_root_password }}">
+            </div>
+            <p class="help">Only needed for Docker setup</p>
+        </div>
+
+        <div class="field mt-5">
+            <div class="control">
+                <button type="submit" class="button is-primary is-medium">
+                    Test Connection &amp; Continue
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

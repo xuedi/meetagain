@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetAgain Installer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <style>
+        .installer-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .step-indicator .step {
+            display: flex;
+            align-items: center;
+            margin: 0 0.5rem;
+        }
+        .step-indicator .step-number {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: #dbdbdb;
+            color: #4a4a4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .step-indicator .step.active .step-number {
+            background: #3273dc;
+            color: white;
+        }
+        .step-indicator .step.completed .step-number {
+            background: #48c774;
+            color: white;
+        }
+        .step-indicator .step-line {
+            width: 3rem;
+            height: 2px;
+            background: #dbdbdb;
+        }
+        .provider-fields {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .provider-fields.active {
+            display: block;
+        }
+        .requirement-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .requirement-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="installer-container">
+            <div class="has-text-centered mb-5">
+                <h1 class="title is-2">MeetAgain Installer</h1>
+                <p class="subtitle">Setup your MeetAgain instance</p>
+            </div>
+
+            <div class="step-indicator">
+                <div class="step {% if current_step >= 1 %}active{% endif %} {% if current_step > 1 %}completed{% endif %}">
+                    <span class="step-number">1</span>
+                    <span>Database</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step {% if current_step >= 2 %}active{% endif %} {% if current_step > 2 %}completed{% endif %}">
+                    <span class="step-number">2</span>
+                    <span>Mail</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step {% if current_step >= 3 %}active{% endif %}">
+                    <span class="step-number">3</span>
+                    <span>Setup</span>
+                </div>
+            </div>
+
+            {{ content }}
+        </div>
+    </section>
+
+    <script>
+        // Mail provider toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const providerRadios = document.querySelectorAll('input[name="mail_provider"]');
+            const providerFields = document.querySelectorAll('.provider-fields');
+
+            function updateProviderFields() {
+                const selected = document.querySelector('input[name="mail_provider"]:checked');
+                if (selected) {
+                    providerFields.forEach(function(field) {
+                        field.classList.remove('active');
+                    });
+                    const targetField = document.getElementById('fields-' + selected.value);
+                    if (targetField) {
+                        targetField.classList.add('active');
+                    }
+                }
+            }
+
+            providerRadios.forEach(function(radio) {
+                radio.addEventListener('change', updateProviderFields);
+            });
+
+            updateProviderFields();
+        });
+    </script>
+</body>
+</html>
