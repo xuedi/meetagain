@@ -115,7 +115,7 @@
     "ext-xdebug": "*",
     "carthage-software/mago": "^0.26.1",
     "dama/doctrine-test-bundle": "^8.4",
-    "deptrac/deptrac": "^3.0",
+    "deptrac/deptrac": "^4.0",
     "phpstan/phpstan": "^2",
     "phpunit/phpunit": "^12",
     "rector/rector": "^2",
