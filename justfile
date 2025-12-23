@@ -57,7 +57,7 @@ dockerEnter:
 # Allows an AI assistant to run SQL command inside the docker container
 [group('docker')]
 dockerDatabase query:
-    {{DB}} mysql -u$MARIADB_USER -p$MARIADB_PASSWORD $MARIADB_DATABASE -e "{{query}}"
+    {{DB}} mariadb -u$MARIADB_USER -p$MARIADB_PASSWORD $MARIADB_DATABASE -e "{{query}}"
 
 # Run any Symfony console command (e.g., just app cache:clear)
 [group('app')]
