@@ -18,7 +18,7 @@ default:
     @echo "  ██║ ╚═╝ ██║███████╗███████╗   ██║       ██║  ██║╚██████╔╝██║  ██║██║██║ ╚████║"
     @echo "  ╚═╝     ╚═╝╚══════╝╚══════╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝"
     @echo ""
-    {{JUST}} --list --unsorted
+    @{{JUST}} --list --unsorted
 
 # Initial project setup: copies config files, starts containers, installs dependencies, runs migrations and fixtures
 install:
@@ -126,8 +126,8 @@ test: testUnit testFunctional checkStan checkRector checkPhpcs checkDeptrac
 [group('testing')]
 testSetup:
     {{PHP}} php bin/console doctrine:database:create --env=test --if-not-exists
-    {{PHP}} php bin/console doctrine:schema:drop --env=test --force
-    {{PHP}} php bin/console doctrine:schema:create --env=test
+    {{PHP}} php bin/console doctrine:schema:drop --env=test --force -q
+    {{PHP}} php bin/console doctrine:schema:create --env=test -q
     {{PHP}} php bin/console doctrine:fixtures:load --env=test -q
 
 # Run only unit tests (faster, no database required)
