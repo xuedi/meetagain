@@ -7,6 +7,7 @@ use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
 use App\Repository\EventRepository;
+use App\Service\EmailService;
 use App\Service\EventService;
 use DateTime;
 use DateTimeImmutable;
@@ -35,6 +36,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act: invoke private structureList method via reflection
@@ -74,6 +76,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $repoStub,
             em: $this->createStub(EntityManagerInterface::class),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act: invoke private getLastRecurringEventDate method via reflection
@@ -108,6 +111,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act: invoke private updateDate method via reflection
@@ -141,6 +145,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $repoMock,
             em: $this->createStub(EntityManagerInterface::class),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act: get filtered list

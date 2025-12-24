@@ -125,6 +125,29 @@ readonly class EmailService
         return $this->addToEmailQueue($email);
     }
 
+    public function prepareEventCanceledNotification(User $recipient, Event $event): bool
+    {
+        $language = $recipient->getLocale();
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $recipient->getEmail());
+        $email->subject('Event canceled: ' . $event->getTitle($language));
+        $email->htmlTemplate('_emails/notification_event_canceled.html.twig');
+        $email->locale($language);
+        $email->context([
+            'username' => $recipient->getName(),
+            'eventLocation' => $event->getLocation()?->getName() ?? '',
+            'eventDate' => $event->getStart()->format('Y-m-d'),
+            'eventId' => $event->getId(),
+            'eventTitle' => $event->getTitle($language),
+            'host' => $this->config->getHost(),
+            'lang' => $language,
+        ]);
+
+        return $this->addToEmailQueue($email);
+    }
+
     public function getMockEmailList(): array
     {
         return [
@@ -181,6 +204,19 @@ readonly class EmailService
                     'token' => '1234567890',
                     'lang' => 'en',
                     'username' => 'John Doe',
+                ]
+            ],
+            'email_event_canceled' => [
+                'subject' => 'Event canceled: Go tournament afterparty',
+                'template' => '_emails/notification_event_canceled.html.twig',
+                'context' => [
+                    'username' => 'John Doe',
+                    'eventLocation' => 'NightBar 64',
+                    'eventDate' => '2025-01-01',
+                    'eventId' => 1,
+                    'eventTitle' => 'Go tournament afterparty',
+                    'host' => 'https://localhost/en',
+                    'lang' => 'en',
                 ]
             ]
         ];

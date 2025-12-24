@@ -81,6 +81,9 @@ class Event
     #[ORM\Column]
     private null|bool $featured = null;
 
+    #[ORM\Column]
+    private bool $canceled = false;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
@@ -417,6 +420,18 @@ class Event
     public function setFeatured(bool $featured): static
     {
         $this->featured = $featured;
+
+        return $this;
+    }
+
+    public function isCanceled(): bool
+    {
+        return $this->canceled;
+    }
+
+    public function setCanceled(bool $canceled): static
+    {
+        $this->canceled = $canceled;
 
         return $this;
     }

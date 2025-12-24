@@ -5,7 +5,9 @@
         </div>
     </div>
     <div class="level-right">
-        {% if is_granted('ROLE_USER') %}
+        {% if event.canceled %}
+            <span class="tag is-danger is-light">{{ "Event canceled"|trans }}</span>
+        {% elseif is_granted('ROLE_USER') %}
             {% set link = path('app_event_toggle_rsvp', {'event': event.id}) %}
             {% if event.rsvp.contains(app.user) %}
                 <a href="{{ link }}" class="button is-danger is-small ml-4">

@@ -21,8 +21,11 @@ use RuntimeException;
 
 readonly class EventService
 {
-    public function __construct(private EventRepository $repo, private EntityManagerInterface $em)
-    {
+    public function __construct(
+        private EventRepository $repo,
+        private EntityManagerInterface $em,
+        private EmailService $emailService,
+    ) {
     }
 
     public function getFilteredList(
@@ -95,6 +98,25 @@ readonly class EventService
         $this->em->flush();
 
         return count($children);
+    }
+
+    public function cancelEvent(Event $event): void
+    {
+        $event->setCanceled(true);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        foreach ($event->getRsvp() as $user) {
+            $this->emailService->prepareEventCanceledNotification($user, $event);
+        }
+        $this->emailService->sendQueue();
+    }
+
+    public function uncancelEvent(Event $event): void
+    {
+        $event->setCanceled(false);
+        $this->em->persist($event);
+        $this->em->flush();
     }
 
     private function fillRecurringEvents(Event $event): void

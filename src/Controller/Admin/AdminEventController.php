@@ -24,12 +24,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminEventController extends AbstractController
 {
     public function __construct(
-        private readonly ImageService $imageService,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly TranslationService $translationService,
+        private readonly ImageService               $imageService,
+        private readonly EntityManagerInterface     $entityManager,
+        private readonly TranslationService         $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
-        private readonly EventService $eventService,
-        private readonly \App\Repository\EventRepository $repo,
+        private readonly EventService               $eventService,
+        private readonly EventRepository            $repo,
     ) {
     }
 
@@ -105,6 +105,26 @@ class AdminEventController extends AbstractController
     {
         dump('delete');
         exit();
+    }
+
+    #[Route('/admin/event/{id}/cancel', name: 'app_admin_event_cancel')]
+    public function eventCancel(Event $event): Response
+    {
+        $rsvpCount = $event->getRsvp()->count();
+        $this->eventService->cancelEvent($event);
+        if ($rsvpCount > 0) {
+            $this->addFlash('success', "Event canceled. $rsvpCount user(s) have been notified.");
+        }
+
+        return $this->redirectToRoute('app_admin_event');
+    }
+
+    #[Route('/admin/event/{id}/uncancel', name: 'app_admin_event_uncancel')]
+    public function eventUncancel(Event $event): Response
+    {
+        $this->eventService->uncancelEvent($event);
+
+        return $this->redirectToRoute('app_admin_event');
     }
 
     private function getTranslation(mixed $languageCode, null|int $getId): EventTranslation
