@@ -10,11 +10,15 @@ JUST := just_executable() + " --justfile=" + justfile()
 
 # Show available commands
 default:
+    @echo ""
+    @echo "  ███╗   ███╗███████╗███████╗████████╗     █████╗  ██████╗  █████╗ ██╗███╗   ██╗"
+    @echo "  ████╗ ████║██╔════╝██╔════╝╚══██╔══╝    ██╔══██╗██╔════╝ ██╔══██╗██║████╗  ██║"
+    @echo "  ██╔████╔██║█████╗  █████╗     ██║       ███████║██║  ███╗███████║██║██╔██╗ ██║"
+    @echo "  ██║╚██╔╝██║██╔══╝  ██╔══╝     ██║       ██╔══██║██║   ██║██╔══██║██║██║╚██╗██║"
+    @echo "  ██║ ╚═╝ ██║███████╗███████╗   ██║       ██║  ██║╚██████╔╝██║  ██║██║██║ ╚████║"
+    @echo "  ╚═╝     ╚═╝╚══════╝╚══════╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝"
+    @echo ""
     {{JUST}} --list --unsorted
-
-# Run any command inside the PHP container (e.g., just do "composer update")
-do +parameter='':
-    {{PHP}} {{parameter}}
 
 # Initial project setup: copies config files, starts containers, installs dependencies, runs migrations and fixtures
 install:
@@ -26,6 +30,16 @@ install:
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{DOCKER}} exec -T mariadb mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
+
+# Alias to start the docker stack
+start: dockerStart
+
+# Alias to stop the docker stack
+stop: dockerStop
+
+# Run any command inside the PHP container (e.g., just do "composer update")
+do +parameter='':
+    {{PHP}} {{parameter}}
 
 # Start all Docker containers in detached mode and prepare log directory
 [group('docker')]

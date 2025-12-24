@@ -79,6 +79,9 @@
                         <div class="column is-7">
                             <p class="subtitle is-7 mb-3">{{ event.start|date('d. F Y @ H:i') }}</p>
                             <a class="title is-4 mt-1" href="{{ path('app_event_details', { 'id': event.id }) }}">{{ event.title(globalService.currentLocale) }}</a>
+                            {% if event.canceled %}
+                                <span class="tag is-danger ml-2">{{ "Canceled"|trans }}</span>
+                            {% endif %}
                             <p class="mt-3">
                                 {% if event.teaser(globalService.currentLocale) is not null and event.teaser(globalService.currentLocale) is not empty %}
                                     {{ event.teaser(globalService.currentLocale)|raw }}

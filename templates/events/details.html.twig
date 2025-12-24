@@ -24,7 +24,17 @@
 
     <section class="section">
         <div class="container">
-            <h1 class="title">{{ event.title(globalService.currentLocale) }}</h1>
+            <h1 class="title">
+                {{ event.title(globalService.currentLocale) }}
+                {% if event.canceled %}
+                    <span class="tag is-danger is-medium ml-2">{{ "Canceled"|trans }}</span>
+                {% endif %}
+            </h1>
+            {% if event.canceled %}
+                <div class="notification is-danger is-light mb-5">
+                    <strong>{{ "This event has been canceled."|trans }}</strong>
+                </div>
+            {% endif %}
             <div class="columns">
                 <div class="column is-9">
                     <div class="content">
