@@ -102,7 +102,8 @@ appMigrate:
 # Complete database reset: drops DB, recreates it, runs install and clears cache
 [group('development')]
 devReset:
-    cp --no-clobber .env.dist .env
+    rm -f .env
+    cp .env.dist .env
     touch installed.lock
     {{JUST}} do "composer install"
     {{JUST}} devResetDatabase

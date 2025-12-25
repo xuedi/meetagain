@@ -159,6 +159,10 @@ function handleStep2(Installer $installer): void
     $mailConfig = ['provider' => $provider];
 
     switch ($provider) {
+        case 'mailhog':
+            // No configuration needed for MailHog
+            break;
+
         case 'smtp':
             $mailConfig['smtp_host'] = $installer->sanitize($_POST['smtp_host'] ?? '');
             $mailConfig['smtp_port'] = $installer->sanitizeInt($_POST['smtp_port'] ?? 587);

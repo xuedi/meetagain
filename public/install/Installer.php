@@ -207,6 +207,7 @@ class Installer
         $provider = $mailConfig['provider'] ?? 'null';
 
         return match ($provider) {
+            'mailhog' => 'smtp://mailhog:1025',
             'smtp' => $this->buildSmtpDsn($mailConfig),
             'sendgrid' => sprintf('sendgrid+api://%s@default', urlencode($mailConfig['api_key'] ?? '')),
             'mailgun' => sprintf(

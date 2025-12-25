@@ -17,26 +17,68 @@
         <div class="field">
             <label class="label">Mail Provider</label>
             <div class="control">
-                <label class="radio">
-                    <input type="radio" name="mail_provider" value="smtp" {% if provider == 'smtp' %}checked{% endif %}>
-                    SMTP Server
-                </label>
-                <label class="radio">
-                    <input type="radio" name="mail_provider" value="sendgrid" {% if provider == 'sendgrid' %}checked{% endif %}>
-                    SendGrid
-                </label>
-                <label class="radio">
-                    <input type="radio" name="mail_provider" value="mailgun" {% if provider == 'mailgun' %}checked{% endif %}>
-                    Mailgun
-                </label>
-                <label class="radio">
-                    <input type="radio" name="mail_provider" value="ses" {% if provider == 'ses' %}checked{% endif %}>
-                    Amazon SES
-                </label>
-                <label class="radio">
-                    <input type="radio" name="mail_provider" value="null" {% if provider == 'null' %}checked{% endif %}>
-                    Disabled (testing)
-                </label>
+                <div class="columns is-multiline">
+                    <div class="column is-half">
+                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                            <input type="radio" name="mail_provider" value="mailhog" {% if provider == 'mailhog' %}checked{% endif %}>
+                            <strong>MailHog</strong>
+                            <span class="tag is-info is-light ml-2">Docker</span>
+                            <br>
+                            <small class="has-text-grey">Local email testing tool</small>
+                        </label>
+                    </div>
+                    <div class="column is-half">
+                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                            <input type="radio" name="mail_provider" value="smtp" {% if provider == 'smtp' %}checked{% endif %}>
+                            <strong>SMTP Server</strong>
+                            <br>
+                            <small class="has-text-grey">Custom SMTP configuration</small>
+                        </label>
+                    </div>
+                    <div class="column is-half">
+                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                            <input type="radio" name="mail_provider" value="sendgrid" {% if provider == 'sendgrid' %}checked{% endif %}>
+                            <strong>SendGrid</strong>
+                            <br>
+                            <small class="has-text-grey">Cloud email delivery service</small>
+                        </label>
+                    </div>
+                    <div class="column is-half">
+                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                            <input type="radio" name="mail_provider" value="mailgun" {% if provider == 'mailgun' %}checked{% endif %}>
+                            <strong>Mailgun</strong>
+                            <br>
+                            <small class="has-text-grey">Email automation service</small>
+                        </label>
+                    </div>
+                    <div class="column is-half">
+                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                            <input type="radio" name="mail_provider" value="ses" {% if provider == 'ses' %}checked{% endif %}>
+                            <strong>Amazon SES</strong>
+                            <br>
+                            <small class="has-text-grey">AWS email service</small>
+                        </label>
+                    </div>
+                    <div class="column is-half">
+                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                            <input type="radio" name="mail_provider" value="null" {% if provider == 'null' %}checked{% endif %}>
+                            <strong>Disabled</strong>
+                            <span class="tag is-warning is-light ml-2">Testing</span>
+                            <br>
+                            <small class="has-text-grey">No emails will be sent</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MailHog Fields -->
+        <div id="fields-mailhog" class="provider-fields">
+            <div class="notification is-info is-light">
+                <strong>MailHog</strong> is a local email testing tool for development.
+                All emails will be captured and viewable at <a href="http://localhost:8025" target="_blank">http://localhost:8025</a>.
+                <br><br>
+                No configuration needed - works automatically in Docker environment.
             </div>
         </div>
 

@@ -2,10 +2,9 @@
 
 // Check if the installation is complete
 $lockFile = dirname(__DIR__) . '/installed.lock';
-$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-
 if (!file_exists($lockFile)) {
     // If we're already accessing the installer, include it directly
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
     if (str_starts_with($requestUri, '/install')) {
         require __DIR__ . '/install/index.php';
         exit;
