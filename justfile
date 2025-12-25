@@ -29,7 +29,7 @@ install:
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
-    {{DOCKER}} exec -T mariadb mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
+    {{DB}} mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
 
 # Alias to start the docker stack
 start: dockerStart
@@ -102,6 +102,8 @@ appMigrate:
 # Complete database reset: drops DB, recreates it, runs install and clears cache
 [group('development')]
 devReset:
+    cp --no-clobber .env.dist .env
+    {{JUST}} do "composer install"
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q
@@ -109,6 +111,12 @@ devReset:
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
     {{JUST}} testSetup
+
+# Complete database reset: drops DB, recreates it, runs install and clears cache
+[group('development')]
+devInstallerTest:
+    {{PHP}} php bin/console doctrine:database:drop --force
+    rm .env
 
 # delete and recreate the database
 [group('development')]
