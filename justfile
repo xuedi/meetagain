@@ -118,7 +118,7 @@ devReset:
 devInstallerTest:
     @cp --no-clobber .env.dist .env || true
     {{JUST}} devResetDatabase
-    rm -f .env var/installed.lock
+    rm -f .env installed.lock
     @echo ""
     @echo "Access: http://localhost/"
 
