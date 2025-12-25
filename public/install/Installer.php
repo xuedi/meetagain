@@ -278,11 +278,6 @@ HOST_UID={$this->getCurrentUid()}
 HOST_GID={$this->getCurrentGid()}
 
 # Database
-MARIADB_ROOT_PASSWORD={$data['db_root_password']}
-MARIADB_DATABASE={$data['db_name']}
-MARIADB_HOST={$data['db_host']}
-MARIADB_USER={$data['db_user']}
-MARIADB_PASSWORD={$data['db_password']}
 DATABASE_URL="mysql://{$data['db_user']}:{$data['db_password']}@{$data['db_host']}:{$data['db_port']}/{$data['db_name']}?charset=utf8mb4"
 
 # Mail

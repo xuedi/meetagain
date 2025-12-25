@@ -33,6 +33,12 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && docker-php-ext-enable apcu \
     && apk del .build-deps
 
+# Install Redis
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del .build-deps
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

@@ -81,7 +81,6 @@ function showStep1(Installer $installer): void
         'db_name' => $installer->getSessionData('db_name', 'meetAgain'),
         'db_user' => $installer->getSessionData('db_user', 'meetAgain'),
         'db_password' => $installer->getSessionData('db_password', ''),
-        'db_root_password' => $installer->getSessionData('db_root_password', ''),
     ]);
 }
 
@@ -93,7 +92,6 @@ function handleStep1(Installer $installer): void
     $dbName = $installer->sanitize($_POST['db_name'] ?? 'meetAgain');
     $dbUser = $installer->sanitize($_POST['db_user'] ?? '');
     $dbPassword = $_POST['db_password'] ?? '';
-    $dbRootPassword = $_POST['db_root_password'] ?? '';
 
     // Validation
     if (empty($dbUser)) {
@@ -128,7 +126,6 @@ function handleStep1(Installer $installer): void
     $installer->setSessionData('db_name', $dbName);
     $installer->setSessionData('db_user', $dbUser);
     $installer->setSessionData('db_password', $dbPassword);
-    $installer->setSessionData('db_root_password', $dbRootPassword);
 
     // Move to step 2
     $installer->setStep(2);

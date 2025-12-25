@@ -35,7 +35,7 @@
                     <div class="control">
                         <input class="input" type="text" name="db_host" value="{{ db_host }}" placeholder="localhost">
                     </div>
-                    <p class="help">Use "ma-db" for Docker setup, "localhost" for local MySQL</p>
+                    <p class="help">Usually "localhost" or your hosting provider's database server address</p>
                 </div>
             </div>
             <div class="column is-4">
@@ -72,14 +72,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="field">
-            <label class="label">MariaDB Root Password (for Docker)</label>
-            <div class="control">
-                <input class="input" type="password" name="db_root_password" value="{{ db_root_password }}">
-            </div>
-            <p class="help">Only needed for Docker setup</p>
         </div>
 
         <div class="field mt-5">
