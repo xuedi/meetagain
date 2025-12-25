@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
  * MeetAgain Web Installer
@@ -8,7 +6,7 @@ declare(strict_types=1);
  */
 class Installer
 {
-    private const LOCK_FILE = '../../var/installed.lock';
+    private const LOCK_FILE = '../../installed.lock';
     private const ENV_FILE = '../../.env';
     private const ENV_DIST = '../../.env.dist';
 

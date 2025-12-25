@@ -113,11 +113,14 @@ devReset:
     {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
     {{JUST}} testSetup
 
-# Complete database reset: drops DB, recreates it, runs install and clears cache
+# Prepare for installer testing: drops DB, removes .env, vendor, and var directories
 [group('development')]
 devInstallerTest:
-    {{PHP}} php bin/console doctrine:database:drop --force
-    rm .env
+    @cp --no-clobber .env.dist .env || true
+    {{JUST}} devResetDatabase
+    rm -f .env var/installed.lock
+    @echo ""
+    @echo "Access: http://localhost/"
 
 # delete and recreate the database
 [group('development')]

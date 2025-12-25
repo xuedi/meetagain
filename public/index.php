@@ -1,6 +1,6 @@
 <?php
 
-// Check if installation is complete
+// Check if the installation is complete
 $lockFile = dirname(__DIR__) . '/installed.lock';
 if (!file_exists($lockFile)) {
     header('Location: /install/');
