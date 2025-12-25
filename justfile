@@ -97,7 +97,7 @@ appClearCache:
 # Run pending database migrations (interactive)
 [group('app')]
 appMigrate:
-    {{EXEC}} php bin/console doctrine:migrations:migrate -q
+    {{PHP}} php bin/console doctrine:migrations:migrate -q
 
 # Complete database reset: drops DB, recreates it, runs install and clears cache
 [group('development')]
