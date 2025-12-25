@@ -1,4 +1,5 @@
 .env
+installed.lock
 /.env.local
 /.env.local.php
 /.env.*.local

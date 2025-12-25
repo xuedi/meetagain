@@ -103,6 +103,7 @@ appMigrate:
 [group('development')]
 devReset:
     cp --no-clobber .env.dist .env
+    touch installed.lock
     {{JUST}} do "composer install"
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate

@@ -1,9 +1,8 @@
 <?php
 
 // Check if installation is complete
-$lockFile = dirname(__DIR__) . '/var/installed.lock';
+$lockFile = dirname(__DIR__) . '/installed.lock';
 if (!file_exists($lockFile)) {
-    // Redirect to installer if not installed
     header('Location: /install/');
     exit;
 }
