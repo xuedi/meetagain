@@ -120,7 +120,7 @@ devInstallerTest:
     {{JUST}} devResetDatabase
     rm -f .env installed.lock
     @echo ""
-    @echo "Access: http://localhost/"
+    @echo "Access: http://localhost/install/"
 
 # delete and recreate the database
 [group('development')]
