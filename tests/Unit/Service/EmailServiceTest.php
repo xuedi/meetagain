@@ -122,6 +122,59 @@ final class EmailServiceTest extends TestCase
         $service->sendQueue();
     }
 
+    public function testPrepareEventCanceledNotificationEnqueuesEmailWithExpectedData(): void
+    {
+        // Arrange: create user and event with translation
+        $user = $this->makeUser('user@example.com', 'Alice', 'en');
+
+        $translation = new \App\Entity\EventTranslation();
+        $translation->setTitle('Test Event');
+        $translation->setLanguage('en');
+
+        $event = new \Tests\Unit\Stubs\EventStub();
+        $event->setId(42);
+        $event->addTranslation($translation);
+        $event->setStart(new \DateTimeImmutable('2025-06-15 14:00:00'));
+        $locationStub = $this->createStub(\App\Entity\Location::class);
+        $locationStub->method('getName')->willReturn('Test Venue');
+        $event->setLocation($locationStub);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())
+            ->method('persist')
+            ->with(
+                $this->callback(function ($entity) {
+                    $this->assertInstanceOf(EmailQueue::class, $entity);
+                    /** @var EmailQueue $entity */
+                    $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
+                    $this->assertSame('user@example.com', $entity->getRecipient());
+                    $this->assertSame('Event canceled: Test Event', $entity->getSubject());
+                    $this->assertSame('_emails/notification_event_canceled.html.twig', $entity->getTemplate());
+                    $this->assertSame('en', $entity->getLang());
+
+                    $ctx = $entity->getContext();
+                    $this->assertSame('Alice', $ctx['username']);
+                    $this->assertSame('Test Venue', $ctx['eventLocation']);
+                    $this->assertSame('2025-06-15', $ctx['eventDate']);
+                    $this->assertSame(42, $ctx['eventId']);
+                    $this->assertSame('Test Event', $ctx['eventTitle']);
+                    $this->assertSame('https://example.com', $ctx['host']);
+                    $this->assertSame('en', $ctx['lang']);
+
+                    return true;
+                })
+            );
+        $emMock->expects($this->once())->method('flush');
+
+        $service = $this->createService(em: $emMock);
+
+        // Act: prepare event canceled notification
+        $ok = $service->prepareEventCanceledNotification($user, $event);
+
+        // Assert: returns true
+        $this->assertTrue($ok);
+    }
+
     private function createService(
         ?MailerInterface $mailer = null,
         ?ConfigService $config = null,

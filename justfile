@@ -205,5 +205,6 @@ fixRector:
 # Generate test coverage badge SVG and stage it for commit (CI only)
 [group('fixing')]
 fixCoverageBadge:
+	{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
 	{{PHP}} php tests/badgeGenerator.php
 	git add tests/badge/coverage.svg

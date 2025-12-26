@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Tests\Unit\Stubs\EventStub;
+use Tests\Unit\Stubs\UserStub;
 
 class EventServiceTest extends TestCase
 {
@@ -168,5 +169,87 @@ class EventServiceTest extends TestCase
                 ->andWhere(Criteria::expr()->not(Criteria::expr()->eq('id', 0)))
                 ->andWhere(Criteria::expr()->eq('published', true)),
         ];
+    }
+
+    public function testCancelEventSetsCanceledFlagAndSendsNotifications(): void
+    {
+        // Arrange: create event with RSVP users
+        $user1 = (new UserStub())->setId(1);
+        $user2 = (new UserStub())->setId(2);
+
+        $event = (new EventStub())->setId(1);
+        $event->addRsvp($user1);
+        $event->addRsvp($user2);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with($event);
+        $emMock->expects($this->once())->method('flush');
+
+        $emailServiceMock = $this->createMock(EmailService::class);
+        $emailServiceMock->expects($this->exactly(2))
+            ->method('prepareEventCanceledNotification')
+            ->willReturn(true);
+        $emailServiceMock->expects($this->once())->method('sendQueue');
+
+        $subject = new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $emMock,
+            emailService: $emailServiceMock,
+        );
+
+        // Act: cancel the event
+        $subject->cancelEvent($event);
+
+        // Assert: event is marked as canceled
+        $this->assertTrue($event->isCanceled());
+    }
+
+    public function testCancelEventWithNoRsvpsDoesNotSendEmails(): void
+    {
+        // Arrange: create event without RSVPs
+        $event = (new EventStub())->setId(1);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with($event);
+        $emMock->expects($this->once())->method('flush');
+
+        $emailServiceMock = $this->createMock(EmailService::class);
+        $emailServiceMock->expects($this->never())->method('prepareEventCanceledNotification');
+        $emailServiceMock->expects($this->once())->method('sendQueue');
+
+        $subject = new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $emMock,
+            emailService: $emailServiceMock,
+        );
+
+        // Act: cancel the event
+        $subject->cancelEvent($event);
+
+        // Assert: event is marked as canceled
+        $this->assertTrue($event->isCanceled());
+    }
+
+    public function testUncancelEventRemovesCanceledFlag(): void
+    {
+        // Arrange: create canceled event
+        $event = (new EventStub())->setId(1);
+        $event->setCanceled(true);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with($event);
+        $emMock->expects($this->once())->method('flush');
+
+        $subject = new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $emMock,
+            emailService: $this->createStub(EmailService::class),
+        );
+
+        // Act: uncancel the event
+        $subject->uncancelEvent($event);
+
+        // Assert: event is no longer canceled
+        $this->assertFalse($event->isCanceled());
     }
 }
