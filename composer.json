@@ -113,7 +113,7 @@
   },
   "require-dev": {
     "ext-xdebug": "*",
-    "carthage-software/mago": "^0.26.1",
+    "carthage-software/mago": "^1.0.0",
     "dama/doctrine-test-bundle": "^8.4",
     "deptrac/deptrac": "^3.0",
     "friendsofphp/php-cs-fixer": "^3.92",
