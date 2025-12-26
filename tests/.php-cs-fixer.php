@@ -16,4 +16,5 @@ return (new PhpCsFixer\Config())
         'PhpCsFixerCustomFixers/declare_after_opening_tag' => true,
     ])
     ->setFinder($finder)
+    ->setCacheFile(__DIR__ . '/../var/cache/.php-cs-fixer.cache')
 ;
