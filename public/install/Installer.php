@@ -6,9 +6,9 @@
  */
 class Installer
 {
-    private const LOCK_FILE = '../../installed.lock';
-    private const ENV_FILE = '../../.env';
-    private const ENV_DIST = '../../.env.dist';
+    private const string LOCK_FILE = '../../installed.lock';
+    private const string ENV_FILE = '../../.env';
+    private const string ENV_DIST = '../../.env.dist';
 
     private array $errors = [];
     private array $session = [];
@@ -16,7 +16,6 @@ class Installer
     public function __construct()
     {
         if (session_status() === PHP_SESSION_NONE) {
-            // Use a separate session name to avoid conflicts with Symfony sessions
             session_name('MEETAGAIN_INSTALLER');
             session_start();
         }
