@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\EmailQueue;
+use App\Entity\EmailTemplate;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
@@ -25,6 +26,7 @@ readonly class EmailService
         private ConfigService $config,
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
+        private EmailTemplateService $templateService,
     ) {
     }
 
@@ -44,7 +46,7 @@ readonly class EmailService
             'lang' => $user->getLocale(),
         ]);
 
-        return $this->addToEmailQueue($email);
+        return $this->addToEmailQueue($email, 'verification_request');
     }
 
     public function prepareWelcome(User $user): bool
@@ -57,9 +59,11 @@ readonly class EmailService
         $email->locale($user->getLocale());
         $email->context([
             'url' => $this->config->getUrl(),
+            'host' => $this->config->getHost(),
+            'lang' => $user->getLocale(),
         ]);
 
-        return $this->addToEmailQueue($email);
+        return $this->addToEmailQueue($email, 'welcome');
     }
 
     public function prepareResetPassword(User $user): bool
@@ -77,7 +81,7 @@ readonly class EmailService
             'username' => $user->getName(),
         ]);
 
-        return $this->addToEmailQueue($email);
+        return $this->addToEmailQueue($email, 'password_reset_request');
     }
 
     public function prepareRsvpNotification(User $userRsvp, User $userRecipient, Event $event): bool
@@ -101,7 +105,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email);
+        return $this->addToEmailQueue($email, 'notification_rsvp');
     }
 
     public function prepareMessageNotification(User $sender, User $recipient): bool
@@ -122,7 +126,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email);
+        return $this->addToEmailQueue($email, 'notification_message');
     }
 
     public function prepareEventCanceledNotification(User $recipient, Event $event): bool
@@ -145,7 +149,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email);
+        return $this->addToEmailQueue($email, 'notification_event_canceled');
     }
 
     public function getMockEmailList(): array
@@ -240,17 +244,26 @@ readonly class EmailService
         $this->em->flush();
     }
 
-    private function addToEmailQueue(TemplatedEmail $email): bool
+    private function addToEmailQueue(TemplatedEmail $email, string $identifier): bool
     {
         $emailQueue = new EmailQueue();
         $emailQueue->setSender($email->getFrom()[0]->toString());
         $emailQueue->setRecipient($email->getTo()[0]->toString());
-        $emailQueue->setSubject($email->getSubject());
-        $emailQueue->setTemplate($email->getHtmlTemplate());
         $emailQueue->setLang($email->getLocale() ?? 'en');
         $emailQueue->setContext($email->getContext());
         $emailQueue->setCreatedAt(new DateTimeImmutable());
         $emailQueue->setSendAt(null);
+
+        $dbTemplate = $this->templateService->getTemplate($identifier);
+        if ($dbTemplate instanceof EmailTemplate) {
+            $context = $email->getContext();
+            $emailQueue->setSubject($this->templateService->renderContent($dbTemplate->getSubject(), $context));
+            $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
+            $emailQueue->setTemplate(null);
+        } else {
+            $emailQueue->setSubject($email->getSubject());
+            $emailQueue->setTemplate($email->getHtmlTemplate());
+        }
 
         $this->em->persist($emailQueue);
         $this->em->flush();
@@ -264,9 +277,14 @@ readonly class EmailService
         $template->addFrom($mail->getSender());
         $template->addTo($mail->getRecipient());
         $template->subject($mail->getSubject());
-        $template->htmlTemplate($mail->getTemplate());
-        $template->context($mail->getContext());
         $template->locale($mail->getLang());
+
+        if ($mail->getRenderedBody() !== null) {
+            $template->html($mail->getRenderedBody());
+        } else {
+            $template->htmlTemplate($mail->getTemplate());
+            $template->context($mail->getContext());
+        }
 
         return $template;
     }

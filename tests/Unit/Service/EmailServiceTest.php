@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Service\ConfigService;
 use App\Service\EmailService;
+use App\Service\EmailTemplateService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -298,6 +299,7 @@ final class EmailServiceTest extends TestCase
         ?ConfigService $config = null,
         ?EmailQueueRepository $mailRepo = null,
         ?EntityManagerInterface $em = null,
+        ?EmailTemplateService $templateService = null,
     ): EmailService {
         if ($config === null) {
             $config = $this->createStub(ConfigService::class);
@@ -306,11 +308,17 @@ final class EmailServiceTest extends TestCase
             $config->method('getUrl')->willReturn('example.com');
         }
 
+        if ($templateService === null) {
+            $templateService = $this->createStub(EmailTemplateService::class);
+            $templateService->method('getTemplate')->willReturn(null);
+        }
+
         return new EmailService(
             mailer: $mailer ?? $this->createStub(MailerInterface::class),
             config: $config,
             mailRepo: $mailRepo ?? $this->createStub(EmailQueueRepository::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
+            templateService: $templateService,
         );
     }
 

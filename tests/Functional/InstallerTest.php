@@ -40,6 +40,7 @@ class InstallerTest extends TestCase
     private const ENV_BACKUP_PATH = __DIR__ . '/../../.env.backup-test';
 
     private ?\Installer $installer = null;
+    private bool $lockFileExisted = false;
     private static string $dbHost;
     private static int $dbPort;
     private static string $dbName;
@@ -68,8 +69,9 @@ class InstallerTest extends TestCase
             copy(self::ENV_FILE_PATH, self::ENV_BACKUP_PATH);
         }
 
-        // Remove lock file for testing
-        if (file_exists(self::LOCK_FILE_PATH)) {
+        // Track and remove lock file for testing
+        $this->lockFileExisted = file_exists(self::LOCK_FILE_PATH);
+        if ($this->lockFileExisted) {
             unlink(self::LOCK_FILE_PATH);
         }
 
@@ -87,9 +89,12 @@ class InstallerTest extends TestCase
             rename(self::ENV_BACKUP_PATH, self::ENV_FILE_PATH);
         }
 
-        // Remove test lock file
+        // Remove any test lock file, then restore if it existed before
         if (file_exists(self::LOCK_FILE_PATH)) {
             unlink(self::LOCK_FILE_PATH);
+        }
+        if ($this->lockFileExisted) {
+            touch(self::LOCK_FILE_PATH);
         }
 
         // Destroy session if active

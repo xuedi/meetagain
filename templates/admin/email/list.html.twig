@@ -7,14 +7,20 @@
         <div class="content">
             <h1 class="title">Email Templates</h1>
             <p>
-                These are all the emails the website is sending out for various events, on the right
-                side are the variables that can be used inside the email templates. The functionality
-                to edit the email templates is not yet implemented. (coming soon)
+                Configure email templates sent by the website. Use <code>{{ '{{' }}variable{{ '}}' }}</code> placeholders
+                in subject and body fields. Click edit to customize a template.
             </p>
         </div>
 
         {% for name,email in emails %}
-            <div class="content has-background-grey-lighter p-3 mt-6 is-large">{{ name | lower | trans }}</div>
+            <div class="content has-background-grey-lighter p-3 mt-6 is-large is-flex is-justify-content-space-between is-align-items-center">
+                <span>{{ name | lower | trans }}</span>
+                {% if templatesByMockKey[name] is defined %}
+                    <a href="{{ path('app_admin_email_edit', {id: templatesByMockKey[name].id}) }}" class="button is-small is-info">
+                        Edit
+                    </a>
+                {% endif %}
+            </div>
             <div class="columns">
                 <div class="column is-7">
                     <div class="box">
@@ -41,4 +47,3 @@
     </div>
 
 {% endblock %}
-

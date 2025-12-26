@@ -123,6 +123,8 @@ deptrac:
       - App\Repository\ConfigRepository
     App\Entity\EmailQueue:
       - App\Repository\EmailQueueRepository
+    App\Entity\EmailTemplate:
+      - App\Repository\EmailTemplateRepository
     App\Entity\EventTranslation:
       - App\Repository\EventTranslationRepository
     App\Entity\Host:
@@ -163,3 +165,7 @@ deptrac:
     # TODO: Twig extension references controller - consider refactoring
     App\Twig\RenderImageModalExtension:
       - App\Controller\ImageUploadController
+
+    # Fixture command needs direct repository access for bulk user retrieval
+    App\Command\EventAddFixtureRsvpsCommand:
+      - App\Repository\UserRepository

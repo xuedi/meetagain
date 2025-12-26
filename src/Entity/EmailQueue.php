@@ -37,8 +37,11 @@ class EmailQueue
     #[ORM\Column]
     private array $context = [];
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private null|string $template = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private null|string $renderedBody = null;
 
     public function getId(): null|int
     {
@@ -134,9 +137,21 @@ class EmailQueue
         return $this->template;
     }
 
-    public function setTemplate(string $template): static
+    public function setTemplate(null|string $template): static
     {
         $this->template = $template;
+
+        return $this;
+    }
+
+    public function getRenderedBody(): null|string
+    {
+        return $this->renderedBody;
+    }
+
+    public function setRenderedBody(null|string $renderedBody): static
+    {
+        $this->renderedBody = $renderedBody;
 
         return $this;
     }

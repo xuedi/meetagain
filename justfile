@@ -151,8 +151,8 @@ testUnit +parameter='':
 
 # Run only functional tests (click path / integration tests)
 [group('testing')]
-testFunctional:
-    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional
+testFunctional +parameter='':
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional {{parameter}}
 
 # Run installer functional tests (prepares environment first)
 [group('testing')]

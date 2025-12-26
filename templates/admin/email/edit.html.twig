@@ -1,0 +1,55 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="content">
+            <h1 class="title">Edit Email Template: {{ template.identifier }}</h1>
+        </div>
+
+        <div class="box mb-4">
+            <h3 class="subtitle">Available Variables</h3>
+            <div class="tags">
+                {% for variable in template.availableVariables %}
+                    <span class="tag is-info">{{ '{{' }}{{ variable }}{{ '}}' }}</span>
+                {% endfor %}
+            </div>
+            <p class="help">Use these placeholders in your subject and body. They will be replaced with actual values when the email is sent.</p>
+        </div>
+
+        {{ form_start(form) }}
+        <div class="box">
+            <div class="field">
+                <label class="label">Subject</label>
+                <div class="control">
+                    {{ form_widget(form.subject, {'attr': {'class': 'input'}}) }}
+                </div>
+                {{ form_errors(form.subject) }}
+            </div>
+
+            <div class="field">
+                <label class="label">Body (HTML)</label>
+                <div class="control">
+                    {{ form_widget(form.body, {'attr': {'class': 'textarea', 'rows': 15}}) }}
+                </div>
+                {{ form_errors(form.body) }}
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="button is-link" type="submit">{{ "button_save" | trans }}</button>
+            <a href="{{ path('app_admin_email_preview', {id: template.id}) }}" class="button" target="_blank">Preview</a>
+            <a href="{{ path('app_admin_email') }}" class="button">Cancel</a>
+        </div>
+        {{ form_end(form) }}
+
+        <form action="{{ path('app_admin_email_reset', {id: template.id}) }}" method="post" class="mt-4">
+            <button type="submit" class="button is-warning" onclick="return confirm('Reset this template to the default content?');">
+                Reset to Default
+            </button>
+        </form>
+
+    </div>
+
+{% endblock %}

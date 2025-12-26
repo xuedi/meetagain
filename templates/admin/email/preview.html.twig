@@ -1,0 +1,44 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="content">
+            <h1 class="title">Preview: {{ template.identifier }}</h1>
+            <p>This is a preview using mock data. The actual email will use real values.</p>
+        </div>
+
+        <div class="columns">
+            <div class="column is-8">
+                <div class="box">
+                    <p class="mb-4"><strong>Subject:</strong> {{ renderedSubject }}</p>
+                    <hr>
+                    <div class="content">
+                        {{ renderedBody|raw }}
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <h3 class="subtitle">Mock Context Variables</h3>
+                    <table class="table is-narrow is-fullwidth">
+                        {% for key, value in context %}
+                            <tr>
+                                <th>{{ key }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <a href="{{ path('app_admin_email_edit', {id: template.id}) }}" class="button is-info">Edit Template</a>
+            <a href="{{ path('app_admin_email') }}" class="button">Back to List</a>
+        </div>
+
+    </div>
+
+{% endblock %}
