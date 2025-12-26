@@ -10,6 +10,14 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . '/../../public/install/TemplateRenderer.php';
 require_once __DIR__ . '/../../public/install/SystemRequirements.php';
 require_once __DIR__ . '/../../public/install/Installer.php';
+require_once __DIR__ . '/../../public/install/MailProvider.php';
+require_once __DIR__ . '/../../public/install/MailProviderRegistry.php';
+require_once __DIR__ . '/../../public/install/Providers/NullMailProvider.php';
+require_once __DIR__ . '/../../public/install/Providers/MailhogMailProvider.php';
+require_once __DIR__ . '/../../public/install/Providers/SmtpMailProvider.php';
+require_once __DIR__ . '/../../public/install/Providers/SendgridMailProvider.php';
+require_once __DIR__ . '/../../public/install/Providers/MailgunMailProvider.php';
+require_once __DIR__ . '/../../public/install/Providers/SesMailProvider.php';
 
 /**
  * Functional tests for the Installer class.
@@ -80,26 +88,28 @@ class InstallerTest extends TestCase
         parent::tearDown();
     }
 
-    // ========== MAILER DSN TESTS ==========
+    // ========== MAILER DSN TESTS (using provider classes) ==========
 
     public function testBuildMailerDsnForMailhog(): void
     {
-        $dsn = $this->installer->buildMailerDsn(['provider' => 'mailhog']);
+        $provider = new \MailhogMailProvider();
+        $dsn = $provider->buildDsn([]);
 
         $this->assertEquals('smtp://mailhog:1025', $dsn);
     }
 
     public function testBuildMailerDsnForNull(): void
     {
-        $dsn = $this->installer->buildMailerDsn(['provider' => 'null']);
+        $provider = new \NullMailProvider();
+        $dsn = $provider->buildDsn([]);
 
         $this->assertEquals('null://null', $dsn);
     }
 
     public function testBuildMailerDsnForSendGrid(): void
     {
-        $dsn = $this->installer->buildMailerDsn([
-            'provider' => 'sendgrid',
+        $provider = new \SendgridMailProvider();
+        $dsn = $provider->buildDsn([
             'api_key' => 'SG.test_key_12345'
         ]);
 
@@ -108,8 +118,8 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForMailgun(): void
     {
-        $dsn = $this->installer->buildMailerDsn([
-            'provider' => 'mailgun',
+        $provider = new \MailgunMailProvider();
+        $dsn = $provider->buildDsn([
             'api_key' => 'key-12345',
             'domain' => 'mg.example.com',
             'region' => 'eu'
@@ -120,8 +130,8 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSes(): void
     {
-        $dsn = $this->installer->buildMailerDsn([
-            'provider' => 'ses',
+        $provider = new \SesMailProvider();
+        $dsn = $provider->buildDsn([
             'access_key' => 'AKIAIOSFODNN7EXAMPLE',
             'secret_key' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
             'region' => 'us-west-2'
@@ -135,8 +145,8 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSmtpWithTls(): void
     {
-        $dsn = $this->installer->buildMailerDsn([
-            'provider' => 'smtp',
+        $provider = new \SmtpMailProvider();
+        $dsn = $provider->buildDsn([
             'smtp_host' => 'smtp.example.com',
             'smtp_port' => 587,
             'smtp_user' => 'user@example.com',
@@ -149,8 +159,8 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSmtpWithSsl(): void
     {
-        $dsn = $this->installer->buildMailerDsn([
-            'provider' => 'smtp',
+        $provider = new \SmtpMailProvider();
+        $dsn = $provider->buildDsn([
             'smtp_host' => 'smtp.example.com',
             'smtp_port' => 465,
             'smtp_user' => 'user',
@@ -163,8 +173,8 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSmtpWithoutAuth(): void
     {
-        $dsn = $this->installer->buildMailerDsn([
-            'provider' => 'smtp',
+        $provider = new \SmtpMailProvider();
+        $dsn = $provider->buildDsn([
             'smtp_host' => 'localhost',
             'smtp_port' => 25,
             'encryption' => 'none'

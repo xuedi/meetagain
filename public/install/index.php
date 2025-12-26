@@ -9,8 +9,17 @@ declare(strict_types=1);
 require_once __DIR__ . '/TemplateRenderer.php';
 require_once __DIR__ . '/SystemRequirements.php';
 require_once __DIR__ . '/Installer.php';
+require_once __DIR__ . '/MailProvider.php';
+require_once __DIR__ . '/MailProviderRegistry.php';
+require_once __DIR__ . '/Providers/NullMailProvider.php';
+require_once __DIR__ . '/Providers/MailhogMailProvider.php';
+require_once __DIR__ . '/Providers/SmtpMailProvider.php';
+require_once __DIR__ . '/Providers/SendgridMailProvider.php';
+require_once __DIR__ . '/Providers/MailgunMailProvider.php';
+require_once __DIR__ . '/Providers/SesMailProvider.php';
 
 $installer = new Installer();
+$mailProviderRegistry = MailProviderRegistry::createDefault();
 
 // Check if already installed
 if ($installer->isInstalled()) {
@@ -146,81 +155,30 @@ function showStep2(Installer $installer): void
 
 function handleStep2(Installer $installer): void
 {
-    $provider = $installer->sanitize($_POST['mail_provider'] ?? 'null');
-    $mailConfig = ['provider' => $provider];
+    global $mailProviderRegistry;
 
-    // Collect and validate provider-specific configuration
-    switch ($provider) {
-        case 'mailhog':
-            // No configuration needed for MailHog
-            break;
+    $providerName = $installer->sanitize($_POST['mail_provider'] ?? 'null');
 
-        case 'smtp':
-            $mailConfig['smtp_host'] = $installer->sanitize($_POST['smtp_host'] ?? '');
-            $mailConfig['smtp_port'] = $installer->sanitizeInt($_POST['smtp_port'] ?? 587);
-            $mailConfig['smtp_user'] = $installer->sanitize($_POST['smtp_user'] ?? '');
-            $mailConfig['smtp_password'] = $_POST['smtp_password'] ?? '';
-            $mailConfig['encryption'] = $installer->sanitize($_POST['smtp_encryption'] ?? 'tls');
-
-            if (empty($mailConfig['smtp_host'])) {
-                $installer->addError('SMTP host is required');
-            }
-
-            // Optionally test SMTP connection
-            if (!$installer->hasErrors() && !empty($_POST['test_smtp'])) {
-                $installer->testSmtpConnection(
-                    $mailConfig['smtp_host'],
-                    $mailConfig['smtp_port'],
-                    $mailConfig['smtp_user'],
-                    $mailConfig['smtp_password'],
-                    $mailConfig['encryption']
-                );
-            }
-            break;
-
-        case 'sendgrid':
-            $mailConfig['api_key'] = $_POST['sendgrid_api_key'] ?? '';
-            if (empty($mailConfig['api_key'])) {
-                $installer->addError('SendGrid API key is required');
-            }
-            break;
-
-        case 'mailgun':
-            $mailConfig['api_key'] = $_POST['mailgun_api_key'] ?? '';
-            $mailConfig['domain'] = $installer->sanitize($_POST['mailgun_domain'] ?? '');
-            $mailConfig['region'] = $installer->sanitize($_POST['mailgun_region'] ?? 'us');
-
-            if (empty($mailConfig['api_key'])) {
-                $installer->addError('Mailgun API key is required');
-            }
-            if (empty($mailConfig['domain'])) {
-                $installer->addError('Mailgun domain is required');
-            }
-            break;
-
-        case 'ses':
-            $mailConfig['region'] = $installer->sanitize($_POST['ses_region'] ?? 'eu-west-1');
-            $mailConfig['access_key'] = $_POST['ses_access_key'] ?? '';
-            $mailConfig['secret_key'] = $_POST['ses_secret_key'] ?? '';
-
-            if (empty($mailConfig['access_key'])) {
-                $installer->addError('AWS Access Key is required');
-            }
-            if (empty($mailConfig['secret_key'])) {
-                $installer->addError('AWS Secret Key is required');
-            }
-            break;
-
-        case 'null':
-        default:
-            // No validation needed
-            break;
+    // Get the provider instance
+    try {
+        $provider = $mailProviderRegistry->getProvider($providerName);
+    } catch (InvalidArgumentException $e) {
+        $installer->addError('Invalid mail provider selected');
+        showStep2($installer);
+        return;
     }
 
+    // Validate provider-specific configuration
+    $provider->validate($_POST, $installer);
+
+    // Collect provider-specific configuration
+    $mailConfig = $provider->collectConfig($_POST, $installer);
+    $mailConfig['provider'] = $providerName;
+
     // Build and store MAILER_DSN on success
-    $data = array_merge(['mail_provider' => $provider], $mailConfig);
+    $data = array_merge(['mail_provider' => $providerName], $mailConfig);
     if (!$installer->hasErrors()) {
-        $data['mailer_dsn'] = $installer->buildMailerDsn($mailConfig);
+        $data['mailer_dsn'] = $provider->buildDsn($mailConfig);
     }
 
     $installer->handleFormResult($data, 3, fn() => showStep2($installer));
