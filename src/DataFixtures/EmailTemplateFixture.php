@@ -10,9 +10,8 @@ use Doctrine\Persistence\ObjectManager;
 
 class EmailTemplateFixture extends AbstractFixture implements FixtureGroupInterface
 {
-    public function __construct(
-        private readonly EmailTemplateService $templateService,
-    ) {
+    public function __construct(private readonly EmailTemplateService $templateService)
+    {
     }
 
     public function load(ObjectManager $manager): void
