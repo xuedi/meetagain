@@ -87,13 +87,22 @@ readonly class TranslationService
         $dataBase = $this->translationRepo->getUniqueList();
         $importUser = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
 
+        if ($importUser === null) {
+            throw new \RuntimeException('System user not found for translation import');
+        }
+
         $finder = new Finder();
         $finder->files()->in($path)->depth(0)->name(['messages*.php']);
         foreach ($finder as $file) {
-            [$name, $lang, $ext] = explode('.', $file->getFilename());
+            $parts = explode('.', $file->getFilename());
+            if (count($parts) !== 3) {
+                // Skip files that don't match the expected pattern (messages.{lang}.php)
+                continue;
+            }
+            [$name, $lang, $ext] = $parts;
             $translations = $this->removeDuplicates(include $file->getPathname());
             foreach (array_keys($translations) as $placeholder) {
-                if (!in_array($placeholder, $dataBase[$lang], true)) {
+                if (!isset($dataBase[$lang]) || !in_array($placeholder, $dataBase[$lang], true)) {
                     $translation = new Translation();
                     $translation->setLanguage($lang);
                     $translation->setPlaceholder($placeholder);
@@ -133,9 +142,9 @@ readonly class TranslationService
                 $this->fs->appendToFile(
                     $file,
                     sprintf(
-                        "'%s' => '%s',",
-                        strtolower($translation->getPlaceholder()),
-                        $translation->getTranslation()
+                        "%s => %s,",
+                        var_export(strtolower($translation->getPlaceholder()), true),
+                        var_export($translation->getTranslation() ?? '', true)
                     ),
                 );
                 $published++;

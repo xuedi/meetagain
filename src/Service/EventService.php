@@ -72,6 +72,10 @@ readonly class EventService
         } elseif ($event->getRecurringOf() !== null) {
             // has parent, load parent
             $parent = $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
+            if ($parent === null) {
+                // Parent event was deleted, cannot update recurring events
+                return 0;
+            }
         } else { // no parent, no recurring, nothing to do
             return 0;
         }
@@ -86,6 +90,10 @@ readonly class EventService
             $child->setPreviewImage($event->getPreviewImage());
             foreach ($event->getTranslation() as $eventTranslation) {
                 $childTranslation = $child->findTranslation($eventTranslation->getLanguage());
+                if ($childTranslation === null) {
+                    // Child doesn't have this language, skip
+                    continue;
+                }
                 $childTranslation->setTitle($eventTranslation->getTitle());
                 $childTranslation->setTeaser($eventTranslation->getTeaser());
                 $childTranslation->setDescription($eventTranslation->getDescription());
@@ -141,14 +149,11 @@ readonly class EventService
             'interval' => $ruleInterval,
             'dtstart' => $this->getLastRecurringEventDate($event),
             'until' => (match ($recurringRule) {
-                EventIntervals::Daily => $today->modify('+2 weeks'),
-                EventIntervals::Weekly,
-                $today->modify('+3 weeks'),
-                EventIntervals::BiMonthly,
-                $today->modify('+5 weeks'),
-                EventIntervals::Monthly,
-                => $today->modify('+3 months'),
-                EventIntervals::Yearly => $today->modify('+3 years'),
+                EventIntervals::Daily => (clone $today)->modify('+2 weeks'),
+                EventIntervals::Weekly => (clone $today)->modify('+3 weeks'),
+                EventIntervals::BiMonthly => (clone $today)->modify('+5 weeks'),
+                EventIntervals::Monthly => (clone $today)->modify('+3 months'),
+                EventIntervals::Yearly => (clone $today)->modify('+3 years'),
                 default => throw new RuntimeException('Unknown EventIntervals'),
             })->format('Y-m-d'),
         ]);
@@ -184,7 +189,7 @@ readonly class EventService
 
             foreach ($event->getTranslation() as $eventTranslation) {
                 $newEventTranslation = new EventTranslation();
-                $newEventTranslation->setEvent($eventTranslation->getEvent());
+                $newEventTranslation->setEvent($recurringEvent);
                 $newEventTranslation->setLanguage($eventTranslation->getLanguage());
                 $newEventTranslation->setTitle($eventTranslation->getTitle());
                 $newEventTranslation->setTeaser($eventTranslation->getTeaser());
@@ -195,8 +200,10 @@ readonly class EventService
             }
 
             $this->em->persist($recurringEvent);
-            $this->em->flush();
         }
+
+        // Flush once after all events are created for better performance
+        $this->em->flush();
     }
 
     private function updateDate(DateTime $target, DateTime $occurrence): DateTime
