@@ -21,16 +21,17 @@ foreach ($metrics as $metric) {
 $coverage = round(($checkedElements / $totalElements) * 100);
 
 $color = match (true) {
-    $coverage >= 0 => 'FF0000',
-    $coverage >= 10 => 'FF3300',
-    $coverage >= 20 => 'FF6600',
-    $coverage >= 30 => 'FF9900',
-    $coverage >= 40 => 'FFFF00',
-    $coverage >= 50 => '99FF00',
-    $coverage >= 60 => '66FF00',
-    $coverage >= 70 => '33FF00',
-    $coverage >= 80 => '00FF33',
-    $coverage >= 90 => '00FF00',
+    $coverage >= 80 => '00CC00',
+    $coverage >= 70 => '33CC00',
+    $coverage >= 60 => '66CC00',
+    $coverage >= 50 => '99CC00',
+    $coverage >= 45 => 'AAAA00',
+    $coverage >= 40 => 'BBBB00',
+    $coverage >= 35 => 'CC9900',
+    $coverage >= 30 => 'DD7700',
+    $coverage >= 25 => 'EE5500',
+    $coverage >= 20 => 'FF3300',
+    default => 'FF0000',
 };
 
 $darkeningFactor = 1.2;
