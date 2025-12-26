@@ -11,7 +11,7 @@ $finder = (new PhpCsFixer\Finder())
 return (new PhpCsFixer\Config())
     ->registerCustomFixers(new PhpCsFixerCustomFixers\Fixers())
     ->setRules([
-        //'@Symfony' => true,
+        //TODO: make <a plan to harmonise with phpcs, until then just use for decare strict after opening tag '@Symfony' => true,
         'PhpCsFixerCustomFixers/declare_after_opening_tag' => true,
     ])
     ->setFinder($finder)
