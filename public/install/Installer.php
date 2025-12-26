@@ -279,6 +279,13 @@ HOST_GID={$this->getCurrentGid()}
 # Database
 DATABASE_URL="mysql://{$data['db_user']}:{$data['db_password']}@{$data['db_host']}:{$data['db_port']}/{$data['db_name']}?charset=utf8mb4"
 
+# MariaDB components (to avoid warnings)
+MARIADB_ROOT_PASSWORD={$data['db_password']}
+MARIADB_DATABASE={$data['db_name']}
+MARIADB_HOST={$data['db_host']}
+MARIADB_USER={$data['db_user']}
+MARIADB_PASSWORD={$data['db_password']}
+
 # Mail
 MAILER_DSN={$data['mailer_dsn']}
 

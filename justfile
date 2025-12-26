@@ -153,6 +153,15 @@ testUnit +parameter='':
 testFunctional:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional
 
+# Run installer functional tests (prepares environment first)
+[group('testing')]
+testInstaller:
+    @echo "Preparing installer test environment..."
+    @test -f .env || cp .env.dist .env
+    {{JUST}} devResetDatabase
+    @echo "Running installer tests..."
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --filter=InstallerTest
+
 # Run PHPStan static analysis for type checking and bug detection
 [group('checks')]
 checkStan +parameter='':
