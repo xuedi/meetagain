@@ -94,14 +94,14 @@ appClearCache:
     {{PHP}} composer dump-autoload
     {{PHP}} php bin/console cache:clear
 
-# Run pending database migrations (interactive)
+# Run pending database migrations (non-interactive)
 [group('app')]
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -q
 
-# Complete database reset: drops DB, recreates it, runs install and clears cache
+# Reset to development mode with fixtures: reinstalls app, loads fixtures, imports translations, sets up test DB
 [group('development')]
-devReset:
+devModeFixtures:
     rm -f .env
     cp .env.dist .env
     touch installed.lock
@@ -114,16 +114,16 @@ devReset:
     {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
     {{JUST}} testSetup
 
-# Prepare for installer testing: drops DB, removes .env, vendor, and var directories
+# Switch to installer mode: resets database and removes .env and installed.lock
 [group('development')]
-devInstallerTest:
+devModeInstaller:
     @cp --no-clobber .env.dist .env || true
     {{JUST}} devResetDatabase
     rm -f .env installed.lock
     @echo ""
     @echo "Access: http://localhost/install/"
 
-# delete and recreate the database
+# Delete and recreate the database
 [group('development')]
 devResetDatabase:
     {{PHP}} php bin/console doctrine:database:drop --force
