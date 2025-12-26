@@ -162,6 +162,12 @@ testInstaller:
     @echo "Running installer tests..."
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --filter=InstallerTest
 
+# Show test coverage report in AI-readable format (runs tests first to generate coverage)
+[group('testing')]
+showCoverage +parameter='':
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
+    {{PHP}} php tests/AiReadableTestCoverage.php {{parameter}}
+
 # Run PHPStan static analysis for type checking and bug detection
 [group('checks')]
 checkStan +parameter='':
