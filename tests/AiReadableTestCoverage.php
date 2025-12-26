@@ -121,104 +121,36 @@ $totalElements = $totalMetrics ? (int) $totalMetrics['elements'] : 0;
 $totalCovered = $totalMetrics ? (int) $totalMetrics['coveredelements'] : 0;
 $totalPercentage = $totalElements > 0 ? (int) round(($totalCovered / $totalElements) * 100) : 0;
 
-// Output
+// Output - Compact format
 echo "\n";
-echo "═══════════════════════════════════════════════════════════════════\n";
-echo "  TEST COVERAGE REPORT\n";
-echo "═══════════════════════════════════════════════════════════════════\n";
-echo "\n";
+echo "COVERAGE: {$totalPercentage}% ({$totalCovered}/{$totalElements})\n";
+echo "---\n";
 
 if (empty($files)) {
-    echo "✓ All files are above {$options['threshold']}% coverage!\n\n";
+    echo "All files above {$options['threshold']}% threshold\n";
 } else {
-    // Group by coverage ranges
-    $low = array_filter($files, fn($f) => $f['percentage'] < 50);
-    $medium = array_filter($files, fn($f) => $f['percentage'] >= 50 && $f['percentage'] < 80);
-    $high = array_filter($files, fn($f) => $f['percentage'] >= 80);
+    // Only show files below 80% (needs attention)
+    $needsWork = array_filter($files, fn($f) => $f['percentage'] < 80);
 
-    if (!empty($low)) {
-        echo "🔴 LOW COVERAGE (<50%)\n";
-        echo "───────────────────────────────────────────────────────────────────\n";
-        foreach ($low as $file) {
+    if (!empty($needsWork)) {
+        echo "NEEDS ATTENTION:\n";
+        foreach ($needsWork as $file) {
+            $impact = $file['uncovered'] > 50 ? 'HIGH' : ($file['uncovered'] > 20 ? 'MED' : 'LOW');
             printf(
-                "%3d%% (%3d/%3d) %-50s [%d uncovered]\n",
+                "  %3d%% %s (%d uncov) - %s\n",
                 $file['percentage'],
-                $file['covered'],
-                $file['total'],
                 $file['name'],
-                $file['uncovered']
+                $file['uncovered'],
+                $impact
             );
         }
-        echo "\n";
     }
 
-    if (!empty($medium)) {
-        echo "🟡 MEDIUM COVERAGE (50-79%)\n";
-        echo "───────────────────────────────────────────────────────────────────\n";
-        foreach ($medium as $file) {
-            printf(
-                "%3d%% (%3d/%3d) %-50s [%d uncovered]\n",
-                $file['percentage'],
-                $file['covered'],
-                $file['total'],
-                $file['name'],
-                $file['uncovered']
-            );
-        }
-        echo "\n";
+    // Show count of good files
+    $goodFiles = count($files) - count($needsWork);
+    if ($goodFiles > 0) {
+        echo "\n{$goodFiles} files with 80%+ coverage (not shown)\n";
     }
-
-    if (!empty($high)) {
-        echo "🟢 HIGH COVERAGE (80%+)\n";
-        echo "───────────────────────────────────────────────────────────────────\n";
-        foreach ($high as $file) {
-            printf(
-                "%3d%% (%3d/%3d) %s\n",
-                $file['percentage'],
-                $file['covered'],
-                $file['total'],
-                $file['name']
-            );
-        }
-        echo "\n";
-    }
-}
-
-echo "═══════════════════════════════════════════════════════════════════\n";
-echo "  SUMMARY\n";
-echo "═══════════════════════════════════════════════════════════════════\n";
-printf("Total Coverage:   %d%% (%d / %d elements)\n", $totalPercentage, $totalCovered, $totalElements);
-printf("Files Analyzed:   %d\n", count($files));
-
-if (!empty($files)) {
-    $avgCoverage = array_sum(array_column($files, 'percentage')) / count($files);
-    printf("Average Coverage: %.1f%%\n", $avgCoverage);
-
-    $totalUncovered = array_sum(array_column($files, 'uncovered'));
-    printf("Total Uncovered:  %d elements\n", $totalUncovered);
-}
-echo "\n";
-
-// Low-hanging fruit recommendations
-$lowHangingFruit = array_filter($files, fn($f) => $f['percentage'] < 60);
-if (!empty($lowHangingFruit)) {
-    echo "═══════════════════════════════════════════════════════════════════\n";
-    echo "  🎯 LOW-HANGING FRUIT (Quick Wins)\n";
-    echo "═══════════════════════════════════════════════════════════════════\n";
-    usort($lowHangingFruit, fn($a, $b) => $a['percentage'] <=> $b['percentage']);
-
-    foreach (array_slice($lowHangingFruit, 0, 5) as $i => $file) {
-        $impact = $file['uncovered'] > 50 ? '🔥 HIGH IMPACT' : ($file['uncovered'] > 20 ? '⭐ MEDIUM' : '📌 LOW');
-        printf(
-            "%d. %s - %s (%d%% coverage, %d uncovered)\n",
-            $i + 1,
-            $file['name'],
-            $impact,
-            $file['percentage'],
-            $file['uncovered']
-        );
-    }
-    echo "\n";
 }
 
 exit(0);
