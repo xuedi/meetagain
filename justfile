@@ -180,7 +180,7 @@ checkPhpcs:
 # Run PHP-CS-Fixer to check code style (dry-run)
 [group('checks')]
 checkPhpCsFixer:
-    {{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+    {{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --verbose --config=tests/.php-cs-fixer.php
 
 # Run Deptrac to check architectural layer dependencies
 [group('checks')]
@@ -195,7 +195,7 @@ fixPhpcs:
 # Automatically fix code style using PHP-CS-Fixer
 [group('fixing')]
 fixPhpCsFixer:
-    {{PHP}} vendor/bin/php-cs-fixer fix --verbose
+    {{PHP}} vendor/bin/php-cs-fixer fix --verbose --config=tests/.php-cs-fixer.php
 
 # Apply Rector refactorings to the codebase
 [group('fixing')]
