@@ -9,7 +9,6 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +22,7 @@ readonly class TranslationService
         private UserRepository $userRepo,
         private EntityManagerInterface $entityManager,
         private Filesystem $fs,
-        private ParameterBagInterface $appParams,
+        private LanguageService $languageService,
         private CommandService $commandService,
         private ConfigService $configService,
         private string $kernelProjectDir,
@@ -131,7 +130,7 @@ readonly class TranslationService
         $published = 0;
         $cleanedUp = $this->cleanUpTranslationFiles();
         $path = $this->kernelProjectDir . '/translations/';
-        $locales = $this->appParams->get('kernel.enabled_locales');
+        $locales = $this->languageService->getEnabledCodes();
 
         // create new translation files
         foreach ($locales as $locale) {
@@ -162,12 +161,12 @@ readonly class TranslationService
 
     public function getLanguageCodes(): array
     {
-        return $this->appParams->get('kernel.enabled_locales');
+        return $this->languageService->getEnabledCodes();
     }
 
     public function isValidLanguageCodes(string $code): bool
     {
-        return in_array($code, $this->appParams->get('kernel.enabled_locales'));
+        return $this->languageService->isValidCode($code);
     }
 
     public function getAltLangList(string $currentLocale, string $currentUri): array

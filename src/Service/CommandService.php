@@ -11,15 +11,13 @@ use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class CommandService
 {
     public function __construct(
         private KernelInterface $kernel,
-        private ParameterBagInterface $appParams,
+        private LanguageService $languageService,
     ) {
     }
 
@@ -51,7 +49,7 @@ readonly class CommandService
     public function extractTranslations(): string
     {
         $output = '';
-        foreach ($this->appParams->get('kernel.enabled_locales') as $locale) {
+        foreach ($this->languageService->getEnabledCodes() as $locale) {
             $output .= $this->execute(new ExtractTranslationsCommand($locale)) . PHP_EOL;
         }
 

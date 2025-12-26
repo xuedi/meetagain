@@ -4,15 +4,15 @@ namespace Tests\Unit\Service;
 
 use App\Service\Command\EchoCommand;
 use App\Service\CommandService;
+use App\Service\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class CommandServiceTest extends TestCase
 {
-    private function createService(?ParameterBagInterface $appParams = null): CommandService
+    private function createService(?LanguageService $languageService = null): CommandService
     {
         // Arrange: stub event dispatcher and container
         $eventDispatcherStub = $this->createStub(EventDispatcher::class);
@@ -25,7 +25,7 @@ class CommandServiceTest extends TestCase
 
         return new CommandService(
             kernel: $kernelStub,
-            appParams: $appParams ?? $this->createStub(ParameterBagInterface::class),
+            languageService: $languageService ?? $this->createStub(LanguageService::class),
         );
     }
 
@@ -60,15 +60,14 @@ class CommandServiceTest extends TestCase
 
     public function testExtractTranslationsUsesConfiguredLocales(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $parameterMock = $this->createMock(ParameterBagInterface::class);
-        $parameterMock
+        // Arrange: mock language service to return enabled codes
+        $languageMock = $this->createMock(LanguageService::class);
+        $languageMock
             ->expects($this->atLeastOnce())
-            ->method('get')
-            ->with('kernel.enabled_locales')
+            ->method('getEnabledCodes')
             ->willReturn(['de', 'en']);
 
-        $service = $this->createService(appParams: $parameterMock);
+        $service = $this->createService(languageService: $languageMock);
 
         // Act & Assert: extract translations runs without throwing
         $service->extractTranslations();

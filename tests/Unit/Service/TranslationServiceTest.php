@@ -7,10 +7,10 @@ use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use App\Service\CommandService;
 use App\Service\ConfigService;
+use App\Service\LanguageService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -153,11 +153,11 @@ class TranslationServiceTest extends TestCase
 
     public function testGetLanguageCodesReturnsEnabledLocales(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $paramsBagStub = $this->createStub(ParameterBagInterface::class);
-        $paramsBagStub->method('get')->with('kernel.enabled_locales')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to return enabled codes
+        $languageServiceStub = $this->createStub(LanguageService::class);
+        $languageServiceStub->method('getEnabledCodes')->willReturn(['en', 'de', 'fr']);
 
-        $subject = $this->createSubject(appParams: $paramsBagStub);
+        $subject = $this->createSubject(languageService: $languageServiceStub);
 
         // Act: get language codes
         $result = $subject->getLanguageCodes();
@@ -168,11 +168,13 @@ class TranslationServiceTest extends TestCase
 
     public function testIsValidLanguageCodesReturnsTrueForValidCode(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $paramsBagStub = $this->createStub(ParameterBagInterface::class);
-        $paramsBagStub->method('get')->with('kernel.enabled_locales')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to validate codes
+        $languageServiceStub = $this->createStub(LanguageService::class);
+        $languageServiceStub->method('isValidCode')->willReturnCallback(
+            fn(string $code) => in_array($code, ['en', 'de', 'fr'], true)
+        );
 
-        $subject = $this->createSubject(appParams: $paramsBagStub);
+        $subject = $this->createSubject(languageService: $languageServiceStub);
 
         // Act & Assert: valid codes return true
         $this->assertTrue($subject->isValidLanguageCodes('en'));
@@ -182,11 +184,13 @@ class TranslationServiceTest extends TestCase
 
     public function testIsValidLanguageCodesReturnsFalseForInvalidCode(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $paramsBagStub = $this->createStub(ParameterBagInterface::class);
-        $paramsBagStub->method('get')->with('kernel.enabled_locales')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to validate codes
+        $languageServiceStub = $this->createStub(LanguageService::class);
+        $languageServiceStub->method('isValidCode')->willReturnCallback(
+            fn(string $code) => in_array($code, ['en', 'de', 'fr'], true)
+        );
 
-        $subject = $this->createSubject(appParams: $paramsBagStub);
+        $subject = $this->createSubject(languageService: $languageServiceStub);
 
         // Act & Assert: invalid codes return false
         $this->assertFalse($subject->isValidLanguageCodes('es'));
@@ -196,11 +200,11 @@ class TranslationServiceTest extends TestCase
 
     public function testGetAltLangListReturnsAlternativeLanguageLinks(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $paramsBagStub = $this->createStub(ParameterBagInterface::class);
-        $paramsBagStub->method('get')->with('kernel.enabled_locales')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to return enabled codes
+        $languageServiceStub = $this->createStub(LanguageService::class);
+        $languageServiceStub->method('getEnabledCodes')->willReturn(['en', 'de', 'fr']);
 
-        $subject = $this->createSubject(appParams: $paramsBagStub);
+        $subject = $this->createSubject(languageService: $languageServiceStub);
 
         // Act: get alternative language list for current locale 'en' and URI '/en/events'
         $result = $subject->getAltLangList('en', '/en/events');
@@ -215,11 +219,11 @@ class TranslationServiceTest extends TestCase
 
     public function testReplaceUriLanguageCodeReplacesLanguageInUri(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $paramsBagStub = $this->createStub(ParameterBagInterface::class);
-        $paramsBagStub->method('get')->with('kernel.enabled_locales')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to return enabled codes
+        $languageServiceStub = $this->createStub(LanguageService::class);
+        $languageServiceStub->method('getEnabledCodes')->willReturn(['en', 'de', 'fr']);
 
-        $subject = $this->createSubject(appParams: $paramsBagStub);
+        $subject = $this->createSubject(languageService: $languageServiceStub);
 
         // Act & Assert: replaces language code in various URI formats
         $this->assertSame('/de/events', $subject->replaceUriLanguageCode('/en/events', 'de'));
@@ -229,11 +233,11 @@ class TranslationServiceTest extends TestCase
 
     public function testReplaceUriLanguageCodeHandlesJustLanguageUri(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $paramsBagStub = $this->createStub(ParameterBagInterface::class);
-        $paramsBagStub->method('get')->with('kernel.enabled_locales')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to return enabled codes
+        $languageServiceStub = $this->createStub(LanguageService::class);
+        $languageServiceStub->method('getEnabledCodes')->willReturn(['en', 'de', 'fr']);
 
-        $subject = $this->createSubject(appParams: $paramsBagStub);
+        $subject = $this->createSubject(languageService: $languageServiceStub);
 
         // Act & Assert: handles URI that is just a language code
         $this->assertSame('/de/', $subject->replaceUriLanguageCode('/en/', 'de'));
@@ -242,11 +246,11 @@ class TranslationServiceTest extends TestCase
 
     public function testReplaceUriLanguageCodeReturnsOriginalWhenNoLanguageInUri(): void
     {
-        // Arrange: mock parameter bag to return enabled locales
-        $paramsBagStub = $this->createStub(ParameterBagInterface::class);
-        $paramsBagStub->method('get')->with('kernel.enabled_locales')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to return enabled codes
+        $languageServiceStub = $this->createStub(LanguageService::class);
+        $languageServiceStub->method('getEnabledCodes')->willReturn(['en', 'de', 'fr']);
 
-        $subject = $this->createSubject(appParams: $paramsBagStub);
+        $subject = $this->createSubject(languageService: $languageServiceStub);
 
         // Act & Assert: returns original URI when no language code is found
         $this->assertSame('/events', $subject->replaceUriLanguageCode('/events', 'de'));
@@ -256,14 +260,14 @@ class TranslationServiceTest extends TestCase
     private function createSubject(
         ?TranslationRepository $translationRepo = null,
         ?EntityManagerInterface $entityManager = null,
-        ?ParameterBagInterface $appParams = null,
+        ?LanguageService $languageService = null,
     ): TranslationService {
         return new TranslationService(
             translationRepo: $translationRepo ?? $this->createStub(TranslationRepository::class),
             userRepo: $this->createStub(UserRepository::class),
             entityManager: $entityManager ?? $this->createStub(EntityManagerInterface::class),
             fs: $this->createStub(Filesystem::class),
-            appParams: $appParams ?? $this->createStub(ParameterBagInterface::class),
+            languageService: $languageService ?? $this->createStub(LanguageService::class),
             commandService: $this->createStub(CommandService::class),
             configService: $this->createStub(ConfigService::class),
             kernelProjectDir: __DIR__ . '/tmp/',

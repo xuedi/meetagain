@@ -55,7 +55,6 @@ class AdminCmsController extends AbstractController
     #[Route(
         '/admin/cms/{id}/edit/{locale}/{blockId}',
         name: 'app_admin_cms_edit',
-        requirements: ['locale' => 'en|de|cn'],
         methods: ['GET', 'POST'],
     )]
     public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, null|int $blockId = null): Response

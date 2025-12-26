@@ -1,0 +1,23 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h1 class="title">{{ isEdit ? 'Edit Language'|trans : 'Add Language'|trans }}</h1>
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="field is-grouped">
+            <div class="control">
+                <button class="button is-primary">{{ "button_save"|trans }}</button>
+            </div>
+            <div class="control">
+                <a class="button" href="{{ path('app_admin_language') }}">{{ "button_cancel"|trans }}</a>
+            </div>
+        </div>
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}

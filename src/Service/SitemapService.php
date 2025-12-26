@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Repository\EventRepository;
 use DateTime;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -17,7 +16,7 @@ readonly class SitemapService
         private Environment $twig,
         private CmsService $cms,
         private EventRepository $events,
-        private ParameterBagInterface $appParams,
+        private LanguageService $languageService,
     ) {
     }
 
@@ -30,7 +29,7 @@ readonly class SitemapService
     {
         $sites = [];
 
-        $locales = $this->appParams->get('kernel.enabled_locales');
+        $locales = $this->languageService->getEnabledCodes();
         foreach ($locales as $locale) {
             $sites = [
                 ...$sites,

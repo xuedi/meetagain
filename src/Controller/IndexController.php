@@ -20,7 +20,7 @@ class IndexController extends AbstractController
         return $this->cms->handle($request->getLocale(), 'index', $this->getResponse());
     }
 
-    #[Route('/language/{locale}', name: 'app_default_language', requirements: ['locale' => 'en|de|cn'])]
+    #[Route('/language/{locale}', name: 'app_default_language')]
     public function setLanguage(Request $request, EntityManagerInterface $entityManager, string $locale): Response
     {
         // set session

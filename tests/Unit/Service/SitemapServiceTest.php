@@ -5,13 +5,13 @@ namespace Tests\Unit\Service;
 use App\Entity\Event;
 use App\Repository\EventRepository;
 use App\Service\CmsService;
+use App\Service\LanguageService;
 use App\Service\SitemapService;
 use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -20,7 +20,7 @@ class SitemapServiceTest extends TestCase
     private MockObject&Environment $environmentMock;
     private Stub&CmsService $cmsServiceStub;
     private Stub&EventRepository $eventRepositoryStub;
-    private MockObject&ParameterBagInterface $parameterBagMock;
+    private MockObject&LanguageService $languageServiceMock;
     private SitemapService $subject;
 
     protected function setUp(): void
@@ -28,13 +28,13 @@ class SitemapServiceTest extends TestCase
         $this->environmentMock = $this->createMock(Environment::class);
         $this->cmsServiceStub = $this->createStub(CmsService::class);
         $this->eventRepositoryStub = $this->createStub(EventRepository::class);
-        $this->parameterBagMock = $this->createMock(ParameterBagInterface::class);
+        $this->languageServiceMock = $this->createMock(LanguageService::class);
 
         $this->subject = new SitemapService(
             twig: $this->environmentMock,
             cms: $this->cmsServiceStub,
             events: $this->eventRepositoryStub,
-            appParams: $this->parameterBagMock,
+            languageService: $this->languageServiceMock,
         );
     }
 
@@ -57,11 +57,10 @@ class SitemapServiceTest extends TestCase
         $event->method('getStart')->willReturn(new DateTime('2025-02-01'));
         $this->eventRepositoryStub->method('findAll')->willReturn([$event]);
 
-        // Arrange: mock parameter bag to return locales
-        $this->parameterBagMock
+        // Arrange: mock language service to return enabled codes
+        $this->languageServiceMock
             ->expects($this->once())
-            ->method('get')
-            ->with('kernel.enabled_locales')
+            ->method('getEnabledCodes')
             ->willReturn($locales);
 
         // Arrange: capture sites array and mock Twig render

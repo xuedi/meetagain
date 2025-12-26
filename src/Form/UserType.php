@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Entity\UserStatus;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use App\Service\LanguageService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UserType extends AbstractType
 {
     public function __construct(
-        private readonly ParameterBagInterface $appParams,
+        private readonly LanguageService $languageService,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -31,7 +31,7 @@ class UserType extends AbstractType
         $user = $builder->getData();
 
         $languageList = [];
-        foreach ($this->appParams->get('kernel.enabled_locales') as $locale) {
+        foreach ($this->languageService->getEnabledCodes() as $locale) {
             $languageList[$this->translator->trans('language_' . $locale)] = $locale;
         }
 
