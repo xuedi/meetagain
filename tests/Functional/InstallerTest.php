@@ -6,7 +6,9 @@ use PDO;
 use PDOException;
 use PHPUnit\Framework\TestCase;
 
-// Include the Installer class (it's not autoloaded)
+// Include the Installer classes (they're not autoloaded)
+require_once __DIR__ . '/../../public/install/TemplateRenderer.php';
+require_once __DIR__ . '/../../public/install/SystemRequirements.php';
 require_once __DIR__ . '/../../public/install/Installer.php';
 
 /**

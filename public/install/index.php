@@ -6,6 +6,8 @@ declare(strict_types=1);
  * MeetAgain Web Installer - Entry Point
  */
 
+require_once __DIR__ . '/TemplateRenderer.php';
+require_once __DIR__ . '/SystemRequirements.php';
 require_once __DIR__ . '/Installer.php';
 
 $installer = new Installer();
@@ -86,15 +88,17 @@ function showStep1(Installer $installer): void
 
 function handleStep1(Installer $installer): void
 {
-    // Collect and validate database settings
-    $dbHost = $installer->sanitize($_POST['db_host'] ?? 'localhost');
-    $dbPort = $installer->sanitizeInt($_POST['db_port'] ?? 3306);
-    $dbName = $installer->sanitize($_POST['db_name'] ?? 'meetAgain');
-    $dbUser = $installer->sanitize($_POST['db_user'] ?? '');
+    // Collect and sanitize database settings
+    $data = [
+        'db_host' => $installer->sanitize($_POST['db_host'] ?? 'localhost'),
+        'db_port' => $installer->sanitizeInt($_POST['db_port'] ?? 3306),
+        'db_name' => $installer->sanitize($_POST['db_name'] ?? 'meetAgain'),
+        'db_user' => $installer->sanitize($_POST['db_user'] ?? ''),
+    ];
     $dbPassword = $_POST['db_password'] ?? '';
 
     // Validation
-    if (empty($dbUser)) {
+    if (empty($data['db_user'])) {
         $installer->addError('Database user is required');
     }
 
@@ -104,33 +108,21 @@ function handleStep1(Installer $installer): void
 
     // Test connection if no validation errors
     if (!$installer->hasErrors()) {
-        if (!$installer->testDatabaseConnection($dbHost, $dbPort, $dbName, $dbUser, $dbPassword)) {
-            // Error already added by testDatabaseConnection
-        }
+        $installer->testDatabaseConnection(
+            $data['db_host'],
+            $data['db_port'],
+            $data['db_name'],
+            $data['db_user'],
+            $dbPassword
+        );
     }
 
-    if ($installer->hasErrors()) {
-        // Store values for form re-display
-        $installer->setSessionData('db_host', $dbHost);
-        $installer->setSessionData('db_port', $dbPort);
-        $installer->setSessionData('db_name', $dbName);
-        $installer->setSessionData('db_user', $dbUser);
-
-        showStep1($installer);
-        return;
+    // Store password only on success
+    if (!$installer->hasErrors()) {
+        $data['db_password'] = $dbPassword;
     }
 
-    // Store successful values
-    $installer->setSessionData('db_host', $dbHost);
-    $installer->setSessionData('db_port', $dbPort);
-    $installer->setSessionData('db_name', $dbName);
-    $installer->setSessionData('db_user', $dbUser);
-    $installer->setSessionData('db_password', $dbPassword);
-
-    // Move to step 2
-    $installer->setStep(2);
-    header('Location: ?step=2');
-    exit;
+    $installer->handleFormResult($data, 2, fn() => showStep1($installer));
 }
 
 function showStep2(Installer $installer): void
@@ -155,9 +147,9 @@ function showStep2(Installer $installer): void
 function handleStep2(Installer $installer): void
 {
     $provider = $installer->sanitize($_POST['mail_provider'] ?? 'null');
-
     $mailConfig = ['provider' => $provider];
 
+    // Collect and validate provider-specific configuration
     switch ($provider) {
         case 'mailhog':
             // No configuration needed for MailHog
@@ -225,31 +217,13 @@ function handleStep2(Installer $installer): void
             break;
     }
 
-    if ($installer->hasErrors()) {
-        // Store values for re-display
-        foreach ($mailConfig as $key => $value) {
-            $installer->setSessionData($key, $value);
-        }
-        $installer->setSessionData('mail_provider', $provider);
-
-        showStep2($installer);
-        return;
+    // Build and store MAILER_DSN on success
+    $data = array_merge(['mail_provider' => $provider], $mailConfig);
+    if (!$installer->hasErrors()) {
+        $data['mailer_dsn'] = $installer->buildMailerDsn($mailConfig);
     }
 
-    // Store mail config
-    $installer->setSessionData('mail_provider', $provider);
-    foreach ($mailConfig as $key => $value) {
-        $installer->setSessionData($key, $value);
-    }
-
-    // Build and store MAILER_DSN
-    $mailerDsn = $installer->buildMailerDsn($mailConfig);
-    $installer->setSessionData('mailer_dsn', $mailerDsn);
-
-    // Move to step 3
-    $installer->setStep(3);
-    header('Location: ?step=3');
-    exit;
+    $installer->handleFormResult($data, 3, fn() => showStep2($installer));
 }
 
 function showStep3(Installer $installer): void
@@ -269,19 +243,22 @@ function showStep3(Installer $installer): void
 
 function handleStep3(Installer $installer): void
 {
-    $siteUrl = $installer->sanitize($_POST['site_url'] ?? '');
-    $siteName = $installer->sanitize($_POST['site_name'] ?? 'MeetAgain');
-    $adminEmail = $installer->sanitize($_POST['admin_email'] ?? '');
-    $adminName = $installer->sanitize($_POST['admin_name'] ?? 'Admin');
+    // Collect and sanitize site settings
+    $data = [
+        'site_url' => $installer->sanitize($_POST['site_url'] ?? ''),
+        'site_name' => $installer->sanitize($_POST['site_name'] ?? 'MeetAgain'),
+        'admin_email' => $installer->sanitize($_POST['admin_email'] ?? ''),
+        'admin_name' => $installer->sanitize($_POST['admin_name'] ?? 'Admin'),
+    ];
     $adminPassword = $_POST['admin_password'] ?? '';
     $adminPasswordConfirm = $_POST['admin_password_confirm'] ?? '';
 
     // Validation
-    if (empty($siteUrl)) {
+    if (empty($data['site_url'])) {
         $installer->addError('Site URL is required');
     }
 
-    if (empty($adminEmail) || !filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+    if (empty($data['admin_email']) || !filter_var($data['admin_email'], FILTER_VALIDATE_EMAIL)) {
         $installer->addError('Valid admin email is required');
     }
 
@@ -289,32 +266,24 @@ function handleStep3(Installer $installer): void
         $installer->addError('Admin password is required');
     } elseif (strlen($adminPassword) < 8) {
         $installer->addError('Admin password must be at least 8 characters');
+    } elseif (strlen($adminPassword) > 72) {
+        $installer->addError('Admin password must not exceed 72 characters');
     } elseif ($adminPassword !== $adminPasswordConfirm) {
         $installer->addError('Passwords do not match');
     }
 
-    if ($installer->hasErrors()) {
-        $installer->setSessionData('site_url', $siteUrl);
-        $installer->setSessionData('site_name', $siteName);
-        $installer->setSessionData('admin_email', $adminEmail);
-        $installer->setSessionData('admin_name', $adminName);
-
-        showStep3($installer);
-        return;
+    // Store password only on success
+    if (!$installer->hasErrors()) {
+        $data['admin_password'] = $adminPassword;
     }
 
-    // Store values
-    $installer->setSessionData('site_url', $siteUrl);
-    $installer->setSessionData('site_name', $siteName);
-    $installer->setSessionData('admin_email', $adminEmail);
-    $installer->setSessionData('admin_name', $adminName);
-    $installer->setSessionData('admin_password', $adminPassword);
+    $installer->handleFormResult($data, null, fn() => showStep3($installer));
 
-    // Run installation
+    // Run installation (only reached if no errors)
     if ($installer->runInstallation()) {
         echo $installer->render('success', [
-            'site_url' => $siteUrl,
-            'admin_email' => $adminEmail,
+            'site_url' => $data['site_url'],
+            'admin_email' => $data['admin_email'],
         ]);
     } else {
         echo $installer->render('error', [

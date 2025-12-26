@@ -2,7 +2,12 @@
 
 /**
  * MeetAgain Web Installer
- * Standalone installer that runs before composer install
+ *
+ * Standalone installer that runs before composer install.
+ * Handles system requirements checking, database setup, mail configuration,
+ * and initial application installation.
+ *
+ * @author MeetAgain Team
  */
 class Installer
 {
@@ -12,6 +17,8 @@ class Installer
 
     private array $errors = [];
     private array $session = [];
+    private TemplateRenderer $renderer;
+    private SystemRequirements $systemRequirements;
 
     public function __construct()
     {
@@ -20,6 +27,8 @@ class Installer
             session_start();
         }
         $this->session = &$_SESSION;
+        $this->renderer = new TemplateRenderer(__DIR__ . '/templates');
+        $this->systemRequirements = new SystemRequirements();
     }
 
     public function isInstalled(): bool
@@ -91,66 +100,76 @@ class Installer
         return $this->session['install_data'] ?? [];
     }
 
-    // PHP Requirements check
+    /**
+     * Store multiple values in session data
+     *
+     * @param array<string, mixed> $data Key-value pairs to store
+     */
+    public function storeSessionData(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            $this->setSessionData($key, $value);
+        }
+    }
+
+    /**
+     * Handle form validation and conditional redirect
+     *
+     * If there are errors, stores the provided data and calls the error handler.
+     * If successful, stores the data and redirects to the next step.
+     *
+     * @param array<string, mixed> $data Data to store in session
+     * @param int|null $nextStep Next step number (null to skip redirect)
+     * @param callable|null $onError Error handler callback
+     */
+    public function handleFormResult(array $data, ?int $nextStep = null, ?callable $onError = null): void
+    {
+        $this->storeSessionData($data);
+
+        if ($this->hasErrors()) {
+            if ($onError !== null) {
+                $onError();
+            }
+            return;
+        }
+
+        if ($nextStep !== null) {
+            $this->setStep($nextStep);
+            header("Location: ?step={$nextStep}");
+            exit;
+        }
+    }
+
+    /**
+     * Check system requirements for MeetAgain installation
+     *
+     * @return array<string, array{name: string, passed: bool, current: string, optional?: bool}>
+     */
     public function checkRequirements(): array
     {
-        $requirements = [];
-
-        // PHP version
-        $requirements['php_version'] = [
-            'name' => 'PHP >= 8.4',
-            'passed' => version_compare(PHP_VERSION, '8.4.0', '>='),
-            'current' => PHP_VERSION,
-        ];
-
-        // Required extensions
-        $extensions = ['pdo', 'pdo_mysql', 'intl', 'iconv', 'ctype', 'json', 'mbstring'];
-        foreach ($extensions as $ext) {
-            $requirements['ext_' . $ext] = [
-                'name' => 'Extension: ' . $ext,
-                'passed' => extension_loaded($ext),
-                'current' => extension_loaded($ext) ? 'Loaded' : 'Missing',
-            ];
-        }
-
-        // Optional extensions
-        $optionalExtensions = ['apcu', 'imagick', 'gd', 'opcache'];
-        foreach ($optionalExtensions as $ext) {
-            $requirements['ext_' . $ext . '_optional'] = [
-                'name' => 'Extension: ' . $ext . ' (optional)',
-                'passed' => true, // optional, always "passes"
-                'current' => extension_loaded($ext) ? 'Loaded' : 'Not loaded',
-                'optional' => true,
-            ];
-        }
-
-        // Writable directories
-        $writableDirs = ['../../var', '../../var/cache', '../../var/log'];
-        foreach ($writableDirs as $dir) {
-            $fullPath = __DIR__ . '/' . $dir;
-            $exists = is_dir($fullPath);
-            $writable = $exists && is_writable($fullPath);
-            $requirements['writable_' . basename($dir)] = [
-                'name' => 'Writable: ' . $dir,
-                'passed' => $writable || !$exists, // Pass if doesn't exist yet
-                'current' => $exists ? ($writable ? 'Writable' : 'Not writable') : 'Will be created',
-            ];
-        }
-
-        return $requirements;
+        return $this->systemRequirements->check();
     }
 
+    /**
+     * Check if all non-optional requirements pass
+     *
+     * @return bool
+     */
     public function allRequirementsPassed(): bool
     {
-        foreach ($this->checkRequirements() as $req) {
-            if (!($req['optional'] ?? false) && !$req['passed']) {
-                return false;
-            }
-        }
-        return true;
+        return $this->systemRequirements->allRequirementsPassed($this->checkRequirements());
     }
 
-    // Database connection test
+    /**
+     * Test database connection with provided credentials
+     *
+     * @param string $host Database host
+     * @param int $port Database port
+     * @param string $name Database name
+     * @param string $user Database username
+     * @param string $password Database password
+     * @return bool True if connection successful, false otherwise
+     */
     public function testDatabaseConnection(string $host, int $port, string $name, string $user, string $password): bool
     {
         try {
@@ -167,7 +186,16 @@ class Installer
         }
     }
 
-    // SMTP connection test
+    /**
+     * Test SMTP server connection
+     *
+     * @param string $host SMTP host
+     * @param int $port SMTP port
+     * @param string|null $user SMTP username (optional)
+     * @param string|null $password SMTP password (optional)
+     * @param string $encryption Encryption type (ssl, tls, or none)
+     * @return bool True if connection successful, false otherwise
+     */
     public function testSmtpConnection(string $host, int $port, ?string $user, ?string $password, string $encryption): bool
     {
         try {
@@ -200,7 +228,14 @@ class Installer
         }
     }
 
-    // Build MAILER_DSN from provider settings
+    /**
+     * Build Symfony Mailer DSN from mail provider configuration
+     *
+     * Supports: mailhog, smtp, sendgrid, mailgun, ses, null
+     *
+     * @param array<string, mixed> $mailConfig Mail provider configuration
+     * @return string Mailer DSN string
+     */
     public function buildMailerDsn(array $mailConfig): string
     {
         $provider = $mailConfig['provider'] ?? 'null';
@@ -349,11 +384,41 @@ ENV;
         return true;
     }
 
-    // Create system user
-    public function createSystemUser(PDO $pdo): int
+    /**
+     * Generic user creation method
+     *
+     * Creates a user with provided data, merging with sensible defaults.
+     * Automatically hashes passwords using bcrypt.
+     *
+     * @param PDO $pdo Database connection
+     * @param array<string, mixed> $userData User data (name, email, roles, password, etc.)
+     * @return int Created user ID
+     */
+    private function createUser(PDO $pdo, array $userData): int
     {
         $now = date('Y-m-d H:i:s');
-        $roles = json_encode(['ROLE_SYSTEM']);
+
+        $defaults = [
+            'name' => 'User',
+            'email' => 'user@localhost',
+            'roles' => ['ROLE_USER'],
+            'password' => '',
+            'locale' => 'en',
+            'status' => 2, // Active
+            'public' => 0,
+            'verified' => 1,
+            'restricted' => 0,
+            'osm_consent' => 0,
+            'tagging' => 0,
+            'notification' => 0,
+        ];
+
+        $data = array_merge($defaults, $userData);
+
+        // Hash password if provided and not already hashed
+        if (!empty($data['password']) && !str_starts_with($data['password'], '$2y$')) {
+            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 13]);
+        }
 
         $stmt = $pdo->prepare(<<<SQL
             INSERT INTO `user` (name, email, roles, password, created_at, last_login, locale, status, public, verified, restricted, osm_consent, tagging, notification)
@@ -361,55 +426,62 @@ ENV;
         SQL);
 
         $stmt->execute([
-            'System',
-            'system@localhost',
-            $roles,
-            '', // No password for system user
+            $data['name'],
+            $data['email'],
+            json_encode($data['roles']),
+            $data['password'],
             $now,
             $now,
-            'en',
-            2, // Active
-            0, // Not public
-            1, // Verified
-            0,
-            0,
-            0,
-            0,
+            $data['locale'],
+            $data['status'],
+            $data['public'],
+            $data['verified'],
+            $data['restricted'],
+            $data['osm_consent'],
+            $data['tagging'],
+            $data['notification'],
         ]);
 
         return (int) $pdo->lastInsertId();
     }
 
-    // Create admin user
+    /**
+     * Create system user for automated operations
+     *
+     * @param PDO $pdo Database connection
+     * @return int Created system user ID
+     */
+    public function createSystemUser(PDO $pdo): int
+    {
+        return $this->createUser($pdo, [
+            'name' => 'System',
+            'email' => 'system@localhost',
+            'roles' => ['ROLE_SYSTEM'],
+            'password' => '', // No password for system user
+            'public' => 0,
+            'tagging' => 0,
+        ]);
+    }
+
+    /**
+     * Create admin user with full privileges
+     *
+     * @param PDO $pdo Database connection
+     * @param string $email Admin email address
+     * @param string $password Admin password (will be hashed)
+     * @param string $name Admin display name
+     * @return int Created admin user ID
+     */
     public function createAdminUser(PDO $pdo, string $email, string $password, string $name): int
     {
-        $now = date('Y-m-d H:i:s');
-        $roles = json_encode(['ROLE_ADMIN', 'ROLE_USER']);
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => 13]);
-
-        $stmt = $pdo->prepare(<<<SQL
-            INSERT INTO `user` (name, email, roles, password, created_at, last_login, locale, status, public, verified, restricted, osm_consent, tagging, notification)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        SQL);
-
-        $stmt->execute([
-            $name,
-            $email,
-            $roles,
-            $hashedPassword,
-            $now,
-            $now,
-            'en',
-            2, // Active
-            1, // Public
-            1, // Verified
-            0,
-            0,
-            1,
-            0,
+        return $this->createUser($pdo, [
+            'name' => $name,
+            'email' => $email,
+            'roles' => ['ROLE_ADMIN', 'ROLE_USER'],
+            'password' => $password,
+            'public' => 1,
+            'tagging' => 1,
         ]);
-
-        return (int) $pdo->lastInsertId();
     }
 
     // Create default config entries
@@ -470,7 +542,19 @@ ENV;
         }
     }
 
-    // Run the full installation
+    /**
+     * Run the complete installation process
+     *
+     * Executes all installation steps:
+     * 1. Generate .env file
+     * 2. Run composer install
+     * 3. Run database migrations
+     * 4. Create system and admin users
+     * 5. Create default configuration
+     * 6. Create installation lock file
+     *
+     * @return bool True if installation successful, false otherwise
+     */
     public function runInstallation(): bool
     {
         $data = $this->getAllSessionData();
@@ -549,93 +633,21 @@ ENV;
         return function_exists('posix_getgid') ? posix_getgid() : 1000;
     }
 
-    // Template rendering
+    /**
+     * Render a template with default installer variables
+     *
+     * @param string $template Template name
+     * @param array<string, mixed> $vars Additional variables
+     * @return string Rendered HTML
+     */
     public function render(string $template, array $vars = []): string
     {
-        $templatePath = __DIR__ . '/templates/' . $template . '.html';
-
-        if (!file_exists($templatePath)) {
-            return "Template not found: $template";
-        }
-
-        $content = file_get_contents($templatePath);
-
         // Add default vars
         $vars['csrf_token'] = $this->generateCsrfToken();
         $vars['errors'] = $this->errors;
         $vars['current_step'] = $this->getCurrentStep();
 
-        // Simple template variable replacement
-        foreach ($vars as $key => $value) {
-            if (is_string($value) || is_numeric($value)) {
-                $content = str_replace('{{ ' . $key . ' }}', htmlspecialchars((string) $value), $content);
-            }
-        }
-
-        // Handle arrays for loops (simple implementation)
-        $content = $this->processLoops($content, $vars);
-        $content = $this->processConditions($content, $vars);
-
-        // Load into layout
-        $layoutPath = __DIR__ . '/templates/layout.html';
-        if (file_exists($layoutPath)) {
-            $layout = file_get_contents($layoutPath);
-            $layout = str_replace('{{ content }}', $content, $layout);
-            $layout = str_replace('{{ current_step }}', (string) ($vars['current_step'] ?? 1), $layout);
-            return $layout;
-        }
-
-        return $content;
-    }
-
-    private function processLoops(string $content, array $vars): string
-    {
-        // Simple loop: {% for item in items %}...{% endfor %}
-        $pattern = '/{%\s*for\s+(\w+)\s+in\s+(\w+)\s*%}(.*?){%\s*endfor\s*%}/s';
-
-        return preg_replace_callback($pattern, function ($matches) use ($vars) {
-            $itemVar = $matches[1];
-            $arrayVar = $matches[2];
-            $loopContent = $matches[3];
-            $output = '';
-
-            if (isset($vars[$arrayVar]) && is_array($vars[$arrayVar])) {
-                foreach ($vars[$arrayVar] as $item) {
-                    $itemContent = $loopContent;
-                    if (is_array($item)) {
-                        foreach ($item as $key => $value) {
-                            $itemContent = str_replace(
-                                '{{ ' . $itemVar . '.' . $key . ' }}',
-                                htmlspecialchars((string) $value),
-                                $itemContent
-                            );
-                        }
-                    } else {
-                        $itemContent = str_replace('{{ ' . $itemVar . ' }}', htmlspecialchars((string) $item), $itemContent);
-                    }
-                    $output .= $itemContent;
-                }
-            }
-
-            return $output;
-        }, $content) ?? $content;
-    }
-
-    private function processConditions(string $content, array $vars): string
-    {
-        // Simple condition: {% if var %}...{% endif %}
-        $pattern = '/{%\s*if\s+(\w+)\s*%}(.*?){%\s*endif\s*%}/s';
-
-        return preg_replace_callback($pattern, function ($matches) use ($vars) {
-            $varName = $matches[1];
-            $ifContent = $matches[2];
-
-            if (!empty($vars[$varName])) {
-                return $ifContent;
-            }
-
-            return '';
-        }, $content) ?? $content;
+        return $this->renderer->render($template, $vars);
     }
 
     // Input sanitization

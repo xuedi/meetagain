@@ -25,5 +25,16 @@
 
     <file>../src/</file>
     <file>../tests/</file>
+    <file>../public/install/</file>
+
+    <!-- Installer is standalone and doesn't use namespaces by design -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>../public/install/*</exclude-pattern>
+    </rule>
+
+    <!-- Entry points and test bootstraps have side effects by design -->
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>../public/install/index.php</exclude-pattern>
+    </rule>
 
 </ruleset>
