@@ -9,7 +9,7 @@
                 <thead>
                 <tr>
                     <th>Key</th>
-                    {% for enabledLocale in app.enabled_locales %}
+                    {% for enabledLocale in enabled_locales %}
                         <th>{{ enabledLocale|upper }}</th>
                     {% endfor %}
                 </tr>
@@ -18,7 +18,7 @@
                 {% for key, translation in translationMatrix %}
                     <tr>
                         <td>{{ key }}</td>
-                        {% for enabledLocale in app.enabled_locales %}
+                        {% for enabledLocale in enabled_locales %}
                             {% set value = translation[enabledLocale]['value'] %}
                             {% set id = translation[enabledLocale]['id'] %}
                             {% if value is null or value is empty %}

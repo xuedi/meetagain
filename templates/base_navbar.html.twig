@@ -1,7 +1,7 @@
 <nav class="navbar navbar-top is-fixed-top py-4" role="navigation" aria-label="main navigation">
     <div class="container">
         <div class="navbar-brand">
-            <a class="navbar-item" href="{{ path('app_default') }}">
+            <a class="navbar-item" href="{{ globalService.showFrontpage ? path('app_frontpage') : path('app_default') }}">
                 <img class="signal-logo" src="/images/logo.webp" width="28" height="28" alt="Website Logo">
             </a>
             {% include 'base_navbar_burger.html.twig' %}

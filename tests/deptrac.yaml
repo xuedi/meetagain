@@ -131,6 +131,8 @@ deptrac:
       - App\Repository\HostRepository
     App\Entity\Image:
       - App\Repository\ImageRepository
+    App\Entity\Language:
+      - App\Repository\LanguageRepository
     App\Entity\Location:
       - App\Repository\LocationRepository
     App\Entity\Menu:

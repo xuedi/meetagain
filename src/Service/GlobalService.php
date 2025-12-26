@@ -25,7 +25,13 @@ readonly class GlobalService
         private MenuRepository $menuRepo,
         private TranslationSuggestionRepository $translationSuggestionRepo,
         private Security $security,
+        private ConfigService $configService,
     ) {
+    }
+
+    public function isShowFrontpage(): bool
+    {
+        return $this->configService->isShowFrontpage();
     }
 
     public function getCurrentLocale(): string

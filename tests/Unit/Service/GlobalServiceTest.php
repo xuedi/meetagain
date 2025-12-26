@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\MenuRepository;
 use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
+use App\Service\ConfigService;
 use App\Service\DashboardService;
 use App\Service\GlobalService;
 use App\Service\PluginService;
@@ -418,6 +419,7 @@ class GlobalServiceTest extends TestCase
         ?MenuRepository $menuRepo = null,
         ?TranslationSuggestionRepository $translationSuggestionRepo = null,
         ?Security $security = null,
+        ?ConfigService $configService = null,
     ): GlobalService {
         return new GlobalService(
             requestStack: $requestStack ?? $this->createStub(RequestStack::class),
@@ -428,6 +430,7 @@ class GlobalServiceTest extends TestCase
             menuRepo: $menuRepo ?? $this->createStub(MenuRepository::class),
             translationSuggestionRepo: $translationSuggestionRepo ?? $this->createStub(TranslationSuggestionRepository::class),
             security: $security ?? $this->createStub(Security::class),
+            configService: $configService ?? $this->createStub(ConfigService::class),
         );
     }
 }

@@ -54,7 +54,7 @@ readonly class LanguageService
     public function getLocaleRegexPattern(): string
     {
         $codes = $this->getEnabledCodes();
-        return empty($codes) ? 'en' : implode('|', $codes);
+        return $codes === [] ? 'en' : implode('|', $codes);
     }
 
     /**

@@ -54,7 +54,7 @@
                         </div>
                         <div class="column is-6">
                             <div class="buttons has-addons is-pulled-right">
-                                {% for locale in app.enabled_locales %}
+                                {% for locale in enabled_locales %}
                                     <a class="button translation-button {% if locale == 'en' %}is-active{% endif %}"
                                        id="translation-button-{{ locale }}"
                                        data-id="{{ locale }}">{{ locale }}</a>
@@ -62,7 +62,7 @@
                             </div>
                         </div>
                     </div>
-                    {% for locale in app.enabled_locales %}
+                    {% for locale in enabled_locales %}
                         <div class="div {% if locale != 'en' %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
                             {{ form_row(form.("title-"~locale)) }}
                             {{ form_row(form.("teaser-"~locale)) }}
@@ -139,7 +139,7 @@
                 buttons[i].addEventListener('click', event => {
                     event.preventDefault();
 
-                    {% for locale in app.enabled_locales %}
+                    {% for locale in enabled_locales %}
                     document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
                     document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
                     {% endfor %}
