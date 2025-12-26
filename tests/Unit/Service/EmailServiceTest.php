@@ -175,6 +175,124 @@ final class EmailServiceTest extends TestCase
         $this->assertTrue($ok);
     }
 
+    public function testPrepareRsvpNotificationEnqueuesEmailWithExpectedData(): void
+    {
+        // Arrange: create users and event with translation
+        $userRsvp = $this->makeUser('rsvp@example.com', 'Bob', 'en');
+        $userRecipient = $this->makeUser('recipient@example.com', 'Alice', 'de');
+
+        $translation = new \App\Entity\EventTranslation();
+        $translation->setTitle('Test Event');
+        $translation->setLanguage('de');
+
+        $event = new \Tests\Unit\Stubs\EventStub();
+        $event->setId(42);
+        $event->addTranslation($translation);
+        $event->setStart(new \DateTimeImmutable('2025-06-15 14:00:00'));
+        $locationStub = $this->createStub(\App\Entity\Location::class);
+        $locationStub->method('getName')->willReturn('Test Venue');
+        $event->setLocation($locationStub);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())
+            ->method('persist')
+            ->with(
+                $this->callback(function ($entity) {
+                    $this->assertInstanceOf(EmailQueue::class, $entity);
+                    /** @var EmailQueue $entity */
+                    $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
+                    $this->assertSame('recipient@example.com', $entity->getRecipient());
+                    $this->assertSame('A user you follow plans to attend an event', $entity->getSubject());
+                    $this->assertSame('_emails/notification_rsvp.html.twig', $entity->getTemplate());
+                    $this->assertSame('de', $entity->getLang());
+
+                    $ctx = $entity->getContext();
+                    $this->assertSame('Alice', $ctx['username']);
+                    $this->assertSame('Bob', $ctx['followedUserName']);
+                    $this->assertSame('Test Venue', $ctx['eventLocation']);
+                    $this->assertSame('2025-06-15', $ctx['eventDate']);
+                    $this->assertSame(42, $ctx['eventId']);
+                    $this->assertSame('Test Event', $ctx['eventTitle']);
+                    $this->assertSame('https://example.com', $ctx['host']);
+                    $this->assertSame('de', $ctx['lang']);
+
+                    return true;
+                })
+            );
+        $emMock->expects($this->once())->method('flush');
+
+        $service = $this->createService(em: $emMock);
+
+        // Act: prepare RSVP notification
+        $ok = $service->prepareRsvpNotification($userRsvp, $userRecipient, $event);
+
+        // Assert: returns true
+        $this->assertTrue($ok);
+    }
+
+    public function testPrepareMessageNotificationEnqueuesEmailWithExpectedData(): void
+    {
+        // Arrange: create sender and recipient users
+        $sender = $this->makeUser('sender@example.com', 'Bob', 'en');
+        $recipient = $this->makeUser('recipient@example.com', 'Alice', 'de');
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())
+            ->method('persist')
+            ->with(
+                $this->callback(function ($entity) {
+                    $this->assertInstanceOf(EmailQueue::class, $entity);
+                    /** @var EmailQueue $entity */
+                    $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
+                    $this->assertSame('recipient@example.com', $entity->getRecipient());
+                    $this->assertSame('You received a message from Bob', $entity->getSubject());
+                    $this->assertSame('_emails/notification_message.html.twig', $entity->getTemplate());
+                    $this->assertSame('de', $entity->getLang());
+
+                    $ctx = $entity->getContext();
+                    $this->assertSame('Alice', $ctx['username']);
+                    $this->assertSame('Bob', $ctx['sender']);
+                    $this->assertSame('https://example.com', $ctx['host']);
+                    $this->assertSame('de', $ctx['lang']);
+
+                    return true;
+                })
+            );
+        $emMock->expects($this->once())->method('flush');
+
+        $service = $this->createService(em: $emMock);
+
+        // Act: prepare message notification
+        $ok = $service->prepareMessageNotification($sender, $recipient);
+
+        // Assert: returns true
+        $this->assertTrue($ok);
+    }
+
+    public function testGetMockEmailListReturnsAllEmailTemplates(): void
+    {
+        // Arrange: create service
+        $service = $this->createService();
+
+        // Act: get mock email list
+        $result = $service->getMockEmailList();
+
+        // Assert: contains all expected email templates
+        $this->assertArrayHasKey('email_message_notification', $result);
+        $this->assertArrayHasKey('email_rsvp_notification', $result);
+        $this->assertArrayHasKey('email_welcome', $result);
+        $this->assertArrayHasKey('email_verification_request', $result);
+        $this->assertArrayHasKey('email_password_reset_request', $result);
+        $this->assertArrayHasKey('email_event_canceled', $result);
+
+        // Assert: each entry has expected structure
+        foreach ($result as $emailData) {
+            $this->assertArrayHasKey('subject', $emailData);
+            $this->assertArrayHasKey('template', $emailData);
+            $this->assertArrayHasKey('context', $emailData);
+        }
+    }
+
     private function createService(
         ?MailerInterface $mailer = null,
         ?ConfigService $config = null,
