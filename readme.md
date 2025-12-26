@@ -34,15 +34,21 @@ A classic PHP Symfony application, as upstream as possible with no fancy librari
 
 ## Requirements
 
+### For Development
+
 - [Docker](https://docs.docker.com/get-docker/) & Docker Compose
 - [Just](https://github.com/casey/just) (task runner)
 
-### PHP Modules
+### For Production
 
-PHP >= 8.4 with modules: apcu, pdo_mysql, imagick, intl, iconv, ctype
-Optional: xdebug, opcache, gd
+- PHP >= 8.4 with modules: apcu, pdo_mysql, imagick, intl, iconv, ctype (Optional: xdebug, opcache, gd)
+- MariaDB or MySQL database
+- Web server (Caddy, Nginx, Apache)
+- Composer (installed automatically by web installer)
 
-## Installation
+## Development Installation
+
+For local development with Docker:
 
 ```bash
 just install
@@ -57,6 +63,36 @@ Then login as `admin@example.org` with password `1234`
 | Web | http://localhost | Main application |
 | MailHog | http://localhost:8025 | Email testing UI |
 | MariaDB | localhost:3306 | Database |
+
+## Production Installation
+
+For production deployments or manual installation without Docker:
+
+1. Clone the repository to your server
+2. Configure your web server to serve the `public/` directory
+3. Navigate to your domain in a browser - you'll be automatically redirected to `/install/`
+4. Follow the web installer wizard:
+   - **Step 1: System Requirements & Database**
+     - Verify PHP requirements
+     - Configure database connection (host, port, database name, credentials)
+   - **Step 2: Mail Configuration**
+     - Choose your mail provider:
+       - **SMTP** - Custom SMTP server
+       - **SendGrid** - SendGrid API
+       - **Mailgun** - Mailgun API
+       - **Amazon SES** - AWS Simple Email Service
+       - **MailHog** - Development mail testing
+       - **Null** - Disable email sending
+   - **Step 3: Site Configuration**
+     - Set site URL and name
+     - Create your admin account
+5. The installer will automatically:
+   - Generate `.env` configuration file
+   - Run `composer install`
+   - Execute database migrations
+   - Create system and admin users
+
+Once installation is complete, login with the admin credentials you created. The installer becomes inaccessible after successful installation via the `installed.lock` file.
 
 ## Development Commands
 See available commands in [justfile](justfile). By typing in the terminal: `just`
