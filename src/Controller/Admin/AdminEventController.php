@@ -116,7 +116,7 @@ class AdminEventController extends AbstractController
             $this->addFlash('success', "Event canceled. $rsvpCount user(s) have been notified.");
         }
 
-        return $this->redirectToRoute('app_admin_event');
+        return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
 
     #[Route('/admin/event/{id}/uncancel', name: 'app_admin_event_uncancel')]
@@ -124,7 +124,7 @@ class AdminEventController extends AbstractController
     {
         $this->eventService->uncancelEvent($event);
 
-        return $this->redirectToRoute('app_admin_event');
+        return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
 
     private function getTranslation(mixed $languageCode, null|int $getId): EventTranslation

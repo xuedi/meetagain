@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetAgain Installer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <style>
+        /* Minimal custom styles - using Bulma components where possible */
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .step-connector {
+            flex: 1;
+            height: 2px;
+            background: hsl(0, 0%, 86%);
+            margin: 0 1rem;
+            align-self: center;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="has-text-centered mb-6">
+                <h1 class="title is-2">MeetAgain Installer</h1>
+                <p class="subtitle">Setup your MeetAgain instance</p>
+            </div>
+
+            <!-- Step Progress using Bulma level component -->
+            <nav class="level mb-6">
+                <div class="level-item has-text-centered">
+                    <div>
+                        <span class="step-number {% if current_step >= 1 %}has-background-primary has-text-white{% else %}has-background-grey-lighter has-text-grey{% endif %} {% if current_step > 1 %}has-background-success{% endif %}">
+                            1
+                        </span>
+                        <p class="heading mt-2">Database</p>
+                    </div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="level-item has-text-centered">
+                    <div>
+                        <span class="step-number {% if current_step >= 2 %}has-background-primary has-text-white{% else %}has-background-grey-lighter has-text-grey{% endif %} {% if current_step > 2 %}has-background-success{% endif %}">
+                            2
+                        </span>
+                        <p class="heading mt-2">Mail</p>
+                    </div>
+                </div>
+                <div class="step-connector"></div>
+                <div class="level-item has-text-centered">
+                    <div>
+                        <span class="step-number {% if current_step >= 3 %}has-background-primary has-text-white{% else %}has-background-grey-lighter has-text-grey{% endif %}">
+                            3
+                        </span>
+                        <p class="heading mt-2">Setup</p>
+                    </div>
+                </div>
+            </nav>
+
+            {{ content }}
+        </div>
+    </section>
+
+    <script>
+        // Mail provider toggle - using Bulma's is-hidden helper
+        document.addEventListener('DOMContentLoaded', function() {
+            const providerRadios = document.querySelectorAll('input[name="mail_provider"]');
+            const providerFields = document.querySelectorAll('.provider-fields');
+
+            function updateProviderFields() {
+                const selected = document.querySelector('input[name="mail_provider"]:checked');
+                if (selected) {
+                    providerFields.forEach(function(field) {
+                        field.classList.add('is-hidden');
+                    });
+                    const targetField = document.getElementById('fields-' + selected.value);
+                    if (targetField) {
+                        targetField.classList.remove('is-hidden');
+                    }
+                }
+            }
+
+            providerRadios.forEach(function(radio) {
+                radio.addEventListener('change', updateProviderFields);
+            });
+
+            updateProviderFields();
+        });
+    </script>
+</body>
+</html>

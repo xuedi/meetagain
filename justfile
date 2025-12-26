@@ -29,7 +29,17 @@ install:
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
-    {{DOCKER}} exec -T mariadb mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
+    {{DB}} mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
+
+# Alias to start the docker stack
+start: dockerStart
+
+# Alias to stop the docker stack
+stop: dockerStop
+
+# Run any command inside the PHP container (e.g., just do "composer update")
+do +parameter='':
+    {{PHP}} {{parameter}}
 
 # Alias to start the docker stack
 start: dockerStart
@@ -94,14 +104,18 @@ appClearCache:
     {{PHP}} composer dump-autoload
     {{PHP}} php bin/console cache:clear
 
-# Run pending database migrations (interactive)
+# Run pending database migrations (non-interactive)
 [group('app')]
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -q
 
-# Complete database reset: drops DB, recreates it, runs install and clears cache
+# Reset to development mode with fixtures: reinstalls app, loads fixtures, imports translations, sets up test DB
 [group('development')]
-devReset:
+devModeFixtures:
+    rm -f .env
+    cp .env.dist .env
+    touch installed.lock
+    {{JUST}} do "composer install"
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q
@@ -110,7 +124,16 @@ devReset:
     {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
     {{JUST}} testSetup
 
-# delete and recreate the database
+# Switch to installer mode: resets database and removes .env and installed.lock
+[group('development')]
+devModeInstaller:
+    @cp --no-clobber .env.dist .env || true
+    {{JUST}} devResetDatabase
+    rm -f .env installed.lock
+    @echo ""
+    @echo "Access: http://localhost/install/"
+
+# Delete and recreate the database
 [group('development')]
 devResetDatabase:
     {{PHP}} php bin/console doctrine:database:drop --force
@@ -118,7 +141,7 @@ devResetDatabase:
 
 # Run all tests and code quality checks
 [group('testing')]
-test: testUnit testFunctional checkStan checkRector checkPhpcs checkDeptrac
+test: testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer checkDeptrac
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -140,6 +163,15 @@ testUnit +parameter='':
 testFunctional:
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional
 
+# Run installer functional tests (prepares environment first)
+[group('testing')]
+testInstaller:
+    @echo "Preparing installer test environment..."
+    @test -f .env || cp .env.dist .env
+    {{JUST}} devResetDatabase
+    @echo "Running installer tests..."
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --filter=InstallerTest
+
 # Run PHPStan static analysis for type checking and bug detection
 [group('checks')]
 checkStan +parameter='':
@@ -155,6 +187,11 @@ checkRector:
 checkPhpcs:
     {{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
 
+# Run PHP-CS-Fixer to check code style (dry-run)
+[group('checks')]
+checkPhpCsFixer:
+    {{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --verbose --config=tests/.php-cs-fixer.php
+
 # Run Deptrac to check architectural layer dependencies
 [group('checks')]
 checkDeptrac:
@@ -164,6 +201,11 @@ checkDeptrac:
 [group('fixing')]
 fixPhpcs:
     {{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+
+# Automatically fix code style using PHP-CS-Fixer
+[group('fixing')]
+fixPhpCsFixer:
+    {{PHP}} vendor/bin/php-cs-fixer fix --verbose --config=tests/.php-cs-fixer.php
 
 # Apply Rector refactorings to the codebase
 [group('fixing')]

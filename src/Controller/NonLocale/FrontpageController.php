@@ -14,6 +14,7 @@ class FrontpageController extends AbstractController
     public function __construct(private readonly \App\Service\ConfigService $configService, private readonly \Symfony\Component\Routing\RouterInterface $router)
     {
     }
+
     #[Route('//', name: 'app_frontpage')]
     public function index(): Response
     {
@@ -21,5 +22,11 @@ class FrontpageController extends AbstractController
             return new RedirectResponse($this->router->generate('app_default'));
         }
         return $this->render('cms/frontpage.html.twig');
+    }
+
+    #[Route('/install', name: 'app_install')]
+    public function install(): Response
+    {
+        return $this->redirect('/');
     }
 }

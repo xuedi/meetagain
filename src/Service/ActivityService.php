@@ -43,7 +43,6 @@ readonly class ActivityService
                 'error' => $exception->getMessage()
             ]);
         }
-
     }
 
     public function getUserList(User $user): array

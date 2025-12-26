@@ -1,0 +1,89 @@
+<div class="box">
+    <h2 class="title is-4">Step 1: Database Configuration</h2>
+
+    {% if errors %}
+    <div class="notification is-danger">
+        <button class="delete" onclick="this.parentElement.remove()"></button>
+        {% for error in errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="content mb-5">
+        <h3 class="title is-5">System Requirements</h3>
+        <table class="table is-fullwidth is-hoverable">
+            <tbody>
+                {% for req in requirements %}
+                <tr>
+                    <td>{{ req.name }}</td>
+                    <td class="has-text-right">
+                        <span class="tag {{ req.tag_class }}">
+                            {{ req.current }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <form method="post" action="">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="step1">
+
+        <div class="columns">
+            <div class="column is-8">
+                <div class="field">
+                    <label class="label">Database Host</label>
+                    <div class="control">
+                        <input class="input" type="text" name="db_host" value="{{ db_host }}" placeholder="ma-db">
+                    </div>
+                    <p class="help">Usually "localhost" or your hosting provider's database server address</p>
+                </div>
+            </div>
+            <div class="column is-4">
+                <div class="field">
+                    <label class="label">Port</label>
+                    <div class="control">
+                        <input class="input" type="number" name="db_port" value="{{ db_port }}" placeholder="3306">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Database Name</label>
+            <div class="control">
+                <input class="input" type="text" name="db_name" value="{{ db_name }}" placeholder="meetAgain">
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label">Database User</label>
+                    <div class="control">
+                        <input class="input" type="text" name="db_user" value="{{ db_user }}" placeholder="meetAgain" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Database Password</label>
+                    <div class="control">
+                        <input class="input" type="password" name="db_password" value="{{ db_password }}" placeholder="UserPassW0rd" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field mt-5">
+            <div class="control">
+                <button type="submit" class="button is-primary is-medium">
+                    Test Connection &amp; Continue
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

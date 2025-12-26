@@ -107,6 +107,23 @@
                         <span class="icon"><i class="fa fa-arrow-up-right-from-square"></i></span>
                     </a>
                 </div>
+
+                <div class="mt-2">
+                    {% if event.canceled %}
+                        <a href="{{ path('app_admin_event_uncancel', {'id': event.id}) }}"
+                           class="button is-warning is-light">
+                            <span class="icon"><i class="fa fa-check"></i></span>
+                            <span>Uncancel</span>
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_admin_event_cancel', {'id': event.id}) }}"
+                           class="button is-danger is-light"
+                           onclick="return confirm('Are you sure you want to cancel this event? All RSVPd users will be notified.')">
+                            <span class="icon"><i class="fa fa-ban"></i></span>
+                            <span>Cancel Event</span>
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
