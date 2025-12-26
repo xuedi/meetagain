@@ -219,6 +219,9 @@ ENV;
             return false;
         }
 
+        // Restrict .env file permissions to owner-only (0600)
+        chmod($envPath, 0600);
+
         return true;
     }
 
