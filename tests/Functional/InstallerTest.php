@@ -35,17 +35,29 @@ require_once __DIR__ . '/../../public/install/Providers/SesMailProvider.php';
  */
 class InstallerTest extends TestCase
 {
-    private const DB_HOST = 'ma-db';
-    private const DB_PORT = 3306;
-    private const DB_NAME = 'meetAgain';
-    private const DB_USER = 'meetAgain';
-    private const DB_PASSWORD = 'UserPassW0rd';
-
     private const LOCK_FILE_PATH = __DIR__ . '/../../installed.lock';
     private const ENV_FILE_PATH = __DIR__ . '/../../.env';
     private const ENV_BACKUP_PATH = __DIR__ . '/../../.env.backup-test';
 
     private ?\Installer $installer = null;
+    private static string $dbHost;
+    private static int $dbPort;
+    private static string $dbName;
+    private static string $dbUser;
+    private static string $dbPassword;
+
+    public static function setUpBeforeClass(): void
+    {
+        // Parse DATABASE_URL from environment, fallback to local Docker defaults
+        $databaseUrl = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? 'mysql://meetAgain:UserPassW0rd@ma-db:3306/meetAgain';
+        $parsed = parse_url($databaseUrl);
+
+        self::$dbHost = $parsed['host'] ?? 'ma-db';
+        self::$dbPort = $parsed['port'] ?? 3306;
+        self::$dbName = ltrim($parsed['path'] ?? '/meetAgain', '/');
+        self::$dbUser = $parsed['user'] ?? 'meetAgain';
+        self::$dbPassword = $parsed['pass'] ?? 'UserPassW0rd';
+    }
 
     protected function setUp(): void
     {
@@ -188,11 +200,11 @@ class InstallerTest extends TestCase
     public function testDatabaseConnectionWithValidCredentials(): void
     {
         $result = $this->installer->testDatabaseConnection(
-            self::DB_HOST,
-            self::DB_PORT,
-            self::DB_NAME,
-            self::DB_USER,
-            self::DB_PASSWORD
+            self::$dbHost,
+            self::$dbPort,
+            self::$dbName,
+            self::$dbUser,
+            self::$dbPassword
         );
 
         $this->assertTrue($result, 'Should connect to database with valid credentials');
@@ -202,9 +214,9 @@ class InstallerTest extends TestCase
     public function testDatabaseConnectionWithInvalidCredentials(): void
     {
         $result = $this->installer->testDatabaseConnection(
-            self::DB_HOST,
-            self::DB_PORT,
-            self::DB_NAME,
+            self::$dbHost,
+            self::$dbPort,
+            self::$dbName,
             'invalid_user',
             'invalid_password'
         );
@@ -218,10 +230,10 @@ class InstallerTest extends TestCase
     {
         $result = $this->installer->testDatabaseConnection(
             'invalid-host',
-            self::DB_PORT,
-            self::DB_NAME,
-            self::DB_USER,
-            self::DB_PASSWORD
+            self::$dbPort,
+            self::$dbName,
+            self::$dbUser,
+            self::$dbPassword
         );
 
         $this->assertFalse($result, 'Should fail to connect with invalid host');
