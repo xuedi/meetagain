@@ -41,6 +41,16 @@ stop: dockerStop
 do +parameter='':
     {{PHP}} {{parameter}}
 
+# Alias to start the docker stack
+start: dockerStart
+
+# Alias to stop the docker stack
+stop: dockerStop
+
+# Run any command inside the PHP container (e.g., just do "composer update")
+do +parameter='':
+    {{PHP}} {{parameter}}
+
 # Start all Docker containers in detached mode and prepare log directory
 [group('docker')]
 dockerStart:

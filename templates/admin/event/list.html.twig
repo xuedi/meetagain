@@ -48,6 +48,15 @@
                         {% if event.featured %}
                             <span class="icon has-text-warning"><i class="fa fa-star"></i></span>
                         {% endif %}
+                        {% if event.canceled %}
+                            <a href="{{ path('app_admin_event_uncancel', {'id': event.id}) }}" onclick="return confirm('Are you sure you want to uncancel this event?')">
+                                <span class="tag is-danger is-light">Canceled</span>
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_admin_event_cancel', {'id': event.id}) }}" onclick="return confirm('Are you sure you want to cancel this event? All RSVPd users will be notified.')">
+                                <span class="icon has-text-danger"><i class="fa fa-ban"></i></span>
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
