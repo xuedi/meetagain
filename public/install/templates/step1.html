@@ -18,7 +18,7 @@
                 <tr>
                     <td>{{ req.name }}</td>
                     <td class="has-text-right">
-                        <span class="tag {% if req.passed %}is-success{% else %}is-danger{% endif %}">
+                        <span class="tag {{ req.tag_class }}">
                             {{ req.current }}
                         </span>
                     </td>

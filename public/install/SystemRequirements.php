@@ -14,37 +14,43 @@ class SystemRequirements
     /**
      * Check system requirements for MeetAgain installation
      *
-     * @return array<string, array{name: string, passed: bool, current: string, optional?: bool}>
+     * @return array<string, array{name: string, passed: bool, current: string, tag_class: string, optional?: bool}>
      */
     public function check(): array
     {
         $requirements = [];
 
         // PHP version
+        $phpPassed = version_compare(PHP_VERSION, '8.4.0', '>=');
         $requirements['php_version'] = [
             'name' => 'PHP >= 8.4',
-            'passed' => version_compare(PHP_VERSION, '8.4.0', '>='),
+            'passed' => $phpPassed,
             'current' => PHP_VERSION,
+            'tag_class' => $phpPassed ? 'is-success' : 'is-danger',
         ];
 
         // Required extensions
         $extensions = ['pdo', 'pdo_mysql', 'intl', 'iconv', 'ctype', 'json', 'mbstring'];
         foreach ($extensions as $ext) {
+            $isLoaded = extension_loaded($ext);
             $requirements['ext_' . $ext] = [
                 'name' => 'Extension: ' . $ext,
-                'passed' => extension_loaded($ext),
-                'current' => extension_loaded($ext) ? 'Loaded' : 'Missing',
+                'passed' => $isLoaded,
+                'current' => $isLoaded ? 'Loaded' : 'Missing',
+                'tag_class' => $isLoaded ? 'is-success' : 'is-danger',
             ];
         }
 
         // Optional extensions
         $optionalExtensions = ['apcu', 'imagick', 'gd', 'opcache'];
         foreach ($optionalExtensions as $ext) {
+            $isLoaded = extension_loaded($ext);
             $requirements['ext_' . $ext . '_optional'] = [
                 'name' => 'Extension: ' . $ext . ' (optional)',
-                'passed' => true, // optional, always "passes"
-                'current' => extension_loaded($ext) ? 'Loaded' : 'Not loaded',
+                'passed' => $isLoaded,
+                'current' => $isLoaded ? 'Loaded' : 'Not loaded',
                 'optional' => true,
+                'tag_class' => $isLoaded ? 'is-success' : 'is-warning',
             ];
         }
 
@@ -54,10 +60,12 @@ class SystemRequirements
             $fullPath = __DIR__ . '/' . $dir;
             $exists = is_dir($fullPath);
             $writable = $exists && is_writable($fullPath);
+            $passed = $writable || !$exists;
             $requirements['writable_' . basename($dir)] = [
                 'name' => 'Writable: ' . $dir,
-                'passed' => $writable || !$exists, // Pass if doesn't exist yet
+                'passed' => $passed,
                 'current' => $exists ? ($writable ? 'Writable' : 'Not writable') : 'Will be created',
+                'tag_class' => $passed ? 'is-success' : 'is-danger',
             ];
         }
 
