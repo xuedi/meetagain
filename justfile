@@ -131,7 +131,7 @@ devResetDatabase:
 
 # Run all tests and code quality checks
 [group('testing')]
-test: testUnit testFunctional checkStan checkRector checkPhpcs checkDeptrac
+test: testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer checkDeptrac
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -177,6 +177,11 @@ checkRector:
 checkPhpcs:
     {{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
 
+# Run PHP-CS-Fixer to check code style (dry-run)
+[group('checks')]
+checkPhpCsFixer:
+    {{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+
 # Run Deptrac to check architectural layer dependencies
 [group('checks')]
 checkDeptrac:
@@ -186,6 +191,11 @@ checkDeptrac:
 [group('fixing')]
 fixPhpcs:
     {{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+
+# Automatically fix code style using PHP-CS-Fixer
+[group('fixing')]
+fixPhpCsFixer:
+    {{PHP}} vendor/bin/php-cs-fixer fix --verbose
 
 # Apply Rector refactorings to the codebase
 [group('fixing')]
