@@ -12,16 +12,20 @@
 
     <div class="content mb-5">
         <h3 class="title is-5">System Requirements</h3>
-        <div class="requirements-list">
-            {% for req in requirements %}
-            <div class="requirement-item">
-                <span>{{ req.name }}</span>
-                <span class="tag {% if req.passed %}is-success{% else %}is-danger{% endif %}">
-                    {{ req.current }}
-                </span>
-            </div>
-            {% endfor %}
-        </div>
+        <table class="table is-fullwidth is-hoverable">
+            <tbody>
+                {% for req in requirements %}
+                <tr>
+                    <td>{{ req.name }}</td>
+                    <td class="has-text-right">
+                        <span class="tag {% if req.passed %}is-success{% else %}is-danger{% endif %}">
+                            {{ req.current }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <form method="post" action="">

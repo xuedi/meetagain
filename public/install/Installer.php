@@ -118,9 +118,7 @@ class Installer
      * If there are errors, stores the provided data and calls the error handler.
      * If successful, stores the data and redirects to the next step.
      *
-     * @param array<string, mixed> $data Data to store in session
-     * @param int|null $nextStep Next step number (null to skip redirect)
-     * @param callable|null $onError Error handler callback
+     * @param array<string, mixed> $data
      */
     public function handleFormResult(array $data, ?int $nextStep = null, ?callable $onError = null): void
     {
@@ -152,8 +150,6 @@ class Installer
 
     /**
      * Check if all non-optional requirements pass
-     *
-     * @return bool
      */
     public function allRequirementsPassed(): bool
     {
@@ -162,13 +158,6 @@ class Installer
 
     /**
      * Test database connection with provided credentials
-     *
-     * @param string $host Database host
-     * @param int $port Database port
-     * @param string $name Database name
-     * @param string $user Database username
-     * @param string $password Database password
-     * @return bool True if connection successful, false otherwise
      */
     public function testDatabaseConnection(string $host, int $port, string $name, string $user, string $password): bool
     {
@@ -284,9 +273,7 @@ ENV;
      * Creates a user with provided data, merging with sensible defaults.
      * Automatically hashes passwords using bcrypt.
      *
-     * @param PDO $pdo Database connection
-     * @param array<string, mixed> $userData User data (name, email, roles, password, etc.)
-     * @return int Created user ID
+     * @param array<string, mixed> $userData
      */
     private function createUser(PDO $pdo, array $userData): int
     {
@@ -341,9 +328,6 @@ ENV;
 
     /**
      * Create system user for automated operations
-     *
-     * @param PDO $pdo Database connection
-     * @return int Created system user ID
      */
     public function createSystemUser(PDO $pdo): int
     {
@@ -359,12 +343,6 @@ ENV;
 
     /**
      * Create admin user with full privileges
-     *
-     * @param PDO $pdo Database connection
-     * @param string $email Admin email address
-     * @param string $password Admin password (will be hashed)
-     * @param string $name Admin display name
-     * @return int Created admin user ID
      */
     public function createAdminUser(PDO $pdo, string $email, string $password, string $name): int
     {
@@ -530,9 +508,7 @@ ENV;
     /**
      * Render a template with default installer variables
      *
-     * @param string $template Template name
-     * @param array<string, mixed> $vars Additional variables
-     * @return string Rendered HTML
+     * @param array<string, mixed> $vars
      */
     public function render(string $template, array $vars = []): string
     {

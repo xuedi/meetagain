@@ -19,7 +19,7 @@
             <div class="control">
                 <div class="columns is-multiline">
                     <div class="column is-half">
-                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                        <label class="radio box p-3 mb-2 is-block is-clickable">
                             <input type="radio" name="mail_provider" value="mailhog" {% if provider == 'mailhog' %}checked{% endif %}>
                             <strong>MailHog</strong>
                             <span class="tag is-info is-light ml-2">Docker</span>
@@ -28,7 +28,7 @@
                         </label>
                     </div>
                     <div class="column is-half">
-                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                        <label class="radio box p-3 mb-2 is-block is-clickable">
                             <input type="radio" name="mail_provider" value="smtp" {% if provider == 'smtp' %}checked{% endif %}>
                             <strong>SMTP Server</strong>
                             <br>
@@ -36,7 +36,7 @@
                         </label>
                     </div>
                     <div class="column is-half">
-                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                        <label class="radio box p-3 mb-2 is-block is-clickable">
                             <input type="radio" name="mail_provider" value="sendgrid" {% if provider == 'sendgrid' %}checked{% endif %}>
                             <strong>SendGrid</strong>
                             <br>
@@ -44,7 +44,7 @@
                         </label>
                     </div>
                     <div class="column is-half">
-                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                        <label class="radio box p-3 mb-2 is-block is-clickable">
                             <input type="radio" name="mail_provider" value="mailgun" {% if provider == 'mailgun' %}checked{% endif %}>
                             <strong>Mailgun</strong>
                             <br>
@@ -52,7 +52,7 @@
                         </label>
                     </div>
                     <div class="column is-half">
-                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                        <label class="radio box p-3 mb-2 is-block is-clickable">
                             <input type="radio" name="mail_provider" value="ses" {% if provider == 'ses' %}checked{% endif %}>
                             <strong>Amazon SES</strong>
                             <br>
@@ -60,7 +60,7 @@
                         </label>
                     </div>
                     <div class="column is-half">
-                        <label class="radio box p-3 mb-2" style="display: block; cursor: pointer;">
+                        <label class="radio box p-3 mb-2 is-block is-clickable">
                             <input type="radio" name="mail_provider" value="null" {% if provider == 'null' %}checked{% endif %}>
                             <strong>Disabled</strong>
                             <span class="tag is-warning is-light ml-2">Testing</span>
@@ -73,7 +73,7 @@
         </div>
 
         <!-- MailHog Fields -->
-        <div id="fields-mailhog" class="provider-fields">
+        <div id="fields-mailhog" class="provider-fields box has-background-light mt-4 is-hidden">
             <div class="notification is-info is-light">
                 <strong>MailHog</strong> is a local email testing tool for development.
                 All emails will be captured and viewable at <a href="http://localhost:8025" target="_blank">http://localhost:8025</a>.
@@ -83,7 +83,7 @@
         </div>
 
         <!-- SMTP Fields -->
-        <div id="fields-smtp" class="provider-fields">
+        <div id="fields-smtp" class="provider-fields box has-background-light mt-4 is-hidden">
             <h4 class="title is-5">SMTP Settings</h4>
             <div class="columns">
                 <div class="column is-8">
@@ -138,7 +138,7 @@
         </div>
 
         <!-- SendGrid Fields -->
-        <div id="fields-sendgrid" class="provider-fields">
+        <div id="fields-sendgrid" class="provider-fields box has-background-light mt-4 is-hidden">
             <h4 class="title is-5">SendGrid Settings</h4>
             <div class="field">
                 <label class="label">API Key</label>
@@ -150,7 +150,7 @@
         </div>
 
         <!-- Mailgun Fields -->
-        <div id="fields-mailgun" class="provider-fields">
+        <div id="fields-mailgun" class="provider-fields box has-background-light mt-4 is-hidden">
             <h4 class="title is-5">Mailgun Settings</h4>
             <div class="field">
                 <label class="label">API Key</label>
@@ -178,7 +178,7 @@
         </div>
 
         <!-- Amazon SES Fields -->
-        <div id="fields-ses" class="provider-fields">
+        <div id="fields-ses" class="provider-fields box has-background-light mt-4 is-hidden">
             <h4 class="title is-5">Amazon SES Settings</h4>
             <div class="field">
                 <label class="label">Region</label>
@@ -209,7 +209,7 @@
         </div>
 
         <!-- Null/Disabled Fields -->
-        <div id="fields-null" class="provider-fields">
+        <div id="fields-null" class="provider-fields box has-background-light mt-4 is-hidden">
             <div class="notification is-info is-light">
                 Mail sending is disabled. Emails will not be sent. You can change this later in the .env file.
             </div>

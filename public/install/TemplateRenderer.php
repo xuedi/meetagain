@@ -18,9 +18,7 @@ class TemplateRenderer
     /**
      * Render a template with variables
      *
-     * @param string $template Template name (without .html extension)
-     * @param array<string, mixed> $vars Variables to inject
-     * @return string Rendered HTML
+     * @param array<string, mixed> $vars
      */
     public function render(string $template, array $vars = []): string
     {
@@ -60,9 +58,7 @@ class TemplateRenderer
      * Handles simple loop syntax: {% for item in items %}...{% endfor %}
      * Supports both scalar and associative array iteration.
      *
-     * @param string $content Template content
-     * @param array<string, mixed> $vars Template variables
-     * @return string Processed content
+     * @param array<string, mixed> $vars
      */
     private function processLoops(string $content, array $vars): string
     {
