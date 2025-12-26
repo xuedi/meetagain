@@ -27,7 +27,6 @@ class EmailTemplateFixture extends AbstractFixture implements FixtureGroupInterf
             $template->setUpdatedAt(new DateTimeImmutable());
 
             $manager->persist($template);
-            $this->tick();
         }
         $manager->flush();
         $this->stop();
