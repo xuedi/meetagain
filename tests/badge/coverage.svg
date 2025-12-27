@@ -5,8 +5,8 @@
         <stop stop-color="#24292E" offset="100%"></stop>
     </linearGradient>
     <linearGradient id="state-fill" x1="50%" y1="0%" x2="50%" y2="100%">
-        <stop stop-color="#FF0000" offset="0%"></stop>
-        <stop stop-color="#D40000" offset="100%"></stop>
+        <stop stop-color="#00CC00" offset="0%"></stop>
+        <stop stop-color="#00AA00" offset="100%"></stop>
     </linearGradient>
 </defs>
 <g fill="none" fill-rule="evenodd">
@@ -22,10 +22,10 @@
     <g transform="translate(76)" font-family="&#39;DejaVu Sans&#39;,Verdana,Geneva,sans-serif" font-size="11">
         <path d="M0 0h46.939C48.629 0 50 1.343 50 3v14c0 1.657-1.37 3-3.061 3H0V0z" id="state-bg" fill="url(#state-fill)" fill-rule="nonzero"></path>
         <text fill="#010101" fill-opacity=".3">
-            <tspan x="10" y="15">84%</tspan>
+            <tspan x="10" y="15">83%</tspan>
         </text>
         <text fill="#FFFFFF">
-            <tspan x="10" y="14">84%</tspan>
+            <tspan x="10" y="14">83%</tspan>
         </text>
     </g>
 </g>
