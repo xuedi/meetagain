@@ -25,6 +25,9 @@ class Language
     #[ORM\Column]
     private int $sortOrder = 0;
 
+    #[ORM\ManyToOne]
+    private null|Image $tileImage = null;
+
     public function getId(): null|int
     {
         return $this->id;
@@ -74,6 +77,18 @@ class Language
     public function setSortOrder(int $sortOrder): static
     {
         $this->sortOrder = $sortOrder;
+
+        return $this;
+    }
+
+    public function getTileImage(): null|Image
+    {
+        return $this->tileImage;
+    }
+
+    public function setTileImage(null|Image $tileImage): static
+    {
+        $this->tileImage = $tileImage;
 
         return $this;
     }

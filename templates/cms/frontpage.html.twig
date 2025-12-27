@@ -14,10 +14,11 @@
                         <div class="card">
                             <a href="/{{ language.code }}/" class="card-image">
                                 <figure class="image p-5">
-                                    <img src="/images/locations/{{ language.code }}.jpg"
-                                         alt="Image for {{ language.name }}"
-                                         class="modal-button"
-                                         onerror="this.src='/images/locations/default.jpg'">
+                                    {% if language.tileImage %}
+                                        {% include '_block/image.html.twig' with {'image': language.tileImage, 'size': '600x400'} %}
+                                    {% else %}
+                                        <img src="/images/locations/default.jpg" alt="Image for {{ language.name }}">
+                                    {% endif %}
                                 </figure>
                             </a>
                             <div class="card-content has-text-centered">

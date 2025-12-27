@@ -5,10 +5,12 @@ namespace App\Form;
 use App\Entity\Language;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -45,6 +47,18 @@ class LanguageType extends AbstractType
             ])
             ->add('sortOrder', IntegerType::class, [
                 'label' => 'Sort Order',
+            ])
+            ->add('tileImage', FileType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => 'Tile Image (for frontpage)',
+                'constraints' => [
+                    new File(
+                        maxSize: '5000k',
+                        mimeTypes: ['image/*'],
+                        mimeTypesMessage: 'Please upload a valid image',
+                    ),
+                ],
             ]);
     }
 

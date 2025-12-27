@@ -9,6 +9,7 @@
             <tr>
                 <th>{{ 'Code'|trans }}</th>
                 <th>{{ 'Name'|trans }}</th>
+                <th>{{ 'Has Tile'|trans }}</th>
                 <th>{{ 'Status'|trans }}</th>
                 <th>{{ 'Sort Order'|trans }}</th>
                 <th>
@@ -23,6 +24,13 @@
                 <tr>
                     <td>{{ language.code }}</td>
                     <td>{{ language.name }}</td>
+                    <td>
+                        {% if language.tileImage %}
+                            <span class="has-text-success">{{ 'yes'|trans }}</span>
+                        {% else %}
+                            <span class="has-text-grey">{{ 'no'|trans }}</span>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if language.enabled %}
                             <span class="tag is-success">{{ 'Enabled'|trans }}</span>

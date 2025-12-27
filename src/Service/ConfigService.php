@@ -26,6 +26,7 @@ readonly class ConfigService
             ImageType::CmsBlock => [[432, 432], [80, 80]],
             ImageType::PluginDishPreview => [[1024, 768], [400, 400], [100, 100], [50, 50]], // is also part of gallery
             ImageType::PluginDishGallery => [[1024, 768], [400, 400]],
+            ImageType::LanguageTile => [[600, 400], [300, 200]],
         };
     }
 

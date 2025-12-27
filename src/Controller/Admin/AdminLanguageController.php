@@ -2,13 +2,17 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Image;
+use App\Entity\ImageType;
 use App\Entity\Language;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
+use App\Service\ImageService;
 use App\Service\LanguageService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,6 +24,7 @@ class AdminLanguageController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
         private readonly TranslationService $translationService,
+        private readonly ImageService $imageService,
     ) {
     }
 
@@ -40,6 +45,8 @@ class AdminLanguageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->handleImageUpload($form, $language);
+
             $this->em->persist($language);
             $this->em->flush();
             $this->languageService->invalidateCache();
@@ -64,6 +71,8 @@ class AdminLanguageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->handleImageUpload($form, $language);
+
             $this->em->flush();
             $this->languageService->invalidateCache();
             $this->translationService->publish();
@@ -92,5 +101,19 @@ class AdminLanguageController extends AbstractController
         $this->addFlash('success', sprintf('Language %s successfully', $status));
 
         return $this->redirectToRoute('app_admin_language');
+    }
+
+    private function handleImageUpload(mixed $form, Language $language): void
+    {
+        $imageData = $form->get('tileImage')->getData();
+        if (!$imageData instanceof UploadedFile) {
+            return;
+        }
+
+        $image = $this->imageService->upload($imageData, $this->getUser(), ImageType::LanguageTile);
+        if ($image instanceof Image) {
+            $language->setTileImage($image);
+            $this->imageService->createThumbnails($image);
+        }
     }
 }

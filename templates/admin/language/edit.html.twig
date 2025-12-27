@@ -7,7 +7,31 @@
         <h1 class="title">{{ isEdit ? 'Edit Language'|trans : 'Add Language'|trans }}</h1>
 
         {{ form_start(form) }}
-        {{ form_widget(form) }}
+
+        <div class="columns">
+            <div class="column is-8">
+                {{ form_row(form.code) }}
+                {{ form_row(form.name) }}
+                {{ form_row(form.enabled) }}
+                {{ form_row(form.sortOrder) }}
+            </div>
+            <div class="column is-4">
+                <div class="box">
+                    <h4 class="subtitle is-5">Tile Image (Frontpage)</h4>
+                    {% if language.tileImage %}
+                        <div class="mb-3">
+                            {% include '_block/image.html.twig' with {'image': language.tileImage, 'size': '300x200'} %}
+                        </div>
+                    {% else %}
+                        <div class="mb-3 has-text-grey">
+                            <em>No image uploaded</em>
+                        </div>
+                    {% endif %}
+                    {{ form_row(form.tileImage) }}
+                </div>
+            </div>
+        </div>
+
         <div class="field is-grouped">
             <div class="control">
                 <button class="button is-primary">{{ "button_save"|trans }}</button>
