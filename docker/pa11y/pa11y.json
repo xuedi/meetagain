@@ -1,5 +1,7 @@
 {
     "chromeLaunchConfig": {
         "args": ["--no-sandbox", "--disable-setuid-sandbox", "--ignore-certificate-errors"]
-    }
+    },
+    "runners": ["htmlcs", "axe"],
+    "includeWarnings": true
 }

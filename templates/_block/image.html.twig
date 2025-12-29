@@ -21,7 +21,7 @@
     {% if image.updatedAt is not null %}{# to invalidate browser cache #}
         {% set file = file ~ '?v' ~ image.updatedAt|date("YmdHis") %}
     {% endif %}
-    <img src="/images/thumbnails/{{ file }}" {% if image.alt %}alt="{{ image.alt }}"{% endif %} width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
+    <img src="/images/thumbnails/{{ file }}" alt="{{ image.alt|default('') }}" width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
 {% else %}
     <img src="/images/default_{{ size }}.png" alt="Placeholder IMAGE"/>
 {% endif %}

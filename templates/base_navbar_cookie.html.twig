@@ -1,9 +1,8 @@
 <div class="navbar-item dropdown is-hoverable {% if globalService.showCookieConsent %}is-active{% endif %}" role="region" aria-label="{{ "menu_cookie_consent_headline" | trans }}">
     <div class="dropdown-trigger">
-        <button 
-            class="button cookie-button" 
-            aria-haspopup="true" 
-            aria-controls="dropdown-cookie"
+        <button
+            class="button cookie-button"
+            aria-haspopup="dialog"
             aria-expanded="{% if globalService.showCookieConsent %}true{% else %}false{% endif %}"
         >
             {% if globalService.showCookieConsent %}
@@ -14,8 +13,8 @@
             </span>
         </button>
     </div>
-    <div class="dropdown-menu" id="dropdown-cookie" role="menu" aria-labelledby="dropdown-cookie" aria-hidden="{% if globalService.showCookieConsent %}false{% else %}true{% endif %}">
-        <div class="dropdown-content" role="dialog" aria-labelledby="cookie-form-title">
+    <div class="dropdown-menu" id="dropdown-cookie">
+        <div class="dropdown-content" role="dialog" aria-labelledby="cookie-form-title" aria-describedby="cookie-form-description">
             <form action="{{ path('app_cookie') }}" method="post" aria-labelledby="cookie-form-title">
                 <h2 id="cookie-form-title" class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_headline" | trans }}</h2>
                 <p id="cookie-form-description" class="navbar-item is-6">
