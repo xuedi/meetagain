@@ -11,20 +11,24 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class ConfigServiceTest extends TestCase
 {
     private Stub&ConfigRepository $configRepoStub;
     private Stub&EntityManagerInterface $entityManagerStub;
+    private Stub&CacheInterface $cacheStub;
     private ConfigService $subject;
 
     protected function setUp(): void
     {
         $this->configRepoStub = $this->createStub(ConfigRepository::class);
         $this->entityManagerStub = $this->createStub(EntityManagerInterface::class);
+        $this->cacheStub = $this->createStub(CacheInterface::class);
         $this->subject = new ConfigService(
             repo: $this->configRepoStub,
             em: $this->entityManagerStub,
+            cache: $this->cacheStub,
         );
     }
 
@@ -217,7 +221,9 @@ class ConfigServiceTest extends TestCase
             ->expects($this->exactly(5))
             ->method('flush');
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock);
+        $cacheStub = $this->createStub(CacheInterface::class);
+
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub);
 
         $subject->saveForm([
             'url' => 'example.com',
@@ -246,7 +252,9 @@ class ConfigServiceTest extends TestCase
             ->expects($this->exactly(5))
             ->method('flush');
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock);
+        $cacheStub = $this->createStub(CacheInterface::class);
+
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub);
 
         $subject->saveForm([
             'url' => 'new-example.com',

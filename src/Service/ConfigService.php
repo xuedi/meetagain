@@ -8,12 +8,17 @@ use App\Entity\ImageType;
 use App\Repository\ConfigRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 readonly class ConfigService
 {
+    private const string CACHE_KEY_THEME_COLORS = 'theme_colors';
+
     public function __construct(
         private ConfigRepository $repo,
         private EntityManagerInterface $em,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -107,13 +112,20 @@ readonly class ConfigService
 
     public function getThemeColors(): array
     {
-        $defaults = $this->getThemeColorDefaults();
-        $colors = [];
-        foreach ($defaults as $name => $default) {
-            $colors[$name] = $this->getString($name, $default);
-        }
+        return $this->cache->get(self::CACHE_KEY_THEME_COLORS, function (ItemInterface $item): array {
+            $item->expiresAfter(3600);
 
-        return $colors;
+            $defaults = $this->getThemeColorDefaults();
+            $colorNames = array_keys($defaults);
+
+            $configs = $this->repo->findBy(['name' => $colorNames]);
+            $dbColors = [];
+            foreach ($configs as $config) {
+                $dbColors[$config->getName()] = $config->getValue();
+            }
+
+            return array_merge($defaults, $dbColors);
+        });
     }
 
     public function getColor(string $name, string $default): string
@@ -128,6 +140,7 @@ readonly class ConfigService
                 $this->setString($name, $value);
             }
         }
+        $this->cache->delete(self::CACHE_KEY_THEME_COLORS);
     }
 
     private function getBoolean(string $name, bool $default = false): bool
