@@ -49,6 +49,11 @@ services:
     container_name: "ma-valkey"
     image: valkey/valkey:latest@sha256:546304417feac0874c3dd576e0952c6bb8f06bb4093ea0c9ca303c73cf458f63
 
+  pa11y:
+    build: pa11y
+    container_name: "ma-pa11y"
+    network_mode: "host"
+
 volumes:
   ma-mysql-data:
   ma-caddy_data:

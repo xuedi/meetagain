@@ -194,6 +194,12 @@ checkPhpCsFixer:
 checkDeptrac:
     {{PHP}} vendor/bin/deptrac analyse --config-file=tests/deptrac.yaml
 
+# Run Pa11y accessibility check with human-readable output
+[group('checks')]
+checkA11y url='http://localhost/':
+    {{DOCKER}} build pa11y -q
+    {{DOCKER}} run --rm pa11y {{url}} --reporter cli --standard WCAG2AA
+
 # Automatically fix coding standards violations using PHPCBF
 [group('fixing')]
 fixPhpcs:
