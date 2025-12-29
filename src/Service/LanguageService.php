@@ -11,6 +11,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 readonly class LanguageService
 {
     private const string CACHE_KEY_ENABLED_CODES = 'language.enabled_codes';
+    private const string CACHE_KEY_ALL_LANGUAGES = 'language.all_languages';
     private const int CACHE_TTL = 3600;
 
     public function __construct(
@@ -46,6 +47,7 @@ readonly class LanguageService
     {
         try {
             $this->appCache->delete(self::CACHE_KEY_ENABLED_CODES);
+            $this->appCache->delete(self::CACHE_KEY_ALL_LANGUAGES);
         } catch (InvalidArgumentException) {
             // Ignore cache invalidation errors
         }
@@ -62,7 +64,17 @@ readonly class LanguageService
      */
     public function getAllLanguages(): array
     {
-        return $this->languageRepo->findAllOrdered();
+        try {
+            return $this->appCache->get(
+                self::CACHE_KEY_ALL_LANGUAGES,
+                function (ItemInterface $item): array {
+                    $item->expiresAfter(self::CACHE_TTL);
+                    return $this->languageRepo->findAllOrdered();
+                }
+            );
+        } catch (InvalidArgumentException) {
+            return $this->languageRepo->findAllOrdered();
+        }
     }
 
     public function findByCode(string $code): null|Language

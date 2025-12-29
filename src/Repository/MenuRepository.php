@@ -16,6 +16,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class MenuRepository extends ServiceEntityRepository
 {
+    /** @var array<string, Menu[]>|null Per-request cache of menus by location */
+    private ?array $menuCache = null;
+
     public function __construct(
         ManagerRegistry $registry,
         private readonly RouterInterface $router,
@@ -28,15 +31,29 @@ class MenuRepository extends ServiceEntityRepository
         string $locale = 'en',
         null|string $location = null,
     ): array {
-        $criteria = match ($location) {
-            'top' => ['location' => MenuLocation::TopBar],
-            'col1' => ['location' => MenuLocation::BottomCol1],
-            'col2' => ['location' => MenuLocation::BottomCol2],
-            'col3' => ['location' => MenuLocation::BottomCol3],
-            'col4' => ['location' => MenuLocation::BottomCol4],
-            default => [],
+        // Load all menus once per request
+        if ($this->menuCache === null) {
+            $this->menuCache = [];
+            $allMenus = $this->findBy([], ['priority' => 'ASC']);
+            foreach ($allMenus as $menu) {
+                $loc = $menu->getLocation()?->value ?? 'default';
+                $this->menuCache[$loc][] = $menu;
+            }
+        }
+
+        // Get menus for requested location from cache
+        $locationKey = match ($location) {
+            'top' => MenuLocation::TopBar->value,
+            'col1' => MenuLocation::BottomCol1->value,
+            'col2' => MenuLocation::BottomCol2->value,
+            'col3' => MenuLocation::BottomCol3->value,
+            'col4' => MenuLocation::BottomCol4->value,
+            default => null,
         };
-        $all = $this->findBy($criteria, ['priority' => 'ASC']);
+
+        $all = $locationKey !== null
+            ? ($this->menuCache[$locationKey] ?? [])
+            : array_merge(...array_values($this->menuCache));
         $list = [];
         foreach ($all as $menu) {
             if (!$this->isVisible($user, $menu->getVisibility())) {
