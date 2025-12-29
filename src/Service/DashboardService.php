@@ -2,18 +2,16 @@
 
 namespace App\Service;
 
-use App\Entity\NotFoundLog;
-use App\Entity\User;
 use App\Repository\ActivityRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
+use App\Repository\ImageRepository;
 use App\Repository\NotFoundLogRepository;
+use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 
 class DashboardService
 {
@@ -31,8 +29,9 @@ class DashboardService
         private readonly EmailQueueRepository $mailRepo,
         private readonly NotFoundLogRepository $notFoundRepo,
         private readonly ActivityRepository $activityRepo,
+        private readonly ImageRepository $imageRepo,
+        private readonly TranslationSuggestionRepository $translationSuggestionRepo,
     ) {
-        // nothing to do, just chilling :-)
     }
 
     public function getTimeControl(): array
@@ -116,5 +115,79 @@ class DashboardService
     public function getNeedForApproval(): array
     {
         return $this->userRepo->findBy(['status' => 1], ['createdAt' => 'desc']);
+    }
+
+    /**
+     * Items requiring admin attention
+     */
+    public function getActionItems(): array
+    {
+        return [
+            'reportedImages' => $this->imageRepo->getReportedCount(),
+            'pendingTranslations' => $this->translationSuggestionRepo->getPendingCount(),
+            'staleEmails' => $this->mailRepo->getStaleCount(60),
+            'pendingEmails' => $this->mailRepo->getPendingCount(),
+        ];
+    }
+
+    /**
+     * User status breakdown
+     * @return array<string, int>
+     */
+    public function getUserStatusBreakdown(): array
+    {
+        return $this->userRepo->getStatusBreakdown();
+    }
+
+    /**
+     * Users active in last 7 days
+     */
+    public function getActiveUsersCount(): int
+    {
+        return $this->userRepo->getRecentlyActiveCount(7);
+    }
+
+    /**
+     * Image storage statistics
+     */
+    public function getImageStats(): array
+    {
+        return $this->imageRepo->getStorageStats($this->weekStartDate, $this->weekStopDate);
+    }
+
+    /**
+     * Upcoming events
+     * @return array
+     */
+    public function getUpcomingEvents(int $limit = 3): array
+    {
+        return $this->eventRepo->getUpcomingEvents($limit);
+    }
+
+    /**
+     * Past events without photos
+     * @return array
+     */
+    public function getPastEventsWithoutPhotos(int $limit = 5): array
+    {
+        return $this->eventRepo->getPastEventsWithoutPhotos($limit);
+    }
+
+    /**
+     * Recurring events count
+     */
+    public function getRecurringEventsCount(): int
+    {
+        return $this->eventRepo->getRecurringCount();
+    }
+
+    public function getWeekStartDate(): DateTimeImmutable
+    {
+        return $this->weekStartDate;
+    }
+
+    public function getWeekStopDate(): DateTimeImmutable
+    {
+        return $this->weekStopDate;
     }
 }

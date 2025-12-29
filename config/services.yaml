@@ -16,3 +16,6 @@ services:
         resource: '../src/'
         exclude:
             - '../src/Kernel.php'
+
+    Doctrine\Migrations\DependencyFactory:
+        alias: 'doctrine.migrations.dependency_factory'

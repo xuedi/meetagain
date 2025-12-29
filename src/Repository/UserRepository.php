@@ -183,6 +183,39 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * @return array<string, int> Count of users per status
+     */
+    public function getStatusBreakdown(): array
+    {
+        $result = $this->createQueryBuilder('u')
+            ->select('u.status, COUNT(u.id) as cnt')
+            ->groupBy('u.status')
+            ->getQuery()
+            ->getResult();
+
+        $breakdown = [];
+        foreach (UserStatus::cases() as $status) {
+            $breakdown[$status->name] = 0;
+        }
+        foreach ($result as $row) {
+            $status = $row['status'];
+            $breakdown[$status->name] = (int) $row['cnt'];
+        }
+
+        return $breakdown;
+    }
+
+    public function getRecentlyActiveCount(int $days = 7): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.lastLogin > :date')
+            ->setParameter('date', new DateTime('-' . $days . ' days'))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
      * Get social counts for a user without loading full collections.
      * @return array{following: int, followers: int, rsvp: int}
      */

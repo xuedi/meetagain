@@ -63,6 +63,7 @@
     "symfony/yaml": "8.0.*",
     "symfonycasts/verify-email-bundle": "^1.17",
     "twig/extra-bundle": "^3",
+    "twig/string-extra": "^3.22",
     "twig/twig": "^3"
   },
   "config": {

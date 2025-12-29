@@ -5,7 +5,9 @@ namespace Tests\Unit\Service;
 use App\Repository\ActivityRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
+use App\Repository\ImageRepository;
 use App\Repository\NotFoundLogRepository;
+use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use App\Service\DashboardService;
 use DateTimeImmutable;
@@ -53,6 +55,8 @@ final class DashboardServiceTest extends TestCase
         ?EmailQueueRepository $mailRepo = null,
         ?NotFoundLogRepository $notFoundRepo = null,
         ?ActivityRepository $activityRepo = null,
+        ?ImageRepository $imageRepo = null,
+        ?TranslationSuggestionRepository $translationSuggestionRepo = null,
     ): DashboardService {
         $service = new DashboardService(
             $eventRepo ?? $this->createStub(EventRepository::class),
@@ -60,6 +64,8 @@ final class DashboardServiceTest extends TestCase
             $mailRepo ?? $this->createStub(EmailQueueRepository::class),
             $notFoundRepo ?? $this->createStub(NotFoundLogRepository::class),
             $activityRepo ?? $this->createStub(ActivityRepository::class),
+            $imageRepo ?? $this->createStub(ImageRepository::class),
+            $translationSuggestionRepo ?? $this->createStub(TranslationSuggestionRepository::class),
         );
 
         // Fix the time window deterministically (ISO week 10 of 2024)

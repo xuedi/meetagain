@@ -128,4 +128,31 @@ class EventRepository extends ServiceEntityRepository
 
         return $list;
     }
+
+    /**
+     * @return array<Event>
+     */
+    public function getPastEventsWithoutPhotos(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.images', 'i')
+            ->where('e.start < :date')
+            ->andWhere('i.id IS NULL')
+            ->setParameter('date', new DateTime())
+            ->orderBy('e.start', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getRecurringCount(): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.recurringRule IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
