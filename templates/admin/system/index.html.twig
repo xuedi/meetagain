@@ -52,6 +52,97 @@
             </div>
         </div>
 
+        <hr>
+
+        <h1 class="title is-5">Theme Colors</h1>
+        <p class="subtitle is-6 has-text-grey">Customize the site's color scheme to match your brand. The text grey colors are optimized for WCAG AA accessibility compliance.</p>
+
+        {{ form_start(colorsForm) }}
+        <div class="columns is-multiline">
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_primary) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_primary) }}
+                        <span class="tag ml-3" style="background-color: {{ colorsForm.color_primary.vars.data }}; color: white;">Preview</span>
+                    </div>
+                    <p class="help">Main buttons and highlights</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_link) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_link) }}
+                        <span class="tag ml-3" style="background-color: {{ colorsForm.color_link.vars.data }}; color: white;">Preview</span>
+                    </div>
+                    <p class="help">Links and clickable elements</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_info) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_info) }}
+                        <span class="tag ml-3" style="background-color: {{ colorsForm.color_info.vars.data }}; color: white;">Preview</span>
+                    </div>
+                    <p class="help">Information messages</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_success) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_success) }}
+                        <span class="tag ml-3" style="background-color: {{ colorsForm.color_success.vars.data }}; color: white;">Preview</span>
+                    </div>
+                    <p class="help">Success notifications</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_warning) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_warning) }}
+                        <span class="tag ml-3" style="background-color: {{ colorsForm.color_warning.vars.data }};">Preview</span>
+                    </div>
+                    <p class="help">Warning alerts</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_danger) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_danger) }}
+                        <span class="tag ml-3" style="background-color: {{ colorsForm.color_danger.vars.data }}; color: white;">Preview</span>
+                    </div>
+                    <p class="help">Errors and delete actions</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_text_grey) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_text_grey) }}
+                        <span class="ml-3" style="color: {{ colorsForm.color_text_grey.vars.data }};">Sample text</span>
+                    </div>
+                    <p class="help">Secondary text content</p>
+                </div>
+            </div>
+            <div class="column is-3">
+                <div class="field">
+                    {{ form_label(colorsForm.color_text_grey_light) }}
+                    <div class="control is-flex is-align-items-center">
+                        {{ form_widget(colorsForm.color_text_grey_light) }}
+                        <span class="ml-3" style="color: {{ colorsForm.color_text_grey_light.vars.data }};">Sample text</span>
+                    </div>
+                    <p class="help">Subtle hints and metadata</p>
+                </div>
+            </div>
+        </div>
+        <button class="button is-link">{{ "button_save" | trans }}</button>
+        {{ form_end(colorsForm) }}
+
     </div>
 
 {% endblock %}

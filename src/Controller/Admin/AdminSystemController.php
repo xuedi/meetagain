@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractController;
 use App\Entity\ConfigType;
 use App\Form\SettingsType;
+use App\Form\ThemeColorsType;
 use App\Repository\ConfigRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\ImageRepository;
@@ -35,11 +36,22 @@ class AdminSystemController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->configService->saveForm($form->getData());
+            $this->addFlash('success', 'Settings saved');
+        }
+
+        $colorsForm = $this->createForm(ThemeColorsType::class);
+        $colorsForm->handleRequest($request);
+
+        if ($colorsForm->isSubmitted() && $colorsForm->isValid()) {
+            $this->configService->saveColors($colorsForm->getData());
+            $this->addFlash('success', 'Theme colors saved');
         }
 
         return $this->render('admin/system/index.html.twig', [
             'active' => 'system',
             'form' => $form,
+            'colorsForm' => $colorsForm,
+            'colorDefaults' => $this->configService->getThemeColorDefaults(),
             'config' => $this->configRepo->findBy(['type' => ConfigType::Boolean]),
         ]);
     }

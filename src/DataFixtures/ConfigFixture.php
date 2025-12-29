@@ -75,6 +75,15 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 (string)$this->getRefUser(SystemUserFixture::IMPORT)->getId(),
                 ConfigType::Integer
             ],
+            // Theme colors (with WCAG AA compliant defaults for grey text)
+            ['color_primary', '#00d1b2', ConfigType::String],
+            ['color_link', '#485fc7', ConfigType::String],
+            ['color_info', '#3e8ed0', ConfigType::String],
+            ['color_success', '#48c78e', ConfigType::String],
+            ['color_warning', '#ffe08a', ConfigType::String],
+            ['color_danger', '#f14668', ConfigType::String],
+            ['color_text_grey', '#767676', ConfigType::String],
+            ['color_text_grey_light', '#959595', ConfigType::String],
         ];
     }
 }

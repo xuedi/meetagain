@@ -6,6 +6,62 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+/* Theme color overrides using CSS custom properties */
+
+/* Primary */
+.is-primary { background-color: var(--theme-primary) !important; }
+.button.is-primary { background-color: var(--theme-primary) !important; border-color: transparent !important; }
+.button.is-primary:hover { background-color: color-mix(in srgb, var(--theme-primary) 90%, black) !important; }
+.has-text-primary { color: var(--theme-primary) !important; }
+.has-background-primary { background-color: var(--theme-primary) !important; }
+
+/* Link */
+.is-link { background-color: var(--theme-link) !important; }
+.button.is-link { background-color: var(--theme-link) !important; border-color: transparent !important; }
+.button.is-link:hover { background-color: color-mix(in srgb, var(--theme-link) 90%, black) !important; }
+.has-text-link { color: var(--theme-link) !important; }
+a { color: var(--theme-link); }
+a:hover { color: color-mix(in srgb, var(--theme-link) 80%, black); }
+
+/* Info */
+.is-info { background-color: var(--theme-info) !important; }
+.button.is-info { background-color: var(--theme-info) !important; border-color: transparent !important; }
+.has-text-info { color: var(--theme-info) !important; }
+.has-background-info { background-color: var(--theme-info) !important; }
+.notification.is-info { background-color: var(--theme-info) !important; }
+
+/* Success */
+.is-success { background-color: var(--theme-success) !important; }
+.button.is-success { background-color: var(--theme-success) !important; border-color: transparent !important; }
+.has-text-success { color: var(--theme-success) !important; }
+.has-background-success { background-color: var(--theme-success) !important; }
+.notification.is-success { background-color: var(--theme-success) !important; }
+
+/* Warning */
+.is-warning { background-color: var(--theme-warning) !important; }
+.button.is-warning { background-color: var(--theme-warning) !important; border-color: transparent !important; }
+.has-text-warning { color: var(--theme-warning) !important; }
+.has-background-warning { background-color: var(--theme-warning) !important; }
+.notification.is-warning { background-color: var(--theme-warning) !important; }
+
+/* Danger */
+.is-danger { background-color: var(--theme-danger) !important; }
+.button.is-danger { background-color: var(--theme-danger) !important; border-color: transparent !important; }
+.has-text-danger { color: var(--theme-danger) !important; }
+.has-background-danger { background-color: var(--theme-danger) !important; }
+.notification.is-danger { background-color: var(--theme-danger) !important; }
+
+/* Text Grey (accessibility - contrast fix) */
+.has-text-grey { color: var(--theme-text-grey) !important; }
+.has-text-grey-light { color: var(--theme-text-grey-light) !important; }
+
+/* Color picker styling */
+input[type="color"] {
+    min-width: 50px;
+    min-height: 30px;
+    cursor: pointer;
+}
+
 #osm-map {
     z-index: 0;
 }

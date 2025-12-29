@@ -18,6 +18,20 @@
     <link rel="stylesheet" href="/stylesheet/custom.css"/>
     <script src="/javascript/custom.js" defer></script>
 
+    {% set colors = globalService.getThemeColors() %}
+    <style>
+        :root {
+            --theme-primary: {{ colors.color_primary }};
+            --theme-link: {{ colors.color_link }};
+            --theme-info: {{ colors.color_info }};
+            --theme-success: {{ colors.color_success }};
+            --theme-warning: {{ colors.color_warning }};
+            --theme-danger: {{ colors.color_danger }};
+            --theme-text-grey: {{ colors.color_text_grey }};
+            --theme-text-grey-light: {{ colors.color_text_grey_light }};
+        }
+    </style>
+
     {% block stylesheets %}{% endblock %}
     {% block javascripts %}{% endblock %}
 </head>

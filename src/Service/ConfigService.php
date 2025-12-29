@@ -91,6 +91,45 @@ readonly class ConfigService
         $this->setInt('system_user_id', $formData['systemUser']);
     }
 
+    public function getThemeColorDefaults(): array
+    {
+        return [
+            'color_primary' => '#00d1b2',
+            'color_link' => '#485fc7',
+            'color_info' => '#3e8ed0',
+            'color_success' => '#48c78e',
+            'color_warning' => '#ffe08a',
+            'color_danger' => '#f14668',
+            'color_text_grey' => '#767676',
+            'color_text_grey_light' => '#959595',
+        ];
+    }
+
+    public function getThemeColors(): array
+    {
+        $defaults = $this->getThemeColorDefaults();
+        $colors = [];
+        foreach ($defaults as $name => $default) {
+            $colors[$name] = $this->getString($name, $default);
+        }
+
+        return $colors;
+    }
+
+    public function getColor(string $name, string $default): string
+    {
+        return $this->getString('color_' . $name, $default);
+    }
+
+    public function saveColors(array $colors): void
+    {
+        foreach ($colors as $name => $value) {
+            if (preg_match('/^#[0-9A-Fa-f]{6}$/', $value)) {
+                $this->setString($name, $value);
+            }
+        }
+    }
+
     private function getBoolean(string $name, bool $default = false): bool
     {
         $setting = $this->repo->findOneBy(['name' => $name]);

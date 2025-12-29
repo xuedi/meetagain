@@ -127,4 +127,9 @@ readonly class GlobalService
 
         return [];
     }
+
+    public function getThemeColors(): array
+    {
+        return $this->configService->getThemeColors();
+    }
 }
