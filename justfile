@@ -169,6 +169,11 @@ showCoverage +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
     {{PHP}} php tests/AiReadableTestCoverage.php {{parameter}}
 
+# Analyze routes for performance metrics (SQL queries, timing, memory)
+[group('testing')]
+routeMetrics +parameter='':
+    {{PHP}} php tests/AiReadableRouteMetrics.php {{parameter}}
+
 # Run PHPStan static analysis for type checking and bug detection
 [group('checks')]
 checkStan +parameter='':
