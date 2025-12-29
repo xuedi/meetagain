@@ -87,6 +87,16 @@ readonly class ImageService
         return $cnt;
     }
 
+    public function regenerateAllThumbnails(): int
+    {
+        $cnt = 0;
+        foreach ($this->imageRepo->findAll() as $image) {
+            $cnt += $this->createThumbnails($image);
+        }
+
+        return $cnt;
+    }
+
     public function rotateThumbNail(Image $image): void
     {
         $sizes = $this->configService->getThumbnailSizes($image->getType());

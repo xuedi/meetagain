@@ -8,7 +8,7 @@
             <div class="column is-6-mobile">
                 <p>{{ 'footer_col1' | trans }}</p>
                 <ul>
-                    {% for menu in globalService.menu('col1') %}
+                    {% for menu in get_menu('col1') %}
                         <li>
                             <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
                         </li>
@@ -18,7 +18,7 @@
             <div class="column is-6-mobile">
                 <p>{{ 'footer_col2' | trans }}</p>
                 <ul>
-                    {% for menu in globalService.menu('col2') %}
+                    {% for menu in get_menu('col2') %}
                         <li>
                             <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
                         </li>
@@ -28,7 +28,7 @@
             <div class="column is-6-mobile">
                 <p>{{ 'footer_col3' | trans }}</p>
                 <ul>
-                    {% for menu in globalService.menu('col3') %}
+                    {% for menu in get_menu('col3') %}
                         <li>
                             <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
                         </li>
@@ -38,7 +38,7 @@
             <div class="column is-6-mobile">
                 <p>{{ 'footer_col4' | trans }}</p>
                 <ul>
-                    {% for menu in globalService.menu('col4') %}
+                    {% for menu in get_menu('col4') %}
                         <li>
                             <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
                         </li>

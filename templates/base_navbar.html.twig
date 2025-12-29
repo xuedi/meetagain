@@ -1,23 +1,23 @@
 <nav class="navbar navbar-top is-fixed-top py-4" role="navigation" aria-label="main navigation">
     <div class="container">
         <div class="navbar-brand">
-            <a class="navbar-item" href="{{ globalService.showFrontpage ? path('app_frontpage') : path('app_default') }}">
+            <a class="navbar-item" href="{{ is_show_frontpage() ? path('app_frontpage') : path('app_default') }}">
                 <img class="signal-logo" src="/images/logo.webp" width="28" height="28" alt="Website Logo">
             </a>
             {% include 'base_navbar_burger.html.twig' %}
         </div>
         <div id="navBarTop" class="navbar-menu">
             <div class="navbar-start">
-                {% for menu in globalService.menu('top') %}
+                {% for menu in get_menu('top') %}
                     <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
                 {% endfor %}
-                {% for plugin in globalService.plugins %}
+                {% for plugin in get_active_plugins() %}
                     <a class="navbar-item" href="/{{ app.locale }}/{{ plugin }}">{{ ("menu_" ~ plugin) | trans }}</a>
                 {% endfor %}
                 {% if is_granted('ROLE_MANAGER') %}
                     <a class="navbar-item" href="{{ path('app_manage') }}">
                         {{ "menu_manage" | trans }}
-                        {% if globalService.managerAttention %}
+                        {% if has_manager_attention() %}
                             <span class="icon has-text-danger ml-1">
                                 <i class="fas fa-exclamation-triangle"></i>
                             </span>
@@ -27,7 +27,7 @@
                 {% if is_granted('ROLE_ADMIN') %}
                     <a class="navbar-item" href="{{ path('app_admin') }}">
                         {{ "menu_admin" | trans }}
-                        {% if globalService.adminAttention %}
+                        {% if has_admin_attention() %}
                             <span class="icon has-text-danger ml-1">
                                 <i class="fas fa-exclamation-triangle"></i>
                             </span>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Chinese/German Culture Exchange in Berlin">
 
-    {% for altLangCode, altLangLink in globalService.getAlternativeLanguageCodes %}
+    {% for altLangCode, altLangLink in get_alternative_languages() %}
         <link rel=”alternate” hreflang="{{ altLangCode }}" href="{{ altLangLink }}" />
     {% endfor %}
 
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="/stylesheet/custom.css"/>
     <script src="/javascript/custom.js" defer></script>
 
-    {% set colors = globalService.getThemeColors() %}
+    {% set colors = get_theme_colors() %}
     <style>
         :root {
             --theme-primary: {{ colors.color_primary }};

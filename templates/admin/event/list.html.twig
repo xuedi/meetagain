@@ -28,7 +28,7 @@
                     {% set textColor = 'has-background-info-light' %}
                 {% endif %}
                 <tr class="{{ textColor }} {% if event.id == nextEvent and not event.canceled %}has-background-warning-light{% endif %}">
-                    <td>{{ event.title(globalService.currentLocale) }}</td>
+                    <td>{{ event.title(app.locale) }}</td>
                     <td>{{ event.start|date('Y-m-d') }}</td>
                     <td>{{ event.stop|date('Y-m-d') }}</td>
                     <td>

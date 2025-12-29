@@ -87,6 +87,27 @@ readonly class ConfigService
         return $this->getBoolean('show_frontpage', false);
     }
 
+    public function getBooleanConfigs(): array
+    {
+        return $this->repo->findBy(['type' => ConfigType::Boolean]);
+    }
+
+    public function toggleBoolean(string $name): bool
+    {
+        $setting = $this->repo->findOneBy(['name' => $name]);
+        if ($setting === null) {
+            throw new \RuntimeException(sprintf("Config '%s' not found", $name));
+        }
+
+        $value = $setting->getValue() !== 'true';
+        $setting->setValue($value ? 'true' : 'false');
+
+        $this->em->persist($setting);
+        $this->em->flush();
+
+        return $value;
+    }
+
     public function saveForm(array $formData): void
     {
         $this->setString('website_url', $formData['url']);

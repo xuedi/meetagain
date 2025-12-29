@@ -1,11 +1,11 @@
-<div class="navbar-item dropdown is-hoverable {% if globalService.showCookieConsent %}is-active{% endif %}" role="region" aria-label="{{ "menu_cookie_consent_headline" | trans }}">
+<div class="navbar-item dropdown is-hoverable {% if show_cookie_consent() %}is-active{% endif %}" role="region" aria-label="{{ "menu_cookie_consent_headline" | trans }}">
     <div class="dropdown-trigger">
         <button
             class="button cookie-button"
             aria-haspopup="dialog"
-            aria-expanded="{% if globalService.showCookieConsent %}true{% else %}false{% endif %}"
+            aria-expanded="{% if show_cookie_consent() %}true{% else %}false{% endif %}"
         >
-            {% if globalService.showCookieConsent %}
+            {% if show_cookie_consent() %}
             <span>{{ "menu_cookie_consent_button" | trans }}</span>
             {% endif %}
             <span class="icon is-small">
@@ -30,7 +30,7 @@
                                         <input
                                             type="checkbox"
                                             name="osm_consent_checkbox"
-                                            {% if globalService.showOsm %}checked{% endif %}
+                                            {% if show_osm() %}checked{% endif %}
                                             id="osm_consent_checkbox"
                                             aria-describedby="osm-description"
                                         />

@@ -44,7 +44,7 @@
 
         <hr class="dropdown-divider"/>
         <div class="navbar-item">
-            {% for altLangCode, altLangLink in globalService.getAlternativeLanguageCodes %}
+            {% for altLangCode, altLangLink in get_alternative_languages() %}
                 <a class="button is-small mr-2" href="{{ altLangLink }}">
                     <figure class="image is-32x32 mt-3">
                         <img class="is-flag" src="{{ '/images/flags/' ~ altLangCode ~ '.png' }}" width="100" height="64" alt="Locale flag"/>

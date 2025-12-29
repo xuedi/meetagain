@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "event"|trans }} - {{ event.title(globalService.currentLocale) }} - {{ event.start|date('Y-m-d H:i') }}{% endblock %}
+{% block title %}{{ "event"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date('Y-m-d H:i') }}{% endblock %}
 
 {% block stylesheets %}
-    {% if event.hasMap and globalService.showOsm %}
+    {% if event.hasMap and show_osm() %}
         <link rel="stylesheet" href="{{ '/stylesheet/leaflet.css' }}"/>
     {% endif %}
     {% if is_granted('ROLE_USER') and event.images|length > 0 %}
@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% if event.hasMap and globalService.showOsm%}
+    {% if event.hasMap and show_osm() %}
         <script src="{{ '/javascript/leaflet.js' }}" ></script>
     {% endif %}
     {% if is_granted('ROLE_USER') and event.images|length > 0 %}
@@ -25,7 +25,7 @@
     <section class="section">
         <div class="container">
             <h1 class="title">
-                {{ event.title(globalService.currentLocale) }}
+                {{ event.title(app.locale) }}
                 {% if event.canceled %}
                     <span class="tag is-danger is-medium ml-2">{{ "Canceled"|trans }}</span>
                 {% endif %}
@@ -38,7 +38,7 @@
             <div class="columns">
                 <div class="column is-9">
                     <div class="content">
-                        {{ event.description(globalService.currentLocale)|raw|nl2br }}
+                        {{ event.description(app.locale)|raw|nl2br }}
                     </div>
                     {% if is_granted('ROLE_USER') %}
                         <div class="mt-5 box">
@@ -91,7 +91,7 @@
             }
         });
 
-        {% if event.hasMap and globalService.showOsm %}
+        {% if event.hasMap and show_osm() %}
             {% include 'events/detailsOpenStreetMap.js.twig' %}
         {% endif %}
 

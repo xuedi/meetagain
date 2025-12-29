@@ -8,20 +8,20 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Activity\MessageFactory;
 use App\Service\Activity\MessageInterface;
-use App\Service\GlobalService;
 use App\Service\ImageService;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 class MessageFactoryTest extends TestCase
 {
     private MockObject|RouterInterface $router;
     private MockObject|UserRepository $userRepository;
     private MockObject|EventRepository $eventRepository;
-    private MockObject|GlobalService $globalService;
+    private MockObject|RequestStack $requestStack;
     private MockObject|MessageInterface $message;
     private MockObject|ImageService $imageService;
     private MockObject|Activity $activity;
@@ -32,7 +32,7 @@ class MessageFactoryTest extends TestCase
         $this->router = $this->createStub(RouterInterface::class);
         $this->userRepository = $this->createStub(UserRepository::class);
         $this->eventRepository = $this->createStub(EventRepository::class);
-        $this->globalService = $this->createStub(GlobalService::class);
+        $this->requestStack = $this->createStub(RequestStack::class);
         $this->message = $this->createStub(MessageInterface::class);
         $this->activity = $this->createStub(Activity::class);
         $this->imageService = $this->createStub(ImageService::class);
@@ -48,13 +48,16 @@ class MessageFactoryTest extends TestCase
         $eventNames = ['eventNames'];
         $locale = 'en';
 
+        $request = $this->createStub(Request::class);
+        $request->method('getLocale')->willReturn($locale);
+        $this->requestStack->method('getCurrentRequest')->willReturn($request);
+
         $this->activity->method('getMeta')->willReturn($meta);
         $this->activity->method('getType')->willReturn($activityType);
         $this->message->method('getType')->willReturn($activityType);
         $this->message->method('injectServices')->willReturn($this->message);
         $this->userRepository->method('getUserNameList')->willReturn($userNames);
         $this->eventRepository->method('getEventNameList')->willReturn($eventNames);
-        $this->globalService->method('getCurrentLocale')->willReturn($locale);
 
         // Create factory with mocked messages
         $factory = new MessageFactory(
@@ -62,7 +65,7 @@ class MessageFactoryTest extends TestCase
             $this->router,
             $this->userRepository,
             $this->eventRepository,
-            $this->globalService,
+            $this->requestStack,
             $this->imageService,
         );
 
@@ -88,7 +91,7 @@ class MessageFactoryTest extends TestCase
             $this->router,
             $this->userRepository,
             $this->eventRepository,
-            $this->globalService,
+            $this->requestStack,
             $this->imageService,
         );
 

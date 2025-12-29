@@ -22,7 +22,7 @@
                                 <div class="column"><i class="fas fa-clock"></i> {{ event.start|date('H:i') }}</div>
                                 <div class="column"><i class="fas fa-location-pin"></i> {{ event.location.name }}</div>
                             </div>
-                            <a class="title is-6" href="{{ path('app_event_details', { 'id': event.id }) }}">{{ event.title(globalService.currentLocale)|slice(0, 32) }}</a>
+                            <a class="title is-6" href="{{ path('app_event_details', { 'id': event.id }) }}">{{ event.title(app.locale)|slice(0, 32) }}</a>
                             {% if not loop.last %}<hr />{% endif %}
                         </div>
                     {% endfor %}

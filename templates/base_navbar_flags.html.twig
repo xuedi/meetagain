@@ -1,4 +1,4 @@
-{% if app.request.attributes.get('_route_params') is not null and globalService.getAlternativeLanguageCodes  is not empty %}
+{% if app.request.attributes.get('_route_params') is not null and get_alternative_languages()  is not empty %}
     <div class="navbar-item dropdown is-hoverable pl-0">
         <div class="dropdown-trigger is-hoverable">
             <button class="button" aria-haspopup="menu" aria-label="Select language">
@@ -11,7 +11,7 @@
         </div>
         <div class="dropdown-menu" id="dropdown-languages" role="menu">
             <div class="dropdown-content">
-                {% for altLangCode, altLangLink in globalService.getAlternativeLanguageCodes %}
+                {% for altLangCode, altLangLink in get_alternative_languages() %}
                     <link rel=”alternate” hreflang="{{ altLangCode }}" href="{{ altLangLink }}"/>
                     <nobr>
                         <a class="navbar-item" href="{{ altLangLink }}" role="menuitem">

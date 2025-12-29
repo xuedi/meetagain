@@ -20,7 +20,7 @@
                                 Pinyin: <b>{{ editItem.pinyin }}</b><br>
                                 Explanation: <b>{{ editItem.explanation }}</b><br>
                                 Category: <b>{{ editItem.category.name }}</b><br>
-                                CreatedBy: <b>{{ globalService.getUserName(editItem.createdBy) }}</b><br>
+                                CreatedBy: <b>{{ get_user_name(editItem.createdBy) }}</b><br>
                                 CreatedAt: <b>{{ editItem.createdAt | time_diff }}</b><br>
                             </p>
                             <div class="has-text-right">

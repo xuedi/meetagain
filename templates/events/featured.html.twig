@@ -23,7 +23,7 @@
                                 </figure>
                             </div>
                             <div class="card-content">
-                                <h2 class="title is-5">{{ event.title(globalService.currentLocale) }}</h2>
+                                <h2 class="title is-5">{{ event.title(app.locale) }}</h2>
                                 <p class="subtitle is-6">{{ event.location.name }} - {{ event.start | time_diff }}</p>
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                                 </figure>
                             </div>
                             <div class="card-content">
-                                <h2 class="title is-5">{{ event.title(globalService.currentLocale) }}</h2>
+                                <h2 class="title is-5">{{ event.title(app.locale) }}</h2>
                                 <p class="subtitle is-6">{{ event.location.name }} - {{ event.start | time_diff }}</p>
                             </div>
                         </div>

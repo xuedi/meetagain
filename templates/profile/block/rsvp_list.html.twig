@@ -1,7 +1,7 @@
 {% for event in list %}
     <div class="field is-grouped">
         <div class="control is-expanded">
-            {% set title = event.title(globalService.currentLocale) %}
+            {% set title = event.title(app.locale) %}
             <a class="has-text-dark" href="{{ path('app_event_details', {id: event.id}) }}">
                 {{ title|length > 36 ? title|slice(0, 36) ~ '...' : title }}
             </a>

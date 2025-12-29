@@ -3,15 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
-use App\Entity\ConfigType;
 use App\Form\SettingsType;
 use App\Form\ThemeColorsType;
-use App\Repository\ConfigRepository;
-use App\Repository\EmailQueueRepository;
-use App\Repository\ImageRepository;
 use App\Service\ConfigService;
 use App\Service\ImageService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,10 +16,7 @@ class AdminSystemController extends AbstractController
 {
     public function __construct(
         private readonly ImageService $imageService,
-        private readonly ImageRepository $imageRepo,
-        private readonly ConfigRepository $configRepo,
         private readonly ConfigService $configService,
-        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -52,18 +44,15 @@ class AdminSystemController extends AbstractController
             'form' => $form,
             'colorsForm' => $colorsForm,
             'colorDefaults' => $this->configService->getThemeColorDefaults(),
-            'config' => $this->configRepo->findBy(['type' => ConfigType::Boolean]),
+            'config' => $this->configService->getBooleanConfigs(),
         ]);
     }
 
     #[Route('/admin/system/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails')]
     public function regenerateThumbnails(): Response
     {
-        $cnt = 0;
         $startTime = microtime(true);
-        foreach ($this->imageRepo->findAll() as $image) {
-            $cnt += $this->imageService->createThumbnails($image);
-        }
+        $cnt = $this->imageService->regenerateAllThumbnails();
         $executionTime = microtime(true) - $startTime;
 
         $this->addFlash('success', 'Regenerated thumbnails for ' . $cnt . ' images in ' . $executionTime . ' seconds');
@@ -86,12 +75,7 @@ class AdminSystemController extends AbstractController
     #[Route('/admin/system/boolean/{name}', name: 'app_admin_system_boolean')]
     public function boolean(Request $request, string $name): Response
     {
-        $config = $this->configRepo->findOneBy(['name' => $name]);
-        $value = $config->getValue() !== 'true';
-        $config->setValue($value ? 'true' : 'false');
-
-        $this->em->persist($config);
-        $this->em->flush();
+        $value = $this->configService->toggleBoolean($name);
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['newStatus' => $value]);

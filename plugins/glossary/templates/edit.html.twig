@@ -43,7 +43,7 @@
                             {% endif %}
                             <div class="box has-background-info-light">
                                 <p>
-                                    <b>{{ globalService.getUserName(suggestion.createdBy) }}</b> suggested {{ suggestion.createdAt | time_diff }} to change the
+                                    <b>{{ get_user_name(suggestion.createdBy) }}</b> suggested {{ suggestion.createdAt | time_diff }} to change the
                                     <b>{{ suggestion.field.value }}</b> to '<b>{{ value }}</b>'
                                 </p>
                             </div>

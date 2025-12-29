@@ -51,7 +51,7 @@
             <div class="column">
                 <div class="box">
                     <h1 class="title is-5">Titles translations</h1>
-                    {% for locale in globalService.languageCodes %}
+                    {% for locale in get_language_codes() %}
                         {{ form_row(form.("name-"~locale)) }}
                     {% endfor %}
                 </div>

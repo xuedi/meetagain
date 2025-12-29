@@ -14,8 +14,8 @@ use App\Form\RegistrationType;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\CaptchaService;
+use App\Service\ConsentService;
 use App\Service\EmailService;
-use App\Service\GlobalService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,7 +37,7 @@ class SecurityController extends AbstractController
         private readonly AuthenticationUtils $authenticationUtils,
         private readonly Security $security,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly GlobalService $globalService,
+        private readonly ConsentService $consentService,
         private readonly UserRepository $userRepo,
         private readonly CaptchaService $captchaService,
     ) {
@@ -100,7 +100,7 @@ class SecurityController extends AbstractController
             $user->setLastLogin(new DateTime());
             $user->setCreatedAt(new DateTimeImmutable());
             $user->setBio(null);
-            $user->setOsmConsent($this->globalService->getShowOsm());
+            $user->setOsmConsent($this->consentService->getShowOsm());
 
             $em->persist($user);
             $em->flush();
