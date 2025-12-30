@@ -43,6 +43,7 @@
     "symfony/framework-bundle": "8.0.*",
     "symfony/http-client": "8.0.*",
     "symfony/intl": "8.0.*",
+    "symfony/lock": "8.0.*",
     "symfony/mailer": "8.0.*",
     "symfony/mime": "8.0.*",
     "symfony/monolog-bundle": "^4",
