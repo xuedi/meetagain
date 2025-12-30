@@ -2,7 +2,6 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\BlockType\BlockType;
 use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
@@ -11,11 +10,11 @@ use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
-use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
 use App\Form\CmsType;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
+use App\Service\CmsBlockService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -25,16 +24,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-//TODO: move lots of logic to service
-
 class AdminCmsController extends AbstractController
 {
-    private const string COUND_NOT_LOAD_BLOCK = 'Could not load block';
-
     public function __construct(
         private readonly CmsRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly CmsBlockRepository $blockRepo,
+        private readonly CmsBlockService $blockService,
     ) {
     }
 
@@ -124,26 +120,15 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
     public function cmsBlockAdd(Request $request, int $id): Response
     {
-        $cmsRepo = $this->em->getRepository(Cms::class);
-        $cmsPage = $cmsRepo->find($id);
+        $cmsPage = $this->repo->find($id);
         if ($cmsPage === null) {
             throw new RuntimeException('Could not find valid page');
         }
 
-        $payload = $request->getPayload()->all();
         $locale = $request->request->get('editLocale');
-        $blockType = (int) $request->request->get('blockType');
-        $blockObject = CmsBlockTypes::buildObject(CmsBlockTypes::from($blockType), $payload);
+        $blockType = CmsBlockTypes::from((int) $request->request->get('blockType'));
 
-        $cmsBlock = new CmsBlock();
-        $cmsBlock->setLanguage($locale);
-        $cmsBlock->setPriority($this->blockRepo->getMaxPriority() + 1);
-        $cmsBlock->setType($blockObject::getType());
-        $cmsBlock->setJson($blockObject->toArray());
-
-        $cmsPage->addBlock($cmsBlock);
-        $this->em->persist($cmsBlock);
-        $this->em->flush();
+        $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $id,
@@ -154,11 +139,11 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
     public function cmsBlockMoveDown(Request $request): Response
     {
-        $pageId = $request->query->get('id');
-        $blockId = $request->query->get('blockId');
+        $pageId = (int) $request->query->get('id');
+        $blockId = (int) $request->query->get('blockId');
         $locale = $request->query->get('locale');
 
-        $this->adjustPriority($pageId, $blockId, $locale, 1.5);
+        $this->blockService->moveBlockDown($pageId, $blockId, $locale);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $pageId,
@@ -169,11 +154,11 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
     public function cmsBlockMoveUp(Request $request): Response
     {
-        $pageId = $request->query->get('id');
-        $blockId = $request->query->get('blockId');
+        $pageId = (int) $request->query->get('id');
+        $blockId = (int) $request->query->get('blockId');
         $locale = $request->query->get('locale');
 
-        $this->adjustPriority($pageId, $blockId, $locale, -1.5);
+        $this->blockService->moveBlockUp($pageId, $blockId, $locale);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $pageId,
@@ -184,17 +169,10 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
     public function cmsBlockSave(Request $request): Response
     {
-        $repo = $this->em->getRepository(CmsBlock::class);
-        $block = $repo->find($request->request->get('blockId'));
-        if ($block !== null) {
-            $payload = $request->getPayload()->all();
-            $type = CmsBlockTypes::from((int) $request->request->get('blockType'));
-            $block->setJson(CmsBlockTypes::buildObject($type, $payload)->toArray());
-            $this->em->persist($block);
-            $this->em->flush();
-        } else {
-            throw new RuntimeException(self::COUND_NOT_LOAD_BLOCK);
-        }
+        $blockId = (int) $request->request->get('blockId');
+        $type = CmsBlockTypes::from((int) $request->request->get('blockType'));
+
+        $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $request->request->get('id'),
@@ -205,50 +183,12 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
     public function cmsBlockDelete(Request $request): Response
     {
-        $repo = $this->em->getRepository(CmsBlock::class);
-        $block = $repo->find($request->query->get('blockId'));
-        if ($block !== null) {
-            $this->em->remove($block);
-            $this->em->flush();
-        } else {
-            throw new RuntimeException(self::COUND_NOT_LOAD_BLOCK);
-        }
+        $this->blockService->deleteBlock((int) $request->query->get('blockId'));
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $request->query->get('id'),
             'locale' => $request->query->get('locale'),
         ]);
-    }
-
-    private function adjustPriority(mixed $pageId, mixed $blockId, mixed $locale, float $value): void
-    {
-        // update half up or down
-        $repo = $this->em->getRepository(CmsBlock::class);
-        $block = $repo->find($blockId);
-        if ($block !== null) {
-            $block->setPriority($block->getPriority() + $value);
-            $this->em->persist($block);
-            $this->em->flush();
-        } else {
-            throw new RuntimeException(self::COUND_NOT_LOAD_BLOCK);
-        }
-
-        // rebuild order
-        $priority = 1;
-        $blocks = $this->em->getRepository(CmsBlock::class)->findBy(
-            [
-                'page' => $pageId,
-                'language' => $locale,
-            ],
-            ['priority' => 'ASC'],
-        );
-
-        foreach ($blocks as $block) {
-            $block->setPriority($priority);
-            $priority++;
-            $this->em->persist($block);
-        }
-        $this->em->flush();
     }
 
     private function getLastEditLocale(null|string $locale, SessionInterface $session): string
