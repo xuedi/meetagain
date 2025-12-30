@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Service;
 use App\Entity\Language;
 use App\Repository\LanguageRepository;
 use App\Service\LanguageService;
+use Exception;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
@@ -34,6 +35,7 @@ class LanguageServiceTest extends TestCase
             ->with('language.enabled_codes')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
+
                 return $callback($item);
             });
 
@@ -51,7 +53,7 @@ class LanguageServiceTest extends TestCase
         $this->appCache->expects($this->once())
             ->method('get')
             ->willThrowException(
-                new class extends \Exception implements InvalidArgumentException {
+                new class extends Exception implements InvalidArgumentException {
                 }
             );
 
@@ -90,7 +92,7 @@ class LanguageServiceTest extends TestCase
     {
         $this->appCache->method('delete')
             ->willThrowException(
-                new class extends \Exception implements InvalidArgumentException {
+                new class extends Exception implements InvalidArgumentException {
                 }
             );
 
@@ -118,8 +120,9 @@ class LanguageServiceTest extends TestCase
         $this->appCache->expects($this->once())
             ->method('get')
             ->with('language.all_languages')
-            ->willReturnCallback(function ($key, $callback) use ($langEn) {
+            ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
+
                 return $callback($item);
             });
 
@@ -137,7 +140,7 @@ class LanguageServiceTest extends TestCase
         $this->appCache->expects($this->once())
             ->method('get')
             ->willThrowException(
-                new class extends \Exception implements InvalidArgumentException {
+                new class extends Exception implements InvalidArgumentException {
                 }
             );
 
