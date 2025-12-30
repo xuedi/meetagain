@@ -160,6 +160,9 @@ class RsvpNotificationServiceTest extends TestCase
 
         $this->eventRepo->method('findUpcomingEventsWithinRange')->willReturn([$event1, $event2]);
 
+        $this->emailService->expects($this->never())
+            ->method('prepareAggregatedRsvpNotification');
+
         $count = $this->service->processUpcomingEvents(5);
         $this->assertEquals(0, $count);
     }
@@ -168,6 +171,9 @@ class RsvpNotificationServiceTest extends TestCase
     {
         $event = $this->createStub(Event::class);
         $event->method('getRsvp')->willReturn(new ArrayCollection([]));
+
+        $this->emailService->expects($this->never())
+            ->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count);

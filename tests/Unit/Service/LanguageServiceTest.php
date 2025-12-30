@@ -5,7 +5,6 @@ namespace App\Tests\Unit\Service;
 use App\Entity\Language;
 use App\Repository\LanguageRepository;
 use App\Service\LanguageService;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
@@ -29,7 +28,7 @@ class LanguageServiceTest extends TestCase
     {
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
         $this->service = new LanguageService($this->languageRepo, $this->appCache);
-        
+
         $this->appCache->expects($this->once())
             ->method('get')
             ->with('language.enabled_codes')
@@ -51,7 +50,10 @@ class LanguageServiceTest extends TestCase
 
         $this->appCache->expects($this->once())
             ->method('get')
-            ->willThrowException(new class extends \Exception implements InvalidArgumentException {});
+            ->willThrowException(
+                new class extends \Exception implements InvalidArgumentException {
+                }
+            );
 
         $this->languageRepo->method('getEnabledCodes')
             ->willReturn(['en']);
@@ -62,7 +64,7 @@ class LanguageServiceTest extends TestCase
     public function testIsValidCode(): void
     {
         $this->appCache->method('get')->willReturn(['en', 'de']);
-        
+
         $this->assertTrue($this->service->isValidCode('en'));
         $this->assertFalse($this->service->isValidCode('fr'));
     }
@@ -74,10 +76,12 @@ class LanguageServiceTest extends TestCase
 
         $this->appCache->expects($this->exactly(2))
             ->method('delete')
-            ->with($this->logicalOr(
-                $this->equalTo('language.enabled_codes'),
-                $this->equalTo('language.all_languages')
-            ));
+            ->with(
+                $this->logicalOr(
+                    $this->equalTo('language.enabled_codes'),
+                    $this->equalTo('language.all_languages')
+                )
+            );
 
         $this->service->invalidateCache();
     }
@@ -85,7 +89,10 @@ class LanguageServiceTest extends TestCase
     public function testInvalidateCacheHandlesException(): void
     {
         $this->appCache->method('delete')
-            ->willThrowException(new class extends \Exception implements InvalidArgumentException {});
+            ->willThrowException(
+                new class extends \Exception implements InvalidArgumentException {
+                }
+            );
 
         $this->service->invalidateCache();
         $this->assertTrue(true); // Should not throw
@@ -96,7 +103,7 @@ class LanguageServiceTest extends TestCase
         $this->appCache->method('get')->willReturn(['en', 'de']);
         $this->assertEquals('en|de', $this->service->getLocaleRegexPattern());
 
-        $this->appCache = $this->createMock(TagAwareCacheInterface::class);
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->service = new LanguageService($this->languageRepo, $this->appCache);
         $this->appCache->method('get')->willReturn([]);
         $this->assertEquals('en', $this->service->getLocaleRegexPattern());
@@ -129,7 +136,10 @@ class LanguageServiceTest extends TestCase
 
         $this->appCache->expects($this->once())
             ->method('get')
-            ->willThrowException(new class extends \Exception implements InvalidArgumentException {});
+            ->willThrowException(
+                new class extends \Exception implements InvalidArgumentException {
+                }
+            );
 
         $this->languageRepo->method('findAllOrdered')
             ->willReturn([]);
