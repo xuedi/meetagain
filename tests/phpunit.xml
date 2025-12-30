@@ -48,6 +48,7 @@
             <directory>../src/Exception</directory>
             <directory>../src/Repository</directory>
             <directory>../src/Entity</directory>
+            <directory>../src/Command</directory>
         </exclude>
     </source>
 </phpunit>
