@@ -180,7 +180,10 @@ readonly class EmailService
                 'template' => '_emails/notification_rsvp_aggregated.html.twig',
                 'context' => [
                     'username' => 'John Doe',
-                    'attendees' => [['name' => 'Denis Matrens'], ['name' => 'Jane Smith']],
+                    'attendees' => [
+                        ['name' => 'Denis Matrens'],
+                        ['name' => 'Jane Smith'],
+                    ],
                     'attendeeNames' => 'Denis Matrens, Jane Smith',
                     'eventLocation' => 'NightBar 64',
                     'eventDate' => '2025-01-01',

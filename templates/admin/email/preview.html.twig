@@ -26,7 +26,7 @@
                         {% for key, value in context %}
                             <tr>
                                 <th>{{ key }}</th>
-                                <td>{{ value }}</td>
+                                <td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </table>
