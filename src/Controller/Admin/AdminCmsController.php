@@ -11,6 +11,7 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
+use App\Entity\User;
 use App\Form\CmsType;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
@@ -53,7 +54,7 @@ class AdminCmsController extends AbstractController
         name: 'app_admin_cms_edit',
         methods: ['GET', 'POST'],
     )]
-    public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, null|int $blockId = null): Response
+    public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, ?int $blockId = null): Response
     {
         $locale = $this->getLastEditLocale($locale, $request->getSession());
 
@@ -102,10 +103,13 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/add', name: 'app_admin_cms_add', methods: ['POST'])]
     public function cmsAdd(Request $request): Response
     {
+        $user = $this->getUser();
+        assert($user instanceof User);
+
         $newPage = new Cms();
         $newPage->setSlug($request->request->all('cms')['slug']);
         $newPage->setPublished(false);
-        $newPage->setCreatedBy($this->getUser());
+        $newPage->setCreatedBy($user);
         $newPage->setCreatedAt(new DateTimeImmutable());
 
         $this->em->persist($newPage);
@@ -191,15 +195,13 @@ class AdminCmsController extends AbstractController
         ]);
     }
 
-    private function getLastEditLocale(null|string $locale, SessionInterface $session): string
+    private function getLastEditLocale(?string $locale, SessionInterface $session): string
     {
         $lastEditLocaleKey = 'lastEditLocale';
         if ($locale === null) {
             $locale = $session->get($lastEditLocaleKey, 'en');
         }
         $session->set($lastEditLocaleKey, $locale);
-
-        ;
 
         return $locale;
     }

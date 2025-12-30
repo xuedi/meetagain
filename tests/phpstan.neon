@@ -1,8 +1,32 @@
 parameters:
-    level: 2
+    level: 5
     paths:
         - ../bin/
         - ../config/
         - ../public/
         - ../src/
         - ../tests/
+    ignoreErrors:
+        # Entity IDs are assigned by Doctrine, not in PHP code
+        - identifier: property.unusedType
+          path: ../src/Entity/*
+
+        # Installer runs standalone outside Symfony, different context
+        - identifier: classConstant.unused
+          path: ../public/install/*
+        - identifier: match.alwaysTrue
+          path: ../public/install/*
+
+        # Test assertions are intentional even when PHPStan knows the type
+        - identifier: method.alreadyNarrowedType
+          path: ../tests/*
+
+        # AdminController version check is intentional for documentation
+        - identifier: greaterOrEqual.alwaysTrue
+          path: ../src/Controller/AdminController.php
+        - identifier: identical.alwaysFalse
+          path: ../src/Controller/AdminController.php
+
+        # Nullsafe with ?? is intentional for readability
+        - identifier: nullsafe.neverNull
+          path: ../src/Controller/Admin/AdminMenuController.php

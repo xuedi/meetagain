@@ -16,6 +16,7 @@ readonly class ImageHtmlRenderer
     public function renderThumbnail(int $id, string $size = '50x50'): string
     {
         $image = $this->imageRepo->findOneBy(['id' => $id]);
+
         return $this->twig->render('_block/image.html.twig', [
             'image' => $image,
             'size' => $size,

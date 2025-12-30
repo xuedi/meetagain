@@ -113,8 +113,8 @@ class MembersPageTest extends WebTestCase
         $client->request('GET', '/en/members/rotate-avatar/2');
         // Either access denied (403) or redirect to access denied page
         $this->assertTrue(
-            $client->getResponse()->getStatusCode() === 403 ||
-            $client->getResponse()->isRedirect(),
+            $client->getResponse()->getStatusCode() === 403
+            || $client->getResponse()->isRedirect(),
             'Manager action should be denied for regular users'
         );
     }

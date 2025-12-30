@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Image;
 use App\Entity\ImageReported;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,7 +17,7 @@ class ReportImageType extends AbstractType
     {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('reported', ChoiceType::class, [
@@ -25,7 +26,7 @@ class ReportImageType extends AbstractType
         ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

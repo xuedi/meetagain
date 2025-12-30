@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Cms;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -12,11 +13,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CmsType extends AbstractType
 {
-    public function __construct(readonly TranslatorInterface $translator)
+    public function __construct(public readonly TranslatorInterface $translator)
     {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('slug', TextType::class, [
@@ -30,7 +31,7 @@ class CmsType extends AbstractType
         ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

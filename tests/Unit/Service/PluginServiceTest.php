@@ -54,7 +54,7 @@ class PluginServiceTest extends TestCase
         ]));
 
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('getRealPath')->willReturnCallback(fn($path) => match ($path) {
+        $fsMock->method('getRealPath')->willReturnCallback(fn ($path) => match ($path) {
             $this->tempDir . '/plugins' => $pluginDir,
             $this->tempDir . '/config' => $this->tempDir . '/config',
             default => false,
@@ -64,9 +64,9 @@ class PluginServiceTest extends TestCase
             ->method('glob')
             ->with($pluginDir . '/*', GLOB_ONLYDIR)
             ->willReturn([$pluginDir . '/plugin1', $pluginDir . '/plugin2']);
-        $fsMock->method('exists')->willReturnCallback(fn($path) => is_dir($path) || file_exists($path));
-        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
-        $fsMock->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
+        $fsMock->method('exists')->willReturnCallback(fn ($path) => is_dir($path) || file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(fn ($path) => file_exists($path));
+        $fsMock->method('getFileContents')->willReturnCallback(fn ($path) => file_get_contents($path));
 
         $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir);
 
@@ -121,6 +121,7 @@ class PluginServiceTest extends TestCase
         $fsStub->method('fileExists')->willReturn(true);
         $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
             file_put_contents($this->configFile, $content);
+
             return true;
         });
 
@@ -164,6 +165,7 @@ class PluginServiceTest extends TestCase
         $fsStub->method('fileExists')->willReturn(true);
         $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
             file_put_contents($this->configFile, $content);
+
             return true;
         });
 
@@ -207,6 +209,7 @@ class PluginServiceTest extends TestCase
         $fsStub->method('fileExists')->willReturn(true);
         $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
             file_put_contents($this->configFile, $content);
+
             return true;
         });
 
@@ -268,6 +271,7 @@ class PluginServiceTest extends TestCase
         $fsStub->method('fileExists')->willReturn(true);
         $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
             file_put_contents($this->configFile, $content);
+
             return true;
         });
 

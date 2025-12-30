@@ -24,7 +24,7 @@ readonly class TranslationFileManager
         $finder->files()->in($path)->depth(0)->name(['*.php']);
         foreach ($finder as $file) {
             $this->fs->remove($file->getPathname());
-            $cleanedUp++;
+            ++$cleanedUp;
         }
 
         return $cleanedUp;
@@ -48,6 +48,7 @@ readonly class TranslationFileManager
         if (!$this->fs->exists($path)) {
             return [];
         }
+
         return $finder->files()->in($path)->depth(0)->name(['messages*.php']);
     }
 

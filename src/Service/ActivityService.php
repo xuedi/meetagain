@@ -39,8 +39,8 @@ readonly class ActivityService
             $this->em->flush();
         } catch (Throwable $exception) {
             // TODO: check why this error still persist on uploading images to events
-            $this->logger->error("Could not log Activity", [
-                'error' => $exception->getMessage()
+            $this->logger->error('Could not log Activity', [
+                'error' => $exception->getMessage(),
             ]);
         }
     }
@@ -55,7 +55,7 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->findBy([], ['createdAt' => 'DESC'], 250));
     }
 
-    private function prepareActivityList(array $list, null|bool $asHtml = false): array
+    private function prepareActivityList(array $list, ?bool $asHtml = false): array
     {
         $preparedList = [];
         foreach ($list as $activity) {

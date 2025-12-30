@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Service\DashboardActionService;
 use App\Service\DashboardStatsService;
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\DependencyFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Throwable;
 
 class AdminController extends AbstractController
 {
@@ -25,9 +27,9 @@ class AdminController extends AbstractController
     }
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
-    public function index(null|int $year = null, null|int $week = null): Response
+    public function index(?int $year = null, ?int $week = null): Response
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $year ??= (int) $now->format('Y');
         $week ??= (int) $now->format('W');
         $dates = $this->dashboardStats->calculateDates($year, $week);
@@ -68,12 +70,12 @@ class AdminController extends AbstractController
             $expected = sprintf('test_%d', random_int(0, 100));
             $cacheKey = 'app_admin_health_test';
             $this->appCache->delete($cacheKey);
-            $this->appCache->get($cacheKey, fn() => $expected);
-            $actual = $this->appCache->get($cacheKey, fn() => 'failed');
+            $this->appCache->get($cacheKey, fn () => $expected);
+            $actual = $this->appCache->get($cacheKey, fn () => 'failed');
             $this->appCache->delete($cacheKey);
 
             return ['ok' => $expected === $actual];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return ['ok' => false, 'error' => $e->getMessage()];
         }
     }
@@ -82,8 +84,9 @@ class AdminController extends AbstractController
     {
         try {
             $result = $this->connection->executeQuery('SELECT 1')->fetchOne();
+
             return ['ok' => $result === 1];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return ['ok' => false, 'error' => $e->getMessage()];
         }
     }
@@ -106,6 +109,7 @@ class AdminController extends AbstractController
         }
 
         $size = filesize($logFile);
+
         return [
             'ok' => $size < $maxSize,
             'size' => $size,
@@ -123,7 +127,7 @@ class AdminController extends AbstractController
                 'ok' => count($newMigrations) === 0,
                 'pending' => count($newMigrations),
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return ['ok' => false, 'error' => $e->getMessage()];
         }
     }

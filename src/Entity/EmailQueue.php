@@ -2,53 +2,52 @@
 
 namespace App\Entity;
 
-use App\Repository\EmailQueueRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: EmailQueueRepository::class)]
+#[ORM\Entity]
 class EmailQueue
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private null|DateTime $sendAt = null;
+    private ?DateTime $sendAt = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $subject = null;
+    private ?string $subject = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $sender = null;
+    private ?string $sender = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $recipient = null;
+    private ?string $recipient = null;
 
     #[ORM\Column(length: 2)]
-    private null|string $lang = null;
+    private ?string $lang = null;
 
     #[ORM\Column]
     private array $context = [];
 
     #[ORM\Column(length: 255, nullable: true)]
-    private null|string $template = null;
+    private ?string $template = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private null|string $renderedBody = null;
+    private ?string $renderedBody = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -60,19 +59,19 @@ class EmailQueue
         return $this;
     }
 
-    public function getSendAt(): null|DateTime
+    public function getSendAt(): ?DateTime
     {
         return $this->sendAt;
     }
 
-    public function setSendAt(null|DateTime $sendAt): static
+    public function setSendAt(?DateTime $sendAt): static
     {
         $this->sendAt = $sendAt;
 
         return $this;
     }
 
-    public function getSubject(): null|string
+    public function getSubject(): ?string
     {
         return $this->subject;
     }
@@ -84,7 +83,7 @@ class EmailQueue
         return $this;
     }
 
-    public function getSender(): null|string
+    public function getSender(): ?string
     {
         return $this->sender;
     }
@@ -96,7 +95,7 @@ class EmailQueue
         return $this;
     }
 
-    public function getRecipient(): null|string
+    public function getRecipient(): ?string
     {
         return $this->recipient;
     }
@@ -108,7 +107,7 @@ class EmailQueue
         return $this;
     }
 
-    public function getLang(): null|string
+    public function getLang(): ?string
     {
         return $this->lang;
     }
@@ -132,24 +131,24 @@ class EmailQueue
         return $this;
     }
 
-    public function getTemplate(): null|string
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
 
-    public function setTemplate(null|string $template): static
+    public function setTemplate(?string $template): static
     {
         $this->template = $template;
 
         return $this;
     }
 
-    public function getRenderedBody(): null|string
+    public function getRenderedBody(): ?string
     {
         return $this->renderedBody;
     }
 
-    public function setRenderedBody(null|string $renderedBody): static
+    public function setRenderedBody(?string $renderedBody): static
     {
         $this->renderedBody = $renderedBody;
 

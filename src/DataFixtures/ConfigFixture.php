@@ -43,42 +43,42 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
             [
                 'automatic_registration',
                 'false',
-                ConfigType::Boolean
+                ConfigType::Boolean,
             ],
             [
                 'show_frontpage',
                 'false',
-                ConfigType::Boolean
+                ConfigType::Boolean,
             ],
             [
                 'email_sender_mail',
                 'email@localhost',
-                ConfigType::String
+                ConfigType::String,
             ],
             [
                 'email_sender_name',
                 'localhost',
-                ConfigType::String
+                ConfigType::String,
             ],
             [
                 'website_url',
                 'localhost',
-                ConfigType::String
+                ConfigType::String,
             ],
             [
                 'website_host',
                 'https://localhost',
-                ConfigType::String
+                ConfigType::String,
             ],
             [
                 'system_user_id',
-                (string)$this->getRefUser(SystemUserFixture::IMPORT)->getId(),
-                ConfigType::Integer
+                (string) $this->getRefUser(SystemUserFixture::IMPORT)->getId(),
+                ConfigType::Integer,
             ],
             [
                 'date_format',
                 'Y-m-d H:i',
-                ConfigType::String
+                ConfigType::String,
             ],
             // Theme colors (with WCAG AA compliant defaults for grey text)
             ['color_primary', '#00d1b2', ConfigType::String],

@@ -42,7 +42,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 $manager->persist($block);
             }
 
-            $priority++;
+            ++$priority;
         }
         $manager->flush();
         $this->stop();
@@ -64,9 +64,9 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 LanguageFixture::ENGLISH,
                 CmsBlockTypes::Headline,
                 [
-                    'title' => 'Imprint'
+                    'title' => 'Imprint',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::IMPRINT,
@@ -74,9 +74,9 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 CmsBlockTypes::Text,
                 [
                     'title' => '1. Paragraph',
-                    'content' => 'Some text p1'
+                    'content' => 'Some text p1',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::IMPRINT,
@@ -84,18 +84,18 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 CmsBlockTypes::Text,
                 [
                     'title' => '2. Paragraph',
-                    'content' => 'Some text p2'
+                    'content' => 'Some text p2',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::GERMAN,
                 CmsBlockTypes::Headline,
                 [
-                    'title' => 'Impressum'
+                    'title' => 'Impressum',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::IMPRINT,
@@ -103,18 +103,18 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 CmsBlockTypes::Text,
                 [
                     'title' => '1. Paragraf',
-                    'content' => 'Etwas text p1'
+                    'content' => 'Etwas text p1',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::CHINESE,
                 CmsBlockTypes::Headline,
                 [
-                    'title' => '版本说明'
+                    'title' => '版本说明',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::IMPRINT,
@@ -122,63 +122,63 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 CmsBlockTypes::Text,
                 [
                     'title' => '第 1 段',
-                    'content' => '第一段的一些文字'
+                    'content' => '第一段的一些文字',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::ENGLISH,
                 CmsBlockTypes::Headline,
                 [
-                    'title' => 'About'
+                    'title' => 'About',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::ENGLISH,
                 CmsBlockTypes::Text,
                 [
-                    'content' => $this->getText('about_en')
+                    'content' => $this->getText('about_en'),
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::GERMAN,
                 CmsBlockTypes::Headline,
                 [
-                    'title' => 'Über Uns'
+                    'title' => 'Über Uns',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::GERMAN,
                 CmsBlockTypes::Text,
                 [
-                    'content' => $this->getText('about_de')
+                    'content' => $this->getText('about_de'),
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::CHINESE,
                 CmsBlockTypes::Headline,
                 [
-                    'title' => '关于我们'
+                    'title' => '关于我们',
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::CHINESE,
                 CmsBlockTypes::Text,
                 [
-                    'content' => $this->getText('about_cn')
+                    'content' => $this->getText('about_cn'),
                 ],
-                null
+                null,
             ],
             [
                 CmsFixture::INDEX,

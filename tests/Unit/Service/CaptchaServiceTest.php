@@ -22,10 +22,10 @@ class CaptchaServiceTest extends TestCase
     {
         $this->sessionMock = $this->createStub(SessionInterface::class);
         $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
-        
+
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        
+
         $this->subject = new CaptchaService($this->requestStackMock);
     }
 
@@ -48,10 +48,10 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
         $this->sessionMock->method('get')->willReturn(null);
-        
+
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        
+
         $this->subject = new CaptchaService($this->requestStackMock);
 
         // Assert: verify session stores refresh timestamps, captcha text, and image

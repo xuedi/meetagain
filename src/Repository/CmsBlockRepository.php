@@ -32,7 +32,7 @@ class CmsBlockRepository extends ServiceEntityRepository
     public function getBlocks(int $pageId, string $locale)
     {
         return $this->createQueryBuilder('cb')
-            ->select('cb') //
+            ->select('cb')
             ->where('cb.page = :pageId')
             ->andWhere('cb.language = :locale')
             ->setParameter('pageId', $pageId)

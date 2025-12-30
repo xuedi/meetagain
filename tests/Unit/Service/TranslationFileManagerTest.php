@@ -43,7 +43,7 @@ class TranslationFileManagerTest extends TestCase
         $this->subject = new TranslationFileManager($this->fs, $this->projectDir);
         $this->fs->method('exists')->willReturn(true);
         $this->fs->expects($this->once())->method('exists')->with($this->projectDir . '/translations/');
-        
+
         $this->subject->cleanUpTranslationFiles();
     }
 
@@ -53,7 +53,7 @@ class TranslationFileManagerTest extends TestCase
         $this->subject = new TranslationFileManager($this->fs, $this->projectDir);
         $this->fs->method('exists')->willReturn(true);
         $this->fs->expects($this->once())->method('dumpFile');
-        
+
         $this->subject->writeTranslationFile('de', ['key' => 'value']);
     }
 
@@ -61,7 +61,7 @@ class TranslationFileManagerTest extends TestCase
     {
         $this->fs->method('exists')->willReturn(false);
         $result = $this->subject->getTranslationFiles();
-        
+
         $this->assertSame([], $result);
     }
 }

@@ -10,7 +10,6 @@ use App\Repository\UserRepository;
 use App\Service\CleanupService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CleanupServiceTest extends TestCase

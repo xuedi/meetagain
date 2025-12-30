@@ -93,7 +93,7 @@ readonly class CmsBlockService
         $priority = 1;
         foreach ($blocks as $block) {
             $block->setPriority($priority);
-            $priority++;
+            ++$priority;
             $this->em->persist($block);
         }
         $this->em->flush();

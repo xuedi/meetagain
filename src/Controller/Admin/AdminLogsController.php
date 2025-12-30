@@ -11,9 +11,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminLogsController extends AbstractController
 {
-    public function __construct(private readonly \App\Service\ActivityService $activityService, private readonly \App\Repository\NotFoundLogRepository $foundLogRepo)
+    public function __construct(private readonly ActivityService $activityService, private readonly NotFoundLogRepository $foundLogRepo)
     {
     }
+
     #[Route('/admin/logs/activity', name: 'app_admin_logs_activity')]
     public function activityList(): Response
     {

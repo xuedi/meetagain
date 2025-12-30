@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * System Requirements Checker
+ * System Requirements Checker.
  *
  * Validates that the system meets MeetAgain's requirements:
  * - PHP version
@@ -12,7 +12,7 @@
 class SystemRequirements
 {
     /**
-     * Check system requirements for MeetAgain installation
+     * Check system requirements for MeetAgain installation.
      *
      * @return array<string, array{name: string, passed: bool, current: string, tag_class: string, optional?: bool}>
      */
@@ -73,10 +73,9 @@ class SystemRequirements
     }
 
     /**
-     * Check if all non-optional requirements pass
+     * Check if all non-optional requirements pass.
      *
      * @param array<string, array{name: string, passed: bool, current: string, optional?: bool}> $requirements
-     * @return bool
      */
     public function allRequirementsPassed(array $requirements): bool
     {
@@ -85,6 +84,7 @@ class SystemRequirements
                 return false;
             }
         }
+
         return true;
     }
 }

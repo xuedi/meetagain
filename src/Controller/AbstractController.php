@@ -14,9 +14,7 @@ abstract class AbstractController extends AbstractSymfonyController
     {
         $user = $this->getUser();
         if (!($user instanceof User)) {
-            throw new AuthenticationCredentialsNotFoundException(
-                'Should never happen, see: config/packages/security.yaml',
-            );
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
         }
 
         return $user;
@@ -33,6 +31,7 @@ abstract class AbstractController extends AbstractSymfonyController
             (new Link(href: '/javascript/custom.js'))->withAttribute('as', 'script'),
             (new Link(href: '/fonts/fa-solid-900.woff2'))->withAttribute('as', 'font'),
         ];
+
         return $this->sendEarlyHints($links);
     }
 }

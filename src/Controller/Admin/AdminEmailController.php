@@ -39,6 +39,7 @@ class AdminEmailController extends AbstractController
 
     /**
      * @param EmailTemplate[] $templates
+     *
      * @return array<string, EmailTemplate>
      */
     private function buildTemplatesByMockKey(array $templates): array

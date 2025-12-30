@@ -2,40 +2,39 @@
 
 namespace App\Entity;
 
-use App\Repository\EmailTemplateRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: EmailTemplateRepository::class)]
+#[ORM\Entity]
 class EmailTemplate
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 64, unique: true)]
-    private null|string $identifier = null;
+    private ?string $identifier = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $subject = null;
+    private ?string $subject = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private null|string $body = null;
+    private ?string $body = null;
 
     #[ORM\Column(type: Types::JSON)]
     private array $availableVariables = [];
 
     #[ORM\Column]
-    private null|DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getIdentifier(): null|string
+    public function getIdentifier(): ?string
     {
         return $this->identifier;
     }
@@ -47,7 +46,7 @@ class EmailTemplate
         return $this;
     }
 
-    public function getSubject(): null|string
+    public function getSubject(): ?string
     {
         return $this->subject;
     }
@@ -59,7 +58,7 @@ class EmailTemplate
         return $this;
     }
 
-    public function getBody(): null|string
+    public function getBody(): ?string
     {
         return $this->body;
     }
@@ -83,7 +82,7 @@ class EmailTemplate
         return $this;
     }
 
-    public function getUpdatedAt(): null|DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }

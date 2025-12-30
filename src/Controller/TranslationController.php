@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class TranslationController extends AbstractController
 {
     public const string ROUTE_MANAGE = 'app_translation';
+
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly TranslationRepository $translationRepo,
@@ -25,6 +26,7 @@ class TranslationController extends AbstractController
         private readonly TranslationSuggestionRepository $translationSuggestionRepo,
     ) {
     }
+
     #[Route('/translation', name: self::ROUTE_MANAGE)]
     public function index(): Response
     {
@@ -32,6 +34,7 @@ class TranslationController extends AbstractController
             'translationMatrix' => $this->translationService->getMatrix(),
         ]);
     }
+
     #[Route('/translation/edit/{id}/{lang}', name: 'app_translation_edit')]
     public function edit(Request $request, int $id, string $lang): Response
     {
@@ -78,6 +81,7 @@ class TranslationController extends AbstractController
             'item' => $translation,
         ]);
     }
+
     #[Route('/translation/suggestion/deny/{id}', name: 'app_translation_suggestion_deny')]
     public function suggestionDeny(int $id): Response
     {
@@ -94,6 +98,7 @@ class TranslationController extends AbstractController
             'lang' => $suggestion->getLanguage(),
         ]);
     }
+
     #[Route('/translation/suggestion/approve/{id}', name: 'app_translation_suggestion_approve')]
     public function suggestionApprove(int $id): Response
     {
@@ -117,6 +122,7 @@ class TranslationController extends AbstractController
             'lang' => $suggestion->getLanguage(),
         ]);
     }
+
     private function addTranslationSuggestion(Translation $translation, string $lang, string $before): void
     {
         $suggestion = new TranslationSuggestion();
@@ -131,6 +137,7 @@ class TranslationController extends AbstractController
         $this->em->persist($suggestion);
         $this->em->flush();
     }
+
     private function getSuggestion(int $id): TranslationSuggestion
     {
         if (!$this->getAuthedUser()->hasRole('ROLE_MANAGER')) {

@@ -2,12 +2,13 @@
 
 namespace App\Twig;
 
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 final class FormatBytesExtension extends AbstractExtension
 {
-    #[\Override]
+    #[Override]
     public function getFilters(): array
     {
         return [

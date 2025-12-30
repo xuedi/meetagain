@@ -73,7 +73,7 @@ class EventController extends AbstractController
     public function details(
         EntityManagerInterface $em,
         Request $request,
-        null|int $id = null,
+        ?int $id = null,
     ): Response {
         $response = $this->getResponse();
         $form = $this->createForm(CommentType::class);
@@ -95,6 +95,7 @@ class EventController extends AbstractController
         }
 
         $event = $this->repo->findOneBy(['id' => $id]);
+
         return $this->render(
             'events/details.html.twig',
             [
@@ -164,6 +165,7 @@ class EventController extends AbstractController
     public function featured(): Response
     {
         $response = $this->getResponse();
+
         return $this->render(
             'events/featured.html.twig',
             [
@@ -179,10 +181,12 @@ class EventController extends AbstractController
     {
         if ($event->isCanceled()) {
             $this->addFlash('error', 'You cannot RSVP to a canceled event.');
+
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
         if ($event->getStart() < new DateTimeImmutable()) {
             $this->addFlash('error', 'You cannot RSVP to an event that has already happened.');
+
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
         $user = $this->getAuthedUser();
@@ -197,7 +201,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/{event}/deleteComment/{id}', name: 'app_event_delete_comment', requirements: ['id' => '\d+'])]
-    public function deleteComment(Event $event, EntityManagerInterface $em, null|int $id = null): Response
+    public function deleteComment(Event $event, EntityManagerInterface $em, ?int $id = null): Response
     {
         $commentRepo = $em->getRepository(Comment::class);
         $comment = $commentRepo->findOneBy(['id' => $id, 'user' => $this->getAuthedUser()]);

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * MailHog Mail Provider
+ * MailHog Mail Provider.
  *
  * Local email testing tool for development.
  * Captures all emails and makes them viewable via web interface.

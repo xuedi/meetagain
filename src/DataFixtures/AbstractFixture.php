@@ -15,24 +15,19 @@ use Throwable;
 
 /**
  * A bit of black magic to make fixtures more readable.
- * Also, method definitions for magic calls for phpStan
+ * Also, method definitions for magic calls for phpStan.
  *
- * @method User getRefUser(string $name)
- * @method void addRefUser(string $name, User $entity)
- *
- * @method Host getRefHost(string $name)
- * @method void addRefHost(string $name, Host $entity)
- *
+ * @method User     getRefUser(string $name)
+ * @method void     addRefUser(string $name, User $entity)
+ * @method Host     getRefHost(string $name)
+ * @method void     addRefHost(string $name, Host $entity)
  * @method Location getRefLocation(string $name)
- * @method void addRefLocation(string $name, Location $entity)
- *
- * @method Cms getRefCms(string $name)
- * @method void addRefCms(string $name, Cms $entity)
- *
- * @method Event getRefEvent(string $name)
- * @method void addRefEvent(string $name, Event $entity)
+ * @method void     addRefLocation(string $name, Location $entity)
+ * @method Cms      getRefCms(string $name)
+ * @method void     addRefCms(string $name, Cms $entity)
+ * @method Event    getRefEvent(string $name)
+ * @method void     addRefEvent(string $name, Event $entity)
  */
-
 abstract class AbstractFixture extends Fixture
 {
     protected ?Filesystem $fs = null;
@@ -44,26 +39,22 @@ abstract class AbstractFixture extends Fixture
         }
 
         $entityName = substr((string) $methodName, 6);
-        $entityClass = sprintf("App\\Entity\\%s", $entityName);
+        $entityClass = sprintf('App\\Entity\\%s', $entityName);
         if (!class_exists($entityClass)) {
             throw new RuntimeException('Class ' . $entityClass . ' does not exist!');
         }
 
-        $key = sprintf('%s::%s', $entityName . 'Fixture', md5((string)($params[0] ?? '')));
+        $key = sprintf('%s::%s', $entityName . 'Fixture', md5((string) ($params[0] ?? '')));
         switch (substr((string) $methodName, 0, 6)) {
             case 'getRef':
                 try {
                     return $this->getReference($key, $entityClass);
                 } catch (Throwable $exception) {
-                    throw new RuntimeException(sprintf(
-                        "Error retrieving reference '%s::%s' [%s]",
-                        $entityName,
-                        $params[0],
-                        $exception->getMessage()
-                    ), $exception->getCode(), $exception);
+                    throw new RuntimeException(sprintf("Error retrieving reference '%s::%s' [%s]", $entityName, $params[0], $exception->getMessage()), $exception->getCode(), $exception);
                 }
             case 'addRef':
                 $this->addReference($key, $params[1]);
+
                 return null;
         }
 
@@ -72,7 +63,7 @@ abstract class AbstractFixture extends Fixture
 
     protected function getText(string $fileName): string
     {
-        if (!$this->fs instanceof \Symfony\Component\Filesystem\Filesystem) {
+        if (!$this->fs instanceof Filesystem) {
             $this->fs = new Filesystem();
         }
         $file = sprintf('%s/%s/%s.txt', __DIR__, $this->getClassName(), $fileName);
@@ -94,7 +85,7 @@ abstract class AbstractFixture extends Fixture
     {
         echo ' OK' . PHP_EOL;
     }
-    
+
     private function getClassName(): string
     {
         $chunks = explode('\\', static::class);

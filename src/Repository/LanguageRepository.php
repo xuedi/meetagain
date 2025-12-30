@@ -41,7 +41,7 @@ class LanguageRepository extends ServiceEntityRepository
         return $this->findBy([], ['sortOrder' => 'ASC']);
     }
 
-    public function findByCode(string $code): null|Language
+    public function findByCode(string $code): ?Language
     {
         return $this->findOneBy(['code' => $code]);
     }

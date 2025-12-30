@@ -10,6 +10,7 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class EmailTemplateServiceTest extends TestCase
 {
@@ -101,7 +102,7 @@ class EmailTemplateServiceTest extends TestCase
         // Arrange
         $content = 'Object: {{obj}}, Array: {{arr}}';
         $context = [
-            'obj' => new \stdClass(),
+            'obj' => new stdClass(),
             'arr' => ['a', 'b'],
         ];
 

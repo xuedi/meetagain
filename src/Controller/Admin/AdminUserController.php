@@ -15,9 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminUserController extends AbstractController
 {
-    public function __construct(private readonly \App\Repository\UserRepository $repo, private readonly \App\Service\EmailService $emailService)
+    public function __construct(private readonly UserRepository $repo, private readonly EmailService $emailService)
     {
     }
+
     #[Route('/admin/user/', name: 'app_admin_user')]
     public function userList(): Response
     {

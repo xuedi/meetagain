@@ -4,13 +4,14 @@ namespace App\EventSubscriber;
 
 use App\Controller\SecurityController;
 use App\Entity\Session\Consent;
+use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 readonly class KernelRequestSubscriber implements EventSubscriberInterface
 {
-    #[\Override]
+    #[Override]
     public static function getSubscribedEvents(): array
     {
         return [

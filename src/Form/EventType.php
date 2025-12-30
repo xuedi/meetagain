@@ -4,16 +4,14 @@ namespace App\Form;
 
 use App\Entity\Event;
 use App\Entity\EventIntervals;
-use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
 use App\Entity\Host;
 use App\Entity\Location;
 use App\Repository\EventTranslationRepository;
 use App\Service\TranslationService;
-use Doctrine\ORM\EntityRepository;
+use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -35,7 +33,7 @@ class EventType extends AbstractType
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $event = $options['data'] ?? null;
@@ -139,7 +137,7 @@ class EventType extends AbstractType
         }
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

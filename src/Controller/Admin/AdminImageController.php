@@ -9,9 +9,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminImageController extends AbstractController
 {
-    public function __construct(private readonly \App\Repository\ImageRepository $repo)
+    public function __construct(private readonly ImageRepository $repo)
     {
     }
+
     #[Route('/admin/image/', name: 'app_admin_image')]
     public function imageList(): Response
     {

@@ -2,50 +2,49 @@
 
 namespace App\Entity;
 
-use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ActivityRepository::class)]
+#[ORM\Entity]
 class Activity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
-    private null|User $user = null;
+    private ?User $user = null;
 
-    private null|string $message = null;
+    private ?string $message = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(enumType: ActivityType::class)]
-    private null|ActivityType $type = null;
+    private ?ActivityType $type = null;
 
     #[ORM\Column(nullable: true)]
-    private null|array $Meta = null; // TODO: do lower case
+    private ?array $Meta = null; // TODO: do lower case
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUser(): null|User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(null|User $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getMessage(): null|string
+    public function getMessage(): ?string
     {
         return $this->message;
     }
@@ -57,7 +56,7 @@ class Activity
         return $this;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -69,7 +68,7 @@ class Activity
         return $this;
     }
 
-    public function getType(): null|ActivityType
+    public function getType(): ?ActivityType
     {
         return $this->type;
     }
@@ -81,12 +80,12 @@ class Activity
         return $this;
     }
 
-    public function getMeta(): null|array
+    public function getMeta(): ?array
     {
         return $this->Meta;
     }
 
-    public function setMeta(null|array $Meta): static
+    public function setMeta(?array $Meta): static
     {
         $this->Meta = $Meta;
 

@@ -2,13 +2,10 @@
 
 namespace App\Service;
 
-use App\Entity\Translation;
 use App\Repository\TranslationRepository;
-use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 readonly class TranslationService
 {
@@ -60,7 +57,7 @@ readonly class TranslationService
             $entities = $this->translationRepo->findBy(['language' => $locale]);
             foreach ($entities as $translation) {
                 $translations[strtolower($translation->getPlaceholder())] = $translation->getTranslation() ?? '';
-                $published++;
+                ++$published;
             }
             $this->fileManager->writeTranslationFile($locale, $translations);
         }
@@ -108,6 +105,7 @@ readonly class TranslationService
         $chunks = explode('/', $trimmedLink);
         if (in_array($chunks[0], $languages, true)) {
             $chunks[0] = $newCode;
+
             return sprintf('/%s', implode('/', $chunks));
         }
 

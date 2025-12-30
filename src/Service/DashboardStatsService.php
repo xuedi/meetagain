@@ -25,6 +25,7 @@ readonly class DashboardStatsService
     public function getTimeControl(int $year, int $week): array
     {
         $dates = $this->calculateDates($year, $week);
+
         return [
             'week' => $week,
             'year' => $year,
@@ -41,6 +42,7 @@ readonly class DashboardStatsService
     public function getDetails(int $year, int $week): array
     {
         $dates = $this->calculateDates($year, $week);
+
         return [
             '404pages' => [
                 'count' => $this->notFoundRepo->count(),
@@ -68,12 +70,13 @@ readonly class DashboardStatsService
     public function getPagesNotFound(int $year, int $week): array
     {
         $dates = $this->calculateDates($year, $week);
+
         return [
             'list' => $this->notFoundRepo->getWeekSummary($dates['start'], $dates['stop']),
         ];
     }
 
-    public function calculateDates(null|int $year, null|int $week): array
+    public function calculateDates(?int $year, ?int $week): array
     {
         $now = new DateTime();
         $year ??= (int) $now->format('Y');
@@ -88,7 +91,7 @@ readonly class DashboardStatsService
         ];
     }
 
-    private function timeCrit(array $dates, null|string $column = 'createdAt'): Criteria
+    private function timeCrit(array $dates, ?string $column = 'createdAt'): Criteria
     {
         $start = $dates['start'];
         $stop = $dates['stop'];
@@ -102,6 +105,7 @@ readonly class DashboardStatsService
         $criteria = new Criteria();
         $criteria->where(Criteria::expr()->gte($column, $start));
         $criteria->andWhere(Criteria::expr()->lte($column, $stop));
+
         return $criteria;
     }
 }

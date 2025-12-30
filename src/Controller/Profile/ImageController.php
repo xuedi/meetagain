@@ -17,7 +17,7 @@ class ImageController extends AbstractController
     #[Route('/profile/images/{action}/{id}/{imageId}', name: 'app_profile_images', requirements: [
         'action' => 'profile|event',
     ])]
-    public function images($action = 'profile', null|int $id = null, null|int $imageId = null): Response
+    public function images($action = 'profile', ?int $id = null, ?int $imageId = null): Response
     {
         $image = null;
         $imageList = null;

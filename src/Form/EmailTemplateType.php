@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\EmailTemplate;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailTemplateType extends AbstractType
 {
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -24,7 +25,7 @@ class EmailTemplateType extends AbstractType
             ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

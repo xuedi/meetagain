@@ -4,6 +4,7 @@ namespace App\Entity\BlockType;
 
 use App\Entity\CmsBlockTypes;
 use App\Entity\Image as ImageEntity;
+use Override;
 
 class Hero implements BlockType
 {
@@ -14,12 +15,12 @@ class Hero implements BlockType
         public string $buttonLink,
         public string $buttonText,
         public string $color,
-        public null|ImageEntity $image,
+        public ?ImageEntity $image,
     ) {
     }
 
-    #[\Override]
-    public static function fromJson(array $json, null|ImageEntity $image = null): self
+    #[Override]
+    public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
         return new self(
             $json['headline'],
@@ -32,13 +33,13 @@ class Hero implements BlockType
         );
     }
 
-    #[\Override]
+    #[Override]
     public static function getType(): CmsBlockTypes
     {
         return CmsBlockTypes::Hero;
     }
 
-    #[\Override]
+    #[Override]
     public function toArray(): array
     {
         return [

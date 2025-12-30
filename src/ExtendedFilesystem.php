@@ -28,6 +28,7 @@ class ExtendedFilesystem extends SymfonyFilesystem
             return $this->readFile($filename);
         } catch (Exception $e) {
             $this->logger->error(sprintf("Error reading file '%s': %s", $filename, $e->getMessage()));
+
             return false;
         }
     }
@@ -36,9 +37,11 @@ class ExtendedFilesystem extends SymfonyFilesystem
     {
         try {
             $this->dumpFile($filename, $data);
+
             return true;
         } catch (Exception $e) {
             $this->logger->error(sprintf("Error writing to file '%s': %s", $filename, $e->getMessage()));
+
             return false;
         }
     }
@@ -51,6 +54,7 @@ class ExtendedFilesystem extends SymfonyFilesystem
     public function glob(string $pattern, int $flags = 0): array
     {
         $result = glob($pattern, $flags);
+
         return $result !== false ? $result : [];
     }
 
@@ -58,9 +62,11 @@ class ExtendedFilesystem extends SymfonyFilesystem
     {
         try {
             $result = scandir($directory);
+
             return $result !== false ? $result : [];
         } catch (Exception $e) {
             $this->logger->error(sprintf("Error scanning directory '%s': %s", $directory, $e->getMessage()));
+
             return [];
         }
     }

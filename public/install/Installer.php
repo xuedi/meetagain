@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * MeetAgain Web Installer
+ * MeetAgain Web Installer.
  *
  * Standalone installer that runs before composer install.
  * Handles system requirements checking, database setup, mail configuration,
@@ -76,6 +76,7 @@ class Installer
         if (!isset($this->session['csrf_token'])) {
             $this->session['csrf_token'] = bin2hex(random_bytes(32));
         }
+
         return $this->session['csrf_token'];
     }
 
@@ -101,7 +102,7 @@ class Installer
     }
 
     /**
-     * Store multiple values in session data
+     * Store multiple values in session data.
      *
      * @param array<string, mixed> $data Key-value pairs to store
      */
@@ -113,7 +114,7 @@ class Installer
     }
 
     /**
-     * Handle form validation and conditional redirect
+     * Handle form validation and conditional redirect.
      *
      * If there are errors, stores the provided data and calls the error handler.
      * If successful, stores the data and redirects to the next step.
@@ -128,6 +129,7 @@ class Installer
             if ($onError !== null) {
                 $onError();
             }
+
             return;
         }
 
@@ -139,7 +141,7 @@ class Installer
     }
 
     /**
-     * Check system requirements for MeetAgain installation
+     * Check system requirements for MeetAgain installation.
      *
      * @return array<string, array{name: string, passed: bool, current: string, optional?: bool}>
      */
@@ -149,7 +151,7 @@ class Installer
     }
 
     /**
-     * Check if all non-optional requirements pass
+     * Check if all non-optional requirements pass.
      */
     public function allRequirementsPassed(): bool
     {
@@ -157,7 +159,7 @@ class Installer
     }
 
     /**
-     * Test database connection with provided credentials
+     * Test database connection with provided credentials.
      */
     public function testDatabaseConnection(string $host, int $port, string $name, string $user, string $password): bool
     {
@@ -168,9 +170,11 @@ class Installer
                 PDO::ATTR_TIMEOUT => 5,
             ]);
             $pdo->query('SELECT 1');
+
             return true;
         } catch (PDOException $e) {
             $this->addError('Database connection failed: ' . $e->getMessage());
+
             return false;
         }
     }
@@ -216,6 +220,7 @@ ENV;
 
         if ($result === false) {
             $this->addError('Failed to write .env file');
+
             return false;
         }
 
@@ -242,6 +247,7 @@ ENV;
 
         if ($returnCode !== 0) {
             $this->addError('Composer install failed: ' . implode("\n", $output));
+
             return false;
         }
 
@@ -264,6 +270,7 @@ ENV;
 
         if ($returnCode !== 0) {
             $this->addError('Migrations failed: ' . implode("\n", $output));
+
             return false;
         }
 
@@ -271,7 +278,7 @@ ENV;
     }
 
     /**
-     * Generic user creation method
+     * Generic user creation method.
      *
      * Creates a user with provided data, merging with sensible defaults.
      * Automatically hashes passwords using bcrypt.
@@ -330,7 +337,7 @@ ENV;
     }
 
     /**
-     * Create system user for automated operations
+     * Create system user for automated operations.
      */
     public function createSystemUser(PDO $pdo): int
     {
@@ -345,7 +352,7 @@ ENV;
     }
 
     /**
-     * Create admin user with full privileges
+     * Create admin user with full privileges.
      */
     public function createAdminUser(PDO $pdo, string $email, string $password, string $name): int
     {
@@ -392,6 +399,7 @@ ENV;
         }
 
         $content = sprintf("Installed: %s\n", $this->getTimestamp());
+
         return file_put_contents($lockPath, $content) !== false;
     }
 
@@ -413,12 +421,13 @@ ENV;
             ]);
         } catch (PDOException $e) {
             $this->addError('Database connection failed: ' . $e->getMessage());
+
             return null;
         }
     }
 
     /**
-     * Run the complete installation process
+     * Run the complete installation process.
      *
      * Executes all installation steps:
      * 1. Generate .env file
@@ -466,12 +475,14 @@ ENV;
         } catch (Exception $e) {
             $pdo->rollBack();
             $this->addError('Failed to create users/config: ' . $e->getMessage());
+
             return false;
         }
 
         // Step 5: Create lock file
         if (!$this->createLockFile()) {
             $this->addError('Failed to create lock file');
+
             return false;
         }
 
@@ -509,7 +520,7 @@ ENV;
     }
 
     /**
-     * Render a template with default installer variables
+     * Render a template with default installer variables.
      *
      * @param array<string, mixed> $vars
      */

@@ -18,7 +18,7 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    public function getConversations(User $user, null|int $id = null): array
+    public function getConversations(User $user, ?int $id = null): array
     {
         $messages = $this->createQueryBuilder('m')
             ->leftJoin('m.sender', 's')
@@ -50,9 +50,9 @@ class MessageRepository extends ServiceEntityRepository
                     'user' => $partner,
                 ];
             } else {
-                $list[$partnerId]['messages']++;
+                ++$list[$partnerId]['messages'];
                 if ($message->isWasRead() === false) {
-                    $list[$partnerId]['unread']++;
+                    ++$list[$partnerId]['unread'];
                 }
             }
         }
@@ -70,9 +70,9 @@ class MessageRepository extends ServiceEntityRepository
         return $list;
     }
 
-    public function getMessages(User $user, User|null $partner = null): null|array
+    public function getMessages(User $user, ?User $partner = null): ?array
     {
-        if (!($partner instanceof \App\Entity\User)) {
+        if (!($partner instanceof User)) {
             return null;
         }
 

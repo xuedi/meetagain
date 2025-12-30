@@ -2,53 +2,52 @@
 
 namespace App\Entity;
 
-use App\Repository\LocationRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: LocationRepository::class)]
+#[ORM\Entity]
 class Location
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $name = null;
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private null|string $description = null;
+    private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $street = null;
+    private ?string $street = null;
 
     #[ORM\Column(length: 32)]
-    private null|string $city = null;
+    private ?string $city = null;
 
     #[ORM\Column(length: 8)]
-    private null|string $postcode = null;
+    private ?string $postcode = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private null|User $user = null;
+    private ?User $user = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    private null|string $longitude = null;
+    private ?string $longitude = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    private null|string $latitude = null;
+    private ?string $latitude = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): null|string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -60,7 +59,7 @@ class Location
         return $this;
     }
 
-    public function getDescription(): null|string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -72,7 +71,7 @@ class Location
         return $this;
     }
 
-    public function getStreet(): null|string
+    public function getStreet(): ?string
     {
         return $this->street;
     }
@@ -84,7 +83,7 @@ class Location
         return $this;
     }
 
-    public function getCity(): null|string
+    public function getCity(): ?string
     {
         return $this->city;
     }
@@ -96,7 +95,7 @@ class Location
         return $this;
     }
 
-    public function getPostcode(): null|string
+    public function getPostcode(): ?string
     {
         return $this->postcode;
     }
@@ -108,19 +107,19 @@ class Location
         return $this;
     }
 
-    public function getUser(): null|User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(null|User $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -132,24 +131,24 @@ class Location
         return $this;
     }
 
-    public function getLongitude(): null|string
+    public function getLongitude(): ?string
     {
         return $this->longitude;
     }
 
-    public function setLongitude(null|string $longitude): static
+    public function setLongitude(?string $longitude): static
     {
         $this->longitude = $longitude;
 
         return $this;
     }
 
-    public function getLatitude(): null|string
+    public function getLatitude(): ?string
     {
         return $this->latitude;
     }
 
-    public function setLatitude(null|string $latitude): static
+    public function setLatitude(?string $latitude): static
     {
         $this->latitude = $latitude;
 

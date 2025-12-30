@@ -4,9 +4,7 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Translation;
 use App\Repository\TranslationRepository;
-use App\Repository\UserRepository;
 use App\Service\CommandService;
-use App\Service\ConfigService;
 use App\Service\LanguageService;
 use App\Service\TranslationFileManager;
 use App\Service\TranslationService;
@@ -15,28 +13,23 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
-use Tests\Unit\Stubs\UserStub;
 
 class TranslationServiceTest extends TestCase
 {
     private MockObject|TranslationRepository $translationRepo;
-    private MockObject|UserRepository $userRepo;
     private MockObject|EntityManagerInterface $entityManager;
     private MockObject|TranslationFileManager $fileManager;
     private MockObject|LanguageService $languageService;
     private MockObject|CommandService $commandService;
-    private MockObject|ConfigService $configService;
     private TranslationService $subject;
 
     protected function setUp(): void
     {
         $this->translationRepo = $this->createStub(TranslationRepository::class);
-        $this->userRepo = $this->createStub(UserRepository::class);
         $this->entityManager = $this->createStub(EntityManagerInterface::class);
         $this->fileManager = $this->createStub(TranslationFileManager::class);
         $this->languageService = $this->createStub(LanguageService::class);
         $this->commandService = $this->createStub(CommandService::class);
-        $this->configService = $this->createStub(ConfigService::class);
 
         $this->subject = new TranslationService(
             $this->translationRepo,
@@ -122,7 +115,7 @@ class TranslationServiceTest extends TestCase
     {
         $this->languageService->method('getEnabledCodes')->willReturn(['de']);
         $this->translationRepo->method('findBy')->willReturn([(new Translation())->setPlaceholder('key')->setTranslation('value')]);
-        
+
         $this->fileManager = $this->createMock(TranslationFileManager::class);
         $this->commandService = $this->createMock(CommandService::class);
         $this->subject = new TranslationService(
@@ -136,7 +129,7 @@ class TranslationServiceTest extends TestCase
         $this->fileManager->expects($this->once())->method('cleanUpTranslationFiles');
         $this->fileManager->expects($this->once())->method('writeTranslationFile')->with('de', ['key' => 'value']);
         $this->commandService->expects($this->once())->method('clearCache');
-        
+
         $result = $this->subject->publish();
         $this->assertSame(1, $result['published']);
     }
@@ -157,7 +150,7 @@ class TranslationServiceTest extends TestCase
     {
         // Arrange: mock language service to validate codes
         $this->languageService->method('isValidCode')->willReturnCallback(
-            fn(string $code) => in_array($code, ['en', 'de', 'fr'], true)
+            fn (string $code) => in_array($code, ['en', 'de', 'fr'], true)
         );
 
         // Act & Assert: valid codes return true
@@ -170,7 +163,7 @@ class TranslationServiceTest extends TestCase
     {
         // Arrange: mock language service to validate codes
         $this->languageService->method('isValidCode')->willReturnCallback(
-            fn(string $code) => in_array($code, ['en', 'de', 'fr'], true)
+            fn (string $code) => in_array($code, ['en', 'de', 'fr'], true)
         );
 
         // Act & Assert: invalid codes return false

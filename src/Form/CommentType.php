@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -10,18 +11,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CommentType extends AbstractType
 {
-    public function __construct(readonly TranslatorInterface $translator)
+    public function __construct(public readonly TranslatorInterface $translator)
     {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // TODO: Extra secure for all kinds of input
         $builder->add('comment', TextareaType::class);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

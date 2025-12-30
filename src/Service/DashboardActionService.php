@@ -7,6 +7,7 @@ use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 
 readonly class DashboardActionService
 {
@@ -25,7 +26,7 @@ readonly class DashboardActionService
     }
 
     /**
-     * Items requiring admin attention
+     * Items requiring admin attention.
      */
     public function getActionItems(): array
     {
@@ -38,7 +39,8 @@ readonly class DashboardActionService
     }
 
     /**
-     * User status breakdown
+     * User status breakdown.
+     *
      * @return array<string, int>
      */
     public function getUserStatusBreakdown(): array
@@ -47,7 +49,7 @@ readonly class DashboardActionService
     }
 
     /**
-     * Users active in last 7 days
+     * Users active in last 7 days.
      */
     public function getActiveUsersCount(): int
     {
@@ -55,15 +57,15 @@ readonly class DashboardActionService
     }
 
     /**
-     * Image storage statistics
+     * Image storage statistics.
      */
-    public function getImageStats(\DateTimeImmutable $start, \DateTimeImmutable $stop): array
+    public function getImageStats(DateTimeImmutable $start, DateTimeImmutable $stop): array
     {
         return $this->imageRepo->getStorageStats($start, $stop);
     }
 
     /**
-     * Upcoming events
+     * Upcoming events.
      */
     public function getUpcomingEvents(int $limit = 3): array
     {
@@ -71,7 +73,7 @@ readonly class DashboardActionService
     }
 
     /**
-     * Past events without photos
+     * Past events without photos.
      */
     public function getPastEventsWithoutPhotos(int $limit = 5): array
     {
@@ -79,7 +81,7 @@ readonly class DashboardActionService
     }
 
     /**
-     * Recurring events count
+     * Recurring events count.
      */
     public function getRecurringEventsCount(): int
     {

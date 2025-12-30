@@ -7,6 +7,7 @@ use App\Service\TranslationService;
 use App\Twig\LanguageExtension;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -45,7 +46,7 @@ class LanguageExtensionTest extends TestCase
 
         $this->assertCount(5, $functions);
 
-        $functionNames = array_map(fn($f) => $f->getName(), $functions);
+        $functionNames = array_map(fn ($f) => $f->getName(), $functions);
         $this->assertContains('get_enabled_locales', $functionNames);
         $this->assertContains('get_all_languages', $functionNames);
         $this->assertContains('current_locale', $functionNames);
@@ -66,7 +67,7 @@ class LanguageExtensionTest extends TestCase
     {
         $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not get current locale');
 
         $this->subject->getCurrentLocale();

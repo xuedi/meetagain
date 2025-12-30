@@ -18,7 +18,7 @@ class AdminVisitorsController extends AbstractController
     public function index(): Response
     {
         $users = $this->userRepo->findBy([], ['createdAt' => 'desc']);
-        $needForApproval = array_filter($users, fn($u) => $u->getStatus() === UserStatus::EmailVerified);
+        $needForApproval = array_filter($users, fn ($u) => $u->getStatus() === UserStatus::EmailVerified);
 
         return $this->render('admin/visitors/index.html.twig', [
             'active' => 'visitors',

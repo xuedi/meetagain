@@ -3,50 +3,41 @@
 namespace App\Entity;
 
 use App\Entity\BlockType\BlockType;
-use App\Entity\BlockType\EventTeaser;
-use App\Entity\BlockType\Headline;
-use App\Entity\BlockType\Hero;
-use App\Entity\BlockType\Image as ImageBlockType;
-use App\Entity\BlockType\Paragraph;
-use App\Entity\BlockType\Text;
-use App\Entity\BlockType\Title;
-use App\Repository\CmsBlockRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Exception;
 
-#[ORM\Entity(repositoryClass: CmsBlockRepository::class)]
+#[ORM\Entity]
 class CmsBlock
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 2)]
-    private null|string $language = null;
+    private ?string $language = null;
 
     #[ORM\Column(enumType: CmsBlockTypes::class)]
-    private null|CmsBlockTypes $Type = null;
+    private ?CmsBlockTypes $Type = null;
 
     #[ORM\ManyToOne(inversedBy: 'blocks')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Cms $page = null; // TODO: rename to just cms (cms_id in DB)
+    private ?Cms $page = null; // TODO: rename to just cms (cms_id in DB)
 
     #[ORM\Column]
     private array $json = [];
 
     #[ORM\Column]
-    private null|float $priority = null;
+    private ?float $priority = null;
 
     #[ORM\ManyToOne]
-    private null|Image $image = null;
+    private ?Image $image = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getLanguage(): null|string
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
@@ -58,7 +49,7 @@ class CmsBlock
         return $this;
     }
 
-    public function getType(): null|CmsBlockTypes
+    public function getType(): ?CmsBlockTypes
     {
         return $this->Type;
     }
@@ -70,12 +61,12 @@ class CmsBlock
         return $this;
     }
 
-    public function getPage(): null|Cms
+    public function getPage(): ?Cms
     {
         return $this->page;
     }
 
-    public function setPage(null|Cms $page): static
+    public function setPage(?Cms $page): static
     {
         $this->page = $page;
 
@@ -99,7 +90,7 @@ class CmsBlock
         return $this;
     }
 
-    public function getPriority(): null|float
+    public function getPriority(): ?float
     {
         return $this->priority;
     }
@@ -111,12 +102,12 @@ class CmsBlock
         return $this;
     }
 
-    public function getImage(): null|Image
+    public function getImage(): ?Image
     {
         return $this->image;
     }
 
-    public function setImage(null|Image $image): static
+    public function setImage(?Image $image): static
     {
         $this->image = $image;
 

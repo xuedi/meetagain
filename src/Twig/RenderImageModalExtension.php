@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Controller\ImageUploadController;
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -12,7 +13,7 @@ class RenderImageModalExtension extends AbstractExtension
     {
     }
 
-    #[\Override]
+    #[Override]
     public function getFunctions(): array
     {
         return [
@@ -22,7 +23,7 @@ class RenderImageModalExtension extends AbstractExtension
 
     public function render(...$parameters): string
     {
-        return $this->imageUploadController->imageReplaceModal((string)$parameters[0], $parameters[1])->getContent();
+        return $this->imageUploadController->imageReplaceModal((string) $parameters[0], $parameters[1])->getContent();
     }
 
     public function getName(): string

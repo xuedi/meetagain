@@ -26,12 +26,14 @@ class ReportedImage extends MessageAbstract
     protected function renderText(): string
     {
         $msgTemplate = 'Reported image for reason: %s';
+
         return sprintf($msgTemplate, ImageReported::from($this->meta['reason'])->name);
     }
 
     protected function renderHtml(): string
     {
         $msgTemplate = 'Reported image for reason: <b>%s</b>';
+
         return sprintf($msgTemplate, ImageReported::from($this->meta['reason'])->name);
     }
 }

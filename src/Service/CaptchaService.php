@@ -47,7 +47,7 @@ readonly class CaptchaService
         return $image;
     }
 
-    public function isValid(string $code): null|string
+    public function isValid(string $code): ?string
     {
         $session = $this->getSession();
         $code = strtolower($code);
@@ -55,6 +55,7 @@ readonly class CaptchaService
         if ($expected !== $code) {
             return sprintf("Wrong captcha code, got '%s' but expected '%s'", $code, $expected);
         }
+
         return null;
     }
 
@@ -73,9 +74,9 @@ readonly class CaptchaService
             $draw = new ImagickDraw();
             $draw->setFont(__DIR__ . '/../../public/fonts/captcha.ttf');
             $draw->setFontSize($size + random_int(-4, 6));
-            ;
+
             $draw->setFillColor(sprintf('#%s0%s0%s0', random_int(0, 9), random_int(0, 9), random_int(0, 9)));
-            ;
+
             $image->annotateImage($draw, $x, $y, $angle, $char);
             $x += 20 + random_int(-4, 4);
         }
@@ -103,6 +104,7 @@ readonly class CaptchaService
             }
         }
         $session->set('captcha_refresh' . $session->getId(), $refresh);
+
         return count($refresh);
     }
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * Amazon SES Mail Provider
+ * Amazon SES Mail Provider.
  *
  * AWS Simple Email Service with region and access key configuration.
  */

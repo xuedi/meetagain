@@ -7,7 +7,6 @@ use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\RsvpNo;
 use App\Service\ImageHtmlRenderer;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -15,7 +14,6 @@ class RsvpNoTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
-
 
     public function setUp(): void
     {

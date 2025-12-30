@@ -47,7 +47,7 @@ class EventRepository extends ServiceEntityRepository
             $qb->andWhere('e.type = :type')->setParameter('type', $type->value);
         }
 
-        if ($rsvp instanceof \App\Entity\EventFilterRsvp && $rsvp !== EventFilterRsvp::All && $user instanceof \App\Entity\User) {
+        if ($rsvp instanceof EventFilterRsvp && $rsvp !== EventFilterRsvp::All && $user instanceof \App\Entity\User) {
             if ($rsvp === EventFilterRsvp::My) {
                 $qb->innerJoin('e.rsvp', 'u', 'WITH', 'u.id = :userId')
                     ->setParameter('userId', $user->getId());
@@ -141,7 +141,7 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function getNextEventId(): null|int
+    public function getNextEventId(): ?int
     {
         $now = new DateTime();
         $now->setTime(0, 0, 0);
@@ -153,6 +153,7 @@ class EventRepository extends ServiceEntityRepository
                 return $event->getId();
             }
         }
+
         return null;
     }
 

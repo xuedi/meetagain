@@ -81,6 +81,7 @@ class ProfileController extends AbstractController
     {
         if ($event->getStart() < new DateTimeImmutable()) { // does reload page for flashMessage to trigger
             $this->addFlash('error', 'You cannot RSVP to an event that has already happened.');
+
             return new Response('', Response::HTTP_LOCKED);
         }
 
@@ -90,8 +91,8 @@ class ProfileController extends AbstractController
         $em->flush();
 
         // TODO: to slow, need to save event data first, generate log & notification async
-        //$type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
-        //$this->activityService->log($type, $user, ['event_id' => $event->getId()]);
+        // $type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
+        // $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['newStatus' => $status]);

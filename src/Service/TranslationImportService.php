@@ -7,6 +7,7 @@ use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 readonly class TranslationImportService
@@ -37,7 +38,7 @@ readonly class TranslationImportService
         $importUser = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
 
         if ($importUser === null) {
-            throw new \RuntimeException('System user not found for translation import');
+            throw new RuntimeException('System user not found for translation import');
         }
 
         foreach ($this->fileManager->getTranslationFiles() as $file) {
@@ -55,9 +56,9 @@ readonly class TranslationImportService
                     $translation->setCreatedAt(new DateTimeImmutable());
                     $translation->setUser($importUser);
                     $this->entityManager->persist($translation);
-                    $newTranslations++;
+                    ++$newTranslations;
                 }
-                $numberTranslationCount++;
+                ++$numberTranslationCount;
             }
         }
         $this->entityManager->flush();
@@ -108,6 +109,7 @@ readonly class TranslationImportService
                 $cleanedList[strtolower((string) $key)] = $translation;
             }
         }
+
         return $cleanedList;
     }
 }

@@ -34,7 +34,7 @@ readonly class NotificationService
                 $eventId = $activity->getMeta()['event_id'];
                 if ($user instanceof User && $eventId !== null) {
                     // TODO: save intend to table that later gets processed by cron for nightly emails
-                    //$this->messageBus->dispatch(NotificationRsvp::fromParameter($user, $eventId));
+                    // $this->messageBus->dispatch(NotificationRsvp::fromParameter($user, $eventId));
                 }
                 break;
             case ActivityType::SendMessage->value:
@@ -62,6 +62,7 @@ readonly class NotificationService
                     if (!$follower->getNotificationSettings()->followingUpdates) {
                         return 'skip';
                     }
+
                     // $this->emailService->prepareRsvpNotification(
                     //     userRsvp: $user,
                     //     userRecipient: $follower,
@@ -70,12 +71,12 @@ readonly class NotificationService
                     return 'send';
                 });
             } catch (InvalidArgumentException) {
-                //TODO: do some logging
+                // TODO: do some logging
             }
         }
     }
 
-    private function sendMessage(null|User $user, null|int $userId = null): void
+    private function sendMessage(?User $user, ?int $userId = null): void
     {
         if (!($user instanceof User) || $userId === null) {
             return;
@@ -98,6 +99,7 @@ readonly class NotificationService
             }
             $this->emailService->prepareMessageNotification(sender: $user, recipient: $recipient);
             $this->emailService->sendQueue(); // TODO: use cron instead
+
             return 'send';
         });
     }

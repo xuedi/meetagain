@@ -6,13 +6,13 @@ use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
 use App\Entity\ImageType;
+use App\Entity\User;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\EventService;
 use App\Service\ImageService;
 use App\Service\TranslationService;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,12 +24,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminEventController extends AbstractController
 {
     public function __construct(
-        private readonly ImageService               $imageService,
-        private readonly EntityManagerInterface     $entityManager,
-        private readonly TranslationService         $translationService,
+        private readonly ImageService $imageService,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
-        private readonly EventService               $eventService,
-        private readonly EventRepository            $repo,
+        private readonly EventService $eventService,
+        private readonly EventRepository $repo,
     ) {
     }
 
@@ -49,15 +49,18 @@ class AdminEventController extends AbstractController
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            assert($user instanceof User);
+
             // overwrite basic data
             $event->setInitial(true);
-            $event->setUser($this->getUser());
+            $event->setUser($user);
 
             // event image
             $image = null;
             $imageData = $form->get('image')->getData();
             if ($imageData instanceof UploadedFile) {
-                $image = $this->imageService->upload($imageData, $this->getUser(), ImageType::EventTeaser);
+                $image = $this->imageService->upload($imageData, $user, ImageType::EventTeaser);
             }
             if ($image instanceof Image) {
                 $event->setPreviewImage($image);
@@ -104,7 +107,7 @@ class AdminEventController extends AbstractController
     public function eventDelete(): Response
     {
         dump('delete');
-        exit();
+        exit;
     }
 
     #[Route('/admin/event/{id}/cancel', name: 'app_admin_event_cancel')]
@@ -127,12 +130,13 @@ class AdminEventController extends AbstractController
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
 
-    private function getTranslation(mixed $languageCode, null|int $getId): EventTranslation
+    private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
     {
         $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);
         if ($translation !== null) {
             return $translation;
         }
+
         return new EventTranslation();
     }
 
@@ -150,12 +154,15 @@ class AdminEventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            assert($user instanceof User);
+
             $event->setCreatedAt(new DateTimeImmutable());
             $event->setPreviewImage(null);
             $event->setInitial(true);
             $event->setPublished(false);
             $event->setFeatured(false);
-            $event->setUser($this->getUser());
+            $event->setUser($user);
 
             $entityManager->persist($event);
             $entityManager->flush();

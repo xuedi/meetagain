@@ -2,32 +2,32 @@
 
 namespace App\Entity;
 
-use App\Repository\NotFoundLogRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: NotFoundLogRepository::class)]
+#[ORM\Entity]
 class NotFoundLog
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $url = null;
+    private ?string $url = null;
 
     #[ORM\Column]
-    private null|\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 16)]
-    private null|string $ip = null;
+    private ?string $ip = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUrl(): null|string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -39,19 +39,19 @@ class NotFoundLog
         return $this;
     }
 
-    public function getCreatedAt(): null|\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getIp(): null|string
+    public function getIp(): ?string
     {
         return $this->ip;
     }

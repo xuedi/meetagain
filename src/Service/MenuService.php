@@ -3,11 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Menu;
-use App\Entity\MenuLocation;
-use App\Entity\MenuType;
-use App\Entity\MenuVisibility;
 use App\Repository\MenuRepository;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class MenuService

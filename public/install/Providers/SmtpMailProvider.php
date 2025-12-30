@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * SMTP Mail Provider
+ * SMTP Mail Provider.
  *
  * Custom SMTP server configuration with optional connection testing.
  * Supports TLS, SSL, and unencrypted connections.
@@ -34,6 +34,7 @@ class SmtpMailProvider implements MailProvider
 
         if (empty($host)) {
             $installer->addError('SMTP host is required');
+
             return false;
         }
 
@@ -99,7 +100,7 @@ class SmtpMailProvider implements MailProvider
     }
 
     /**
-     * Test SMTP server connection
+     * Test SMTP server connection.
      */
     private function testSmtpConnection(
         string $host,
@@ -107,7 +108,7 @@ class SmtpMailProvider implements MailProvider
         ?string $user,
         ?string $password,
         string $encryption,
-        Installer $installer
+        Installer $installer,
     ): bool {
         try {
             $timeout = 5;
@@ -121,6 +122,7 @@ class SmtpMailProvider implements MailProvider
 
             if (!$socket) {
                 $installer->addError("SMTP connection failed: $errstr ($errno)");
+
                 return false;
             }
 
@@ -128,13 +130,16 @@ class SmtpMailProvider implements MailProvider
             if (strpos($response, '220') !== 0) {
                 $installer->addError('SMTP server did not respond correctly');
                 fclose($socket);
+
                 return false;
             }
 
             fclose($socket);
+
             return true;
         } catch (Exception $e) {
             $installer->addError('SMTP connection failed: ' . $e->getMessage());
+
             return false;
         }
     }

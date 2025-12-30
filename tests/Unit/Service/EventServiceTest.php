@@ -12,9 +12,7 @@ use App\Service\EmailService;
 use App\Service\EventService;
 use DateTime;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\LazyCriteriaCollection;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -262,7 +260,7 @@ class EventServiceTest extends TestCase
         $parent = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::Weekly);
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
         $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
-        
+
         $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findFollowUpEvents')->willReturn([$child]);
 
@@ -327,13 +325,14 @@ class EventServiceTest extends TestCase
 
         $subject->extentRecurringEvents();
     }
+
     public function testUpdateRecurringEventsWithChildUpdatesParent(): void
     {
         $parent = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::Weekly);
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
-        
+
         $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
-        
+
         $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findOneBy')->with(['id' => 1])->willReturn($parent);
         $repoMock->method('findFollowUpEvents')->willReturn([$child]);
@@ -354,7 +353,7 @@ class EventServiceTest extends TestCase
     public function testUpdateRecurringEventsWithDeletedParentReturnsZero(): void
     {
         $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
-        
+
         $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findOneBy')->with(['id' => 1])->willReturn(null);
 
@@ -373,7 +372,7 @@ class EventServiceTest extends TestCase
         $event->setStart(new DateTime('2025-01-01 10:00:00'));
         $event->setStop(new DateTime('2025-01-01 12:00:00'));
         $event->setPublished(true);
-        
+
         $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findAllRecurring')->willReturn([$event]);
         $repoMock->method('findOneBy')->willReturn(null);

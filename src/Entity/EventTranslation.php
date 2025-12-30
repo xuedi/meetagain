@@ -2,53 +2,52 @@
 
 namespace App\Entity;
 
-use App\Repository\EventTranslationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\UniqueConstraint(fields: ['language', 'event'])]
-#[ORM\Entity(repositoryClass: EventTranslationRepository::class)]
+#[ORM\Entity]
 class EventTranslation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Event $event = null;
+    private ?Event $event = null;
 
     #[ORM\Column(length: 2)]
-    private null|string $language = null;
+    private ?string $language = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $title = null;
+    private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private null|string $description = null;
+    private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private null|string $teaser = null;
+    private ?string $teaser = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getEvent(): null|Event
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
-    public function setEvent(null|Event $event): static
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
 
         return $this;
     }
 
-    public function getLanguage(): null|string
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
@@ -60,7 +59,7 @@ class EventTranslation
         return $this;
     }
 
-    public function getTitle(): null|string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -72,7 +71,7 @@ class EventTranslation
         return $this;
     }
 
-    public function getDescription(): null|string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -84,12 +83,12 @@ class EventTranslation
         return $this;
     }
 
-    public function getTeaser(): null|string
+    public function getTeaser(): ?string
     {
         return $this->teaser;
     }
 
-    public function setTeaser(null|string $teaser): static
+    public function setTeaser(?string $teaser): static
     {
         $this->teaser = $teaser;
 

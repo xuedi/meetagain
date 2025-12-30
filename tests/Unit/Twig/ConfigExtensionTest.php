@@ -24,7 +24,7 @@ class ConfigExtensionTest extends TestCase
 
         $this->assertCount(4, $functions);
 
-        $functionNames = array_map(fn($f) => $f->getName(), $functions);
+        $functionNames = array_map(fn ($f) => $f->getName(), $functions);
         $this->assertContains('is_show_frontpage', $functionNames);
         $this->assertContains('get_theme_colors', $functionNames);
         $this->assertContains('get_date_format', $functionNames);
@@ -79,6 +79,7 @@ class ConfigExtensionTest extends TestCase
                 return $function;
             }
         }
+
         return null;
     }
 }

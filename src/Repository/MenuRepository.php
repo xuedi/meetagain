@@ -27,16 +27,16 @@ class MenuRepository extends ServiceEntityRepository
     }
 
     public function getAllSlugified(
-        null|UserInterface $user = null,
+        ?UserInterface $user = null,
         string $locale = 'en',
-        null|string $location = null,
+        ?string $location = null,
     ): array {
         // Load all menus once per request
         if ($this->menuCache === null) {
             $this->menuCache = [];
             $allMenus = $this->findBy([], ['priority' => 'ASC']);
             foreach ($allMenus as $menu) {
-                $loc = $menu->getLocation()?->value ?? 'default';
+                $loc = $menu->getLocation()->value ?? 'default';
                 $this->menuCache[$loc][] = $menu;
             }
         }
@@ -63,7 +63,7 @@ class MenuRepository extends ServiceEntityRepository
                 MenuType::Cms => '/' . $locale . '/' . $menu->getCms()?->getSlug(),
                 MenuType::Event => '/' . $locale . '/events/' . $menu->getEvent()?->getId(),
                 MenuType::Route => $this->router->generate($menu->getRoute()->value),
-                MenuType::Url => $menu->getSlug(),
+                MenuType::Url, null => $menu->getSlug(),
             });
             $list[] = $menu;
         }
@@ -71,7 +71,7 @@ class MenuRepository extends ServiceEntityRepository
         return $list;
     }
 
-    private function isVisible(null|UserInterface $user, null|MenuVisibility $visibility): bool
+    private function isVisible(?UserInterface $user, ?MenuVisibility $visibility): bool
     {
         if (!$visibility instanceof MenuVisibility) {
             return true;
@@ -82,7 +82,6 @@ class MenuRepository extends ServiceEntityRepository
             MenuVisibility::User => $user instanceof UserInterface && in_array('ROLE_USER', $user->getRoles(), true),
             MenuVisibility::Manager => $user instanceof UserInterface && in_array('ROLE_MANAGER', $user->getRoles(), true),
             MenuVisibility::Admin => $user instanceof UserInterface && in_array('ROLE_ADMIN', $user->getRoles(), true),
-            default => false,
         };
     }
 }

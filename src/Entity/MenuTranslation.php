@@ -2,46 +2,45 @@
 
 namespace App\Entity;
 
-use App\Repository\MenuTranslationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\UniqueConstraint(fields: ['language', 'menu'])]
-#[ORM\Entity(repositoryClass: MenuTranslationRepository::class)]
+#[ORM\Entity]
 class MenuTranslation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Menu $menu = null;
+    private ?Menu $menu = null;
 
     #[ORM\Column(length: 2)]
-    private null|string $language = null;
+    private ?string $language = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $name = null;
+    private ?string $name = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getMenu(): null|Menu
+    public function getMenu(): ?Menu
     {
         return $this->menu;
     }
 
-    public function setMenu(null|Menu $menu): static
+    public function setMenu(?Menu $menu): static
     {
         $this->menu = $menu;
 
         return $this;
     }
 
-    public function getLanguage(): null|string
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
@@ -53,7 +52,7 @@ class MenuTranslation
         return $this;
     }
 
-    public function getName(): null|string
+    public function getName(): ?string
     {
         return $this->name;
     }

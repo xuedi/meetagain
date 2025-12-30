@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\ExtendedFilesystem;
+use JsonException;
+use Throwable;
 
 readonly class PluginService
 {
@@ -32,7 +34,7 @@ readonly class PluginService
             }
             try {
                 $pluginData = json_decode($manifestContent, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
+            } catch (JsonException) {
                 continue;
             }
 
@@ -52,7 +54,8 @@ readonly class PluginService
     public function getActiveList(): array
     {
         $config = $this->getPluginConfig();
-        return array_keys(array_filter($config, fn($enabled) => $enabled === true));
+
+        return array_keys(array_filter($config, fn ($enabled) => $enabled === true));
     }
 
     public function install(string $pluginKey): void
@@ -100,6 +103,7 @@ readonly class PluginService
         if (!$this->filesystem->exists($this->pluginDir)) {
             return [];
         }
+
         return $this->filesystem->glob($this->pluginDir . '/*', GLOB_ONLYDIR);
     }
 
@@ -112,8 +116,9 @@ readonly class PluginService
 
         try {
             $config = include $configFile;
+
             return is_array($config) ? $config : [];
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return [];
         }
     }
@@ -130,6 +135,7 @@ readonly class PluginService
     private function isInstalled(string $pluginKey): bool
     {
         $config = $this->getPluginConfig();
+
         return isset($config[$pluginKey]);
     }
 
@@ -139,6 +145,7 @@ readonly class PluginService
         if (!isset($config[$pluginKey])) {
             return false;
         }
+
         return $config[$pluginKey] === true;
     }
 }

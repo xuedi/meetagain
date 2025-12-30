@@ -4,28 +4,29 @@ namespace App\Entity\BlockType;
 
 use App\Entity\CmsBlockTypes;
 use App\Entity\Image as ImageEntity;
+use Override;
 
 class Title implements BlockType
 {
     private function __construct(
         public string $title,
-        public null|ImageEntity $image,
+        public ?ImageEntity $image,
     ) {
     }
 
-    #[\Override]
-    public static function fromJson(array $json, null|ImageEntity $image = null): self
+    #[Override]
+    public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
         return new self($json['title'], $image);
     }
 
-    #[\Override]
+    #[Override]
     public static function getType(): CmsBlockTypes
     {
         return CmsBlockTypes::Title;
     }
 
-    #[\Override]
+    #[Override]
     public function toArray(): array
     {
         return [

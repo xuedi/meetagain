@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Service\MenuService;
+use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,7 +19,7 @@ final class MenuExtension extends AbstractExtension
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function getFunctions(): array
     {
         return [

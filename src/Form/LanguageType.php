@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Language;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -17,7 +18,7 @@ use Symfony\Component\Validator\Constraints\Regex;
 
 class LanguageType extends AbstractType
 {
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -62,7 +63,7 @@ class LanguageType extends AbstractType
             ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

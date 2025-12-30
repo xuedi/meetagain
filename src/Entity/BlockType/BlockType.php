@@ -7,7 +7,7 @@ use App\Entity\Image as ImageEntity;
 
 interface BlockType
 {
-    public static function fromJson(array $json, null|ImageEntity $image = null): self;
+    public static function fromJson(array $json, ?ImageEntity $image = null): self;
 
     public static function getType(): CmsBlockTypes;
 

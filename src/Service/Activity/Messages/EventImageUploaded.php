@@ -26,6 +26,7 @@ class EventImageUploaded extends MessageAbstract
     {
         $eventId = $this->meta['event_id'];
         $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+
         return sprintf('uploaded %d images to the event %s', $this->meta['images'], $eventName);
     }
 
@@ -36,6 +37,7 @@ class EventImageUploaded extends MessageAbstract
         if ($eventName === '[deleted]') {
             return sprintf('uploaded <b>%d</b> images to event [deleted]', $this->meta['images']);
         }
+
         return sprintf(
             'uploaded <b>%d</b> images to the event <a href="%s">%s</a>',
             $this->meta['images'],

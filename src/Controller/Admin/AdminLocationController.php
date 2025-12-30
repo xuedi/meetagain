@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Location;
+use App\Entity\User;
 use App\Form\LocationType;
 use App\Repository\LocationRepository;
 use DateTimeImmutable;
@@ -14,9 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminLocationController extends AbstractController
 {
-    public function __construct(private readonly \App\Repository\LocationRepository $repo)
+    public function __construct(private readonly LocationRepository $repo)
     {
     }
+
     #[Route('/admin/location/', name: 'app_admin_location')]
     public function locationList(): Response
     {
@@ -55,8 +57,11 @@ class AdminLocationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            assert($user instanceof User);
+
             $location->setCreatedAt(new DateTimeImmutable());
-            $location->setUser($this->getUser());
+            $location->setUser($user);
 
             $entityManager->persist($location);
             $entityManager->flush();

@@ -6,6 +6,7 @@ use App\Entity\EmailTemplate;
 use App\Service\EmailTemplateService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +22,7 @@ class EmailTemplateSeedCommand extends Command
         parent::__construct();
     }
 
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $defaults = $this->templateService->getDefaultTemplates();
@@ -42,7 +43,7 @@ class EmailTemplateSeedCommand extends Command
             $template->setUpdatedAt(new DateTimeImmutable());
 
             $this->em->persist($template);
-            $created++;
+            ++$created;
             $output->writeln(sprintf('Created template "%s".', $identifier));
         }
 

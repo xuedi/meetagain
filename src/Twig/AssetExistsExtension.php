@@ -3,7 +3,7 @@
 namespace App\Twig;
 
 use App\ExtendedFilesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -15,7 +15,7 @@ class AssetExistsExtension extends AbstractExtension
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function getFunctions(): array
     {
         return [

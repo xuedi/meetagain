@@ -2,9 +2,14 @@
 
 namespace Tests\Functional;
 
-use PDO;
-use PDOException;
+use Installer;
+use MailgunMailProvider;
+use MailhogMailProvider;
+use NullMailProvider;
 use PHPUnit\Framework\TestCase;
+use SendgridMailProvider;
+use SesMailProvider;
+use SmtpMailProvider;
 
 // Include the Installer classes (they're not autoloaded)
 require_once __DIR__ . '/../../public/install/TemplateRenderer.php';
@@ -39,7 +44,7 @@ class InstallerTest extends TestCase
     private const ENV_FILE_PATH = __DIR__ . '/../../.env';
     private const ENV_BACKUP_PATH = __DIR__ . '/../../.env.backup-test';
 
-    private ?\Installer $installer = null;
+    private ?Installer $installer = null;
     private bool $lockFileExisted = false;
     private static string $dbHost;
     private static int $dbPort;
@@ -76,7 +81,7 @@ class InstallerTest extends TestCase
         }
 
         // Create installer instance
-        $this->installer = new \Installer();
+        $this->installer = new Installer();
     }
 
     protected function tearDown(): void
@@ -109,7 +114,7 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForMailhog(): void
     {
-        $provider = new \MailhogMailProvider();
+        $provider = new MailhogMailProvider();
         $dsn = $provider->buildDsn([]);
 
         $this->assertEquals('smtp://mailhog:1025', $dsn);
@@ -117,7 +122,7 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForNull(): void
     {
-        $provider = new \NullMailProvider();
+        $provider = new NullMailProvider();
         $dsn = $provider->buildDsn([]);
 
         $this->assertEquals('null://null', $dsn);
@@ -125,9 +130,9 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSendGrid(): void
     {
-        $provider = new \SendgridMailProvider();
+        $provider = new SendgridMailProvider();
         $dsn = $provider->buildDsn([
-            'api_key' => 'SG.test_key_12345'
+            'api_key' => 'SG.test_key_12345',
         ]);
 
         $this->assertEquals('sendgrid+api://SG.test_key_12345@default', $dsn);
@@ -135,11 +140,11 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForMailgun(): void
     {
-        $provider = new \MailgunMailProvider();
+        $provider = new MailgunMailProvider();
         $dsn = $provider->buildDsn([
             'api_key' => 'key-12345',
             'domain' => 'mg.example.com',
-            'region' => 'eu'
+            'region' => 'eu',
         ]);
 
         $this->assertEquals('mailgun+api://key-12345:mg.example.com@default?region=eu', $dsn);
@@ -147,11 +152,11 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSes(): void
     {
-        $provider = new \SesMailProvider();
+        $provider = new SesMailProvider();
         $dsn = $provider->buildDsn([
             'access_key' => 'AKIAIOSFODNN7EXAMPLE',
             'secret_key' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
-            'region' => 'us-west-2'
+            'region' => 'us-west-2',
         ]);
 
         $this->assertEquals(
@@ -162,13 +167,13 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSmtpWithTls(): void
     {
-        $provider = new \SmtpMailProvider();
+        $provider = new SmtpMailProvider();
         $dsn = $provider->buildDsn([
             'smtp_host' => 'smtp.example.com',
             'smtp_port' => 587,
             'smtp_user' => 'user@example.com',
             'smtp_password' => 'password123',
-            'encryption' => 'tls'
+            'encryption' => 'tls',
         ]);
 
         $this->assertEquals('smtp://user%40example.com:password123@smtp.example.com:587?encryption=tls', $dsn);
@@ -176,13 +181,13 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSmtpWithSsl(): void
     {
-        $provider = new \SmtpMailProvider();
+        $provider = new SmtpMailProvider();
         $dsn = $provider->buildDsn([
             'smtp_host' => 'smtp.example.com',
             'smtp_port' => 465,
             'smtp_user' => 'user',
             'smtp_password' => 'pass',
-            'encryption' => 'ssl'
+            'encryption' => 'ssl',
         ]);
 
         $this->assertEquals('smtps://user:pass@smtp.example.com:465', $dsn);
@@ -190,11 +195,11 @@ class InstallerTest extends TestCase
 
     public function testBuildMailerDsnForSmtpWithoutAuth(): void
     {
-        $provider = new \SmtpMailProvider();
+        $provider = new SmtpMailProvider();
         $dsn = $provider->buildDsn([
             'smtp_host' => 'localhost',
             'smtp_port' => 25,
-            'encryption' => 'none'
+            'encryption' => 'none',
         ]);
 
         $this->assertEquals('smtp://localhost:25', $dsn);

@@ -5,8 +5,8 @@ namespace App\Form;
 use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Service\LanguageService;
+use Override;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -24,7 +24,7 @@ class UserType extends AbstractType
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var User $user */
@@ -108,7 +108,7 @@ class UserType extends AbstractType
             ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

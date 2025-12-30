@@ -6,6 +6,7 @@ use App\Entity\EventFilterRsvp;
 use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,11 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventFilterType extends AbstractType
 {
-    public function __construct(readonly TranslatorInterface $translator)
+    public function __construct(public readonly TranslatorInterface $translator)
     {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -60,7 +61,7 @@ class EventFilterType extends AbstractType
             ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

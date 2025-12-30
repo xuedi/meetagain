@@ -4,7 +4,6 @@ namespace Tests\Unit\Command;
 
 use App\Command\CleanupCommand;
 use App\Service\CleanupService;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;

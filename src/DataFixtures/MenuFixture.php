@@ -8,7 +8,6 @@ use App\Entity\MenuRoutes;
 use App\Entity\MenuTranslation;
 use App\Entity\MenuType;
 use App\Entity\MenuVisibility;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
@@ -21,7 +20,7 @@ class MenuFixture extends AbstractFixture implements DependentFixtureInterface
             if (!isset($priority[$location->value])) {
                 $priority[$location->value] = 0;
             }
-            $priority[$location->value] += 1;
+            ++$priority[$location->value];
 
             $menu = new Menu();
             $menu->setLocation($location);

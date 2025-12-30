@@ -2,16 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\LanguageRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: LanguageRepository::class)]
+#[ORM\Entity]
 class Language
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 2, unique: true)]
     private string $code;
@@ -26,9 +25,9 @@ class Language
     private int $sortOrder = 0;
 
     #[ORM\ManyToOne]
-    private null|Image $tileImage = null;
+    private ?Image $tileImage = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -81,12 +80,12 @@ class Language
         return $this;
     }
 
-    public function getTileImage(): null|Image
+    public function getTileImage(): ?Image
     {
         return $this->tileImage;
     }
 
-    public function setTileImage(null|Image $tileImage): static
+    public function setTileImage(?Image $tileImage): static
     {
         $this->tileImage = $tileImage;
 

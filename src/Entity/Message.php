@@ -2,80 +2,80 @@
 
 namespace App\Entity;
 
-use App\Repository\MessageRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Entity]
 class Message
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column]
-    private null|\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'messagesSend')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|User $sender = null;
+    private ?User $sender = null;
 
     #[ORM\ManyToOne(inversedBy: 'messagesReceived')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|User $receiver = null;
+    private ?User $receiver = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private null|string $content = null;
+    private ?string $content = null;
 
     #[ORM\Column]
-    private null|bool $deleted = null;
+    private ?bool $deleted = null;
 
     #[ORM\Column]
-    private null|bool $wasRead = null;
+    private ?bool $wasRead = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCreatedAt(): null|\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getSender(): null|User
+    public function getSender(): ?User
     {
         return $this->sender;
     }
 
-    public function setSender(null|User $sender): static
+    public function setSender(?User $sender): static
     {
         $this->sender = $sender;
 
         return $this;
     }
 
-    public function getReceiver(): null|User
+    public function getReceiver(): ?User
     {
         return $this->receiver;
     }
 
-    public function setReceiver(null|User $receiver): static
+    public function setReceiver(?User $receiver): static
     {
         $this->receiver = $receiver;
 
         return $this;
     }
 
-    public function getContent(): null|string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -87,7 +87,7 @@ class Message
         return $this;
     }
 
-    public function isDeleted(): null|bool
+    public function isDeleted(): ?bool
     {
         return $this->deleted;
     }
@@ -99,7 +99,7 @@ class Message
         return $this;
     }
 
-    public function isWasRead(): null|bool
+    public function isWasRead(): ?bool
     {
         return $this->wasRead;
     }

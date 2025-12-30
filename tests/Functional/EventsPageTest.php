@@ -6,8 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class EventsPageTest extends WebTestCase
 {
-    private const ADMIN_EMAIL = 'Admin@example.org';
-    private const ADMIN_PASSWORD = '1234';
     private const USER_EMAIL = 'Crystal.Liu@example.org';
     private const USER_PASSWORD = '1234';
 

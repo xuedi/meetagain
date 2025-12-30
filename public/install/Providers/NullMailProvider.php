@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * Null Mail Provider
+ * Null Mail Provider.
  *
  * Disables email sending - useful for testing environments.
  */

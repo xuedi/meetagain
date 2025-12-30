@@ -105,7 +105,7 @@ class AdminMenuController extends AbstractController
         return $this->redirectToRoute('app_admin_menu');
     }
 
-    private function getTranslation(mixed $languageCode, null|int $getId): MenuTranslation
+    private function getTranslation(mixed $languageCode, ?int $getId): MenuTranslation
     {
         $translation = $this->menuTransRepo->findOneBy(['language' => $languageCode, 'menu' => $getId]);
         if ($translation !== null) {
@@ -144,13 +144,13 @@ class AdminMenuController extends AbstractController
         $list = $this->repo->findBy(['location' => $subject->getLocation()], ['priority' => 'ASC']);
         foreach ($list as $menu) {
             $menu->setPriority($priority);
-            $priority++;
+            ++$priority;
             $this->entityManager->persist($menu);
         }
         $this->entityManager->flush();
     }
 
-    private function getMenuPriorityForLocation(null|MenuLocation $getLocation): float
+    private function getMenuPriorityForLocation(?MenuLocation $getLocation): float
     {
         $menu = $this->repo->findOneBy(['location' => $getLocation], ['priority' => 'DESC']);
 

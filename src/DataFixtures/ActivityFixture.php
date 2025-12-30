@@ -5,7 +5,6 @@ namespace App\DataFixtures;
 use App\Entity\Activity;
 use App\Entity\ActivityType;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
@@ -41,20 +40,20 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
                 '2025-01-01 10:00:00',
                 UserFixture::ADMIN,
                 ActivityType::Registered,
-                null
+                null,
             ],
             [
                 '2025-01-02 10:00:00',
                 UserFixture::ADMIN,
                 ActivityType::Login,
-                null
+                null,
             ],
             [
                 '2025-01-03 10:00:00',
                 UserFixture::ADMIN,
                 ActivityType::RsvpYes,
                 [
-                    'event_id' => 1
+                    'event_id' => 1,
                 ],
             ],
             [
@@ -62,7 +61,7 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
                 UserFixture::ADMIN,
                 ActivityType::RsvpYes,
                 [
-                    'event_id' => 2
+                    'event_id' => 2,
                 ],
             ],
             [
@@ -70,27 +69,27 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
                 UserFixture::ADMIN,
                 ActivityType::RsvpYes,
                 [
-                    'event_id' => 6
+                    'event_id' => 6,
                 ],
             ],
             [
                 '2025-01-11 10:00:00',
                 UserFixture::ADEM_LANE,
                 ActivityType::Registered,
-                null
+                null,
             ],
             [
                 '2025-01-12 10:00:00',
                 UserFixture::ADEM_LANE,
                 ActivityType::Login,
-                null
+                null,
             ],
             [
                 '2025-01-13 10:00:00',
                 UserFixture::ADEM_LANE,
                 ActivityType::RsvpYes,
                 [
-                    'event_id' => 1
+                    'event_id' => 1,
                 ],
             ],
             [
@@ -98,7 +97,7 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
                 UserFixture::ADEM_LANE,
                 ActivityType::RsvpYes,
                 [
-                    'event_id' => 6
+                    'event_id' => 6,
                 ],
             ],
             [
@@ -106,7 +105,7 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
                 UserFixture::ADEM_LANE,
                 ActivityType::FollowedUser,
                 [
-                    'user_id' => 2
+                    'user_id' => 2,
                 ],
             ],
             [
@@ -114,20 +113,20 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
                 UserFixture::ADMIN,
                 ActivityType::FollowedUser,
                 [
-                    'user_id' => 3
+                    'user_id' => 3,
                 ],
             ],
             [
                 '2025-02-01 10:00:00',
                 UserFixture::CRYSTAL_LIU,
                 ActivityType::Registered,
-                null
+                null,
             ],
             [
                 '2025-02-02 10:00:00',
                 UserFixture::CRYSTAL_LIU,
                 ActivityType::Login,
-                null
+                null,
             ],
             [
                 '2025-02-03 10:00:00',
@@ -135,7 +134,7 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
                 ActivityType::ChangedUsername,
                 [
                     'old' => 'dalong',
-                    'new' => 'xiaolong'
+                    'new' => 'xiaolong',
                 ],
             ],
         ];

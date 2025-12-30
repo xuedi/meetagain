@@ -2,33 +2,32 @@
 
 namespace App\Entity;
 
-use App\Repository\ConfigRepository;
 use Doctrine\ORM\Mapping as ORM;
 use LogicException;
 
-#[ORM\Entity(repositoryClass: ConfigRepository::class)]
+#[ORM\Entity]
 class Config
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 64)]
-    private null|string $name = null;
+    private ?string $name = null;
 
     #[ORM\Column(length: 128)]
-    private null|string $value = null;
+    private ?string $value = null;
 
     #[ORM\Column(enumType: ConfigType::class)]
-    private null|ConfigType $type = null;
+    private ?ConfigType $type = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): null|string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -40,7 +39,7 @@ class Config
         return $this;
     }
 
-    public function getValue(): null|string
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -52,7 +51,7 @@ class Config
         return $this;
     }
 
-    public function getType(): null|ConfigType
+    public function getType(): ?ConfigType
     {
         return $this->type;
     }

@@ -1188,7 +1188,7 @@ class UserFixture extends AbstractFixture
                     self::COHEN_LOZANO,
                     self::JAYA_WILLIS,
                     self::JAY_SHEPARD,
-                    self::LYLE_KAUFFMAN
+                    self::LYLE_KAUFFMAN,
                 ],
                 'restricted' => false,
             ],
@@ -1671,7 +1671,7 @@ class UserFixture extends AbstractFixture
                     self::DILLAN_NGUYEN,
                     self::ISOBEL_CARROLL,
                     self::RACHAEL_STRONG,
-                    self::ROSALEE_MELVIN
+                    self::ROSALEE_MELVIN,
                 ],
                 'followers' => [
                     self::ANAIAH_WHITTEN,
@@ -1903,7 +1903,7 @@ class UserFixture extends AbstractFixture
                     self::CAMERON_YANG,
                     self::EVE_LEROY,
                     self::HARRIET_ROJAS,
-                    self::NOEL_BALDWIN
+                    self::NOEL_BALDWIN,
                 ],
                 'followers' => [
                     self::ADMIN,
@@ -2324,7 +2324,7 @@ class UserFixture extends AbstractFixture
                     self::JOSHUA_WILSON,
                     self::KADEN_SCOTT,
                     self::KORAY_OKUMUS,
-                    self::RAYHAN_ZUA
+                    self::RAYHAN_ZUA,
                 ],
                 'followers' => [
                     self::AYAH_WILKINSON,
@@ -2523,7 +2523,7 @@ class UserFixture extends AbstractFixture
                     self::FLEUR_COOK,
                     self::GENEVIEVE_MCLEAN,
                     self::KYLA_CLAY,
-                    self::RACHAEL_STRONG
+                    self::RACHAEL_STRONG,
                 ],
                 'restricted' => false,
             ],
@@ -3372,7 +3372,7 @@ class UserFixture extends AbstractFixture
                     self::ISLA_ALLISON,
                     self::OLLY_SCHROEDER,
                     self::SALLY_MASON,
-                    self::ZAHRA_CHRISTENSEN
+                    self::ZAHRA_CHRISTENSEN,
                 ],
                 'followers' => [
                     self::DEMI_WILKINSON,
@@ -3576,7 +3576,7 @@ class UserFixture extends AbstractFixture
                     self::ELSIE_ROY,
                     self::SIENNA_HEWITT,
                     self::ADMIN,
-                    self::ADEM_LANE
+                    self::ADEM_LANE,
                 ],
                 'followers' => [
                     self::ADRIANA_O_SULLIVAN,
@@ -4169,7 +4169,7 @@ class UserFixture extends AbstractFixture
                     self::CANDICE_WU,
                     self::ELENA_OWENS,
                     self::HARRIET_ROJAS,
-                    self::ROSALEE_MELVIN
+                    self::ROSALEE_MELVIN,
                 ],
                 'restricted' => false,
             ],

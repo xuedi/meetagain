@@ -9,15 +9,12 @@ use App\Entity\EventFilterTime;
 use App\Entity\EventIntervals;
 use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
-use App\Exception\Event\UnknownIntervalException;
 use App\Repository\EventRepository;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use RRule\RRule;
-use RuntimeException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class EventService
@@ -51,7 +48,7 @@ readonly class EventService
 
     public function updateRecurringEvents(Event $event): int
     {
-        if ($event->getRecurringRule() instanceof \App\Entity\EventIntervals) {
+        if ($event->getRecurringRule() instanceof EventIntervals) {
             // is recurring, must be the parent
             $parent = clone $event;
         } elseif ($event->getRecurringOf() !== null) {
@@ -192,13 +189,17 @@ readonly class EventService
         return $recurringEvent;
     }
 
-    private function updateDate(DateTime $target, DateTime $occurrence): DateTime
+    private function updateDate(?DateTimeInterface $target, DateTime $occurrence): ?DateTime
     {
-        $newDate = clone $target;
+        if (!$target instanceof DateTimeInterface) {
+            return null;
+        }
+
+        $newDate = DateTime::createFromInterface($target);
         $newDate->setDate(
-            year: (int)$occurrence->format('Y'),
-            month: (int)$occurrence->format('m'),
-            day: (int)$occurrence->format('d'),
+            year: (int) $occurrence->format('Y'),
+            month: (int) $occurrence->format('m'),
+            day: (int) $occurrence->format('d'),
         );
 
         return $newDate;
@@ -228,6 +229,7 @@ readonly class EventService
             }
             $structuredList[$key]['events'][] = $event;
         }
+
         return $structuredList;
     }
 }

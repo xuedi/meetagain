@@ -170,7 +170,7 @@ class ConfigServiceTest extends TestCase
     {
         $this->configRepoStub
             ->method('findOneBy')
-            ->willReturnCallback(fn(array $criteria) => match ($criteria['name']) {
+            ->willReturnCallback(fn (array $criteria) => match ($criteria['name']) {
                 'email_sender_mail' => (new Config())->setValue('noreply@example.com'),
                 'email_sender_name' => (new Config())->setValue('Example Sender'),
                 default => null,

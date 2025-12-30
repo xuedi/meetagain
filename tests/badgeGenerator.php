@@ -6,7 +6,7 @@ $badge = __DIR__ . '/badge/coverage.svg';
 
 if (!file_exists($cloverXml)) {
     echo "No coverage file found: $cloverXml" . PHP_EOL;
-    exit();
+    exit;
 }
 
 $xml = new SimpleXMLElement(file_get_contents($cloverXml));

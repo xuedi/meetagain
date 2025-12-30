@@ -2,69 +2,68 @@
 
 namespace App\Entity;
 
-use App\Repository\MenuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: MenuRepository::class)]
+#[ORM\Entity]
 class Menu
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(enumType: MenuLocation::class)]
-    private null|MenuLocation $location = null;
+    private ?MenuLocation $location = null;
 
     #[ORM\OneToMany(targetEntity: MenuTranslation::class, mappedBy: 'menu')]
     private Collection $translations;
 
     #[ORM\Column]
-    private null|float $priority = null;
+    private ?float $priority = null;
 
     #[ORM\Column(enumType: MenuVisibility::class)]
-    private null|MenuVisibility $visibility = null;
+    private ?MenuVisibility $visibility = null;
 
     #[ORM\Column(enumType: MenuType::class)]
-    private null|MenuType $type = null;
+    private ?MenuType $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private null|string $slug = null;
+    private ?string $slug = null;
 
     #[ORM\ManyToOne]
-    private null|Cms $cms = null;
+    private ?Cms $cms = null;
 
     #[ORM\ManyToOne]
-    private null|Event $event = null;
+    private ?Event $event = null;
 
     #[ORM\Column(nullable: true, enumType: MenuRoutes::class)]
-    private null|MenuRoutes $route = null;
+    private ?MenuRoutes $route = null;
 
     public function __construct()
     {
         $this->translations = new ArrayCollection();
     }
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getSlug(): null|string
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    public function setSlug(null|string $slug): static
+    public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
 
         return $this;
     }
 
-    public function getLocation(): null|MenuLocation
+    public function getLocation(): ?MenuLocation
     {
         return $this->location;
     }
@@ -100,13 +99,14 @@ class Menu
         return $this;
     }
 
-    public function findTranslation(string $language): null|MenuTranslation
+    public function findTranslation(string $language): ?MenuTranslation
     {
         foreach ($this->translations as $translation) {
             if ($translation->getLanguage() === $language) {
                 return $translation;
             }
         }
+
         return null;
     }
 
@@ -117,6 +117,7 @@ class Menu
                 return $translation->getName() ?? '';
             }
         }
+
         return '';
     }
 
@@ -125,7 +126,7 @@ class Menu
         return $this->findTranslation($language)?->getName() ?? '';
     }
 
-    public function getPriority(): null|float
+    public function getPriority(): ?float
     {
         return $this->priority;
     }
@@ -137,7 +138,7 @@ class Menu
         return $this;
     }
 
-    public function getType(): null|MenuType
+    public function getType(): ?MenuType
     {
         return $this->type;
     }
@@ -149,31 +150,31 @@ class Menu
         return $this;
     }
 
-    public function getCms(): null|Cms
+    public function getCms(): ?Cms
     {
         return $this->cms;
     }
 
-    public function setCms(null|Cms $cms): static
+    public function setCms(?Cms $cms): static
     {
         $this->cms = $cms;
 
         return $this;
     }
 
-    public function getEvent(): null|Event
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
-    public function setEvent(null|Event $event): static
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
 
         return $this;
     }
 
-    public function getVisibility(): null|MenuVisibility
+    public function getVisibility(): ?MenuVisibility
     {
         return $this->visibility;
     }
@@ -185,12 +186,12 @@ class Menu
         return $this;
     }
 
-    public function getRoute(): null|MenuRoutes
+    public function getRoute(): ?MenuRoutes
     {
         return $this->route;
     }
 
-    public function setRoute(null|MenuRoutes $route): static
+    public function setRoute(?MenuRoutes $route): static
     {
         $this->route = $route;
 

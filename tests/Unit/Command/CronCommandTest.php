@@ -4,8 +4,6 @@ namespace Tests\Unit\Command;
 
 use App\Command\CronCommand;
 use App\Service\EmailService;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 class CronCommandTest extends TestCase

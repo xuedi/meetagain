@@ -23,12 +23,14 @@ class ChangedUsername extends MessageAbstract
     protected function renderText(): string
     {
         $msgTemplate = 'Changed username from %s to %s';
+
         return sprintf($msgTemplate, $this->meta['old'], $this->meta['new']);
     }
 
     protected function renderHtml(): string
     {
         $msgTemplate = 'Changed username from <b>%s</b> to <b>%s</b>';
+
         return sprintf($msgTemplate, $this->meta['old'], $this->meta['new']);
     }
 }

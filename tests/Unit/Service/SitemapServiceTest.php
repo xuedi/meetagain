@@ -72,6 +72,7 @@ class SitemapServiceTest extends TestCase
                 $this->equalTo('sitemap/index.xml.twig'),
                 $this->callback(function ($params) use (&$capturedSites) {
                     $capturedSites = $params['sites'] ?? null;
+
                     return isset($params['sites']);
                 }),
             )

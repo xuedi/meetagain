@@ -10,6 +10,7 @@ use App\Service\EmailService;
 use App\Service\NotificationService;
 use DateTime;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Tests\Unit\Stubs\EventStub;
@@ -151,6 +152,7 @@ final class NotificationServiceTest extends TestCase
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
+
                 return $callback($item);
             });
 
@@ -186,6 +188,7 @@ final class NotificationServiceTest extends TestCase
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
+
                 return $callback($item);
             });
 
@@ -216,7 +219,7 @@ final class NotificationServiceTest extends TestCase
         );
 
         // Act: send message notification with null user (via reflection)
-        $method = new \ReflectionMethod($service, 'sendMessage');
+        $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, null, 2);
 
         // Assert: no repository calls (verified by mock)
@@ -241,7 +244,7 @@ final class NotificationServiceTest extends TestCase
         );
 
         // Act: send message notification (via reflection)
-        $method = new \ReflectionMethod($service, 'sendMessage');
+        $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, $sender, 999);
 
         // Assert: cache not accessed (verified by mock)
@@ -270,6 +273,7 @@ final class NotificationServiceTest extends TestCase
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
+
                 return $callback($item);
             });
 
@@ -281,7 +285,7 @@ final class NotificationServiceTest extends TestCase
         );
 
         // Act: send message notification (via reflection)
-        $method = new \ReflectionMethod($service, 'sendMessage');
+        $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, $sender, 2);
 
         // Assert: email service methods called (verified by mocks)
@@ -309,6 +313,7 @@ final class NotificationServiceTest extends TestCase
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
+
                 return $callback($item);
             });
 
@@ -320,7 +325,7 @@ final class NotificationServiceTest extends TestCase
         );
 
         // Act: send message notification (via reflection)
-        $method = new \ReflectionMethod($service, 'sendMessage');
+        $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, $sender, 2);
 
         // Assert: email not sent due to recent activity

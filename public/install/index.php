@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * MeetAgain Web Installer - Entry Point
+ * MeetAgain Web Installer - Entry Point.
  */
 
 require_once __DIR__ . '/TemplateRenderer.php';
@@ -129,7 +129,7 @@ function handleStep1(Installer $installer): void
         $data['db_password'] = $dbPassword;
     }
 
-    $installer->handleFormResult($data, 2, fn() => showStep1($installer));
+    $installer->handleFormResult($data, 2, fn () => showStep1($installer));
 }
 
 function showStep2(Installer $installer): void
@@ -163,6 +163,7 @@ function handleStep2(Installer $installer): void
     } catch (InvalidArgumentException $e) {
         $installer->addError('Invalid mail provider selected');
         showStep2($installer);
+
         return;
     }
 
@@ -179,7 +180,7 @@ function handleStep2(Installer $installer): void
         $data['mailer_dsn'] = $provider->buildDsn($mailConfig);
     }
 
-    $installer->handleFormResult($data, 3, fn() => showStep2($installer));
+    $installer->handleFormResult($data, 3, fn () => showStep2($installer));
 }
 
 function showStep3(Installer $installer): void
@@ -233,7 +234,7 @@ function handleStep3(Installer $installer): void
         $data['admin_password'] = $adminPassword;
     }
 
-    $installer->handleFormResult($data, null, fn() => showStep3($installer));
+    $installer->handleFormResult($data, null, fn () => showStep3($installer));
 
     // Run installation (only reached if no errors)
     if ($installer->runInstallation()) {

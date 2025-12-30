@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\CleanupService;
+use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +17,7 @@ class CleanupCommand extends Command
         parent::__construct();
     }
 
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->write('Clean image cache ... ');

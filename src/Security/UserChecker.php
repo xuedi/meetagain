@@ -9,6 +9,7 @@ use App\Repository\MessageRepository;
 use App\Service\ActivityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -26,7 +27,7 @@ readonly class UserChecker implements UserCheckerInterface
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function checkPreAuth(UserInterface $user): void
     {
         if (!($user instanceof User)) {
@@ -38,7 +39,7 @@ readonly class UserChecker implements UserCheckerInterface
         }
     }
 
-    #[\Override]
+    #[Override]
     public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
         if (!($user instanceof User)) {

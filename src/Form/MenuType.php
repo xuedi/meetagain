@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\Cms;
 use App\Entity\Menu;
 use App\Entity\MenuLocation as EnumMenuLocation;
 use App\Entity\MenuRoutes as EnumMenuRoutes;
@@ -13,9 +12,9 @@ use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Repository\MenuTranslationRepository;
 use App\Service\TranslationService;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -32,7 +31,7 @@ class MenuType extends AbstractType
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $menu = $options['data'] ?? null;
@@ -81,7 +80,7 @@ class MenuType extends AbstractType
             'mapped' => false,
             'label' => 'AppRoute',
             'choices' => EnumMenuRoutes::getChoices($this->translator),
-            'data' => $menu?->getRoute()?->value ?? EnumMenuRoutes::Profile->value,
+            'data' => $menu?->getRoute()->value ?? EnumMenuRoutes::Profile->value,
         ]);
 
         $menuId = $menu?->getId() ?? null;
@@ -90,13 +89,13 @@ class MenuType extends AbstractType
             $translation = $this->menuTransRepo->findOneBy($crit) ?? new MenuTranslation();
             $builder->add("name-$languageCode", TextType::class, [
                 'label' => "$languageCode",
-                'data' => $translation?->getName() ?? '',
+                'data' => $translation->getName() ?? '',
                 'mapped' => false,
             ]);
         }
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

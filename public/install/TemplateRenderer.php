@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * Simple Template Renderer for Installer
+ * Simple Template Renderer for Installer.
  *
  * Handles template loading, variable replacement, conditionals, and loop processing.
  * Supports: {{ var }}, {% if condition %}, {% for item in items %}
@@ -17,7 +17,7 @@ class TemplateRenderer
     }
 
     /**
-     * Render a template with variables
+     * Render a template with variables.
      *
      * @param array<string, mixed> $vars
      */
@@ -61,7 +61,7 @@ class TemplateRenderer
     }
 
     /**
-     * Process template loops
+     * Process template loops.
      *
      * Handles simple loop syntax: {% for item in items %}...{% endfor %}
      * Supports both scalar and associative array iteration.
@@ -110,7 +110,7 @@ class TemplateRenderer
     }
 
     /**
-     * Process template conditionals
+     * Process template conditionals.
      *
      * Handles conditional syntax: {% if condition %}...{% endif %}
      * Supports: {% if var %}, {% if var == value %}, {% if var >= value %}
@@ -135,7 +135,7 @@ class TemplateRenderer
     }
 
     /**
-     * Evaluate a conditional expression
+     * Evaluate a conditional expression.
      *
      * @param array<string, mixed> $vars
      */
@@ -176,7 +176,7 @@ class TemplateRenderer
     }
 
     /**
-     * Get variable value from vars array, supporting dot notation
+     * Get variable value from vars array, supporting dot notation.
      *
      * @param array<string, mixed> $vars
      */
@@ -188,6 +188,7 @@ class TemplateRenderer
             if (isset($vars[$parts[0]]) && is_array($vars[$parts[0]])) {
                 return $vars[$parts[0]][$parts[1]] ?? null;
             }
+
             return null;
         }
 

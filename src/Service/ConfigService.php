@@ -7,6 +7,7 @@ use App\Entity\ConfigType;
 use App\Entity\ImageType;
 use App\Repository\ConfigRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -107,7 +108,7 @@ readonly class ConfigService
     {
         $setting = $this->repo->findOneBy(['name' => $name]);
         if ($setting === null) {
-            throw new \RuntimeException(sprintf("Config '%s' not found", $name));
+            throw new RuntimeException(sprintf("Config '%s' not found", $name));
         }
 
         $value = $setting->getValue() !== 'true';

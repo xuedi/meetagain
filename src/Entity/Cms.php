@@ -2,39 +2,32 @@
 
 namespace App\Entity;
 
-use App\Entity\BlockType\EventTeaser as EventTeaserType;
-use App\Entity\BlockType\Headline as HeadlineBlockType;
-use App\Entity\BlockType\Hero as HeroBlockType;
-use App\Entity\BlockType\Image as ImageBlockType;
-use App\Entity\BlockType\Paragraph as ParagraphBlockType;
-use App\Entity\BlockType\Text as TextBlockType;
 use App\Entity\BlockType\Title as TitleType;
-use App\Repository\CmsRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Exception;
 
-#[ORM\Entity(repositoryClass: CmsRepository::class)]
+#[ORM\Entity]
 class Cms
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 64, nullable: true)]
-    private null|string $slug = null;
+    private ?string $slug = null;
 
     #[ORM\Column]
-    private null|\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private null|User $createdBy = null;
+    private ?User $createdBy = null;
 
     #[ORM\Column]
-    private null|bool $published = null;
+    private ?bool $published = null;
 
     /**
      * @var Collection<int, CmsBlock>
@@ -47,48 +40,48 @@ class Cms
         $this->blocks = new ArrayCollection();
     }
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getSlug(): null|string
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    public function setSlug(null|string $slug): static
+    public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
 
         return $this;
     }
 
-    public function getCreatedAt(): null|\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getCreatedBy(): null|User
+    public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(null|User $createdBy): static
+    public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
 
         return $this;
     }
 
-    public function isPublished(): null|bool
+    public function isPublished(): ?bool
     {
         return $this->published;
     }
@@ -120,7 +113,7 @@ class Cms
         return new ArrayCollection($objects);
     }
 
-    public function getPageTitle(string $language): null|string
+    public function getPageTitle(string $language): ?string
     {
         $title = null;
         foreach ($this->blocks as $block) {

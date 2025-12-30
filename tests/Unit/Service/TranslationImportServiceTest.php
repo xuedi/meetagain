@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\Translation;
 use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use App\Service\CommandService;
@@ -52,11 +51,11 @@ class TranslationImportServiceTest extends TestCase
         $importUser = (new UserStub())->setId(1);
         $this->userRepo->method('findOneBy')->willReturn($importUser);
         $this->configService->method('getSystemUserId')->willReturn(1);
-        
+
         $file = $this->createStub(\Symfony\Component\Finder\SplFileInfo::class);
         $file->method('getFilename')->willReturn('messages.de.php');
         $file->method('getPathname')->willReturn(__DIR__ . '/Stubs/translations_stub.php');
-        
+
         $this->fileManager->method('getTranslationFiles')->willReturn([$file]);
         $this->translationRepo->method('getUniqueList')->willReturn(['de' => []]);
 

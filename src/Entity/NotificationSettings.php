@@ -13,11 +13,12 @@ class NotificationSettings implements JsonSerializable
 
     public bool $receivedMessage;
 
-    public static function fromJson(null|array $notificationSettings): self
+    public static function fromJson(?array $notificationSettings): self
     {
         if ($notificationSettings === null) {
             return new self([]);
         }
+
         return new self($notificationSettings);
     }
 
@@ -73,6 +74,7 @@ class NotificationSettings implements JsonSerializable
             default:
                 throw new Exception(sprintf("Invalid type: '%s'", $type));
         }
+
         return $this;
     }
 
@@ -82,6 +84,7 @@ class NotificationSettings implements JsonSerializable
             'announcements' => $this->announcements,
             'followingUpdates' => $this->followingUpdates,
             'receivedMessage' => $this->receivedMessage,
+            default => throw new Exception(sprintf("Invalid type: '%s'", $type)),
         };
     }
 }

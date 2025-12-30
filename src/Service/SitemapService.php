@@ -68,6 +68,7 @@ readonly class SitemapService
                 'prio' => 0.7,
             ];
         }
+
         return $sites;
     }
 
@@ -83,6 +84,7 @@ readonly class SitemapService
                 'prio' => 0.9,
             ];
         }
+
         return $sites;
     }
 
@@ -96,6 +98,7 @@ readonly class SitemapService
                 'prio' => 0.6,
             ];
         }
+
         return $sites;
     }
 }

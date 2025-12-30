@@ -3,9 +3,6 @@
 namespace App\Entity\ValueObjects;
 
 use DateTimeImmutable;
-use Exception;
-use InvalidArgumentException;
-use Throwable;
 
 // TODO: add strict validation and refactor more php 8'y
 class LogEntry
@@ -14,7 +11,7 @@ class LogEntry
     private readonly string $type;
     private readonly string $level;
     private string $message;
-    private null|string $json = null;
+    private ?string $json = null;
 
     public function __construct(string $line)
     {
@@ -60,7 +57,7 @@ class LogEntry
         return $this->message;
     }
 
-    public function getJson(): null|string
+    public function getJson(): ?string
     {
         return $this->json;
     }

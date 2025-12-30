@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * SendGrid Mail Provider
+ * SendGrid Mail Provider.
  *
  * Cloud email delivery service using API key authentication.
  */
@@ -33,6 +33,7 @@ class SendgridMailProvider implements MailProvider
 
         if (empty($apiKey)) {
             $installer->addError('SendGrid API key is required');
+
             return false;
         }
 

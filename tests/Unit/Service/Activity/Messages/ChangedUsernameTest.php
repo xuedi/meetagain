@@ -5,10 +5,8 @@ namespace Tests\Unit\Service\Activity\Messages;
 use App\Entity\ActivityType;
 use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\ChangedUsername;
-use App\Service\Activity\Messages\Login;
 use App\Service\ImageHtmlRenderer;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 

@@ -10,14 +10,9 @@ use App\Repository\EmailQueueRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Part\AbstractPart;
-use Twig\Environment;
 
 readonly class EmailService
 {
@@ -164,7 +159,7 @@ readonly class EmailService
                     'senderId' => 1,
                     'host' => 'https://localhost/en',
                     'lang' => 'en',
-                ]
+                ],
             ],
             'email_rsvp_notification' => [
                 'subject' => 'A user you follow plans to attend an event',
@@ -178,7 +173,7 @@ readonly class EmailService
                     'eventTitle' => 'Go tournament afterparty',
                     'host' => 'https://localhost/en',
                     'lang' => 'en',
-                ]
+                ],
             ],
             'email_welcome' => [
                 'subject' => 'Welcome!',
@@ -187,7 +182,7 @@ readonly class EmailService
                     'host' => 'https://localhost/en',
                     'url' => 'https://localhost/en',
                     'lang' => 'en',
-                ]
+                ],
             ],
             'email_verification_request' => [
                 'subject' => 'Please Confirm your Email',
@@ -198,7 +193,7 @@ readonly class EmailService
                     'username' => 'John Doe',
                     'url' => 'https://localhost/en',
                     'lang' => 'en',
-                ]
+                ],
             ],
             'email_password_reset_request' => [
                 'subject' => 'Password reset request',
@@ -208,7 +203,7 @@ readonly class EmailService
                     'token' => '1234567890',
                     'lang' => 'en',
                     'username' => 'John Doe',
-                ]
+                ],
             ],
             'email_event_canceled' => [
                 'subject' => 'Event canceled: Go tournament afterparty',
@@ -221,25 +216,24 @@ readonly class EmailService
                     'eventTitle' => 'Go tournament afterparty',
                     'host' => 'https://localhost/en',
                     'lang' => 'en',
-                ]
-            ]
+                ],
+            ],
         ];
     }
-
 
     public function sendQueue(): void
     {
         $mails = $this->mailRepo->findBy(['sendAt' => null], ['id' => 'ASC'], 1000);
         foreach ($mails as $mail) {
-            //try {
+            // try {
             $this->mailer->send($this->queueToTemplate($mail));
             $mail->setSendAt(new DateTime());
             $this->em->persist($mail);
 
-            //} catch (TransportExceptionInterface $e) {
+            // } catch (TransportExceptionInterface $e) {
             //    continue;
             //    // TODO: add new entity for failed email send messages
-            //}
+            // }
         }
         $this->em->flush();
     }

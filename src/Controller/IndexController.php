@@ -14,6 +14,7 @@ class IndexController extends AbstractController
     public function __construct(private readonly CmsService $cms)
     {
     }
+
     #[Route('/', name: 'app_default')]
     public function index(Request $request): Response
     {

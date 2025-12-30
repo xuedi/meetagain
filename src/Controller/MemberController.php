@@ -21,7 +21,7 @@ class MemberController extends AbstractController
         private readonly UserRepository $repo,
         private readonly FriendshipService $service,
         private readonly ImageService $imageService,
-        private readonly Security $security
+        private readonly Security $security,
     ) {
     }
 
@@ -37,6 +37,7 @@ class MemberController extends AbstractController
             $userTotal = $this->repo->getNumberOfActivePublicMembers();
             $users = $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset);
         }
+
         return $this->render(
             'member/index.html.twig',
             [

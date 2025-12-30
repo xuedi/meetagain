@@ -27,7 +27,7 @@ readonly class ImageService
     ) {
     }
 
-    public function upload(UploadedFile $imageData, User $user, ImageType $type): null|Image
+    public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
     {
         // load or create
         $hash = sha1($imageData->getContent());
@@ -44,7 +44,7 @@ readonly class ImageService
         $image->setMimeType($imageData->getMimeType());
         $image->setExtension($imageData->guessExtension());
         $image->setType($type);
-        $image->setSize($imageData->getSize() ?? 0);
+        $image->setSize($imageData->getSize() ?: 0);
         $image->setCreatedAt(new DateTimeImmutable());
         $image->setUploader($user);
 
@@ -54,7 +54,7 @@ readonly class ImageService
         return $image;
     }
 
-    public function createThumbnails(Image $image, null|ImageType $imageType = null): int
+    public function createThumbnails(Image $image, ?ImageType $imageType = null): int
     {
         $cnt = 0;
         $source = $this->getSourceFile($image);
@@ -75,10 +75,9 @@ readonly class ImageService
                 $imagick->stripImage(); // metadata
                 $imagick->setFormat('webp');
                 $imagick->writeImage($target);
-                $cnt++;
+                ++$cnt;
             } catch (ImagickException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));
-                ;
             }
         }
 
@@ -111,7 +110,6 @@ readonly class ImageService
                 $this->entityManager->flush();
             } catch (ImagickException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));
-                ;
             }
         }
     }
@@ -136,7 +134,7 @@ readonly class ImageService
             foreach ($this->configService->getThumbnailSizes($type) as [$width, $height]) {
                 $expected = $this->getThumbnailFileByHash($hash, $width, $height, true);
                 if (!isset($thumpFileList[$expected])) {
-                    $missingThumbnailsCount++;
+                    ++$missingThumbnailsCount;
                 }
             }
         }
@@ -181,7 +179,7 @@ readonly class ImageService
         foreach ($this->getObsoleteThumbnails() as $file) {
             if ($this->filesystem->exists($this->getThumbnailDir() . $file)) {
                 $this->filesystem->remove($this->getThumbnailDir() . $file);
-                $cnt++;
+                ++$cnt;
             }
         }
 
@@ -191,6 +189,7 @@ readonly class ImageService
     private function getSourceFile(Image $image): string
     {
         $path = $this->kernelProjectDir . '/data/images/';
+
         return $path . $image->getHash() . '.' . $image->getExtension();
     }
 
@@ -199,7 +198,7 @@ readonly class ImageService
         return $this->getThumbnailFileByHash($image->getHash(), $width, $height);
     }
 
-    private function getThumbnailFileByHash(string $hash, int $width, int $height, null|bool $justName = false): string
+    private function getThumbnailFileByHash(string $hash, int $width, int $height, ?bool $justName = false): string
     {
         $filename = sprintf('%s_%sx%s.webp', $hash, $width, $height);
         if ($justName) {

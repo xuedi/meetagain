@@ -24,6 +24,7 @@ class RsvpNo extends MessageAbstract
     {
         $eventId = $this->meta['event_id'];
         $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+
         return sprintf('Is skipping event: %s', $eventName);
     }
 
@@ -31,6 +32,7 @@ class RsvpNo extends MessageAbstract
     {
         $eventId = $this->meta['event_id'];
         $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+
         return sprintf('Is skipping event: %s', $eventName);
     }
 }

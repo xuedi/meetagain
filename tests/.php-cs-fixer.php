@@ -11,8 +11,11 @@ $finder = (new PhpCsFixer\Finder())
 return (new PhpCsFixer\Config())
     ->registerCustomFixers(new PhpCsFixerCustomFixers\Fixers())
     ->setRules([
-        //TODO: make <a plan to harmonise with phpcs, until then just use for decare strict after opening tag '@Symfony' => true,
+        '@Symfony' => true,
         'PhpCsFixerCustomFixers/declare_after_opening_tag' => true,
+        'global_namespace_import' => ['import_classes' => true],
+        'yoda_style' => false,
+        'concat_space' => ['spacing' => 'one'],
     ])
     ->setFinder($finder)
     ->setCacheFile(__DIR__ . '/../var/cache/.php-cs-fixer.cache')

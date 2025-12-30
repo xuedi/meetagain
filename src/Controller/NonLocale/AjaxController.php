@@ -13,9 +13,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AjaxController extends AbstractController
 {
-    public function __construct(private readonly \App\Service\CaptchaService $captchaService)
+    public function __construct(private readonly CaptchaService $captchaService)
     {
     }
+
     #[Route('/ajax/', name: 'app_ajax', methods: ['GET'])]
     public function index(): Response
     {

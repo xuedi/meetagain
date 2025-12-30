@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Service\TranslationImportService;
-use App\Service\TranslationService;
+use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,13 +18,13 @@ class ImportTranslationsCommand extends Command
         parent::__construct();
     }
 
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->addArgument('url', InputArgument::REQUIRED, 'Url of translation API');
     }
 
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->translationImportService->importForLocalDevelopment($input->getArgument('url'));

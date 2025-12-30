@@ -8,7 +8,7 @@ use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
 use App\Service\DashboardStatsService;
-use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
@@ -100,7 +100,7 @@ class DashboardStatsServiceTest extends TestCase
 
         $this->assertArrayHasKey('start', $result);
         $this->assertArrayHasKey('stop', $result);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $result['start']);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $result['stop']);
+        $this->assertInstanceOf(DateTimeImmutable::class, $result['start']);
+        $this->assertInstanceOf(DateTimeImmutable::class, $result['stop']);
     }
 }

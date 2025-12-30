@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\Language;
+use App\Entity\User;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
 use App\Service\ImageService;
@@ -53,6 +54,7 @@ class AdminLanguageController extends AbstractController
             $this->translationService->publish();
 
             $this->addFlash('success', 'Language added successfully');
+
             return $this->redirectToRoute('app_admin_language');
         }
 
@@ -78,6 +80,7 @@ class AdminLanguageController extends AbstractController
             $this->translationService->publish();
 
             $this->addFlash('success', 'Language updated successfully');
+
             return $this->redirectToRoute('app_admin_language');
         }
 
@@ -110,7 +113,10 @@ class AdminLanguageController extends AbstractController
             return;
         }
 
-        $image = $this->imageService->upload($imageData, $this->getUser(), ImageType::LanguageTile);
+        $user = $this->getUser();
+        assert($user instanceof User);
+
+        $image = $this->imageService->upload($imageData, $user, ImageType::LanguageTile);
         if ($image instanceof Image) {
             $language->setTileImage($image);
             $this->imageService->createThumbnails($image);

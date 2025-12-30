@@ -13,6 +13,7 @@ class AdminPluginController extends AbstractController
         private readonly PluginService $pluginService,
     ) {
     }
+
     #[Route('/admin/plugin', name: 'app_admin_plugin')]
     public function list(): Response
     {
@@ -21,6 +22,7 @@ class AdminPluginController extends AbstractController
             'active' => 'plugin',
         ]);
     }
+
     #[Route('/admin/plugin/install/{name}', name: 'admin_plugin_install')]
     public function install(string $name): Response
     {
@@ -28,6 +30,7 @@ class AdminPluginController extends AbstractController
 
         return $this->redirectToRoute('app_admin_plugin');
     }
+
     #[Route('/admin/plugin/uninstall/{name}', name: 'admin_plugin_uninstall')]
     public function uninstall(string $name): Response
     {
@@ -35,6 +38,7 @@ class AdminPluginController extends AbstractController
 
         return $this->redirectToRoute('app_admin_plugin');
     }
+
     #[Route('/admin/plugin/enable/{name}', name: 'admin_plugin_enable')]
     public function enable(string $name): Response
     {
@@ -42,6 +46,7 @@ class AdminPluginController extends AbstractController
 
         return $this->redirectToRoute('app_admin_plugin');
     }
+
     #[Route('/admin/plugin/disable/{name}', name: 'admin_plugin_disable')]
     public function disable(string $name): Response
     {

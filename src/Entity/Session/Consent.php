@@ -16,8 +16,8 @@ class Consent implements JsonSerializable
     public const string TYPE_OSM = 'consent_cookies_osm';
 
     public function __construct(
-        private null|ConsentType $cookies = ConsentType::Unknown,
-        private null|ConsentType $osm = ConsentType::Unknown,
+        private ?ConsentType $cookies = ConsentType::Unknown,
+        private ?ConsentType $osm = ConsentType::Unknown,
     ) {
     }
 
@@ -49,6 +49,7 @@ class Consent implements JsonSerializable
     public function getHtmlCookies(): array
     {
         $cookieExpires = new DateTime('+1 year');
+
         return [
             new Cookie(self::TYPE_OSM, $this->getOsm()->value, $cookieExpires),
             new Cookie(self::TYPE_COOKIES, $this->getCookies()->value, $cookieExpires),
@@ -81,7 +82,6 @@ class Consent implements JsonSerializable
             $consent->setCookies(ConsentType::from($data[self::TYPE_COOKIES] ?? 'unknown'));
             $consent->setOsm(ConsentType::from($data[self::TYPE_OSM] ?? 'unknown'));
         } catch (Throwable) {
-            //
         }
 
         return $consent;

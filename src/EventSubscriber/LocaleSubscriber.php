@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -12,7 +13,7 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
     {
     }
 
-    #[\Override]
+    #[Override]
     public static function getSubscribedEvents(): array
     {
         return [

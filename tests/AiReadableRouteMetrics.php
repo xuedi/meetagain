@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * AI-Readable Route Metrics Report
+ * AI-Readable Route Metrics Report.
  *
  * Analyzes Symfony routes and outputs performance metrics (SQL queries, timing, memory)
  * in a simple, human/AI-readable format.
@@ -54,7 +54,7 @@ foreach ($argv as $arg) {
 }
 
 /**
- * Route Metrics Analyzer using Symfony's WebTestCase
+ * Route Metrics Analyzer using Symfony's WebTestCase.
  */
 class RouteMetricsAnalyzer extends WebTestCase
 {
@@ -140,6 +140,7 @@ class RouteMetricsAnalyzer extends WebTestCase
                 if ($verbose) {
                     fwrite(STDERR, "  -> No profile for {$path} (status: {$response->getStatusCode()})\n");
                 }
+
                 return null;
             }
 
@@ -156,7 +157,7 @@ class RouteMetricsAnalyzer extends WebTestCase
                 'total_time' => round($timeCollector->getDuration(), 2),
                 'memory' => round($memoryCollector->getMemory() / 1024 / 1024, 2),
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return [
                 'route' => $routeName,
                 'path' => $path,
@@ -204,7 +205,7 @@ echo "Total: {$totalRoutes} | Analyzed: {$analyzedCount} | Skipped: {$skippedCou
 echo "---\n";
 
 // High query count section
-$highQueries = array_filter($results, fn($r) => $r['queries'] > $options['threshold']);
+$highQueries = array_filter($results, fn ($r) => $r['queries'] > $options['threshold']);
 if (!empty($highQueries)) {
     echo "\nHIGH QUERY COUNT (>{$options['threshold']}):\n";
     foreach ($highQueries as $r) {
@@ -219,7 +220,7 @@ if (!empty($highQueries)) {
 }
 
 // Errors section
-$errors = array_filter($results, fn($r) => $r['status'] === 'ERROR' || $r['status'] >= 400);
+$errors = array_filter($results, fn ($r) => $r['status'] === 'ERROR' || $r['status'] >= 400);
 if (!empty($errors)) {
     echo "\nERRORS:\n";
     foreach ($errors as $r) {
@@ -234,8 +235,8 @@ if (!empty($errors)) {
 
 // All routes summary
 echo "\nALL ROUTES (by {$options['sort']}):\n";
-printf("  %-5s | %-30s | %-35s | %s | %s\n", "Qry", "Route", "Path", "Time", "Mem");
-echo "  " . str_repeat("-", 100) . "\n";
+printf("  %-5s | %-30s | %-35s | %s | %s\n", 'Qry', 'Route', 'Path', 'Time', 'Mem');
+echo '  ' . str_repeat('-', 100) . "\n";
 
 foreach ($results as $r) {
     if ($r['status'] !== 'ERROR') {

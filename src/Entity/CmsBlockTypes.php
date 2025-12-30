@@ -26,7 +26,7 @@ enum CmsBlockTypes: int
     case EventTeaser = 9;
     case Title = 10;
 
-    public static function buildObject(self $type, array $data, null|ImageEntity $image = null): BlockType
+    public static function buildObject(self $type, array $data, ?ImageEntity $image = null): BlockType
     {
         return match ($type) {
             CmsBlockTypes::Headline => Headline::fromJson($data, $image),

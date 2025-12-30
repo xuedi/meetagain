@@ -70,6 +70,7 @@ class ImageRepository extends ServiceEntityRepository
     public function getOldImageUpdates(int $int): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
+
         return $qb
             ->select('i')
             ->from(Image::class, 'i')
@@ -100,6 +101,7 @@ class ImageRepository extends ServiceEntityRepository
                 'date' => $event->getStart()->format('Y-m-d'),
             ];
         }
+
         return $return;
     }
 

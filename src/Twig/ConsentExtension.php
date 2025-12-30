@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Service\ConsentService;
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -13,7 +14,7 @@ final class ConsentExtension extends AbstractExtension
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function getFunctions(): array
     {
         return [

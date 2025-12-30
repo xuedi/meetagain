@@ -24,6 +24,7 @@ class SendMessage extends MessageAbstract
     {
         $userId = $this->meta['user_id'];
         $userName = $this->userNames[$userId] ?? '[deleted]';
+
         return sprintf('Send a message to: %s', $userName);
     }
 
@@ -31,6 +32,7 @@ class SendMessage extends MessageAbstract
     {
         $userId = $this->meta['user_id'];
         $userName = $this->userNames[$userId] ?? '[deleted]';
+
         return sprintf('Send a message to: %s', $userName);
     }
 }

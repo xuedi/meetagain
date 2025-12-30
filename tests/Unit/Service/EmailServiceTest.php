@@ -9,8 +9,8 @@ use App\Service\ConfigService;
 use App\Service\EmailService;
 use App\Service\EmailTemplateService;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
@@ -29,7 +29,7 @@ final class EmailServiceTest extends TestCase
             ->with(
                 $this->callback(function ($entity) {
                     $this->assertInstanceOf(EmailQueue::class, $entity);
-                    /** @var EmailQueue $entity */
+                    /* @var EmailQueue $entity */
                     $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
                     $this->assertSame('user@example.com', $entity->getRecipient());
                     $this->assertSame('Please Confirm your Email', $entity->getSubject());
@@ -45,6 +45,7 @@ final class EmailServiceTest extends TestCase
 
                     $this->assertNotNull($entity->getCreatedAt());
                     $this->assertNull($entity->getSendAt());
+
                     return true;
                 })
             );
@@ -108,6 +109,7 @@ final class EmailServiceTest extends TestCase
                 $this->callback(function ($entity) use ($queued) {
                     $this->assertSame($queued, $entity);
                     $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
+
                     return true;
                 })
             );
@@ -135,7 +137,7 @@ final class EmailServiceTest extends TestCase
         $event = new \Tests\Unit\Stubs\EventStub();
         $event->setId(42);
         $event->addTranslation($translation);
-        $event->setStart(new \DateTimeImmutable('2025-06-15 14:00:00'));
+        $event->setStart(new DateTimeImmutable('2025-06-15 14:00:00'));
         $locationStub = $this->createStub(\App\Entity\Location::class);
         $locationStub->method('getName')->willReturn('Test Venue');
         $event->setLocation($locationStub);
@@ -146,7 +148,7 @@ final class EmailServiceTest extends TestCase
             ->with(
                 $this->callback(function ($entity) {
                     $this->assertInstanceOf(EmailQueue::class, $entity);
-                    /** @var EmailQueue $entity */
+                    /* @var EmailQueue $entity */
                     $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
                     $this->assertSame('user@example.com', $entity->getRecipient());
                     $this->assertSame('Event canceled: Test Event', $entity->getSubject());
@@ -189,7 +191,7 @@ final class EmailServiceTest extends TestCase
         $event = new \Tests\Unit\Stubs\EventStub();
         $event->setId(42);
         $event->addTranslation($translation);
-        $event->setStart(new \DateTimeImmutable('2025-06-15 14:00:00'));
+        $event->setStart(new DateTimeImmutable('2025-06-15 14:00:00'));
         $locationStub = $this->createStub(\App\Entity\Location::class);
         $locationStub->method('getName')->willReturn('Test Venue');
         $event->setLocation($locationStub);
@@ -200,7 +202,7 @@ final class EmailServiceTest extends TestCase
             ->with(
                 $this->callback(function ($entity) {
                     $this->assertInstanceOf(EmailQueue::class, $entity);
-                    /** @var EmailQueue $entity */
+                    /* @var EmailQueue $entity */
                     $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
                     $this->assertSame('recipient@example.com', $entity->getRecipient());
                     $this->assertSame('A user you follow plans to attend an event', $entity->getSubject());
@@ -243,7 +245,7 @@ final class EmailServiceTest extends TestCase
             ->with(
                 $this->callback(function ($entity) {
                     $this->assertInstanceOf(EmailQueue::class, $entity);
-                    /** @var EmailQueue $entity */
+                    /* @var EmailQueue $entity */
                     $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
                     $this->assertSame('recipient@example.com', $entity->getRecipient());
                     $this->assertSame('You received a message from Bob', $entity->getSubject());
@@ -326,13 +328,14 @@ final class EmailServiceTest extends TestCase
         string $email,
         string $name = 'Alice',
         string $locale = 'en',
-        string $regcode = 'token-123'
+        string $regcode = 'token-123',
     ): User {
         $user = new User();
         $user->setEmail($email);
         $user->setName($name);
         $user->setLocale($locale);
         $user->setRegcode($regcode);
+
         return $user;
     }
 }

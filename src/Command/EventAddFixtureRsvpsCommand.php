@@ -3,10 +3,9 @@
 namespace App\Command;
 
 use App\Entity\Comment;
-use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,13 +38,12 @@ class EventAddFixtureRsvpsCommand extends Command
 
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly EventRepository $eventRepo,
         private readonly UserRepository $userRepo,
     ) {
         parent::__construct();
     }
 
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->addOption(
@@ -78,7 +76,7 @@ class EventAddFixtureRsvpsCommand extends Command
         );
     }
 
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $minRsvps = (int) $input->getOption('min-rsvps');
@@ -93,6 +91,7 @@ class EventAddFixtureRsvpsCommand extends Command
 
         if (empty($recurringEvents)) {
             $output->writeln('<comment>No recurring events found to enhance.</comment>');
+
             return Command::SUCCESS;
         }
 
@@ -101,6 +100,7 @@ class EventAddFixtureRsvpsCommand extends Command
 
         if (count($allUsers) < $minRsvps) {
             $output->writeln('<error>Not enough users in database to add RSVPs.</error>');
+
             return Command::FAILURE;
         }
 
@@ -115,7 +115,7 @@ class EventAddFixtureRsvpsCommand extends Command
 
                 foreach ($selectedUsers as $user) {
                     $event->addRsvp($user);
-                    $rsvpCount++;
+                    ++$rsvpCount;
                 }
 
                 $this->em->persist($event);
@@ -123,7 +123,7 @@ class EventAddFixtureRsvpsCommand extends Command
 
             // Add random comments
             $numComments = random_int($minComments, min($maxComments, count($allUsers)));
-            for ($i = 0; $i < $numComments; $i++) {
+            for ($i = 0; $i < $numComments; ++$i) {
                 $comment = new Comment();
                 $comment->setEvent($event);
                 $comment->setUser($this->getRandomUsers($allUsers, 1)[0]);
@@ -136,7 +136,7 @@ class EventAddFixtureRsvpsCommand extends Command
                 );
 
                 $this->em->persist($comment);
-                $commentCount++;
+                ++$commentCount;
             }
         }
 
@@ -154,12 +154,14 @@ class EventAddFixtureRsvpsCommand extends Command
 
     /**
      * @param array<int, \App\Entity\User> $users
+     *
      * @return array<int, \App\Entity\User>
      */
     private function getRandomUsers(array $users, int $count): array
     {
         $shuffled = $users;
         shuffle($shuffled);
+
         return array_slice($shuffled, 0, $count);
     }
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * AI-Readable Test Coverage Report
+ * AI-Readable Test Coverage Report.
  *
  * Parses PHPUnit's clover.xml coverage report and outputs coverage statistics
  * in a simple, human/AI-readable format.
@@ -110,9 +110,9 @@ foreach ($xml->xpath('//file') as $file) {
 
 // Sort
 if ($options['sort'] === 'uncovered') {
-    usort($files, fn($a, $b) => $b['uncovered'] <=> $a['uncovered']);
+    usort($files, fn ($a, $b) => $b['uncovered'] <=> $a['uncovered']);
 } else {
-    usort($files, fn($a, $b) => $a['percentage'] <=> $b['percentage']);
+    usort($files, fn ($a, $b) => $a['percentage'] <=> $b['percentage']);
 }
 
 // Get total metrics
@@ -130,7 +130,7 @@ if (empty($files)) {
     echo "All files above {$options['threshold']}% threshold\n";
 } else {
     // Only show files below 80% (needs attention)
-    $needsWork = array_filter($files, fn($f) => $f['percentage'] < 80);
+    $needsWork = array_filter($files, fn ($f) => $f['percentage'] < 80);
 
     if (!empty($needsWork)) {
         echo "NEEDS ATTENTION:\n";

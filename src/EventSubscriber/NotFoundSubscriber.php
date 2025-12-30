@@ -7,6 +7,7 @@ use App\Service\CmsService;
 use App\Service\SitemapService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -25,7 +26,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public static function getSubscribedEvents(): array
     {
         return [

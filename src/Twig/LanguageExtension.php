@@ -4,6 +4,8 @@ namespace App\Twig;
 
 use App\Service\LanguageService;
 use App\Service\TranslationService;
+use Override;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
@@ -19,7 +21,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function getGlobals(): array
     {
         return [
@@ -27,7 +29,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         ];
     }
 
-    #[\Override]
+    #[Override]
     public function getFunctions(): array
     {
         return [
@@ -41,7 +43,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
     public function getCurrentLocale(): string
     {
-        return $this->requestStack->getCurrentRequest()?->getLocale() ?? throw new \RuntimeException('Could not get current locale');
+        return $this->requestStack->getCurrentRequest()?->getLocale() ?? throw new RuntimeException('Could not get current locale');
     }
 
     public function getAlternativeLanguageCodes(): array

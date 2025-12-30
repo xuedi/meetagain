@@ -41,6 +41,7 @@ class TranslationRepository extends ServiceEntityRepository
         foreach ($this->findAll() as $translation) {
             $list[$translation->getId()] = $translation->getTranslation();
         }
+
         return $list;
     }
 
@@ -50,6 +51,7 @@ class TranslationRepository extends ServiceEntityRepository
         foreach ($this->findAll() as $translation) {
             $list[$translation->getLanguage()][] = strtolower($translation->getPlaceholder());
         }
+
         return $list;
     }
 
@@ -63,6 +65,7 @@ class TranslationRepository extends ServiceEntityRepository
                 'translation' => $translation->getTranslation(),
             ];
         }
+
         return $list;
     }
 }

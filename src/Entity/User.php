@@ -2,18 +2,18 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Override;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
@@ -22,25 +22,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    protected null|int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column(length: 64, nullable: true)]
-    private null|string $name = null;
+    private ?string $name = null;
 
     #[ORM\Column(length: 180)]
-    private null|string $email = null;
+    private ?string $email = null;
 
     #[ORM\Column]
     private array $roles = [];
 
     #[ORM\Column]
-    private null|string $password = null;
+    private ?string $password = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private null|DateTimeInterface $lastLogin = null;
+    private ?DateTimeInterface $lastLogin = null;
 
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'rsvp')]
     private Collection $rsvp;
@@ -49,31 +49,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $locale = 'en';
 
     #[ORM\Column(enumType: UserStatus::class)]
-    private null|UserStatus $status = null;
+    private ?UserStatus $status = null;
 
     #[ORM\Column]
     private bool $public = true;
 
     #[ORM\Column(length: 40, nullable: true)]
-    private null|string $regcode = null;
+    private ?string $regcode = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private null|Image $image = null;
+    private ?Image $image = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private null|string $bio = null;
+    private ?string $bio = null;
 
     #[ORM\Column]
     private bool $verified = false;
 
     #[ORM\Column]
-    private null|bool $restricted = false;
+    private ?bool $restricted = false;
 
     #[ORM\Column]
-    private null|bool $osmConsent = false;
+    private ?bool $osmConsent = false;
 
     #[ORM\Column]
-    private null|bool $tagging = true;
+    private ?bool $tagging = true;
 
     #[ORM\OneToMany(targetEntity: Activity::class, mappedBy: 'user')]
     private Collection $activities;
@@ -91,10 +91,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $messagesReceived;
 
     #[ORM\Column]
-    private null|bool $notification = null;
+    private ?bool $notification = null;
 
     #[ORM\Column(nullable: true)]
-    private null|array $notificationSettings = null;
+    private ?array $notificationSettings = null;
 
     public function __construct()
     {
@@ -106,12 +106,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->messagesReceived = new ArrayCollection();
     }
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getEmail(): null|string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -128,7 +128,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @see UserInterface
      */
-    #[\Override]
+    #[Override]
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -139,7 +139,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return list<string>
      */
-    #[\Override]
+    #[Override]
     public function getRoles(): array
     {
         return $this->roles;
@@ -160,8 +160,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return in_array($role, $this->roles, true);
     }
 
-    #[\Override]
-    public function getPassword(): null|string
+    #[Override]
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -183,7 +183,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -195,12 +195,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getName(): null|string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(null|string $name): static
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
@@ -267,36 +267,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRegcode(): null|string
+    public function getRegcode(): ?string
     {
         return $this->regcode;
     }
 
-    public function setRegcode(null|string $regcode): static
+    public function setRegcode(?string $regcode): static
     {
         $this->regcode = $regcode;
 
         return $this;
     }
 
-    public function getImage(): null|Image
+    public function getImage(): ?Image
     {
         return $this->image;
     }
 
-    public function setImage(null|Image $image): static
+    public function setImage(?Image $image): static
     {
         $this->image = $image;
 
         return $this;
     }
 
-    public function getBio(): null|string
+    public function getBio(): ?string
     {
         return $this->bio;
     }
 
-    public function setBio(null|string $bio): static
+    public function setBio(?string $bio): static
     {
         $this->bio = $bio;
 
@@ -389,7 +389,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
     }
 
-    public function isRestricted(): null|bool
+    public function isRestricted(): ?bool
     {
         return $this->restricted;
     }
@@ -401,7 +401,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isOsmConsent(): null|bool
+    public function isOsmConsent(): ?bool
     {
         return $this->osmConsent;
     }
@@ -413,7 +413,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getLastLogin(): null|DateTimeInterface
+    public function getLastLogin(): ?DateTimeInterface
     {
         return $this->lastLogin;
     }
@@ -481,7 +481,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isTagging(): null|bool
+    public function isTagging(): ?bool
     {
         return $this->tagging;
     }
@@ -493,7 +493,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isNotification(): null|bool
+    public function isNotification(): ?bool
     {
         return $this->notification;
     }
@@ -510,7 +510,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return NotificationSettings::fromJson($this->notificationSettings);
     }
 
-    public function setNotificationSettings(null|NotificationSettings $notificationSettings): static
+    public function setNotificationSettings(?NotificationSettings $notificationSettings): static
     {
         $this->notificationSettings = $notificationSettings->jsonSerialize();
 

@@ -5,8 +5,6 @@ namespace App\Repository;
 use App\Entity\NotFoundLog;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,8 +22,8 @@ class NotFoundLogRepository extends ServiceEntityRepository
         // TODO: remove custom stuff (doctrine.yaml::DoctrineExtensions\Query\Mysql\DateFormat) and find a upstream way
         //       also fill up dateRange in sql and return key value pair straight as array
 
-        //$dbal = $this->getDoctrine()->getConnection();
-        //$idsAndNames = $dbal->executeQuery('SELECT id, name FROM Categories')->fetchAll(\PDO::FETCH_KEY_PAIR);
+        // $dbal = $this->getDoctrine()->getConnection();
+        // $idsAndNames = $dbal->executeQuery('SELECT id, name FROM Categories')->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         $unhydratedList = $this->getEntityManager()
             ->createQueryBuilder()

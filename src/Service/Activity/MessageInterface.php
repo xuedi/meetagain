@@ -13,7 +13,7 @@ interface MessageInterface
     public function injectServices(
         RouterInterface $router,
         ImageHtmlRenderer $imageRenderer,
-        null|array $meta = [],
+        ?array $meta = [],
         array $userNames = [],
         array $eventNames = [],
     ): self;

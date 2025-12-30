@@ -48,7 +48,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
             }
 
             // upload file and create thumbnails
-            $imageFile = __DIR__ . "/Event/" . $data['previewImage'];
+            $imageFile = __DIR__ . '/Event/' . $data['previewImage'];
             $uploadedImage = new UploadedFile($imageFile, $event->getId() . '.jpg');
             $image = $this->imageService->upload($uploadedImage, $data['createdBy'], ImageType::EventTeaser);
             $this->imageService->createThumbnails($image);
@@ -75,7 +75,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 $comment->setContent($commentData['msg']);
                 $manager->persist($comment);
             }
-
 
             $manager->persist($event);
             $this->addRefEvent($data['name'], $event);
@@ -157,7 +156,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'user' => UserFixture::CRYSTAL_LIU,
                         'msg' => 'Next time i will have my revenge',
                     ],
-                ]
+                ],
             ],
         ];
     }
@@ -165,6 +164,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
     private function getWednesdayMeetupDate(): DateTime
     {
         $date = new DateTime('now');
+
         return $date
             ->modify('-7 days')
             ->modify('first wednesday')

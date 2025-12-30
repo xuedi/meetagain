@@ -25,6 +25,7 @@ class FrontpageController extends AbstractController
         if ($this->configService->isShowFrontpage() === false) {
             return new RedirectResponse($this->router->generate('app_default'));
         }
+
         return $this->render('cms/frontpage.html.twig', [
             'languages' => $this->languageService->getAllLanguages(),
         ]);

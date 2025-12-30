@@ -19,7 +19,7 @@ class ReportController extends AbstractController
     }
 
     #[Route('/report/image/{id}', name: 'app_report_image')]
-    public function index(Request $request, null|int $id = null): Response
+    public function index(Request $request, ?int $id = null): Response
     {
         $response = $this->getResponse();
         $user = $this->getAuthedUser();
@@ -32,6 +32,7 @@ class ReportController extends AbstractController
                 'image_id' => $image->getId(),
                 'reason' => $form->get('reported')->getData()->value,
             ]);
+
             return $this->redirectToRoute('app_report_success');
         }
 

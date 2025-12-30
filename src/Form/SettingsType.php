@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Repository\UserRepository;
 use App\Service\ConfigService;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -19,7 +20,7 @@ class SettingsType extends AbstractType
     ) {
     }
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $mailer = $this->configService->getMailerAddress();
@@ -63,7 +64,7 @@ class SettingsType extends AbstractType
             ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

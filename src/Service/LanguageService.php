@@ -30,6 +30,7 @@ readonly class LanguageService
                 self::CACHE_KEY_ENABLED_CODES,
                 function (ItemInterface $item): array {
                     $item->expiresAfter(self::CACHE_TTL);
+
                     return $this->languageRepo->getEnabledCodes();
                 }
             );
@@ -56,6 +57,7 @@ readonly class LanguageService
     public function getLocaleRegexPattern(): string
     {
         $codes = $this->getEnabledCodes();
+
         return $codes === [] ? 'en' : implode('|', $codes);
     }
 
@@ -69,6 +71,7 @@ readonly class LanguageService
                 self::CACHE_KEY_ALL_LANGUAGES,
                 function (ItemInterface $item): array {
                     $item->expiresAfter(self::CACHE_TTL);
+
                     return $this->languageRepo->findAllOrdered();
                 }
             );
@@ -77,7 +80,7 @@ readonly class LanguageService
         }
     }
 
-    public function findByCode(string $code): null|Language
+    public function findByCode(string $code): ?Language
     {
         return $this->languageRepo->findByCode($code);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,13 +14,13 @@ class EchoCommand extends Command
 {
     private const string PARAMETER_MESSAGE = 'message';
 
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->addArgument(self::PARAMETER_MESSAGE, InputArgument::REQUIRED, 'Message to return');
     }
 
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->write('Echo command: ');

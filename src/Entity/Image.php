@@ -2,54 +2,53 @@
 
 namespace App\Entity;
 
-use App\Repository\ImageRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ORM\Entity]
 class Image
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 128)]
-    private null|string $mimeType = null;
+    private ?string $mimeType = null;
 
     #[ORM\Column(length: 8)]
-    private null|string $extension = null;
+    private ?string $extension = null;
 
     #[ORM\Column(type: Types::BIGINT)]
-    private null|int $size = null;
+    private ?int $size = null;
 
     #[ORM\Column(length: 64, unique: true)]
-    private null|string $hash = null;
+    private ?string $hash = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private null|string $alt = null;
+    private ?string $alt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private null|User $uploader = null;
+    private ?User $uploader = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private null|DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: ImageType::class)]
-    private null|ImageType $type = null;
+    private ?ImageType $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'images')]
-    private null|Event $event = null;
+    private ?Event $event = null;
 
     #[ORM\Column(nullable: true, enumType: ImageReported::class)]
-    private null|ImageReported $reported = null;
+    private ?ImageReported $reported = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -102,31 +101,31 @@ class Image
         return $this;
     }
 
-    public function getAlt(): null|string
+    public function getAlt(): ?string
     {
         return $this->alt;
     }
 
-    public function setAlt(null|string $alt): static
+    public function setAlt(?string $alt): static
     {
         $this->alt = $alt;
 
         return $this;
     }
 
-    public function getUploader(): null|User
+    public function getUploader(): ?User
     {
         return $this->uploader;
     }
 
-    public function setUploader(null|User $uploader): static
+    public function setUploader(?User $uploader): static
     {
         $this->uploader = $uploader;
 
         return $this;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -138,7 +137,7 @@ class Image
         return $this;
     }
 
-    public function getType(): null|ImageType
+    public function getType(): ?ImageType
     {
         return $this->type;
     }
@@ -150,36 +149,36 @@ class Image
         return $this;
     }
 
-    public function getUpdatedAt(): null|DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(null|DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
-    public function getEvent(): null|Event
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
-    public function setEvent(null|Event $event): static
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
 
         return $this;
     }
 
-    public function getReported(): null|ImageReported
+    public function getReported(): ?ImageReported
     {
         return $this->reported;
     }
 
-    public function setReported(null|ImageReported $reported): static
+    public function setReported(?ImageReported $reported): static
     {
         $this->reported = $reported;
 

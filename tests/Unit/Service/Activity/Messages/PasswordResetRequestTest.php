@@ -6,7 +6,6 @@ use App\Entity\ActivityType;
 use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\PasswordResetRequest;
 use App\Service\ImageHtmlRenderer;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 

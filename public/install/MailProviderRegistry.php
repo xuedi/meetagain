@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * Mail Provider Registry
+ * Mail Provider Registry.
  *
  * Central registry for all mail provider implementations.
  * Manages provider registration and retrieval.
@@ -12,7 +12,7 @@ class MailProviderRegistry
     private array $providers = [];
 
     /**
-     * Register a mail provider
+     * Register a mail provider.
      */
     public function register(MailProvider $provider): void
     {
@@ -20,7 +20,7 @@ class MailProviderRegistry
     }
 
     /**
-     * Get a mail provider by name
+     * Get a mail provider by name.
      *
      * @throws InvalidArgumentException if provider not found
      */
@@ -34,7 +34,7 @@ class MailProviderRegistry
     }
 
     /**
-     * Get all registered providers
+     * Get all registered providers.
      *
      * @return array<string, MailProvider>
      */
@@ -44,7 +44,7 @@ class MailProviderRegistry
     }
 
     /**
-     * Check if a provider exists
+     * Check if a provider exists.
      */
     public function hasProvider(string $name): bool
     {
@@ -52,7 +52,7 @@ class MailProviderRegistry
     }
 
     /**
-     * Create and configure the default registry with all available providers
+     * Create and configure the default registry with all available providers.
      */
     public static function createDefault(): self
     {

@@ -13,9 +13,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminHostController extends AbstractController
 {
-    public function __construct(private readonly \App\Repository\HostRepository $repo)
+    public function __construct(private readonly HostRepository $repo)
     {
     }
+
     #[Route('/admin/host/', name: 'app_admin_host')]
     public function hostList(): Response
     {

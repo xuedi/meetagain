@@ -10,7 +10,7 @@ abstract class MessageAbstract implements MessageInterface
 {
     protected RouterInterface $router;
     protected ImageHtmlRenderer $imageRenderer;
-    protected null|array $meta = [];
+    protected ?array $meta = [];
     protected array $userNames = [];
     protected array $eventNames = [];
 
@@ -18,7 +18,7 @@ abstract class MessageAbstract implements MessageInterface
     public function injectServices(
         RouterInterface $router,
         ImageHtmlRenderer $imageRenderer,
-        null|array $meta = [],
+        ?array $meta = [],
         array $userNames = [],
         array $eventNames = [],
     ): self {
@@ -50,11 +50,7 @@ abstract class MessageAbstract implements MessageInterface
     protected function ensureIsNumeric(string $key): void
     {
         if (!is_numeric($this->meta[$key])) {
-            throw new InvalidArgumentException(sprintf(
-                "Value '%s' has to be numeric in '%s'",
-                $key,
-                $this->getType()->name,
-            ));
+            throw new InvalidArgumentException(sprintf("Value '%s' has to be numeric in '%s'", $key, $this->getType()->name));
         }
     }
 }

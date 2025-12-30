@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * Mailgun Mail Provider
+ * Mailgun Mail Provider.
  *
  * Email automation service with API key, domain, and region configuration.
  */

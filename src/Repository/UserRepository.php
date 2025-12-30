@@ -7,6 +7,7 @@ use App\Entity\UserStatus;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Override;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    private null|array $userNameList = null;
+    private ?array $userNameList = null;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -85,7 +86,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
-    #[\Override]
+    #[Override]
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!($user instanceof User)) {
@@ -160,6 +161,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getOldRegistrations(int $int)
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
+
         return $qb
             ->select('u')
             ->from(User::class, 'u')
@@ -217,6 +219,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     /**
      * Get social counts for a user without loading full collections.
+     *
      * @return array{following: int, followers: int, rsvp: int}
      */
     public function getSocialCounts(User $user): array
@@ -226,7 +229,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $followingCount = (int) $em->createQueryBuilder()
             ->select('COUNT(f.id)')
-            ->from(\App\Entity\User::class, 'u')
+            ->from(User::class, 'u')
             ->innerJoin('u.following', 'f')
             ->where('u.id = :userId')
             ->setParameter('userId', $userId)
@@ -235,7 +238,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         $followersCount = (int) $em->createQueryBuilder()
             ->select('COUNT(f.id)')
-            ->from(\App\Entity\User::class, 'u')
+            ->from(User::class, 'u')
             ->innerJoin('u.followers', 'f')
             ->where('u.id = :userId')
             ->setParameter('userId', $userId)

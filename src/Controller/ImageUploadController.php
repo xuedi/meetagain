@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * TODO: refactor logic from here into the ImageService, so this controller is not called at other services anymore
+ * TODO: refactor logic from here into the ImageService, so this controller is not called at other services anymore.
  */
 class ImageUploadController extends AbstractController
 {
@@ -120,7 +120,7 @@ class ImageUploadController extends AbstractController
             $imageData = $form->get('newImage')->getData();
             if ($imageData instanceof UploadedFile) {
                 $image = $this->imageService->upload($imageData, $this->getAuthedUser(), $imageType);
-                $image->setUploader($this->getUser());
+                $image->setUploader($this->getAuthedUser());
                 $image->setUpdatedAt(new DateTimeImmutable());
                 $this->em->persist($image);
                 $this->imageService->createThumbnails($image, $imageType);

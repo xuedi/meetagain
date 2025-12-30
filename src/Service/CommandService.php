@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Plugin;
 use App\Service\Command\ClearCacheCommand;
 use App\Service\Command\CommandInterface;
 use App\Service\Command\ExecuteMigrationsCommand;

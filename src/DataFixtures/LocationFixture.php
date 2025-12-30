@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use App\Entity\Location;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 

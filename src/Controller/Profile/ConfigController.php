@@ -16,7 +16,7 @@ class ConfigController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
     ) {
     }
 
@@ -38,6 +38,7 @@ class ConfigController extends AbstractController
                 $this->addFlash('error', 'The old password is not correct');
             }
         }
+
         return $this->render('profile/config.html.twig', [
             'user' => $this->getAuthedUser(),
             'form' => $form,
@@ -55,6 +56,7 @@ class ConfigController extends AbstractController
             'tagging' => $user->setTagging(!$user->isTagging())->isTagging(),
             'notification' => $user->setNotification(!$user->isNotification())->isNotification(),
             'public' => $user->setPublic(!$user->isPublic())->isPublic(),
+            default => throw new Exception("Invalid toggle type: $type"),
         };
         $this->em->persist($user);
         $this->em->flush();

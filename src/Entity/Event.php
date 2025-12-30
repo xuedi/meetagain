@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,33 +16,33 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    protected null|int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column]
-    private null|bool $initial = null;
+    private ?bool $initial = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private DateTimeInterface $start;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private null|DateTimeInterface $stop = null;
+    private ?DateTimeInterface $stop = null;
 
     #[ORM\Column(nullable: true)]
-    private null|int $recurringOf = null;
+    private ?int $recurringOf = null;
 
     #[ORM\Column(type: 'integer', nullable: true, enumType: EventIntervals::class)]
-    private null|EventIntervals $recurringRule = null;
+    private ?EventIntervals $recurringRule = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private null|User $user = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Location $location = null;
+    private ?Location $location = null;
 
     #[ORM\Column]
-    private null|\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToMany(targetEntity: Host::class)]
     private Collection $host;
@@ -51,10 +52,10 @@ class Event
     private Collection $rsvp;
 
     #[ORM\ManyToOne]
-    private null|Image $previewImage = null;
+    private ?Image $previewImage = null;
 
     #[ORM\Column(nullable: true, enumType: EventTypes::class)]
-    private null|EventTypes $type = null;
+    private ?EventTypes $type = null;
 
     /**
      * @var Collection<int, Comment>
@@ -75,10 +76,10 @@ class Event
     private Collection $images;
 
     #[ORM\Column]
-    private null|bool $published = null;
+    private ?bool $published = null;
 
     #[ORM\Column]
-    private null|bool $featured = null;
+    private ?bool $featured = null;
 
     #[ORM\Column]
     private bool $canceled = false;
@@ -92,12 +93,12 @@ class Event
         $this->translations = new ArrayCollection();
     }
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function isInitial(): null|bool
+    public function isInitial(): ?bool
     {
         return $this->initial;
     }
@@ -121,72 +122,72 @@ class Event
         return $this;
     }
 
-    public function getStop(): null|DateTimeInterface
+    public function getStop(): ?DateTimeInterface
     {
         return $this->stop;
     }
 
-    public function setStop(null|DateTimeInterface $stop): static
+    public function setStop(?DateTimeInterface $stop): static
     {
         $this->stop = $stop;
 
         return $this;
     }
 
-    public function getRecurringOf(): null|int
+    public function getRecurringOf(): ?int
     {
         return $this->recurringOf;
     }
 
-    public function setRecurringOf(null|int $recurringOf): static
+    public function setRecurringOf(?int $recurringOf): static
     {
         $this->recurringOf = $recurringOf;
 
         return $this;
     }
 
-    public function getRecurringRule(): null|EventIntervals
+    public function getRecurringRule(): ?EventIntervals
     {
         return $this->recurringRule;
     }
 
-    public function setRecurringRule(null|EventIntervals $recurringRule): static
+    public function setRecurringRule(?EventIntervals $recurringRule): static
     {
         $this->recurringRule = $recurringRule;
 
         return $this;
     }
 
-    public function getUser(): null|User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(null|User $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getLocation(): null|Location
+    public function getLocation(): ?Location
     {
         return $this->location;
     }
 
-    public function setLocation(null|Location $location): static
+    public function setLocation(?Location $location): static
     {
         $this->location = $location;
 
         return $this;
     }
 
-    public function getCreatedAt(): null|\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
@@ -259,24 +260,24 @@ class Event
         return $this;
     }
 
-    public function getPreviewImage(): null|Image
+    public function getPreviewImage(): ?Image
     {
         return $this->previewImage;
     }
 
-    public function setPreviewImage(null|Image $previewImage): static
+    public function setPreviewImage(?Image $previewImage): static
     {
         $this->previewImage = $previewImage;
 
         return $this;
     }
 
-    public function getType(): null|EventTypes
+    public function getType(): ?EventTypes
     {
         return $this->type;
     }
 
-    public function setType(null|EventTypes $type): static
+    public function setType(?EventTypes $type): static
     {
         $this->type = $type;
 
@@ -285,9 +286,10 @@ class Event
 
     public function hasMap(): bool
     {
-        if (!($this->getLocation() instanceof \App\Entity\Location)) {
+        if (!($this->getLocation() instanceof Location)) {
             return false;
         }
+
         return $this->getLocation()->getLatitude() !== null && $this->getLocation()->getLongitude() !== null;
     }
 
@@ -361,17 +363,18 @@ class Event
         return $this;
     }
 
-    public function findTranslation(string $language): null|EventTranslation
+    public function findTranslation(string $language): ?EventTranslation
     {
         foreach ($this->translations as $translation) {
             if ($translation->getLanguage() === $language) {
                 return $translation;
             }
         }
+
         return null;
     }
 
-    public function isPublished(): null|bool
+    public function isPublished(): ?bool
     {
         return $this->published;
     }
@@ -411,7 +414,7 @@ class Event
         return $this;
     }
 
-    public function isFeatured(): null|bool
+    public function isFeatured(): ?bool
     {
         return $this->featured;
     }

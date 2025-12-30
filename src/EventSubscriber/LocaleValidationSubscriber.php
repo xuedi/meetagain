@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Service\LanguageService;
+use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -14,7 +15,7 @@ readonly class LocaleValidationSubscriber implements EventSubscriberInterface
     {
     }
 
-    #[\Override]
+    #[Override]
     public static function getSubscribedEvents(): array
     {
         return [

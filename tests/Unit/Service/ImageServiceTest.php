@@ -11,11 +11,9 @@ use App\Service\ConfigService;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Twig\Environment;
 
 class ImageServiceTest extends TestCase
 {
@@ -127,15 +125,15 @@ class ImageServiceTest extends TestCase
             ->expects($this->once())
             ->method('persist')
             ->with($this->callback(function (Image $image) use ($hash, $mimeType, $extension, $type, $size, $user) {
-                return (
-                    $image->getHash() === $hash &&
-                    $image->getMimeType() === $mimeType &&
-                    $image->getExtension() === $extension &&
-                    $image->getType() === $type &&
-                    $image->getSize() === $size &&
-                    $image->getUploader() === $user &&
-                    $image->getCreatedAt() instanceof DateTimeImmutable
-                );
+                return
+                    $image->getHash() === $hash
+                    && $image->getMimeType() === $mimeType
+                    && $image->getExtension() === $extension
+                    && $image->getType() === $type
+                    && $image->getSize() === $size
+                    && $image->getUploader() === $user
+                    && $image->getCreatedAt() instanceof DateTimeImmutable
+                ;
             }));
 
         $subject = $this->createService(
@@ -331,6 +329,7 @@ class ImageServiceTest extends TestCase
                 if ($type === ImageType::EventTeaser && $width === 200 && $height === 200) {
                     return true;
                 }
+
                 return false;
             });
 
@@ -385,6 +384,7 @@ class ImageServiceTest extends TestCase
             ->method('remove')
             ->willReturnCallback(function ($path) use (&$removedFiles) {
                 $removedFiles[] = $path;
+
                 return true;
             });
 
