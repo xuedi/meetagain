@@ -11,11 +11,11 @@ use App\Entity\UserStatus;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
-use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\CaptchaService;
 use App\Service\ConsentService;
 use App\Service\EmailService;
+use App\Service\PasswordResetService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,8 +38,8 @@ class SecurityController extends AbstractController
         private readonly Security $security,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly ConsentService $consentService,
-        private readonly UserRepository $userRepo,
         private readonly CaptchaService $captchaService,
+        private readonly PasswordResetService $passwordResetService,
     ) {
     }
 
@@ -149,10 +149,8 @@ class SecurityController extends AbstractController
     }
 
     #[Route(path: '/reset', name: 'app_reset')]
-    public function reset(
-        Request $request,
-        EntityManagerInterface $em,
-    ): Response {
+    public function reset(Request $request): Response
+    {
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
 
@@ -164,24 +162,17 @@ class SecurityController extends AbstractController
             }
 
             $email = $form->get('email')->getData();
-            $user = $this->userRepo->findOneBy(['email' => $email]);
-            if (null === $user) {
-                $form->get('email')->addError(new FormError('No valid user found'));
-            }
 
             if ($form->getErrors(true)->count() === 0) {
-                $user->setRegcode(sha1(random_bytes(128)));
-                $em->persist($user);
-                $em->flush();
-
-                $this->activityService->log(ActivityType::PasswordResetRequest, $user);
-                $this->emailService->prepareResetPassword($user);
-                $this->emailService->sendQueue(); // TODO: use cron instead
-
-                return $this->render('security/reset_email_send.html.twig');
-            } else {
-                $this->captchaService->reset();
+                $user = $this->passwordResetService->requestReset($email);
+                if (!$user instanceof User) {
+                    $form->get('email')->addError(new FormError('No valid user found'));
+                } else {
+                    return $this->render('security/reset_email_send.html.twig');
+                }
             }
+
+            $this->captchaService->reset();
         } else {
             $this->captchaService->reset();
         }
@@ -195,13 +186,10 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/reset/verify/{code}', name: 'app_reset_password')]
-    public function resetPassword(
-        EntityManagerInterface $em,
-        string $code,
-        Request $request,
-    ): Response {
-        $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
-        if ($user === null) {
+    public function resetPassword(string $code, Request $request): Response
+    {
+        $user = $this->passwordResetService->findUserByResetCode($code);
+        if (!$user instanceof User) {
             return $this->render('security/reset_error.html.twig');
         }
 
@@ -209,13 +197,7 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($this->hasher->hashPassword($user, $form->get('password')->getData()));
-            $user->setRegcode(null);
-
-            $em->persist($user);
-            $em->flush();
-
-            $this->activityService->log(ActivityType::PasswordReset, $user);
+            $this->passwordResetService->resetPassword($user, $form->get('password')->getData());
 
             return $this->render('security/reset_success.html.twig');
         }
