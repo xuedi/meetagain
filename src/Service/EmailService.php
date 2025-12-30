@@ -117,12 +117,17 @@ readonly class EmailService
             ? 'People you follow plan to attend an event'
             : sprintf('%s plans to attend an event', $attendees[0]->getName());
 
+        $attendeesData = array_map(
+            fn (User $user) => ['name' => $user->getName()],
+            $attendees
+        );
+
         $email->subject($subject);
         $email->htmlTemplate('_emails/notification_rsvp_aggregated.html.twig');
         $email->locale($language);
         $email->context([
             'username' => $recipient->getName(),
-            'attendees' => $attendees,
+            'attendees' => $attendeesData,
             'eventLocation' => $event->getLocation()?->getName() ?? '',
             'eventDate' => $event->getStart()->format('Y-m-d'),
             'eventId' => $event->getId(),
