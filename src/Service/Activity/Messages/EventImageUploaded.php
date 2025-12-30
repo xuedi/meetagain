@@ -25,19 +25,22 @@ class EventImageUploaded extends MessageAbstract
     protected function renderText(): string
     {
         $eventId = $this->meta['event_id'];
-        $msgTemplate = 'uploaded %d images to the event %s';
-        return sprintf($msgTemplate, $this->meta['images'], $this->eventNames[$eventId]);
+        $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        return sprintf('uploaded %d images to the event %s', $this->meta['images'], $eventName);
     }
 
     protected function renderHtml(): string
     {
         $eventId = $this->meta['event_id'];
-        $msgTemplate = 'uploaded <b>%d</b> images to the event <a href="%s">%s</a>';
+        $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        if ($eventName === '[deleted]') {
+            return sprintf('uploaded <b>%d</b> images to event [deleted]', $this->meta['images']);
+        }
         return sprintf(
-            $msgTemplate,
+            'uploaded <b>%d</b> images to the event <a href="%s">%s</a>',
             $this->meta['images'],
             $this->router->generate('app_event_details', ['id' => $eventId]),
-            $this->eventNames[$eventId],
+            $eventName,
         );
     }
 }

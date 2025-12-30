@@ -2,21 +2,28 @@
 
 namespace App\Controller\Admin;
 
-use App\Repository\NotFoundLogRepository;
+use App\Entity\UserStatus;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminVisitorsController extends AbstractController
 {
-    public function __construct(private readonly \App\Repository\NotFoundLogRepository $repo)
+    public function __construct(private readonly UserRepository $userRepo)
     {
     }
+
     #[Route('/admin/visitors/', name: 'app_admin_visitors')]
-    public function notFoundVisits(): Response
+    public function index(): Response
     {
+        $users = $this->userRepo->findBy([], ['createdAt' => 'desc']);
+        $needForApproval = array_filter($users, fn($u) => $u->getStatus() === UserStatus::EmailVerified);
+
         return $this->render('admin/visitors/index.html.twig', [
-            'notFound' => $this->repo->findAll(),
+            'active' => 'visitors',
+            'users' => $users,
+            'needForApproval' => $needForApproval,
         ]);
     }
 }

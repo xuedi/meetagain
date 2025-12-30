@@ -23,14 +23,14 @@ class RsvpYes extends MessageAbstract
     protected function renderText(): string
     {
         $eventId = $this->meta['event_id'];
-        $msgTemplate = 'Going to event: %s';
-        return sprintf($msgTemplate, $this->eventNames[$eventId]);
+        $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        return sprintf('Going to event: %s', $eventName);
     }
 
     protected function renderHtml(): string
     {
         $eventId = $this->meta['event_id'];
-        $msgTemplate = 'Going to event: %s'; // TODO: link
-        return sprintf($msgTemplate, $this->eventNames[$eventId]);
+        $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        return sprintf('Going to event: %s', $eventName);
     }
 }

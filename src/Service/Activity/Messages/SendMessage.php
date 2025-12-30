@@ -23,14 +23,14 @@ class SendMessage extends MessageAbstract
     protected function renderText(): string
     {
         $userId = $this->meta['user_id'];
-        $msgTemplate = 'Send a message to: %s';
-        return sprintf($msgTemplate, $this->userNames[$userId]);
+        $userName = $this->userNames[$userId] ?? '[deleted]';
+        return sprintf('Send a message to: %s', $userName);
     }
 
     protected function renderHtml(): string
     {
         $userId = $this->meta['user_id'];
-        $msgTemplate = 'Send a message to: %s'; // TODO: link
-        return sprintf($msgTemplate, $this->userNames[$userId]);
+        $userName = $this->userNames[$userId] ?? '[deleted]';
+        return sprintf('Send a message to: %s', $userName);
     }
 }

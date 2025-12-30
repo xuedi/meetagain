@@ -23,14 +23,14 @@ class FollowedUser extends MessageAbstract
     protected function renderText(): string
     {
         $userId = $this->meta['user_id'];
-        $msgTemplate = 'Started following: %s';
-        return sprintf($msgTemplate, $this->userNames[$userId]);
+        $userName = $this->userNames[$userId] ?? '[deleted]';
+        return sprintf('Started following: %s', $userName);
     }
 
     protected function renderHtml(): string
     {
         $userId = $this->meta['user_id'];
-        $msgTemplate = 'Started following: %s'; // TODO: link
-        return sprintf($msgTemplate, $this->userNames[$userId]);
+        $userName = $this->userNames[$userId] ?? '[deleted]';
+        return sprintf('Started following: %s', $userName);
     }
 }
