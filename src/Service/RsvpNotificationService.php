@@ -78,11 +78,11 @@ readonly class RsvpNotificationService
             $followedAttendees = $data['attendees'];
 
             $this->emailService->prepareAggregatedRsvpNotification($recipient, $followedAttendees, $event);
-            
+
             foreach ($followedAttendees as $attendee) {
                 $this->markNotificationSent($recipient, $attendee, $event);
             }
-            $sentCount++;
+            ++$sentCount;
         }
 
         return $sentCount;
@@ -102,20 +102,14 @@ readonly class RsvpNotificationService
             return false;
         }
 
-        if ($this->wasNotificationSent($recipient, $attendee, $event)) {
-            return false;
-        }
-
-        return true;
+        return !$this->wasNotificationSent($recipient, $attendee, $event);
     }
 
     private function wasNotificationSent(User $recipient, User $attendee, Event $event): bool
     {
         $key = $this->getCacheKey($recipient, $attendee, $event);
         try {
-            return $this->appCache->get($key, function (ItemInterface $item) {
-                return false;
-            }) === true;
+            return (bool) $this->appCache->get($key, fn (ItemInterface $item) => false);
         } catch (InvalidArgumentException) {
             return false;
         }
@@ -127,6 +121,7 @@ readonly class RsvpNotificationService
         try {
             $this->appCache->get($key, function (ItemInterface $item) {
                 $item->expiresAfter(self::THIRTY_DAYS);
+
                 return true;
             }, beta: INF); // beta: INF forces the callback to run and save the new value
         } catch (InvalidArgumentException) {

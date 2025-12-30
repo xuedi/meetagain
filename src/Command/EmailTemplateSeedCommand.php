@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\EmailTemplate;
+use App\Enum\EmailType;
 use App\Service\EmailTemplateService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +30,8 @@ class EmailTemplateSeedCommand extends Command
         $created = 0;
 
         foreach ($defaults as $identifier => $data) {
-            $existing = $this->templateService->getTemplate($identifier);
+            $emailType = EmailType::from($identifier);
+            $existing = $this->templateService->getTemplate($emailType);
             if ($existing instanceof EmailTemplate) {
                 $output->writeln(sprintf('Template "%s" already exists, skipping.', $identifier));
                 continue;

@@ -9,35 +9,37 @@ use App\Repository\EventRepository;
 use App\Service\EmailService;
 use App\Service\RsvpNotificationService;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class RsvpNotificationServiceTest extends TestCase
 {
-    private EventRepository $eventRepo;
-    private EmailService $emailService;
-    private TagAwareCacheInterface $appCache;
+    private EventRepository&Stub $eventRepo;
+    private EmailService&MockObject $emailService;
+    private TagAwareCacheInterface&Stub $appCache;
     private RsvpNotificationService $service;
 
     protected function setUp(): void
     {
-        $this->eventRepo = $this->createMock(EventRepository::class);
+        $this->eventRepo = $this->createStub(EventRepository::class);
         $this->emailService = $this->createMock(EmailService::class);
-        $this->appCache = $this->createMock(TagAwareCacheInterface::class);
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->service = new RsvpNotificationService($this->eventRepo, $this->emailService, $this->appCache);
     }
 
     public function testNotifyFollowersForEventSendsEmail(): void
     {
-        $event = $this->createMock(Event::class);
+        $event = $this->createStub(Event::class);
         $event->method('getId')->willReturn(1);
 
-        $attendee = $this->createMock(User::class);
+        $attendee = $this->createStub(User::class);
         $attendee->method('getId')->willReturn(10);
         $attendee->method('getName')->willReturn('Attendee');
 
-        $follower = $this->createMock(User::class);
+        $follower = $this->createStub(User::class);
         $follower->method('getId')->willReturn(20);
         $follower->method('isNotification')->willReturn(true);
         $settings = new NotificationSettings(['followingUpdates' => true]);
@@ -47,11 +49,12 @@ class RsvpNotificationServiceTest extends TestCase
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
         $event->method('hasRsvp')->with($follower)->willReturn(false);
 
-        $this->appCache->method('get')->willReturnCallback(function($key, $callback) {
+        $this->appCache->method('get')->willReturnCallback(function ($key, $callback) {
             if (str_starts_with($key, 'rsvp_following_notif_')) {
                 // For wasNotificationSent, callback returns false (default value if not in cache)
-                return $callback($this->createMock(ItemInterface::class));
+                return $callback($this->createStub(ItemInterface::class));
             }
+
             return null;
         });
 
@@ -65,18 +68,18 @@ class RsvpNotificationServiceTest extends TestCase
 
     public function testNotifyFollowersForEventSendsEmailAggregated(): void
     {
-        $event = $this->createMock(Event::class);
+        $event = $this->createStub(Event::class);
         $event->method('getId')->willReturn(1);
 
-        $attendee1 = $this->createMock(User::class);
+        $attendee1 = $this->createStub(User::class);
         $attendee1->method('getId')->willReturn(10);
         $attendee1->method('getName')->willReturn('Attendee 1');
 
-        $attendee2 = $this->createMock(User::class);
+        $attendee2 = $this->createStub(User::class);
         $attendee2->method('getId')->willReturn(11);
         $attendee2->method('getName')->willReturn('Attendee 2');
 
-        $follower = $this->createMock(User::class);
+        $follower = $this->createStub(User::class);
         $follower->method('getId')->willReturn(20);
         $follower->method('isNotification')->willReturn(true);
         $settings = new NotificationSettings(['followingUpdates' => true]);
@@ -87,10 +90,11 @@ class RsvpNotificationServiceTest extends TestCase
         $attendee2->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
         $event->method('hasRsvp')->with($follower)->willReturn(false);
 
-        $this->appCache->method('get')->willReturnCallback(function($key, $callback) {
+        $this->appCache->method('get')->willReturnCallback(function ($key, $callback) {
             if (str_starts_with($key, 'rsvp_following_notif_')) {
-                return $callback($this->createMock(ItemInterface::class));
+                return $callback($this->createStub(ItemInterface::class));
             }
+
             return null;
         });
 
@@ -104,13 +108,13 @@ class RsvpNotificationServiceTest extends TestCase
 
     public function testNotifyFollowersForEventSkipsIfAlreadyNotified(): void
     {
-        $event = $this->createMock(Event::class);
+        $event = $this->createStub(Event::class);
         $event->method('getId')->willReturn(1);
 
-        $attendee = $this->createMock(User::class);
+        $attendee = $this->createStub(User::class);
         $attendee->method('getId')->willReturn(10);
 
-        $follower = $this->createMock(User::class);
+        $follower = $this->createStub(User::class);
         $follower->method('getId')->willReturn(20);
         $follower->method('isNotification')->willReturn(true);
         $settings = new NotificationSettings(['followingUpdates' => true]);
@@ -131,10 +135,10 @@ class RsvpNotificationServiceTest extends TestCase
 
     public function testNotifyFollowersForEventSkipsIfNotificationsDisabled(): void
     {
-        $event = $this->createMock(Event::class);
-        $attendee = $this->createMock(User::class);
-        $follower = $this->createMock(User::class);
-        
+        $event = $this->createStub(Event::class);
+        $attendee = $this->createStub(User::class);
+        $follower = $this->createStub(User::class);
+
         $follower->method('isNotification')->willReturn(false);
 
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));

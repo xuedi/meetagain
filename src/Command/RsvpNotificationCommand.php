@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class RsvpNotificationCommand extends Command
 {
     public function __construct(
-        private readonly RsvpNotificationService $rsvpNotificationService
+        private readonly RsvpNotificationService $rsvpNotificationService,
     ) {
         parent::__construct();
     }

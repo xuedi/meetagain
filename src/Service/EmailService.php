@@ -6,6 +6,7 @@ use App\Entity\EmailQueue;
 use App\Entity\EmailTemplate;
 use App\Entity\Event;
 use App\Entity\User;
+use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
 use DateTime;
 use DateTimeImmutable;
@@ -13,8 +14,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-
-use App\Enum\EmailType;
 
 readonly class EmailService
 {
