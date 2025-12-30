@@ -203,4 +203,58 @@ class RsvpNotificationServiceTest extends TestCase
         $count = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count);
     }
+
+    public function testNotifyFollowersForEventDoesNotSendDuplicateEmails(): void
+    {
+        $event = $this->createStub(Event::class);
+        $event->method('getId')->willReturn(1);
+
+        $attendee = $this->createStub(User::class);
+        $attendee->method('getId')->willReturn(10);
+        $attendee->method('getName')->willReturn('Attendee');
+
+        $follower = $this->createStub(User::class);
+        $follower->method('getId')->willReturn(20);
+        $follower->method('isNotification')->willReturn(true);
+        $settings = new NotificationSettings(['followingUpdates' => true]);
+        $follower->method('getNotificationSettings')->willReturn($settings);
+
+        $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
+        $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
+        $event->method('hasRsvp')->with($follower)->willReturn(false);
+
+        // Simulate cache storage - tracks which keys have been marked as sent
+        $cacheStorage = [];
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(
+            function ($key, $callback, $beta = null) use (&$cacheStorage) {
+                if (isset($cacheStorage[$key])) {
+                    return $cacheStorage[$key];
+                }
+                $item = $this->createStub(ItemInterface::class);
+                $value = $callback($item);
+                // When beta is INF, it forces saving the new value (markNotificationSent)
+                if ($beta === INF) {
+                    $cacheStorage[$key] = $value;
+                }
+
+                return $value;
+            }
+        );
+
+        $this->service = new RsvpNotificationService($this->eventRepo, $this->emailService, $this->appCache);
+
+        // Email should be sent exactly once across both calls
+        $this->emailService->expects($this->once())
+            ->method('prepareAggregatedRsvpNotification')
+            ->with($follower, [$attendee], $event);
+
+        // First call - should send notification
+        $count1 = $this->service->notifyFollowersForEvent($event);
+        $this->assertEquals(1, $count1);
+
+        // Second call - should NOT send notification (already cached)
+        $count2 = $this->service->notifyFollowersForEvent($event);
+        $this->assertEquals(0, $count2);
+    }
 }

@@ -87,6 +87,7 @@ appCron:
 [group('app')]
 appRsvpNotify:
     {{PHP}} php bin/console app:rsvp:notify
+    {{JUST}} appCron
 
 # Clear the dev.log file
 [group('app')]

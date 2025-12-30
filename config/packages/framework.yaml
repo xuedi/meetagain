@@ -3,8 +3,6 @@ framework:
     secret: '%env(APP_SECRET)%'
     csrf_protection: true
     session: true
-    cache:
-        app: cache.adapter.apcu
 
 when@test:
     framework:
