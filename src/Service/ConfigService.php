@@ -87,6 +87,17 @@ readonly class ConfigService
         return $this->getBoolean('show_frontpage', false);
     }
 
+    public function getDateFormat(): string
+    {
+        return $this->getString('date_format', 'Y-m-d H:i');
+    }
+
+    public function getDateFormatFlatpickr(): string
+    {
+        // Convert PHP date format to flatpickr format (A -> K for AM/PM)
+        return str_replace('A', 'K', $this->getDateFormat());
+    }
+
     public function getBooleanConfigs(): array
     {
         return $this->repo->findBy(['type' => ConfigType::Boolean]);
@@ -115,6 +126,7 @@ readonly class ConfigService
         $this->setString('email_sender_name', $formData['senderName']);
         $this->setString('email_sender_mail', $formData['senderEmail']);
         $this->setInt('system_user_id', $formData['systemUser']);
+        $this->setString('date_format', $formData['dateFormat']);
     }
 
     public function getThemeColorDefaults(): array

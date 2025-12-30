@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "event"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date('Y-m-d H:i') }}{% endblock %}
+{% block title %}{{ "event"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
 
 {% block stylesheets %}
     {% if event.hasMap and show_osm() %}

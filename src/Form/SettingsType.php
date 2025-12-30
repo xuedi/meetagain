@@ -49,6 +49,17 @@ class SettingsType extends AbstractType
                 'label' => 'System User',
                 'data' => $this->configService->getSystemUserId(),
                 'choices' => $this->userRepo->getAllUserChoice(),
+            ])
+            ->add('dateFormat', ChoiceType::class, [
+                'attr' => ['class' => 'is-fullwidth'],
+                'label' => 'Date Format',
+                'data' => $this->configService->getDateFormat(),
+                'choices' => [
+                    '2025-12-30 14:30 (ISO)' => 'Y-m-d H:i',
+                    '30.12.2025 14:30 (EU)' => 'd.m.Y H:i',
+                    '30/12/2025 14:30 (UK)' => 'd/m/Y H:i',
+                    '12/30/2025 02:30 PM (US)' => 'm/d/Y h:i A',
+                ],
             ]);
     }
 

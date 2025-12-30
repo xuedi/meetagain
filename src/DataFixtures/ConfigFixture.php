@@ -75,6 +75,11 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 (string)$this->getRefUser(SystemUserFixture::IMPORT)->getId(),
                 ConfigType::Integer
             ],
+            [
+                'date_format',
+                'Y-m-d H:i',
+                ConfigType::String
+            ],
             // Theme colors (with WCAG AA compliant defaults for grey text)
             ['color_primary', '#00d1b2', ConfigType::String],
             ['color_link', '#485fc7', ConfigType::String],

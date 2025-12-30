@@ -43,8 +43,8 @@
             flatpickr(el, {
                 wrap: true,
                 enableTime: true,
-                dateFormat: "Y-m-d H:i",
-                time_24hr: true,
+                dateFormat: "{{ get_date_format_flatpickr() }}",
+                time_24hr: {{ 'A' in get_date_format() ? 'false' : 'true' }},
                 locale: "{{ app.request.locale }}"
             });
         });

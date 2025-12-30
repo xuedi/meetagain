@@ -92,11 +92,11 @@
                     <tbody>
                     {% for suggestion in suggestions %}
                         <tr>
-                            <td>{{ suggestion.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>{{ suggestion.createdAt|date(get_date_format()) }}</td>
                             <td>{{ suggestion.createdBy.name }}</td>
                             <td>{{ suggestion.previous }}</td>
                             <td>{{ suggestion.suggestion }}</td>
-                            <td>{{ suggestion.approvedAt is empty ? '' : suggestion.approvedAt|date('Y-m-d H:i') }}</td>
+                            <td>{{ suggestion.approvedAt is empty ? '' : suggestion.approvedAt|date(get_date_format()) }}</td>
                             <td>{{ suggestion.approvedByName }}</td>
                             {% if is_granted('ROLE_MANAGER') and suggestion.status.value == 0 %}
                                 <td>

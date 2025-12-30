@@ -27,7 +27,7 @@
                     {% for suggestion in translationSuggestions %}
                         {% set translation = suggestion.translation %}
                         <tr>
-                            <td>{{ suggestion.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>{{ suggestion.createdAt|date(get_date_format()) }}</td>
                             <td>{{ suggestion.createdBy.name }}</td>
                             <td>{{ suggestion.previous }}</td>
                             <td>{{ suggestion.suggestion }}</td>

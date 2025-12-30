@@ -214,11 +214,11 @@ class ConfigServiceTest extends TestCase
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(6))
             ->method('persist')
             ->with($this->isInstanceOf(Config::class));
         $entityManagerMock
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(6))
             ->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);
@@ -231,6 +231,7 @@ class ConfigServiceTest extends TestCase
             'senderName' => 'Example Sender',
             'senderEmail' => 'noreply@example.com',
             'systemUser' => 42,
+            'dateFormat' => 'Y-m-d H:i',
         ]);
     }
 
@@ -245,11 +246,11 @@ class ConfigServiceTest extends TestCase
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(6))
             ->method('persist')
             ->with($this->isInstanceOf(Config::class));
         $entityManagerMock
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(6))
             ->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);
@@ -262,6 +263,7 @@ class ConfigServiceTest extends TestCase
             'senderName' => 'New Sender',
             'senderEmail' => 'new@example.com',
             'systemUser' => 99,
+            'dateFormat' => 'd.m.Y H:i',
         ]);
     }
 }
