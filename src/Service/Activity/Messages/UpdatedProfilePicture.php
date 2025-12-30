@@ -34,8 +34,8 @@ class UpdatedProfilePicture extends MessageAbstract
 
         return sprintf(
             $msgTemplate,
-            $this->imageService->imageTemplateById($this->meta['old']),
-            $this->imageService->imageTemplateById($this->meta['new']),
+            $this->imageRenderer->renderThumbnail($this->meta['old']),
+            $this->imageRenderer->renderThumbnail($this->meta['new']),
         );
     }
 }

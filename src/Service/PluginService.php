@@ -6,21 +6,22 @@ use App\ExtendedFilesystem;
 
 readonly class PluginService
 {
-    public const string CONFIG_DIR = __DIR__ . '/../../config';
-    public const string PLUGIN_DIR = __DIR__ . '/../../plugins';
+    private string $configDir;
+    private string $pluginDir;
 
     public function __construct(
         private CommandService $commandService,
         private ExtendedFilesystem $filesystem,
+        string $kernelProjectDir,
     ) {
+        $this->configDir = $kernelProjectDir . '/config';
+        $this->pluginDir = $kernelProjectDir . '/plugins';
     }
 
     public function getAdminList(): array
     {
         $plugins = [];
         foreach ($this->parsePluginDir() as $pluginPath) {
-            $chunks = explode('/', (string) $pluginPath);
-            $pluginKey = end($chunks);
             $manifest = $pluginPath . '/manifest.json';
             if (!$this->filesystem->fileExists($manifest)) {
                 continue;
@@ -34,6 +35,8 @@ readonly class PluginService
             } catch (\JsonException) {
                 continue;
             }
+
+            $pluginKey = basename($pluginPath);
             $plugins[] = [
                 'name' => $pluginData['name'] ?? $pluginKey,
                 'version' => $pluginData['version'] ?? '0.0.0',
@@ -94,15 +97,15 @@ readonly class PluginService
 
     private function parsePluginDir(): array
     {
-        if (!$this->filesystem->exists(self::PLUGIN_DIR)) {
+        if (!$this->filesystem->exists($this->pluginDir)) {
             return [];
         }
-        return $this->filesystem->glob(self::PLUGIN_DIR . '/*', GLOB_ONLYDIR);
+        return $this->filesystem->glob($this->pluginDir . '/*', GLOB_ONLYDIR);
     }
 
     private function getPluginConfig(): array
     {
-        $configFile = self::CONFIG_DIR . '/plugins.php';
+        $configFile = $this->configDir . '/plugins.php';
         if (!$this->filesystem->fileExists($configFile)) {
             return [];
         }
@@ -117,11 +120,11 @@ readonly class PluginService
 
     public function setPluginConfig(array $config): void
     {
-        $configFile = self::CONFIG_DIR . '/plugins.php';
+        $configFile = $this->configDir . '/plugins.php';
         $content = '<?php declare(strict_types=1);' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
-        $this->filesystem->putFileContents($configFile, $content);
-
-        $this->commandService->clearCache();
+        if ($this->filesystem->putFileContents($configFile, $content)) {
+            $this->commandService->clearCache();
+        }
     }
 
     private function isInstalled(string $pluginKey): bool

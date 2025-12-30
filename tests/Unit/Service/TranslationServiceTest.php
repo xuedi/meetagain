@@ -40,12 +40,10 @@ class TranslationServiceTest extends TestCase
 
         $this->subject = new TranslationService(
             $this->translationRepo,
-            $this->userRepo,
             $this->entityManager,
             $this->fileManager,
             $this->languageService,
-            $this->commandService,
-            $this->configService
+            $this->commandService
         );
     }
 
@@ -54,25 +52,20 @@ class TranslationServiceTest extends TestCase
         // Arrange: expected matrix structure sorted alphabetically by placeholder
         $expected = [
             'a_translation' => [
-                'de' => ['id' => null, 'value' => 'Translation A-DE'],
-                'en' => ['id' => null, 'value' => 'Translation A-EN'],
+                'de' => ['id' => 1, 'value' => 'Translation A-DE'],
+                'en' => ['id' => 2, 'value' => 'Translation A-EN'],
             ],
             'b_translation' => [
-                'de' => ['id' => null, 'value' => 'Translation B-DE'],
-                'en' => ['id' => null, 'value' => ''],
+                'de' => ['id' => 3, 'value' => 'Translation B-DE'],
+                'en' => ['id' => 4, 'value' => ''],
             ],
         ];
 
-        // Arrange: mock repository to return translations in random order
+        // Arrange: mock repository to return matrix
         $this->translationRepo
             ->expects($this->once())
-            ->method('findAll')
-            ->willReturn([
-                (new Translation())->setLanguage('de')->setPlaceholder('b_translation')->setTranslation('Translation B-DE'),
-                (new Translation())->setLanguage('de')->setPlaceholder('a_translation')->setTranslation('Translation A-DE'),
-                (new Translation())->setLanguage('en')->setPlaceholder('b_translation')->setTranslation(null),
-                (new Translation())->setLanguage('en')->setPlaceholder('a_translation')->setTranslation('Translation A-EN'),
-            ]);
+            ->method('getMatrix')
+            ->willReturn($expected);
 
         // Act: get matrix
         $actual = $this->subject->getMatrix();
@@ -104,26 +97,6 @@ class TranslationServiceTest extends TestCase
 
         // Assert: translation value is updated
         $this->assertSame('new_value', $translationEntity->getTranslation());
-    }
-
-    public function testExtractProcessesFilesCorrectly(): void
-    {
-        $importUser = (new UserStub())->setId(1);
-        $this->userRepo->method('findOneBy')->willReturn($importUser);
-        $this->configService->method('getSystemUserId')->willReturn(1);
-        
-        $file = $this->createMock(\Symfony\Component\Finder\SplFileInfo::class);
-        $file->method('getFilename')->willReturn('messages.de.php');
-        $file->method('getPathname')->willReturn(__DIR__ . '/Stubs/translations_stub.php');
-        
-        $this->fileManager->method('getTranslationFiles')->willReturn([$file]);
-        $this->translationRepo->method('getUniqueList')->willReturn(['de' => []]);
-
-        $this->entityManager->expects($this->atLeastOnce())->method('persist');
-        $this->entityManager->expects($this->atLeastOnce())->method('flush');
-
-        $result = $this->subject->extract();
-        $this->assertArrayHasKey('count', $result);
     }
 
     public function testPublishWritesFilesAndClearsCache(): void

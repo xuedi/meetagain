@@ -6,7 +6,7 @@ use App\Entity\ActivityType;
 use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\ChangedUsername;
 use App\Service\Activity\Messages\Login;
-use App\Service\ImageService;
+use App\Service\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -14,13 +14,10 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ChangedUsernameTest extends TestCase
 {
-    private MockObject|RouterInterface $router;
-    private MockObject|ImageService $imageService;
-
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
-        $this->imageService = $this->createStub(ImageService::class);
+        $this->imageService = $this->createStub(ImageHtmlRenderer::class);
     }
 
     public function testCanBuild(): void

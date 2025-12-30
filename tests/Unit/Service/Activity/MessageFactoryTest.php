@@ -8,7 +8,7 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Activity\MessageFactory;
 use App\Service\Activity\MessageInterface;
-use App\Service\ImageService;
+use App\Service\ImageHtmlRenderer;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +23,7 @@ class MessageFactoryTest extends TestCase
     private MockObject|EventRepository $eventRepository;
     private MockObject|RequestStack $requestStack;
     private MockObject|MessageInterface $message;
-    private MockObject|ImageService $imageService;
+    private MockObject|ImageHtmlRenderer $imageRenderer;
     private MockObject|Activity $activity;
     private array $messages;
 
@@ -35,7 +35,7 @@ class MessageFactoryTest extends TestCase
         $this->requestStack = $this->createStub(RequestStack::class);
         $this->message = $this->createStub(MessageInterface::class);
         $this->activity = $this->createStub(Activity::class);
-        $this->imageService = $this->createStub(ImageService::class);
+        $this->imageRenderer = $this->createStub(ImageHtmlRenderer::class);
         $this->messages = [$this->message];
     }
 
@@ -66,7 +66,7 @@ class MessageFactoryTest extends TestCase
             $this->userRepository,
             $this->eventRepository,
             $this->requestStack,
-            $this->imageService,
+            $this->imageRenderer,
         );
 
         // Call the method under test
@@ -92,7 +92,7 @@ class MessageFactoryTest extends TestCase
             $this->userRepository,
             $this->eventRepository,
             $this->requestStack,
-            $this->imageService,
+            $this->imageRenderer,
         );
 
         // Expect exception

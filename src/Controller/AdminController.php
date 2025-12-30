@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Service\DashboardService;
+use App\Service\DashboardActionService;
+use App\Service\DashboardStatsService;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\DependencyFactory;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,8 @@ class AdminController extends AbstractController
 
     public function __construct(
         private readonly TagAwareCacheInterface $appCache,
-        private readonly DashboardService $dashboard,
+        private readonly DashboardStatsService $dashboardStats,
+        private readonly DashboardActionService $dashboardAction,
         private readonly Connection $connection,
         private readonly DependencyFactory $dependencyFactory,
         private readonly string $kernelProjectDir,
@@ -27,20 +29,21 @@ class AdminController extends AbstractController
     {
         $year ??= (int) (new \DateTime())->format('Y');
         $week ??= (int) (new \DateTime())->format('W');
+        $dates = $this->dashboardStats->calculateDates($year, $week);
 
         return $this->render('admin/index.html.twig', [
             'active' => 'dashboard',
-            'needForApproval' => $this->dashboard->getNeedForApproval(),
-            'time' => $this->dashboard->getTimeControl($year, $week),
-            'details' => $this->dashboard->getDetails($year, $week),
-            'pagesNotFound' => $this->dashboard->getPagesNotFound($year, $week),
-            'actionItems' => $this->dashboard->getActionItems(),
-            'userStatusBreakdown' => $this->dashboard->getUserStatusBreakdown(),
-            'activeUsers' => $this->dashboard->getActiveUsersCount(),
-            'imageStats' => $this->dashboard->getImageStats($year, $week),
-            'upcomingEvents' => $this->dashboard->getUpcomingEvents(3),
-            'pastEventsNoPhotos' => $this->dashboard->getPastEventsWithoutPhotos(5),
-            'recurringEvents' => $this->dashboard->getRecurringEventsCount(),
+            'needForApproval' => $this->dashboardAction->getNeedForApproval(),
+            'time' => $this->dashboardStats->getTimeControl($year, $week),
+            'details' => $this->dashboardStats->getDetails($year, $week),
+            'pagesNotFound' => $this->dashboardStats->getPagesNotFound($year, $week),
+            'actionItems' => $this->dashboardAction->getActionItems(),
+            'userStatusBreakdown' => $this->dashboardAction->getUserStatusBreakdown(),
+            'activeUsers' => $this->dashboardAction->getActiveUsersCount(),
+            'imageStats' => $this->dashboardAction->getImageStats($dates['start'], $dates['stop']),
+            'upcomingEvents' => $this->dashboardAction->getUpcomingEvents(3),
+            'pastEventsNoPhotos' => $this->dashboardAction->getPastEventsWithoutPhotos(5),
+            'recurringEvents' => $this->dashboardAction->getRecurringEventsCount(),
             'tests' => $this->runHealthChecks(),
         ]);
     }

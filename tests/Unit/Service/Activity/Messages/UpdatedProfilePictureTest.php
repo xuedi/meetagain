@@ -5,21 +5,19 @@ namespace Tests\Unit\Service\Activity\Messages;
 use App\Entity\ActivityType;
 use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\UpdatedProfilePicture;
-use App\Service\ImageService;
+use App\Service\ImageHtmlRenderer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
 class UpdatedProfilePictureTest extends TestCase
 {
-    private MockObject|RouterInterface $router;
-    private MockObject|ImageService $imageService;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
-        // keep ImageService as a mock because interaction is asserted
-        $this->imageService = $this->createMock(ImageService::class);
+        // keep ImageHtmlRenderer as a mock because interaction is asserted
+        $this->imageRenderer = $this->createMock(ImageHtmlRenderer::class);
     }
 
     public function testCanBuild(): void
@@ -35,16 +33,16 @@ class UpdatedProfilePictureTest extends TestCase
             '</div>';
         $meta = ['old' => 0, 'new' => 1];
 
-        // Set up expectations for imageTemplateById
-        $this->imageService
+        // Set up expectations for renderThumbnail
+        $this->imageRenderer
             ->expects($this->exactly(2))
-            ->method('imageTemplateById')
+            ->method('renderThumbnail')
             ->willReturnMap([
-                [0, $oldImageHtml],
-                [1, $newImageHtml],
+                [0, '50x50', $oldImageHtml],
+                [1, '50x50', $newImageHtml],
             ]);
 
-        $subject = new UpdatedProfilePicture()->injectServices($this->router, $this->imageService, $meta);
+        $subject = new UpdatedProfilePicture()->injectServices($this->router, $this->imageRenderer, $meta);
 
         // check returns
         $this->assertInstanceOf(MessageInterface::class, $subject->validate());

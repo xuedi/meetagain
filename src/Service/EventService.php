@@ -117,8 +117,7 @@ readonly class EventService
             return;
         }
 
-        $recurringRule = $event->getRecurringRule();
-        $rrule = $this->createRRule($event, $recurringRule);
+        $rrule = $this->createRRule($event, $event->getRecurringRule());
 
         $skipFirst = true;
         foreach ($rrule as $occurrence) {
@@ -130,8 +129,7 @@ readonly class EventService
                 continue;
             }
 
-            $recurringEvent = $this->createRecurringEvent($event, $occurrence);
-            $this->em->persist($recurringEvent);
+            $this->em->persist($this->createRecurringEvent($event, $occurrence));
         }
 
         $this->em->flush();

@@ -3,7 +3,7 @@
 namespace App\Service\Activity;
 
 use App\Entity\ActivityType;
-use App\Service\ImageService;
+use App\Service\ImageHtmlRenderer;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -12,7 +12,7 @@ interface MessageInterface
 {
     public function injectServices(
         RouterInterface $router,
-        ImageService $imageService,
+        ImageHtmlRenderer $imageRenderer,
         null|array $meta = [],
         array $userNames = [],
         array $eventNames = [],

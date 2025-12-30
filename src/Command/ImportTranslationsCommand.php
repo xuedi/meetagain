@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\TranslationImportService;
 use App\Service\TranslationService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:translation:import', description: 'imports online translations for local development')]
 class ImportTranslationsCommand extends Command
 {
-    public function __construct(private readonly TranslationService $translationService)
+    public function __construct(private readonly TranslationImportService $translationImportService)
     {
         parent::__construct();
     }
@@ -26,7 +27,7 @@ class ImportTranslationsCommand extends Command
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->translationService->importForLocalDevelopment($input->getArgument('url'));
+        $this->translationImportService->importForLocalDevelopment($input->getArgument('url'));
 
         return Command::SUCCESS;
     }

@@ -4,14 +4,14 @@ namespace App\Twig;
 
 use App\Entity\TranslationSuggestionStatus;
 use App\Repository\TranslationSuggestionRepository;
-use App\Service\DashboardService;
+use App\Service\DashboardActionService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class AttentionExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly DashboardService $dashboardService,
+        private readonly DashboardActionService $dashboardAction,
         private readonly TranslationSuggestionRepository $translationSuggestionRepo,
     ) {
     }
@@ -27,7 +27,7 @@ final class AttentionExtension extends AbstractExtension
 
     public function getAdminAttention(): bool
     {
-        return count($this->dashboardService->getNeedForApproval()) > 0;
+        return count($this->dashboardAction->getNeedForApproval()) > 0;
     }
 
     public function getManagerAttention(): bool

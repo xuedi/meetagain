@@ -2,14 +2,14 @@
 
 namespace App\Service\Activity;
 
-use App\Service\ImageService;
+use App\Service\ImageHtmlRenderer;
 use InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
 
 abstract class MessageAbstract implements MessageInterface
 {
     protected RouterInterface $router;
-    protected ImageService $imageService;
+    protected ImageHtmlRenderer $imageRenderer;
     protected null|array $meta = [];
     protected array $userNames = [];
     protected array $eventNames = [];
@@ -17,13 +17,13 @@ abstract class MessageAbstract implements MessageInterface
     // TODO: add translator
     public function injectServices(
         RouterInterface $router,
-        ImageService $imageService,
+        ImageHtmlRenderer $imageRenderer,
         null|array $meta = [],
         array $userNames = [],
         array $eventNames = [],
     ): self {
         $this->router = $router;
-        $this->imageService = $imageService;
+        $this->imageRenderer = $imageRenderer;
         $this->meta = $meta;
         $this->userNames = $userNames;
         $this->eventNames = $eventNames;

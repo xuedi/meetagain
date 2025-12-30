@@ -4,9 +4,8 @@ namespace App\Service\Activity;
 
 use App\Entity\Activity;
 use App\Repository\EventRepository;
-use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
-use App\Service\ImageService;
+use App\Service\ImageHtmlRenderer;
 use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +21,7 @@ readonly class MessageFactory
         private UserRepository $userRepository,
         private EventRepository $eventRepository,
         private RequestStack $requestStack,
-        private ImageService $imageService,
+        private ImageHtmlRenderer $imageRenderer,
     ) {
     }
 
@@ -35,7 +34,7 @@ readonly class MessageFactory
             if ($message instanceof MessageInterface && $message->getType() === $activity->getType()) {
                 return $message->injectServices(
                     $this->router,
-                    $this->imageService,
+                    $this->imageRenderer,
                     $activity->getMeta(),
                     $this->userRepository->getUserNameList(),
                     $this->eventRepository->getEventNameList($locale),

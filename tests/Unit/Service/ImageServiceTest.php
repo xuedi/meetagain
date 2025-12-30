@@ -27,7 +27,6 @@ class ImageServiceTest extends TestCase
         ?ConfigService $configService = null,
         ?ExtendedFilesystem $filesystemService = null,
         ?LoggerInterface $logger = null,
-        ?Environment $twig = null,
     ): ImageService {
         return new ImageService(
             $imageRepo ?? $this->createStub(ImageRepository::class),
@@ -35,7 +34,6 @@ class ImageServiceTest extends TestCase
             $configService ?? $this->createStub(ConfigService::class),
             $filesystemService ?? $this->createStub(ExtendedFilesystem::class),
             $logger ?? $this->createStub(LoggerInterface::class),
-            $twig ?? $this->createStub(Environment::class),
             $this->kernelProjectDir,
         );
     }
@@ -169,7 +167,6 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ConfigService::class),
                 $this->createStub(ExtendedFilesystem::class),
                 $this->createStub(LoggerInterface::class),
-                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['createThumbnails'])
@@ -201,7 +198,6 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ConfigService::class),
                 $this->createStub(ExtendedFilesystem::class),
                 $this->createStub(LoggerInterface::class),
-                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['rotateThumbNail'])
@@ -265,7 +261,6 @@ class ImageServiceTest extends TestCase
                 $configServiceMock,
                 $filesystemMock,
                 $this->createStub(LoggerInterface::class),
-                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
@@ -367,7 +362,6 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ConfigService::class),
                 $filesystemMock,
                 $this->createStub(LoggerInterface::class),
-                $this->createStub(Environment::class),
                 $this->kernelProjectDir,
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
@@ -403,38 +397,4 @@ class ImageServiceTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
-    public function testImageTemplateById(): void
-    {
-        // Arrange: stub image
-        $imageId = 123;
-        $expectedHtml = '<div>rendered template</div>';
-        $image = $this->createStub(Image::class);
-
-        // Arrange: mock image repository to return image
-        $imageRepoMock = $this->createMock(ImageRepository::class);
-        $imageRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => $imageId])
-            ->willReturn($image);
-
-        // Arrange: mock Twig to render template
-        $twigMock = $this->createMock(Environment::class);
-        $twigMock
-            ->expects($this->once())
-            ->method('render')
-            ->with('_block/image.html.twig', ['image' => $image, 'size' => '50x50'])
-            ->willReturn($expectedHtml);
-
-        $subject = $this->createService(
-            imageRepo: $imageRepoMock,
-            twig: $twigMock,
-        );
-
-        // Act: get image template
-        $result = $subject->imageTemplateById($imageId);
-
-        // Assert: returns rendered HTML
-        $this->assertEquals($expectedHtml, $result);
-    }
 }

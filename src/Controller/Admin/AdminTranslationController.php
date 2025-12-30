@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Service\TranslationImportService;
 use App\Service\TranslationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,9 +11,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminTranslationController extends AbstractController
 {
-    public function __construct(private readonly \App\Service\TranslationService $translationService)
-    {
+    public function __construct(
+        private readonly TranslationService $translationService,
+        private readonly TranslationImportService $translationImportService,
+    ) {
     }
+
     #[Route('/admin/translations/edit', name: 'app_admin_translation_edit')]
     public function translationsIndex(): Response
     {
@@ -37,7 +41,7 @@ class AdminTranslationController extends AbstractController
     {
         return $this->render('admin/translations/extract.html.twig', [
             'active' => 'extract',
-            'result' => $this->translationService->extract(),
+            'result' => $this->translationImportService->extract(),
         ]);
     }
 

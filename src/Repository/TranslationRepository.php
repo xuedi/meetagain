@@ -16,6 +16,25 @@ class TranslationRepository extends ServiceEntityRepository
         parent::__construct($registry, Translation::class);
     }
 
+    public function getMatrix(): array
+    {
+        $structuredList = [];
+        $translations = $this->findAll();
+        foreach ($translations as $translation) {
+            $id = $translation->getId();
+            $lang = $translation->getLanguage();
+            $placeholder = $translation->getPlaceholder();
+            $translationText = $translation->getTranslation() ?? '';
+            $structuredList[$placeholder][$lang] = [
+                'id' => $id,
+                'value' => $translationText,
+            ];
+        }
+        ksort($structuredList, SORT_NATURAL);
+
+        return $structuredList;
+    }
+
     public function buildKeyValueList(): array
     {
         $list = [];
