@@ -60,6 +60,24 @@ class EventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @return array<Event>
+     */
+    public function findUpcomingEventsWithinRange(DateTimeInterface $start, DateTimeInterface $end): array
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.start BETWEEN :start AND :end')
+            ->andWhere('e.published = :published')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('published', true)
+            ->orderBy('e.start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getEventNameList(string $language): array
     {
         $events = $this->createQueryBuilder('e')

@@ -103,6 +103,36 @@ readonly class EmailService
         return $this->addToEmailQueue($email, 'notification_rsvp');
     }
 
+    public function prepareAggregatedRsvpNotification(User $recipient, array $attendees, Event $event): bool
+    {
+        $language = $recipient->getLocale();
+        $count = count($attendees);
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $recipient->getEmail());
+
+        $subject = $count > 1
+            ? 'People you follow plan to attend an event'
+            : sprintf('%s plans to attend an event', $attendees[0]->getName());
+
+        $email->subject($subject);
+        $email->htmlTemplate('_emails/notification_rsvp_aggregated.html.twig');
+        $email->locale($language);
+        $email->context([
+            'username' => $recipient->getName(),
+            'attendees' => $attendees,
+            'eventLocation' => $event->getLocation()?->getName() ?? '',
+            'eventDate' => $event->getStart()->format('Y-m-d'),
+            'eventId' => $event->getId(),
+            'eventTitle' => $event->getTitle($language),
+            'host' => $this->config->getHost(),
+            'lang' => $language,
+        ]);
+
+        return $this->addToEmailQueue($email, 'notification_rsvp_aggregated');
+    }
+
     public function prepareMessageNotification(User $sender, User $recipient): bool
     {
         $language = $recipient->getLocale();

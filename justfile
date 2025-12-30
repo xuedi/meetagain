@@ -83,6 +83,11 @@ app +parameter='':
 appCron:
     {{PHP}} php bin/console app:cron
 
+# Send RSVP notifications for upcoming events
+[group('app')]
+appRsvpNotify:
+    {{PHP}} php bin/console app:rsvp:notify
+
 # Clear the dev.log file
 [group('app')]
 appClearLogs:

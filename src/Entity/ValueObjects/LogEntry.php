@@ -4,7 +4,6 @@ namespace App\Entity\ValueObjects;
 
 use DateTimeImmutable;
 
-// TODO: add strict validation and refactor more php 8'y
 class LogEntry
 {
     private readonly DateTimeImmutable $date;

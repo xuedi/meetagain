@@ -1,0 +1,32 @@
+
+<h1>Hello {{ username }}!</h1>
+
+<p>
+    {% if attendees|length > 1 %}
+        Some people you follow plan to attend <b>{{ eventTitle }}</b> at <b>{{ eventLocation }}</b> on <b>{{ eventDate }}</b>:
+    {% else %}
+        <b>{{ attendees[0].name }}</b> whom you follow plans to attend <b>{{ eventTitle }}</b> at <b>{{ eventLocation }}</b> on <b>{{ eventDate }}</b>.
+    {% endif %}
+</p>
+
+{% if attendees|length > 1 %}
+<ul>
+    {% for attendee in attendees %}
+        <li>{{ attendee.name }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<p>
+    You can have a look at the Event details <a href="{{ host }}/{{ lang }}/event/{{ eventId }}">here</a>.
+</p>
+
+<p>
+    If you don't like to receive this notification, you can<br>
+    switch them off in your <a href="{{ host }}/{{ lang }}/profile/config/">settings</a>
+</p>
+
+<p>
+    Cheers,<br>
+    xuedi & yimu
+</p>
