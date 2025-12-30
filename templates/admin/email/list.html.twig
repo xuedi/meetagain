@@ -15,8 +15,8 @@
         {% for name,email in emails %}
             <div class="content has-background-grey-lighter p-3 mt-6 is-large is-flex is-justify-content-space-between is-align-items-center">
                 <span>{{ name | lower | trans }}</span>
-                {% if templatesByMockKey[name] is defined %}
-                    <a href="{{ path('app_admin_email_edit', {id: templatesByMockKey[name].id}) }}" class="button is-small is-info">
+                {% if email.template %}
+                    <a href="{{ path('app_admin_email_edit', {id: email.template.id}) }}" class="button is-small is-info">
                         Edit
                     </a>
                 {% endif %}
@@ -26,9 +26,9 @@
                     <div class="box">
                         <p>Subject: <b>{{ email.subject }}</b></p>
                         <br>
-                        <p>
-                            {% include email.template with email.context %}
-                        </p>
+                        <div>
+                            {{ email.renderedBody|raw }}
+                        </div>
                     </div>
                 </div>
                 <div class="column">

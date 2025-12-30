@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\EmailQueue;
+use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Service\ConfigService;
@@ -33,7 +34,7 @@ final class EmailServiceTest extends TestCase
                     $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
                     $this->assertSame('user@example.com', $entity->getRecipient());
                     $this->assertSame('Please Confirm your Email', $entity->getSubject());
-                    $this->assertSame('_emails/verification_request.html.twig', $entity->getTemplate());
+                    $this->assertSame('<p>Verification body</p>', $entity->getRenderedBody());
                     $this->assertSame('en', $entity->getLang());
 
                     $ctx = $entity->getContext();
@@ -51,7 +52,16 @@ final class EmailServiceTest extends TestCase
             );
         $emMock->expects($this->once())->method('flush');
 
-        $service = $this->createService(em: $emMock);
+        $templateService = $this->createStub(EmailTemplateService::class);
+        $template = new EmailTemplate();
+        $template->setSubject('Please Confirm your Email');
+        $template->setBody('<p>Verification body</p>');
+        $templateService->method('getTemplate')->willReturn($template);
+        $templateService->method('renderContent')->willReturnCallback(
+            fn (string $content) => $content
+        );
+
+        $service = $this->createService(em: $emMock, templateService: $templateService);
 
         // Act: prepare verification request
         $ok = $service->prepareVerificationRequest($user);
@@ -83,7 +93,7 @@ final class EmailServiceTest extends TestCase
             ->setSender('"email sender" <sender@email.com>')
             ->setRecipient('user@example.com')
             ->setSubject('Subject')
-            ->setTemplate('_emails/verification_request.html.twig')
+            ->setRenderedBody('<p>Rendered email body</p>')
             ->setLang('en')
             ->setContext(['k' => 'v']);
 
@@ -152,7 +162,7 @@ final class EmailServiceTest extends TestCase
                     $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
                     $this->assertSame('user@example.com', $entity->getRecipient());
                     $this->assertSame('Event canceled: Test Event', $entity->getSubject());
-                    $this->assertSame('_emails/notification_event_canceled.html.twig', $entity->getTemplate());
+                    $this->assertSame('<p>Event canceled body</p>', $entity->getRenderedBody());
                     $this->assertSame('en', $entity->getLang());
 
                     $ctx = $entity->getContext();
@@ -169,7 +179,16 @@ final class EmailServiceTest extends TestCase
             );
         $emMock->expects($this->once())->method('flush');
 
-        $service = $this->createService(em: $emMock);
+        $templateService = $this->createStub(EmailTemplateService::class);
+        $template = new EmailTemplate();
+        $template->setSubject('Event canceled: Test Event');
+        $template->setBody('<p>Event canceled body</p>');
+        $templateService->method('getTemplate')->willReturn($template);
+        $templateService->method('renderContent')->willReturnCallback(
+            fn (string $content) => $content
+        );
+
+        $service = $this->createService(em: $emMock, templateService: $templateService);
 
         // Act: prepare event canceled notification
         $ok = $service->prepareEventCanceledNotification($user, $event);
@@ -194,7 +213,7 @@ final class EmailServiceTest extends TestCase
                     $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
                     $this->assertSame('recipient@example.com', $entity->getRecipient());
                     $this->assertSame('You received a message from Bob', $entity->getSubject());
-                    $this->assertSame('_emails/notification_message.html.twig', $entity->getTemplate());
+                    $this->assertSame('<p>Message notification body</p>', $entity->getRenderedBody());
                     $this->assertSame('de', $entity->getLang());
 
                     $ctx = $entity->getContext();
@@ -208,7 +227,16 @@ final class EmailServiceTest extends TestCase
             );
         $emMock->expects($this->once())->method('flush');
 
-        $service = $this->createService(em: $emMock);
+        $templateService = $this->createStub(EmailTemplateService::class);
+        $template = new EmailTemplate();
+        $template->setSubject('You received a message from Bob');
+        $template->setBody('<p>Message notification body</p>');
+        $templateService->method('getTemplate')->willReturn($template);
+        $templateService->method('renderContent')->willReturnCallback(
+            fn (string $content) => $content
+        );
+
+        $service = $this->createService(em: $emMock, templateService: $templateService);
 
         // Act: prepare message notification
         $ok = $service->prepareMessageNotification($sender, $recipient);
@@ -225,18 +253,17 @@ final class EmailServiceTest extends TestCase
         // Act: get mock email list
         $result = $service->getMockEmailList();
 
-        // Assert: contains all expected email templates
-        $this->assertArrayHasKey('email_message_notification', $result);
-        $this->assertArrayHasKey('email_rsvp_notification_aggregated', $result);
-        $this->assertArrayHasKey('email_welcome', $result);
-        $this->assertArrayHasKey('email_verification_request', $result);
-        $this->assertArrayHasKey('email_password_reset_request', $result);
-        $this->assertArrayHasKey('email_event_canceled', $result);
+        // Assert: contains all expected email templates (using EmailType enum values)
+        $this->assertArrayHasKey('notification_message', $result);
+        $this->assertArrayHasKey('notification_rsvp_aggregated', $result);
+        $this->assertArrayHasKey('welcome', $result);
+        $this->assertArrayHasKey('verification_request', $result);
+        $this->assertArrayHasKey('password_reset_request', $result);
+        $this->assertArrayHasKey('notification_event_canceled', $result);
 
         // Assert: each entry has expected structure
         foreach ($result as $emailData) {
             $this->assertArrayHasKey('subject', $emailData);
-            $this->assertArrayHasKey('template', $emailData);
             $this->assertArrayHasKey('context', $emailData);
         }
     }
@@ -257,7 +284,13 @@ final class EmailServiceTest extends TestCase
 
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
-            $templateService->method('getTemplate')->willReturn(null);
+            $template = new EmailTemplate();
+            $template->setSubject('Test Subject');
+            $template->setBody('<p>Test Body</p>');
+            $templateService->method('getTemplate')->willReturn($template);
+            $templateService->method('renderContent')->willReturnCallback(
+                fn (string $content, array $context) => $content
+            );
         }
 
         return new EmailService(

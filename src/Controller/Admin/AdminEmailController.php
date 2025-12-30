@@ -28,12 +28,25 @@ class AdminEmailController extends AbstractController
     public function list(): Response
     {
         $templates = $this->templateRepo->findAll();
-        $templatesByMockKey = $this->buildTemplatesByMockKey($templates);
+        $templatesByIdentifier = $this->buildTemplatesByMockKey($templates);
+        $mockList = $this->emailService->getMockEmailList();
+
+        $emails = [];
+        foreach ($mockList as $identifier => $mockData) {
+            $dbTemplate = $templatesByIdentifier[$identifier] ?? null;
+            $emails[$identifier] = [
+                'subject' => $mockData['subject'],
+                'context' => $mockData['context'],
+                'renderedBody' => $dbTemplate
+                    ? $this->templateService->renderContent($dbTemplate->getBody(), $mockData['context'])
+                    : '<p>Template not found. Run app:email-templates:seed</p>',
+                'template' => $dbTemplate,
+            ];
+        }
 
         return $this->render('admin/email/list.html.twig', [
             'active' => 'email',
-            'emails' => $this->emailService->getMockEmailList(),
-            'templatesByMockKey' => $templatesByMockKey,
+            'emails' => $emails,
         ]);
     }
 
@@ -44,21 +57,9 @@ class AdminEmailController extends AbstractController
      */
     private function buildTemplatesByMockKey(array $templates): array
     {
-        $mapping = [
-            'verification_request' => 'email_verification_request',
-            'welcome' => 'email_welcome',
-            'password_reset_request' => 'email_password_reset_request',
-            'notification_message' => 'email_message_notification',
-            'notification_rsvp_aggregated' => 'email_rsvp_notification_aggregated',
-            'notification_event_canceled' => 'email_event_canceled',
-        ];
-
         $result = [];
         foreach ($templates as $template) {
-            $mockKey = $mapping[$template->getIdentifier()] ?? null;
-            if ($mockKey !== null) {
-                $result[$mockKey] = $template;
-            }
+            $result[$template->getIdentifier()] = $template;
         }
 
         return $result;
@@ -130,20 +131,6 @@ class AdminEmailController extends AbstractController
 
     private function getMockContextForTemplate(string $identifier, array $mockList): array
     {
-        $mapping = [
-            'verification_request' => 'email_verification_request',
-            'welcome' => 'email_welcome',
-            'password_reset_request' => 'email_password_reset_request',
-            'notification_message' => 'email_message_notification',
-            'notification_rsvp_aggregated' => 'email_rsvp_notification_aggregated',
-            'notification_event_canceled' => 'email_event_canceled',
-        ];
-
-        $mockKey = $mapping[$identifier] ?? null;
-        if ($mockKey !== null && isset($mockList[$mockKey])) {
-            return $mockList[$mockKey]['context'];
-        }
-
-        return [];
+        return $mockList[$identifier]['context'] ?? [];
     }
 }

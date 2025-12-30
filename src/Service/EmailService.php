@@ -11,6 +11,7 @@ use App\Repository\EmailQueueRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -31,8 +32,6 @@ readonly class EmailService
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $user->getEmail());
-        $email->subject('Please Confirm your Email');
-        $email->htmlTemplate('_emails/verification_request.html.twig');
         $email->locale($user->getLocale());
         $email->context([
             'host' => $this->config->getHost(),
@@ -50,8 +49,6 @@ readonly class EmailService
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $user->getEmail());
-        $email->subject('Welcome!');
-        $email->htmlTemplate('_emails/welcome.html.twig');
         $email->locale($user->getLocale());
         $email->context([
             'url' => $this->config->getUrl(),
@@ -67,8 +64,6 @@ readonly class EmailService
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $user->getEmail());
-        $email->subject('Password reset request');
-        $email->htmlTemplate('_emails/password_reset_request.html.twig');
         $email->locale($user->getLocale());
         $email->context([
             'host' => $this->config->getHost(),
@@ -83,28 +78,14 @@ readonly class EmailService
     public function prepareAggregatedRsvpNotification(User $recipient, array $attendees, Event $event): bool
     {
         $language = $recipient->getLocale();
-        $count = count($attendees);
+        $attendeeNames = implode(', ', array_map(fn (User $user) => $user->getName(), $attendees));
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $recipient->getEmail());
-
-        $subject = $count > 1
-            ? 'People you follow plan to attend an event'
-            : sprintf('%s plans to attend an event', $attendees[0]->getName());
-
-        $attendeesData = array_map(
-            fn (User $user) => ['name' => $user->getName()],
-            $attendees
-        );
-        $attendeeNames = implode(', ', array_map(fn (User $user) => $user->getName(), $attendees));
-
-        $email->subject($subject);
-        $email->htmlTemplate('_emails/notification_rsvp_aggregated.html.twig');
         $email->locale($language);
         $email->context([
             'username' => $recipient->getName(),
-            'attendees' => $attendeesData,
             'attendeeNames' => $attendeeNames,
             'eventLocation' => $event->getLocation()?->getName() ?? '',
             'eventDate' => $event->getStart()->format('Y-m-d'),
@@ -124,8 +105,6 @@ readonly class EmailService
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $recipient->getEmail());
-        $email->subject('You received a message from ' . $sender->getName());
-        $email->htmlTemplate('_emails/notification_message.html.twig');
         $email->locale($language);
         $email->context([
             'username' => $recipient->getName(),
@@ -145,8 +124,6 @@ readonly class EmailService
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $recipient->getEmail());
-        $email->subject('Event canceled: ' . $event->getTitle($language));
-        $email->htmlTemplate('_emails/notification_event_canceled.html.twig');
         $email->locale($language);
         $email->context([
             'username' => $recipient->getName(),
@@ -164,9 +141,8 @@ readonly class EmailService
     public function getMockEmailList(): array
     {
         return [
-            'email_message_notification' => [
+            EmailType::NotificationMessage->value => [
                 'subject' => 'You received a message from %senderName%',
-                'template' => '_emails/notification_message.html.twig',
                 'context' => [
                     'username' => 'John Doe',
                     'sender' => 'john.doe@example.org',
@@ -175,15 +151,10 @@ readonly class EmailService
                     'lang' => 'en',
                 ],
             ],
-            'email_rsvp_notification_aggregated' => [
+            EmailType::NotificationRsvpAggregated->value => [
                 'subject' => 'People you follow plan to attend an event',
-                'template' => '_emails/notification_rsvp_aggregated.html.twig',
                 'context' => [
                     'username' => 'John Doe',
-                    'attendees' => [
-                        ['name' => 'Denis Matrens'],
-                        ['name' => 'Jane Smith'],
-                    ],
                     'attendeeNames' => 'Denis Matrens, Jane Smith',
                     'eventLocation' => 'NightBar 64',
                     'eventDate' => '2025-01-01',
@@ -193,18 +164,16 @@ readonly class EmailService
                     'lang' => 'en',
                 ],
             ],
-            'email_welcome' => [
+            EmailType::Welcome->value => [
                 'subject' => 'Welcome!',
-                'template' => '_emails/welcome.html.twig',
                 'context' => [
                     'host' => 'https://localhost/en',
                     'url' => 'https://localhost/en',
                     'lang' => 'en',
                 ],
             ],
-            'email_verification_request' => [
+            EmailType::VerificationRequest->value => [
                 'subject' => 'Please Confirm your Email',
-                'template' => '_emails/verification_request.html.twig',
                 'context' => [
                     'host' => 'https://localhost/en',
                     'token' => '1234567890',
@@ -213,9 +182,8 @@ readonly class EmailService
                     'lang' => 'en',
                 ],
             ],
-            'email_password_reset_request' => [
+            EmailType::PasswordResetRequest->value => [
                 'subject' => 'Password reset request',
-                'template' => '_emails/password_reset_request.html.twig',
                 'context' => [
                     'host' => 'https://localhost/en',
                     'token' => '1234567890',
@@ -223,9 +191,8 @@ readonly class EmailService
                     'username' => 'John Doe',
                 ],
             ],
-            'email_event_canceled' => [
+            EmailType::NotificationEventCanceled->value => [
                 'subject' => 'Event canceled: Go tournament afterparty',
-                'template' => '_emails/notification_event_canceled.html.twig',
                 'context' => [
                     'username' => 'John Doe',
                     'eventLocation' => 'NightBar 64',
@@ -258,24 +225,22 @@ readonly class EmailService
 
     private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier): bool
     {
+        $dbTemplate = $this->templateService->getTemplate($identifier);
+        if (!$dbTemplate instanceof EmailTemplate) {
+            throw new RuntimeException(sprintf('Email template "%s" not found in database. Run app:email-templates:seed command.', $identifier->value));
+        }
+
+        $context = $email->getContext();
+
         $emailQueue = new EmailQueue();
         $emailQueue->setSender($email->getFrom()[0]->toString());
         $emailQueue->setRecipient($email->getTo()[0]->toString());
         $emailQueue->setLang($email->getLocale() ?? 'en');
-        $emailQueue->setContext($email->getContext());
+        $emailQueue->setContext($context);
         $emailQueue->setCreatedAt(new DateTimeImmutable());
         $emailQueue->setSendAt(null);
-
-        $dbTemplate = $this->templateService->getTemplate($identifier);
-        if ($dbTemplate instanceof EmailTemplate) {
-            $context = $email->getContext();
-            $emailQueue->setSubject($this->templateService->renderContent($dbTemplate->getSubject(), $context));
-            $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
-            $emailQueue->setTemplate(null);
-        } else {
-            $emailQueue->setSubject($email->getSubject());
-            $emailQueue->setTemplate($email->getHtmlTemplate());
-        }
+        $emailQueue->setSubject($this->templateService->renderContent($dbTemplate->getSubject(), $context));
+        $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
 
         $this->em->persist($emailQueue);
         $this->em->flush();
@@ -290,13 +255,7 @@ readonly class EmailService
         $template->addTo($mail->getRecipient());
         $template->subject($mail->getSubject());
         $template->locale($mail->getLang());
-
-        if ($mail->getRenderedBody() !== null) {
-            $template->html($mail->getRenderedBody());
-        } else {
-            $template->htmlTemplate($mail->getTemplate());
-            $template->context($mail->getContext());
-        }
+        $template->html($mail->getRenderedBody());
 
         return $template;
     }
