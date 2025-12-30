@@ -24,16 +24,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
-    // TODO: get via builder straight as keyValue
+    /**
+     * Get user id => name mapping without loading full entities.
+     *
+     * @return array<int, string>
+     */
     public function getUserNameList(): array
     {
         if ($this->userNameList !== null) {
             return $this->userNameList;
         }
-        $this->userNameList = [];
-        foreach ($this->findAll() as $user) {
-            $this->userNameList[$user->getId()] = $user->getName();
-        }
+
+        $result = $this->createQueryBuilder('u')
+            ->select('u.id', 'u.name')
+            ->getQuery()
+            ->getArrayResult();
+
+        $this->userNameList = array_column($result, 'name', 'id');
 
         return $this->userNameList;
     }
@@ -174,14 +181,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult();
     }
 
+    /**
+     * Get user name => id mapping for form choices without loading full entities.
+     *
+     * @return array<string, int>
+     */
     public function getAllUserChoice(): array
     {
-        $list = [];
-        foreach ($this->findAll() as $user) {
-            $list[$user->getName()] = $user->getId();
-        }
+        $result = $this->createQueryBuilder('u')
+            ->select('u.id', 'u.name')
+            ->getQuery()
+            ->getArrayResult();
 
-        return $list;
+        return array_column($result, 'id', 'name');
     }
 
     /**
