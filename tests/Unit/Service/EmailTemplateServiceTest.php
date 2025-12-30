@@ -114,7 +114,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->assertSame('Object: {{obj}}, Array: {{arr}}', $result);
     }
 
-    public function testGetDefaultTemplatesReturnsAllSixTemplates(): void
+    public function testGetDefaultTemplatesReturnsAllTemplates(): void
     {
         // Act
         $templates = $this->subject->getDefaultTemplates();
@@ -125,7 +125,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->assertArrayHasKey('welcome', $templates);
         $this->assertArrayHasKey('password_reset_request', $templates);
         $this->assertArrayHasKey('notification_message', $templates);
-        $this->assertArrayHasKey('notification_rsvp', $templates);
+        $this->assertArrayHasKey('notification_rsvp_aggregated', $templates);
         $this->assertArrayHasKey('notification_event_canceled', $templates);
     }
 

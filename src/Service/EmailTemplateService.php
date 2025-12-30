@@ -112,13 +112,13 @@ readonly class EmailTemplateService
 </p>',
                 'variables' => ['username', 'sender', 'senderId', 'host', 'lang'],
             ],
-            'notification_rsvp' => [
-                'subject' => 'A user you follow plans to attend an event',
+            'notification_rsvp_aggregated' => [
+                'subject' => 'People you follow plan to attend an event',
                 'body' => '<h1>Hello {{username}}!</h1>
 
 <p>
-    <b>{{followedUserName}}</b> plans to attend the <b>{{eventTitle}}</b> event<br>
-     at the <b>{{eventLocation}}</b> on the <b>{{eventDate}}</b>.
+    <b>{{attendeeNames}}</b> plan to attend the <b>{{eventTitle}}</b> event<br>
+    at the <b>{{eventLocation}}</b> on the <b>{{eventDate}}</b>.
 </p>
 <p>
     You can have a look at the Event details <a href="{{host}}/{{lang}}/event/{{eventId}}">here</a>.
@@ -132,7 +132,7 @@ readonly class EmailTemplateService
     Cheers,<br>
     xuedi & yimu
 </p>',
-                'variables' => ['username', 'followedUserName', 'eventLocation', 'eventDate', 'eventId', 'eventTitle', 'host', 'lang'],
+                'variables' => ['username', 'attendeeNames', 'eventLocation', 'eventDate', 'eventId', 'eventTitle', 'host', 'lang'],
             ],
             'notification_event_canceled' => [
                 'subject' => 'Event canceled: {{eventTitle}}',

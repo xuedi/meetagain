@@ -80,30 +80,6 @@ readonly class EmailService
         return $this->addToEmailQueue($email, EmailType::PasswordResetRequest);
     }
 
-    public function prepareRsvpNotification(User $userRsvp, User $userRecipient, Event $event): bool
-    {
-        $language = $userRecipient->getLocale();
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $userRecipient->getEmail());
-        $email->subject('A user you follow plans to attend an event');
-        $email->htmlTemplate('_emails/notification_rsvp.html.twig');
-        $email->locale($language);
-        $email->context([
-            'username' => $userRecipient->getName(),
-            'followedUserName' => $userRsvp->getName(),
-            'eventLocation' => $event->getLocation()->getName(),
-            'eventDate' => $event->getStart()->format('Y-m-d'),
-            'eventId' => $event->getId(),
-            'eventTitle' => $event->getTitle($language),
-            'host' => $this->config->getHost(),
-            'lang' => $language,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::NotificationRsvp);
-    }
-
     public function prepareAggregatedRsvpNotification(User $recipient, array $attendees, Event $event): bool
     {
         $language = $recipient->getLocale();
@@ -121,6 +97,7 @@ readonly class EmailService
             fn (User $user) => ['name' => $user->getName()],
             $attendees
         );
+        $attendeeNames = implode(', ', array_map(fn (User $user) => $user->getName(), $attendees));
 
         $email->subject($subject);
         $email->htmlTemplate('_emails/notification_rsvp_aggregated.html.twig');
@@ -128,6 +105,7 @@ readonly class EmailService
         $email->context([
             'username' => $recipient->getName(),
             'attendees' => $attendeesData,
+            'attendeeNames' => $attendeeNames,
             'eventLocation' => $event->getLocation()?->getName() ?? '',
             'eventDate' => $event->getStart()->format('Y-m-d'),
             'eventId' => $event->getId(),
@@ -197,12 +175,13 @@ readonly class EmailService
                     'lang' => 'en',
                 ],
             ],
-            'email_rsvp_notification' => [
-                'subject' => 'A user you follow plans to attend an event',
-                'template' => '_emails/notification_rsvp.html.twig',
+            'email_rsvp_notification_aggregated' => [
+                'subject' => 'People you follow plan to attend an event',
+                'template' => '_emails/notification_rsvp_aggregated.html.twig',
                 'context' => [
                     'username' => 'John Doe',
-                    'followedUserName' => 'Denis Matrens',
+                    'attendees' => [['name' => 'Denis Matrens'], ['name' => 'Jane Smith']],
+                    'attendeeNames' => 'Denis Matrens, Jane Smith',
                     'eventLocation' => 'NightBar 64',
                     'eventDate' => '2025-01-01',
                     'eventId' => 1,

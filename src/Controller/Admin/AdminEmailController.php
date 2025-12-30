@@ -49,7 +49,7 @@ class AdminEmailController extends AbstractController
             'welcome' => 'email_welcome',
             'password_reset_request' => 'email_password_reset_request',
             'notification_message' => 'email_message_notification',
-            'notification_rsvp' => 'email_rsvp_notification',
+            'notification_rsvp_aggregated' => 'email_rsvp_notification_aggregated',
             'notification_event_canceled' => 'email_event_canceled',
         ];
 
@@ -135,7 +135,7 @@ class AdminEmailController extends AbstractController
             'welcome' => 'email_welcome',
             'password_reset_request' => 'email_password_reset_request',
             'notification_message' => 'email_message_notification',
-            'notification_rsvp' => 'email_rsvp_notification',
+            'notification_rsvp_aggregated' => 'email_rsvp_notification_aggregated',
             'notification_event_canceled' => 'email_event_canceled',
         ];
 
