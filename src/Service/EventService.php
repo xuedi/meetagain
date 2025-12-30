@@ -9,6 +9,7 @@ use App\Entity\EventFilterTime;
 use App\Entity\EventIntervals;
 use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
+use App\Exception\Event\UnknownIntervalException;
 use App\Repository\EventRepository;
 use DateTime;
 use DateTimeImmutable;
@@ -17,6 +18,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use RRule\RRule;
 use RuntimeException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class EventService
 {
@@ -32,26 +34,9 @@ readonly class EventService
         EventFilterSort $sort,
         EventTypes $type,
         EventFilterRsvp $rsvp,
+        ?UserInterface $user = null,
     ): array {
-        $criteria = new Criteria();
-        $criteria->orderBy(['start' => $sort->value]);
-        $criteria->where(
-            match ($time) { // TODO: all should be a dummy, no idea how
-                EventFilterTime::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
-                EventFilterTime::Past => Criteria::expr()->lte('start', new DateTime()),
-                EventFilterTime::Future => Criteria::expr()->gte('start', new DateTime()),
-            }
-        );
-        $criteria->andWhere(
-            match ($type) {
-                EventTypes::All => Criteria::expr()->not(Criteria::expr()->eq('id', 0)),
-                EventTypes::Regular => Criteria::expr()->eq('type', EventTypes::Regular->value),
-                EventTypes::Outdoor => Criteria::expr()->eq('type', EventTypes::Outdoor->value),
-                EventTypes::Dinner => Criteria::expr()->eq('type', EventTypes::Dinner->value),
-            }
-        );
-        $criteria->andWhere(Criteria::expr()->eq('published', true));
-        $result = $this->repo->matching($criteria)->toArray();
+        $result = $this->repo->findByFilters($time, $sort, $type, $user, $rsvp);
 
         return $this->structureList($result);
     }
@@ -132,32 +117,10 @@ readonly class EventService
             return;
         }
 
-        $skipFirst = true;
-        $today = new DateTime();
         $recurringRule = $event->getRecurringRule();
-        $ruleInterval = EventIntervals::BiMonthly === $recurringRule ? 2 : 1;
-        $ruleFrequency = match ($recurringRule) {
-            EventIntervals::Daily => RRule::DAILY,
-            EventIntervals::Weekly, EventIntervals::BiMonthly => RRule::WEEKLY,
-            EventIntervals::Monthly => RRule::MONTHLY,
-            EventIntervals::Yearly => RRule::YEARLY,
-            default => throw new RuntimeException('Unknown EventIntervals'),
-        };
+        $rrule = $this->createRRule($event, $recurringRule);
 
-        $rrule = new RRule([
-            'freq' => $ruleFrequency,
-            'interval' => $ruleInterval,
-            'dtstart' => $this->getLastRecurringEventDate($event),
-            'until' => (match ($recurringRule) {
-                EventIntervals::Daily => (clone $today)->modify('+2 weeks'),
-                EventIntervals::Weekly => (clone $today)->modify('+3 weeks'),
-                EventIntervals::BiMonthly => (clone $today)->modify('+5 weeks'),
-                EventIntervals::Monthly => (clone $today)->modify('+3 months'),
-                EventIntervals::Yearly => (clone $today)->modify('+3 years'),
-                default => throw new RuntimeException('Unknown EventIntervals'),
-            })->format('Y-m-d'),
-        ]);
-
+        $skipFirst = true;
         foreach ($rrule as $occurrence) {
             if ($skipFirst) {
                 $skipFirst = false;
@@ -167,43 +130,70 @@ readonly class EventService
                 continue;
             }
 
-            /** @var DateTime $eventStart */
-            $eventStart = $event->getStart();
-            /** @var DateTime $eventStop */
-            $eventStop = $event->getStop();
-
-            $recurringEvent = new Event();
-            $recurringEvent->setUser($event->getUser());
-            $recurringEvent->setPublished($event->isPublished());
-            $recurringEvent->setFeatured(false);
-            $recurringEvent->setLocation($event->getLocation());
-            $recurringEvent->setPreviewImage($event->getPreviewImage());
-            $recurringEvent->setInitial(false);
-            $recurringEvent->setStart($this->updateDate($eventStart, $occurrence));
-            $recurringEvent->setStop($this->updateDate($eventStop, $occurrence));
-            $recurringEvent->setRecurringOf($event->getId());
-            $recurringEvent->setRecurringRule(null);
-            $recurringEvent->setCreatedAt(new DateTimeImmutable());
-            $recurringEvent->setHost($event->getHost());
-            $recurringEvent->setType($event->getType());
-
-            foreach ($event->getTranslation() as $eventTranslation) {
-                $newEventTranslation = new EventTranslation();
-                $newEventTranslation->setEvent($recurringEvent);
-                $newEventTranslation->setLanguage($eventTranslation->getLanguage());
-                $newEventTranslation->setTitle($eventTranslation->getTitle());
-                $newEventTranslation->setTeaser($eventTranslation->getTeaser());
-                $newEventTranslation->setDescription($eventTranslation->getDescription());
-
-                $this->em->persist($newEventTranslation);
-                $recurringEvent->addTranslation($newEventTranslation);
-            }
-
+            $recurringEvent = $this->createRecurringEvent($event, $occurrence);
             $this->em->persist($recurringEvent);
         }
 
-        // Flush once after all events are created for better performance
         $this->em->flush();
+    }
+
+    private function createRRule(Event $event, EventIntervals $recurringRule): RRule
+    {
+        $today = new DateTime();
+        $ruleInterval = EventIntervals::BiMonthly === $recurringRule ? 2 : 1;
+        $ruleFrequency = match ($recurringRule) {
+            EventIntervals::Daily => RRule::DAILY,
+            EventIntervals::Weekly, EventIntervals::BiMonthly => RRule::WEEKLY,
+            EventIntervals::Monthly => RRule::MONTHLY,
+            EventIntervals::Yearly => RRule::YEARLY,
+            default => throw new UnknownIntervalException('Unknown EventIntervals'),
+        };
+
+        return new RRule([
+            'freq' => $ruleFrequency,
+            'interval' => $ruleInterval,
+            'dtstart' => $this->getLastRecurringEventDate($event),
+            'until' => (match ($recurringRule) {
+                EventIntervals::Daily => (clone $today)->modify('+2 weeks'),
+                EventIntervals::Weekly => (clone $today)->modify('+3 weeks'),
+                EventIntervals::BiMonthly => (clone $today)->modify('+5 weeks'),
+                EventIntervals::Monthly => (clone $today)->modify('+3 months'),
+                EventIntervals::Yearly => (clone $today)->modify('+3 years'),
+                default => throw new UnknownIntervalException('Unknown EventIntervals'),
+            })->format('Y-m-d'),
+        ]);
+    }
+
+    private function createRecurringEvent(Event $parent, DateTime $occurrence): Event
+    {
+        $recurringEvent = new Event();
+        $recurringEvent->setUser($parent->getUser());
+        $recurringEvent->setPublished($parent->isPublished());
+        $recurringEvent->setFeatured(false);
+        $recurringEvent->setLocation($parent->getLocation());
+        $recurringEvent->setPreviewImage($parent->getPreviewImage());
+        $recurringEvent->setInitial(false);
+        $recurringEvent->setStart($this->updateDate($parent->getStart(), $occurrence));
+        $recurringEvent->setStop($this->updateDate($parent->getStop(), $occurrence));
+        $recurringEvent->setRecurringOf($parent->getId());
+        $recurringEvent->setRecurringRule(null);
+        $recurringEvent->setCreatedAt(new DateTimeImmutable());
+        $recurringEvent->setHost($parent->getHost());
+        $recurringEvent->setType($parent->getType());
+
+        foreach ($parent->getTranslation() as $eventTranslation) {
+            $newEventTranslation = new EventTranslation();
+            $newEventTranslation->setEvent($recurringEvent);
+            $newEventTranslation->setLanguage($eventTranslation->getLanguage());
+            $newEventTranslation->setTitle($eventTranslation->getTitle());
+            $newEventTranslation->setTeaser($eventTranslation->getTeaser());
+            $newEventTranslation->setDescription($eventTranslation->getDescription());
+
+            $this->em->persist($newEventTranslation);
+            $recurringEvent->addTranslation($newEventTranslation);
+        }
+
+        return $recurringEvent;
     }
 
     private function updateDate(DateTime $target, DateTime $occurrence): DateTime

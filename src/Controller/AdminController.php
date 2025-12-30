@@ -25,18 +25,19 @@ class AdminController extends AbstractController
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
     public function index(null|int $year = null, null|int $week = null): Response
     {
-        $this->dashboard->setTime($year, $week);
+        $year ??= (int) (new \DateTime())->format('Y');
+        $week ??= (int) (new \DateTime())->format('W');
 
         return $this->render('admin/index.html.twig', [
             'active' => 'dashboard',
             'needForApproval' => $this->dashboard->getNeedForApproval(),
-            'time' => $this->dashboard->getTimeControl(),
-            'details' => $this->dashboard->getDetails(),
-            'pagesNotFound' => $this->dashboard->getPagesNotFound(),
+            'time' => $this->dashboard->getTimeControl($year, $week),
+            'details' => $this->dashboard->getDetails($year, $week),
+            'pagesNotFound' => $this->dashboard->getPagesNotFound($year, $week),
             'actionItems' => $this->dashboard->getActionItems(),
             'userStatusBreakdown' => $this->dashboard->getUserStatusBreakdown(),
             'activeUsers' => $this->dashboard->getActiveUsersCount(),
-            'imageStats' => $this->dashboard->getImageStats(),
+            'imageStats' => $this->dashboard->getImageStats($year, $week),
             'upcomingEvents' => $this->dashboard->getUpcomingEvents(3),
             'pastEventsNoPhotos' => $this->dashboard->getPastEventsWithoutPhotos(5),
             'recurringEvents' => $this->dashboard->getRecurringEventsCount(),

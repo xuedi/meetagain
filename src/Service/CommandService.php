@@ -15,25 +15,37 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 readonly class CommandService
 {
+    private Application $application;
+    private AnsiToHtmlConverter $converter;
+
     public function __construct(
         private KernelInterface $kernel,
         private LanguageService $languageService,
     ) {
+        $this->application = new Application($this->kernel);
+        $this->application->setAutoExit(false);
+        $this->converter = new AnsiToHtmlConverter();
     }
 
     public function execute(CommandInterface $command): string
     {
-        $input = new ArrayInput($command->getParameter());
+        $params = $command->getParameter();
+        $commandName = $command->getCommand();
+        if (!isset($params['command'])) {
+            $params['command'] = $commandName;
+        }
+
+        return $this->run($params);
+    }
+
+    public function run(array $parameters): string
+    {
+        $input = new ArrayInput($parameters);
         $output = new BufferedOutput();
 
-        $application = new Application($this->kernel);
-        $application->setAutoExit(false);
-        $application->run($input, $output);
+        $this->application->run($input, $output);
 
-        $converter = new AnsiToHtmlConverter();
-        $content = $output->fetch();
-
-        return $converter->convert($content);
+        return $this->converter->convert($output->fetch());
     }
 
     public function clearCache(): string

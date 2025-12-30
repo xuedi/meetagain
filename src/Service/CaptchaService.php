@@ -6,20 +6,25 @@ use DateTimeImmutable;
 use Imagick;
 use ImagickDraw;
 use ImagickPixel;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class CaptchaService
+readonly class CaptchaService
 {
-    private SessionInterface $session;
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {
+    }
 
-    public function setSession(SessionInterface $session): void
+    private function getSession(): SessionInterface
     {
-        $this->session = $session;
+        return $this->requestStack->getSession();
     }
 
     public function generate(): string
     {
-        $image = $this->session->get('captcha_image' . $this->session->getId());
+        $session = $this->getSession();
+        $image = $session->get('captcha_image' . $session->getId());
         if ($image !== null) {
             return $image;
         }
@@ -32,20 +37,21 @@ class CaptchaService
         }
         $image = $this->generateImage($code);
 
-        $refresh = $this->session->get('captcha_refresh' . $this->session->getId(), []);
+        $refresh = $session->get('captcha_refresh' . $session->getId(), []);
         $refresh[] = new DateTimeImmutable();
 
-        $this->session->set('captcha_refresh' . $this->session->getId(), $refresh);
-        $this->session->set('captcha_text' . $this->session->getId(), $code);
-        $this->session->set('captcha_image' . $this->session->getId(), $image);
+        $session->set('captcha_refresh' . $session->getId(), $refresh);
+        $session->set('captcha_text' . $session->getId(), $code);
+        $session->set('captcha_image' . $session->getId(), $image);
 
         return $image;
     }
 
     public function isValid(string $code): null|string
     {
+        $session = $this->getSession();
         $code = strtolower($code);
-        $expected = strtolower((string) $this->session->get('captcha_text' . $this->session->getId()));
+        $expected = strtolower((string) $session->get('captcha_text' . $session->getId()));
         if ($expected !== $code) {
             return sprintf("Wrong captcha code, got '%s' but expected '%s'", $code, $expected);
         }
@@ -79,28 +85,31 @@ class CaptchaService
 
     public function reset(): void
     {
+        $session = $this->getSession();
         if ($this->getRefreshCount() >= 7) {
             return;
         }
-        $this->session->remove('captcha_text' . $this->session->getId());
-        $this->session->remove('captcha_image' . $this->session->getId());
+        $session->remove('captcha_text' . $session->getId());
+        $session->remove('captcha_image' . $session->getId());
     }
 
     public function getRefreshCount(): int
     {
-        $refresh = $this->session->get('captcha_refresh' . $this->session->getId(), []);
+        $session = $this->getSession();
+        $refresh = $session->get('captcha_refresh' . $session->getId(), []);
         foreach ($refresh as $key => $value) {
             if ($value->modify('+1 minute') < new DateTimeImmutable()) {
                 unset($refresh[$key]);
             }
         }
-        $this->session->set('captcha_refresh' . $this->session->getId(), $refresh);
+        $session->set('captcha_refresh' . $session->getId(), $refresh);
         return count($refresh);
     }
 
     public function getRefreshTime(): int
     {
-        $refresh = $this->session->get('captcha_refresh' . $this->session->getId(), []);
+        $session = $this->getSession();
+        $refresh = $session->get('captcha_refresh' . $session->getId(), []);
         $now = new DateTimeImmutable();
         $minSeconds = PHP_INT_MAX;
 

@@ -153,8 +153,6 @@ class SecurityController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
     ): Response {
-        $this->captchaService->setSession($request->getSession());
-
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
 

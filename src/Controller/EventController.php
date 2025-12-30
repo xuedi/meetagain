@@ -62,7 +62,7 @@ class EventController extends AbstractController
         return $this->render(
             'events/index.html.twig',
             [
-                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp),
+                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser()),
                 'filter' => $form,
             ],
             $response,

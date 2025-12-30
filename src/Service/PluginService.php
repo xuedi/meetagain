@@ -29,11 +29,15 @@ readonly class PluginService
             if ($manifestContent === false) {
                 continue;
             }
-            $pluginData = json_decode($manifestContent, true);
+            try {
+                $pluginData = json_decode($manifestContent, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+                continue;
+            }
             $plugins[] = [
-                'name' => $pluginData['name'],
-                'version' => $pluginData['version'],
-                'description' => $pluginData['description'],
+                'name' => $pluginData['name'] ?? $pluginKey,
+                'version' => $pluginData['version'] ?? '0.0.0',
+                'description' => $pluginData['description'] ?? '',
                 'installed' => $this->isInstalled($pluginKey),
                 'enabled' => $this->isEnabled($pluginKey),
             ];
@@ -44,15 +48,8 @@ readonly class PluginService
 
     public function getActiveList(): array
     {
-        $activePlugins = [];
         $config = $this->getPluginConfig();
-        foreach ($config as $key => $value) {
-            if ($value === true) {
-                $activePlugins[] = $key;
-            }
-        }
-
-        return $activePlugins;
+        return array_keys(array_filter($config, fn($enabled) => $enabled === true));
     }
 
     public function install(string $pluginKey): void
@@ -97,36 +94,31 @@ readonly class PluginService
 
     private function parsePluginDir(): array
     {
-        $pluginDir = $this->filesystem->getRealPath(self::PLUGIN_DIR);
-        if ($pluginDir === false) {
+        if (!$this->filesystem->exists(self::PLUGIN_DIR)) {
             return [];
         }
-        return $this->filesystem->glob($pluginDir . '/*', GLOB_ONLYDIR);
+        return $this->filesystem->glob(self::PLUGIN_DIR . '/*', GLOB_ONLYDIR);
     }
 
     private function getPluginConfig(): array
     {
-        $configPath = $this->filesystem->getRealPath(self::CONFIG_DIR);
-        if ($configPath === false) {
+        $configFile = self::CONFIG_DIR . '/plugins.php';
+        if (!$this->filesystem->fileExists($configFile)) {
             return [];
         }
-        $configFile = $configPath . '/plugins.php';
 
-        return include $configFile;
+        try {
+            $config = include $configFile;
+            return is_array($config) ? $config : [];
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     public function setPluginConfig(array $config): void
     {
-        $configPath = $this->filesystem->getRealPath(self::CONFIG_DIR);
-        if ($configPath === false) {
-            return;
-        }
-        $configFile = $configPath . '/plugins.php';
-        $configItems = [];
-        foreach ($config as $key => $value) {
-            $configItems[] = "'" . $key . "' => " . ($value ? 'true' : 'false');
-        }
-        $content = '<?php declare(strict_types=1); return [' . implode(',', $configItems) . '];';
+        $configFile = self::CONFIG_DIR . '/plugins.php';
+        $content = '<?php declare(strict_types=1);' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
         $this->filesystem->putFileContents($configFile, $content);
 
         $this->commandService->clearCache();

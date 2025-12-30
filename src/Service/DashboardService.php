@@ -13,97 +13,91 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
 
-class DashboardService
+readonly class DashboardService
 {
-    private int $week = 0;
-    private int $weekNext = 0;
-    private int $weekPrevious = 0;
-    private int $year = 0;
-
-    private DateTimeImmutable $weekStartDate;
-    private DateTimeImmutable $weekStopDate;
-
     public function __construct(
-        private readonly EventRepository $eventRepo,
-        private readonly UserRepository $userRepo,
-        private readonly EmailQueueRepository $mailRepo,
-        private readonly NotFoundLogRepository $notFoundRepo,
-        private readonly ActivityRepository $activityRepo,
-        private readonly ImageRepository $imageRepo,
-        private readonly TranslationSuggestionRepository $translationSuggestionRepo,
+        private EventRepository $eventRepo,
+        private UserRepository $userRepo,
+        private EmailQueueRepository $mailRepo,
+        private NotFoundLogRepository $notFoundRepo,
+        private ActivityRepository $activityRepo,
+        private ImageRepository $imageRepo,
+        private TranslationSuggestionRepository $translationSuggestionRepo,
     ) {
     }
 
-    public function getTimeControl(): array
+    public function getTimeControl(int $year, int $week): array
     {
+        $dates = $this->calculateDates($year, $week);
         return [
-            'week' => $this->week,
-            'year' => $this->year,
-            'weekNext' => $this->weekNext,
-            'weekPrevious' => $this->weekPrevious,
+            'week' => $week,
+            'year' => $year,
+            'weekNext' => $week + 1, // TODO: over/underflow someday
+            'weekPrevious' => $week - 1,
             'weekDetails' => sprintf(
                 '%s - %s',
-                $this->weekStartDate->format('Y-m-d'),
-                $this->weekStopDate->format('Y-m-d'),
+                $dates['start']->format('Y-m-d'),
+                $dates['stop']->format('Y-m-d'),
             ),
         ];
     }
 
-    public function getDetails(): array
+    public function getDetails(int $year, int $week): array
     {
+        $dates = $this->calculateDates($year, $week);
         return [
             '404pages' => [
                 'count' => $this->notFoundRepo->count(),
-                'week' => $this->notFoundRepo->matching($this->timeCrit())->count(),
+                'week' => $this->notFoundRepo->matching($this->timeCrit($dates))->count(),
             ],
             'members' => [
                 'count' => $this->userRepo->count(),
-                'week' => $this->userRepo->matching($this->timeCrit())->count(),
+                'week' => $this->userRepo->matching($this->timeCrit($dates))->count(),
             ],
             'activity' => [
                 'count' => $this->activityRepo->count(),
-                'week' => $this->activityRepo->matching($this->timeCrit())->count(),
+                'week' => $this->activityRepo->matching($this->timeCrit($dates))->count(),
             ],
             'events' => [
                 'count' => $this->eventRepo->count(),
-                'week' => $this->eventRepo->matching($this->timeCrit('start'))->count(),
+                'week' => $this->eventRepo->matching($this->timeCrit($dates, 'start'))->count(),
             ],
             'emails' => [
                 'count' => $this->mailRepo->count(),
-                'week' => $this->mailRepo->matching($this->timeCrit())->count(),
+                'week' => $this->mailRepo->matching($this->timeCrit($dates))->count(),
             ],
         ];
     }
 
-    public function getPagesNotFound(): array
+    public function getPagesNotFound(int $year, int $week): array
     {
+        $dates = $this->calculateDates($year, $week);
         return [
-            'list' => $this->notFoundRepo->getWeekSummary($this->weekStartDate, $this->weekStopDate),
+            'list' => $this->notFoundRepo->getWeekSummary($dates['start'], $dates['stop']),
         ];
     }
 
-    public function setTime(null|int $year, null|int $week): void
+    public function calculateDates(null|int $year, null|int $week): array
     {
-        $this->year = $year ?? ((int) new DateTime()->format('Y'));
-        $this->week = $week ?? ((int) new DateTime()->format('W'));
+        $year ??= (int) (new DateTime())->format('Y');
+        $week ??= (int) (new DateTime())->format('W');
 
         $tmpDate = new DateTime();
-        $tmpDate->setISODate($this->year, $this->week);
+        $tmpDate->setISODate($year, $week);
 
-        $this->weekStartDate = DateTimeImmutable::createFromMutable($tmpDate);
-        $this->weekStopDate = DateTimeImmutable::createFromMutable($tmpDate->modify('+6 days'));
-
-        $this->weekNext = $this->week + 1; // TODO: over/underflow someday
-        $this->weekPrevious = $this->week - 1;
+        return [
+            'start' => DateTimeImmutable::createFromMutable($tmpDate),
+            'stop' => DateTimeImmutable::createFromMutable($tmpDate->modify('+6 days')),
+        ];
     }
 
-    private function timeCrit(null|string $column = 'createdAt'): Criteria
+    private function timeCrit(array $dates, null|string $column = 'createdAt'): Criteria
     {
-        $start = $this->weekStartDate;
-        $stop = $this->weekStopDate;
+        $start = $dates['start'];
+        $stop = $dates['stop'];
         if ($column === 'start') {
-            $start = new DateTime()->setTimestamp($start->getTimestamp());
-            $stop = new DateTime()->setTimestamp($stop->getTimestamp());
+            $start = (new DateTime())->setTimestamp($start->getTimestamp());
+            $stop = (new DateTime())->setTimestamp($stop->getTimestamp());
         }
 
         $criteria = new Criteria();
@@ -150,9 +144,10 @@ class DashboardService
     /**
      * Image storage statistics
      */
-    public function getImageStats(): array
+    public function getImageStats(int $year, int $week): array
     {
-        return $this->imageRepo->getStorageStats($this->weekStartDate, $this->weekStopDate);
+        $dates = $this->calculateDates($year, $week);
+        return $this->imageRepo->getStorageStats($dates['start'], $dates['stop']);
     }
 
     /**
@@ -179,15 +174,5 @@ class DashboardService
     public function getRecurringEventsCount(): int
     {
         return $this->eventRepo->getRecurringCount();
-    }
-
-    public function getWeekStartDate(): DateTimeImmutable
-    {
-        return $this->weekStartDate;
-    }
-
-    public function getWeekStopDate(): DateTimeImmutable
-    {
-        return $this->weekStopDate;
     }
 }

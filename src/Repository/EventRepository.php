@@ -3,10 +3,15 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use App\Entity\EventFilterRsvp;
+use App\Entity\EventFilterSort;
+use App\Entity\EventFilterTime;
+use App\Entity\EventTypes;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /** @extends ServiceEntityRepository<Event> */
 class EventRepository extends ServiceEntityRepository
@@ -14,6 +19,45 @@ class EventRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Event::class);
+    }
+
+    /**
+     * @return Event[]
+     */
+    public function findByFilters(
+        EventFilterTime $time,
+        EventFilterSort $sort,
+        EventTypes $type,
+        ?UserInterface $user = null,
+        ?EventFilterRsvp $rsvp = null,
+    ): array {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->andWhere('e.published = :published')
+            ->setParameter('published', true);
+
+        match ($time) {
+            EventFilterTime::Past => $qb->andWhere('e.start <= :now')->setParameter('now', new DateTime()),
+            EventFilterTime::Future => $qb->andWhere('e.start >= :now')->setParameter('now', new DateTime()),
+            EventFilterTime::All => null,
+        };
+
+        if ($type !== EventTypes::All) {
+            $qb->andWhere('e.type = :type')->setParameter('type', $type->value);
+        }
+
+        if ($rsvp !== null && $rsvp !== EventFilterRsvp::All && $user !== null) {
+            if ($rsvp === EventFilterRsvp::My) {
+                $qb->innerJoin('e.rsvp', 'u', 'WITH', 'u.id = :userId')
+                    ->setParameter('userId', $user->getId());
+            }
+            // Friends filtering not yet implemented
+        }
+
+        $qb->orderBy('e.start', $sort->value);
+
+        return $qb->getQuery()->getResult();
     }
 
     public function getEventNameList(string $language): array

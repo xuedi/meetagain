@@ -7,12 +7,7 @@ use App\Repository\TranslationRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 readonly class TranslationService
@@ -21,11 +16,10 @@ readonly class TranslationService
         private TranslationRepository $translationRepo,
         private UserRepository $userRepo,
         private EntityManagerInterface $entityManager,
-        private Filesystem $fs,
+        private TranslationFileManager $fileManager,
         private LanguageService $languageService,
         private CommandService $commandService,
         private ConfigService $configService,
-        private string $kernelProjectDir,
     ) {
     }
 
@@ -78,11 +72,10 @@ readonly class TranslationService
 
         $numberTranslationCount = 0;
         $newTranslations = 0;
-        $this->cleanUpTranslationFiles();
-        $output = $this->extractTranslationsFromFiles();
-        $deletedTranslations = 0; //$this->deleteOrphanedTranslations();
+        $this->fileManager->cleanUpTranslationFiles();
+        $output = $this->commandService->extractTranslations();
+        $deletedTranslations = 0;
 
-        $path = $this->kernelProjectDir . '/translations/';
         $dataBase = $this->translationRepo->getUniqueList();
         $importUser = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
 
@@ -90,12 +83,9 @@ readonly class TranslationService
             throw new \RuntimeException('System user not found for translation import');
         }
 
-        $finder = new Finder();
-        $finder->files()->in($path)->depth(0)->name(['messages*.php']);
-        foreach ($finder as $file) {
+        foreach ($this->fileManager->getTranslationFiles() as $file) {
             $parts = explode('.', $file->getFilename());
             if (count($parts) !== 3) {
-                // Skip files that don't match the expected pattern (messages.{lang}.php)
                 continue;
             }
             [$name, $lang, $ext] = $parts;
@@ -128,27 +118,17 @@ readonly class TranslationService
     public function publish(): array
     {
         $published = 0;
-        $cleanedUp = $this->cleanUpTranslationFiles();
-        $path = $this->kernelProjectDir . '/translations/';
+        $cleanedUp = $this->fileManager->cleanUpTranslationFiles();
         $locales = $this->languageService->getEnabledCodes();
 
-        // create new translation files
         foreach ($locales as $locale) {
-            $file = $path . 'messages.' . $locale . '.php';
-            $this->fs->appendToFile($file, '<?php return array (');
-            $translations = $this->translationRepo->findBy(['language' => $locale]);
-            foreach ($translations as $translation) {
-                $this->fs->appendToFile(
-                    $file,
-                    sprintf(
-                        "%s => %s,",
-                        var_export(strtolower($translation->getPlaceholder()), true),
-                        var_export($translation->getTranslation() ?? '', true)
-                    ),
-                );
+            $translations = [];
+            $entities = $this->translationRepo->findBy(['language' => $locale]);
+            foreach ($entities as $translation) {
+                $translations[strtolower($translation->getPlaceholder())] = $translation->getTranslation() ?? '';
                 $published++;
             }
-            $this->fs->appendToFile($file, ');');
+            $this->fileManager->writeTranslationFile($locale, $translations);
         }
         $this->commandService->clearCache();
 
@@ -212,7 +192,6 @@ readonly class TranslationService
 
         // get import user
         $user = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
-        ;
 
         foreach ($data as $item) {
             $translation = new Translation();
@@ -238,24 +217,5 @@ readonly class TranslationService
             }
         }
         return $cleanedList;
-    }
-
-    private function cleanUpTranslationFiles(): int
-    {
-        $cleanedUp = 0;
-        $path = $this->kernelProjectDir . '/translations/';
-        $finder = new Finder();
-        $finder->files()->in($path)->depth(0)->name(['*.php']);
-        foreach ($finder as $file) {
-            $this->fs->remove($file->getPathname());
-            $cleanedUp++;
-        }
-
-        return $cleanedUp;
-    }
-
-    private function extractTranslationsFromFiles(): string
-    {
-        return $this->commandService->extractTranslations();
     }
 }
