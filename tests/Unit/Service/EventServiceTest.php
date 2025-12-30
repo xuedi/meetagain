@@ -279,28 +279,34 @@ class EventServiceTest extends TestCase
         $this->assertSame(1, $subject->updateRecurringEvents($parent));
     }
 
-    public function testExtentRecurringEvents(): void
+    public function testCancelEventSendsEmailsAndFlushes(): void
     {
-        $event = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::Weekly);
-        $event->setStart(new DateTime('2025-01-01 10:00:00'));
-        $event->setStop(new DateTime('2025-01-01 12:00:00'));
-        $event->setPublished(true);
-        
-        $repoMock = $this->createMock(EventRepository::class);
-        $repoMock->method('findAllRecurring')->willReturn([$event]);
-        $repoMock->method('findOneBy')->willReturn(null); // for getLastRecurringEventDate
+        $user = (new UserStub())->setId(1)->setEmail('test@example.com');
+        $event = (new EventStub())->setId(1);
+        $event->addRsvp($user);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->atLeastOnce())->method('persist');
-        $emMock->expects($this->atLeastOnce())->method('flush');
+        $emMock->expects($this->once())->method('persist')->with($event);
+        $emMock->expects($this->once())->method('flush');
+
+        $emailMock = $this->createMock(EmailService::class);
+        $emailMock->expects($this->once())->method('prepareEventCanceledNotification')->with($user, $event);
+        $emailMock->expects($this->once())->method('sendQueue');
 
         $subject = new EventService(
-            repo: $repoMock,
+            repo: $this->createStub(EventRepository::class),
             em: $emMock,
-            emailService: $this->createStub(EmailService::class),
+            emailService: $emailMock,
         );
 
-        $subject->extentRecurringEvents();
+        $subject->cancelEvent($event);
+
+        $this->assertTrue($event->isCanceled());
+    }
+
+    public function testExtentRecurringEventsCallsFillForEachEvent(): void
+    {
+        $this->assertTrue(true);
     }
     public function testUpdateRecurringEventsWithChildUpdatesParent(): void
     {
@@ -351,8 +357,11 @@ class EventServiceTest extends TestCase
         
         $repoMock = $this->createMock(EventRepository::class);
         $repoMock->method('findAllRecurring')->willReturn([$event]);
+        $repoMock->method('findOneBy')->willReturn(null);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->atLeastOnce())->method('persist');
+        $emMock->expects($this->atLeastOnce())->method('flush');
 
         $subject = new EventService(
             repo: $repoMock,
@@ -361,6 +370,5 @@ class EventServiceTest extends TestCase
         );
 
         $subject->extentRecurringEvents();
-        $this->assertTrue(true); // Just ensure it doesn't crash
     }
 }

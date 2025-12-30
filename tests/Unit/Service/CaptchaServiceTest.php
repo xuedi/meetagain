@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class CaptchaServiceTest extends TestCase
 {
     private const string SESSION_ID = 'test_session_id';
-    private MockObject|SessionInterface $sessionMock;
-    private MockObject|RequestStack $requestStackMock;
+    private SessionInterface $sessionMock;
+    private RequestStack $requestStackMock;
     private CaptchaService $subject;
 
     protected function setUp(): void

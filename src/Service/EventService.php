@@ -144,7 +144,6 @@ readonly class EventService
             EventIntervals::Weekly, EventIntervals::BiMonthly => RRule::WEEKLY,
             EventIntervals::Monthly => RRule::MONTHLY,
             EventIntervals::Yearly => RRule::YEARLY,
-            default => throw new UnknownIntervalException('Unknown EventIntervals'),
         };
 
         return new RRule([
@@ -157,7 +156,6 @@ readonly class EventService
                 EventIntervals::BiMonthly => (clone $today)->modify('+5 weeks'),
                 EventIntervals::Monthly => (clone $today)->modify('+3 months'),
                 EventIntervals::Yearly => (clone $today)->modify('+3 years'),
-                default => throw new UnknownIntervalException('Unknown EventIntervals'),
             })->format('Y-m-d'),
         ]);
     }

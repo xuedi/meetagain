@@ -19,13 +19,13 @@ use Tests\Unit\Stubs\UserStub;
 
 class TranslationServiceTest extends TestCase
 {
-    private MockObject|TranslationRepository $translationRepo;
-    private MockObject|UserRepository $userRepo;
-    private MockObject|EntityManagerInterface $entityManager;
-    private MockObject|TranslationFileManager $fileManager;
-    private MockObject|LanguageService $languageService;
-    private MockObject|CommandService $commandService;
-    private MockObject|ConfigService $configService;
+    private TranslationRepository $translationRepo;
+    private UserRepository $userRepo;
+    private EntityManagerInterface $entityManager;
+    private TranslationFileManager $fileManager;
+    private LanguageService $languageService;
+    private CommandService $commandService;
+    private ConfigService $configService;
     private TranslationService $subject;
 
     protected function setUp(): void

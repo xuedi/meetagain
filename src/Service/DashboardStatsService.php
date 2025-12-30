@@ -97,8 +97,8 @@ readonly class DashboardStatsService
         }
 
         $criteria = new Criteria();
-        $criteria->where(Criteria::expr()?->gte($column, $start));
-        $criteria->andWhere(Criteria::expr()?->lte($column, $stop));
+        $criteria->where(Criteria::expr()->gte($column, $start));
+        $criteria->andWhere(Criteria::expr()->lte($column, $stop));
         return $criteria;
     }
 }
