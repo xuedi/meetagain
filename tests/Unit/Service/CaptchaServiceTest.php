@@ -14,16 +14,16 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class CaptchaServiceTest extends TestCase
 {
     private const string SESSION_ID = 'test_session_id';
-    private SessionInterface $sessionMock;
-    private RequestStack $requestStackMock;
+    private MockObject|SessionInterface $sessionMock;
+    private MockObject|RequestStack $requestStackMock;
     private CaptchaService $subject;
 
     protected function setUp(): void
     {
-        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock = $this->createStub(SessionInterface::class);
         $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
         
-        $this->requestStackMock = $this->createMock(RequestStack::class);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
         
         $this->subject = new CaptchaService($this->requestStackMock);
@@ -45,7 +45,14 @@ class CaptchaServiceTest extends TestCase
     public function testGenerateCreatesNewImageWhenNoneExists(): void
     {
         // Arrange: mock session to verify new captcha data is stored
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
         $this->sessionMock->method('get')->willReturn(null);
+        
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        
+        $this->subject = new CaptchaService($this->requestStackMock);
 
         // Assert: verify session stores refresh timestamps, captcha text, and image
         $this->sessionMock
@@ -68,6 +75,12 @@ class CaptchaServiceTest extends TestCase
     public function testIsValid(string $storedCode, string $inputCode, ?string $expectedError): void
     {
         // Arrange: set up session mock to return stored captcha code
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        $this->subject = new CaptchaService($this->requestStackMock);
+
         $this->sessionMock
             ->expects($this->once())
             ->method('get')
@@ -98,6 +111,12 @@ class CaptchaServiceTest extends TestCase
     public function testGetRefreshTimeReturnsZeroWhenNoRefreshHistory(): void
     {
         // Arrange: session returns empty refresh history
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        $this->subject = new CaptchaService($this->requestStackMock);
+
         $this->sessionMock
             ->expects($this->once())
             ->method('get')
@@ -114,6 +133,12 @@ class CaptchaServiceTest extends TestCase
     public function testGetRefreshTimeReturnsSecondsUntilNextRefresh(): void
     {
         // Arrange: session returns single recent refresh timestamp
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        $this->subject = new CaptchaService($this->requestStackMock);
+
         $this->sessionMock
             ->expects($this->once())
             ->method('get')
@@ -130,6 +155,12 @@ class CaptchaServiceTest extends TestCase
     public function testGetRefreshTimeReturnsSmallestRemainingTime(): void
     {
         // Arrange: session returns multiple refresh timestamps, oldest determines wait time
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        $this->subject = new CaptchaService($this->requestStackMock);
+
         $refreshHistory = [
             new DateTimeImmutable('-10 seconds'),
             new DateTimeImmutable('-35 seconds'), // oldest - determines smallest remaining time
@@ -153,6 +184,12 @@ class CaptchaServiceTest extends TestCase
     public function testGetRefreshCount(array $refreshHistory, int $expectedCount): void
     {
         // Arrange: mock session to return refresh history and expect cleanup
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        $this->subject = new CaptchaService($this->requestStackMock);
+
         $this->sessionMock
             ->expects($this->once())
             ->method('get')
@@ -199,6 +236,12 @@ class CaptchaServiceTest extends TestCase
     public function testResetDoesNotClearSessionWhenTooManyRefreshAttempts(): void
     {
         // Arrange: session has 7 refresh attempts (exceeds limit)
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        $this->subject = new CaptchaService($this->requestStackMock);
+
         $refreshHistory = array_fill(0, 7, new DateTimeImmutable());
 
         $this->sessionMock->method('get')->willReturn($refreshHistory);
@@ -213,6 +256,12 @@ class CaptchaServiceTest extends TestCase
     public function testResetClearsSessionWhenRefreshAttemptsWithinLimit(): void
     {
         // Arrange: session has only 1 refresh attempt (within limit)
+        $this->sessionMock = $this->createMock(SessionInterface::class);
+        $this->sessionMock->method('getId')->willReturn(self::SESSION_ID);
+        $this->requestStackMock = $this->createStub(RequestStack::class);
+        $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
+        $this->subject = new CaptchaService($this->requestStackMock);
+
         $refreshHistory = [new DateTimeImmutable()];
 
         $this->sessionMock->method('get')->willReturn($refreshHistory);

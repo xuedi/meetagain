@@ -15,7 +15,7 @@ class TranslationFileManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fs = $this->createMock(Filesystem::class);
+        $this->fs = $this->createStub(Filesystem::class);
         $this->projectDir = sys_get_temp_dir() . '/meetAgain_' . uniqid();
         mkdir($this->projectDir . '/translations', 0777, true);
         $this->subject = new TranslationFileManager($this->fs, $this->projectDir);
@@ -39,6 +39,8 @@ class TranslationFileManagerTest extends TestCase
 
     public function testCleanUpTranslationFilesRemovesPhpFiles(): void
     {
+        $this->fs = $this->createMock(Filesystem::class);
+        $this->subject = new TranslationFileManager($this->fs, $this->projectDir);
         $this->fs->method('exists')->willReturn(true);
         $this->fs->expects($this->once())->method('exists')->with($this->projectDir . '/translations/');
         
@@ -47,6 +49,8 @@ class TranslationFileManagerTest extends TestCase
 
     public function testWriteTranslationFileDumpsFile(): void
     {
+        $this->fs = $this->createMock(Filesystem::class);
+        $this->subject = new TranslationFileManager($this->fs, $this->projectDir);
         $this->fs->method('exists')->willReturn(true);
         $this->fs->expects($this->once())->method('dumpFile');
         

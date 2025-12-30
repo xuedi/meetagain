@@ -13,6 +13,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RsvpYesTest extends TestCase
 {
+    private RouterInterface $router;
+    private ImageHtmlRenderer $imageService;
 
 
     public function setUp(): void

@@ -12,7 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PasswordResetRequestTest extends TestCase
 {
-
+    private RouterInterface $router;
+    private ImageHtmlRenderer $imageService;
 
     public function setUp(): void
     {

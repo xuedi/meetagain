@@ -14,6 +14,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ChangedUsernameTest extends TestCase
 {
+    private RouterInterface $router;
+    private ImageHtmlRenderer $imageService;
+
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);

@@ -12,6 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class UpdatedProfilePictureTest extends TestCase
 {
+    private MockObject|RouterInterface $router;
+    private MockObject|ImageHtmlRenderer $imageRenderer;
 
     public function setUp(): void
     {

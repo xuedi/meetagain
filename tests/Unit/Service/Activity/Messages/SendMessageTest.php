@@ -13,7 +13,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SendMessageTest extends TestCase
 {
-
+    private RouterInterface $router;
+    private ImageHtmlRenderer $imageService;
 
     public function setUp(): void
     {

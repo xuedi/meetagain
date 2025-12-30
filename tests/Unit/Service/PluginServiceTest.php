@@ -325,13 +325,13 @@ class PluginServiceTest extends TestCase
     public function testSetPluginConfigSkipsWhenConfigPathIsFalse(): void
     {
         // Arrange: mock filesystem to return false for config path
-        $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('putFileContents')->willReturn(false);
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('putFileContents')->willReturn(false);
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir);
 
         // Act: try to set plugin config
         $subject->setPluginConfig(['test-plugin' => true]);

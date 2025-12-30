@@ -17,13 +17,13 @@ use Tests\Unit\Stubs\UserStub;
 
 class TranslationImportServiceTest extends TestCase
 {
-    private TranslationRepository $translationRepo;
-    private UserRepository $userRepo;
-    private EntityManagerInterface $entityManager;
-    private TranslationFileManager $fileManager;
-    private CommandService $commandService;
-    private ConfigService $configService;
-    private TranslationService $translationService;
+    private MockObject|TranslationRepository $translationRepo;
+    private MockObject|UserRepository $userRepo;
+    private MockObject|EntityManagerInterface $entityManager;
+    private MockObject|TranslationFileManager $fileManager;
+    private MockObject|CommandService $commandService;
+    private MockObject|ConfigService $configService;
+    private MockObject|TranslationService $translationService;
     private TranslationImportService $subject;
 
     protected function setUp(): void
@@ -53,7 +53,7 @@ class TranslationImportServiceTest extends TestCase
         $this->userRepo->method('findOneBy')->willReturn($importUser);
         $this->configService->method('getSystemUserId')->willReturn(1);
         
-        $file = $this->createMock(\Symfony\Component\Finder\SplFileInfo::class);
+        $file = $this->createStub(\Symfony\Component\Finder\SplFileInfo::class);
         $file->method('getFilename')->willReturn('messages.de.php');
         $file->method('getPathname')->willReturn(__DIR__ . '/Stubs/translations_stub.php');
         

@@ -263,7 +263,7 @@ class EventServiceTest extends TestCase
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
         $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
         
-        $repoMock = $this->createMock(EventRepository::class);
+        $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findFollowUpEvents')->willReturn([$child]);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -306,7 +306,26 @@ class EventServiceTest extends TestCase
 
     public function testExtentRecurringEventsCallsFillForEachEvent(): void
     {
-        $this->assertTrue(true);
+        $event = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::Weekly);
+        $event->setStart(new DateTime('2025-01-01 10:00:00'));
+        $event->setStop(new DateTime('2025-01-01 12:00:00'));
+        $event->setPublished(true);
+
+        $repoMock = $this->createStub(EventRepository::class);
+        $repoMock->method('findAllRecurring')->willReturn([$event]);
+        $repoMock->method('findOneBy')->willReturn(null);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->atLeastOnce())->method('persist');
+        $emMock->expects($this->atLeastOnce())->method('flush');
+
+        $subject = new EventService(
+            repo: $repoMock,
+            em: $emMock,
+            emailService: $this->createStub(EmailService::class),
+        );
+
+        $subject->extentRecurringEvents();
     }
     public function testUpdateRecurringEventsWithChildUpdatesParent(): void
     {
@@ -315,7 +334,7 @@ class EventServiceTest extends TestCase
         
         $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
         
-        $repoMock = $this->createMock(EventRepository::class);
+        $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findOneBy')->with(['id' => 1])->willReturn($parent);
         $repoMock->method('findFollowUpEvents')->willReturn([$child]);
 
@@ -336,7 +355,7 @@ class EventServiceTest extends TestCase
     {
         $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
         
-        $repoMock = $this->createMock(EventRepository::class);
+        $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findOneBy')->with(['id' => 1])->willReturn(null);
 
         $subject = new EventService(
@@ -355,7 +374,7 @@ class EventServiceTest extends TestCase
         $event->setStop(new DateTime('2025-01-01 12:00:00'));
         $event->setPublished(true);
         
-        $repoMock = $this->createMock(EventRepository::class);
+        $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findAllRecurring')->willReturn([$event]);
         $repoMock->method('findOneBy')->willReturn(null);
 

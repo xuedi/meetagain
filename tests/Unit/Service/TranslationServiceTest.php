@@ -19,24 +19,24 @@ use Tests\Unit\Stubs\UserStub;
 
 class TranslationServiceTest extends TestCase
 {
-    private TranslationRepository $translationRepo;
-    private UserRepository $userRepo;
-    private EntityManagerInterface $entityManager;
-    private TranslationFileManager $fileManager;
-    private LanguageService $languageService;
-    private CommandService $commandService;
-    private ConfigService $configService;
+    private MockObject|TranslationRepository $translationRepo;
+    private MockObject|UserRepository $userRepo;
+    private MockObject|EntityManagerInterface $entityManager;
+    private MockObject|TranslationFileManager $fileManager;
+    private MockObject|LanguageService $languageService;
+    private MockObject|CommandService $commandService;
+    private MockObject|ConfigService $configService;
     private TranslationService $subject;
 
     protected function setUp(): void
     {
-        $this->translationRepo = $this->createMock(TranslationRepository::class);
-        $this->userRepo = $this->createMock(UserRepository::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->fileManager = $this->createMock(TranslationFileManager::class);
-        $this->languageService = $this->createMock(LanguageService::class);
-        $this->commandService = $this->createMock(CommandService::class);
-        $this->configService = $this->createMock(ConfigService::class);
+        $this->translationRepo = $this->createStub(TranslationRepository::class);
+        $this->userRepo = $this->createStub(UserRepository::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->fileManager = $this->createStub(TranslationFileManager::class);
+        $this->languageService = $this->createStub(LanguageService::class);
+        $this->commandService = $this->createStub(CommandService::class);
+        $this->configService = $this->createStub(ConfigService::class);
 
         $this->subject = new TranslationService(
             $this->translationRepo,
@@ -62,6 +62,15 @@ class TranslationServiceTest extends TestCase
         ];
 
         // Arrange: mock repository to return matrix
+        $this->translationRepo = $this->createMock(TranslationRepository::class);
+        $this->subject = new TranslationService(
+            $this->translationRepo,
+            $this->entityManager,
+            $this->fileManager,
+            $this->languageService,
+            $this->commandService
+        );
+
         $this->translationRepo
             ->expects($this->once())
             ->method('getMatrix')
@@ -82,6 +91,7 @@ class TranslationServiceTest extends TestCase
             ->setPlaceholder('key')
             ->setTranslation('old_value');
 
+        $this->translationRepo = $this->createStub(TranslationRepository::class);
         $this->translationRepo->method('buildKeyValueList')->willReturn(['1' => 'old_value']);
         $this->translationRepo->method('findOneBy')->with(['id' => '1'])->willReturn($translationEntity);
 
@@ -89,6 +99,15 @@ class TranslationServiceTest extends TestCase
         $requestStub->method('getPayload')->willReturn(new InputBag(['1' => 'new_value']));
 
         // Arrange: mock entity manager to verify persist is called
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->subject = new TranslationService(
+            $this->translationRepo,
+            $this->entityManager,
+            $this->fileManager,
+            $this->languageService,
+            $this->commandService
+        );
+
         $this->entityManager->expects($this->once())->method('persist')->with($translationEntity);
         $this->entityManager->expects($this->once())->method('flush');
 
@@ -104,6 +123,16 @@ class TranslationServiceTest extends TestCase
         $this->languageService->method('getEnabledCodes')->willReturn(['de']);
         $this->translationRepo->method('findBy')->willReturn([(new Translation())->setPlaceholder('key')->setTranslation('value')]);
         
+        $this->fileManager = $this->createMock(TranslationFileManager::class);
+        $this->commandService = $this->createMock(CommandService::class);
+        $this->subject = new TranslationService(
+            $this->translationRepo,
+            $this->entityManager,
+            $this->fileManager,
+            $this->languageService,
+            $this->commandService
+        );
+
         $this->fileManager->expects($this->once())->method('cleanUpTranslationFiles');
         $this->fileManager->expects($this->once())->method('writeTranslationFile')->with('de', ['key' => 'value']);
         $this->commandService->expects($this->once())->method('clearCache');

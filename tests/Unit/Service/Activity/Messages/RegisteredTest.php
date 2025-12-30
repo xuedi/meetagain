@@ -12,7 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RegisteredTest extends TestCase
 {
-
+    private RouterInterface $router;
+    private ImageHtmlRenderer $imageService;
 
     public function setUp(): void
     {

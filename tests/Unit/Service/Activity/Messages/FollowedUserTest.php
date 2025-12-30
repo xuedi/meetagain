@@ -13,7 +13,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class FollowedUserTest extends TestCase
 {
-
+    private RouterInterface $router;
+    private ImageHtmlRenderer $imageService;
 
     public function setUp(): void
     {
