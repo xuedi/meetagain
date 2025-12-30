@@ -4,6 +4,7 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href='/stylesheet/jstable.min.css'/>
+    <link rel="stylesheet" href='/stylesheet/flatpickr-bulma.min.css'/>
 {% endblock %}
 
 {% block body %}
@@ -30,6 +31,22 @@
             perPageSelect: [
                 5, 10, 15, 25, 50, 100,
             ]
+        });
+    </script>
+
+    <script src='/javascript/flatpickr.min.js'></script>
+    {% if app.request.locale != 'en' %}
+    <script src='/javascript/flatpickr-l10n/{{ app.request.locale }}.js'></script>
+    {% endif %}
+    <script>
+        document.querySelectorAll('.flatpickr-field').forEach((el) => {
+            flatpickr(el, {
+                wrap: true,
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                time_24hr: true,
+                locale: "{{ app.request.locale }}"
+            });
         });
     </script>
 

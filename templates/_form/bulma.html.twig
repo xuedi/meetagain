@@ -148,7 +148,15 @@
 
 {%- block datetime_widget -%}
     {% if widget == 'single_text' %}
-        {{- block('form_widget_simple') -}}
+        <div class="field has-addons flatpickr-field">
+            <div class="control is-expanded">
+                {%- set attr = attr|merge({'data-input': ''}) -%}
+                {{- block('form_widget_simple') -}}
+            </div>
+            <div class="control">
+                <a class="button" data-toggle><span class="icon"><i class="fa fa-calendar"></i></span></a>
+            </div>
+        </div>
     {%- else -%}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' datetime-widget')|trim}) -%}
         <div {{ block('widget_container_attributes') }}>
