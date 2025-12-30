@@ -27,8 +27,9 @@ class AdminController extends AbstractController
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
     public function index(null|int $year = null, null|int $week = null): Response
     {
-        $year ??= (int) (new \DateTime())->format('Y');
-        $week ??= (int) (new \DateTime())->format('W');
+        $now = new \DateTime();
+        $year ??= (int) $now->format('Y');
+        $week ??= (int) $now->format('W');
         $dates = $this->dashboardStats->calculateDates($year, $week);
 
         return $this->render('admin/index.html.twig', [

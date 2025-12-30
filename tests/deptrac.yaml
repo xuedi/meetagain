@@ -171,3 +171,4 @@ deptrac:
     # Fixture command needs direct repository access for bulk user retrieval
     App\Command\EventAddFixtureRsvpsCommand:
       - App\Repository\UserRepository
+      - App\Repository\EventRepository

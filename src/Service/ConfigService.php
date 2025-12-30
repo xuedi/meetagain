@@ -157,7 +157,7 @@ readonly class ConfigService
     public function saveColors(array $colors): void
     {
         foreach ($colors as $name => $value) {
-            if (preg_match('/^#[0-9A-Fa-f]{6}$/', $value)) {
+            if (preg_match('/^#[0-9A-Fa-f]{6}$/', (string) $value)) {
                 $this->setString($name, $value);
             }
         }

@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php84\Rector\MethodCall\NewMethodCallWithoutParenthesesRector;
 use Rector\Symfony\Set\SymfonySetList;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
 
@@ -13,6 +14,9 @@ return RectorConfig::configure()
         __DIR__ . '/../tests',
     ])
     ->withPhpSets(php84: true)
+    ->withSkip([
+        NewMethodCallWithoutParenthesesRector::class,
+    ])
     ->withPHPStanConfigs([__DIR__ . '/phpstan.neon'])
     ->withPreparedSets(
         deadCode: true,

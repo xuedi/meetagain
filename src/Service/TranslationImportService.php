@@ -41,7 +41,7 @@ readonly class TranslationImportService
         }
 
         foreach ($this->fileManager->getTranslationFiles() as $file) {
-            $parts = explode('.', $file->getFilename());
+            $parts = explode('.', (string) $file->getFilename());
             if (count($parts) !== 3) {
                 continue;
             }

@@ -74,10 +74,12 @@ readonly class SitemapService
     private function getStaticPages(string $host, string $locale): array
     {
         $sites = [];
+        $now = new DateTime();
+        $date = $now->format('Y-m-d');
         foreach (['', 'events', 'members'] as $site) {
             $sites[] = [
                 'loc' => sprintf('https://%s/%s/%s', $host, $locale, $site),
-                'lastmod' => new DateTime()->format('Y-m-d'),
+                'lastmod' => $date,
                 'prio' => 0.9,
             ];
         }

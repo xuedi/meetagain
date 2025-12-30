@@ -2,14 +2,14 @@
 
 namespace App\Twig;
 
-use App\Repository\UserRepository;
+use App\Service\UserService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class UserExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly UserRepository $userRepo,
+        private readonly UserService $userService,
     ) {
     }
 
@@ -23,6 +23,6 @@ final class UserExtension extends AbstractExtension
 
     public function getUserName(int $id): string
     {
-        return $this->userRepo->findOneBy(['id' => $id])?->getName() ?? 'Unknown';
+        return $this->userService->resolveUserName($id);
     }
 }

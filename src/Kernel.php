@@ -68,7 +68,8 @@ class Kernel extends BaseKernel
             $routes->import($configDir . '/{routes}.php');
         }
 
-        if (false !== ($fileName = new ReflectionObject($this)->getFileName())) {
+        $reflection = new ReflectionObject($this);
+        if (false !== ($fileName = $reflection->getFileName())) {
             $routes->import($fileName, 'attribute');
         }
     }

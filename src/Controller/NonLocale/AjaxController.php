@@ -54,7 +54,7 @@ class AjaxController extends AbstractController
     }
 
     #[Route('/ajax/get-captcha-count', name: 'app_ajax_get_captcha_count', methods: ['GET'])]
-    public function getCaptchaCountIndex(Request $request): Response
+    public function getCaptchaCountIndex(): Response
     {
         return new JsonResponse([
             'count' => $this->captchaService->getRefreshCount(),

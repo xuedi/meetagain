@@ -280,4 +280,3 @@ class CaptchaServiceTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value);
     }
 }
-

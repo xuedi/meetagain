@@ -64,7 +64,6 @@ readonly class DashboardActionService
 
     /**
      * Upcoming events
-     * @return array
      */
     public function getUpcomingEvents(int $limit = 3): array
     {
@@ -73,7 +72,6 @@ readonly class DashboardActionService
 
     /**
      * Past events without photos
-     * @return array
      */
     public function getPastEventsWithoutPhotos(int $limit = 5): array
     {
@@ -86,5 +84,10 @@ readonly class DashboardActionService
     public function getRecurringEventsCount(): int
     {
         return $this->eventRepo->getRecurringCount();
+    }
+
+    public function getPendingSuggestionsCount(): int
+    {
+        return $this->translationSuggestionRepo->getPendingCount();
     }
 }

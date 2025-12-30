@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Repository\MenuRepository;
+use App\Service\MenuService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -13,7 +13,7 @@ final class MenuExtension extends AbstractExtension
 {
     public function __construct(
         private readonly RequestStack $requestStack,
-        private readonly MenuRepository $menuRepo,
+        private readonly MenuService $menuService,
         private readonly Security $security,
     ) {
     }
@@ -29,14 +29,12 @@ final class MenuExtension extends AbstractExtension
     public function getMenu(string $type): array
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request instanceof Request) {
-            return $this->menuRepo->getAllSlugified(
-                user: $this->security->getUser(),
-                locale: $request->getLocale(),
-                location: $type,
-            );
-        }
+        $locale = $request instanceof Request ? $request->getLocale() : 'en';
 
-        return $this->menuRepo->getAllSlugified(user: $this->security->getUser());
+        return $this->menuService->getMenuForContext(
+            type: $type,
+            user: $this->security->getUser(),
+            locale: $locale
+        );
     }
 }

@@ -36,7 +36,7 @@ readonly class PluginService
                 continue;
             }
 
-            $pluginKey = basename($pluginPath);
+            $pluginKey = basename((string) $pluginPath);
             $plugins[] = [
                 'name' => $pluginData['name'] ?? $pluginKey,
                 'version' => $pluginData['version'] ?? '0.0.0',

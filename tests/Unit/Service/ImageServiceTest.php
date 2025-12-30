@@ -396,5 +396,4 @@ class ImageServiceTest extends TestCase
         $this->assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash1_300x300.webp', $removedFiles);
         $this->assertEquals(2, $result);
     }
-
 }

@@ -2,8 +2,6 @@
 
 namespace App\Twig;
 
-use App\Entity\TranslationSuggestionStatus;
-use App\Repository\TranslationSuggestionRepository;
 use App\Service\DashboardActionService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -12,7 +10,6 @@ final class AttentionExtension extends AbstractExtension
 {
     public function __construct(
         private readonly DashboardActionService $dashboardAction,
-        private readonly TranslationSuggestionRepository $translationSuggestionRepo,
     ) {
     }
 
@@ -32,6 +29,6 @@ final class AttentionExtension extends AbstractExtension
 
     public function getManagerAttention(): bool
     {
-        return count($this->translationSuggestionRepo->findBy(['status' => TranslationSuggestionStatus::Requested])) > 0;
+        return $this->dashboardAction->getPendingSuggestionsCount() > 0;
     }
 }

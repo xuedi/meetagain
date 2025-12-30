@@ -75,8 +75,9 @@ readonly class DashboardStatsService
 
     public function calculateDates(null|int $year, null|int $week): array
     {
-        $year ??= (int) (new DateTime())->format('Y');
-        $week ??= (int) (new DateTime())->format('W');
+        $now = new DateTime();
+        $year ??= (int) $now->format('Y');
+        $week ??= (int) $now->format('W');
 
         $tmpDate = new DateTime();
         $tmpDate->setISODate($year, $week);
@@ -92,8 +93,10 @@ readonly class DashboardStatsService
         $start = $dates['start'];
         $stop = $dates['stop'];
         if ($column === 'start') {
-            $start = (new DateTime())->setTimestamp($start->getTimestamp());
-            $stop = (new DateTime())->setTimestamp($stop->getTimestamp());
+            $start = new DateTime();
+            $start->setTimestamp($dates['start']->getTimestamp());
+            $stop = new DateTime();
+            $stop->setTimestamp($dates['stop']->getTimestamp());
         }
 
         $criteria = new Criteria();

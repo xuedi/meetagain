@@ -164,7 +164,8 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
 
     private function getWednesdayMeetupDate(): DateTime
     {
-        return new DateTime('now')
+        $date = new DateTime('now');
+        return $date
             ->modify('-7 days')
             ->modify('first wednesday')
             ->setTime(18, 00);

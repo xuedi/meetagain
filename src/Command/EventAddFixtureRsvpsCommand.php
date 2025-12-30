@@ -38,9 +38,9 @@ class EventAddFixtureRsvpsCommand extends Command
     ];
 
     public function __construct(
+        private readonly EntityManagerInterface $em,
         private readonly EventRepository $eventRepo,
         private readonly UserRepository $userRepo,
-        private readonly EntityManagerInterface $em,
     ) {
         parent::__construct();
     }
