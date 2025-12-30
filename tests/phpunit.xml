@@ -40,8 +40,14 @@
     </coverage>
     <source>
         <include>
-            <directory>../src/Service</directory>
-            <directory>../src/Security</directory>
+            <directory>../src</directory>
         </include>
+        <exclude>
+            <directory>../src/DataFixtures</directory>
+            <directory>../src/Enum</directory>
+            <directory>../src/Exception</directory>
+            <directory>../src/Repository</directory>
+            <directory>../src/Entity</directory>
+        </exclude>
     </source>
 </phpunit>
