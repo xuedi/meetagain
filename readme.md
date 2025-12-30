@@ -17,7 +17,8 @@ A self-hosted, open-source alternative to meetup.com for organizing groups and s
 - Multi-language support with community translations
 - Plugin system for extensibility
 - User management with email verification
-- RSVP tracking and event filtering
+- RSVP tracking and event notifications
+- Aggregated notifications for followers
 - Private messaging and activity feeds
 
 ### Tech Stack
@@ -41,7 +42,7 @@ A classic PHP Symfony application, as upstream as possible with no fancy librari
 
 ### For Production
 
-- PHP >= 8.4 with modules: apcu, pdo_mysql, imagick, intl, iconv, ctype (Optional: xdebug, opcache, gd)
+- PHP >= 8.4 with modules: apcu, pdo_mysql, imagick, intl, iconv, ctype, redis (Optional: xdebug, opcache, gd)
 - MariaDB or MySQL database
 - Web server (Caddy, Nginx, Apache)
 - Composer (installed automatically by web installer)
@@ -62,6 +63,7 @@ Then login as `admin@example.org` with password `1234`
 |---------|-----|-------------|
 | Web | http://localhost | Main application |
 | MailHog | http://localhost:8025 | Email testing UI |
+| Valkey | localhost:6379 | Redis-compatible cache |
 | MariaDB | localhost:3306 | Database |
 
 ## Production Installation
