@@ -150,4 +150,51 @@ class RsvpNotificationServiceTest extends TestCase
         $count = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count);
     }
+
+    public function testProcessUpcomingEvents(): void
+    {
+        $event1 = $this->createStub(Event::class);
+        $event1->method('getRsvp')->willReturn(new ArrayCollection([]));
+        $event2 = $this->createStub(Event::class);
+        $event2->method('getRsvp')->willReturn(new ArrayCollection([]));
+
+        $this->eventRepo->method('findUpcomingEventsWithinRange')->willReturn([$event1, $event2]);
+
+        $count = $this->service->processUpcomingEvents(5);
+        $this->assertEquals(0, $count);
+    }
+
+    public function testNotifyFollowersForEventEmptyAttendees(): void
+    {
+        $event = $this->createStub(Event::class);
+        $event->method('getRsvp')->willReturn(new ArrayCollection([]));
+
+        $count = $this->service->notifyFollowersForEvent($event);
+        $this->assertEquals(0, $count);
+    }
+
+    public function testNotifyFollowersForEventSkipsIfRecipientHasRsvp(): void
+    {
+        $event = $this->createStub(Event::class);
+        $event->method('getId')->willReturn(1);
+
+        $attendee = $this->createStub(User::class);
+        $attendee->method('getId')->willReturn(10);
+
+        $follower = $this->createStub(User::class);
+        $follower->method('getId')->willReturn(20);
+        $follower->method('isNotification')->willReturn(true);
+        $settings = new NotificationSettings(['followingUpdates' => true]);
+        $follower->method('getNotificationSettings')->willReturn($settings);
+
+        $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
+        $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
+        $event->method('hasRsvp')->with($follower)->willReturn(true);
+
+        $this->emailService->expects($this->never())
+            ->method('prepareAggregatedRsvpNotification');
+
+        $count = $this->service->notifyFollowersForEvent($event);
+        $this->assertEquals(0, $count);
+    }
 }
