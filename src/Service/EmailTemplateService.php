@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\EmailTemplate;
+use App\Enum\EmailType;
 use App\Repository\EmailTemplateRepository;
 
 readonly class EmailTemplateService
@@ -11,9 +12,9 @@ readonly class EmailTemplateService
     {
     }
 
-    public function getTemplate(string $identifier): ?EmailTemplate
+    public function getTemplate(EmailType $identifier): ?EmailTemplate
     {
-        return $this->repo->findByIdentifier($identifier);
+        return $this->repo->findByIdentifier($identifier->value);
     }
 
     public function renderContent(string $content, array $context): string

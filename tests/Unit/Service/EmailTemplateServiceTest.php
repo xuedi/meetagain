@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\EmailTemplate;
+use App\Enum\EmailType;
 use App\Repository\EmailTemplateRepository;
 use App\Service\EmailTemplateService;
 use DateTimeImmutable;
@@ -30,7 +31,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->repoStub->method('findByIdentifier')->willReturn($template);
 
         // Act
-        $result = $this->subject->getTemplate('welcome');
+        $result = $this->subject->getTemplate(EmailType::Welcome);
 
         // Assert
         $this->assertSame($template, $result);
@@ -42,7 +43,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->repoStub->method('findByIdentifier')->willReturn(null);
 
         // Act
-        $result = $this->subject->getTemplate('nonexistent');
+        $result = $this->subject->getTemplate(EmailType::VerificationRequest);
 
         // Assert
         $this->assertNull($result);

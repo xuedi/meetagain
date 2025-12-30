@@ -14,6 +14,8 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
+use App\Enum\EmailType;
+
 readonly class EmailService
 {
     public function __construct(
@@ -41,7 +43,7 @@ readonly class EmailService
             'lang' => $user->getLocale(),
         ]);
 
-        return $this->addToEmailQueue($email, 'verification_request');
+        return $this->addToEmailQueue($email, EmailType::VerificationRequest);
     }
 
     public function prepareWelcome(User $user): bool
@@ -58,7 +60,7 @@ readonly class EmailService
             'lang' => $user->getLocale(),
         ]);
 
-        return $this->addToEmailQueue($email, 'welcome');
+        return $this->addToEmailQueue($email, EmailType::Welcome);
     }
 
     public function prepareResetPassword(User $user): bool
@@ -76,7 +78,7 @@ readonly class EmailService
             'username' => $user->getName(),
         ]);
 
-        return $this->addToEmailQueue($email, 'password_reset_request');
+        return $this->addToEmailQueue($email, EmailType::PasswordResetRequest);
     }
 
     public function prepareRsvpNotification(User $userRsvp, User $userRecipient, Event $event): bool
@@ -100,7 +102,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email, 'notification_rsvp');
+        return $this->addToEmailQueue($email, EmailType::NotificationRsvp);
     }
 
     public function prepareAggregatedRsvpNotification(User $recipient, array $attendees, Event $event): bool
@@ -130,7 +132,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email, 'notification_rsvp_aggregated');
+        return $this->addToEmailQueue($email, EmailType::NotificationRsvpAggregated);
     }
 
     public function prepareMessageNotification(User $sender, User $recipient): bool
@@ -151,7 +153,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email, 'notification_message');
+        return $this->addToEmailQueue($email, EmailType::NotificationMessage);
     }
 
     public function prepareEventCanceledNotification(User $recipient, Event $event): bool
@@ -174,7 +176,7 @@ readonly class EmailService
             'lang' => $language,
         ]);
 
-        return $this->addToEmailQueue($email, 'notification_event_canceled');
+        return $this->addToEmailQueue($email, EmailType::NotificationEventCanceled);
     }
 
     public function getMockEmailList(): array
@@ -268,7 +270,7 @@ readonly class EmailService
         $this->em->flush();
     }
 
-    private function addToEmailQueue(TemplatedEmail $email, string $identifier): bool
+    private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier): bool
     {
         $emailQueue = new EmailQueue();
         $emailQueue->setSender($email->getFrom()[0]->toString());
