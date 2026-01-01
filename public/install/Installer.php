@@ -168,7 +168,7 @@ class Installer
             $pdo = new PDO($dsn, $user, $password, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_TIMEOUT => 3,
-                PDO::MYSQL_ATTR_CONNECT_TIMEOUT => 3,
+                1002 => 3, // PDO::MYSQL_ATTR_CONNECT_TIMEOUT
             ]);
             $pdo->query('SELECT 1');
 
