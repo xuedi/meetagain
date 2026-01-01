@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\CommandExecutionService;
 use App\Service\RsvpNotificationService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -9,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
 
 #[AsCommand(
     name: 'app:rsvp:notify',
@@ -18,6 +20,7 @@ class RsvpNotificationCommand extends Command
 {
     public function __construct(
         private readonly RsvpNotificationService $rsvpNotificationService,
+        private readonly CommandExecutionService $commandExecutionService,
     ) {
         parent::__construct();
     }
@@ -33,11 +36,21 @@ class RsvpNotificationCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $days = (int) $input->getOption('days');
 
-        $io->info(sprintf('Processing upcoming events for the next %d days...', $days));
+        $log = $this->commandExecutionService->start('app:rsvp:notify');
 
-        $count = $this->rsvpNotificationService->processUpcomingEvents($days);
+        try {
+            $io->info(sprintf('Processing upcoming events for the next %d days...', $days));
 
-        $io->success(sprintf('Sent %d notification emails.', $count));
+            $count = $this->rsvpNotificationService->processUpcomingEvents($days);
+
+            $io->success(sprintf('Sent %d notification emails.', $count));
+
+            $this->commandExecutionService->complete($log, 0, "Sent {$count} notification emails");
+        } catch (Throwable $e) {
+            $this->commandExecutionService->fail($log, $e->getMessage());
+
+            throw $e;
+        }
 
         return Command::SUCCESS;
     }

@@ -4,6 +4,7 @@ namespace Tests\Unit\Command;
 
 use App\Command\CleanupCommand;
 use App\Service\CleanupService;
+use App\Service\CommandExecutionService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -13,7 +14,8 @@ class CleanupCommandTest extends TestCase
     public function testCommandHasCorrectName(): void
     {
         $cleanupServiceStub = $this->createStub(CleanupService::class);
-        $command = new CleanupCommand($cleanupServiceStub);
+        $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
+        $command = new CleanupCommand($cleanupServiceStub, $commandExecServiceStub);
 
         $this->assertSame('app:cleanup', $command->getName());
     }
@@ -21,7 +23,8 @@ class CleanupCommandTest extends TestCase
     public function testCommandHasCorrectDescription(): void
     {
         $cleanupServiceStub = $this->createStub(CleanupService::class);
-        $command = new CleanupCommand($cleanupServiceStub);
+        $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
+        $command = new CleanupCommand($cleanupServiceStub, $commandExecServiceStub);
 
         $this->assertSame('does certain cleanup tasks', $command->getDescription());
     }
@@ -36,7 +39,8 @@ class CleanupCommandTest extends TestCase
             ->expects($this->once())
             ->method('removeGhostedRegistrations');
 
-        $command = new CleanupCommand($cleanupServiceMock);
+        $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
+        $command = new CleanupCommand($cleanupServiceMock, $commandExecServiceStub);
         $commandTester = new CommandTester($command);
 
         $exitCode = $commandTester->execute([]);

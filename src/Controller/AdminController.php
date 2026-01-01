@@ -44,6 +44,17 @@ class AdminController extends AbstractController
             'pastEventsNoPhotos' => $this->dashboardAction->getPastEventsWithoutPhotos(5),
             'recurringEvents' => $this->dashboardAction->getRecurringEventsCount(),
             'tests' => $this->runHealthChecks(),
+            'unverifiedCount' => $this->dashboardAction->getUnverifiedCount(),
+            'messageStats' => $this->dashboardAction->getMessageStats(),
+            'emailQueueBreakdown' => $this->dashboardAction->getEmailQueueBreakdown(),
+            'rsvpStats' => $this->dashboardStats->getRsvpStats($year, $week),
+            'loginTrend' => $this->dashboardStats->getLoginTrend($year, $week),
+            'socialStats' => $this->dashboardStats->getSocialNetworkStats($year, $week),
+            'loginAttempts' => $this->dashboardAction->getLoginAttemptStats(),
+            'commandStats' => $this->dashboardAction->getCommandExecutionStats(),
+            'lastCommands' => $this->dashboardAction->getLastCommandExecutions(),
+            'emailDeliveryStats' => $this->dashboardAction->getEmailDeliveryStats(),
+            'emailDeliveryRate' => $this->dashboardAction->getEmailDeliverySuccessRate(),
         ]);
     }
 

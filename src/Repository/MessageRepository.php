@@ -120,4 +120,28 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Get system-wide message statistics.
+     *
+     * @return array{total: int, unread: int}
+     */
+    public function getSystemStats(): array
+    {
+        $total = (int) $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $unread = (int) $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->where('m.wasRead = false')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return [
+            'total' => $total,
+            'unread' => $unread,
+        ];
+    }
 }

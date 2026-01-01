@@ -6,6 +6,7 @@ use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Entity\Event;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -95,5 +96,71 @@ class ActivityRepository extends ServiceEntityRepository
             ->setParameter('ids', $activityIds)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Get RSVP statistics for a time period.
+     *
+     * @return array{yes: int, no: int, total: int}
+     */
+    public function getRsvpStats(DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        $yes = (int) $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->where('a.type = :type')
+            ->andWhere('a.createdAt >= :start')
+            ->andWhere('a.createdAt <= :end')
+            ->setParameter('type', ActivityType::RsvpYes)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $no = (int) $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->where('a.type = :type')
+            ->andWhere('a.createdAt >= :start')
+            ->andWhere('a.createdAt <= :end')
+            ->setParameter('type', ActivityType::RsvpNo)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return [
+            'yes' => $yes,
+            'no' => $no,
+            'total' => $yes + $no,
+        ];
+    }
+
+    /**
+     * Get login activity trend for dashboard.
+     *
+     * @return array<string, int> Day name => login count
+     */
+    public function getLoginTrend(DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        $result = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("DATE_FORMAT(a.createdAt, '%W') AS day", 'COUNT(a.id) as count')
+            ->from(Activity::class, 'a')
+            ->where('a.type = :type')
+            ->andWhere('a.createdAt >= :start')
+            ->andWhere('a.createdAt <= :end')
+            ->setParameter('type', ActivityType::Login)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->groupBy('day')
+            ->getQuery()
+            ->getArrayResult();
+
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        $trend = array_fill_keys($days, 0);
+        foreach ($result as $row) {
+            $trend[$row['day']] = (int) $row['count'];
+        }
+
+        return $trend;
     }
 }

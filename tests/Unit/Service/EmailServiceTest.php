@@ -113,16 +113,19 @@ final class EmailServiceTest extends TestCase
             ->with($this->isInstanceOf(TemplatedEmail::class));
 
         // Arrange: mock entity manager to verify persist/flush
+        // Expect 2 persist calls: one for EmailQueue, one for EmailDeliveryLog
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')
-            ->with(
-                $this->callback(function ($entity) use ($queued) {
+        $persistCallCount = 0;
+        $emMock->expects($this->exactly(2))->method('persist')
+            ->willReturnCallback(function ($entity) use ($queued, &$persistCallCount) {
+                if ($persistCallCount === 0) {
                     $this->assertSame($queued, $entity);
                     $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
-
-                    return true;
-                })
-            );
+                } else {
+                    $this->assertInstanceOf(\App\Entity\EmailDeliveryLog::class, $entity);
+                }
+                $persistCallCount++;
+            });
         $emMock->expects($this->once())->method('flush');
 
         $service = $this->createService(

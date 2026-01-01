@@ -7,6 +7,7 @@ use App\Entity\UserStatus;
 use App\Repository\MessageRepository;
 use App\Security\UserChecker;
 use App\Service\ActivityService;
+use App\Service\LoginAttemptService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,11 +95,11 @@ class UserCheckerTest extends TestCase
                 $this->assertContains($key, ['lastLogin', 'hasNewMessage']);
             });
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getSession')->willReturn($sessionMock);
+        $request = new Request();
+        $request->setSession($sessionMock);
 
         $requestStackStub = $this->createStub(RequestStack::class);
-        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+        $requestStackStub->method('getCurrentRequest')->willReturn($request);
 
         // Arrange: mock entity manager to verify user is persisted and flushed
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -133,11 +134,11 @@ class UserCheckerTest extends TestCase
             ->method('set')
             ->with('lastLogin', $this->anything());
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getSession')->willReturn($sessionMock);
+        $request = new Request();
+        $request->setSession($sessionMock);
 
         $requestStackStub = $this->createStub(RequestStack::class);
-        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+        $requestStackStub->method('getCurrentRequest')->willReturn($request);
 
         // Arrange: mock message repository to return false for new messages
         $msgRepoStub = $this->createStub(MessageRepository::class);
@@ -157,12 +158,14 @@ class UserCheckerTest extends TestCase
         ?EntityManagerInterface $em = null,
         ?RequestStack $requestStack = null,
         ?MessageRepository $msgRepo = null,
+        ?LoginAttemptService $loginAttemptService = null,
     ): UserChecker {
         return new UserChecker(
             activityService: $activityService ?? $this->createStub(ActivityService::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             requestStack: $requestStack ?? $this->createStub(RequestStack::class),
             msgRepo: $msgRepo ?? $this->createStub(MessageRepository::class),
+            loginAttemptService: $loginAttemptService ?? $this->createStub(LoginAttemptService::class),
         );
     }
 }

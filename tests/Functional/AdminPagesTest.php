@@ -10,6 +10,19 @@ class AdminPagesTest extends WebTestCase
     private const ADMIN_EMAIL = 'Admin@example.org';
     private const ADMIN_PASSWORD = '1234';
 
+    public function testAdminDashboardPage(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $client->request('GET', '/en/admin/dashboard');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+    }
+
     public function testAdminLogsActivityPage(): void
     {
         // Arrange

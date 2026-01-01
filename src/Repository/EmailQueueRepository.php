@@ -36,4 +36,27 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * Get pending emails grouped by template type.
+     *
+     * @return array<string, int> Template name => count
+     */
+    public function getPendingByTemplate(): array
+    {
+        $result = $this->createQueryBuilder('eq')
+            ->select('eq.template', 'COUNT(eq.id) as count')
+            ->where('eq.sendAt IS NULL')
+            ->groupBy('eq.template')
+            ->getQuery()
+            ->getArrayResult();
+
+        $breakdown = [];
+        foreach ($result as $row) {
+            $template = $row['template'] ?? 'unknown';
+            $breakdown[$template] = (int) $row['count'];
+        }
+
+        return $breakdown;
+    }
 }

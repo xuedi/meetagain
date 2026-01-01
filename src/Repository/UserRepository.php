@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Entity\UserStatus;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
@@ -227,6 +228,37 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('date', new DateTime('-' . $days . ' days'))
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Count users stuck in EmailVerified status (verified but not approved).
+     */
+    public function getUnverifiedCount(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.status = :status')
+            ->setParameter('status', UserStatus::EmailVerified)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Get total social network connections (following relationships).
+     *
+     * @return array{total: int}
+     */
+    public function getSocialNetworkStats(DateTimeImmutable $weekStart): array
+    {
+        $em = $this->getEntityManager();
+
+        $total = (int) $em->getConnection()
+            ->executeQuery('SELECT COUNT(*) FROM user_user')
+            ->fetchOne();
+
+        return [
+            'total' => $total,
+        ];
     }
 
     /**

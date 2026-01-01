@@ -2,9 +2,13 @@
 
 namespace App\Service;
 
+use App\Repository\CommandExecutionLogRepository;
+use App\Repository\EmailDeliveryLogRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
+use App\Repository\LoginAttemptRepository;
+use App\Repository\MessageRepository;
 use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -17,6 +21,10 @@ readonly class DashboardActionService
         private EmailQueueRepository $mailRepo,
         private ImageRepository $imageRepo,
         private TranslationSuggestionRepository $translationSuggestionRepo,
+        private MessageRepository $messageRepo,
+        private LoginAttemptRepository $loginAttemptRepo,
+        private CommandExecutionLogRepository $commandLogRepo,
+        private EmailDeliveryLogRepository $emailDeliveryLogRepo,
     ) {
     }
 
@@ -91,5 +99,89 @@ readonly class DashboardActionService
     public function getPendingSuggestionsCount(): int
     {
         return $this->translationSuggestionRepo->getPendingCount();
+    }
+
+    /**
+     * Count users stuck in EmailVerified status.
+     */
+    public function getUnverifiedCount(): int
+    {
+        return $this->userRepo->getUnverifiedCount();
+    }
+
+    /**
+     * Get system-wide message statistics.
+     *
+     * @return array{total: int, unread: int}
+     */
+    public function getMessageStats(): array
+    {
+        return $this->messageRepo->getSystemStats();
+    }
+
+    /**
+     * Get pending emails by template type.
+     *
+     * @return array<string, int>
+     */
+    public function getEmailQueueBreakdown(): array
+    {
+        return $this->mailRepo->getPendingByTemplate();
+    }
+
+    /**
+     * Get login attempt statistics for the last 24 hours.
+     *
+     * @return array{total: int, successful: int, failed: int}
+     */
+    public function getLoginAttemptStats(): array
+    {
+        $since = new DateTimeImmutable('-24 hours');
+
+        return $this->loginAttemptRepo->getStats($since);
+    }
+
+    /**
+     * Get command execution statistics for the last 24 hours.
+     *
+     * @return array{total: int, successful: int, failed: int}
+     */
+    public function getCommandExecutionStats(): array
+    {
+        $since = new DateTimeImmutable('-24 hours');
+
+        return $this->commandLogRepo->getStats($since);
+    }
+
+    /**
+     * Get last execution for each command.
+     *
+     * @return array<string, \App\Entity\CommandExecutionLog>
+     */
+    public function getLastCommandExecutions(): array
+    {
+        return $this->commandLogRepo->getLastExecutionsByCommand();
+    }
+
+    /**
+     * Get email delivery statistics for the last 24 hours.
+     *
+     * @return array{total: int, sent: int, failed: int}
+     */
+    public function getEmailDeliveryStats(): array
+    {
+        $since = new DateTimeImmutable('-24 hours');
+
+        return $this->emailDeliveryLogRepo->getStats($since);
+    }
+
+    /**
+     * Get email delivery success rate for the last 24 hours.
+     */
+    public function getEmailDeliverySuccessRate(): float
+    {
+        $since = new DateTimeImmutable('-24 hours');
+
+        return $this->emailDeliveryLogRepo->getSuccessRate($since);
     }
 }
