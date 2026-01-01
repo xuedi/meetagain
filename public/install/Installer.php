@@ -165,11 +165,15 @@ class Installer
     {
         try {
             $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $host, $port, $name);
-            $pdo = new PDO($dsn, $user, $password, [
+            $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_TIMEOUT => 3,
-                1002 => 3, // PDO::MYSQL_ATTR_CONNECT_TIMEOUT
-            ]);
+            ];
+            // Add MySQL-specific connect timeout if available
+            if (defined('PDO::MYSQL_ATTR_CONNECT_TIMEOUT')) {
+                $options[PDO::MYSQL_ATTR_CONNECT_TIMEOUT] = 3;
+            }
+            $pdo = new PDO($dsn, $user, $password, $options);
             $pdo->query('SELECT 1');
 
             return true;
