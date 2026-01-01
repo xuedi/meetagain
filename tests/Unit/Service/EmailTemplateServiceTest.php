@@ -120,13 +120,14 @@ class EmailTemplateServiceTest extends TestCase
         $templates = $this->subject->getDefaultTemplates();
 
         // Assert
-        $this->assertCount(6, $templates);
+        $this->assertCount(7, $templates);
         $this->assertArrayHasKey('verification_request', $templates);
         $this->assertArrayHasKey('welcome', $templates);
         $this->assertArrayHasKey('password_reset_request', $templates);
         $this->assertArrayHasKey('notification_message', $templates);
         $this->assertArrayHasKey('notification_rsvp_aggregated', $templates);
         $this->assertArrayHasKey('notification_event_canceled', $templates);
+        $this->assertArrayHasKey('announcement', $templates);
     }
 
     public function testGetDefaultTemplatesContainsRequiredKeys(): void

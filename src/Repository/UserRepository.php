@@ -304,4 +304,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             'rsvp' => $rsvpCount,
         ];
     }
+
+    /**
+     * Find users who have enabled announcement notifications.
+     * Note: The notificationSettings.announcements check is done in PHP
+     * since it's stored as JSON.
+     *
+     * @return User[]
+     */
+    public function findAnnouncementSubscribers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.status = :status')
+            ->andWhere('u.notification = :notificationEnabled')
+            ->setParameter('status', UserStatus::Active)
+            ->setParameter('notificationEnabled', true)
+            ->getQuery()
+            ->getResult();
+    }
 }

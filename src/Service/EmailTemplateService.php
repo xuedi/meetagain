@@ -156,6 +156,27 @@ readonly class EmailTemplateService
 </p>',
                 'variables' => ['username', 'eventLocation', 'eventDate', 'eventId', 'eventTitle', 'host', 'lang'],
             ],
+            'announcement' => [
+                'subject' => '{{title}}',
+                'body' => '<h1>{{title}}</h1>
+
+<div>{{content}}</div>
+
+<p>
+    <a href="{{announcementUrl}}">Read online</a>
+</p>
+
+<p>
+    If you don\'t like to receive announcements, you can<br>
+    switch them off in your <a href="{{host}}/{{lang}}/profile/config/">settings</a>
+</p>
+
+<p>
+    Cheers,<br>
+    xuedi & yimu
+</p>',
+                'variables' => ['title', 'content', 'announcementUrl', 'username', 'host', 'lang'],
+            ],
         ];
     }
 }

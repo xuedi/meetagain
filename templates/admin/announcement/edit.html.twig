@@ -1,0 +1,41 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h1 class="title">{{ 'announcement_edit' | trans }}</h1>
+
+        {{ form_start(form) }}
+
+        <div class="columns">
+            <div class="column is-8">
+                <div class="field">
+                    <label class="label">{{ 'announcement_title' | trans }}</label>
+                    <div class="control">
+                        {{ form_widget(form.title) }}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">{{ 'announcement_content' | trans }}</label>
+                    <div class="control">
+                        {{ form_widget(form.content) }}
+                    </div>
+                    <p class="help">{{ 'announcement_content_help' | trans }}</p>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary">{{ 'button_save' | trans }}</button>
+                        <a href="{{ path('app_admin_announcement_view', {'id': announcement.id}) }}" class="button">{{ 'button_cancel' | trans }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <nav class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <h1 class="title">{{ 'announcement_preview' | trans }}: {{ announcement.title }}</h1>
+                </div>
+            </div>
+            <div class="level-right">
+                <div class="level-item">
+                    <a href="{{ path('app_admin_announcement_view', {'id': announcement.id}) }}" class="button">
+                        <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                        <span>{{ 'button_back' | trans }}</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="columns">
+            <div class="column">
+                <div class="box">
+                    <h2 class="subtitle">{{ 'announcement_email_preview' | trans }}</h2>
+
+                    <div class="notification is-light">
+                        <p><strong>{{ 'email_subject' | trans }}:</strong> {{ preview.subject }}</p>
+                    </div>
+
+                    <div class="content" style="background: #fff; padding: 20px; border: 1px solid #ddd;">
+                        {{ preview.body | raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if announcement.draft %}
+        <div class="has-text-centered">
+            <form action="{{ path('app_admin_announcement_send', {'id': announcement.id}) }}" method="post" style="display: inline;">
+                <button type="submit" class="button is-success is-large" onclick="return confirm('{{ 'confirm_send_announcement' | trans }}');">
+                    <span class="icon"><i class="fa fa-paper-plane"></i></span>
+                    <span>{{ 'button_send_announcement' | trans }}</span>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

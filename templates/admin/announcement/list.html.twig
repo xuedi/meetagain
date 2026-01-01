@@ -1,0 +1,44 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'announcement_title' | trans }}</th>
+                <th>{{ 'announcement_status' | trans }}</th>
+                <th>{{ 'announcement_created' | trans }}</th>
+                <th>{{ 'announcement_sent_at' | trans }}</th>
+                <th>{{ 'announcement_recipients' | trans }}</th>
+                <th><a href="{{ path('app_admin_announcement_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for announcement in announcements %}
+                <tr>
+                    <td>{{ announcement.title }}</td>
+                    <td>
+                        {% if announcement.draft %}
+                            <span class="tag is-warning">{{ 'draft' | trans }}</span>
+                        {% else %}
+                            <span class="tag is-success">{{ 'sent' | trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ announcement.createdAt|date('Y-m-d H:i') }}</td>
+                    <td>{{ announcement.sentAt ? announcement.sentAt|date('Y-m-d H:i') : '-' }}</td>
+                    <td>{{ announcement.recipientCount ?? '-' }}</td>
+                    <td><a href="{{ path('app_admin_announcement_view', {'id': announcement.id}) }}"><span class="icon"><i class="fa fa-eye"></i></span></a></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="has-text-centered">{{ 'no_announcements' | trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
