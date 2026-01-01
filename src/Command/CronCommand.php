@@ -9,40 +9,28 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Throwable;
 
 #[AsCommand(name: 'app:cron', description: 'cron manager to be called often, maybe every 5 min or so')]
-class CronCommand extends Command
+class CronCommand extends LoggedCommand
 {
     use LockableTrait;
 
     public function __construct(
         private readonly EmailService $mailService,
-        private readonly CommandExecutionService $commandExecutionService,
+        CommandExecutionService $commandExecutionService,
     ) {
-        parent::__construct();
+        parent::__construct($commandExecutionService);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
             return Command::SUCCESS;
         }
 
-        $log = $this->commandExecutionService->start('app:cron');
-
-        try {
-            $output->write('Send out queued emails ... ');
-            $this->mailService->sendQueue();
-            $output->writeln('OK');
-
-            $this->commandExecutionService->complete($log, 0, 'Email queue processed');
-        } catch (Throwable $e) {
-            $this->commandExecutionService->fail($log, $e->getMessage());
-            $this->release();
-
-            throw $e;
-        }
+        $output->write('Send out queued emails ... ');
+        $this->mailService->sendQueue();
+        $output->writeln('OK');
 
         $this->release();
 
