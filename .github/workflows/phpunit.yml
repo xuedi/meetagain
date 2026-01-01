@@ -84,7 +84,7 @@ jobs:
           cp .env.dist .env
           echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/meetAgain_test" >> .env
           echo "APP_ENV=test" >> .env
-          php bin/console doctrine:migrations:migrate --no-interaction
+          php bin/console doctrine:schema:create --no-interaction
           php bin/console doctrine:fixtures:load --no-interaction
 
       - name: Run functional tests

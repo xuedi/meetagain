@@ -238,8 +238,9 @@ class InstallerTest extends TestCase
 
     public function testDatabaseConnectionWithInvalidHost(): void
     {
+        // Use non-routable IP to avoid DNS lookup hang (fails fast with connection refused)
         $result = $this->installer->testDatabaseConnection(
-            'invalid-host',
+            '10.255.255.1',
             self::$dbPort,
             self::$dbName,
             self::$dbUser,
