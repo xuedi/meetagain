@@ -91,3 +91,41 @@ jobs:
         env:
           DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
         run: vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --no-coverage
+
+  checks:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
+        with:
+          php-version: '8.4'
+          extensions: gd, apcu, intl
+
+      - name: Cache Composer packages
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-php-
+
+      - name: Setup config
+        run: |
+          cp config/plugins.dist.php config/plugins.php
+          cp .env.dist .env
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Validate composer
+        run: composer validate --strict
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M
+
+      - name: PHP CodeSniffer
+        run: vendor/bin/phpcs --standard=./tests/phpcs.xml
+
+      - name: Deptrac
+        run: vendor/bin/deptrac analyse --config-file=tests/deptrac.yaml
