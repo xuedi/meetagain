@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\EmailQueue;
+use App\Entity\EmailQueueStatus;
 use App\Entity\EmailTemplate;
 use App\Entity\Event;
 use App\Entity\User;
@@ -208,14 +209,14 @@ readonly class EmailService
 
     public function sendQueue(): void
     {
-        $mails = $this->mailRepo->findBy(['status' => 'pending'], ['id' => 'ASC'], 1000);
+        $mails = $this->mailRepo->findBy(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000);
         foreach ($mails as $mail) {
             try {
                 $this->mailer->send($this->queueToTemplate($mail));
                 $mail->setSendAt(new DateTime());
-                $mail->setStatus('sent');
+                $mail->setStatus(EmailQueueStatus::Sent);
             } catch (TransportExceptionInterface $e) {
-                $mail->setStatus('failed');
+                $mail->setStatus(EmailQueueStatus::Failed);
                 $mail->setErrorMessage($e->getMessage());
             }
             $this->em->persist($mail);
@@ -239,6 +240,7 @@ readonly class EmailService
         $emailQueue->setContext($context);
         $emailQueue->setCreatedAt(new DateTimeImmutable());
         $emailQueue->setSendAt(null);
+        $emailQueue->setTemplate($identifier);
         $emailQueue->setSubject($this->templateService->renderContent($dbTemplate->getSubject(), $context));
         $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
 

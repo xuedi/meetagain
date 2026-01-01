@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\EmailQueue;
+use App\Entity\EmailQueueStatus;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
@@ -102,7 +103,7 @@ final class EmailServiceTest extends TestCase
         $mailRepoMock
             ->expects($this->once())
             ->method('findBy')
-            ->with(['status' => 'pending'], ['id' => 'ASC'], 1000)
+            ->with(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000)
             ->willReturn([$queued]);
 
         // Arrange: mock mailer to verify send is called
@@ -119,7 +120,7 @@ final class EmailServiceTest extends TestCase
                 $this->callback(function ($entity) use ($queued) {
                     $this->assertSame($queued, $entity);
                     $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
-                    $this->assertSame('sent', $queued->getStatus());
+                    $this->assertSame(EmailQueueStatus::Sent, $queued->getStatus());
 
                     return true;
                 })

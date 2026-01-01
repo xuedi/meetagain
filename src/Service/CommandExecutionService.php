@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\CommandExecutionLog;
 use App\Entity\CommandExecutionStatus;
+use App\Entity\CommandTriggerType;
 use App\Repository\CommandExecutionLogRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,7 +17,7 @@ readonly class CommandExecutionService
     ) {
     }
 
-    public function start(string $commandName, string $triggeredBy = 'cron'): CommandExecutionLog
+    public function start(string $commandName, CommandTriggerType $triggeredBy = CommandTriggerType::Cron): CommandExecutionLog
     {
         $log = new CommandExecutionLog();
         $log->setCommandName($commandName);

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\EmailQueue;
+use App\Entity\EmailQueueStatus;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -23,7 +24,7 @@ class EmailQueueRepository extends ServiceEntityRepository
         return (int) $this->createQueryBuilder('eq')
             ->select('COUNT(eq.id)')
             ->where('eq.status = :status')
-            ->setParameter('status', 'pending')
+            ->setParameter('status', EmailQueueStatus::Pending)
             ->getQuery()
             ->getSingleScalarResult();
     }
@@ -34,7 +35,7 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->select('COUNT(eq.id)')
             ->where('eq.status = :status')
             ->andWhere('eq.createdAt < :threshold')
-            ->setParameter('status', 'pending')
+            ->setParameter('status', EmailQueueStatus::Pending)
             ->setParameter('threshold', new DateTime('-' . $minutes . ' minutes'))
             ->getQuery()
             ->getSingleScalarResult();
@@ -50,14 +51,14 @@ class EmailQueueRepository extends ServiceEntityRepository
         $result = $this->createQueryBuilder('eq')
             ->select('eq.template', 'COUNT(eq.id) as count')
             ->where('eq.status = :status')
-            ->setParameter('status', 'pending')
+            ->setParameter('status', EmailQueueStatus::Pending)
             ->groupBy('eq.template')
             ->getQuery()
             ->getArrayResult();
 
         $breakdown = [];
         foreach ($result as $row) {
-            $template = $row['template'] ?? 'unknown';
+            $template = $row['template']->value ?? 'unknown';
             $breakdown[$template] = (int) $row['count'];
         }
 
@@ -74,12 +75,13 @@ class EmailQueueRepository extends ServiceEntityRepository
         $result = $this->createQueryBuilder('eq')
             ->select(
                 'COUNT(eq.id) as total',
-                "SUM(CASE WHEN eq.status = 'sent' THEN 1 ELSE 0 END) as sent",
-                "SUM(CASE WHEN eq.status = 'failed' THEN 1 ELSE 0 END) as failed"
+                'SUM(CASE WHEN eq.status = :sent THEN 1 ELSE 0 END) as sent',
+                'SUM(CASE WHEN eq.status = :failed THEN 1 ELSE 0 END) as failed'
             )
             ->where('eq.sendAt IS NOT NULL OR eq.status = :failed')
             ->andWhere('eq.createdAt > :since')
-            ->setParameter('failed', 'failed')
+            ->setParameter('sent', EmailQueueStatus::Sent)
+            ->setParameter('failed', EmailQueueStatus::Failed)
             ->setParameter('since', $since)
             ->getQuery()
             ->getSingleResult();

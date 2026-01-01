@@ -38,8 +38,8 @@ class CommandExecutionLog
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $errorOutput = null;
 
-    #[ORM\Column(length: 20)]
-    private string $triggeredBy = 'cron';
+    #[ORM\Column(length: 20, enumType: CommandTriggerType::class)]
+    private CommandTriggerType $triggeredBy = CommandTriggerType::Cron;
 
     public function getId(): ?int
     {
@@ -130,12 +130,12 @@ class CommandExecutionLog
         return $this;
     }
 
-    public function getTriggeredBy(): string
+    public function getTriggeredBy(): CommandTriggerType
     {
         return $this->triggeredBy;
     }
 
-    public function setTriggeredBy(string $triggeredBy): static
+    public function setTriggeredBy(CommandTriggerType $triggeredBy): static
     {
         $this->triggeredBy = $triggeredBy;
 
