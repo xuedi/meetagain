@@ -102,7 +102,7 @@ final class EmailServiceTest extends TestCase
         $mailRepoMock
             ->expects($this->once())
             ->method('findBy')
-            ->with(['sendAt' => null], ['id' => 'ASC'], 1000)
+            ->with(['status' => 'pending'], ['id' => 'ASC'], 1000)
             ->willReturn([$queued]);
 
         // Arrange: mock mailer to verify send is called
@@ -113,19 +113,17 @@ final class EmailServiceTest extends TestCase
             ->with($this->isInstanceOf(TemplatedEmail::class));
 
         // Arrange: mock entity manager to verify persist/flush
-        // Expect 2 persist calls: one for EmailQueue, one for EmailDeliveryLog
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $persistCallCount = 0;
-        $emMock->expects($this->exactly(2))->method('persist')
-            ->willReturnCallback(function ($entity) use ($queued, &$persistCallCount) {
-                if ($persistCallCount === 0) {
+        $emMock->expects($this->once())->method('persist')
+            ->with(
+                $this->callback(function ($entity) use ($queued) {
                     $this->assertSame($queued, $entity);
                     $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
-                } else {
-                    $this->assertInstanceOf(\App\Entity\EmailDeliveryLog::class, $entity);
-                }
-                $persistCallCount++;
-            });
+                    $this->assertSame('sent', $queued->getStatus());
+
+                    return true;
+                })
+            );
         $emMock->expects($this->once())->method('flush');
 
         $service = $this->createService(

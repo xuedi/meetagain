@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\EmailQueue;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,7 +22,8 @@ class EmailQueueRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('eq')
             ->select('COUNT(eq.id)')
-            ->where('eq.sendAt IS NULL')
+            ->where('eq.status = :status')
+            ->setParameter('status', 'pending')
             ->getQuery()
             ->getSingleScalarResult();
     }
@@ -30,8 +32,9 @@ class EmailQueueRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('eq')
             ->select('COUNT(eq.id)')
-            ->where('eq.sendAt IS NULL')
+            ->where('eq.status = :status')
             ->andWhere('eq.createdAt < :threshold')
+            ->setParameter('status', 'pending')
             ->setParameter('threshold', new DateTime('-' . $minutes . ' minutes'))
             ->getQuery()
             ->getSingleScalarResult();
@@ -46,7 +49,8 @@ class EmailQueueRepository extends ServiceEntityRepository
     {
         $result = $this->createQueryBuilder('eq')
             ->select('eq.template', 'COUNT(eq.id) as count')
-            ->where('eq.sendAt IS NULL')
+            ->where('eq.status = :status')
+            ->setParameter('status', 'pending')
             ->groupBy('eq.template')
             ->getQuery()
             ->getArrayResult();
@@ -58,5 +62,46 @@ class EmailQueueRepository extends ServiceEntityRepository
         }
 
         return $breakdown;
+    }
+
+    /**
+     * Get delivery stats for the dashboard.
+     *
+     * @return array{total: int, sent: int, failed: int}
+     */
+    public function getDeliveryStats(DateTimeImmutable $since): array
+    {
+        $result = $this->createQueryBuilder('eq')
+            ->select(
+                'COUNT(eq.id) as total',
+                "SUM(CASE WHEN eq.status = 'sent' THEN 1 ELSE 0 END) as sent",
+                "SUM(CASE WHEN eq.status = 'failed' THEN 1 ELSE 0 END) as failed"
+            )
+            ->where('eq.sendAt IS NOT NULL OR eq.status = :failed')
+            ->andWhere('eq.createdAt > :since')
+            ->setParameter('failed', 'failed')
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getSingleResult();
+
+        return [
+            'total' => (int) $result['total'],
+            'sent' => (int) $result['sent'],
+            'failed' => (int) $result['failed'],
+        ];
+    }
+
+    /**
+     * Calculate delivery success rate.
+     */
+    public function getDeliverySuccessRate(DateTimeImmutable $since): float
+    {
+        $stats = $this->getDeliveryStats($since);
+
+        if ($stats['total'] === 0) {
+            return 100.0;
+        }
+
+        return round(($stats['sent'] / $stats['total']) * 100, 1);
     }
 }

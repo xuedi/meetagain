@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\EmailDeliveryLog;
-use App\Entity\EmailDeliveryStatus;
 use App\Entity\EmailQueue;
 use App\Entity\EmailTemplate;
 use App\Entity\Event;
@@ -210,33 +208,19 @@ readonly class EmailService
 
     public function sendQueue(): void
     {
-        $mails = $this->mailRepo->findBy(['sendAt' => null], ['id' => 'ASC'], 1000);
+        $mails = $this->mailRepo->findBy(['status' => 'pending'], ['id' => 'ASC'], 1000);
         foreach ($mails as $mail) {
             try {
                 $this->mailer->send($this->queueToTemplate($mail));
                 $mail->setSendAt(new DateTime());
-                $this->em->persist($mail);
-
-                $this->logDelivery($mail, EmailDeliveryStatus::Sent);
+                $mail->setStatus('sent');
             } catch (TransportExceptionInterface $e) {
-                $this->logDelivery($mail, EmailDeliveryStatus::Failed, $e->getMessage());
+                $mail->setStatus('failed');
+                $mail->setErrorMessage($e->getMessage());
             }
+            $this->em->persist($mail);
         }
         $this->em->flush();
-    }
-
-    private function logDelivery(
-        EmailQueue $mail,
-        EmailDeliveryStatus $status,
-        ?string $errorMessage = null
-    ): void {
-        $log = new EmailDeliveryLog();
-        $log->setEmailQueue($mail);
-        $log->setSentAt(new DateTimeImmutable());
-        $log->setStatus($status);
-        $log->setErrorMessage($errorMessage);
-
-        $this->em->persist($log);
     }
 
     private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier): bool

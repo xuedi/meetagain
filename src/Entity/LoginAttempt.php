@@ -2,13 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\LoginAttemptRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: LoginAttemptRepository::class)]
-#[ORM\Index(columns: ['attempted_at'], name: 'idx_login_attempt_time')]
-#[ORM\Index(columns: ['ip'], name: 'idx_login_attempt_ip')]
+#[ORM\Entity]
+#[ORM\Index(name: 'idx_login_attempt_time', columns: ['attempted_at'])]
+#[ORM\Index(name: 'idx_login_attempt_ip', columns: ['ip'])]
 class LoginAttempt
 {
     #[ORM\Id]

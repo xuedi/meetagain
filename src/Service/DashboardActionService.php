@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Repository\CommandExecutionLogRepository;
-use App\Repository\EmailDeliveryLogRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
@@ -24,7 +23,6 @@ readonly class DashboardActionService
         private MessageRepository $messageRepo,
         private LoginAttemptRepository $loginAttemptRepo,
         private CommandExecutionLogRepository $commandLogRepo,
-        private EmailDeliveryLogRepository $emailDeliveryLogRepo,
     ) {
     }
 
@@ -172,7 +170,7 @@ readonly class DashboardActionService
     {
         $since = new DateTimeImmutable('-24 hours');
 
-        return $this->emailDeliveryLogRepo->getStats($since);
+        return $this->mailRepo->getDeliveryStats($since);
     }
 
     /**
@@ -182,6 +180,6 @@ readonly class DashboardActionService
     {
         $since = new DateTimeImmutable('-24 hours');
 
-        return $this->emailDeliveryLogRepo->getSuccessRate($since);
+        return $this->mailRepo->getDeliverySuccessRate($since);
     }
 }

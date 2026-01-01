@@ -2,15 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\CommandExecutionLogRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CommandExecutionLogRepository::class)]
-#[ORM\Index(columns: ['command_name'], name: 'idx_command_log_name')]
-#[ORM\Index(columns: ['started_at'], name: 'idx_command_log_started')]
-#[ORM\Index(columns: ['status'], name: 'idx_command_log_status')]
+#[ORM\Entity]
+#[ORM\Index(name: 'idx_command_log_name', columns: ['command_name'])]
+#[ORM\Index(name: 'idx_command_log_started', columns: ['started_at'])]
+#[ORM\Index(name: 'idx_command_log_status', columns: ['status'])]
 class CommandExecutionLog
 {
     #[ORM\Id]
@@ -145,7 +144,7 @@ class CommandExecutionLog
 
     public function getDuration(): ?int
     {
-        if ($this->startedAt === null || $this->completedAt === null) {
+        if (!$this->startedAt instanceof DateTimeImmutable || !$this->completedAt instanceof DateTimeImmutable) {
             return null;
         }
 

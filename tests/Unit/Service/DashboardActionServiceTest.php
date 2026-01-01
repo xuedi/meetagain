@@ -5,7 +5,6 @@ namespace Tests\Unit\Service;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\CommandExecutionLogRepository;
-use App\Repository\EmailDeliveryLogRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
@@ -28,7 +27,6 @@ class DashboardActionServiceTest extends TestCase
     private Stub&MessageRepository $messageRepoStub;
     private Stub&LoginAttemptRepository $loginAttemptRepoStub;
     private Stub&CommandExecutionLogRepository $commandLogRepoStub;
-    private Stub&EmailDeliveryLogRepository $emailDeliveryLogRepoStub;
     private DashboardActionService $subject;
 
     protected function setUp(): void
@@ -41,7 +39,6 @@ class DashboardActionServiceTest extends TestCase
         $this->messageRepoStub = $this->createStub(MessageRepository::class);
         $this->loginAttemptRepoStub = $this->createStub(LoginAttemptRepository::class);
         $this->commandLogRepoStub = $this->createStub(CommandExecutionLogRepository::class);
-        $this->emailDeliveryLogRepoStub = $this->createStub(EmailDeliveryLogRepository::class);
 
         $this->subject = new DashboardActionService(
             $this->eventRepoStub,
@@ -51,8 +48,7 @@ class DashboardActionServiceTest extends TestCase
             $this->translationRepoStub,
             $this->messageRepoStub,
             $this->loginAttemptRepoStub,
-            $this->commandLogRepoStub,
-            $this->emailDeliveryLogRepoStub
+            $this->commandLogRepoStub
         );
     }
 
@@ -213,7 +209,7 @@ class DashboardActionServiceTest extends TestCase
     public function testGetEmailDeliveryStatsReturnsStats(): void
     {
         $stats = ['total' => 100, 'sent' => 98, 'failed' => 2];
-        $this->emailDeliveryLogRepoStub->method('getStats')->willReturn($stats);
+        $this->mailRepoStub->method('getDeliveryStats')->willReturn($stats);
 
         $result = $this->subject->getEmailDeliveryStats();
 
@@ -222,7 +218,7 @@ class DashboardActionServiceTest extends TestCase
 
     public function testGetEmailDeliverySuccessRateReturnsRate(): void
     {
-        $this->emailDeliveryLogRepoStub->method('getSuccessRate')->willReturn(98.5);
+        $this->mailRepoStub->method('getDeliverySuccessRate')->willReturn(98.5);
 
         $result = $this->subject->getEmailDeliverySuccessRate();
 

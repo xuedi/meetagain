@@ -6,7 +6,10 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\LoginAttemptService;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
 #[AsEventListener(event: LoginFailureEvent::class)]
@@ -22,16 +25,16 @@ readonly class LoginFailureListener
     public function __invoke(LoginFailureEvent $event): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request === null) {
+        if (!$request instanceof Request) {
             return;
         }
 
         $passport = $event->getPassport();
-        if ($passport === null) {
+        if (!$passport instanceof Passport) {
             return;
         }
 
-        $email = $passport->getBadge('Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge')?->getUserIdentifier();
+        $email = $passport->getBadge(UserBadge::class)?->getUserIdentifier();
         if ($email === null) {
             return;
         }
