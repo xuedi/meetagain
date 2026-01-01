@@ -216,47 +216,12 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>Database</td>
-                                <td class="has-text-right">
-                                    {% if tests.database.ok %}
-                                        <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
-                                    {% else %}
-                                        <span class="icon has-text-danger"><i class="fa fa-times-circle"></i></span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Storage</td>
-                                <td class="has-text-right">
-                                    {% if tests.storage.ok %}
-                                        <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
-                                    {% else %}
-                                        <span class="icon has-text-danger"><i class="fa fa-times-circle"></i></span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
                                 <td>
                                     Log Size
                                     <span class="is-size-7 has-text-grey">({{ (tests.logSize.size / 1024 / 1024)|number_format(1) }}MB)</span>
                                 </td>
                                 <td class="has-text-right">
                                     {% if tests.logSize.ok %}
-                                        <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
-                                    {% else %}
-                                        <span class="icon has-text-warning"><i class="fa fa-exclamation-circle"></i></span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Migrations
-                                    {% if tests.migrations.pending > 0 %}
-                                        <span class="is-size-7 has-text-grey">({{ tests.migrations.pending }} pending)</span>
-                                    {% endif %}
-                                </td>
-                                <td class="has-text-right">
-                                    {% if tests.migrations.ok %}
                                         <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
                                     {% else %}
                                         <span class="icon has-text-warning"><i class="fa fa-exclamation-circle"></i></span>
