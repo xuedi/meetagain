@@ -11,9 +11,8 @@ use Throwable;
 
 abstract class LoggedCommand extends Command
 {
-    public function __construct(
-        protected readonly CommandExecutionService $commandExecutionService,
-    ) {
+    public function __construct(protected readonly CommandExecutionService $commandExecutionService)
+    {
         parent::__construct();
     }
 
