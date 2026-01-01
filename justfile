@@ -30,6 +30,7 @@ install:
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{DB}} mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
+    touch installed.lock
 
 # Alias to start the docker stack
 start: dockerStart
