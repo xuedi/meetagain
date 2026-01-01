@@ -6,7 +6,6 @@ use App\Repository\CommandExecutionLogRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
-use App\Repository\LoginAttemptRepository;
 use App\Repository\MessageRepository;
 use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
@@ -21,7 +20,6 @@ readonly class DashboardActionService
         private ImageRepository $imageRepo,
         private TranslationSuggestionRepository $translationSuggestionRepo,
         private MessageRepository $messageRepo,
-        private LoginAttemptRepository $loginAttemptRepo,
         private CommandExecutionLogRepository $commandLogRepo,
     ) {
     }
@@ -125,18 +123,6 @@ readonly class DashboardActionService
     public function getEmailQueueBreakdown(): array
     {
         return $this->mailRepo->getPendingByTemplate();
-    }
-
-    /**
-     * Get login attempt statistics for the last 24 hours.
-     *
-     * @return array{total: int, successful: int, failed: int}
-     */
-    public function getLoginAttemptStats(): array
-    {
-        $since = new DateTimeImmutable('-24 hours');
-
-        return $this->loginAttemptRepo->getStats($since);
     }
 
     /**

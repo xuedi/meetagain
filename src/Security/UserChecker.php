@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Repository\MessageRepository;
 use App\Service\ActivityService;
-use App\Service\LoginAttemptService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -25,7 +24,6 @@ readonly class UserChecker implements UserCheckerInterface
         private EntityManagerInterface $em,
         private RequestStack $requestStack,
         private MessageRepository $msgRepo,
-        private LoginAttemptService $loginAttemptService,
     ) {
     }
 
@@ -60,13 +58,6 @@ readonly class UserChecker implements UserCheckerInterface
         $this->em->flush();
 
         $this->activityService->log(ActivityType::Login, $user, []);
-
-        $this->loginAttemptService->log(
-            $user,
-            $request->getClientIp() ?? 'unknown',
-            true,
-            $request->headers->get('User-Agent')
-        );
 
         if ($this->msgRepo->hasNewMessages($user)) {
             $request->getSession()->set('hasNewMessage', true);

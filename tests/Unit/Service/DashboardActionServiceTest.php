@@ -8,7 +8,6 @@ use App\Repository\CommandExecutionLogRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
-use App\Repository\LoginAttemptRepository;
 use App\Repository\MessageRepository;
 use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
@@ -25,7 +24,6 @@ class DashboardActionServiceTest extends TestCase
     private Stub&ImageRepository $imageRepoStub;
     private Stub&TranslationSuggestionRepository $translationRepoStub;
     private Stub&MessageRepository $messageRepoStub;
-    private Stub&LoginAttemptRepository $loginAttemptRepoStub;
     private Stub&CommandExecutionLogRepository $commandLogRepoStub;
     private DashboardActionService $subject;
 
@@ -37,7 +35,6 @@ class DashboardActionServiceTest extends TestCase
         $this->imageRepoStub = $this->createStub(ImageRepository::class);
         $this->translationRepoStub = $this->createStub(TranslationSuggestionRepository::class);
         $this->messageRepoStub = $this->createStub(MessageRepository::class);
-        $this->loginAttemptRepoStub = $this->createStub(LoginAttemptRepository::class);
         $this->commandLogRepoStub = $this->createStub(CommandExecutionLogRepository::class);
 
         $this->subject = new DashboardActionService(
@@ -47,7 +44,6 @@ class DashboardActionServiceTest extends TestCase
             $this->imageRepoStub,
             $this->translationRepoStub,
             $this->messageRepoStub,
-            $this->loginAttemptRepoStub,
             $this->commandLogRepoStub
         );
     }
@@ -174,16 +170,6 @@ class DashboardActionServiceTest extends TestCase
         $result = $this->subject->getEmailQueueBreakdown();
 
         $this->assertSame($breakdown, $result);
-    }
-
-    public function testGetLoginAttemptStatsReturnsStats(): void
-    {
-        $stats = ['total' => 100, 'successful' => 95, 'failed' => 5];
-        $this->loginAttemptRepoStub->method('getStats')->willReturn($stats);
-
-        $result = $this->subject->getLoginAttemptStats();
-
-        $this->assertSame($stats, $result);
     }
 
     public function testGetCommandExecutionStatsReturnsStats(): void

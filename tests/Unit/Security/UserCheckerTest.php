@@ -7,7 +7,6 @@ use App\Entity\UserStatus;
 use App\Repository\MessageRepository;
 use App\Security\UserChecker;
 use App\Service\ActivityService;
-use App\Service\LoginAttemptService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -158,14 +157,12 @@ class UserCheckerTest extends TestCase
         ?EntityManagerInterface $em = null,
         ?RequestStack $requestStack = null,
         ?MessageRepository $msgRepo = null,
-        ?LoginAttemptService $loginAttemptService = null,
     ): UserChecker {
         return new UserChecker(
             activityService: $activityService ?? $this->createStub(ActivityService::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             requestStack: $requestStack ?? $this->createStub(RequestStack::class),
             msgRepo: $msgRepo ?? $this->createStub(MessageRepository::class),
-            loginAttemptService: $loginAttemptService ?? $this->createStub(LoginAttemptService::class),
         );
     }
 }

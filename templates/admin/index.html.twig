@@ -22,7 +22,7 @@
                     </a>
                 </div>
 
-                {% if actionItems.reportedImages > 0 or actionItems.pendingTranslations > 0 or actionItems.staleEmails > 0 or unverifiedCount > 0 or loginAttempts.failed > 0 or commandStats.failed > 0 or emailDeliveryStats.failed > 0 %}
+                {% if actionItems.reportedImages > 0 or actionItems.pendingTranslations > 0 or actionItems.staleEmails > 0 or unverifiedCount > 0 or commandStats.failed > 0 or emailDeliveryStats.failed > 0 %}
                 <div class="box has-background-warning-light">
                     <h2 class="title is-6"><span class="icon"><i class="fa fa-exclamation-triangle"></i></span> Action Required</h2>
                     <div class="tags">
@@ -49,12 +49,6 @@
                                 <span class="icon"><i class="fa fa-user-clock"></i></span>
                                 <span>{{ unverifiedCount }} Unverified Account{{ unverifiedCount > 1 ? 's' : '' }}</span>
                             </a>
-                        {% endif %}
-                        {% if loginAttempts.failed > 0 %}
-                            <span class="tag is-warning is-medium">
-                                <span class="icon"><i class="fa fa-shield-alt"></i></span>
-                                <span>{{ loginAttempts.failed }} Failed Login{{ loginAttempts.failed > 1 ? 's' : '' }} (24h)</span>
-                            </span>
                         {% endif %}
                         {% if commandStats.failed > 0 %}
                             <span class="tag is-danger is-medium">

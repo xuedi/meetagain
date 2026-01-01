@@ -50,7 +50,6 @@ class AdminController extends AbstractController
             'rsvpStats' => $this->dashboardStats->getRsvpStats($year, $week),
             'loginTrend' => $this->dashboardStats->getLoginTrend($year, $week),
             'socialStats' => $this->dashboardStats->getSocialNetworkStats($year, $week),
-            'loginAttempts' => $this->dashboardAction->getLoginAttemptStats(),
             'commandStats' => $this->dashboardAction->getCommandExecutionStats(),
             'lastCommands' => $this->dashboardAction->getLastCommandExecutions(),
             'emailDeliveryStats' => $this->dashboardAction->getEmailDeliveryStats(),
