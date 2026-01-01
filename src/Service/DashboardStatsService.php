@@ -76,6 +76,40 @@ readonly class DashboardStatsService
         ];
     }
 
+    /**
+     * Get RSVP statistics for the week.
+     *
+     * @return array{yes: int, no: int, total: int}
+     */
+    public function getRsvpStats(int $year, int $week): array
+    {
+        $dates = $this->calculateDates($year, $week);
+
+        return $this->activityRepo->getRsvpStats($dates['start'], $dates['stop']);
+    }
+
+    /**
+     * Get login activity trend for the week.
+     *
+     * @return array<string, int>
+     */
+    public function getLoginTrend(int $year, int $week): array
+    {
+        $dates = $this->calculateDates($year, $week);
+
+        return $this->activityRepo->getLoginTrend($dates['start'], $dates['stop']);
+    }
+
+    /**
+     * Get social network statistics.
+     */
+    public function getSocialNetworkStats(int $year, int $week): array
+    {
+        $dates = $this->calculateDates($year, $week);
+
+        return $this->userRepo->getSocialNetworkStats($dates['start']);
+    }
+
     public function calculateDates(?int $year, ?int $week): array
     {
         $now = new DateTime();

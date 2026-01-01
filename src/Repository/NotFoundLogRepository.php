@@ -31,9 +31,8 @@ class NotFoundLogRepository extends ServiceEntityRepository
             ->from(NotFoundLog::class, 'nf')
             ->where('nf.createdAt > :startDate AND nf.createdAt < :endDate')
             ->groupBy('groupedDay')
-            ->orderBy('nf.id')
-            ->setParameter('startDate', $startDate) // 5 days
-            ->setParameter('endDate', $endDate) // 5 days
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
             ->getQuery()
             ->getArrayResult();
 

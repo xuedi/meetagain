@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Enum\EmailType;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ORM\Index(name: 'idx_email_queue_status', columns: ['status'])]
 class EmailQueue
 {
     #[ORM\Id]
@@ -20,6 +22,12 @@ class EmailQueue
 
     #[ORM\Column(nullable: true)]
     private ?DateTime $sendAt = null;
+
+    #[ORM\Column(length: 20, enumType: EmailQueueStatus::class)]
+    private EmailQueueStatus $status = EmailQueueStatus::Pending;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $errorMessage = null;
 
     #[ORM\Column(length: 255)]
     private ?string $subject = null;
@@ -36,8 +44,8 @@ class EmailQueue
     #[ORM\Column]
     private array $context = [];
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $template = null;
+    #[ORM\Column(length: 64, nullable: true, enumType: EmailType::class)]
+    private ?EmailType $template = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $renderedBody = null;
@@ -131,12 +139,12 @@ class EmailQueue
         return $this;
     }
 
-    public function getTemplate(): ?string
+    public function getTemplate(): ?EmailType
     {
         return $this->template;
     }
 
-    public function setTemplate(?string $template): static
+    public function setTemplate(?EmailType $template): static
     {
         $this->template = $template;
 
@@ -153,5 +161,44 @@ class EmailQueue
         $this->renderedBody = $renderedBody;
 
         return $this;
+    }
+
+    public function getStatus(): EmailQueueStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(EmailQueueStatus $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getErrorMessage(): ?string
+    {
+        return $this->errorMessage;
+    }
+
+    public function setErrorMessage(?string $errorMessage): static
+    {
+        $this->errorMessage = $errorMessage;
+
+        return $this;
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === EmailQueueStatus::Pending;
+    }
+
+    public function isSent(): bool
+    {
+        return $this->status === EmailQueueStatus::Sent;
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === EmailQueueStatus::Failed;
     }
 }

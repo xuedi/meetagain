@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\CommandExecutionService;
 use App\Service\EmailService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -10,16 +11,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(name: 'app:cron', description: 'cron manager to be called often, maybe every 5 min or so')]
-class CronCommand extends Command
+class CronCommand extends LoggedCommand
 {
     use LockableTrait;
 
-    public function __construct(private readonly EmailService $mailService)
-    {
-        parent::__construct();
+    public function __construct(
+        private readonly EmailService $mailService,
+        CommandExecutionService $commandExecutionService,
+    ) {
+        parent::__construct($commandExecutionService);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
             return Command::SUCCESS;

@@ -3,6 +3,7 @@
 namespace Tests\Functional\Command;
 
 use App\Entity\EmailQueue;
+use App\Entity\EmailQueueStatus;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -23,6 +24,7 @@ class CronCommandTest extends KernelTestCase
         $email->setLang('en');
         $email->setCreatedAt(new DateTimeImmutable());
         $email->setRenderedBody('Test Body');
+        $email->setStatus(EmailQueueStatus::Pending);
         $email->setSendAt(null);
 
         $em->persist($email);
@@ -43,6 +45,7 @@ class CronCommandTest extends KernelTestCase
         // 3. Assert: Check if email is marked as sent
         $em->clear();
         $updatedEmail = $em->getRepository(EmailQueue::class)->find($emailId);
+        $this->assertSame(EmailQueueStatus::Sent, $updatedEmail->getStatus(), 'Email status should be sent');
         $this->assertNotNull($updatedEmail->getSendAt(), 'Email should have a send date');
     }
 }

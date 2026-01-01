@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\CommandExecutionService;
 use App\Service\RsvpNotificationService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -14,12 +15,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'app:rsvp:notify',
     description: 'Send notifications to users whose followed users have RSVPd to upcoming events',
 )]
-class RsvpNotificationCommand extends Command
+class RsvpNotificationCommand extends LoggedCommand
 {
     public function __construct(
         private readonly RsvpNotificationService $rsvpNotificationService,
+        CommandExecutionService $commandExecutionService,
     ) {
-        parent::__construct();
+        parent::__construct($commandExecutionService);
     }
 
     protected function configure(): void
@@ -28,7 +30,7 @@ class RsvpNotificationCommand extends Command
             ->addOption('days', 'd', InputOption::VALUE_OPTIONAL, 'How many days ahead to check for events', 7);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $days = (int) $input->getOption('days');

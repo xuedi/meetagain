@@ -94,11 +94,11 @@ class UserCheckerTest extends TestCase
                 $this->assertContains($key, ['lastLogin', 'hasNewMessage']);
             });
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getSession')->willReturn($sessionMock);
+        $request = new Request();
+        $request->setSession($sessionMock);
 
         $requestStackStub = $this->createStub(RequestStack::class);
-        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+        $requestStackStub->method('getCurrentRequest')->willReturn($request);
 
         // Arrange: mock entity manager to verify user is persisted and flushed
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -133,11 +133,11 @@ class UserCheckerTest extends TestCase
             ->method('set')
             ->with('lastLogin', $this->anything());
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getSession')->willReturn($sessionMock);
+        $request = new Request();
+        $request->setSession($sessionMock);
 
         $requestStackStub = $this->createStub(RequestStack::class);
-        $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
+        $requestStackStub->method('getCurrentRequest')->willReturn($request);
 
         // Arrange: mock message repository to return false for new messages
         $msgRepoStub = $this->createStub(MessageRepository::class);

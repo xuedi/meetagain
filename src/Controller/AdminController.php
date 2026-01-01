@@ -5,8 +5,6 @@ namespace App\Controller;
 use App\Service\DashboardActionService;
 use App\Service\DashboardStatsService;
 use DateTime;
-use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\DependencyFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -20,8 +18,6 @@ class AdminController extends AbstractController
         private readonly TagAwareCacheInterface $appCache,
         private readonly DashboardStatsService $dashboardStats,
         private readonly DashboardActionService $dashboardAction,
-        private readonly Connection $connection,
-        private readonly DependencyFactory $dependencyFactory,
         private readonly string $kernelProjectDir,
     ) {
     }
@@ -48,6 +44,16 @@ class AdminController extends AbstractController
             'pastEventsNoPhotos' => $this->dashboardAction->getPastEventsWithoutPhotos(5),
             'recurringEvents' => $this->dashboardAction->getRecurringEventsCount(),
             'tests' => $this->runHealthChecks(),
+            'unverifiedCount' => $this->dashboardAction->getUnverifiedCount(),
+            'messageStats' => $this->dashboardAction->getMessageStats(),
+            'emailQueueBreakdown' => $this->dashboardAction->getEmailQueueBreakdown(),
+            'rsvpStats' => $this->dashboardStats->getRsvpStats($year, $week),
+            'loginTrend' => $this->dashboardStats->getLoginTrend($year, $week),
+            'socialStats' => $this->dashboardStats->getSocialNetworkStats($year, $week),
+            'commandStats' => $this->dashboardAction->getCommandExecutionStats(),
+            'lastCommands' => $this->dashboardAction->getLastCommandExecutions(),
+            'emailDeliveryStats' => $this->dashboardAction->getEmailDeliveryStats(),
+            'emailDeliveryRate' => $this->dashboardAction->getEmailDeliverySuccessRate(),
         ]);
     }
 
@@ -55,10 +61,7 @@ class AdminController extends AbstractController
     {
         return [
             'cache' => $this->testCache(),
-            'database' => $this->testDatabase(),
-            'storage' => $this->testStorage(),
             'logSize' => $this->testLogSize(),
-            'migrations' => $this->testMigrations(),
             'diskSpace' => $this->testDiskSpace(),
             'phpVersion' => $this->getPhpInfo(),
         ];
@@ -80,25 +83,6 @@ class AdminController extends AbstractController
         }
     }
 
-    private function testDatabase(): array
-    {
-        try {
-            $result = $this->connection->executeQuery('SELECT 1')->fetchOne();
-
-            return ['ok' => $result === 1];
-        } catch (Throwable $e) {
-            return ['ok' => false, 'error' => $e->getMessage()];
-        }
-    }
-
-    private function testStorage(): array
-    {
-        $uploadDir = $this->kernelProjectDir . '/public/uploads';
-        $writable = is_dir($uploadDir) && is_writable($uploadDir);
-
-        return ['ok' => $writable, 'path' => $uploadDir];
-    }
-
     private function testLogSize(): array
     {
         $logFile = $this->kernelProjectDir . '/var/log/dev.log';
@@ -115,21 +99,6 @@ class AdminController extends AbstractController
             'size' => $size,
             'maxSize' => $maxSize,
         ];
-    }
-
-    private function testMigrations(): array
-    {
-        try {
-            $statusCalculator = $this->dependencyFactory->getMigrationStatusCalculator();
-            $newMigrations = $statusCalculator->getNewMigrations();
-
-            return [
-                'ok' => count($newMigrations) === 0,
-                'pending' => count($newMigrations),
-            ];
-        } catch (Throwable $e) {
-            return ['ok' => false, 'error' => $e->getMessage()];
-        }
     }
 
     private function testDiskSpace(): array
