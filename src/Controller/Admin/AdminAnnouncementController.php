@@ -89,20 +89,6 @@ class AdminAnnouncementController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/system/announcements/{id}/preview', name: 'app_admin_announcement_preview')]
-    public function preview(Announcement $announcement, Request $request): Response
-    {
-        $locale = $request->query->get('locale', 'en');
-        $preview = $this->announcementService->renderPreview($announcement, $locale);
-
-        return $this->render('admin/announcement/preview.html.twig', [
-            'active' => 'announcement',
-            'announcement' => $announcement,
-            'preview' => $preview,
-            'previewLocale' => $locale,
-        ]);
-    }
-
     #[Route('/admin/system/announcements/{id}/send', name: 'app_admin_announcement_send', methods: ['POST'])]
     public function send(Announcement $announcement): Response
     {
