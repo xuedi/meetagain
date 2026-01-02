@@ -38,11 +38,25 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="column is-2">
-                <button class="button">{{ "button_save" | trans }}</button>
-                <a class="button is-danger toggleTrigger" data-id="cms-delete-warning" href="{{ path('app_admin_cms_delete', {'id': cms.id}) }}">
-                    <span class="icon"><i class="fa fa-trash"></i></span>
-                </a>
+            <div class="column is-4">
+                <div class="has-text-right">
+                    <button class="button">{{ "button_save" | trans }}</button>
+                    <a class="button is-danger toggleTrigger" data-id="cms-delete-warning"
+                       href="{{ path('app_admin_cms_delete', {'id': cms.id}) }}">
+                        <span class="icon"><i class="fa fa-trash"></i></span>
+                    </a>
+                    {% if linkedAnnouncement %}
+                        <a class="button is-info" href="{{ path('app_admin_announcement_view', {'id': linkedAnnouncement.id}) }}">
+                            <span class="icon"><i class="fa fa-bullhorn"></i></span>
+                            <span>open</span>
+                        </a>
+                    {% else %}
+                        <a class="button is-info" href="{{ path('app_admin_announcement_from_cms', {'id': cms.id}) }}">
+                            <span class="icon"><i class="fa fa-bullhorn"></i></span>
+                            <span>Create</span>
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {{ form_end(form) }}

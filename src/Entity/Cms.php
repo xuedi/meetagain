@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\BlockType\Text as TextType;
 use App\Entity\BlockType\Title as TitleType;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -101,6 +102,16 @@ class Cms
         return $this->blocks;
     }
 
+    public function getLanguages(): array
+    {
+        $languages = [];
+        foreach ($this->blocks as $block) {
+            $languages[$block->getLanguage()] = true;
+        }
+
+        return array_keys($languages);
+    }
+
     public function getLanguageFilteredBlockJsonList(string $language): Collection
     {
         $objects = [];
@@ -115,14 +126,30 @@ class Cms
 
     public function getPageTitle(string $language): ?string
     {
-        $title = null;
         foreach ($this->blocks as $block) {
             if ($block->getLanguage() === $language && $block->getType() === CmsBlockTypes::Title) {
-                $title = TitleType::fromJson($block->getJson())->title;
+                return TitleType::fromJson($block->getJson())->title;
             }
         }
 
-        return $title;
+        return null;
+    }
+
+    public function getPageContent(string $language): ?string
+    {
+        $content = [];
+        foreach ($this->blocks as $block) {
+            if ($block->getLanguage() === $language && $block->getType() === CmsBlockTypes::Text) {
+                $content[] = TextType::fromJson($block->getJson())->content;
+            }
+        }
+
+        return $content !== [] ? implode("\n\n", $content) : null;
+    }
+
+    public function hasContentForLanguage(string $language): bool
+    {
+        return $this->getPageTitle($language) !== null;
     }
 
     public function addBlock(CmsBlock $block): static

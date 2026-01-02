@@ -139,6 +139,26 @@ readonly class EmailService
         return $this->addToEmailQueue($email, EmailType::NotificationEventCanceled);
     }
 
+    public function prepareAnnouncementEmail(User $recipient, array $renderedContent, string $announcementUrl, bool $flush = true): bool
+    {
+        $locale = $recipient->getLocale();
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $recipient->getEmail());
+        $email->locale($locale);
+        $email->context([
+            'title' => $renderedContent['title'],
+            'content' => $renderedContent['content'],
+            'announcementUrl' => $announcementUrl,
+            'username' => $recipient->getName(),
+            'host' => $this->config->getHost(),
+            'lang' => $locale,
+        ]);
+
+        return $this->addToEmailQueue($email, EmailType::Announcement, $flush);
+    }
+
     public function getMockEmailList(): array
     {
         return [
@@ -204,6 +224,17 @@ readonly class EmailService
                     'lang' => 'en',
                 ],
             ],
+            EmailType::Announcement->value => [
+                'subject' => 'Important Community Update',
+                'context' => [
+                    'title' => 'Important Community Update',
+                    'content' => '<p>We are excited to announce some upcoming changes to our community platform.</p><p>Stay tuned for more details!</p>',
+                    'announcementUrl' => 'https://localhost/announcement/abc123def456',
+                    'username' => 'John Doe',
+                    'host' => 'https://localhost',
+                    'lang' => 'en',
+                ],
+            ],
         ];
     }
 
@@ -224,7 +255,7 @@ readonly class EmailService
         $this->em->flush();
     }
 
-    private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier): bool
+    private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier, bool $flush = true): bool
     {
         $dbTemplate = $this->templateService->getTemplate($identifier);
         if (!$dbTemplate instanceof EmailTemplate) {
@@ -245,7 +276,9 @@ readonly class EmailService
         $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
 
         $this->em->persist($emailQueue);
-        $this->em->flush();
+        if ($flush) {
+            $this->em->flush();
+        }
 
         return true;
     }

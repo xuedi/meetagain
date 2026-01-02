@@ -45,7 +45,7 @@
                     <td>{{ page.createdAt|date('Y-m-d') }}</td>
                     <td>{% if page.published %}{{ 'published' | trans }}{% else %}{{ 'draft' | trans }}{% endif %}</td>
                     <td>{{ page.blocks|length }}</td>
-                    <td>0</td>
+                    <td>{{ page.languages|length }}</td>
                     <td><a href="{{ path('app_admin_cms_edit', {'id': page.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
                 </tr>
             {% endfor %}

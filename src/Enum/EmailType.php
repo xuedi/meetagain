@@ -10,4 +10,5 @@ enum EmailType: string
     case NotificationRsvpAggregated = 'notification_rsvp_aggregated';
     case NotificationMessage = 'notification_message';
     case NotificationEventCanceled = 'notification_event_canceled';
+    case Announcement = 'announcement';
 }

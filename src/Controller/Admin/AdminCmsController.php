@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
@@ -13,13 +14,13 @@ use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
 use App\Entity\User;
 use App\Form\CmsType;
+use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\CmsBlockService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -32,6 +33,7 @@ class AdminCmsController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly CmsBlockRepository $blockRepo,
         private readonly CmsBlockService $blockService,
+        private readonly AnnouncementRepository $announcementRepo,
     ) {
     }
 
@@ -84,6 +86,7 @@ class AdminCmsController extends AbstractController
             'blocks' => $this->blockRepo->getBlocks($cms->getId(), $locale),
             'form' => $form,
             'cms' => $cms,
+            'linkedAnnouncement' => $this->announcementRepo->findByCmsPage($cms->getId()),
         ]);
     }
 
