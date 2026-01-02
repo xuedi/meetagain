@@ -252,6 +252,63 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 ],
                 'group-cn.jpg',
             ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::ENGLISH,
+                CmsBlockTypes::Headline,
+                [
+                    'title' => 'New Website Version Released!',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::ENGLISH,
+                CmsBlockTypes::Text,
+                [
+                    'title' => 'Launch Announcement',
+                    'content' => 'We are excited to announce the launch of our new website version. Enjoy a better experience and new features!',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::GERMAN,
+                CmsBlockTypes::Headline,
+                [
+                    'title' => 'Neue Website-Version veröffentlicht!',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::GERMAN,
+                CmsBlockTypes::Text,
+                [
+                    'title' => 'Ankündigung zum Launch',
+                    'content' => 'Wir freuen uns, den Start unserer neuen Website-Version bekannt zu geben. Genießen Sie eine bessere Benutzererfahrung und neue Funktionen!',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::CHINESE,
+                CmsBlockTypes::Headline,
+                [
+                    'title' => '新版本网站发布！',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::CHINESE,
+                CmsBlockTypes::Text,
+                [
+                    'title' => '上线公告',
+                    'content' => '我们很高兴地宣布新版本网站正式上线。享受更好的体验和更多新功能！',
+                ],
+                null,
+            ],
         ];
     }
 }

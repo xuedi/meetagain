@@ -13,6 +13,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
     public const string PRIVACY = 'privacy';
     public const string ABOUT = 'about';
     public const string IMPRINT = 'imprint';
+    public const string ANNOUNCEMENT = '2026-01-new-website';
 
     public function load(ObjectManager $manager): void
     {
@@ -45,6 +46,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             [self::PRIVACY],
             [self::ABOUT],
             [self::IMPRINT],
+            [self::ANNOUNCEMENT],
         ];
     }
 }
