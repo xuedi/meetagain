@@ -131,3 +131,7 @@ deptrac:
     # Fixture command needs direct repository access for bulk user retrieval
     App\Command\EventAddFixtureRsvpsCommand:
       - App\Repository\UserRepository
+
+    # Seed command needs direct repository access to check for existing translations
+    App\Command\EmailTemplateSeedCommand:
+      - App\Repository\EmailTemplateTranslationRepository

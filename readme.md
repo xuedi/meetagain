@@ -6,7 +6,7 @@
 [![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
 
-## Introduction
+A self-hosted, open-source alternative to meetup.com for organizing groups and scheduling events. Built as a single-instance platform with recurring events, a block-based CMS for custom pages, multi-language support, a plugin system, user management with email verification, RSVP tracking, aggregated notifications, and private messaging.
 
 A self-hosted, open-source alternative to meetup.com for organizing groups and scheduling events. Built as a single-instance meetup platform with a modular CMS to customize pages for different groups.
 
@@ -80,30 +80,9 @@ Run `just` to see all available commands.
 
 Login with your admin credentials. The `installed.lock` file prevents re-running the installer.
 
-## Project Structure
-
-```
-meetAgain/
-├── src/               # Application code
-│   ├── Controller/    # HTTP controllers
-│   ├── Entity/        # Doctrine entities
-│   ├── Repository/    # Database repositories
-│   └── Service/       # Business logic
-├── templates/         # Twig templates
-├── config/            # Symfony configuration
-├── plugins/           # Plugin system (glossary, karaoke, dishes)
-├── docker/            # Docker setup
-├── tests/             # PHPUnit tests
-├── migrations/        # Database migrations
-└── translations/      # i18n files
-```
-
 ## PhpStorm Setup
 
-For the Docker remote PHP interpreter, add this environment parameter:
-```
-COMPOSE_ENV_FILES=../.env
-```
+For the Docker remote PHP interpreter, add `COMPOSE_ENV_FILES=../.env` as environment parameter.
 
 ## Insights
 

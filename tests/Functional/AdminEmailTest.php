@@ -50,8 +50,9 @@ class AdminEmailTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('form')->count(), 'Edit form should exist');
-        $this->assertSelectorExists('input[name="email_template[subject]"]');
-        $this->assertSelectorExists('textarea[name="email_template[body]"]');
+        // Form fields are now language-specific
+        $this->assertSelectorExists('input[name="email_template[subject-en]"]');
+        $this->assertSelectorExists('textarea[name="email_template[body-en]"]');
     }
 
     public function testEmailTemplatePreviewPageLoads(): void
@@ -78,10 +79,10 @@ class AdminEmailTest extends WebTestCase
 
         $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/edit');
 
-        // Act
+        // Act - form fields are now language-specific
         $form = $crawler->filter('button[type="submit"]')->form([
-            'email_template[subject]' => 'Updated Subject',
-            'email_template[body]' => '<h1>Updated Body</h1>',
+            'email_template[subject-en]' => 'Updated Subject',
+            'email_template[body-en]' => '<h1>Updated Body</h1>',
         ]);
         $client->submit($form);
 
@@ -93,7 +94,7 @@ class AdminEmailTest extends WebTestCase
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $em->clear();
         $updated = $em->getRepository(EmailTemplate::class)->find($template->getId());
-        $this->assertSame('Updated Subject', $updated->getSubject());
+        $this->assertSame('Updated Subject', $updated->getSubject('en'));
     }
 
     public function testEmailTemplateResetToDefault(): void
@@ -102,13 +103,13 @@ class AdminEmailTest extends WebTestCase
         $client = static::createClient();
         $this->loginAsAdmin($client);
         $template = $this->getFirstTemplate($client);
-        $originalSubject = $template->getSubject();
+        $originalSubject = $template->getSubject('en');
 
         // First change the template
         $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/edit');
         $form = $crawler->filter('button[type="submit"]')->form([
-            'email_template[subject]' => 'Modified Subject',
-            'email_template[body]' => '<p>Modified</p>',
+            'email_template[subject-en]' => 'Modified Subject',
+            'email_template[body-en]' => '<p>Modified</p>',
         ]);
         $client->submit($form);
         $client->followRedirect();
@@ -121,7 +122,7 @@ class AdminEmailTest extends WebTestCase
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $em->clear();
         $reset = $em->getRepository(EmailTemplate::class)->find($template->getId());
-        $this->assertSame($originalSubject, $reset->getSubject());
+        $this->assertSame($originalSubject, $reset->getSubject('en'));
     }
 
     private function loginAsAdmin($client): void
