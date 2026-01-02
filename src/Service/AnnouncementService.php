@@ -10,6 +10,7 @@ use App\Entity\BlockType\Title as TitleType;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
 use App\Entity\EmailTemplate;
+use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\UserRepository;
@@ -93,14 +94,14 @@ readonly class AnnouncementService
             }
 
             match ($block->getType()) {
-                CmsBlockTypes::Headline => $title = TitleType::fromJson($block->getJson())->title,
+                CmsBlockTypes::Title => $title = TitleType::fromJson($block->getJson())->title,
                 CmsBlockTypes::Text => $contentParts[] = '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
                 CmsBlockTypes::Image => $contentParts[] = $this->renderImageBlock(ImageType::fromJson($block->getJson(), $block->getImage())),
                 default => null,
             };
         }
 
-        if(empty($contentParts)) {
+        if($contentParts === []) {
             $contentParts[] =  "ERROR: The CMS page has no content for the language [$locale]";
         }
 
@@ -113,7 +114,7 @@ readonly class AnnouncementService
     private function renderImageBlock(ImageType $imageBlock): string
     {
         $image = $imageBlock->image;
-        if ($image === null) {
+        if (!$image instanceof Image) {
             return '';
         }
 
