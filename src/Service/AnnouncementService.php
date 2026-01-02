@@ -131,7 +131,7 @@ readonly class AnnouncementService
         $context = [
             'title' => $announcement->getTitle(),
             'announcement' => $announcement->getContent(),
-            'announcementLink' => $cmsUrl,
+            'announcementUrl' => $cmsUrl,
             'username' => $recipient->getName(),
             'host' => $this->configService->getHost(),
             'lang' => $recipient->getLocale(),
@@ -158,7 +158,7 @@ readonly class AnnouncementService
         return [
             'title' => $announcement->getTitle(),
             'announcement' => $announcement->getContent(),
-            'announcementLink' => $this->configService->getHost() . '/announcement/' . $linkHash,
+            'announcementUrl' => $this->configService->getHost() . '/announcement/' . $linkHash,
             'username' => 'Preview User',
             'host' => $this->configService->getHost(),
             'lang' => 'en',
