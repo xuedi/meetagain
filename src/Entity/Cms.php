@@ -102,6 +102,16 @@ class Cms
         return $this->blocks;
     }
 
+    public function getLanguages(): array
+    {
+        $languages = [];
+        foreach ($this->blocks as $block) {
+            $languages[$block->getLanguage()] = true;
+        }
+
+        return array_keys($languages);
+    }
+
     public function getLanguageFilteredBlockJsonList(string $language): Collection
     {
         $objects = [];
