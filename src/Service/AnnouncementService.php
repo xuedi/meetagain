@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;
-use App\Entity\EmailQueue;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -21,6 +20,7 @@ readonly class AnnouncementService
         private UserRepository $userRepo,
         private ConfigService $configService,
         private EmailTemplateService $templateService,
+        private EmailService $emailService,
     ) {
     }
 
@@ -42,7 +42,7 @@ readonly class AnnouncementService
         $announcementUrl = $this->configService->getHost() . '/announcement/' . $announcement->getLinkHash();
 
         foreach ($subscribers as $subscriber) {
-            $this->queueAnnouncementEmail($subscriber, $announcement, $announcementUrl);
+            $this->emailService->prepareAnnouncementEmail($subscriber, $announcement, $announcementUrl, flush: false);
             ++$recipientCount;
         }
 
@@ -72,36 +72,6 @@ readonly class AnnouncementService
     private function generateLinkHash(): string
     {
         return bin2hex(random_bytes(16));
-    }
-
-    private function queueAnnouncementEmail(User $recipient, Announcement $announcement, string $announcementUrl): void
-    {
-        $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
-        if (!$dbTemplate instanceof EmailTemplate) {
-            throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
-        }
-
-        $locale = $recipient->getLocale();
-        $context = [
-            'announcement' => $announcement->getContent($locale),
-            'announcementUrl' => $announcementUrl,
-            'username' => $recipient->getName(),
-            'host' => $this->configService->getHost(),
-            'lang' => $locale,
-        ];
-
-        $emailQueue = new EmailQueue();
-        $emailQueue->setSender($this->configService->getMailerAddress()->toString());
-        $emailQueue->setRecipient((string) $recipient->getEmail());
-        $emailQueue->setLang($locale);
-        $emailQueue->setContext($context);
-        $emailQueue->setCreatedAt(new DateTimeImmutable());
-        $emailQueue->setSendAt(null);
-        $emailQueue->setTemplate(EmailType::Announcement);
-        $emailQueue->setSubject($this->templateService->renderContent($dbTemplate->getSubject(), $context));
-        $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
-
-        $this->em->persist($emailQueue);
     }
 
     public function getPreviewContext(Announcement $announcement, string $locale = 'en'): array

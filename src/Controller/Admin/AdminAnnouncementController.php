@@ -119,33 +119,6 @@ class AdminAnnouncementController extends AbstractController
         return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
     }
 
-    #[Route('/admin/system/announcements/{id}/edit', name: 'app_admin_announcement_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Announcement $announcement): Response
-    {
-        if (!$announcement->isDraft()) {
-            $this->addFlash('error', 'announcement_cannot_edit_sent');
-
-            return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
-        }
-
-        $form = $this->createForm(AnnouncementType::class, $announcement);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->em->flush();
-
-            $this->addFlash('success', 'announcement_updated');
-
-            return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
-        }
-
-        return $this->render('admin/announcement/edit.html.twig', [
-            'active' => 'announcement',
-            'form' => $form,
-            'announcement' => $announcement,
-        ]);
-    }
-
     #[Route('/admin/system/announcements/{id}/delete', name: 'app_admin_announcement_delete', methods: ['POST'])]
     public function delete(Announcement $announcement): Response
     {
@@ -157,8 +130,6 @@ class AdminAnnouncementController extends AbstractController
 
         $this->em->remove($announcement);
         $this->em->flush();
-
-        $this->addFlash('success', 'announcement_deleted');
 
         return $this->redirectToRoute('app_admin_announcement');
     }

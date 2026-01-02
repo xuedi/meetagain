@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Announcement;
 use App\Entity\EmailQueue;
 use App\Entity\EmailQueueStatus;
 use App\Entity\EmailTemplate;
@@ -139,6 +140,25 @@ readonly class EmailService
         return $this->addToEmailQueue($email, EmailType::NotificationEventCanceled);
     }
 
+    public function prepareAnnouncementEmail(User $recipient, Announcement $announcement, string $announcementUrl, bool $flush = true): bool
+    {
+        $locale = $recipient->getLocale();
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $recipient->getEmail());
+        $email->locale($locale);
+        $email->context([
+            'announcement' => $announcement->getContent($locale),
+            'announcementUrl' => $announcementUrl,
+            'username' => $recipient->getName(),
+            'host' => $this->config->getHost(),
+            'lang' => $locale,
+        ]);
+
+        return $this->addToEmailQueue($email, EmailType::Announcement, $flush);
+    }
+
     public function getMockEmailList(): array
     {
         return [
@@ -234,7 +254,7 @@ readonly class EmailService
         $this->em->flush();
     }
 
-    private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier): bool
+    private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier, bool $flush = true): bool
     {
         $dbTemplate = $this->templateService->getTemplate($identifier);
         if (!$dbTemplate instanceof EmailTemplate) {
@@ -255,7 +275,9 @@ readonly class EmailService
         $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
 
         $this->em->persist($emailQueue);
-        $this->em->flush();
+        if ($flush) {
+            $this->em->flush();
+        }
 
         return true;
     }
