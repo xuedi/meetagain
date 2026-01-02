@@ -40,7 +40,7 @@ class TranslationListCommand extends Command
                 continue;
             }
             [$name, $lang, $ext] = $parts;
-            
+
             if (!in_array($lang, $locales, true)) {
                 continue;
             }

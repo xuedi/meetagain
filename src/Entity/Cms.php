@@ -4,13 +4,12 @@ namespace App\Entity;
 
 use App\Entity\BlockType\Text as TextType;
 use App\Entity\BlockType\Title as TitleType;
-use App\Repository\CmsRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CmsRepository::class)]
+#[ORM\Entity]
 class Cms
 {
     #[ORM\Id]

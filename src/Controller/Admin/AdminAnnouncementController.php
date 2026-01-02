@@ -6,7 +6,6 @@ use App\Controller\AbstractController;
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;
-use App\Entity\User;
 use App\Form\AnnouncementType;
 use App\Repository\AnnouncementRepository;
 use App\Service\AnnouncementService;

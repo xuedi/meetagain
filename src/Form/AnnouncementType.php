@@ -14,8 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AnnouncementType extends AbstractType
 {
-    public function __construct(public readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        public readonly TranslatorInterface $translator,
+        public readonly CmsRepository $cmsRepository,
+    ) {
     }
 
     #[Override]
@@ -26,7 +28,7 @@ class AnnouncementType extends AbstractType
                 'class' => Cms::class,
                 'label' => false,
                 'choice_label' => fn (Cms $cms) => $cms->getSlug() . ($cms->isPublished() ? '' : ' (unpublished)'),
-                'query_builder' => fn (CmsRepository $repo) => $repo->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
+                'query_builder' => fn () => $this->cmsRepository->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
             ]);
     }
 
