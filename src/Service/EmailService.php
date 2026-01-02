@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\EmailQueue;
 use App\Entity\EmailQueueStatus;
-use App\Entity\EmailTemplate;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -12,7 +11,6 @@ use App\Repository\EmailQueueRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -257,23 +255,21 @@ readonly class EmailService
 
     private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier, bool $flush = true): bool
     {
-        $dbTemplate = $this->templateService->getTemplate($identifier);
-        if (!$dbTemplate instanceof EmailTemplate) {
-            throw new RuntimeException(sprintf('Email template "%s" not found in database. Run app:email-templates:seed command.', $identifier->value));
-        }
+        $locale = $email->getLocale() ?? 'en';
+        $templateContent = $this->templateService->getTemplateContent($identifier, $locale);
 
         $context = $email->getContext();
 
         $emailQueue = new EmailQueue();
         $emailQueue->setSender($email->getFrom()[0]->toString());
         $emailQueue->setRecipient($email->getTo()[0]->toString());
-        $emailQueue->setLang($email->getLocale() ?? 'en');
+        $emailQueue->setLang($locale);
         $emailQueue->setContext($context);
         $emailQueue->setCreatedAt(new DateTimeImmutable());
         $emailQueue->setSendAt(null);
         $emailQueue->setTemplate($identifier);
-        $emailQueue->setSubject($this->templateService->renderContent($dbTemplate->getSubject(), $context));
-        $emailQueue->setRenderedBody($this->templateService->renderContent($dbTemplate->getBody(), $context));
+        $emailQueue->setSubject($this->templateService->renderContent($templateContent['subject'], $context));
+        $emailQueue->setRenderedBody($this->templateService->renderContent($templateContent['body'], $context));
 
         $this->em->persist($emailQueue);
         if ($flush) {

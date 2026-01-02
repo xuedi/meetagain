@@ -153,8 +153,8 @@ readonly class AnnouncementService
         $context = $this->getPreviewContext($announcement, $locale);
 
         return [
-            'subject' => $this->templateService->renderContent($dbTemplate->getSubject(), $context),
-            'body' => $this->templateService->renderContent($dbTemplate->getBody(), $context),
+            'subject' => $this->templateService->renderContent($dbTemplate->getSubject($locale), $context),
+            'body' => $this->templateService->renderContent($dbTemplate->getBody($locale), $context),
         ];
     }
 }
