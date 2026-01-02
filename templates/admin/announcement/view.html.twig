@@ -7,7 +7,7 @@
         <nav class="level">
             <div class="level-left">
                 <div class="level-item">
-                    <h1 class="title">{{ announcement.title }}</h1>
+                    <h1 class="title">{{ announcement.cmsPage ? announcement.cmsPage.slug : 'Announcement #' ~ announcement.id }}</h1>
                 </div>
                 <div class="level-item">
                     {% if announcement.draft %}
@@ -36,7 +36,22 @@
                     <table class="table is-fullwidth">
                         <tbody>
                         <tr>
-                            <th style="width: 200px;">{{ 'announcement_created_by' | trans }}</th>
+                            <th style="width: 200px;">{{ 'announcement_cms_page' | trans }}</th>
+                            <td>
+                                {% if announcement.cmsPage %}
+                                    <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}">
+                                        {{ announcement.cmsPage.slug }}
+                                    </a>
+                                    {% if not announcement.cmsPage.published %}
+                                        <span class="tag is-warning is-small">{{ 'unpublished' | trans }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="has-text-danger">{{ 'no_cms_page' | trans }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'announcement_created_by' | trans }}</th>
                             <td>{{ announcement.createdBy.name }}</td>
                         </tr>
                         <tr>
@@ -52,31 +67,28 @@
                             <th>{{ 'announcement_recipients' | trans }}</th>
                             <td>{{ announcement.recipientCount }}</td>
                         </tr>
-                        {% if announcement.cmsPage %}
-                        <tr>
-                            <th>{{ 'announcement_cms_page' | trans }}</th>
-                            <td>
-                                <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}">
-                                    {{ announcement.cmsPage.slug }}
-                                </a>
-                            </td>
-                        </tr>
-                        {% endif %}
                         {% endif %}
                         </tbody>
                     </table>
                 </div>
 
-                <div class="box">
-                    <h2 class="subtitle">{{ 'announcement_content' | trans }}</h2>
-                    <div class="content">
-                        {{ announcement.content | nl2br }}
-                    </div>
-                </div>
-
                 {% if preview %}
                 <div class="box">
-                    <h2 class="subtitle">{{ 'announcement_email_preview' | trans }}</h2>
+                    <div class="level">
+                        <div class="level-left">
+                            <h2 class="subtitle">{{ 'announcement_email_preview' | trans }}</h2>
+                        </div>
+                        <div class="level-right">
+                            <div class="buttons has-addons">
+                                {% for locale in enabled_locales %}
+                                    <a href="{{ path('app_admin_announcement_view', {'id': announcement.id, 'locale': locale}) }}"
+                                       class="button is-small {% if locale == previewLocale %}is-active is-info{% endif %}">
+                                        {{ locale }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                     <p><strong>{{ 'email_subject' | trans }}:</strong> {{ preview.subject }}</p>
                     <hr>
                     <div class="content">
@@ -99,12 +111,19 @@
                             </button>
                         </form>
 
-                        <a href="{{ path('app_admin_announcement_edit', {'id': announcement.id}) }}" class="button is-info is-fullwidth mb-3">
+                        {% if announcement.cmsPage %}
+                        <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}" class="button is-info is-fullwidth mb-3">
                             <span class="icon"><i class="fa fa-edit"></i></span>
-                            <span>{{ 'button_edit' | trans }}</span>
+                            <span>{{ 'button_edit_cms_page' | trans }}</span>
+                        </a>
+                        {% endif %}
+
+                        <a href="{{ path('app_admin_announcement_edit', {'id': announcement.id}) }}" class="button is-fullwidth mb-3">
+                            <span class="icon"><i class="fa fa-exchange-alt"></i></span>
+                            <span>{{ 'button_change_cms_page' | trans }}</span>
                         </a>
 
-                        <a href="{{ path('app_admin_announcement_preview', {'id': announcement.id}) }}" class="button is-fullwidth mb-3">
+                        <a href="{{ path('app_admin_announcement_preview', {'id': announcement.id, 'locale': previewLocale}) }}" class="button is-fullwidth mb-3">
                             <span class="icon"><i class="fa fa-eye"></i></span>
                             <span>{{ 'button_preview' | trans }}</span>
                         </a>

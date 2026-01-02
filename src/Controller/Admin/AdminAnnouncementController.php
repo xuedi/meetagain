@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Announcement;
+use App\Entity\Cms;
 use App\Entity\User;
 use App\Form\AnnouncementType;
 use App\Repository\AnnouncementRepository;
@@ -42,11 +43,10 @@ class AdminAnnouncementController extends AbstractController
             $user = $this->getUser();
             assert($user instanceof User);
 
-            $this->announcementService->createAnnouncement(
-                $announcement->getTitle(),
-                $announcement->getContent(),
-                $user
-            );
+            $cmsPage = $announcement->getCmsPage();
+            assert($cmsPage instanceof Cms);
+
+            $this->announcementService->createAnnouncement($cmsPage, $user);
 
             $this->addFlash('success', 'announcement_created');
 
@@ -59,30 +59,47 @@ class AdminAnnouncementController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/system/announcements/{id}', name: 'app_admin_announcement_view')]
-    public function view(Announcement $announcement): Response
+    #[Route('/admin/system/announcements/from-cms/{id}', name: 'app_admin_announcement_from_cms', methods: ['POST'])]
+    public function createFromCms(Cms $cmsPage): Response
     {
+        $user = $this->getUser();
+        assert($user instanceof User);
+
+        $announcement = $this->announcementService->createAnnouncement($cmsPage, $user);
+
+        $this->addFlash('success', 'announcement_created');
+
+        return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
+    }
+
+    #[Route('/admin/system/announcements/{id}', name: 'app_admin_announcement_view')]
+    public function view(Announcement $announcement, Request $request): Response
+    {
+        $locale = $request->query->get('locale', 'en');
         $preview = null;
         if ($announcement->isDraft()) {
-            $preview = $this->announcementService->renderPreview($announcement);
+            $preview = $this->announcementService->renderPreview($announcement, $locale);
         }
 
         return $this->render('admin/announcement/view.html.twig', [
             'active' => 'announcement',
             'announcement' => $announcement,
             'preview' => $preview,
+            'previewLocale' => $locale,
         ]);
     }
 
     #[Route('/admin/system/announcements/{id}/preview', name: 'app_admin_announcement_preview')]
-    public function preview(Announcement $announcement): Response
+    public function preview(Announcement $announcement, Request $request): Response
     {
-        $preview = $this->announcementService->renderPreview($announcement);
+        $locale = $request->query->get('locale', 'en');
+        $preview = $this->announcementService->renderPreview($announcement, $locale);
 
         return $this->render('admin/announcement/preview.html.twig', [
             'active' => 'announcement',
             'announcement' => $announcement,
             'preview' => $preview,
+            'previewLocale' => $locale,
         ]);
     }
 
@@ -95,10 +112,7 @@ class AdminAnnouncementController extends AbstractController
             return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
         }
 
-        $user = $this->getUser();
-        assert($user instanceof User);
-
-        $recipientCount = $this->announcementService->send($announcement, $user);
+        $recipientCount = $this->announcementService->send($announcement);
 
         $this->addFlash('success', sprintf('announcement_sent_success: %d', $recipientCount));
 

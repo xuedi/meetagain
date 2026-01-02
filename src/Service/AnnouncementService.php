@@ -5,12 +5,10 @@ namespace App\Service;
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;
-use App\Entity\CmsBlockTypes;
 use App\Entity\EmailQueue;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Enum\EmailType;
-use App\Repository\LanguageRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,18 +19,15 @@ readonly class AnnouncementService
     public function __construct(
         private EntityManagerInterface $em,
         private UserRepository $userRepo,
-        private LanguageRepository $languageRepo,
-        private CmsBlockService $cmsBlockService,
         private ConfigService $configService,
         private EmailTemplateService $templateService,
     ) {
     }
 
-    public function createAnnouncement(string $title, string $content, User $createdBy): Announcement
+    public function createAnnouncement(Cms $cmsPage, User $createdBy): Announcement
     {
         $announcement = new Announcement();
-        $announcement->setTitle($title);
-        $announcement->setContent($content);
+        $announcement->setCmsPage($cmsPage);
         $announcement->setCreatedBy($createdBy);
         $announcement->setCreatedAt(new DateTimeImmutable());
         $announcement->setStatus(AnnouncementStatus::Draft);
@@ -43,14 +38,17 @@ readonly class AnnouncementService
         return $announcement;
     }
 
-    public function send(Announcement $announcement, User $admin): int
+    public function send(Announcement $announcement): int
     {
         if (!$announcement->isDraft()) {
             throw new RuntimeException('Announcement has already been sent');
         }
 
-        $cmsPage = $this->createCmsPage($announcement, $admin);
-        $announcement->setCmsPage($cmsPage);
+        $cmsPage = $announcement->getCmsPage();
+        if (!$cmsPage instanceof Cms) {
+            throw new RuntimeException('Announcement must have a CMS page linked before sending');
+        }
+
         $announcement->setLinkHash($this->generateLinkHash());
 
         $subscribers = $this->getAnnouncementSubscribers();
@@ -72,37 +70,6 @@ readonly class AnnouncementService
         return $recipientCount;
     }
 
-    public function createCmsPage(Announcement $announcement, User $admin): Cms
-    {
-        $cmsPage = new Cms();
-        $cmsPage->setSlug('announcement-' . $announcement->getId());
-        $cmsPage->setPublished(true);
-        $cmsPage->setCreatedBy($admin);
-        $cmsPage->setCreatedAt(new DateTimeImmutable());
-
-        $this->em->persist($cmsPage);
-        $this->em->flush();
-
-        $languages = $this->languageRepo->getEnabledCodes();
-        foreach ($languages as $locale) {
-            $this->cmsBlockService->createBlock(
-                $cmsPage,
-                $locale,
-                CmsBlockTypes::Title,
-                ['title' => $announcement->getTitle()]
-            );
-
-            $this->cmsBlockService->createBlock(
-                $cmsPage,
-                $locale,
-                CmsBlockTypes::Text,
-                ['content' => $announcement->getContent()]
-            );
-        }
-
-        return $cmsPage;
-    }
-
     /**
      * @return User[]
      */
@@ -121,26 +88,27 @@ readonly class AnnouncementService
         return bin2hex(random_bytes(16));
     }
 
-    private function queueAnnouncementEmail(User $recipient, Announcement $announcement, string $cmsUrl): void
+    private function queueAnnouncementEmail(User $recipient, Announcement $announcement, string $announcementUrl): void
     {
         $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
         if (!$dbTemplate instanceof EmailTemplate) {
             throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
         }
 
+        $locale = $recipient->getLocale();
         $context = [
-            'title' => $announcement->getTitle(),
-            'announcement' => $announcement->getContent(),
-            'announcementUrl' => $cmsUrl,
+            'title' => $announcement->getTitle($locale),
+            'announcement' => $announcement->getContent($locale),
+            'announcementUrl' => $announcementUrl,
             'username' => $recipient->getName(),
             'host' => $this->configService->getHost(),
-            'lang' => $recipient->getLocale(),
+            'lang' => $locale,
         ];
 
         $emailQueue = new EmailQueue();
         $emailQueue->setSender($this->configService->getMailerAddress()->toString());
         $emailQueue->setRecipient((string) $recipient->getEmail());
-        $emailQueue->setLang($recipient->getLocale());
+        $emailQueue->setLang($locale);
         $emailQueue->setContext($context);
         $emailQueue->setCreatedAt(new DateTimeImmutable());
         $emailQueue->setSendAt(null);
@@ -151,28 +119,28 @@ readonly class AnnouncementService
         $this->em->persist($emailQueue);
     }
 
-    public function getPreviewContext(Announcement $announcement): array
+    public function getPreviewContext(Announcement $announcement, string $locale = 'en'): array
     {
         $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
 
         return [
-            'title' => $announcement->getTitle(),
-            'announcement' => $announcement->getContent(),
+            'title' => $announcement->getTitle($locale),
+            'announcement' => $announcement->getContent($locale),
             'announcementUrl' => $this->configService->getHost() . '/announcement/' . $linkHash,
             'username' => 'Preview User',
             'host' => $this->configService->getHost(),
-            'lang' => 'en',
+            'lang' => $locale,
         ];
     }
 
-    public function renderPreview(Announcement $announcement): array
+    public function renderPreview(Announcement $announcement, string $locale = 'en'): array
     {
         $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
         if (!$dbTemplate instanceof EmailTemplate) {
             throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
         }
 
-        $context = $this->getPreviewContext($announcement);
+        $context = $this->getPreviewContext($announcement, $locale);
 
         return [
             'subject' => $this->templateService->renderContent($dbTemplate->getSubject(), $context),

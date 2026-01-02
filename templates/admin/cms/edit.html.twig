@@ -6,11 +6,27 @@
         <article class="message is-info">
             <div class="message-body">
                 <span class="icon"><i class="fa fa-bullhorn"></i></span>
-                This page is linked to announcement: <strong>{{ linkedAnnouncement.title }}</strong>
+                This page is linked to an announcement
+                {% if linkedAnnouncement.sent %}
+                    <span class="tag is-success is-small ml-2">{{ 'sent' | trans }}</span>
+                {% else %}
+                    <span class="tag is-warning is-small ml-2">{{ 'draft' | trans }}</span>
+                {% endif %}
                 <a href="{{ path('app_admin_announcement_view', {'id': linkedAnnouncement.id}) }}" class="ml-2">
                     <span class="icon"><i class="fa fa-arrow-right"></i></span>
                     <span>View Announcement</span>
                 </a>
+            </div>
+        </article>
+    {% else %}
+        <article class="message is-light">
+            <div class="message-body">
+                <form action="{{ path('app_admin_announcement_from_cms', {'id': cms.id}) }}" method="post" style="display: inline;">
+                    <button type="submit" class="button is-small is-info">
+                        <span class="icon"><i class="fa fa-bullhorn"></i></span>
+                        <span>Create Announcement from this page</span>
+                    </button>
+                </form>
             </div>
         </article>
     {% endif %}

@@ -3,10 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Announcement;
+use App\Entity\Cms;
+use App\Repository\CmsRepository;
 use Override;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,13 +17,13 @@ class AnnouncementType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('title', TextType::class, [
-                'label' => 'announcement_title',
+            ->add('cmsPage', EntityType::class, [
+                'class' => Cms::class,
+                'label' => 'announcement_cms_page',
+                'choice_label' => fn (Cms $cms) => $cms->getSlug() . ($cms->isPublished() ? '' : ' (unpublished)'),
+                'query_builder' => fn (CmsRepository $repo) => $repo->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
+                'placeholder' => 'announcement_select_cms_page',
                 'attr' => ['class' => 'input'],
-            ])
-            ->add('content', TextareaType::class, [
-                'label' => 'announcement_content',
-                'attr' => ['class' => 'textarea', 'rows' => 10],
             ]);
     }
 

@@ -3,22 +3,17 @@
 namespace App\Entity;
 
 use DateTimeImmutable;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 class Announcement
 {
+    private const string FALLBACK_LOCALE = 'en';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
 
     #[ORM\Column(length: 20, enumType: AnnouncementStatus::class)]
     private AnnouncementStatus $status = AnnouncementStatus::Draft;
@@ -47,28 +42,24 @@ class Announcement
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(string $locale): ?string
     {
-        return $this->title;
+        if (!$this->cmsPage instanceof Cms) {
+            return null;
+        }
+
+        return $this->cmsPage->getPageTitle($locale)
+            ?? $this->cmsPage->getPageTitle(self::FALLBACK_LOCALE);
     }
 
-    public function setTitle(string $title): static
+    public function getContent(string $locale): ?string
     {
-        $this->title = $title;
+        if (!$this->cmsPage instanceof Cms) {
+            return null;
+        }
 
-        return $this;
-    }
-
-    public function getContent(): ?string
-    {
-        return $this->content;
-    }
-
-    public function setContent(string $content): static
-    {
-        $this->content = $content;
-
-        return $this;
+        return $this->cmsPage->getPageContent($locale)
+            ?? $this->cmsPage->getPageContent(self::FALLBACK_LOCALE);
     }
 
     public function getStatus(): AnnouncementStatus

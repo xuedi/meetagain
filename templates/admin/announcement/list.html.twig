@@ -7,7 +7,7 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ 'announcement_title' | trans }}</th>
+                <th>{{ 'announcement_cms_page' | trans }}</th>
                 <th>{{ 'announcement_status' | trans }}</th>
                 <th>{{ 'announcement_created' | trans }}</th>
                 <th>{{ 'announcement_sent_at' | trans }}</th>
@@ -18,7 +18,7 @@
             <tbody>
             {% for announcement in announcements %}
                 <tr>
-                    <td>{{ announcement.title }}</td>
+                    <td>{{ announcement.cmsPage ? announcement.cmsPage.slug : '-' }}</td>
                     <td>
                         {% if announcement.draft %}
                             <span class="tag is-warning">{{ 'draft' | trans }}</span>
