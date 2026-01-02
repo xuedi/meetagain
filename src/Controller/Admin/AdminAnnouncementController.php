@@ -2,14 +2,16 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\Announcement;
+use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;
 use App\Entity\User;
 use App\Form\AnnouncementType;
 use App\Repository\AnnouncementRepository;
 use App\Service\AnnouncementService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -40,17 +42,14 @@ class AdminAnnouncementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            assert($user instanceof User);
+            $announcement->setCreatedBy($this->getAuthedUser());
+            $announcement->setCreatedAt(new DateTimeImmutable());
+            $announcement->setStatus(AnnouncementStatus::Draft);
 
-            $cmsPage = $announcement->getCmsPage();
-            assert($cmsPage instanceof Cms);
+            $this->em->persist($announcement);
+            $this->em->flush();
 
-            $this->announcementService->createAnnouncement($cmsPage, $user);
-
-            $this->addFlash('success', 'announcement_created');
-
-            return $this->redirectToRoute('app_admin_announcement');
+            return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
         }
 
         return $this->render('admin/announcement/new.html.twig', [
@@ -59,15 +58,17 @@ class AdminAnnouncementController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/system/announcements/from-cms/{id}', name: 'app_admin_announcement_from_cms', methods: ['POST'])]
+    #[Route('/admin/system/announcements/from-cms/{id}', name: 'app_admin_announcement_from_cms', methods: ['GET'])]
     public function createFromCms(Cms $cmsPage): Response
     {
-        $user = $this->getUser();
-        assert($user instanceof User);
+        $announcement = new Announcement();
+        $announcement->setCmsPage($cmsPage);
+        $announcement->setCreatedBy($this->getAuthedUser());
+        $announcement->setCreatedAt(new DateTimeImmutable());
+        $announcement->setStatus(AnnouncementStatus::Draft);
 
-        $announcement = $this->announcementService->createAnnouncement($cmsPage, $user);
-
-        $this->addFlash('success', 'announcement_created');
+        $this->em->persist($announcement);
+        $this->em->flush();
 
         return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
     }

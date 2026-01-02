@@ -74,7 +74,7 @@ readonly class EmailTemplateService
             EmailType::Announcement->value => [
                 'subject' => '{{title}}',
                 'body' => $this->loadTemplateBody(EmailType::Announcement),
-                'variables' => ['title', 'announcement', 'announcementUrl', 'username', 'host', 'lang'],
+                'variables' => ['announcement', 'announcementUrl', 'username', 'host', 'lang'],
             ],
         ];
     }

@@ -10,20 +10,23 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AnnouncementType extends AbstractType
 {
+    public function __construct(public readonly TranslatorInterface $translator)
+    {
+    }
+
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('cmsPage', EntityType::class, [
                 'class' => Cms::class,
-                'label' => 'announcement_cms_page',
+                'label' => false,
                 'choice_label' => fn (Cms $cms) => $cms->getSlug() . ($cms->isPublished() ? '' : ' (unpublished)'),
                 'query_builder' => fn (CmsRepository $repo) => $repo->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
-                'placeholder' => 'announcement_select_cms_page',
-                'attr' => ['class' => 'input'],
             ]);
     }
 

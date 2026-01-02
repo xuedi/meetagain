@@ -24,20 +24,6 @@ readonly class AnnouncementService
     ) {
     }
 
-    public function createAnnouncement(Cms $cmsPage, User $createdBy): Announcement
-    {
-        $announcement = new Announcement();
-        $announcement->setCmsPage($cmsPage);
-        $announcement->setCreatedBy($createdBy);
-        $announcement->setCreatedAt(new DateTimeImmutable());
-        $announcement->setStatus(AnnouncementStatus::Draft);
-
-        $this->em->persist($announcement);
-        $this->em->flush();
-
-        return $announcement;
-    }
-
     public function send(Announcement $announcement): int
     {
         if (!$announcement->isDraft()) {
@@ -97,7 +83,6 @@ readonly class AnnouncementService
 
         $locale = $recipient->getLocale();
         $context = [
-            'title' => $announcement->getTitle($locale),
             'announcement' => $announcement->getContent($locale),
             'announcementUrl' => $announcementUrl,
             'username' => $recipient->getName(),
@@ -124,7 +109,6 @@ readonly class AnnouncementService
         $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
 
         return [
-            'title' => $announcement->getTitle($locale),
             'announcement' => $announcement->getContent($locale),
             'announcementUrl' => $this->configService->getHost() . '/announcement/' . $linkHash,
             'username' => 'Preview User',

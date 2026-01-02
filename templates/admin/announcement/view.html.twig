@@ -37,26 +37,15 @@
                         <tbody>
                         <tr>
                             <th style="width: 200px;">{{ 'announcement_cms_page' | trans }}</th>
-                            <td>
-                                {% if announcement.cmsPage %}
-                                    <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}">
-                                        {{ announcement.cmsPage.slug }}
-                                    </a>
-                                    {% if not announcement.cmsPage.published %}
-                                        <span class="tag is-warning is-small">{{ 'unpublished' | trans }}</span>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="has-text-danger">{{ 'no_cms_page' | trans }}</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'announcement_created_by' | trans }}</th>
-                            <td>{{ announcement.createdBy.name }}</td>
+                            <td>{{ announcement.cmsPage.slug }}</td>
                         </tr>
                         <tr>
                             <th>{{ 'announcement_created' | trans }}</th>
                             <td>{{ announcement.createdAt|date('Y-m-d H:i') }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'announcement_created_by' | trans }}</th>
+                            <td>{{ announcement.createdBy.name }}</td>
                         </tr>
                         {% if announcement.sent %}
                         <tr>
@@ -117,16 +106,6 @@
                             <span>{{ 'button_edit_cms_page' | trans }}</span>
                         </a>
                         {% endif %}
-
-                        <a href="{{ path('app_admin_announcement_edit', {'id': announcement.id}) }}" class="button is-fullwidth mb-3">
-                            <span class="icon"><i class="fa fa-exchange-alt"></i></span>
-                            <span>{{ 'button_change_cms_page' | trans }}</span>
-                        </a>
-
-                        <a href="{{ path('app_admin_announcement_preview', {'id': announcement.id, 'locale': previewLocale}) }}" class="button is-fullwidth mb-3">
-                            <span class="icon"><i class="fa fa-eye"></i></span>
-                            <span>{{ 'button_preview' | trans }}</span>
-                        </a>
 
                         <form action="{{ path('app_admin_announcement_delete', {'id': announcement.id}) }}" method="post">
                             <button type="submit" class="button is-danger is-fullwidth" onclick="return confirm('{{ 'confirm_delete_announcement' | trans }}');">
