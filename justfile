@@ -98,7 +98,7 @@ appMigrate:
 [group('development')]
 devModeFixtures:
     {{JUST}} dockerStop
-    {{JUST}} devResetToFreshCloneState
+    {{JUST}} devResetConfigs
     cp .env.dist .env
     cp config/plugins.dist.php config/plugins.php
     touch installed.lock
@@ -115,12 +115,17 @@ devModeFixtures:
 [group('development')]
 devModeInstaller:
     {{JUST}} dockerStop
-    {{JUST}} devResetToFreshCloneState
+    {{JUST}} devResetConfigs
     {{JUST}} dockerStart
     {{JUST}} devResetDatabase
     rm -f .env installed.lock
     @echo ""
     @echo "Access: http://localhost/install/"
+
+# Clean all generated files (runs without Docker)
+[group('development')]
+devResetConfigs:
+    rm -rf .env installed.lock config/plugins.php var/
 
 # Clean all generated files (runs without Docker)
 [group('development')]
