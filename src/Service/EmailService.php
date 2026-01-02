@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Announcement;
 use App\Entity\EmailQueue;
 use App\Entity\EmailQueueStatus;
 use App\Entity\EmailTemplate;
@@ -140,7 +139,7 @@ readonly class EmailService
         return $this->addToEmailQueue($email, EmailType::NotificationEventCanceled);
     }
 
-    public function prepareAnnouncementEmail(User $recipient, Announcement $announcement, string $announcementUrl, bool $flush = true): bool
+    public function prepareAnnouncementEmail(User $recipient, array $renderedContent, string $announcementUrl, bool $flush = true): bool
     {
         $locale = $recipient->getLocale();
 
@@ -149,7 +148,8 @@ readonly class EmailService
         $email->to((string) $recipient->getEmail());
         $email->locale($locale);
         $email->context([
-            'announcement' => $announcement->getContent($locale),
+            'title' => $renderedContent['title'],
+            'content' => $renderedContent['content'],
             'announcementUrl' => $announcementUrl,
             'username' => $recipient->getName(),
             'host' => $this->config->getHost(),
@@ -227,7 +227,8 @@ readonly class EmailService
             EmailType::Announcement->value => [
                 'subject' => 'Important Community Update',
                 'context' => [
-                    'announcement' => 'We are excited to announce some upcoming changes to our community platform. Stay tuned for more details!',
+                    'title' => 'Important Community Update',
+                    'content' => '<p>We are excited to announce some upcoming changes to our community platform.</p><p>Stay tuned for more details!</p>',
                     'announcementUrl' => 'https://localhost/announcement/abc123def456',
                     'username' => 'John Doe',
                     'host' => 'https://localhost',

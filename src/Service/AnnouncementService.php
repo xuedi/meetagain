@@ -4,7 +4,11 @@ namespace App\Service;
 
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
+use App\Entity\BlockType\Image as ImageType;
+use App\Entity\BlockType\Text as TextType;
+use App\Entity\BlockType\Title as TitleType;
 use App\Entity\Cms;
+use App\Entity\CmsBlockTypes;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -42,7 +46,8 @@ readonly class AnnouncementService
         $announcementUrl = $this->configService->getHost() . '/announcement/' . $announcement->getLinkHash();
 
         foreach ($subscribers as $subscriber) {
-            $this->emailService->prepareAnnouncementEmail($subscriber, $announcement, $announcementUrl, flush: false);
+            $renderedContent = $this->renderContent($cmsPage, $subscriber->getLocale());
+            $this->emailService->prepareAnnouncementEmail($subscriber, $renderedContent, $announcementUrl, flush: false);
             ++$recipientCount;
         }
 
@@ -74,14 +79,64 @@ readonly class AnnouncementService
         return bin2hex(random_bytes(16));
     }
 
+    /**
+     * @return array{title: string|null, content: string}
+     */
+    private function renderContent(Cms $cmsPage, string $locale): array
+    {
+        $title = "ERROR: The CMS page has no title for the language [$locale]";
+        $contentParts = [];
+
+        foreach ($cmsPage->getBlocks() as $block) {
+            if ($block->getLanguage() !== $locale) {
+                continue;
+            }
+
+            match ($block->getType()) {
+                CmsBlockTypes::Headline => $title = TitleType::fromJson($block->getJson())->title,
+                CmsBlockTypes::Text => $contentParts[] = '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
+                CmsBlockTypes::Image => $contentParts[] = $this->renderImageBlock(ImageType::fromJson($block->getJson(), $block->getImage())),
+                default => null,
+            };
+        }
+
+        if(empty($contentParts)) {
+            $contentParts[] =  "ERROR: The CMS page has no content for the language [$locale]";
+        }
+
+        return [
+            'title' => $title,
+            'content' => implode("\n", array_filter($contentParts)),
+        ];
+    }
+
+    private function renderImageBlock(ImageType $imageBlock): string
+    {
+        $image = $imageBlock->image;
+        if ($image === null) {
+            return '';
+        }
+
+        $url = $this->configService->getHost() . '/images/thumbnails/' . $image->getHash() . '_600x400.webp';
+        $alt = htmlspecialchars($image->getAlt() ?? '', ENT_QUOTES, 'UTF-8');
+
+        return sprintf('<p><img src="%s" alt="%s" style="max-width: 100%%; height: auto;"></p>', $url, $alt);
+    }
+
     public function getPreviewContext(Announcement $announcement, string $locale = 'en'): array
     {
         $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
+        $cmsPage = $announcement->getCmsPage();
+
+        $renderedContent = $cmsPage instanceof Cms
+            ? $this->renderContent($cmsPage, $locale)
+            : ['title' => null, 'content' => ''];
 
         return [
-            'announcement' => $announcement->getContent($locale),
+            'title' => $renderedContent['title'],
+            'content' => $renderedContent['content'],
             'announcementUrl' => $this->configService->getHost() . '/announcement/' . $linkHash,
-            'username' => 'Preview User',
+            'username' => 'User',
             'host' => $this->configService->getHost(),
             'lang' => $locale,
         ];
