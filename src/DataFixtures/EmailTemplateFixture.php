@@ -8,9 +8,10 @@ use App\Service\EmailTemplateService;
 use App\Service\LanguageService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class EmailTemplateFixture extends AbstractFixture implements FixtureGroupInterface
+class EmailTemplateFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
 {
     public function __construct(
         private readonly EmailTemplateService $templateService,
@@ -53,5 +54,12 @@ class EmailTemplateFixture extends AbstractFixture implements FixtureGroupInterf
     public static function getGroups(): array
     {
         return ['install'];
+    }
+
+    public function getDependencies(): array
+    {
+        return [
+            LanguageFixture::class,
+        ];
     }
 }
