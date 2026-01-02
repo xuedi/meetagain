@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\EmailTemplate;
+use App\Entity\EmailTemplateTranslation;
 use App\Enum\EmailType;
 use App\Repository\EmailTemplateRepository;
 use App\Service\EmailTemplateService;
@@ -11,6 +12,7 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 
 class EmailTemplateServiceTest extends TestCase
@@ -48,6 +50,64 @@ class EmailTemplateServiceTest extends TestCase
 
         // Assert
         $this->assertNull($result);
+    }
+
+    public function testGetTemplateContentReturnsContentForRequestedLanguage(): void
+    {
+        // Arrange
+        $template = $this->makeTemplate('welcome', 'Welcome!', '<h1>Hello</h1>');
+        $this->repoStub->method('findByIdentifier')->willReturn($template);
+
+        // Act
+        $result = $this->subject->getTemplateContent(EmailType::Welcome, 'en');
+
+        // Assert
+        $this->assertSame('Welcome!', $result['subject']);
+        $this->assertSame('<h1>Hello</h1>', $result['body']);
+    }
+
+    public function testGetTemplateContentFallsBackToEnglish(): void
+    {
+        // Arrange
+        $template = $this->makeTemplate('welcome', 'Welcome!', '<h1>Hello</h1>');
+        $this->repoStub->method('findByIdentifier')->willReturn($template);
+
+        // Act - request German, but only English exists
+        $result = $this->subject->getTemplateContent(EmailType::Welcome, 'de');
+
+        // Assert - should fall back to English
+        $this->assertSame('Welcome!', $result['subject']);
+        $this->assertSame('<h1>Hello</h1>', $result['body']);
+    }
+
+    public function testGetTemplateContentThrowsWhenTemplateNotFound(): void
+    {
+        // Arrange
+        $this->repoStub->method('findByIdentifier')->willReturn(null);
+
+        // Assert
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Email template "welcome" not found');
+
+        // Act
+        $this->subject->getTemplateContent(EmailType::Welcome, 'en');
+    }
+
+    public function testGetTemplateContentThrowsWhenNoTranslationFound(): void
+    {
+        // Arrange - template without any translations
+        $template = new EmailTemplate();
+        $template->setIdentifier('welcome');
+        $template->setAvailableVariables(['username']);
+        $template->setUpdatedAt(new DateTimeImmutable());
+        $this->repoStub->method('findByIdentifier')->willReturn($template);
+
+        // Assert
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('No translation found for email template');
+
+        // Act
+        $this->subject->getTemplateContent(EmailType::Welcome, 'en');
     }
 
     #[DataProvider('renderContentProvider')]
@@ -149,10 +209,17 @@ class EmailTemplateServiceTest extends TestCase
     {
         $template = new EmailTemplate();
         $template->setIdentifier($identifier);
-        $template->setSubject($subject);
-        $template->setBody($body);
         $template->setAvailableVariables(['username', 'host']);
         $template->setUpdatedAt(new DateTimeImmutable());
+
+        // Create English translation
+        $translation = new EmailTemplateTranslation();
+        $translation->setEmailTemplate($template);
+        $translation->setLanguage('en');
+        $translation->setSubject($subject);
+        $translation->setBody($body);
+        $translation->setUpdatedAt(new DateTimeImmutable());
+        $template->addTranslation($translation);
 
         return $template;
     }

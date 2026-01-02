@@ -20,21 +20,40 @@
 
         {{ form_start(form) }}
         <div class="box">
-            <div class="field">
-                <label class="label">Subject</label>
-                <div class="control">
-                    {{ form_widget(form.subject, {'attr': {'class': 'input'}}) }}
+            <div class="columns">
+                <div class="column is-6">
+                    <p class="has-text-grey">Edit template for each language</p>
                 </div>
-                {{ form_errors(form.subject) }}
+                <div class="column is-6">
+                    <div class="buttons has-addons is-pulled-right">
+                        {% for locale in languages %}
+                            <a class="button translation-button {% if locale == 'en' %}is-active{% endif %}"
+                               id="translation-button-{{ locale }}"
+                               data-id="{{ locale }}">{{ locale }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
 
-            <div class="field">
-                <label class="label">Body (HTML)</label>
-                <div class="control">
-                    {{ form_widget(form.body, {'attr': {'class': 'textarea', 'rows': 15}}) }}
+            {% for locale in languages %}
+                <div class="translation-div {% if locale != 'en' %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
+                    <div class="field">
+                        <label class="label">Subject ({{ locale }})</label>
+                        <div class="control">
+                            {{ form_widget(form.("subject-"~locale), {'attr': {'class': 'input'}}) }}
+                        </div>
+                        {{ form_errors(form.("subject-"~locale)) }}
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Body ({{ locale }})</label>
+                        <div class="control">
+                            {{ form_widget(form.("body-"~locale), {'attr': {'class': 'textarea', 'rows': 15}}) }}
+                        </div>
+                        {{ form_errors(form.("body-"~locale)) }}
+                    </div>
                 </div>
-                {{ form_errors(form.body) }}
-            </div>
+            {% endfor %}
         </div>
 
         <div class="buttons">
@@ -45,11 +64,33 @@
         {{ form_end(form) }}
 
         <form action="{{ path('app_admin_email_reset', {id: template.id}) }}" method="post" class="mt-4">
-            <button type="submit" class="button is-warning" onclick="return confirm('Reset this template to the default content?');">
+            <button type="submit" class="button is-warning" onclick="return confirm('Reset this template to the default content for all languages?');">
                 Reset to Default
             </button>
         </form>
 
     </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            let buttons = document.getElementsByClassName('translation-button');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', event => {
+                    event.preventDefault();
+
+                    {% for locale in languages %}
+                    document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
+                    document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
+                    {% endfor %}
+
+                    let button = 'translation-button-' + event.currentTarget.getAttribute('data-id');
+                    document.getElementById(button).classList.add('is-active');
+
+                    let target = 'translation-div-' + event.currentTarget.getAttribute('data-id');
+                    document.getElementById(target).classList.remove('is-hidden');
+                });
+            }
+        });
+    </script>
 
 {% endblock %}

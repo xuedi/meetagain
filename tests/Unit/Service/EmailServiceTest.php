@@ -4,7 +4,6 @@ namespace Tests\Unit\Service;
 
 use App\Entity\EmailQueue;
 use App\Entity\EmailQueueStatus;
-use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Service\ConfigService;
@@ -54,10 +53,10 @@ final class EmailServiceTest extends TestCase
         $emMock->expects($this->once())->method('flush');
 
         $templateService = $this->createStub(EmailTemplateService::class);
-        $template = new EmailTemplate();
-        $template->setSubject('Please Confirm your Email');
-        $template->setBody('<p>Verification body</p>');
-        $templateService->method('getTemplate')->willReturn($template);
+        $templateService->method('getTemplateContent')->willReturn([
+            'subject' => 'Please Confirm your Email',
+            'body' => '<p>Verification body</p>',
+        ]);
         $templateService->method('renderContent')->willReturnCallback(
             fn (string $content) => $content
         );
@@ -182,10 +181,10 @@ final class EmailServiceTest extends TestCase
         $emMock->expects($this->once())->method('flush');
 
         $templateService = $this->createStub(EmailTemplateService::class);
-        $template = new EmailTemplate();
-        $template->setSubject('Event canceled: Test Event');
-        $template->setBody('<p>Event canceled body</p>');
-        $templateService->method('getTemplate')->willReturn($template);
+        $templateService->method('getTemplateContent')->willReturn([
+            'subject' => 'Event canceled: Test Event',
+            'body' => '<p>Event canceled body</p>',
+        ]);
         $templateService->method('renderContent')->willReturnCallback(
             fn (string $content) => $content
         );
@@ -230,10 +229,10 @@ final class EmailServiceTest extends TestCase
         $emMock->expects($this->once())->method('flush');
 
         $templateService = $this->createStub(EmailTemplateService::class);
-        $template = new EmailTemplate();
-        $template->setSubject('You received a message from Bob');
-        $template->setBody('<p>Message notification body</p>');
-        $templateService->method('getTemplate')->willReturn($template);
+        $templateService->method('getTemplateContent')->willReturn([
+            'subject' => 'You received a message from Bob',
+            'body' => '<p>Message notification body</p>',
+        ]);
         $templateService->method('renderContent')->willReturnCallback(
             fn (string $content) => $content
         );
@@ -286,10 +285,10 @@ final class EmailServiceTest extends TestCase
 
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
-            $template = new EmailTemplate();
-            $template->setSubject('Test Subject');
-            $template->setBody('<p>Test Body</p>');
-            $templateService->method('getTemplate')->willReturn($template);
+            $templateService->method('getTemplateContent')->willReturn([
+                'subject' => 'Test Subject',
+                'body' => '<p>Test Body</p>',
+            ]);
             $templateService->method('renderContent')->willReturnCallback(
                 fn (string $content, array $context) => $content
             );

@@ -9,6 +9,17 @@
             <p>This is a preview using mock data. The actual email will use real values.</p>
         </div>
 
+        <div class="mb-4">
+            <div class="buttons has-addons">
+                {% for locale in languages %}
+                    <a href="{{ path('app_admin_email_preview', {id: template.id, lang: locale}) }}"
+                       class="button {% if locale == currentLanguage %}is-info is-selected{% endif %}">
+                        {{ locale }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
         <div class="columns">
             <div class="column is-8">
                 <div class="box">
