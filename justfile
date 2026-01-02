@@ -140,7 +140,7 @@ devResetDatabase:
 
 # Run all tests and code quality checks
 [group('testing')]
-test: testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer checkDeptrac
+test: testSetup testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer checkDeptrac
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
