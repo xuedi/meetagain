@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\BlockingService;
 use App\Service\FriendshipService;
 use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +23,7 @@ class MemberController extends AbstractController
         private readonly FriendshipService $service,
         private readonly ImageService $imageService,
         private readonly Security $security,
+        private readonly BlockingService $blockingService,
     ) {
     }
 
@@ -30,9 +32,12 @@ class MemberController extends AbstractController
     {
         $response = $this->getResponse();
         $offset = ($page - 1) * self::PAGE_SIZE;
-        if ($this->getUser() instanceof User) {
-            $userTotal = $this->repo->getNumberOfActiveMembers();
-            $users = $this->repo->findActiveMembers(self::PAGE_SIZE, $offset);
+        $currentUser = $this->getUser();
+
+        if ($currentUser instanceof User) {
+            $excludeIds = $this->blockingService->getExcludedUserIds($currentUser);
+            $userTotal = $this->repo->getNumberOfActiveMembers($excludeIds);
+            $users = $this->repo->findActiveMembers(self::PAGE_SIZE, $offset, $excludeIds);
         } else {
             $userTotal = $this->repo->getNumberOfActivePublicMembers();
             $users = $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset);
@@ -59,12 +64,25 @@ class MemberController extends AbstractController
             $currentUser = $this->getAuthedUser();
             $userDetails = $this->repo->findOneBy(['id' => $id]);
 
+            if ($userDetails === null) {
+                throw $this->createNotFoundException();
+            }
+
+            // If the target user has blocked the current user, deny access
+            if ($this->blockingService->hasBlocked($userDetails, $currentUser)) {
+                return $this->render('member/403.html.twig', [], $response);
+            }
+
+            // Check if current user has blocked the target (to show unblock button)
+            $hasBlockedTarget = $this->blockingService->hasBlocked($currentUser, $userDetails);
+
             return $this->render(
                 'member/view.html.twig',
                 [
                     'currentUser' => $currentUser,
                     'userDetails' => $userDetails,
                     'isFollow' => $currentUser->getFollowing()->contains($userDetails),
+                    'isBlocked' => $hasBlockedTarget,
                 ],
                 $response,
             );

@@ -38,6 +38,9 @@
                         <p>Followers: {{ socialCounts.followers }}</p>
                         <p>Messages: {{ messageCount }}</p>
                         <p>RSVP: {{ socialCounts.rsvp }}</p>
+                        {% if blockedCount > 0 %}
+                            <p>Blocked: <a href="{{ path('app_profile_blocked_users') }}">{{ blockedCount }}</a></p>
+                        {% endif %}
                     </div>
 
                     {{ form_end(form) }}

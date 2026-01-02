@@ -18,7 +18,10 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    public function getConversations(User $user, ?int $id = null): array
+    /**
+     * @param int[] $excludeUserIds User IDs to exclude from conversation list (e.g., blocked users)
+     */
+    public function getConversations(User $user, ?int $id = null, array $excludeUserIds = []): array
     {
         $messages = $this->createQueryBuilder('m')
             ->leftJoin('m.sender', 's')
@@ -42,6 +45,11 @@ class MessageRepository extends ServiceEntityRepository
                 : $message->getSender();
             $partnerId = $partner->getId();
 
+            // Skip blocked users
+            if (in_array($partnerId, $excludeUserIds, true)) {
+                continue;
+            }
+
             if (!isset($list[$partnerId])) {
                 $list[$partnerId] = [
                     'messages' => 1,
@@ -57,7 +65,8 @@ class MessageRepository extends ServiceEntityRepository
             }
         }
 
-        if ($id !== null && !isset($list[$id])) {
+        // Only add new conversation partner if not blocked
+        if ($id !== null && !isset($list[$id]) && !in_array($id, $excludeUserIds, true)) {
             $userRepo = $this->getEntityManager()->getRepository(User::class);
             $list[] = [
                 'messages' => 0,

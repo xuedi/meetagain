@@ -90,6 +90,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'receiver', orphanRemoval: true)]
     private Collection $messagesReceived;
 
+    #[ORM\OneToMany(targetEntity: UserBlock::class, mappedBy: 'blocker')]
+    private Collection $blockedUsers;
+
+    #[ORM\OneToMany(targetEntity: UserBlock::class, mappedBy: 'blocked')]
+    private Collection $blockedByUsers;
+
     #[ORM\Column]
     private ?bool $notification = null;
 
@@ -104,6 +110,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->following = new ArrayCollection();
         $this->messagesSend = new ArrayCollection();
         $this->messagesReceived = new ArrayCollection();
+        $this->blockedUsers = new ArrayCollection();
+        $this->blockedByUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -515,5 +523,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->notificationSettings = $notificationSettings->jsonSerialize();
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, UserBlock>
+     */
+    public function getBlockedUsers(): Collection
+    {
+        return $this->blockedUsers;
+    }
+
+    /**
+     * @return Collection<int, UserBlock>
+     */
+    public function getBlockedByUsers(): Collection
+    {
+        return $this->blockedByUsers;
     }
 }

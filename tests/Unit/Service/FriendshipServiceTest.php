@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\User;
+use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
 use App\Service\FriendshipService;
 use Doctrine\Common\Collections\Collection;
@@ -63,8 +64,12 @@ class FriendshipServiceTest extends TestCase
             ->with($returnRoute, ['_locale' => $locale, 'id' => $userId])
             ->willReturn($generatedRoute);
 
+        $blockRepoStub = $this->createStub(UserBlockRepository::class);
+        $blockRepoStub->method('isBlockedEitherWay')->willReturn(false);
+
         $subject = new FriendshipService(
             repo: $userRepoMock,
+            blockRepo: $blockRepoStub,
             em: $emMock,
             router: $routerMock,
             security: $securityStub,
@@ -124,8 +129,12 @@ class FriendshipServiceTest extends TestCase
             ->with($returnRoute, ['_locale' => $locale, 'id' => $userId])
             ->willReturn($generatedRoute);
 
+        $blockRepoStub = $this->createStub(UserBlockRepository::class);
+        $blockRepoStub->method('isBlockedEitherWay')->willReturn(false);
+
         $subject = new FriendshipService(
             repo: $userRepoMock,
+            blockRepo: $blockRepoStub,
             em: $emMock,
             router: $routerMock,
             security: $securityStub,
@@ -148,6 +157,7 @@ class FriendshipServiceTest extends TestCase
 
         $subject = new FriendshipService(
             repo: $this->createStub(UserRepository::class),
+            blockRepo: $this->createStub(UserBlockRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             router: $this->createStub(RouterInterface::class),
             security: $securityStub,
@@ -172,6 +182,7 @@ class FriendshipServiceTest extends TestCase
 
         $subject = new FriendshipService(
             repo: $this->createStub(UserRepository::class),
+            blockRepo: $this->createStub(UserBlockRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             router: $this->createStub(RouterInterface::class),
             security: $securityStub,
