@@ -3,7 +3,7 @@
 # Always use `just test` to run tests, not `just do "vendor/bin/phpunit ..."`.
 set dotenv-load
 
-DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
+DOCKER := "docker-compose --env-file .env.dist -f docker/docker-compose.yml"
 PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 DB := DOCKER + " exec mariadb"
 JUST := just_executable() + " --justfile=" + justfile()
@@ -41,7 +41,7 @@ dockerStart:
 # Stop and remove all Docker containers
 [group('docker')]
 dockerStop:
-	docker-compose --env-file .env.dist -f docker/docker-compose.yml down
+	{{DOCKER}} down
 
 # Restarts all Docker containers (alias for stop & start)
 [group('docker')]
@@ -116,9 +116,7 @@ devModeFixtures:
 devModeInstaller:
     {{JUST}} dockerStop
     {{JUST}} devResetToFreshCloneState
-    cp .env.dist .env
     {{JUST}} dockerStart
-    {{JUST}} do "composer install"
     {{JUST}} devResetDatabase
     rm -f .env installed.lock
     @echo ""
@@ -158,15 +156,6 @@ testUnit +parameter='':
 [group('testing')]
 testFunctional +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional {{parameter}}
-
-# Run installer functional tests (prepares environment first)
-[group('testing')]
-testInstaller:
-    @echo "Preparing installer test environment..."
-    @test -f .env || cp .env.dist .env
-    {{JUST}} devResetDatabase
-    @echo "Running installer tests..."
-    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --filter=InstallerTest
 
 # Show test coverage report in AI-readable format (runs tests first to generate coverage)
 [group('testing')]
