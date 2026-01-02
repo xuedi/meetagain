@@ -25,6 +25,7 @@ install:
     cp --no-clobber .env.dist .env
     cp --no-clobber config/plugins.dist.php config/plugins.php
     {{JUST}} dockerStart
+    {{JUST}} do "composer install"
     {{JUST}} appClearCache
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
