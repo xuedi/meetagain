@@ -3,7 +3,7 @@
 # Always use `just test` to run tests, not `just do "vendor/bin/phpunit ..."`.
 set dotenv-load
 
-DOCKER := "docker-compose --env-file .env -f docker/docker-compose.yml"
+DOCKER := "docker-compose --env-file .env.dist -f docker/docker-compose.yml"
 PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 DB := DOCKER + " exec mariadb"
 JUST := just_executable() + " --justfile=" + justfile()
@@ -19,18 +19,6 @@ default:
     @echo "  ╚═╝     ╚═╝╚══════╝╚══════╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝"
     @echo ""
     @{{JUST}} --list --unsorted
-
-# Initial project setup: copies config files, starts containers, installs dependencies, runs migrations and fixtures
-install:
-    cp --no-clobber .env.dist .env
-    cp --no-clobber config/plugins.dist.php config/plugins.php
-    {{JUST}} dockerStart
-    {{JUST}} appClearCache
-    {{JUST}} appMigrate
-    {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
-    {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
-    {{DB}} mariadb -u root -p$MARIADB_ROOT_PASSWORD < docker/mariadb/init/01-create-test-db.sql
-    touch installed.lock
 
 # Alias to start the docker stack
 start: dockerStart
@@ -109,9 +97,12 @@ appMigrate:
 # Reset to development mode with fixtures: reinstalls app, loads fixtures, imports translations, sets up test DB
 [group('development')]
 devModeFixtures:
-    rm -f .env
+    {{JUST}} dockerStop
+    {{JUST}} devResetConfigs
     cp .env.dist .env
+    cp config/plugins.dist.php config/plugins.php
     touch installed.lock
+    {{JUST}} dockerStart
     {{JUST}} do "composer install"
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
@@ -119,23 +110,33 @@ devModeFixtures:
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console app:event:add-fixture-rsvps
-    {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
-    {{JUST}} testSetup
 
 # Switch to installer mode: resets database and removes .env and installed.lock
 [group('development')]
 devModeInstaller:
-    @cp --no-clobber .env.dist .env || true
+    {{JUST}} dockerStop
+    {{JUST}} devResetConfigs
+    {{JUST}} dockerStart
     {{JUST}} devResetDatabase
     rm -f .env installed.lock
     @echo ""
     @echo "Access: http://localhost/install/"
 
+# Clean all generated files (runs without Docker)
+[group('development')]
+devResetConfigs:
+    rm -rf .env installed.lock config/plugins.php var/
+
+# Clean all generated files (runs without Docker)
+[group('development')]
+devResetToFreshCloneState:
+    rm -rf .env installed.lock config/plugins.php vendor/ var/ public/bundles/
+
 # Delete and recreate the database
 [group('development')]
 devResetDatabase:
-    {{PHP}} php bin/console doctrine:database:drop --force
-    {{PHP}} php bin/console doctrine:database:create
+    {{PHP}} php bin/console doctrine:database:drop --force --if-exists
+    {{PHP}} php bin/console doctrine:database:create --if-not-exists
 
 # Run all tests and code quality checks
 [group('testing')]
@@ -146,8 +147,8 @@ test: testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer c
 # Initialize test database schema and load fixtures (run once or after schema changes)
 [group('testing')]
 testSetup:
-    {{PHP}} php bin/console doctrine:database:create --env=test --if-not-exists
-    {{PHP}} php bin/console doctrine:schema:drop --env=test --force -q
+    {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
+    {{PHP}} php bin/console doctrine:database:create --env=test
     {{PHP}} php bin/console doctrine:schema:create --env=test -q
     {{PHP}} php bin/console doctrine:fixtures:load --env=test -q
 
@@ -160,15 +161,6 @@ testUnit +parameter='':
 [group('testing')]
 testFunctional +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional {{parameter}}
-
-# Run installer functional tests (prepares environment first)
-[group('testing')]
-testInstaller:
-    @echo "Preparing installer test environment..."
-    @test -f .env || cp .env.dist .env
-    {{JUST}} devResetDatabase
-    @echo "Running installer tests..."
-    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --filter=InstallerTest
 
 # Show test coverage report in AI-readable format (runs tests first to generate coverage)
 [group('testing')]

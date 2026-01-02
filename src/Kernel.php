@@ -20,7 +20,8 @@ class Kernel extends BaseKernel
 
     public function getPluginConfigDirs(): iterable
     {
-        $plugins = require $this->getProjectDir() . '/config/plugins.php';
+        $pluginsFile = $this->getProjectDir() . '/config/plugins.php';
+        $plugins = file_exists($pluginsFile) ? require $pluginsFile : [];
         foreach ($plugins as $pluginName => $pluginEnabled) {
             yield $this->getProjectDir() . '/plugins/' . $pluginName . '/config' => $pluginEnabled;
         }
