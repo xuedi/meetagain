@@ -51,13 +51,14 @@ readonly class AnnouncementService
 
         $cmsPage = $this->createCmsPage($announcement, $admin);
         $announcement->setCmsPage($cmsPage);
+        $announcement->setLinkHash($this->generateLinkHash());
 
         $subscribers = $this->getAnnouncementSubscribers();
         $recipientCount = 0;
-        $cmsUrl = $this->configService->getHost() . '/' . $cmsPage->getSlug();
+        $announcementUrl = $this->configService->getHost() . '/announcement/' . $announcement->getLinkHash();
 
         foreach ($subscribers as $subscriber) {
-            $this->queueAnnouncementEmail($subscriber, $announcement, $cmsUrl);
+            $this->queueAnnouncementEmail($subscriber, $announcement, $announcementUrl);
             ++$recipientCount;
         }
 
@@ -115,6 +116,11 @@ readonly class AnnouncementService
         );
     }
 
+    private function generateLinkHash(): string
+    {
+        return bin2hex(random_bytes(16));
+    }
+
     private function queueAnnouncementEmail(User $recipient, Announcement $announcement, string $cmsUrl): void
     {
         $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
@@ -124,8 +130,8 @@ readonly class AnnouncementService
 
         $context = [
             'title' => $announcement->getTitle(),
-            'content' => $announcement->getContent(),
-            'announcementUrl' => $cmsUrl,
+            'announcement' => $announcement->getContent(),
+            'announcementLink' => $cmsUrl,
             'username' => $recipient->getName(),
             'host' => $this->configService->getHost(),
             'lang' => $recipient->getLocale(),
@@ -147,10 +153,12 @@ readonly class AnnouncementService
 
     public function getPreviewContext(Announcement $announcement): array
     {
+        $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
+
         return [
             'title' => $announcement->getTitle(),
-            'content' => $announcement->getContent(),
-            'announcementUrl' => $this->configService->getHost() . '/announcement-' . $announcement->getId(),
+            'announcement' => $announcement->getContent(),
+            'announcementLink' => $this->configService->getHost() . '/announcement/' . $linkHash,
             'username' => 'Preview User',
             'host' => $this->configService->getHost(),
             'lang' => 'en',

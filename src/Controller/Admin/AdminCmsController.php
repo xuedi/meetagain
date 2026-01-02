@@ -13,6 +13,7 @@ use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
 use App\Entity\User;
 use App\Form\CmsType;
+use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\CmsBlockService;
@@ -32,6 +33,7 @@ class AdminCmsController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly CmsBlockRepository $blockRepo,
         private readonly CmsBlockService $blockService,
+        private readonly AnnouncementRepository $announcementRepo,
     ) {
     }
 
@@ -84,6 +86,7 @@ class AdminCmsController extends AbstractController
             'blocks' => $this->blockRepo->getBlocks($cms->getId(), $locale),
             'form' => $form,
             'cms' => $cms,
+            'linkedAnnouncement' => $this->announcementRepo->findByCmsPage($cms->getId()),
         ]);
     }
 

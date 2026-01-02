@@ -21,7 +21,8 @@ class EmailTemplateServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->repoStub = $this->createStub(EmailTemplateRepository::class);
-        $this->subject = new EmailTemplateService(repo: $this->repoStub);
+        $projectDir = dirname(__DIR__, 3);
+        $this->subject = new EmailTemplateService(repo: $this->repoStub, projectDir: $projectDir);
     }
 
     public function testGetTemplateReturnsTemplateWhenFound(): void

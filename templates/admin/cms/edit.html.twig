@@ -2,6 +2,19 @@
 
 {% block content %}
 
+    {% if linkedAnnouncement %}
+        <article class="message is-info">
+            <div class="message-body">
+                <span class="icon"><i class="fa fa-bullhorn"></i></span>
+                This page is linked to announcement: <strong>{{ linkedAnnouncement.title }}</strong>
+                <a href="{{ path('app_admin_announcement_view', {'id': linkedAnnouncement.id}) }}" class="ml-2">
+                    <span class="icon"><i class="fa fa-arrow-right"></i></span>
+                    <span>View Announcement</span>
+                </a>
+            </div>
+        </article>
+    {% endif %}
+
     <article class="message is-danger is-hidden" id="cms-delete-warning">
         <div class="message-header">
             <p>Delete the Page</p>

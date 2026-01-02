@@ -39,6 +39,9 @@ class Announcement
     #[ORM\ManyToOne]
     private ?Cms $cmsPage = null;
 
+    #[ORM\Column(length: 32, unique: true, nullable: true)]
+    private ?string $linkHash = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -148,5 +151,17 @@ class Announcement
     public function isSent(): bool
     {
         return $this->status === AnnouncementStatus::Sent;
+    }
+
+    public function getLinkHash(): ?string
+    {
+        return $this->linkHash;
+    }
+
+    public function setLinkHash(?string $linkHash): static
+    {
+        $this->linkHash = $linkHash;
+
+        return $this;
     }
 }

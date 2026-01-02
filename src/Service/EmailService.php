@@ -204,6 +204,17 @@ readonly class EmailService
                     'lang' => 'en',
                 ],
             ],
+            EmailType::Announcement->value => [
+                'subject' => 'Important Community Update',
+                'context' => [
+                    'title' => 'Important Community Update',
+                    'announcement' => '<p>We are excited to announce some upcoming changes to our community platform. Stay tuned for more details!</p>',
+                    'announcementLink' => 'https://localhost/announcement/abc123def456',
+                    'username' => 'John Doe',
+                    'host' => 'https://localhost',
+                    'lang' => 'en',
+                ],
+            ],
         ];
     }
 

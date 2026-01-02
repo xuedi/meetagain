@@ -26,4 +26,14 @@ class AnnouncementRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByLinkHash(string $hash): ?Announcement
+    {
+        return $this->findOneBy(['linkHash' => $hash]);
+    }
+
+    public function findByCmsPage(int $cmsPageId): ?Announcement
+    {
+        return $this->findOneBy(['cmsPage' => $cmsPageId]);
+    }
 }

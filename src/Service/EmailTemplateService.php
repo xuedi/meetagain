@@ -5,11 +5,18 @@ namespace App\Service;
 use App\Entity\EmailTemplate;
 use App\Enum\EmailType;
 use App\Repository\EmailTemplateRepository;
+use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class EmailTemplateService
 {
-    public function __construct(private EmailTemplateRepository $repo)
-    {
+    private const string TEMPLATE_PATH = '/templates/email/defaults/';
+
+    public function __construct(
+        private EmailTemplateRepository $repo,
+        #[Autowire('%kernel.project_dir%')]
+        private string $projectDir,
+    ) {
     }
 
     public function getTemplate(EmailType $identifier): ?EmailTemplate
@@ -28,155 +35,58 @@ readonly class EmailTemplateService
         return $content;
     }
 
+    /**
+     * @return array<string, array{subject: string, body: string, variables: string[]}>
+     */
     public function getDefaultTemplates(): array
     {
         return [
-            'verification_request' => [
+            EmailType::VerificationRequest->value => [
                 'subject' => 'Please Confirm your Email',
-                'body' => '<h1>Welcome {{username}}!</h1>
-
-<p>
-    You signed up as for {{url}} please confirm your email address by clicking the link below.
-</p>
-
-<p>
-    <a href="{{host}}/{{lang}}/register/verify/{{token}}">Confirm your email</a>
-</p>
-
-<p>
-    Cheers,<br>
-    xuedi & yimu
-</p>',
+                'body' => $this->loadTemplateBody(EmailType::VerificationRequest),
                 'variables' => ['username', 'token', 'host', 'url', 'lang'],
             ],
-            'welcome' => [
+            EmailType::Welcome->value => [
                 'subject' => 'Welcome!',
-                'body' => '<h1>Welcome to {{url}}</h1>
-
-<p>
-    Your account just got approved, welcome to the community
-</p>
-
-<p>
-    Feel free to <a href="{{host}}/{{lang}}/profile/">Login</a>
-</p>
-
-<p>
-    Cheers,<br>
-    xuedi & yimu
-</p>',
+                'body' => $this->loadTemplateBody(EmailType::Welcome),
                 'variables' => ['host', 'url', 'lang'],
             ],
-            'password_reset_request' => [
+            EmailType::PasswordResetRequest->value => [
                 'subject' => 'Password reset request',
-                'body' => '<h1>Hello {{username}}!</h1>
-
-<p>
-    Someone (hopefully you) requested to reset your password.
-</p>
-<p>
-    If you did not request this, you can safely ignore this email.
-</p>
-<p>
-    If you did, please click the link below to continue.
-</p>
-
-<p>
-    <a href="{{host}}/{{lang}}/reset/verify/{{token}}">Reset your password</a>
-</p>
-
-<p>
-    Cheers,<br>
-    xuedi & yimu
-</p>',
+                'body' => $this->loadTemplateBody(EmailType::PasswordResetRequest),
                 'variables' => ['username', 'token', 'host', 'lang'],
             ],
-            'notification_message' => [
+            EmailType::NotificationMessage->value => [
                 'subject' => 'You received a message from {{sender}}',
-                'body' => '<h1>Hello {{username}}!</h1>
-
-<p>
-    <b>{{sender}}</b> just has sent you a message <br>
-</p>
-<p>
-    You can read the message <a href="{{host}}/{{lang}}/profile/messages/{{senderId}}">here</a>.
-</p>
-<p>
-    If you don\'t like to receive this notification, you can<br>
-    switch them off in your <a href="{{host}}/{{lang}}/profile/config/">settings</a>
-</p>
-
-<p>
-    Cheers,<br>
-    xuedi & yimu
-</p>',
+                'body' => $this->loadTemplateBody(EmailType::NotificationMessage),
                 'variables' => ['username', 'sender', 'senderId', 'host', 'lang'],
             ],
-            'notification_rsvp_aggregated' => [
+            EmailType::NotificationRsvpAggregated->value => [
                 'subject' => 'People you follow plan to attend an event',
-                'body' => '<h1>Hello {{username}}!</h1>
-
-<p>
-    <b>{{attendeeNames}}</b> plan to attend the <b>{{eventTitle}}</b> event<br>
-    at the <b>{{eventLocation}}</b> on the <b>{{eventDate}}</b>.
-</p>
-<p>
-    You can have a look at the Event details <a href="{{host}}/{{lang}}/event/{{eventId}}">here</a>.
-</p>
-<p>
-    If you don\'t like to receive this notification, you can<br>
-    switch them off in your <a href="{{host}}/{{lang}}/profile/config/">settings</a>
-</p>
-
-<p>
-    Cheers,<br>
-    xuedi & yimu
-</p>',
+                'body' => $this->loadTemplateBody(EmailType::NotificationRsvpAggregated),
                 'variables' => ['username', 'attendeeNames', 'eventLocation', 'eventDate', 'eventId', 'eventTitle', 'host', 'lang'],
             ],
-            'notification_event_canceled' => [
+            EmailType::NotificationEventCanceled->value => [
                 'subject' => 'Event canceled: {{eventTitle}}',
-                'body' => '<h1>Hello {{username}}!</h1>
-
-<p>
-    We\'re sorry to inform you that the <b>{{eventTitle}}</b> event<br>
-    at the <b>{{eventLocation}}</b> on the <b>{{eventDate}}</b> has been <b>canceled</b>.
-</p>
-<p>
-    You can still view the event details <a href="{{host}}/{{lang}}/event/{{eventId}}">here</a>.
-</p>
-<p>
-    If you don\'t like to receive this notification, you can<br>
-    switch them off in your <a href="{{host}}/{{lang}}/profile/config/">settings</a>
-</p>
-
-<p>
-    Cheers,<br>
-    xuedi & yimu
-</p>',
+                'body' => $this->loadTemplateBody(EmailType::NotificationEventCanceled),
                 'variables' => ['username', 'eventLocation', 'eventDate', 'eventId', 'eventTitle', 'host', 'lang'],
             ],
-            'announcement' => [
+            EmailType::Announcement->value => [
                 'subject' => '{{title}}',
-                'body' => '<h1>{{title}}</h1>
-
-<div>{{content}}</div>
-
-<p>
-    <a href="{{announcementUrl}}">Read online</a>
-</p>
-
-<p>
-    If you don\'t like to receive announcements, you can<br>
-    switch them off in your <a href="{{host}}/{{lang}}/profile/config/">settings</a>
-</p>
-
-<p>
-    Cheers,<br>
-    xuedi & yimu
-</p>',
-                'variables' => ['title', 'content', 'announcementUrl', 'username', 'host', 'lang'],
+                'body' => $this->loadTemplateBody(EmailType::Announcement),
+                'variables' => ['title', 'announcement', 'announcementLink', 'username', 'host', 'lang'],
             ],
         ];
+    }
+
+    private function loadTemplateBody(EmailType $type): string
+    {
+        $filePath = $this->projectDir . self::TEMPLATE_PATH . $type->value . '.html';
+
+        if (!file_exists($filePath)) {
+            throw new RuntimeException(sprintf('Email template file not found: %s', $filePath));
+        }
+
+        return file_get_contents($filePath);
     }
 }
