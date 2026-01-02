@@ -33,71 +33,52 @@ A self-hosted, open-source alternative to meetup.com for organizing groups and s
 
 A classic PHP Symfony application, as upstream as possible with no fancy libraries. Local development runs in Docker via justfile. Uses basic Twig templating with upstream Bulma and minimal JS & CSS.
 
-## Requirements
+## Local Development
 
-### For Development
+Requires [Docker](https://docs.docker.com/get-docker/) with Docker Compose and [Just](https://github.com/casey/just) task runner.
 
-- [Docker](https://docs.docker.com/get-docker/) & Docker Compose
-- [Just](https://github.com/casey/just) (task runner)
+### Development Modes
 
-### For Production
+| Command | Description |
+|---------|-------------|
+| `just devModeFixtures` | Full reset with demo data - resets everything, installs dependencies, loads fixtures |
+| `just devModeInstaller` | Test the web installer - resets to fresh state, access at `/install/` |
+| `just devResetToFreshCloneState` | Nuclear option - removes vendor/, var/, and all configs |
 
-- PHP >= 8.4 with modules: apcu, pdo_mysql, imagick, intl, iconv, ctype, redis (Optional: xdebug, opcache, gd)
-- MariaDB or MySQL database
-- Web server (Caddy, Nginx, Apache)
-- Composer (installed automatically by web installer)
-
-## Development Installation
-
-For local development with Docker:
+### Quick Start
 
 ```bash
-just install
+just devModeFixtures
 ```
 
-Then login as `admin@example.org` with password `1234`
+Login at http://localhost as `admin@example.org` with password `1234`
 
 ### Docker Services
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| Web | http://localhost | Main application |
-| MailHog | http://localhost:8025 | Email testing UI |
-| Valkey | localhost:6379 | Redis-compatible cache |
-| MariaDB | localhost:3306 | Database |
+| Service | URL |
+|---------|-----|
+| Web | http://localhost |
+| MailHog | http://localhost:8025 |
+| Valkey | localhost:6379 |
+| MariaDB | localhost:3306 |
+
+### Commands
+
+Run `just` to see all available commands.
 
 ## Production Installation
 
-For production deployments or manual installation without Docker:
+**Requirements:** PHP >= 8.4 (apcu, pdo_mysql, imagick, intl, iconv, ctype, redis), MariaDB/MySQL, web server (Caddy, Nginx, Apache)
 
-1. Clone the repository to your server
-2. Configure your web server to serve the `public/` directory
-3. Navigate to your domain in a browser - you'll be automatically redirected to `/install/`
-4. Follow the web installer wizard:
-   - **Step 1: System Requirements & Database**
-     - Verify PHP requirements
-     - Configure database connection (host, port, database name, credentials)
-   - **Step 2: Mail Configuration**
-     - Choose your mail provider:
-       - **SMTP** - Custom SMTP server
-       - **SendGrid** - SendGrid API
-       - **Mailgun** - Mailgun API
-       - **Amazon SES** - AWS Simple Email Service
-       - **MailHog** - Development mail testing
-       - **Null** - Disable email sending
-   - **Step 3: Site Configuration**
-     - Set site URL and name
-     - Create your admin account
-5. The installer will automatically:
-   - Generate `.env` configuration file
-   - Run `composer install`
-   - Execute database migrations
-   - Create system and admin users
+1. Clone repository and configure web server to serve `public/`
+2. Navigate to your domain - redirects to `/install/`
+3. Follow the wizard:
+   - **Step 1:** Verify PHP requirements, configure database
+   - **Step 2:** Choose mail provider (SMTP, SendGrid, Mailgun, Amazon SES, or Null)
+   - **Step 3:** Set site URL/name, create admin account
+4. Installer auto-runs composer, migrations, and user creation
 
-Once installation is complete, login with the admin credentials you created. The installer becomes inaccessible after successful installation via the `installed.lock` file.
-
-## Development Commands
-See available commands in [justfile](justfile). By typing in the terminal: `just`
+Login with your admin credentials. The `installed.lock` file prevents re-running the installer.
 
 ## Project Structure
 
