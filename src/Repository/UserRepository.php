@@ -123,18 +123,26 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult();
     }
 
-    public function findActiveMembers(int $limit = 500, int $offset = 0): array
+    /**
+     * @param int[] $excludeIds User IDs to exclude from results (e.g., blocked users)
+     */
+    public function findActiveMembers(int $limit = 500, int $offset = 0, array $excludeIds = []): array
     {
-        return $this->createQueryBuilder('u')
+        $qb = $this->createQueryBuilder('u')
             ->select('u, i') // forces to fet all columns from user and image table
             ->leftJoin('u.image', 'i') // Assuming 'image' is the property name
             ->where('u.status = :status')
             ->setParameter('status', UserStatus::Active)
             ->orderBy('u.createdAt', 'ASC')
             ->setMaxResults($limit)
-            ->setFirstResult($offset)
-            ->getQuery()
-            ->getResult();
+            ->setFirstResult($offset);
+
+        if ($excludeIds !== []) {
+            $qb->andWhere('u.id NOT IN (:excludeIds)')
+                ->setParameter('excludeIds', $excludeIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     // TODO: merge with getNumberOfActiveMembers via param
@@ -150,15 +158,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getSingleScalarResult();
     }
 
-    public function getNumberOfActiveMembers(): int
+    /**
+     * @param int[] $excludeIds User IDs to exclude from count (e.g., blocked users)
+     */
+    public function getNumberOfActiveMembers(array $excludeIds = []): int
     {
-        return (int) $this->createQueryBuilder('u')
+        $qb = $this->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.status = :status')
             ->andwhere('u.id <> 1')
-            ->setParameter('status', UserStatus::Active)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('status', UserStatus::Active);
+
+        if ($excludeIds !== []) {
+            $qb->andWhere('u.id NOT IN (:excludeIds)')
+                ->setParameter('excludeIds', $excludeIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     public function resolveUserName(int $userId): string

@@ -9,6 +9,7 @@ use App\Form\CommentType;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
+use App\Service\BlockingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,7 @@ class MessageController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
+        private readonly BlockingService $blockingService,
     ) {
     }
 
@@ -31,24 +33,30 @@ class MessageController extends AbstractController
         $form = null;
         $user = $this->getAuthedUser();
         $messages = null;
+        $isBlocked = false;
 
         $conversationPartner = $this->userRepo->findOneBy(['id' => $id]);
         if ($conversationPartner !== null) {
-            $form = $this->createForm(CommentType::class);
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $msg = new Message();
-                $msg->setDeleted(false);
-                $msg->setWasRead(true); // hopefully ^_^
-                $msg->setSender($this->getAuthedUser());
-                $msg->setReceiver($conversationPartner);
-                $msg->setCreatedAt(new DateTimeImmutable());
-                $msg->setContent($form->getData()['comment']);
+            // Check if either user has blocked the other
+            $isBlocked = $this->blockingService->isBlocked($user, $conversationPartner);
 
-                $this->em->persist($msg);
-                $this->em->flush();
+            if (!$isBlocked) {
+                $form = $this->createForm(CommentType::class);
+                $form->handleRequest($request);
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $msg = new Message();
+                    $msg->setDeleted(false);
+                    $msg->setWasRead(true); // hopefully ^_^
+                    $msg->setSender($this->getAuthedUser());
+                    $msg->setReceiver($conversationPartner);
+                    $msg->setCreatedAt(new DateTimeImmutable());
+                    $msg->setContent($form->getData()['comment']);
 
-                $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' => $conversationPartner->getId()]);
+                    $this->em->persist($msg);
+                    $this->em->flush();
+
+                    $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' => $conversationPartner->getId()]);
+                }
             }
             // preRender then flush when no new messages
             $messages = $this->msgRepo->getMessages($user, $conversationPartner);
@@ -58,15 +66,21 @@ class MessageController extends AbstractController
             }
         }
 
-        $this->userRepo->findOneBy(['id' => $id]);
+        // Check if current user has blocked the partner (for showing block/unblock button)
+        $hasBlockedPartner = $conversationPartner !== null && $this->blockingService->hasBlocked($user, $conversationPartner);
+
+        // Get excluded user IDs for filtering conversations list
+        $excludeUserIds = $this->blockingService->getExcludedUserIds($user);
 
         return $this->render('profile/messages/index.html.twig', [
             'conversationsId' => $id,
-            'conversations' => $this->msgRepo->getConversations($user, $id),
+            'conversations' => $this->msgRepo->getConversations($user, $id, $excludeUserIds),
             'messages' => $messages,
             'friends' => $this->userRepo->getFriends($user),
             'user' => $user,
             'form' => $form,
+            'isBlocked' => $isBlocked,
+            'hasBlockedPartner' => $hasBlockedPartner,
         ]);
     }
 }

@@ -59,6 +59,29 @@
                 </p>
             {% else %}
                 <div style="display: flex; flex-direction: column; height: 70vh;">
+                    {# Block button in header #}
+                    {% if conversationsId %}
+                        <div class="level mb-2">
+                            <div class="level-left"></div>
+                            <div class="level-right">
+                                {% if hasBlockedPartner %}
+                                    <form action="{{ path('app_profile_unblock_user', {'id': conversationsId}) }}" method="post" class="is-inline">
+                                        <button type="submit" class="button is-warning is-small">
+                                            <span class="icon"><i class="fa fa-unlock"></i></span><span>Unblock</span>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form action="{{ path('app_profile_block_user', {'id': conversationsId}) }}" method="post" class="is-inline"
+                                          onsubmit="return confirm('Block this user? They will not be able to see your profile or message you.')">
+                                        <button type="submit" class="button is-dark is-small">
+                                            <span class="icon"><i class="fa fa-ban"></i></span><span>Block</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <div class="pr-3" id="desktop-message-container" style="flex: 1; overflow-y: auto; margin-bottom: 1rem;">
                         {% for message in messages %}
                             {% if user.id == message.sender.id %}
@@ -101,17 +124,24 @@
                     </div>
                     <div>
                         <hr>
-                        {{ form_start(form) }}
-                        <div class="level">
-                            <div class="level-item">
-                                <input class="input" type="text" name="{{ field_name(form.comment) }}"
-                                       placeholder="Message"/>
+                        {% if isBlocked %}
+                            <div class="notification is-warning">
+                                <span class="icon"><i class="fa fa-ban"></i></span>
+                                You cannot message this user.
                             </div>
-                            <div class="level-right">
-                                <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                        {% elseif form %}
+                            {{ form_start(form) }}
+                            <div class="level">
+                                <div class="level-item">
+                                    <input class="input" type="text" name="{{ field_name(form.comment) }}"
+                                           placeholder="Message"/>
+                                </div>
+                                <div class="level-right">
+                                    <button class="button is-link ml-2">{{ "button_send" | trans }}</button>
+                                </div>
                             </div>
-                        </div>
-                        {{ form_end(form) }}
+                            {{ form_end(form) }}
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}

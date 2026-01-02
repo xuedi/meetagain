@@ -53,6 +53,8 @@ class ActivityRepository extends ServiceEntityRepository
                 ActivityType::ChangedUsername->value,
                 ActivityType::EventImageUploaded->value,
                 ActivityType::UpdatedProfilePicture->value,
+                ActivityType::BlockedUser->value,
+                ActivityType::UnblockedUser->value,
             ])
             ->getQuery()
             ->getResult();
@@ -76,6 +78,14 @@ class ActivityRepository extends ServiceEntityRepository
 
                 case ActivityType::UpdatedProfilePicture->value:
                     if (in_array($activityUserId, $following) || $user->getId() === $activityUserId) {
+                        $activityIds[] = $userActivity->getId();
+                    }
+                    break;
+
+                case ActivityType::BlockedUser->value:
+                case ActivityType::UnblockedUser->value:
+                    // Only visible to the user themselves (self-only visibility)
+                    if ($user->getId() === $activityUserId) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;

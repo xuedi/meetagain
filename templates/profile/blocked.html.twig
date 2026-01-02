@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "page_title_profile"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-8 is-offset-2">
+                    <h1 class="title is-4">Blocked Users</h1>
+                    <p class="mb-4">
+                        Users you have blocked cannot see your profile, send you messages, or follow you.
+                        You will also not see them in member lists.
+                    </p>
+
+                    {% if blockedUsers|length == 0 %}
+                        <div class="notification is-light">
+                            <span class="icon"><i class="fa fa-info-circle"></i></span>
+                            You have not blocked any users.
+                        </div>
+                    {% else %}
+                        <table class="table is-fullwidth is-striped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>User</th>
+                                    <th>Blocked on</th>
+                                    <th class="has-text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for block in blockedUsers %}
+                                <tr>
+                                    <td style="width: 60px;">
+                                        {% include '_block/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ block.blocked.name }}</strong>
+                                    </td>
+                                    <td>
+                                        <small>{{ block.createdAt|date('Y-m-d') }}</small>
+                                    </td>
+                                    <td class="has-text-right">
+                                        <form action="{{ path('app_profile_unblock_user', {'id': block.blocked.id}) }}" method="post" class="is-inline">
+                                            <button type="submit" class="button is-warning is-small">
+                                                <span class="icon"><i class="fa fa-unlock"></i></span><span>Unblock</span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{{ path('app_profile') }}" class="button is-light">
+                            <span class="icon"><i class="fa fa-arrow-left"></i></span><span>Back to Profile</span>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

@@ -17,15 +17,33 @@
                     <div class="mb-4">
                         <h1 class="title is-3 is-inline">{{ userDetails.name }}</h1>
                         {% if userDetails.id != currentUser.id %}
-                            {% set followLink = path('app_member_toggle_follow', {'id': userDetails.id}) %}
-                            {% if isFollow %}
-                                <a href="{{ followLink }}" class="button is-danger is-small ml-4 mt-1">
-                                    <span class="icon"><i class="fa fa-minus"></i></span><span>Unfollow</span>
-                                </a>
+                            {% if not isBlocked %}
+                                {% set followLink = path('app_member_toggle_follow', {'id': userDetails.id}) %}
+                                {% if isFollow %}
+                                    <a href="{{ followLink }}" class="button is-danger is-small ml-4 mt-1">
+                                        <span class="icon"><i class="fa fa-minus"></i></span><span>Unfollow</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ followLink }}" class="button is-success is-small ml-4 mt-1">
+                                        <span class="icon"><i class="fa fa-plus"></i></span><span>Follow</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+
+                            {# Block/Unblock button #}
+                            {% if isBlocked %}
+                                <form action="{{ path('app_profile_unblock_user', {'id': userDetails.id}) }}" method="post" class="is-inline">
+                                    <button type="submit" class="button is-warning is-small ml-2 mt-1">
+                                        <span class="icon"><i class="fa fa-unlock"></i></span><span>Unblock</span>
+                                    </button>
+                                </form>
                             {% else %}
-                                <a href="{{ followLink }}" class="button is-success is-small ml-4 mt-1">
-                                    <span class="icon"><i class="fa fa-plus"></i></span><span>Follow</span>
-                                </a>
+                                <form action="{{ path('app_profile_block_user', {'id': userDetails.id}) }}" method="post" class="is-inline"
+                                      onsubmit="return confirm('Block this user? They will not be able to see your profile or message you.')">
+                                    <button type="submit" class="button is-dark is-small ml-2 mt-1">
+                                        <span class="icon"><i class="fa fa-ban"></i></span><span>Block</span>
+                                    </button>
+                                </form>
                             {% endif %}
                         {% else %}
                             <div class="button is-warning is-small ml-4 mt-1">
@@ -36,9 +54,11 @@
 
                     <p>{{ userDetails.bio }}</p>
 
-                    <a href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-small mt-4">
-                        <span class="icon"><i class="fa fa-envelope"></i></span><span>Message</span>
-                    </a>
+                    {% if userDetails.id != currentUser.id and not isBlocked %}
+                        <a href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-small mt-4">
+                            <span class="icon"><i class="fa fa-envelope"></i></span><span>Message</span>
+                        </a>
+                    {% endif %}
                 </div>
 
 

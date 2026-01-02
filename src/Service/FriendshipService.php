@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\User;
+use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -16,6 +17,7 @@ readonly class FriendshipService
 {
     public function __construct(
         private UserRepository $repo,
+        private UserBlockRepository $blockRepo,
         private EntityManagerInterface $em,
         private RouterInterface $router,
         private Security $security,
@@ -27,6 +29,17 @@ readonly class FriendshipService
     {
         $currentUser = $this->getAuthedUser();
         $targetUser = $this->repo->findOneBy(['id' => $id]);
+
+        // Check if either user has blocked the other
+        if ($this->blockRepo->isBlockedEitherWay($currentUser, $targetUser)) {
+            // Cannot follow if blocked - just redirect back
+            $route = $this->router->generate($returnRoute, [
+                '_locale' => $this->requestStack->getCurrentRequest()?->getLocale(),
+                'id' => $targetUser->getId(),
+            ]);
+
+            return new RedirectResponse($route);
+        }
 
         if ($currentUser->getFollowing()->contains($targetUser)) {
             $currentUser->removeFollowing($targetUser);
