@@ -101,8 +101,8 @@ readonly class AnnouncementService
             };
         }
 
-        if($contentParts === []) {
-            $contentParts[] =  "ERROR: The CMS page has no content for the language [$locale]";
+        if ($contentParts === []) {
+            $contentParts[] = "ERROR: The CMS page has no content for the language [$locale]";
         }
 
         return [
