@@ -112,6 +112,7 @@ devModeFixtures:
     rm -f .env
     cp .env.dist .env
     touch installed.lock
+    {{JUST}} dockerStart
     {{JUST}} do "composer install"
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
