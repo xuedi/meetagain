@@ -2,7 +2,10 @@
 framework:
     secret: '%env(APP_SECRET)%'
     csrf_protection: true
-    session: true
+    session:
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
+        cookie_secure: auto
+        cookie_samesite: lax
 
 when@test:
     framework:
