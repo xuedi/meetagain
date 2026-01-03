@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Service\ActivityService;
 use App\Service\CommandExecutionService;
 use App\Service\EmailService;
+use App\Service\RsvpNotificationService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,6 +21,7 @@ class CronCommand extends LoggedCommand
     public function __construct(
         private readonly EmailService $mailService,
         private readonly ActivityService $activityService,
+        private readonly RsvpNotificationService $rsvpNotificationService,
         private readonly LoggerInterface $logger,
         CommandExecutionService $commandExecutionService,
     ) {
@@ -35,6 +37,10 @@ class CronCommand extends LoggedCommand
         $output->write('Send out queued emails ... ');
         $this->mailService->sendQueue();
         $output->writeln('OK');
+
+        $output->write('Send RSVP notifications ... ');
+        $count = $this->rsvpNotificationService->processUpcomingEvents(7);
+        $output->writeln(sprintf('%d sent', $count));
 
         $output->write('Validating activity payloads ... ');
         $invalidActivities = $this->activityService->validateAllActivities();

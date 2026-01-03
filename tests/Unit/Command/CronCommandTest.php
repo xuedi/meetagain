@@ -6,6 +6,7 @@ use App\Command\CronCommand;
 use App\Service\ActivityService;
 use App\Service\CommandExecutionService;
 use App\Service\EmailService;
+use App\Service\RsvpNotificationService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -15,9 +16,10 @@ class CronCommandTest extends TestCase
     {
         $emailServiceStub = $this->createStub(EmailService::class);
         $activityServiceStub = $this->createStub(ActivityService::class);
+        $rsvpNotificationServiceStub = $this->createStub(RsvpNotificationService::class);
         $loggerStub = $this->createStub(LoggerInterface::class);
         $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
-        $command = new CronCommand($emailServiceStub, $activityServiceStub, $loggerStub, $commandExecServiceStub);
+        $command = new CronCommand($emailServiceStub, $activityServiceStub, $rsvpNotificationServiceStub, $loggerStub, $commandExecServiceStub);
 
         $this->assertSame('app:cron', $command->getName());
     }
@@ -26,9 +28,10 @@ class CronCommandTest extends TestCase
     {
         $emailServiceStub = $this->createStub(EmailService::class);
         $activityServiceStub = $this->createStub(ActivityService::class);
+        $rsvpNotificationServiceStub = $this->createStub(RsvpNotificationService::class);
         $loggerStub = $this->createStub(LoggerInterface::class);
         $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
-        $command = new CronCommand($emailServiceStub, $activityServiceStub, $loggerStub, $commandExecServiceStub);
+        $command = new CronCommand($emailServiceStub, $activityServiceStub, $rsvpNotificationServiceStub, $loggerStub, $commandExecServiceStub);
 
         $this->assertSame('cron manager to be called often, maybe every 5 min or so', $command->getDescription());
     }
