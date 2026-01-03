@@ -155,12 +155,12 @@ testSetup:
 # Run only unit tests (faster, no database required)
 [group('testing')]
 testUnit +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default {{parameter}}
+    @{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default --no-progress {{parameter}}
 
-# Run only functional tests (click path / integration tests)
+# Run only functional tests (click no, keep thatpath / integration tests)
 [group('testing')]
 testFunctional +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional {{parameter}}
+    @{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --no-progress {{parameter}}
 
 # Show test coverage report in AI-readable format (runs tests first to generate coverage)
 [group('testing')]
@@ -176,27 +176,27 @@ routeMetrics +parameter='':
 # Run PHPStan static analysis for type checking and bug detection
 [group('checks')]
 checkStan +parameter='':
-    {{PHP}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M {{parameter}}
+    @{{PHP}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M --no-progress {{parameter}}
 
 # Run Rector in dry-run mode to check for code improvements without applying them
 [group('checks')]
 checkRector:
-    {{PHP}} vendor/bin/rector process src --dry-run -c tests/rector.php
+    @{{PHP}} vendor/bin/rector process src --dry-run -c tests/rector.php
 
 # Run PHP CodeSniffer to check coding standards compliance
 [group('checks')]
 checkPhpcs:
-    {{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+    @{{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache -q
 
 # Run PHP-CS-Fixer to check code style (dry-run)
 [group('checks')]
 checkPhpCsFixer:
-    {{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --verbose --config=tests/.php-cs-fixer.php
+    @{{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --quiet --config=tests/.php-cs-fixer.php
 
 # Run Deptrac to check architectural layer dependencies
 [group('checks')]
 checkDeptrac:
-    {{PHP}} vendor/bin/deptrac analyse --config-file=tests/deptrac.yaml
+    @{{PHP}} vendor/bin/deptrac analyse --config-file=tests/deptrac.yaml --no-progress
 
 # Run Pa11y accessibility check with human-readable output
 [group('checks')]
@@ -207,21 +207,21 @@ checkA11y url='http://localhost/':
 # Automatically fix coding standards violations using PHPCBF
 [group('fixing')]
 fixPhpcs:
-    {{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+    @{{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
 
 # Automatically fix code style using PHP-CS-Fixer
 [group('fixing')]
 fixPhpCsFixer:
-    {{PHP}} vendor/bin/php-cs-fixer fix --verbose --config=tests/.php-cs-fixer.php
+    @{{PHP}} vendor/bin/php-cs-fixer fix --verbose --config=tests/.php-cs-fixer.php
 
 # Apply Rector refactorings to the codebase
 [group('fixing')]
 fixRector:
-    {{PHP}} vendor/bin/rector process src -c tests/rector.php
+    @{{PHP}} vendor/bin/rector process src -c tests/rector.php
 
 # Generate test coverage badge SVG and stage it for commit (CI only)
 [group('fixing')]
 fixCoverageBadge:
-	{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
-	{{PHP}} php tests/badgeGenerator.php
-	git add tests/badge/coverage.svg
+	@{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --no-progress
+	@{{PHP}} php tests/badgeGenerator.php
+	@git add tests/badge/coverage.svg
