@@ -1,0 +1,6 @@
+controllers:
+    type: attribute
+    prefix: /{_locale}
+    resource:
+        path: ../src/Controller/
+        namespace: Plugin\Filmclub\Controller
