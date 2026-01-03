@@ -1,6 +1,6 @@
 # MeetAgain
 
-[![Gitea Release](https://img.shields.io/badge/Version-v0.5.0-31c754.svg)](https://github.com/xuedi/meetAgain/releases)
+[![Gitea Release](https://img.shields.io/badge/Version-v1.0.0-31c754.svg)](https://github.com/xuedi/meetAgain/releases)
 [![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
 [![EUPL Licence](https://img.shields.io/badge/Roadmap-1.0-31c754.svg)](https://github.com/xuedi/meetAgain/milestones?sort=title&direction=asc)
 [![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
