@@ -12,10 +12,10 @@ class FrontpageController extends AbstractController
     public function __construct() {
     }
 
-    #[Route('/', name: 'app_plugin_filmclub_frontpage', methods: ['GET'])]
+    #[Route('', name: 'app_plugin_filmclub_frontpage', methods: ['GET'])]
     public function pending(): Response
     {
-        return $this->render('@filmclub/frontpage.html.twig', [
+        return $this->render('@Filmclub/frontpage.html.twig', [
             'films' => [],
         ]);
     }
