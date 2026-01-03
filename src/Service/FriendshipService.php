@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
@@ -22,6 +23,7 @@ readonly class FriendshipService
         private RouterInterface $router,
         private Security $security,
         private RequestStack $requestStack,
+        private ActivityService $activityService,
     ) {
     }
 
@@ -43,12 +45,16 @@ readonly class FriendshipService
 
         if ($currentUser->getFollowing()->contains($targetUser)) {
             $currentUser->removeFollowing($targetUser);
+            $activityType = ActivityType::UnFollowedUser;
         } else {
             $currentUser->addFollowing($targetUser);
+            $activityType = ActivityType::FollowedUser;
         }
 
         $this->em->persist($currentUser);
         $this->em->flush();
+
+        $this->activityService->log($activityType, $currentUser, ['user_id' => $targetUser->getId()]);
 
         $route = $this->router->generate($returnRoute, [
             '_locale' => $this->requestStack->getCurrentRequest()?->getLocale(),

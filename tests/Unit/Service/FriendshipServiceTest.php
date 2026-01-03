@@ -5,6 +5,7 @@ namespace Tests\Unit\Service;
 use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
+use App\Service\ActivityService;
 use App\Service\FriendshipService;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -67,6 +68,8 @@ class FriendshipServiceTest extends TestCase
         $blockRepoStub = $this->createStub(UserBlockRepository::class);
         $blockRepoStub->method('isBlockedEitherWay')->willReturn(false);
 
+        $activityServiceStub = $this->createStub(ActivityService::class);
+
         $subject = new FriendshipService(
             repo: $userRepoMock,
             blockRepo: $blockRepoStub,
@@ -74,6 +77,7 @@ class FriendshipServiceTest extends TestCase
             router: $routerMock,
             security: $securityStub,
             requestStack: $requestStackStub,
+            activityService: $activityServiceStub,
         );
 
         // Act: toggle follow
@@ -132,6 +136,8 @@ class FriendshipServiceTest extends TestCase
         $blockRepoStub = $this->createStub(UserBlockRepository::class);
         $blockRepoStub->method('isBlockedEitherWay')->willReturn(false);
 
+        $activityServiceStub = $this->createStub(ActivityService::class);
+
         $subject = new FriendshipService(
             repo: $userRepoMock,
             blockRepo: $blockRepoStub,
@@ -139,6 +145,7 @@ class FriendshipServiceTest extends TestCase
             router: $routerMock,
             security: $securityStub,
             requestStack: $requestStackStub,
+            activityService: $activityServiceStub,
         );
 
         // Act: toggle follow
@@ -162,6 +169,7 @@ class FriendshipServiceTest extends TestCase
             router: $this->createStub(RouterInterface::class),
             security: $securityStub,
             requestStack: $this->createStub(RequestStack::class),
+            activityService: $this->createStub(ActivityService::class),
         );
 
         // Assert: expect authentication exception
@@ -187,6 +195,7 @@ class FriendshipServiceTest extends TestCase
             router: $this->createStub(RouterInterface::class),
             security: $securityStub,
             requestStack: $this->createStub(RequestStack::class),
+            activityService: $this->createStub(ActivityService::class),
         );
 
         // Assert: expect authentication exception

@@ -22,6 +22,7 @@ enum ActivityType: int
     case UpdatedProfilePicture = 13;
     case BlockedUser = 14;
     case UnblockedUser = 15;
+    case PasswordChanged = 16;
 
     // TODO: should be separate translator not here in enum
     public static function getChoices(TranslatorInterface $translator): array
