@@ -13,13 +13,23 @@ jobs:
   unit:
     name: Unit Tests
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=3s
+          --health-timeout=3s
+          --health-retries=5
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
         with:
           php-version: '8.4'
-          extensions: gd, apcu, intl
+          extensions: gd, apcu, intl, redis
 
       - name: Cache Composer packages
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
@@ -32,6 +42,7 @@ jobs:
         run: |
           cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
+          echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
@@ -55,6 +66,15 @@ jobs:
           --health-interval=3s
           --health-timeout=3s
           --health-retries=5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=3s
+          --health-timeout=3s
+          --health-retries=5
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -62,7 +82,7 @@ jobs:
       - uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
         with:
           php-version: '8.4'
-          extensions: gd, apcu, pdo_mysql, imagick, intl, opcache
+          extensions: gd, apcu, pdo_mysql, imagick, intl, opcache, redis
 
       - name: Cache Composer packages
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
@@ -80,9 +100,11 @@ jobs:
       - name: Setup test environment
         env:
           DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
+          REDIS_URL: redis://127.0.0.1:6379
         run: |
           cp .env.dist .env
           echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/meetAgain_test" >> .env
+          echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
           echo "APP_ENV=test" >> .env
           php bin/console doctrine:schema:create --no-interaction
           php bin/console doctrine:fixtures:load --no-interaction
@@ -90,18 +112,29 @@ jobs:
       - name: Run functional tests
         env:
           DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
+          REDIS_URL: redis://127.0.0.1:6379
         run: vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --no-coverage
 
   checks:
     name: Code Quality
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=3s
+          --health-timeout=3s
+          --health-retries=5
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
         with:
           php-version: '8.4'
-          extensions: gd, apcu, intl
+          extensions: gd, apcu, intl, redis
 
       - name: Cache Composer packages
         uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5
@@ -114,6 +147,7 @@ jobs:
         run: |
           cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
+          echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
