@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pending Approval - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>Pending Approval</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">Books Pending Approval</h1>
+
+        {% if books|length > 0 %}
+            <table class="table is-fullwidth is-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Added By</th>
+                        <th>Added At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('app_plugin_bookclub_book_show', {id: book.id}) }}">
+                                    {{ book.title }}
+                                </a>
+                            </td>
+                            <td>{{ book.author ?? 'Unknown' }}</td>
+                            <td>{{ book.isbn }}</td>
+                            <td>{{ get_user_name(book.createdBy) }}</td>
+                            <td>{{ book.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                <div class="buttons are-small">
+                                    <form action="{{ path('app_plugin_bookclub_approve', {id: book.id}) }}" method="post" style="display: inline;">
+                                        <button type="submit" class="button is-success is-small">
+                                            <span class="icon"><i class="fas fa-check"></i></span>
+                                        </button>
+                                    </form>
+                                    <form action="{{ path('app_plugin_bookclub_reject', {id: book.id}) }}" method="post" style="display: inline;">
+                                        <button type="submit" class="button is-danger is-small" onclick="return confirm('Reject and delete this book?')">
+                                            <span class="icon"><i class="fas fa-times"></i></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="notification is-success is-light">
+                <p>No books pending approval!</p>
+            </div>
+        {% endif %}
+
+        <a href="{{ path('app_plugin_bookclub') }}" class="button is-light">
+            Back to Book Club
+        </a>
+    </div>
+</section>
+{% endblock %}

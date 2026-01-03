@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notes: {{ book.title }} - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li><a href="{{ path('app_plugin_bookclub_notes') }}">My Notes</a></li>
+                <li class="is-active"><a>{{ book.title }}</a></li>
+            </ul>
+        </nav>
+
+        <div class="columns">
+            <div class="column is-8">
+                <h1 class="title">Notes: {{ book.title }}</h1>
+                <p class="subtitle">by {{ book.author ?? 'Unknown' }}</p>
+
+                {{ form_start(form) }}
+                    <div class="field">
+                        {{ form_label(form.content, null, {'label_attr': {'class': 'label'}}) }}
+                        <div class="control">
+                            {{ form_widget(form.content, {'attr': {'class': 'textarea', 'rows': 15}}) }}
+                        </div>
+                        {{ form_errors(form.content) }}
+                    </div>
+
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-primary">
+                                <span class="icon"><i class="fas fa-save"></i></span>
+                                <span>Save Notes</span>
+                            </button>
+                            <a href="{{ path('app_plugin_bookclub_notes') }}" class="button is-light">Cancel</a>
+                        </div>
+                    </div>
+                {{ form_end(form) }}
+
+                {% if existingNote %}
+                    <p class="is-size-7 has-text-grey mt-4">
+                        Created: {{ existingNote.createdAt|date('Y-m-d H:i') }}
+                        {% if existingNote.updatedAt %}
+                            | Last updated: {{ existingNote.updatedAt|date('Y-m-d H:i') }}
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="column is-4">
+                <div class="box">
+                    <h3 class="title is-5">Book Info</h3>
+                    {% if book.coverImage %}
+                        <figure class="image mb-4">
+                            {% include '_block/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
+                        </figure>
+                    {% endif %}
+                    {% if book.description %}
+                        <p class="content is-size-7">{{ book.description|slice(0, 300) }}...</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

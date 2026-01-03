@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Poll - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>Poll</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">Book Poll</h1>
+
+        <div class="notification is-info is-light">
+            <p>No active poll at the moment.</p>
+            <p>Check the <a href="{{ path('app_plugin_bookclub_suggestions') }}">suggestions page</a> to suggest a book for the next poll.</p>
+        </div>
+
+        {% if is_granted('ROLE_MANAGER') %}
+            <div class="box">
+                <h3 class="title is-5">Manager Actions</h3>
+                <a href="{{ path('app_plugin_bookclub_poll_create') }}" class="button is-primary">
+                    Create New Poll
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "Book Club"|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Book Club</h1>
+
+        <div class="buttons">
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_plugin_bookclub_book_add') }}" class="button is-primary">
+                    <span class="icon"><i class="fas fa-plus"></i></span>
+                    <span>Add Book</span>
+                </a>
+                <a href="{{ path('app_plugin_bookclub_suggestions') }}" class="button is-info">
+                    <span class="icon"><i class="fas fa-lightbulb"></i></span>
+                    <span>Suggestions</span>
+                </a>
+                <a href="{{ path('app_plugin_bookclub_poll') }}" class="button is-warning">
+                    <span class="icon"><i class="fas fa-poll"></i></span>
+                    <span>Current Poll</span>
+                </a>
+                <a href="{{ path('app_plugin_bookclub_notes') }}" class="button is-link">
+                    <span class="icon"><i class="fas fa-sticky-note"></i></span>
+                    <span>My Notes</span>
+                </a>
+            {% endif %}
+            {% if is_granted('ROLE_MANAGER') %}
+                <a href="{{ path('app_plugin_bookclub_pending') }}" class="button is-danger">
+                    <span class="icon"><i class="fas fa-check-circle"></i></span>
+                    <span>Pending Approval</span>
+                </a>
+            {% endif %}
+        </div>
+
+        <h2 class="subtitle">All Books</h2>
+
+        {% if books|length > 0 %}
+            <div class="columns is-multiline">
+                {% for book in books %}
+                    <div class="column is-3">
+                        <div class="card">
+                            {% if book.coverImage %}
+                                <div class="card-image">
+                                    <figure class="image is-4by5">
+                                        {% include '_block/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
+                                    </figure>
+                                </div>
+                            {% endif %}
+                            <div class="card-content">
+                                <p class="title is-5">{{ book.title }}</p>
+                                <p class="subtitle is-6">{{ book.author ?? 'Unknown author' }}</p>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="{{ path('app_plugin_bookclub_book_show', {id: book.id}) }}" class="card-footer-item">View</a>
+                                {% if is_granted('ROLE_USER') %}
+                                    <a href="{{ path('app_plugin_bookclub_note_edit', {bookId: book.id}) }}" class="card-footer-item">Notes</a>
+                                {% endif %}
+                            </footer>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="has-text-grey">No books in the catalog yet.</p>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

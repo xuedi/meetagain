@@ -6,10 +6,13 @@ parameters:
         - ../public/
         - ../src/
         - ../tests/
+        - ../plugins/
     ignoreErrors:
         # Entity IDs are assigned by Doctrine, not in PHP code
         - identifier: property.unusedType
           path: ../src/Entity/*
+        - identifier: property.unusedType
+          path: ../plugins/*/src/Entity/*
 
         # Installer runs standalone outside Symfony, different context
         - identifier: classConstant.unused

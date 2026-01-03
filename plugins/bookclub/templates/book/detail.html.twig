@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }} - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>{{ book.title }}</a></li>
+            </ul>
+        </nav>
+
+        <div class="columns">
+            <div class="column is-4">
+                {% if book.coverImage %}
+                    <figure class="image">
+                        {% include '_block/image.html.twig' with {'image': book.coverImage, 'size': '400x500'} %}
+                    </figure>
+                {% else %}
+                    <div class="box has-background-light has-text-centered" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <span class="icon is-large has-text-grey">
+                            <i class="fas fa-book fa-3x"></i>
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="column is-8">
+                <h1 class="title">{{ book.title }}</h1>
+                <h2 class="subtitle">{{ book.author ?? 'Unknown author' }}</h2>
+
+                <div class="content">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>ISBN</th>
+                                <td>{{ book.isbn }}</td>
+                            </tr>
+                            {% if book.publishedYear %}
+                            <tr>
+                                <th>Published</th>
+                                <td>{{ book.publishedYear }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if book.pageCount %}
+                            <tr>
+                                <th>Pages</th>
+                                <td>{{ book.pageCount }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if book.approved %}
+                                        <span class="tag is-success">Approved</span>
+                                    {% else %}
+                                        <span class="tag is-warning">Pending Approval</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    {% if book.description %}
+                        <h3>Description</h3>
+                        <p>{{ book.description|nl2br }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="buttons">
+                    {% if is_granted('ROLE_USER') %}
+                        <a href="{{ path('app_plugin_bookclub_note_edit', {bookId: book.id}) }}" class="button is-primary">
+                            <span class="icon"><i class="fas fa-sticky-note"></i></span>
+                            <span>My Notes</span>
+                        </a>
+                        {% if book.approved %}
+                            <form action="{{ path('app_plugin_bookclub_suggest', {bookId: book.id}) }}" method="post" style="display: inline;">
+                                <button type="submit" class="button is-info">
+                                    <span class="icon"><i class="fas fa-lightbulb"></i></span>
+                                    <span>Suggest for Next Poll</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

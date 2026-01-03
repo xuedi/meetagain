@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vote - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>Current Poll</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">{{ poll.title ?? 'Book Poll' }}</h1>
+        <p class="subtitle">
+            Vote for the next book to read!
+            {% if event %}
+                <br><span class="is-size-6">For: <strong>{{ event.getTitle('en') }}</strong> ({{ event.start|date('Y-m-d') }})</span>
+            {% endif %}
+        </p>
+
+        {% if userVote %}
+            <div class="notification is-success">
+                You voted for: <strong>{{ userVote.suggestion.book.title }}</strong>
+                <br><small>You can change your vote until the poll closes.</small>
+            </div>
+        {% endif %}
+
+        <div class="columns is-multiline">
+            {% for suggestion in poll.suggestions %}
+                <div class="column is-4">
+                    <div class="card {% if userVote and userVote.suggestion.id == suggestion.id %}has-background-success-light{% endif %}">
+                        {% if suggestion.book.coverImage %}
+                            <div class="card-image">
+                                <figure class="image is-4by5">
+                                    {% include '_block/image.html.twig' with {'image': suggestion.book.coverImage, 'size': '200x250'} %}
+                                </figure>
+                            </div>
+                        {% endif %}
+                        <div class="card-content">
+                            <p class="title is-5">{{ suggestion.book.title }}</p>
+                            <p class="subtitle is-6">{{ suggestion.book.author ?? 'Unknown' }}</p>
+                            <p class="is-size-7 has-text-grey">
+                                Suggested by {{ get_user_name(suggestion.suggestedBy) }}
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <form action="{{ path('app_plugin_bookclub_poll_vote', {suggestionId: suggestion.id}) }}" method="post" class="card-footer-item">
+                                <button type="submit" class="button is-primary is-fullwidth {% if userVote and userVote.suggestion.id == suggestion.id %}is-outlined{% endif %}">
+                                    {% if userVote and userVote.suggestion.id == suggestion.id %}
+                                        <span class="icon"><i class="fas fa-check"></i></span>
+                                        <span>Voted</span>
+                                    {% else %}
+                                        <span class="icon"><i class="fas fa-vote-yea"></i></span>
+                                        <span>Vote</span>
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </footer>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if is_granted('ROLE_MANAGER') %}
+            <div class="box mt-5">
+                <h3 class="title is-5">Manager Actions</h3>
+                <form action="{{ path('app_plugin_bookclub_poll_close', {id: poll.id}) }}" method="post">
+                    <button type="submit" class="button is-danger" onclick="return confirm('Close the poll and announce the winner?')">
+                        <span class="icon"><i class="fas fa-stop"></i></span>
+                        <span>Close Poll</span>
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

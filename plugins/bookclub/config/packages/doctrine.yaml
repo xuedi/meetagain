@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Bookclub:
+                        dir: "%kernel.project_dir%/plugins/bookclub/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Bookclub\Entity
+                        alias: Bookclub
+
+doctrine_migrations:
+    migrations_paths:
+        PluginBookclubMigrations: "%kernel.project_dir%/plugins/bookclub/migrations"
