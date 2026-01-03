@@ -2,9 +2,15 @@
 
 namespace Plugin\Bookclub\DataFixtures;
 
+use App\DataFixtures\AbstractFixture;
+use App\DataFixtures\SystemUserFixture;
+use App\DataFixtures\UserFixture;
+use App\Entity\ImageType;
+use App\Entity\User;
+use App\Service\ImageService;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Bookclub\Entity\Book;
 use Plugin\Bookclub\Entity\BookNote;
@@ -13,15 +19,21 @@ use Plugin\Bookclub\Entity\BookPollVote;
 use Plugin\Bookclub\Entity\BookSuggestion;
 use Plugin\Bookclub\Entity\PollStatus;
 use Plugin\Bookclub\Entity\SuggestionStatus;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class BookclubFixture extends Fixture implements FixtureGroupInterface
+class BookclubFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
 {
+    public function __construct(
+        private readonly ImageService $imageService,
+    ) {}
+
     #[\Override]
     public function load(ObjectManager $manager): void
     {
         echo 'Creating bookclub data ... ';
 
-        $books = $this->createBooks($manager);
+        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
+        $books = $this->createBooks($manager, $importUser);
         $this->createClosedPollWithVotes($manager, $books);
         $this->createPendingSuggestions($manager, $books);
         $this->createUserNotes($manager, $books);
@@ -30,8 +42,18 @@ class BookclubFixture extends Fixture implements FixtureGroupInterface
         echo 'OK' . PHP_EOL;
     }
 
-    /** @return Book[] */
-    private function createBooks(ObjectManager $manager): array
+    #[\Override]
+    public function getDependencies(): array
+    {
+        return [
+            UserFixture::class,
+        ];
+    }
+
+    /**
+     * @return Book[]
+     */
+    private function createBooks(ObjectManager $manager, User $importUser): array
     {
         $books = [];
         foreach ($this->getBookData() as $data) {
@@ -45,6 +67,15 @@ class BookclubFixture extends Fixture implements FixtureGroupInterface
             $book->setApproved(true);
             $book->setCreatedBy($data['createdBy']);
             $book->setCreatedAt(new DateTimeImmutable('-' . rand(30, 365) . ' days'));
+
+            // Add cover image if available
+            $coverFile = __DIR__ . '/covers/' . $data['isbn'] . '.jpg';
+            if (file_exists($coverFile)) {
+                $uploadedImage = new UploadedFile($coverFile, $data['isbn'] . '.jpg');
+                $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginBookclubCover);
+                $this->imageService->createThumbnails($image);
+                $book->setCoverImage($image);
+            }
 
             $manager->persist($book);
             $books[] = $book;
