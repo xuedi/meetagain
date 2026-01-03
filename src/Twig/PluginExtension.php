@@ -19,6 +19,13 @@ final class PluginExtension extends AbstractExtension
     #[Override]
     public function getFunctions(): array
     {
+        return [
+            new TwigFunction('get_plugins_links', $this->getPluginsLinks(...)),
+        ];
+    }
+
+    public function getPluginsLinks(): array
+    {
         $links = [];
         foreach ($this->plugins as $plugin) {
             foreach ($plugin->getMenuLinks() as $link) {
@@ -26,8 +33,6 @@ final class PluginExtension extends AbstractExtension
             }
         }
 
-        return [
-            new TwigFunction('get_plugins_links', $links),
-        ];
+        return $links;
     }
 }
