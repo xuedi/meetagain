@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AppMigrations;
+namespace PluginBookclubMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
