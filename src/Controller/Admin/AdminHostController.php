@@ -2,11 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\Host;
 use App\Form\HostType;
 use App\Repository\HostRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

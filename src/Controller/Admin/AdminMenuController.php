@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
 use App\Entity\MenuRoutes;
@@ -15,7 +16,6 @@ use App\Repository\MenuRepository;
 use App\Repository\MenuTranslationRepository;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

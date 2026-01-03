@@ -2,13 +2,12 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\Location;
-use App\Entity\User;
 use App\Form\LocationType;
 use App\Repository\LocationRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -57,8 +56,7 @@ class AdminLocationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            assert($user instanceof User);
+            $user = $this->getAuthedUser();
 
             $location->setCreatedAt(new DateTimeImmutable());
             $location->setUser($user);

@@ -2,9 +2,9 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\UserStatus;
 use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
