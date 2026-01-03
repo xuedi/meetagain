@@ -17,7 +17,7 @@ class BlockingServiceTest extends TestCase
     public function testBlockThrowsExceptionWhenBlockingYourself(): void
     {
         // Arrange: create user that tries to block themselves
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $user->method('getId')->willReturn(42);
 
         $subject = new BlockingService(
@@ -37,10 +37,10 @@ class BlockingServiceTest extends TestCase
     public function testBlockDoesNothingWhenAlreadyBlocked(): void
     {
         // Arrange: create users
-        $blocker = $this->createMock(User::class);
+        $blocker = $this->createStub(User::class);
         $blocker->method('getId')->willReturn(1);
 
-        $blocked = $this->createMock(User::class);
+        $blocked = $this->createStub(User::class);
         $blocked->method('getId')->willReturn(2);
 
         // Arrange: repository indicates already blocked
@@ -159,7 +159,7 @@ class BlockingServiceTest extends TestCase
     {
         // Arrange: create users
         $blocker = $this->createStub(User::class);
-        $blocked = $this->createMock(User::class);
+        $blocked = $this->createStub(User::class);
         $blocked->method('getId')->willReturn(42);
 
         // Arrange: create existing block

@@ -27,7 +27,7 @@ class AnnouncementServiceTest extends TestCase
     public function testSendThrowsExceptionWhenNotDraft(): void
     {
         // Arrange: create announcement that is already sent
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('isDraft')->willReturn(false);
 
         $subject = new AnnouncementService(
@@ -49,7 +49,7 @@ class AnnouncementServiceTest extends TestCase
     public function testSendThrowsExceptionWhenNoCmsPage(): void
     {
         // Arrange: create draft announcement without CMS page
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('isDraft')->willReturn(true);
         $announcement->method('getCmsPage')->willReturn(null);
 
@@ -72,20 +72,20 @@ class AnnouncementServiceTest extends TestCase
     public function testSendSuccessfullyProcessesSubscribers(): void
     {
         // Arrange: create CMS blocks
-        $titleBlock = $this->createMock(CmsBlock::class);
+        $titleBlock = $this->createStub(CmsBlock::class);
         $titleBlock->method('getLanguage')->willReturn('en');
         $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
         $titleBlock->method('getJson')->willReturn(['title' => 'Test Title']);
         $titleBlock->method('getImage')->willReturn(null);
 
-        $textBlock = $this->createMock(CmsBlock::class);
+        $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
         $textBlock->method('getType')->willReturn(CmsBlockTypes::Text);
         $textBlock->method('getJson')->willReturn(['content' => 'Test content']);
         $textBlock->method('getImage')->willReturn(null);
 
         // Arrange: create CMS page with blocks
-        $cmsPage = $this->createMock(Cms::class);
+        $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock, $textBlock]));
 
         // Arrange: create draft announcement with CMS page
@@ -98,15 +98,15 @@ class AnnouncementServiceTest extends TestCase
         $announcement->expects($this->once())->method('setRecipientCount')->with(2);
 
         // Arrange: create notification settings that allow announcements
-        $notificationSettings = $this->createMock(NotificationSettings::class);
+        $notificationSettings = $this->createStub(NotificationSettings::class);
         $notificationSettings->method('isActive')->with('announcements')->willReturn(true);
 
         // Arrange: create subscribers
-        $subscriber1 = $this->createMock(User::class);
+        $subscriber1 = $this->createStub(User::class);
         $subscriber1->method('getLocale')->willReturn('en');
         $subscriber1->method('getNotificationSettings')->willReturn($notificationSettings);
 
-        $subscriber2 = $this->createMock(User::class);
+        $subscriber2 = $this->createStub(User::class);
         $subscriber2->method('getLocale')->willReturn('en');
         $subscriber2->method('getNotificationSettings')->willReturn($notificationSettings);
 
@@ -118,8 +118,8 @@ class AnnouncementServiceTest extends TestCase
             ->willReturn([$subscriber1, $subscriber2]);
 
         // Arrange: config service returns host
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         // Arrange: email service should be called for each subscriber
         $emailServiceMock = $this->createMock(EmailService::class);
@@ -133,7 +133,7 @@ class AnnouncementServiceTest extends TestCase
         $subject = new AnnouncementService(
             em: $emMock,
             userRepo: $userRepoMock,
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $emailServiceMock,
         );
@@ -148,14 +148,14 @@ class AnnouncementServiceTest extends TestCase
     public function testSendFiltersOutUsersWithDisabledNotifications(): void
     {
         // Arrange: create CMS blocks
-        $titleBlock = $this->createMock(CmsBlock::class);
+        $titleBlock = $this->createStub(CmsBlock::class);
         $titleBlock->method('getLanguage')->willReturn('en');
         $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
         $titleBlock->method('getJson')->willReturn(['title' => 'Test Title']);
         $titleBlock->method('getImage')->willReturn(null);
 
         // Arrange: create CMS page with blocks
-        $cmsPage = $this->createMock(Cms::class);
+        $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock]));
 
         // Arrange: create draft announcement
@@ -165,18 +165,18 @@ class AnnouncementServiceTest extends TestCase
         $announcement->expects($this->once())->method('setRecipientCount')->with(1);
 
         // Arrange: notification settings - one enabled, one disabled
-        $enabledSettings = $this->createMock(NotificationSettings::class);
+        $enabledSettings = $this->createStub(NotificationSettings::class);
         $enabledSettings->method('isActive')->with('announcements')->willReturn(true);
 
-        $disabledSettings = $this->createMock(NotificationSettings::class);
+        $disabledSettings = $this->createStub(NotificationSettings::class);
         $disabledSettings->method('isActive')->with('announcements')->willReturn(false);
 
         // Arrange: create subscribers
-        $enabledSubscriber = $this->createMock(User::class);
+        $enabledSubscriber = $this->createStub(User::class);
         $enabledSubscriber->method('getLocale')->willReturn('en');
         $enabledSubscriber->method('getNotificationSettings')->willReturn($enabledSettings);
 
-        $disabledSubscriber = $this->createMock(User::class);
+        $disabledSubscriber = $this->createStub(User::class);
         $disabledSubscriber->method('getNotificationSettings')->willReturn($disabledSettings);
 
         // Arrange: user repository returns both subscribers
@@ -190,13 +190,13 @@ class AnnouncementServiceTest extends TestCase
         $emailServiceMock = $this->createMock(EmailService::class);
         $emailServiceMock->expects($this->once())->method('prepareAnnouncementEmail');
 
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $userRepoMock,
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $emailServiceMock,
         );
@@ -211,36 +211,36 @@ class AnnouncementServiceTest extends TestCase
     public function testGetPreviewContextReturnsCorrectData(): void
     {
         // Arrange: create CMS blocks
-        $titleBlock = $this->createMock(CmsBlock::class);
+        $titleBlock = $this->createStub(CmsBlock::class);
         $titleBlock->method('getLanguage')->willReturn('en');
         $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
         $titleBlock->method('getJson')->willReturn(['title' => 'Preview Title']);
         $titleBlock->method('getImage')->willReturn(null);
 
-        $textBlock = $this->createMock(CmsBlock::class);
+        $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
         $textBlock->method('getType')->willReturn(CmsBlockTypes::Text);
         $textBlock->method('getJson')->willReturn(['content' => 'Preview content']);
         $textBlock->method('getImage')->willReturn(null);
 
         // Arrange: create CMS page
-        $cmsPage = $this->createMock(Cms::class);
+        $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock, $textBlock]));
 
         // Arrange: create announcement
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(123);
         $announcement->method('getLinkHash')->willReturn('abc123hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
         // Arrange: config service
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $this->createStub(EmailService::class),
         );
@@ -260,19 +260,19 @@ class AnnouncementServiceTest extends TestCase
     public function testGetPreviewContextUsesPreviewHashWhenLinkHashIsNull(): void
     {
         // Arrange: create announcement without link hash
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(42);
         $announcement->method('getLinkHash')->willReturn(null);
         $announcement->method('getCmsPage')->willReturn(null);
 
         // Arrange: config service
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $this->createStub(EmailService::class),
         );
@@ -287,19 +287,19 @@ class AnnouncementServiceTest extends TestCase
     public function testGetPreviewContextHandlesMissingCmsPage(): void
     {
         // Arrange: create announcement without CMS page
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn(null);
 
         // Arrange: config service
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $this->createStub(EmailService::class),
         );
@@ -344,24 +344,24 @@ class AnnouncementServiceTest extends TestCase
     public function testRenderPreviewReturnsRenderedSubjectAndBody(): void
     {
         // Arrange: create CMS blocks
-        $titleBlock = $this->createMock(CmsBlock::class);
+        $titleBlock = $this->createStub(CmsBlock::class);
         $titleBlock->method('getLanguage')->willReturn('en');
         $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
         $titleBlock->method('getJson')->willReturn(['title' => 'My Title']);
         $titleBlock->method('getImage')->willReturn(null);
 
         // Arrange: create CMS page
-        $cmsPage = $this->createMock(Cms::class);
+        $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock]));
 
         // Arrange: create announcement
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash123');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
         // Arrange: create email template
-        $emailTemplate = $this->createMock(EmailTemplate::class);
+        $emailTemplate = $this->createStub(EmailTemplate::class);
         $emailTemplate->method('getSubject')->with('en')->willReturn('Subject: {{title}}');
         $emailTemplate->method('getBody')->with('en')->willReturn('Body: {{content}}');
 
@@ -378,13 +378,13 @@ class AnnouncementServiceTest extends TestCase
             ->willReturnCallback(fn (string $content) => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content));
 
         // Arrange: config service
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $templateServiceMock,
             emailService: $this->createStub(EmailService::class),
         );
@@ -400,35 +400,35 @@ class AnnouncementServiceTest extends TestCase
     public function testRenderContentIncludesImageBlock(): void
     {
         // Arrange: create image
-        $image = $this->createMock(Image::class);
+        $image = $this->createStub(Image::class);
         $image->method('getHash')->willReturn('imagehash123');
         $image->method('getAlt')->willReturn('Test image');
 
         // Arrange: create image block
-        $imageBlock = $this->createMock(CmsBlock::class);
+        $imageBlock = $this->createStub(CmsBlock::class);
         $imageBlock->method('getLanguage')->willReturn('en');
         $imageBlock->method('getType')->willReturn(CmsBlockTypes::Image);
         $imageBlock->method('getJson')->willReturn(['id' => 'img-1']);
         $imageBlock->method('getImage')->willReturn($image);
 
         // Arrange: create CMS page
-        $cmsPage = $this->createMock(Cms::class);
+        $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$imageBlock]));
 
         // Arrange: create announcement
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
         // Arrange: config service
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $this->createStub(EmailService::class),
         );
@@ -445,36 +445,36 @@ class AnnouncementServiceTest extends TestCase
     public function testRenderContentSkipsBlocksForDifferentLocale(): void
     {
         // Arrange: create blocks for different locales
-        $enBlock = $this->createMock(CmsBlock::class);
+        $enBlock = $this->createStub(CmsBlock::class);
         $enBlock->method('getLanguage')->willReturn('en');
         $enBlock->method('getType')->willReturn(CmsBlockTypes::Text);
         $enBlock->method('getJson')->willReturn(['content' => 'English content']);
         $enBlock->method('getImage')->willReturn(null);
 
-        $deBlock = $this->createMock(CmsBlock::class);
+        $deBlock = $this->createStub(CmsBlock::class);
         $deBlock->method('getLanguage')->willReturn('de');
         $deBlock->method('getType')->willReturn(CmsBlockTypes::Text);
         $deBlock->method('getJson')->willReturn(['content' => 'German content']);
         $deBlock->method('getImage')->willReturn(null);
 
         // Arrange: create CMS page
-        $cmsPage = $this->createMock(Cms::class);
+        $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$enBlock, $deBlock]));
 
         // Arrange: create announcement
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
         // Arrange: config service
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $this->createStub(EmailService::class),
         );
@@ -490,30 +490,30 @@ class AnnouncementServiceTest extends TestCase
     public function testRenderContentShowsErrorWhenNoContentForLocale(): void
     {
         // Arrange: create block for different locale only
-        $deBlock = $this->createMock(CmsBlock::class);
+        $deBlock = $this->createStub(CmsBlock::class);
         $deBlock->method('getLanguage')->willReturn('de');
         $deBlock->method('getType')->willReturn(CmsBlockTypes::Text);
         $deBlock->method('getJson')->willReturn(['content' => 'German content']);
         $deBlock->method('getImage')->willReturn(null);
 
         // Arrange: create CMS page
-        $cmsPage = $this->createMock(Cms::class);
+        $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$deBlock]));
 
         // Arrange: create announcement
-        $announcement = $this->createMock(Announcement::class);
+        $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
         // Arrange: config service
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->method('getHost')->willReturn('https://example.com');
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
-            configService: $configServiceMock,
+            configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             emailService: $this->createStub(EmailService::class),
         );
