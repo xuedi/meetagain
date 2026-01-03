@@ -2,11 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
 use App\Entity\ImageType;
-use App\Entity\User;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
@@ -15,7 +15,6 @@ use App\Service\ImageService;
 use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,8 +48,7 @@ class AdminEventController extends AbstractController
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            assert($user instanceof User);
+            $user = $this->getAuthedUser();
 
             // overwrite basic data
             $event->setInitial(true);
@@ -154,8 +152,7 @@ class AdminEventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            assert($user instanceof User);
+            $user = $this->getAuthedUser();
 
             $event->setCreatedAt(new DateTimeImmutable());
             $event->setPreviewImage(null);

@@ -2,10 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\ValueObjects\LogEntry;
 use App\Repository\NotFoundLogRepository;
 use App\Service\ActivityService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 

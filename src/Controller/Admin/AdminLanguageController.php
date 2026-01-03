@@ -2,17 +2,16 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\AbstractController;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\Language;
-use App\Entity\User;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
 use App\Service\ImageService;
 use App\Service\LanguageService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,8 +112,7 @@ class AdminLanguageController extends AbstractController
             return;
         }
 
-        $user = $this->getUser();
-        assert($user instanceof User);
+        $user = $this->getAuthedUser();
 
         $image = $this->imageService->upload($imageData, $user, ImageType::LanguageTile);
         if ($image instanceof Image) {

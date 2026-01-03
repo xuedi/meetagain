@@ -12,7 +12,6 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
-use App\Entity\User;
 use App\Form\CmsType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
@@ -106,8 +105,7 @@ class AdminCmsController extends AbstractController
     #[Route('/admin/cms/add', name: 'app_admin_cms_add', methods: ['POST'])]
     public function cmsAdd(Request $request): Response
     {
-        $user = $this->getUser();
-        assert($user instanceof User);
+        $user = $this->getAuthedUser();
 
         $newPage = new Cms();
         $newPage->setSlug($request->request->all('cms')['slug']);
