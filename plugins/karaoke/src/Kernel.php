@@ -10,4 +10,14 @@ class Kernel implements Plugin
     {
         return 'karaoke';
     }
+
+    public function registerMenuLinks(): array
+    {
+        return [];
+    }
+
+    public function getEventTile(int $eventId): ?string
+    {
+        return null;
+    }
 }

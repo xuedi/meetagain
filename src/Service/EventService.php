@@ -9,12 +9,14 @@ use App\Entity\EventFilterTime;
 use App\Entity\EventIntervals;
 use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
+use App\Plugin;
 use App\Repository\EventRepository;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use RRule\RRule;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class EventService
@@ -23,6 +25,8 @@ readonly class EventService
         private EventRepository $repo,
         private EntityManagerInterface $em,
         private EmailService $emailService,
+        #[AutowireIterator(Plugin::class)]
+        private iterable $plugins,
     ) {
     }
 
@@ -197,9 +201,9 @@ readonly class EventService
 
         $newDate = DateTime::createFromInterface($target);
         $newDate->setDate(
-            year: (int) $occurrence->format('Y'),
-            month: (int) $occurrence->format('m'),
-            day: (int) $occurrence->format('d'),
+            year: (int)$occurrence->format('Y'),
+            month: (int)$occurrence->format('m'),
+            day: (int)$occurrence->format('d'),
         );
 
         return $newDate;
@@ -231,5 +235,18 @@ readonly class EventService
         }
 
         return $structuredList;
+    }
+
+    public function getPluginEventTiles(int $id): array
+    {
+        $tiles = [];
+        foreach ($this->plugins as $plugin) {
+            $tile = $plugin->getEventTile($id);
+            if ($tile !== null) {
+                $tiles[] = $tile;
+            }
+        }
+
+        return $tiles;
     }
 }

@@ -100,6 +100,7 @@ class EventController extends AbstractController
             'events/details.html.twig',
             [
                 'commentForm' => $form,
+                'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id) : [],
                 'comments' => $this->comments->findByEventWithUser($id),
                 'event' => $event,
                 'user' => ($this->getUser() instanceof UserInterface) ? $this->getAuthedUser() : null,

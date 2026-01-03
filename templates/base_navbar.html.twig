@@ -11,8 +11,8 @@
                 {% for menu in get_menu('top') %}
                     <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
                 {% endfor %}
-                {% for plugin in get_active_plugins() %}
-                    <a class="navbar-item" href="/{{ app.locale }}/{{ plugin }}">{{ ("menu_" ~ plugin) | trans }}</a>
+                {% for pluginLink in get_plugins_links() %}
+                    <a class="navbar-item" href="/{{ app.locale }}/{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
                 {% endfor %}
                 {% if is_granted('ROLE_MANAGER') %}
                     <a class="navbar-item" href="{{ path('app_manage') }}">

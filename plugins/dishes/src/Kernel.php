@@ -10,4 +10,14 @@ class Kernel implements Plugin
     {
         return 'dishes';
     }
+
+    public function getMenuLinks(): array
+    {
+        return [];
+    }
+
+    public function getEventTile(int $eventId): ?string
+    {
+        return null;
+    }
 }
