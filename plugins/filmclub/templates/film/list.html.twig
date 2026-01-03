@@ -5,11 +5,36 @@
 {% block body %}
 <section class="section">
     <div class="container">
-        <h1 class="title">Film list</h1>
+        <h1 class="title">{{ "Film list"|trans }}</h1>
 
-        <p>
-            ....
-        </p>
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ "Title"|trans }}</th>
+                <th>{{ "Year"|trans }}</th>
+                <th>{{ "Runtime"|trans }}</th>
+                <th>{{ "Genres"|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for film in films %}
+                <tr>
+                    <td>{{ film.title }}</td>
+                    <td>{{ film.year }}</td>
+                    <td>{{ film.runtime }} min</td>
+                    <td>
+                        {% for genre in film.genres %}
+                            <span class="tag is-info">{{ genre.value|trans }}</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">{{ "No films found"|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </section>
 {% endblock %}
