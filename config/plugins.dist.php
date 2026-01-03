@@ -1,1 +1,1 @@
-<?php declare(strict_types=1); return [];
+<?php declare(strict_types=1); return ['bookclub' => true];
