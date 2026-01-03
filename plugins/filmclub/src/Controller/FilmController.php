@@ -6,14 +6,14 @@ use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/filmclub')]
+#[Route('/films')]
 class FilmController extends AbstractController
 {
     public function __construct() {
     }
 
-    #[Route('', name: 'app_filmclub_filmlist', methods: ['GET'])]
-    public function pending(): Response
+    #[Route('/', name: 'app_filmclub_filmlist', methods: ['GET'])]
+    public function films(): Response
     {
         return $this->render('@Filmclub/film/list.html.twig', [
             'films' => [],

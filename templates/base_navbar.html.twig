@@ -12,7 +12,7 @@
                     <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
                 {% endfor %}
                 {% for pluginLink in get_plugins_links() %}
-                    <a class="navbar-item" href="/{{ app.locale }}/{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
+                    <a class="navbar-item" href="{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
                 {% endfor %}
                 {% if is_granted('ROLE_MANAGER') %}
                     <a class="navbar-item" href="{{ path('app_manage') }}">
