@@ -55,6 +55,7 @@ class ActivityRepository extends ServiceEntityRepository
                 ActivityType::UpdatedProfilePicture->value,
                 ActivityType::BlockedUser->value,
                 ActivityType::UnblockedUser->value,
+                ActivityType::FollowedUser->value,
             ])
             ->getQuery()
             ->getResult();
@@ -86,6 +87,14 @@ class ActivityRepository extends ServiceEntityRepository
                 case ActivityType::UnblockedUser->value:
                     // Only visible to the user themselves (self-only visibility)
                     if ($user->getId() === $activityUserId) {
+                        $activityIds[] = $userActivity->getId();
+                    }
+                    break;
+
+                case ActivityType::FollowedUser->value:
+                    // Visible to the target user (the user being followed - "X started following you")
+                    $targetUserId = $userActivity->getMeta()['user_id'] ?? null;
+                    if ($user->getId() === $targetUserId) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;

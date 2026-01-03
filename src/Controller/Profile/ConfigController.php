@@ -3,7 +3,9 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Entity\ActivityType;
 use App\Form\ChangePassword;
+use App\Service\ActivityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +19,7 @@ class ConfigController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
+        private readonly ActivityService $activityService,
     ) {
     }
 
@@ -32,6 +35,8 @@ class ConfigController extends AbstractController
 
                 $this->em->persist($user);
                 $this->em->flush();
+
+                $this->activityService->log(ActivityType::PasswordChanged, $user);
 
                 $this->addFlash('success', 'Password was changed, please verify by logging in again');
             } else {

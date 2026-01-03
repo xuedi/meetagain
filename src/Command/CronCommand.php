@@ -2,8 +2,10 @@
 
 namespace App\Command;
 
+use App\Service\ActivityService;
 use App\Service\CommandExecutionService;
 use App\Service\EmailService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
@@ -17,6 +19,8 @@ class CronCommand extends LoggedCommand
 
     public function __construct(
         private readonly EmailService $mailService,
+        private readonly ActivityService $activityService,
+        private readonly LoggerInterface $logger,
         CommandExecutionService $commandExecutionService,
     ) {
         parent::__construct($commandExecutionService);
@@ -31,6 +35,27 @@ class CronCommand extends LoggedCommand
         $output->write('Send out queued emails ... ');
         $this->mailService->sendQueue();
         $output->writeln('OK');
+
+        $output->write('Validating activity payloads ... ');
+        $invalidActivities = $this->activityService->validateAllActivities();
+        if ($invalidActivities === []) {
+            $output->writeln('OK');
+        } else {
+            $output->writeln(sprintf('<error>%d invalid activities found</error>', count($invalidActivities)));
+            foreach ($invalidActivities as $invalid) {
+                $this->logger->warning('Invalid activity payload', [
+                    'activity_id' => $invalid['id'],
+                    'type' => $invalid['type'],
+                    'error' => $invalid['error'],
+                ]);
+                $output->writeln(sprintf(
+                    '  - Activity #%d (%s): %s',
+                    $invalid['id'],
+                    $invalid['type'],
+                    $invalid['error']
+                ));
+            }
+        }
 
         $this->release();
 

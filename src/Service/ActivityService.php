@@ -55,6 +55,31 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->findBy([], ['createdAt' => 'DESC'], 250));
     }
 
+    /**
+     * Validates all activities in the database and returns invalid ones.
+     *
+     * @return array<array{id: int, type: string, error: string}>
+     */
+    public function validateAllActivities(): array
+    {
+        $invalidActivities = [];
+        $activities = $this->repo->findAll();
+
+        foreach ($activities as $activity) {
+            try {
+                $this->messageFactory->build($activity)->validate();
+            } catch (Throwable $e) {
+                $invalidActivities[] = [
+                    'id' => $activity->getId(),
+                    'type' => $activity->getType()->name,
+                    'error' => $e->getMessage(),
+                ];
+            }
+        }
+
+        return $invalidActivities;
+    }
+
     private function prepareActivityList(array $list, ?bool $asHtml = false): array
     {
         $preparedList = [];
