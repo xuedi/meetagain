@@ -72,12 +72,6 @@ app +parameter='':
 appCron:
     {{PHP}} php bin/console app:cron
 
-# Send RSVP notifications
-[group('app')]
-appRsvpNotify:
-    {{PHP}} php bin/console app:rsvp:notify
-    {{JUST}} appCron
-
 # Clear cache and autoload
 [group('app')]
 appClearCache:
