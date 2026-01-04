@@ -14,6 +14,7 @@
                 <th>{{ "Year"|trans }}</th>
                 <th>{{ "Runtime"|trans }}</th>
                 <th>{{ "Genres"|trans }}</th>
+                <th><a href="{{ path('app_filmclub_film_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
             </tr>
             </thead>
             <tbody>
@@ -27,10 +28,11 @@
                             <span class="tag is-info">{{ genre.value|trans }}</span>
                         {% endfor %}
                     </td>
+                    <td></td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="4">{{ "No films found"|trans }}</td>
+                    <td colspan="5">{{ "No films found"|trans }}</td>
                 </tr>
             {% endfor %}
             </tbody>
