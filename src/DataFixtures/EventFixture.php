@@ -166,7 +166,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
         $date = new DateTime('now');
 
         return $date
-            ->modify('-7 days')
+            ->modify('-2 month')
             ->modify('first wednesday')
             ->setTime(18, 00);
     }
