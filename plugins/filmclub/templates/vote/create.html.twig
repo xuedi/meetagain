@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "Create vote"|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">{{ "Create vote for event"|trans }}</h1>
+
+        <div class="box">
+            <p class="subtitle">{{ event.title(app.request.locale) }}</p>
+            <p>{{ event.start|date('d.m.Y H:i') }}</p>
+        </div>
+
+        <form method="post">
+            <div class="field">
+                <label class="label" for="closes_at">{{ "Voting closes at"|trans }}</label>
+                <div class="control">
+                    <input class="input" type="datetime-local" name="closes_at" id="closes_at" required
+                           value="{{ event.start|date_modify('-1 day')|date('Y-m-d\\TH:i') }}">
+                </div>
+                <p class="help">{{ "Members can vote until this time"|trans }}</p>
+            </div>
+
+            <div class="field is-grouped mt-5">
+                <div class="control">
+                    <button type="submit" class="button is-primary">{{ "Create vote"|trans }}</button>
+                </div>
+                <div class="control">
+                    <a href="{{ path('app_filmclub_vote') }}" class="button is-light">{{ "Cancel"|trans }}</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

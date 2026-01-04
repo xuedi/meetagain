@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "Film vote"|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">{{ "Vote for next film"|trans }}</h1>
+
+        {% if nextEvent %}
+            <div class="box">
+                <h2 class="subtitle">{{ "Next Film Night"|trans }}: {{ nextEvent.title(app.request.locale) }}</h2>
+                <p>{{ nextEvent.start|date('d.m.Y H:i') }}</p>
+
+                {% set existingVote = null %}
+                {% for vote in openVotes %}
+                    {% if vote.eventId == nextEvent.id %}
+                        {% set existingVote = vote %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if existingVote %}
+                    <a href="{{ path('app_filmclub_vote_show', {id: existingVote.id}) }}" class="button is-primary mt-3">
+                        {{ "View current vote"|trans }}
+                    </a>
+                {% elseif is_granted('ROLE_MANAGER') %}
+                    <a href="{{ path('app_filmclub_vote_create', {eventId: nextEvent.id}) }}" class="button is-success mt-3">
+                        <span class="icon"><i class="fa fa-plus"></i></span>
+                        <span>{{ "Create vote"|trans }}</span>
+                    </a>
+                {% else %}
+                    <p class="has-text-grey mt-3">{{ "No vote created yet"|trans }}</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="notification is-info">
+                {{ "No upcoming film nights scheduled"|trans }}
+            </div>
+        {% endif %}
+
+        {% if openVotes|length > 0 %}
+            <h2 class="title is-4 mt-5">{{ "Open Votes"|trans }}</h2>
+            <div class="columns is-multiline">
+                {% for vote in openVotes %}
+                    <div class="column is-one-third">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title is-5">{{ "Vote #"|trans }}{{ vote.id }}</p>
+                                <p class="subtitle is-6">{{ "Closes"|trans }}: {{ vote.closesAt|date('d.m.Y H:i') }}</p>
+                                <p>{{ vote.ballots|length }} {{ "votes cast"|trans }}</p>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="card-footer-item">{{ "View"|trans }}</a>
+                            </footer>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if closedVotes|length > 0 %}
+            <h2 class="title is-4 mt-5">{{ "Past Votes"|trans }}</h2>
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ "Event"|trans }}</th>
+                        <th>{{ "Winner"|trans }}</th>
+                        <th>{{ "Votes"|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vote in closedVotes %}
+                        <tr>
+                            <td>{{ "Vote #"|trans }}{{ vote.id }}</td>
+                            <td>
+                                {% if vote.winningFilm %}
+                                    {{ vote.winningFilm.title }}
+                                {% else %}
+                                    <span class="has-text-grey">{{ "No votes"|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ vote.ballots|length }}</td>
+                            <td>
+                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="button is-small">{{ "View"|trans }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
