@@ -28,10 +28,24 @@ class VoteController extends AbstractController
     #[Route('/', name: 'app_filmclub_vote', methods: ['GET'])]
     public function index(): Response
     {
+        $openVotes = $this->voteRepository->findOpenVotes();
+        $closedVotes = $this->voteRepository->findClosedVotes();
+
+        $eventIds = array_unique(array_merge(
+            array_map(fn(Vote $v) => $v->getEventId(), $openVotes),
+            array_map(fn(Vote $v) => $v->getEventId(), $closedVotes),
+        ));
+
+        $events = [];
+        foreach ($eventIds as $eventId) {
+            $events[$eventId] = $this->eventRepository->find($eventId);
+        }
+
         return $this->render('@Filmclub/vote/index.html.twig', [
-            'openVotes' => $this->voteRepository->findOpenVotes(),
-            'closedVotes' => $this->voteRepository->findClosedVotes(),
+            'openVotes' => $openVotes,
+            'closedVotes' => $closedVotes,
             'nextEvent' => $this->getNextEvent(),
+            'events' => $events,
         ]);
     }
 

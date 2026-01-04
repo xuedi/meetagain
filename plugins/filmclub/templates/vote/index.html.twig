@@ -45,12 +45,20 @@
                     <div class="column is-one-third">
                         <div class="card">
                             <div class="card-content">
-                                <p class="title is-5">{{ "Vote #"|trans }}{{ vote.id }}</p>
-                                <p class="subtitle is-6">{{ "Closes"|trans }}: {{ vote.closesAt|date('d.m.Y H:i') }}</p>
+                                {% if events[vote.eventId] is defined and events[vote.eventId] %}
+                                    <p class="title is-5">{{ events[vote.eventId].title(app.request.locale) }}</p>
+                                    <p class="subtitle is-6">{{ events[vote.eventId].start|date('d.m.Y H:i') }}</p>
+                                {% else %}
+                                    <p class="title is-5">{{ "Vote #"|trans }}{{ vote.id }}</p>
+                                {% endif %}
+                                <p class="is-size-7">{{ "Closes"|trans }}: {{ vote.closesAt|date('d.m.Y H:i') }}</p>
                                 <p>{{ vote.ballots|length }} {{ "votes cast"|trans }}</p>
                             </div>
                             <footer class="card-footer">
-                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="card-footer-item">{{ "View"|trans }}</a>
+                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="card-footer-item">{{ "Vote"|trans }}</a>
+                                {% if events[vote.eventId] is defined and events[vote.eventId] %}
+                                    <a href="{{ path('app_event_details', {id: vote.eventId}) }}" class="card-footer-item">{{ "Event"|trans }}</a>
+                                {% endif %}
                             </footer>
                         </div>
                     </div>
@@ -72,7 +80,16 @@
                 <tbody>
                     {% for vote in closedVotes %}
                         <tr>
-                            <td>{{ "Vote #"|trans }}{{ vote.id }}</td>
+                            <td>
+                                {% if events[vote.eventId] is defined and events[vote.eventId] %}
+                                    <a href="{{ path('app_event_details', {id: vote.eventId}) }}">
+                                        {{ events[vote.eventId].title(app.request.locale) }}
+                                    </a>
+                                    <br><span class="is-size-7 has-text-grey">{{ events[vote.eventId].start|date('d.m.Y') }}</span>
+                                {% else %}
+                                    {{ "Vote #"|trans }}{{ vote.id }}
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if vote.winningFilm %}
                                     {{ vote.winningFilm.title }}

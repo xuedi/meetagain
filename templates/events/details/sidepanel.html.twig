@@ -2,7 +2,7 @@
 {% include '_block/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
 {% for tile in pluginTiles %}
     <div class="box mt-5">
-        {{ tile }}
+        {{ tile|raw }}
     </div>
 <div class="box mt-5">
     <strong>{{ event.start|date('d. F Y') }}</strong>

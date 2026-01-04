@@ -16,7 +16,9 @@
 
         {% if event %}
             <div class="box">
-                <p class="subtitle">{{ event.title(app.request.locale) }}</p>
+                <p class="subtitle">
+                    <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.title(app.request.locale) }}</a>
+                </p>
                 <p>{{ event.start|date('d.m.Y H:i') }}</p>
             </div>
         {% endif %}

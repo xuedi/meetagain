@@ -39,12 +39,10 @@ class Kernel implements Plugin
     public function getEventTile(int $eventId): ?string
     {
         $vote = $this->voteRepository->findByEventId($eventId);
-        if ($vote === null) {
-            return null;
-        }
 
         return $this->twig->render('@Filmclub/tile/event.html.twig', [
             'vote' => $vote,
+            'eventId' => $eventId,
         ]);
     }
 }
