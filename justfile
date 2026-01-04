@@ -98,7 +98,7 @@ devModeFixtures:
     {{PHP}} php bin/console doctrine:fixtures:load -q
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
-    {{PHP}} php bin/console app:event:add-fixture-rsvps
+    {{PHP}} php bin/console app:event:add-fixture
 
 # Switch to installer mode
 [group('development')]

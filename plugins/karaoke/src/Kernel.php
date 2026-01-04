@@ -3,6 +3,7 @@
 namespace Plugin\Karaoke;
 
 use App\Plugin;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Kernel implements Plugin
 {
@@ -11,7 +12,7 @@ class Kernel implements Plugin
         return 'karaoke';
     }
 
-    public function registerMenuLinks(): array
+    public function getMenuLinks(): array
     {
         return [];
     }
@@ -19,5 +20,9 @@ class Kernel implements Plugin
     public function getEventTile(int $eventId): ?string
     {
         return null;
+    }
+
+    public function loadPostExtendFixtures(OutputInterface $output): void
+    {
     }
 }

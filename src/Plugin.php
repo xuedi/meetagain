@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag]
@@ -21,4 +22,10 @@ interface Plugin
      * Returns a rendered tile to be displayed as a box on the event details page
      */
     public function getEventTile(int $eventId): ?string;
+
+    /**
+     * Runs fixture data creation after events have been extended.
+     * Called by app:event:add-fixture command.
+     */
+    public function loadPostExtendFixtures(OutputInterface $output): void;
 }

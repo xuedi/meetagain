@@ -3,6 +3,7 @@
 namespace Plugin\Dishes;
 
 use App\Plugin;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Kernel implements Plugin
 {
@@ -19,5 +20,9 @@ class Kernel implements Plugin
     public function getEventTile(int $eventId): ?string
     {
         return null;
+    }
+
+    public function loadPostExtendFixtures(OutputInterface $output): void
+    {
     }
 }
