@@ -2,6 +2,7 @@
 
 namespace Plugin\Dishes\Controller;
 
+use App\Controller\AbstractController;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -9,7 +10,6 @@ use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Entity\ViewType;
 use Plugin\Dishes\Form\DishType;
 use Plugin\Dishes\Repository\DishRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -64,20 +64,17 @@ class IndexController extends AbstractController
         return $this->redirectToRoute('app_plugin_dishes');
     }
 
-    #[Route('/edit/{id}', name: 'app_plugin_dishes_edit')]
-    public function edit(Request $request, Dish $dish, null|int $id = null): Response
+    #[Route('/edit/{id}', name: 'app_plugin_dishes_edit', defaults: ['id' => null])]
+    public function edit(Request $request, ?Dish $dish = null): Response
     {
-        if ($id !== null) {
-            $dish = $this->repo->findOneBy(['id' => $id]);
+        if ($dish === null) {
+            $dish = new Dish();
         }
         $form = $this->createForm(DishType::class, $dish);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!($this->getUser() instanceof User)) {
-                throw new AuthenticationException('Only for logged in users');
-            }
-            $dish->setCreatedBy($this->getUser()->getId());
+            $dish->setCreatedBy($this->getAuthedUser()->getId());
             $dish->setCreatedAt(new DateTimeImmutable());
             $dish->setApproved(false);
 
@@ -91,4 +88,5 @@ class IndexController extends AbstractController
             'form' => $form,
         ]);
     }
+
 }

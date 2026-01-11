@@ -7,9 +7,9 @@ use App\Plugin;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class Kernel implements Plugin
+readonly class Kernel implements Plugin
 {
-    public function __construct(private readonly UrlGeneratorInterface $urlGenerator)
+    public function __construct(private UrlGeneratorInterface $urlGenerator)
     {
     }
 

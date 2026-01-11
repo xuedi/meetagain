@@ -6,10 +6,8 @@ use App\DataFixtures\AbstractFixture;
 use App\DataFixtures\SystemUserFixture;
 use App\DataFixtures\UserFixture;
 use App\Entity\ImageType;
-use App\Entity\User;
 use App\Service\ImageService;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -19,9 +17,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DishFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
 {
-    public function __construct(
-        private readonly ImageService $imageService,
-    ) {}
+    public function __construct(private readonly ImageService $imageService)
+    {
+    }
 
     #[\Override]
     public function load(ObjectManager $manager): void
