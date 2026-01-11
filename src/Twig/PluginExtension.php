@@ -6,6 +6,7 @@ use App\Plugin;
 use App\Service\PluginService;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Throwable;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -34,8 +35,12 @@ final class PluginExtension extends AbstractExtension
             if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
                 continue;
             }
-            foreach ($plugin->getMenuLinks() as $link) {
-                $links[] = $link;
+            try {
+                foreach ($plugin->getMenuLinks() as $link) {
+                    $links[] = $link;
+                }
+            } catch (Throwable) {
+                continue;
             }
         }
 
