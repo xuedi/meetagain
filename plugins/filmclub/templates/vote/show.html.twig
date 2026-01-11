@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "Film vote"|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="{{ path('app_filmclub_vote') }}">{{ "Votes"|trans }}</a></li>
+                <li class="is-active"><a href="#" aria-current="page">{{ "Vote #"|trans }}{{ vote.id }}</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">{{ "Film vote"|trans }}</h1>
+
+        {% if event %}
+            <div class="box">
+                <p class="subtitle">
+                    <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.title(app.request.locale) }}</a>
+                </p>
+                <p>{{ event.start|date('d.m.Y H:i') }}</p>
+            </div>
+        {% endif %}
+
+        <div class="columns">
+            <div class="column is-two-thirds">
+                {% if vote.votingOpen %}
+                    <div class="notification is-success is-light">
+                        <strong>{{ "Voting is open"|trans }}</strong>
+                        <br>{{ "Closes"|trans }}: {{ vote.closesAt|date('d.m.Y H:i') }}
+                    </div>
+
+                    {% if userBallot %}
+                        <div class="notification is-info is-light">
+                            {{ "You voted for"|trans }}: <strong>{{ userBallot.film.title }}</strong>
+                        </div>
+                    {% elseif is_granted('ROLE_USER') %}
+                        <h2 class="title is-4">{{ "Cast your vote"|trans }}</h2>
+                        <form method="post" action="{{ path('app_filmclub_vote_cast', {id: vote.id}) }}">
+                            <div class="field">
+                                {% for film in films %}
+                                    <div class="control">
+                                        <label class="radio">
+                                            <input type="radio" name="film_id" value="{{ film.id }}" required>
+                                            {{ film.title }} ({{ film.year }})
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="field mt-4">
+                                <div class="control">
+                                    <button type="submit" class="button is-primary">{{ "Submit vote"|trans }}</button>
+                                </div>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="notification is-warning is-light">
+                            {{ "Please log in to vote"|trans }}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="notification is-warning is-light">
+                        <strong>{{ "Voting is closed"|trans }}</strong>
+                    </div>
+
+                    {% if vote.winningFilm %}
+                        <div class="box has-background-success-light">
+                            <h2 class="title is-4">{{ "Winner"|trans }}</h2>
+                            <p class="title is-3">{{ vote.winningFilm.title }}</p>
+                            <p class="subtitle">{{ vote.winningFilm.year }} - {{ vote.winningFilm.runtime }} min</p>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="column">
+                <div class="box">
+                    <h3 class="title is-5">{{ "Current results"|trans }}</h3>
+                    {% set filmVotes = {} %}
+                    {% for ballot in vote.ballots %}
+                        {% set filmId = ballot.film.id %}
+                        {% set filmVotes = filmVotes|merge({(filmId): (filmVotes[filmId] ?? 0) + 1}) %}
+                    {% endfor %}
+
+                    {% set canVote = vote.votingOpen and is_granted('ROLE_USER') and userBallot is null %}
+                    {% if vote.ballots|length > 0 %}
+                        <table class="table is-fullwidth is-striped">
+                            <thead>
+                                <tr>
+                                    <th>{{ "Film"|trans }}</th>
+                                    <th>{{ "Votes"|trans }}</th>
+                                    {% if canVote %}<th></th>{% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for film in films %}
+                                    {% if filmVotes[film.id] is defined %}
+                                        <tr>
+                                            <td>{{ film.title }}</td>
+                                            <td>{{ filmVotes[film.id] }}</td>
+                                            {% if canVote %}
+                                                <td>
+                                                    <form method="post" action="{{ path('app_filmclub_vote_cast', {id: vote.id}) }}">
+                                                        <input type="hidden" name="film_id" value="{{ film.id }}">
+                                                        <button type="submit" class="button is-small is-primary">{{ "Vote"|trans }}</button>
+                                                    </form>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <p class="has-text-grey">{{ "Total votes"|trans }}: {{ vote.ballots|length }}</p>
+                    {% else %}
+                        <p class="has-text-grey">{{ "No votes yet"|trans }}</p>
+                    {% endif %}
+                </div>
+
+                {% if is_granted('ROLE_MANAGER') and vote.votingOpen %}
+                    <div class="box">
+                        <h3 class="title is-5">{{ "Manager actions"|trans }}</h3>
+                        <form method="post" action="{{ path('app_filmclub_vote_close', {id: vote.id}) }}">
+                            <button type="submit" class="button is-warning" onclick="return confirm('{{ "Are you sure you want to close this vote?"|trans }}')">
+                                {{ "Close vote"|trans }}
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

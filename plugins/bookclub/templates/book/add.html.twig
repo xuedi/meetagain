@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Book - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>Add Book</a></li>
+            </ul>
+        </nav>
+
+        <div class="columns">
+            <div class="column is-6">
+                <h1 class="title">Add a Book</h1>
+                <p class="subtitle">Enter an ISBN and we'll look up the book details automatically.</p>
+
+                {{ form_start(form) }}
+                    <div class="field">
+                        {{ form_label(form.isbn, null, {'label_attr': {'class': 'label'}}) }}
+                        <div class="control">
+                            {{ form_widget(form.isbn, {'attr': {'class': 'input'}}) }}
+                        </div>
+                        {{ form_errors(form.isbn) }}
+                        <p class="help">Enter ISBN-10 or ISBN-13 (with or without hyphens)</p>
+                    </div>
+
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-primary">
+                                <span class="icon"><i class="fas fa-search"></i></span>
+                                <span>Look Up Book</span>
+                            </button>
+                        </div>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+
+            <div class="column is-6">
+                <div class="box">
+                    <h3 class="title is-5">How it works</h3>
+                    <div class="content">
+                        <ol>
+                            <li>Enter the book's ISBN (found on the back cover or copyright page)</li>
+                            <li>We'll automatically fetch the title, author, and cover image</li>
+                            <li>{% if is_granted('ROLE_MANAGER') %}The book will be added immediately{% else %}A manager will review and approve the book{% endif %}</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

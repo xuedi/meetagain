@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Suggestions - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>Suggestions</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">Book Suggestions</h1>
+
+        {% if userSuggestion %}
+            <div class="notification is-info">
+                <strong>Your current suggestion:</strong> {{ userSuggestion.book.title }}
+                <form action="{{ path('app_plugin_bookclub_withdraw', {suggestionId: userSuggestion.id}) }}" method="post" style="display: inline; margin-left: 1rem;">
+                    <button type="submit" class="button is-small is-warning">Withdraw</button>
+                </form>
+            </div>
+        {% else %}
+            <div class="notification is-light">
+                You haven't suggested a book yet. Choose one from below or from the <a href="{{ path('app_plugin_bookclub') }}">book catalog</a>.
+            </div>
+        {% endif %}
+
+        <div class="columns">
+            <div class="column is-8">
+                <h2 class="subtitle">Pending Suggestions (by priority)</h2>
+
+                {% if suggestions|length > 0 %}
+                    <table class="table is-fullwidth is-striped">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Author</th>
+                                <th>Suggested By</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for suggestion in suggestions %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('app_plugin_bookclub_book_show', {id: suggestion.book.id}) }}">
+                                            {{ suggestion.book.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ suggestion.book.author ?? 'Unknown' }}</td>
+                                    <td>{{ get_user_name(suggestion.suggestedBy) }}</td>
+                                    <td>
+                                        <span class="tag is-info">
+                                            {{ suggestion.resubmitCount > 0 ? 'Resubmit #' ~ suggestion.resubmitCount : 'New' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="has-text-grey">No pending suggestions.</p>
+                {% endif %}
+
+                {% if userRejected|length > 0 %}
+                    <h3 class="subtitle mt-5">Your Rejected Suggestions (can resubmit)</h3>
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            {% for suggestion in userRejected %}
+                                <tr>
+                                    <td>{{ suggestion.book.title }}</td>
+                                    <td>Resubmit count: {{ suggestion.resubmitCount }}</td>
+                                    <td>
+                                        <form action="{{ path('app_plugin_bookclub_resubmit', {suggestionId: suggestion.id}) }}" method="post">
+                                            <button type="submit" class="button is-small is-primary">Resubmit</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+
+            <div class="column is-4">
+                {% if not userSuggestion %}
+                    <div class="box">
+                        <h3 class="title is-5">Suggest a Book</h3>
+                        <p class="mb-3">Select a book to suggest for the next poll:</p>
+                        {% for book in books %}
+                            <form action="{{ path('app_plugin_bookclub_suggest', {bookId: book.id}) }}" method="post" class="mb-2">
+                                <button type="submit" class="button is-small is-fullwidth is-outlined">
+                                    {{ book.title }}
+                                </button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if is_granted('ROLE_MANAGER') %}
+                    <div class="box">
+                        <h3 class="title is-5">Manager Actions</h3>
+                        <a href="{{ path('app_plugin_bookclub_poll_create') }}" class="button is-primary is-fullwidth">
+                            Create Poll from Suggestions
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Poll - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li><a href="{{ path('app_plugin_bookclub_poll') }}">Poll</a></li>
+                <li class="is-active"><a>Create Poll</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">Create New Poll</h1>
+        <p class="subtitle">Select member suggestions and/or add books directly to the poll.</p>
+
+        {{ form_start(form) }}
+            <div class="field">
+                {{ form_label(form.title, null, {'label_attr': {'class': 'label'}}) }}
+                <div class="control">
+                    {{ form_widget(form.title, {'attr': {'class': 'input'}}) }}
+                </div>
+                {{ form_errors(form.title) }}
+            </div>
+
+            <div class="columns">
+                <div class="column">
+                    <div class="box">
+                        <h3 class="title is-5">Member Suggestions</h3>
+                        <p class="help mb-3">These are books suggested by members (sorted by priority).</p>
+                        {{ form_widget(form.suggestions) }}
+                        {{ form_errors(form.suggestions) }}
+                        {% if suggestions|length == 0 %}
+                            <p class="has-text-grey">No pending suggestions.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="box">
+                        <h3 class="title is-5">Add Books Directly</h3>
+                        <p class="help mb-3">Add books from the catalog that weren't suggested by members.</p>
+                        {{ form_widget(form.books) }}
+                        {{ form_errors(form.books) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <button type="submit" class="button is-primary">
+                        <span class="icon"><i class="fas fa-poll"></i></span>
+                        <span>Create Poll (Draft)</span>
+                    </button>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</section>
+{% endblock %}

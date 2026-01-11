@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Poll Results - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>Poll Results</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">{{ poll.title ?? 'Poll Results' }}</h1>
+        <p class="subtitle">
+            Total votes: {{ results.totalVotes }}
+            {% if event %}
+                | For Event: <strong>{{ event.getTitle('en') }}</strong> ({{ event.start|date('Y-m-d') }})
+            {% endif %}
+        </p>
+
+        {% if results.winner %}
+            <div class="notification is-success is-light">
+                <h2 class="title is-4">
+                    <span class="icon"><i class="fas fa-trophy"></i></span>
+                    Winner: {{ results.winner.book.title }}
+                </h2>
+                <p>by {{ results.winner.book.author ?? 'Unknown' }}</p>
+            </div>
+        {% endif %}
+
+        <h3 class="subtitle">Full Results</h3>
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Author</th>
+                    <th>Votes</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for suggestion in poll.suggestions %}
+                    {% set voteCount = results.votes[suggestion.id] ?? 0 %}
+                    <tr class="{% if results.winner and suggestion.id == results.winner.id %}has-background-success-light{% endif %}">
+                        <td>
+                            <a href="{{ path('app_plugin_bookclub_book_show', {id: suggestion.book.id}) }}">
+                                {{ suggestion.book.title }}
+                            </a>
+                        </td>
+                        <td>{{ suggestion.book.author ?? 'Unknown' }}</td>
+                        <td>
+                            <span class="tag is-info is-medium">{{ voteCount }}</span>
+                        </td>
+                        <td>
+                            {% if results.winner and suggestion.id == results.winner.id %}
+                                <span class="tag is-success">Winner</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="buttons mt-5">
+            <a href="{{ path('app_plugin_bookclub') }}" class="button is-primary">
+                Back to Book Club
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

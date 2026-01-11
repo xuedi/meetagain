@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Poll - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li><a href="{{ path('app_plugin_bookclub_poll') }}">Poll</a></li>
+                <li class="is-active"><a>Manage</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">{{ poll.title ?? 'Poll' }}</h1>
+        <p class="subtitle">
+            Status:
+            {% if poll.status.value == 0 %}
+                <span class="tag is-warning">Draft</span>
+            {% elseif poll.status.value == 1 %}
+                <span class="tag is-success">Active</span>
+            {% else %}
+                <span class="tag is-info">Closed</span>
+            {% endif %}
+            {% if event %}
+                | For Event: <strong>{{ event.getTitle('en') }}</strong> ({{ event.start|date('Y-m-d') }})
+            {% endif %}
+        </p>
+
+        <h3 class="subtitle">Books in this poll ({{ poll.suggestions|length }})</h3>
+
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Author</th>
+                    <th>Suggested By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for suggestion in poll.suggestions %}
+                    <tr>
+                        <td>{{ suggestion.book.title }}</td>
+                        <td>{{ suggestion.book.author ?? 'Unknown' }}</td>
+                        <td>{{ get_user_name(suggestion.suggestedBy) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if poll.status.value == 0 %}
+            <div class="box">
+                <h3 class="title is-5">Actions</h3>
+                {% if poll.suggestions|length >= 2 %}
+                    <form action="{{ path('app_plugin_bookclub_poll_activate', {id: poll.id}) }}" method="post">
+                        <button type="submit" class="button is-success">
+                            <span class="icon"><i class="fas fa-play"></i></span>
+                            <span>Activate Poll (Start Voting)</span>
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="notification is-warning">
+                        A poll needs at least 2 options before it can be activated.
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

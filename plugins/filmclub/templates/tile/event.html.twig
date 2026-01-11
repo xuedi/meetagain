@@ -1,0 +1,33 @@
+<h3 class="title is-5">
+    <span class="icon"><i class="fa fa-film"></i></span>
+    {{ "Film Night"|trans }}
+</h3>
+
+{% if vote %}
+    {% if vote.votingOpen %}
+        <p>{{ "Voting is open!"|trans }}</p>
+        <p class="has-text-grey is-size-7">{{ "Closes"|trans }}: {{ vote.closesAt|date('d.m.Y H:i') }}</p>
+        <p class="is-size-7">{{ vote.ballots|length }} {{ "votes cast"|trans }}</p>
+        <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="button is-small is-primary mt-2">
+            {{ "Vote now"|trans }}
+        </a>
+    {% else %}
+        {% if vote.winningFilm %}
+            <p class="has-text-weight-bold">{{ vote.winningFilm.title }}</p>
+            <p class="has-text-grey is-size-7">{{ vote.winningFilm.year }} - {{ vote.winningFilm.runtime }} min</p>
+        {% else %}
+            <p class="has-text-grey">{{ "No film selected"|trans }}</p>
+        {% endif %}
+        <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="button is-small is-light mt-2">
+            {{ "View results"|trans }}
+        </a>
+    {% endif %}
+{% else %}
+    <p class="has-text-grey">{{ "No vote started yet"|trans }}</p>
+    {% if is_granted('ROLE_MANAGER') %}
+        <a href="{{ path('app_filmclub_vote_create', {eventId: eventId}) }}" class="button is-small is-success mt-2">
+            <span class="icon"><i class="fa fa-plus"></i></span>
+            <span>{{ "Create vote"|trans }}</span>
+        </a>
+    {% endif %}
+{% endif %}

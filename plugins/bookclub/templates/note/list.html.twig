@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Notes - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>My Notes</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">My Reading Notes</h1>
+
+        {% if notes|length > 0 %}
+            <div class="columns is-multiline">
+                {% for note in notes %}
+                    <div class="column is-6">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title is-5">
+                                    <a href="{{ path('app_plugin_bookclub_book_show', {id: note.book.id}) }}">
+                                        {{ note.book.title }}
+                                    </a>
+                                </p>
+                                <p class="subtitle is-6">{{ note.book.author ?? 'Unknown' }}</p>
+                                <div class="content">
+                                    {{ note.content|slice(0, 200) }}{% if note.content|length > 200 %}...{% endif %}
+                                </div>
+                                <p class="is-size-7 has-text-grey">
+                                    Last updated: {{ note.updatedAt ? note.updatedAt|date('Y-m-d H:i') : note.createdAt|date('Y-m-d H:i') }}
+                                </p>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="{{ path('app_plugin_bookclub_note_edit', {bookId: note.book.id}) }}" class="card-footer-item">
+                                    <span class="icon"><i class="fas fa-edit"></i></span>
+                                    <span>Edit</span>
+                                </a>
+                            </footer>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="notification is-info is-light">
+                <p>You haven't written any notes yet.</p>
+                <p>Visit a <a href="{{ path('app_plugin_bookclub') }}">book's page</a> to add your reading notes.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

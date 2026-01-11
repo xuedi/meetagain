@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "Filmlist"|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">{{ "Film list"|trans }}</h1>
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ "Title"|trans }}</th>
+                <th>{{ "Year"|trans }}</th>
+                <th>{{ "Runtime"|trans }}</th>
+                <th>{{ "Genres"|trans }}</th>
+                <th>{{ "Film was shown at this event"|trans }}</th>
+                <th><a href="{{ path('app_filmclub_film_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for film in films %}
+                <tr>
+                    <td>{{ film.title }}</td>
+                    <td>{{ film.year }}</td>
+                    <td>{{ film.runtime }} min</td>
+                    <td>
+                        {% for genre in film.genres %}
+                            <span class="tag is-info">{{ genre.value|trans }}</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if filmEvents[film.id] is defined %}
+                            <a href="{{ path('app_event_details', {'id': filmEvents[film.id].id}) }}">
+                                {{ filmEvents[film.id].title(app.locale) }}
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">{{ "No films found"|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

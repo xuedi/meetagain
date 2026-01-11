@@ -3,7 +3,9 @@
 namespace App\Command;
 
 use App\Entity\Comment;
+use App\Plugin;
 use App\Repository\UserRepository;
+use App\Service\PluginService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -11,12 +13,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 #[AsCommand(
-    name: 'app:event:add-fixture-rsvps',
-    description: 'Add random RSVPs and comments to extended recurring events for fixture data'
+    name: 'app:event:add-fixture',
+    description: 'Add random RSVPs, comments and plugin fixtures to extended recurring events'
 )]
-class EventAddFixtureRsvpsCommand extends Command
+class EventAddFixtureCommand extends Command
 {
     private const array SAMPLE_COMMENTS = [
         'Looking forward to this event!',
@@ -36,9 +39,15 @@ class EventAddFixtureRsvpsCommand extends Command
         'Bringing a friend along',
     ];
 
+    /**
+     * @param iterable<Plugin> $plugins
+     */
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserRepository $userRepo,
+        private readonly PluginService $pluginService,
+        #[AutowireIterator(Plugin::class)]
+        private readonly iterable $plugins,
     ) {
         parent::__construct();
     }
@@ -148,6 +157,15 @@ class EventAddFixtureRsvpsCommand extends Command
             $commentCount,
             count($recurringEvents)
         ));
+
+        // Run plugin fixtures for enabled plugins only
+        $enabledPlugins = $this->pluginService->getActiveList();
+        foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+            $plugin->loadPostExtendFixtures($output);
+        }
 
         return Command::SUCCESS;
     }

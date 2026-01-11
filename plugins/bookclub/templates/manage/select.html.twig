@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Select Book for Event - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>Select Book for Event</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">Select Book for Event</h1>
+        <p class="subtitle">Event: {{ event.title }}</p>
+
+        {% if currentSelection %}
+            <div class="notification is-info">
+                <strong>Current selection:</strong> {{ currentSelection.book.title }}
+                <form action="{{ path('app_plugin_bookclub_unselect', {selectionId: currentSelection.id}) }}" method="post" style="display: inline; margin-left: 1rem;">
+                    <button type="submit" class="button is-small is-warning">Remove</button>
+                </form>
+            </div>
+        {% else %}
+            <form action="{{ path('app_plugin_bookclub_select_submit', {eventId: event.id}) }}" method="post">
+                <div class="field">
+                    <label class="label">Select a Book</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="book_id" required>
+                                <option value="">-- Choose a book --</option>
+                                {% for book in books %}
+                                    <option value="{{ book.id }}">
+                                        {{ book.title }} - {{ book.author ?? 'Unknown' }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary">
+                            Assign Book to Event
+                        </button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
