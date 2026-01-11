@@ -14,6 +14,7 @@
                 <th>{{ "Year"|trans }}</th>
                 <th>{{ "Runtime"|trans }}</th>
                 <th>{{ "Genres"|trans }}</th>
+                <th>{{ "Film was shown at this event"|trans }}</th>
                 <th><a href="{{ path('app_filmclub_film_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
             </tr>
             </thead>
@@ -27,6 +28,13 @@
                         {% for genre in film.genres %}
                             <span class="tag is-info">{{ genre.value|trans }}</span>
                         {% endfor %}
+                    </td>
+                    <td>
+                        {% if filmEvents[film.id] is defined %}
+                            <a href="{{ path('app_event_details', {'id': filmEvents[film.id].id}) }}">
+                                {{ filmEvents[film.id].title(app.locale) }}
+                            </a>
+                        {% endif %}
                     </td>
                     <td></td>
                 </tr>

@@ -2,6 +2,10 @@
 
 {% block title %}{{ "Create vote"|trans }}{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href='/stylesheet/flatpickr-bulma.min.css'/>
+{% endblock %}
+
 {% block body %}
 <section class="section">
     <div class="container">
@@ -15,9 +19,14 @@
         <form method="post">
             <div class="field">
                 <label class="label" for="closes_at">{{ "Voting closes at"|trans }}</label>
-                <div class="control">
-                    <input class="input" type="datetime-local" name="closes_at" id="closes_at" required
-                           value="{{ event.start|date_modify('-1 day')|date('Y-m-d\\TH:i') }}">
+                <div class="field has-addons flatpickr-field">
+                    <div class="control is-expanded">
+                        <input class="input" type="text" name="closes_at" id="closes_at" required data-input
+                               value="{{ event.start|date_modify('-1 day')|date(get_date_format()) }}">
+                    </div>
+                    <div class="control">
+                        <a class="button" data-toggle><span class="icon"><i class="fa fa-calendar"></i></span></a>
+                    </div>
                 </div>
                 <p class="help">{{ "Members can vote until this time"|trans }}</p>
             </div>
@@ -33,4 +42,22 @@
         </form>
     </div>
 </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script src='/javascript/flatpickr.min.js'></script>
+    {% if app.request.locale != 'en' %}
+    <script src='/javascript/flatpickr-l10n/{{ app.request.locale }}.js'></script>
+    {% endif %}
+    <script>
+        document.querySelectorAll('.flatpickr-field').forEach((el) => {
+            flatpickr(el, {
+                wrap: true,
+                enableTime: true,
+                dateFormat: "{{ get_date_format_flatpickr() }}",
+                time_24hr: {{ 'A' in get_date_format() ? 'false' : 'true' }},
+                locale: "{{ app.request.locale }}"
+            });
+        });
+    </script>
 {% endblock %}

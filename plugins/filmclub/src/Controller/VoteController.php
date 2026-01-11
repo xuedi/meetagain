@@ -4,6 +4,7 @@ namespace Plugin\Filmclub\Controller;
 
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
+use App\Service\ConfigService;
 use Plugin\Filmclub\Entity\Vote;
 use Plugin\Filmclub\Entity\VoteBallot;
 use Plugin\Filmclub\Repository\FilmRepository;
@@ -22,6 +23,7 @@ class VoteController extends AbstractController
         private readonly VoteBallotRepository $voteBallotRepository,
         private readonly FilmRepository $filmRepository,
         private readonly EventRepository $eventRepository,
+        private readonly ConfigService $configService,
     ) {
     }
 
@@ -66,15 +68,24 @@ class VoteController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $closesAt = $request->request->get('closes_at');
-            if (!$closesAt) {
+            $closesAtString = $request->request->get('closes_at');
+            if (!$closesAtString) {
                 $this->addFlash('error', 'Please provide a closing date');
+                return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);
+            }
+
+            $closesAt = \DateTimeImmutable::createFromFormat(
+                $this->configService->getDateFormat(),
+                $closesAtString
+            );
+            if (!$closesAt) {
+                $this->addFlash('error', 'Invalid date format');
                 return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);
             }
 
             $vote = new Vote();
             $vote->setEventId($eventId);
-            $vote->setClosesAt(new \DateTimeImmutable($closesAt));
+            $vote->setClosesAt($closesAt);
             $vote->setCreatedAt(new \DateTimeImmutable());
             $vote->setCreatedBy($this->getAuthedUser()->getId());
 
