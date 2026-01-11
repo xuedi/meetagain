@@ -21,7 +21,7 @@ class Film
     #[ORM\Column]
     private ?int $runtime = null;
 
-    /** @var array<FilmGenre> */
+    /** @var array<string> */
     #[ORM\Column(type: Types::JSON)]
     private array $genres = [];
 

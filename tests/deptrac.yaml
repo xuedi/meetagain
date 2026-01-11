@@ -129,7 +129,7 @@ deptrac:
       - App\Controller\ImageUploadController
 
     # Fixture command needs direct repository access for bulk user retrieval
-    App\Command\EventAddFixtureRsvpsCommand:
+    App\Command\EventAddFixtureCommand:
       - App\Repository\UserRepository
 
     # Seed command needs direct repository access to check for existing translations

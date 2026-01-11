@@ -10,6 +10,7 @@ use App\Entity\EventTypes;
 use App\Repository\EventRepository;
 use App\Service\EmailService;
 use App\Service\EventService;
+use App\Service\PluginService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,6 +38,8 @@ class EventServiceTest extends TestCase
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         // Act: invoke private structureList method via reflection
@@ -77,6 +80,8 @@ class EventServiceTest extends TestCase
             repo: $repoStub,
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         // Act: invoke private getLastRecurringEventDate method via reflection
@@ -112,6 +117,8 @@ class EventServiceTest extends TestCase
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         // Act: invoke private updateDate method via reflection
@@ -142,6 +149,8 @@ class EventServiceTest extends TestCase
             repo: $repoMock,
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         // Act: get filtered list
@@ -185,6 +194,8 @@ class EventServiceTest extends TestCase
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
             emailService: $emailServiceMock,
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         // Act: cancel the event
@@ -211,6 +222,8 @@ class EventServiceTest extends TestCase
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
             emailService: $emailServiceMock,
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         // Act: cancel the event
@@ -234,6 +247,8 @@ class EventServiceTest extends TestCase
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         // Act: uncancel the event
@@ -250,6 +265,8 @@ class EventServiceTest extends TestCase
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         $this->assertSame(0, $subject->updateRecurringEvents($event));
@@ -272,6 +289,8 @@ class EventServiceTest extends TestCase
             repo: $repoMock,
             em: $emMock,
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         $this->assertSame(1, $subject->updateRecurringEvents($parent));
@@ -295,6 +314,8 @@ class EventServiceTest extends TestCase
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
             emailService: $emailMock,
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         $subject->cancelEvent($event);
@@ -321,6 +342,8 @@ class EventServiceTest extends TestCase
             repo: $repoMock,
             em: $emMock,
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         $subject->extentRecurringEvents();
@@ -345,6 +368,8 @@ class EventServiceTest extends TestCase
             repo: $repoMock,
             em: $emMock,
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         $this->assertSame(1, $subject->updateRecurringEvents($child));
@@ -361,6 +386,8 @@ class EventServiceTest extends TestCase
             repo: $repoMock,
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         $this->assertSame(0, $subject->updateRecurringEvents($child));
@@ -385,6 +412,8 @@ class EventServiceTest extends TestCase
             repo: $repoMock,
             em: $emMock,
             emailService: $this->createStub(EmailService::class),
+            pluginService: $this->createStub(PluginService::class),
+            plugins: [],
         );
 
         $subject->extentRecurringEvents();

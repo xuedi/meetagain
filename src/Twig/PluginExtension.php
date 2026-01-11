@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Plugin;
+use App\Service\PluginService;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Twig\Extension\AbstractExtension;
@@ -12,7 +13,8 @@ final class PluginExtension extends AbstractExtension
 {
     public function __construct(
         #[AutowireIterator(Plugin::class)]
-        private iterable $plugins,
+        private readonly iterable $plugins,
+        private readonly PluginService $pluginService,
     ) {
     }
 
@@ -26,8 +28,12 @@ final class PluginExtension extends AbstractExtension
 
     public function getPluginsLinks(): array
     {
+        $enabledPlugins = $this->pluginService->getActiveList();
         $links = [];
         foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
             foreach ($plugin->getMenuLinks() as $link) {
                 $links[] = $link;
             }

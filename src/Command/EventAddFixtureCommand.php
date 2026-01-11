@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\Comment;
 use App\Plugin;
 use App\Repository\UserRepository;
+use App\Service\PluginService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -44,6 +45,7 @@ class EventAddFixtureCommand extends Command
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserRepository $userRepo,
+        private readonly PluginService $pluginService,
         #[AutowireIterator(Plugin::class)]
         private readonly iterable $plugins,
     ) {
@@ -156,8 +158,12 @@ class EventAddFixtureCommand extends Command
             count($recurringEvents)
         ));
 
-        // Run plugin fixtures
+        // Run plugin fixtures for enabled plugins only
+        $enabledPlugins = $this->pluginService->getActiveList();
         foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
             $plugin->loadPostExtendFixtures($output);
         }
 

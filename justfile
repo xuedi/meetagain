@@ -144,12 +144,12 @@ testSetup:
 # Run unit tests
 [group('testing')]
 testUnit +parameter='':
-    @{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default --no-progress {{parameter}}
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default --no-progress {{parameter}}
 
 # Run functional tests
 [group('testing')]
 testFunctional +parameter='':
-    @{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --no-progress {{parameter}}
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --no-progress {{parameter}}
 
 # Show coverage report
 [group('testing')]
@@ -165,27 +165,27 @@ routeMetrics +parameter='':
 # Run PHPStan
 [group('checks')]
 checkStan +parameter='':
-    @{{PHP}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M --no-progress {{parameter}}
+    {{PHP}} vendor/bin/phpstan analyse -c tests/phpstan.neon --memory-limit=256M --no-progress {{parameter}}
 
 # Check Rector (dry-run)
 [group('checks')]
 checkRector:
-    @{{PHP}} vendor/bin/rector process src --dry-run -c tests/rector.php
+    {{PHP}} vendor/bin/rector process src --dry-run -c tests/rector.php
 
 # Check PHPCS
 [group('checks')]
 checkPhpcs:
-    @{{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache -q
+    {{PHP}} vendor/bin/phpcs --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache -q
 
 # Check PHP-CS-Fixer (dry-run)
 [group('checks')]
 checkPhpCsFixer:
-    @{{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --quiet --config=tests/.php-cs-fixer.php
+    {{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --quiet --config=tests/.php-cs-fixer.php
 
 # Check Deptrac
 [group('checks')]
 checkDeptrac:
-    @{{PHP}} vendor/bin/deptrac analyse --config-file=tests/deptrac.yaml --no-progress
+    {{PHP}} vendor/bin/deptrac analyse --config-file=tests/deptrac.yaml --no-progress
 
 # Check accessibility (Pa11y)
 [group('checks')]
@@ -196,21 +196,21 @@ checkA11y url='http://localhost/':
 # Fix PHPCS violations
 [group('fixing')]
 fixPhpcs:
-    @{{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
+    {{PHP}} vendor/bin/phpcbf --standard=./tests/phpcs.xml --cache=var/cache/phpcs.cache
 
 # Fix with PHP-CS-Fixer
 [group('fixing')]
 fixPhpCsFixer:
-    @{{PHP}} vendor/bin/php-cs-fixer fix --verbose --config=tests/.php-cs-fixer.php
+    {{PHP}} vendor/bin/php-cs-fixer fix --verbose --config=tests/.php-cs-fixer.php
 
 # Apply Rector fixes
 [group('fixing')]
 fixRector:
-    @{{PHP}} vendor/bin/rector process src -c tests/rector.php
+    {{PHP}} vendor/bin/rector process src -c tests/rector.php
 
 # Generate coverage badge (CI)
 [group('fixing')]
 fixCoverageBadge:
-	@{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --no-progress
-	@{{PHP}} php tests/badgeGenerator.php
-	@git add tests/badge/coverage.svg
+	{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --no-progress
+	{{PHP}} php tests/badgeGenerator.php
+	git add tests/badge/coverage.svg
