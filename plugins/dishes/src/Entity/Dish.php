@@ -17,7 +17,7 @@ class Dish
     #[ORM\Column]
     private null|int $id = null;
 
-    #[ORM\OneToMany(targetEntity: DishTranslation::class, mappedBy: 'dish')]
+    #[ORM\OneToMany(targetEntity: DishTranslation::class, mappedBy: 'dish', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $translations;
 
     #[ORM\Column]

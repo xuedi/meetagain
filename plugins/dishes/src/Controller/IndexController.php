@@ -4,12 +4,15 @@ namespace Plugin\Dishes\Controller;
 
 use App\Controller\AbstractController;
 use App\Entity\User;
+use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dishes\Entity\Dish;
+use Plugin\Dishes\Entity\DishTranslation;
 use Plugin\Dishes\Entity\ViewType;
 use Plugin\Dishes\Form\DishType;
 use Plugin\Dishes\Repository\DishRepository;
+use Plugin\Dishes\Repository\DishTranslationRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,6 +23,8 @@ class IndexController extends AbstractController
 {
     public function __construct(
         private readonly DishRepository $repo,
+        private readonly DishTranslationRepository $dishTransRepo,
+        private readonly TranslationService $translationService,
         private readonly EntityManagerInterface $em,
     ) {}
 
@@ -75,10 +80,26 @@ class IndexController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $dish->setCreatedBy($this->getAuthedUser()->getId());
-            $dish->setCreatedAt(new DateTimeImmutable());
+            if ($dish->getCreatedAt() === null) {
+                $dish->setCreatedAt(new DateTimeImmutable());
+            }
             $dish->setApproved(false);
 
             $this->em->persist($dish);
+
+            // save translations
+            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+                $translation = $dish->findTranslation($languageCode);
+                if ($translation === null) {
+                    $translation = new DishTranslation();
+                    $translation->setLanguage($languageCode);
+                    $dish->addTranslation($translation);
+                }
+                $translation->setName($form->get("name-$languageCode")->getData());
+                $translation->setPhonetic($form->get("phonetic-$languageCode")->getData());
+                $translation->setDescription($form->get("description-$languageCode")->getData() ?? '');
+            }
+
             $this->em->flush();
 
             return $this->redirectToRoute('app_plugin_dishes');
