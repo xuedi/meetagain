@@ -100,10 +100,12 @@ readonly class EventService
         $this->em->persist($event);
         $this->em->flush();
 
-        foreach ($event->getRsvp() as $user) {
-            $this->emailService->prepareEventCanceledNotification($user, $event);
+        if ($event->getStart() > new DateTime()) {
+            foreach ($event->getRsvp() as $user) {
+                $this->emailService->prepareEventCanceledNotification($user, $event);
+            }
+            $this->emailService->sendQueue();
         }
-        $this->emailService->sendQueue();
     }
 
     public function uncancelEvent(Event $event): void
