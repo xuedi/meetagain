@@ -10,12 +10,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DishType extends AbstractType
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
         private readonly TranslationService $translationService,
         private readonly DishTranslationRepository $dishTransRepo,
     ) {}

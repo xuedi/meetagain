@@ -10,12 +10,78 @@
             <p>Add a new dish</p>
 
             {{ form_start(form) }}
-            {{ form_widget(form) }}
+            <div class="box">
+                <div class="columns">
+                    <div class="column is-6">
+                        <p class="has-text-grey">Edit dish for each language</p>
+                    </div>
+                    <div class="column is-6">
+                        <div class="buttons has-addons is-pulled-right">
+                            {% for locale in languages %}
+                                <a class="button translation-button {% if locale == app.locale %}is-active{% endif %}"
+                                   id="translation-button-{{ locale }}"
+                                   data-id="{{ locale }}">{{ locale }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% for locale in languages %}
+                    <div class="translation-div {% if locale != app.locale %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
+                        <div class="field">
+                            <label class="label">Name ({{ locale }})</label>
+                            <div class="control">
+                                {{ form_widget(form.("name-"~locale), {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.("name-"~locale)) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Phonetic ({{ locale }})</label>
+                            <div class="control">
+                                {{ form_widget(form.("phonetic-"~locale), {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.("phonetic-"~locale)) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Description ({{ locale }})</label>
+                            <div class="control">
+                                {{ form_widget(form.("description-"~locale), {'attr': {'class': 'textarea', 'rows': 5}}) }}
+                            </div>
+                            {{ form_errors(form.("description-"~locale)) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
             <button class="button is-link">{{ "button_add" | trans }}</button>
             {{ form_end(form) }}
 
         </div>
     </section>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            let buttons = document.getElementsByClassName('translation-button');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', event => {
+                    event.preventDefault();
+
+                    {% for locale in languages %}
+                    document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
+                    document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
+                    {% endfor %}
+
+                    let button = 'translation-button-' + event.currentTarget.getAttribute('data-id');
+                    document.getElementById(button).classList.add('is-active');
+
+                    let target = 'translation-div-' + event.currentTarget.getAttribute('data-id');
+                    document.getElementById(target).classList.remove('is-hidden');
+                });
+            }
+        });
+    </script>
 
 {% endblock %}
 

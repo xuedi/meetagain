@@ -6,9 +6,11 @@
         <th>Phonetic</th>
         <th>Description</th>
         <th>
-            <a href="{{ path('app_plugin_dishes_edit') }}">
-                <span class="icon"><i class="fa fa-add"></i></span>
-            </a>
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_plugin_dishes_edit') }}">
+                    <span class="icon"><i class="fa fa-add"></i></span>
+                </a>
+            {% endif %}
         </th>
     </tr>
     </thead>
@@ -24,9 +26,11 @@
             <td>{{ item.getPhonetic(app.locale) }}</td>
             <td>{{ item.getTranslatedDescription(app.locale) }}</td>
             <td>
-                <a href="{{ path('app_plugin_dishes_edit', {'id': item.id}) }}">
-                    <span class="icon"><i class="fa fa-edit"></i></span>
-                </a>
+                {% if is_granted('ROLE_USER') %}
+                    <a href="{{ path('app_plugin_dishes_edit', {'id': item.id}) }}">
+                        <span class="icon"><i class="fa fa-edit"></i></span>
+                    </a>
+                {% endif %}
             </td>
         </tr>
     {% endfor %}

@@ -107,6 +107,7 @@ class IndexController extends AbstractController
 
         return $this->render('@Dishes/edit.html.twig', [
             'form' => $form,
+            'languages' => $this->translationService->getLanguageCodes(),
         ]);
     }
 
