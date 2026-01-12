@@ -57,7 +57,7 @@ dockerRebuild:
 dockerEnter:
     {{DOCKER}} exec php bash
 
-# Run SQL query
+# Run SQL command with the parameter: query
 [group('docker')]
 dockerDatabase query:
     {{DB}} mariadb -u$MARIADB_USER -p$MARIADB_PASSWORD $MARIADB_DATABASE -e "{{query}}"
