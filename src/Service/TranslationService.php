@@ -54,12 +54,17 @@ readonly class TranslationService
 
         foreach ($locales as $locale) {
             $translations = [];
-            $entities = $this->translationRepo->findBy(['language' => $locale]);
-            foreach ($entities as $translation) {
+            $query = $this->entityManager->createQuery(
+                'SELECT t FROM App\Entity\Translation t WHERE t.language = :locale'
+            )->setParameter('locale', $locale);
+
+            foreach ($query->toIterable() as $translation) {
                 $translations[strtolower($translation->getPlaceholder())] = $translation->getTranslation() ?? '';
                 ++$published;
+                $this->entityManager->detach($translation);
             }
             $this->fileManager->writeTranslationFile($locale, $translations);
+            $this->entityManager->clear();
         }
         $this->commandService->clearCache();
 

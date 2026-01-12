@@ -1,5 +1,14 @@
 
+{% if is_granted('ROLE_USER') %}
+<div class="mb-4">
+    <a href="{{ path('plugin_dishes_add') }}" class="button is-link is-fullwidth">
+        <span class="icon"><i class="fa-solid fa-plus"></i></span>
+        <span>Add Dish</span>
+    </a>
+</div>
+{% endif %}
 
+<p class="has-text-grey is-size-7 has-text-centered mb-2">View</p>
 <div class="buttons has-addons is-centered">
     {% for id, name in viewTypeList %}
     <a class="button {% if viewType == id %} has-background-link has-text-light{% endif %}" href="{{ path('plugin_dishes_set_view_type', {'type': id}) }}">
@@ -8,4 +17,30 @@
     {% endfor %}
 </div>
 
+{% if is_granted('ROLE_MANAGER') %}
+<hr>
+<p class="has-text-grey is-size-7 has-text-centered mb-2">Manager</p>
 
+{% if pendingCount is defined and pendingCount > 0 %}
+<a href="{{ path('plugin_dishes_approval_pending') }}" class="button is-warning is-fullwidth mb-2">
+    <span class="icon"><i class="fa-solid fa-clock"></i></span>
+    <span>Pending ({{ pendingCount }})</span>
+</a>
+{% endif %}
+
+{% if suggestionCount is defined and suggestionCount > 0 %}
+<a href="{{ path('plugin_dishes_suggestions_list') }}" class="button is-info is-fullwidth mb-2">
+    <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
+    <span>Suggestions ({{ suggestionCount }})</span>
+</a>
+{% endif %}
+{% endif %}
+
+{% if is_granted('ROLE_USER') %}
+<hr>
+<p class="has-text-grey is-size-7 has-text-centered mb-2">My Lists</p>
+<a href="{{ path('plugin_dishes_lists') }}" class="button is-light is-fullwidth">
+    <span class="icon"><i class="fa-solid fa-list"></i></span>
+    <span>My Lists</span>
+</a>
+{% endif %}

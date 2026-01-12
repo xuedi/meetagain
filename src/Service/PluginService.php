@@ -128,6 +128,9 @@ readonly class PluginService
         $configFile = $this->configDir . '/plugins.php';
         $content = '<?php declare(strict_types=1);' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
         if ($this->filesystem->putFileContents($configFile, $content)) {
+            if (function_exists('opcache_invalidate')) {
+                opcache_invalidate($configFile, true);
+            }
             $this->commandService->clearCache();
         }
     }

@@ -114,7 +114,18 @@ class TranslationServiceTest extends TestCase
     public function testPublishWritesFilesAndClearsCache(): void
     {
         $this->languageService->method('getEnabledCodes')->willReturn(['de']);
-        $this->translationRepo->method('findBy')->willReturn([(new Translation())->setPlaceholder('key')->setTranslation('value')]);
+
+        $query = $this->getMockBuilder(\Doctrine\ORM\Query::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['setParameter', 'toIterable'])
+            ->getMock();
+        $query->method('setParameter')->willReturn($query);
+        $query->method('toIterable')->willReturn([
+            (new Translation())->setPlaceholder('key')->setTranslation('value'),
+        ]);
+
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager->method('createQuery')->willReturn($query);
 
         $this->fileManager = $this->createMock(TranslationFileManager::class);
         $this->commandService = $this->createMock(CommandService::class);
@@ -129,6 +140,8 @@ class TranslationServiceTest extends TestCase
         $this->fileManager->expects($this->once())->method('cleanUpTranslationFiles');
         $this->fileManager->expects($this->once())->method('writeTranslationFile')->with('de', ['key' => 'value']);
         $this->commandService->expects($this->once())->method('clearCache');
+        $this->entityManager->expects($this->atLeastOnce())->method('detach');
+        $this->entityManager->expects($this->atLeastOnce())->method('clear');
 
         $result = $this->subject->publish();
         $this->assertSame(1, $result['published']);

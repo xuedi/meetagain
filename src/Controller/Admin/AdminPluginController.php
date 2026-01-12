@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Service\CommandService;
 use App\Service\PluginService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,6 +12,7 @@ class AdminPluginController extends AbstractController
 {
     public function __construct(
         private readonly PluginService $pluginService,
+        private readonly CommandService $commandService,
     ) {
     }
 
@@ -43,6 +45,14 @@ class AdminPluginController extends AbstractController
     public function enable(string $name): Response
     {
         $this->pluginService->enable($name);
+
+        return $this->redirectToRoute('admin_plugin_migrate');
+    }
+
+    #[Route('/admin/plugin/migrate', name: 'admin_plugin_migrate')]
+    public function migrate(): Response
+    {
+        $this->commandService->executeMigrations();
 
         return $this->redirectToRoute('app_admin_plugin');
     }

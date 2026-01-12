@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "Add a Dish" }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dishes') }}">Dishes</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">Add New</a></li>
+                </ul>
+            </nav>
+
+            <div class="columns">
+                <div class="column is-8">
+                    <div class="box">
+                        <h2 class="title is-4">
+                            <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                            <span>Add a New Dish</span>
+                        </h2>
+
+                        <p class="mb-4 has-text-grey">
+                            Share a dish you talked about at a meetup! Add it in your language ({{ currentLocale|upper }})
+                            and others can suggest translations later.
+                        </p>
+
+                        {{ form_start(form, {'attr': {'class': 'dish-add-form'}}) }}
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-utensils"></i></span>
+                                    <span>{{ form.name.vars.label }}</span>
+                                </span>
+                                <span class="tag is-info is-light ml-2">{{ currentLocale|upper }}</span>
+                            </label>
+                            <div class="control">
+                                {{ form_widget(form.name, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.name) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
+                                    <span>{{ form.phonetic.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                {{ form_widget(form.phonetic, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.phonetic) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-align-left"></i></span>
+                                    <span>{{ form.description.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                {{ form_widget(form.description, {'attr': {'class': 'textarea'}}) }}
+                            </div>
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-book-open"></i></span>
+                                    <span>{{ form.recipe.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                {{ form_widget(form.recipe, {'attr': {'class': 'textarea'}}) }}
+                            </div>
+                            {{ form_errors(form.recipe) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                                    <span>{{ form.origin.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                {{ form_widget(form.origin, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.origin) }}
+                        </div>
+
+                        <div class="field is-grouped mt-5">
+                            <div class="control">
+                                <button type="submit" class="button is-link">
+                                    <span class="icon"><i class="fa-solid fa-check"></i></span>
+                                    <span>Add Dish</span>
+                                </button>
+                            </div>
+                            <div class="control">
+                                <a href="{{ path('app_plugin_dishes') }}" class="button">Cancel</a>
+                            </div>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+
+                <div class="column is-4">
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-circle-info"></i></span>
+                            <span>How it works</span>
+                        </h3>
+                        <div class="content">
+                            <ol>
+                                <li>Add the dish in your language</li>
+                                <li>{% if is_granted('ROLE_MANAGER') %}Your dish will be added immediately{% else %}Wait for approval from a manager{% endif %}</li>
+                                <li>Other users can suggest translations</li>
+                                <li>Build a multilingual dish collection together!</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
+                            <span>Tips</span>
+                        </h3>
+                        <div class="content is-small">
+                            <ul>
+                                <li>Only the <strong>name</strong> is required</li>
+                                <li>Add <strong>phonetic</strong> for pronunciation help</li>
+                                <li>Include the <strong>origin</strong> to help others find regional dishes</li>
+                                <li>You can add an image later</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

@@ -5,6 +5,13 @@
         <th>Name</th>
         <th>Phonetic</th>
         <th>Description</th>
+        <th>
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_plugin_dishes_edit') }}">
+                    <span class="icon"><i class="fa fa-add"></i></span>
+                </a>
+            {% endif %}
+        </th>
     </tr>
     </thead>
     <tbody>
@@ -18,6 +25,13 @@
             <td>{{ item.getTranslatedName(app.locale) }}</td>
             <td>{{ item.getPhonetic(app.locale) }}</td>
             <td>{{ item.getTranslatedDescription(app.locale) }}</td>
+            <td>
+                {% if is_granted('ROLE_USER') %}
+                    <a href="{{ path('app_plugin_dishes_edit', {'id': item.id}) }}">
+                        <span class="icon"><i class="fa fa-edit"></i></span>
+                    </a>
+                {% endif %}
+            </td>
         </tr>
     {% endfor %}
 </table>

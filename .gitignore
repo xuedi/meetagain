@@ -7,6 +7,7 @@ installed.lock
 /config/plugins.php
 /public/bundles/
 /tests/reports/clover.xml
+/tests/reports/performance/*
 /var/
 /vendor/
 /.idea/

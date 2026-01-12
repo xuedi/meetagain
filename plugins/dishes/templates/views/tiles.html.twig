@@ -1,5 +1,5 @@
 <div class="columns is-multiline">
-    {% for item in list %}{# action items for managers #}
+    {% for item in list %}
         <div class="column is-2">
             <a href="{{ path('plugin_dishes_item_show', {'id': item.id}) }}">
                 <div class="card">
@@ -7,9 +7,24 @@
                         <figure class="image">
                             {% include '_block/image.html.twig' with {'image': item.previewImage, 'size': '400x400'} %}
                         </figure>
+                        {% if not item.approved %}
+                            <span class="tag is-warning" style="position: absolute; top: 5px; right: 5px;">Pending</span>
+                        {% endif %}
                     </div>
-                    <div class="card-content p-2 has-text-centered">
-                        {{ item.getTranslatedName(app.locale) }}
+                    <div class="card-content p-2">
+                        <p class="has-text-centered">{{ item.getTranslatedName(app.locale) ?: item.getTranslatedName(item.originLang) }}</p>
+                        <div class="is-flex is-justify-content-space-between is-size-7 has-text-grey mt-1">
+                            <span>
+                                <span class="icon is-small"><i class="fa-solid fa-heart"></i></span>
+                                {{ item.likes }}
+                            </span>
+                            {% if item.origin %}
+                                <span>
+                                    <span class="icon is-small"><i class="fa-solid fa-location-dot"></i></span>
+                                    {{ item.origin|length > 10 ? item.origin|slice(0, 10) ~ '...' : item.origin }}
+                                </span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </a>

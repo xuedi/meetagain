@@ -65,4 +65,36 @@ class TranslationImportServiceTest extends TestCase
         $result = $this->subject->extract();
         $this->assertArrayHasKey('count', $result);
     }
+
+    public function testImportForLocalDevelopmentBatchesCorrectly(): void
+    {
+        $importUser = (new UserStub())->setId(1);
+        $this->userRepo->method('findOneBy')->willReturn($importUser);
+        $this->configService->method('getSystemUserId')->willReturn(1);
+
+        $connMock = $this->createMock(\Doctrine\DBAL\Connection::class);
+        $this->entityManager->method('getConnection')->willReturn($connMock);
+        $connMock->expects($this->exactly(2))->method('executeStatement');
+
+        $data = [];
+        for ($i = 0; $i < 250; ++$i) {
+            $data[] = [
+                'language' => 'en',
+                'placeholder' => 'test' . $i,
+                'translation' => 'Test ' . $i,
+            ];
+        }
+
+        $apiUrl = 'data:application/json;base64,' . base64_encode(json_encode($data));
+
+        $this->entityManager->expects($this->exactly(250))->method('persist');
+        // 250 items, batch size 100:
+        // i=100 -> flush, clear
+        // i=200 -> flush, clear
+        // final -> flush, clear
+        $this->entityManager->expects($this->exactly(3))->method('flush');
+        $this->entityManager->expects($this->exactly(3))->method('clear');
+
+        $this->subject->importForLocalDevelopment($apiUrl);
+    }
 }

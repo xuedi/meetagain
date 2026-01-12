@@ -6,6 +6,7 @@ use App\Entity\Image;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Plugin\Dishes\Repository\DishRepository;
 
@@ -17,7 +18,7 @@ class Dish
     #[ORM\Column]
     private null|int $id = null;
 
-    #[ORM\OneToMany(targetEntity: DishTranslation::class, mappedBy: 'dish')]
+    #[ORM\OneToMany(targetEntity: DishTranslation::class, mappedBy: 'dish', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $translations;
 
     #[ORM\Column]
@@ -34,6 +35,15 @@ class Dish
 
     #[ORM\Column(length: 2, nullable: true)]
     private null|string $originLang = null;
+
+    #[ORM\Column]
+    private int $likes = 0;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private null|array $suggestions = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private null|string $origin = null;
 
     public function __construct()
     {
@@ -167,5 +177,121 @@ class Dish
         $this->originLang = $originLang;
 
         return $this;
+    }
+
+    public function getLikes(): int
+    {
+        return $this->likes;
+    }
+
+    public function setLikes(int $likes): static
+    {
+        $this->likes = $likes;
+
+        return $this;
+    }
+
+    public function incrementLikes(): static
+    {
+        $this->likes++;
+
+        return $this;
+    }
+
+    public function getSuggestions(): null|array
+    {
+        return $this->suggestions;
+    }
+
+    public function setSuggestions(null|array $suggestions): static
+    {
+        $this->suggestions = $suggestions;
+
+        return $this;
+    }
+
+    public function addSuggestion(DishSuggestion $suggestion): static
+    {
+        $suggestions = $this->suggestions ?? [];
+        $suggestions[] = $suggestion->jsonSerialize();
+        $this->suggestions = $suggestions;
+
+        return $this;
+    }
+
+    public function removeSuggestionByHash(string $hash): static
+    {
+        if ($this->suggestions === null) {
+            return $this;
+        }
+
+        $this->suggestions = array_values(array_filter(
+            $this->suggestions,
+            fn(array $s) => DishSuggestion::fromJson($s)->getHash() !== $hash
+        ));
+
+        if ($this->suggestions === []) {
+            $this->suggestions = null;
+        }
+
+        return $this;
+    }
+
+    public function findSuggestionByHash(string $hash): null|DishSuggestion
+    {
+        if ($this->suggestions === null) {
+            return null;
+        }
+
+        foreach ($this->suggestions as $s) {
+            $suggestion = DishSuggestion::fromJson($s);
+            if ($suggestion->getHash() === $hash) {
+                return $suggestion;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return DishSuggestion[]
+     */
+    public function getSuggestionObjects(): array
+    {
+        if ($this->suggestions === null) {
+            return [];
+        }
+
+        return array_map(
+            fn(array $s) => DishSuggestion::fromJson($s),
+            $this->suggestions
+        );
+    }
+
+    public function hasSuggestions(): bool
+    {
+        return $this->suggestions !== null && $this->suggestions !== [];
+    }
+
+    public function getOrigin(): null|string
+    {
+        return $this->origin;
+    }
+
+    public function setOrigin(null|string $origin): static
+    {
+        $this->origin = $origin;
+
+        return $this;
+    }
+
+    public function getTranslatedRecipe(string $language): string
+    {
+        foreach ($this->translations as $translation) {
+            if ($translation->getLanguage() === $language) {
+                return $translation->getRecipe() ?? '';
+            }
+        }
+        return '';
     }
 }
