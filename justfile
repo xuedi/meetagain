@@ -153,14 +153,20 @@ testFunctional +parameter='':
 
 # Show coverage report
 [group('testing')]
-showCoverage +parameter='':
+testCoverage +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
-    {{PHP}} php tests/AiReadableTestCoverage.php {{parameter}}
+    {{PHP}} php tests/AiReadableCoverage.php {{parameter}}
 
 # Analyze route performance
 [group('testing')]
-routeMetrics +parameter='':
-    {{PHP}} php tests/AiReadableRouteMetrics.php {{parameter}}
+testSymfony +parameter='':
+    {{PHP}} php tests/AiReadableSymfonyMetrics.php {{parameter}}
+
+# Analyze Page speed in various browsers
+[group('testing')]
+testPerformance:
+    {{PHP}} mkdir -p tests/reports/performance
+    docker run --rm -v "$(pwd)/tests/reports/performance:/sitespeed.io" sitespeedio/sitespeed.io:39.3.1 https://localhost/en
 
 # Run PHPStan
 [group('checks')]
