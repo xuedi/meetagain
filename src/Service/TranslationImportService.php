@@ -76,6 +76,10 @@ readonly class TranslationImportService
     public function importForLocalDevelopment(string $apiUrl): void
     {
         $json = file_get_contents($apiUrl);
+        if ($json === false) {
+            throw new RuntimeException('Could not fetch translations from ' . $apiUrl);
+        }
+
         $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         // Clear suggestions first due to FK to translation, then clear translations
@@ -83,9 +87,11 @@ readonly class TranslationImportService
         $conn->executeStatement('DELETE FROM translation_suggestion');
         $conn->executeStatement('DELETE FROM translation');
 
-        // get import user
-        $user = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
+        $systemUserId = $this->configService->getSystemUserId();
+        $user = $this->userRepo->findOneBy(['id' => $systemUserId]);
 
+        $batchSize = 100;
+        $i = 1;
         foreach ($data as $item) {
             $translation = new Translation();
             $translation->setUser($user);
@@ -95,9 +101,17 @@ readonly class TranslationImportService
             $translation->setCreatedAt(new DateTimeImmutable());
 
             $this->entityManager->persist($translation);
+
+            if (($i % $batchSize) === 0) {
+                $this->entityManager->flush();
+                $this->entityManager->clear();
+                $user = $this->userRepo->findOneBy(['id' => $systemUserId]);
+            }
+            ++$i;
         }
 
         $this->entityManager->flush();
+        $this->entityManager->clear();
         $this->translationService->publish();
     }
 
