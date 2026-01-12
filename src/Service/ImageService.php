@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
@@ -14,7 +15,6 @@ use ImagickException;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use App\Entity\Event;
 
 readonly class ImageService
 {

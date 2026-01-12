@@ -24,12 +24,6 @@ parameters:
         - identifier: method.alreadyNarrowedType
           path: ../tests/*
 
-        # AdminController version check is intentional for documentation
-        - identifier: greaterOrEqual.alwaysTrue
-          path: ../src/Controller/AdminController.php
-        - identifier: identical.alwaysFalse
-          path: ../src/Controller/AdminController.php
-
         # Nullsafe with ?? is intentional for readability
         - identifier: nullsafe.neverNull
           path: ../src/Controller/Admin/AdminMenuController.php

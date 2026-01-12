@@ -27,7 +27,6 @@
  *        Expected: 'foo'
  *        Actual: 'bar'
  */
-
 $options = [
     'suite' => null,
     'failures-only' => false,
@@ -141,14 +140,12 @@ function extractMessage(string $fullMessage): string
     $lines = explode("\n", $fullMessage);
     foreach ($lines as $line) {
         $line = trim($line);
-        if (str_starts_with($line, 'Failed asserting') ||
-            str_starts_with($line, 'Exception:') ||
-            str_starts_with($line, 'Error:')) {
+        if (str_starts_with($line, 'Failed asserting') || str_starts_with($line, 'Exception:') || str_starts_with($line, 'Error:')) {
             return $line;
         }
     }
 
-    return $lines[0] ?? '';
+    return $lines[0];
 }
 
 function extractDiff(string $fullMessage): string

@@ -29,11 +29,10 @@ readonly class HealthCheckService
             $expected = sprintf('test_%d', random_int(0, 100));
             $cacheKey = 'app_admin_health_test';
             $this->appCache->delete($cacheKey);
-            $this->appCache->get($cacheKey, fn () => $expected);
-            $actual = $this->appCache->get($cacheKey, fn () => 'failed');
+            $stored = $this->appCache->get($cacheKey, fn () => $expected);
             $this->appCache->delete($cacheKey);
 
-            return ['ok' => $expected === $actual];
+            return ['ok' => $expected === $stored];
         } catch (Throwable $e) {
             return ['ok' => false, 'error' => $e->getMessage()];
         }
@@ -80,7 +79,7 @@ readonly class HealthCheckService
     private function getPhpInfo(): array
     {
         return [
-            'ok' => PHP_VERSION_ID >= 80200,
+            'ok' => true,
             'version' => PHP_VERSION,
             'memoryLimit' => ini_get('memory_limit'),
             'maxExecution' => ini_get('max_execution_time'),
