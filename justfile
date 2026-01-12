@@ -83,13 +83,13 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -q
 
-# Reset dev with fixtures
+# Reset dev with fixtures (plugins: 'no', 'all', or plugin name like 'dishes')
 [group('development')]
-devModeFixtures:
+devModeFixtures plugins='no':
     {{JUST}} dockerStop
     {{JUST}} devResetConfigs
     cp .env.dist .env
-    cp config/plugins.dist.php config/plugins.php
+    php bin/generate-plugins-config.php {{plugins}}
     touch installed.lock
     {{JUST}} dockerStart
     {{JUST}} do "composer install"
