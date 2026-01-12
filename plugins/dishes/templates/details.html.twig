@@ -1,18 +1,274 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_dishes_title_details"|trans }} - {{ dish.getTranslatedName(app.locale) }}{% endblock %}
+{% block title %}{{ "page_plugin_dishes_title_details"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            <p>{{ dish.getTranslatedName(app.locale) }}</p>
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dishes') }}">Dishes</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}</a></li>
+                </ul>
+            </nav>
 
-            {% include '_block/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
+            <div class="columns">
+                <div class="column is-8">
+                    <div class="box">
+                        <div class="level">
+                            <div class="level-left">
+                                <div class="level-item">
+                                    <h1 class="title is-3">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}</h1>
+                                </div>
+                                {% if not dish.approved %}
+                                    <div class="level-item">
+                                        <span class="tag is-warning">Pending Approval</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="level-right">
+                                <div class="level-item">
+                                    <button class="button like-button" data-dish-id="{{ dish.id }}">
+                                        <span class="icon has-text-danger"><i class="fa-solid fa-heart"></i></span>
+                                        <span class="like-count">{{ dish.likes }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if dish.getPhonetic(app.locale) or dish.getPhonetic(dish.originLang) %}
+                            <p class="subtitle is-5 has-text-grey">
+                                <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
+                                {{ dish.getPhonetic(app.locale) ?: dish.getPhonetic(dish.originLang) }}
+                            </p>
+                        {% endif %}
+
+                        {% if dish.previewImage %}
+                            <figure class="image mb-4">
+                                {% include '_block/image.html.twig' with {'image': dish.previewImage, 'size': '600x400'} %}
+                            </figure>
+                        {% endif %}
+
+                        {% if dish.getTranslatedDescription(app.locale) or dish.getTranslatedDescription(dish.originLang) %}
+                            <div class="content">
+                                <h4>Description</h4>
+                                <p>{{ (dish.getTranslatedDescription(app.locale) ?: dish.getTranslatedDescription(dish.originLang))|nl2br }}</p>
+                            </div>
+                        {% endif %}
+
+                        {% if dish.getTranslatedRecipe(app.locale) or dish.getTranslatedRecipe(dish.originLang) %}
+                            <div class="content">
+                                <h4>Recipe</h4>
+                                <p>{{ (dish.getTranslatedRecipe(app.locale) ?: dish.getTranslatedRecipe(dish.originLang))|nl2br }}</p>
+                            </div>
+                        {% endif %}
+
+                        {% if dish.origin %}
+                            <p>
+                                <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                                <strong>Origin:</strong> {{ dish.origin }}
+                            </p>
+                        {% endif %}
+
+                        {% if dish.hasSuggestions and is_granted('ROLE_MANAGER') %}
+                            <div class="notification is-info is-light mt-4">
+                                <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
+                                This dish has {{ dish.suggestionObjects|length }} pending suggestion(s).
+                                <a href="{{ path('plugin_dishes_suggestion_view', {'id': dish.id}) }}">Review now</a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-globe"></i></span>
+                            <span>Translations</span>
+                        </h3>
+
+                        <table class="table is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Language</th>
+                                    <th>Name</th>
+                                    <th>Phonetic</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lang in languages %}
+                                    {% set trans = dish.findTranslation(lang) %}
+                                    <tr>
+                                        <td>
+                                            <span class="tag {% if lang == dish.originLang %}is-success{% elseif trans %}is-info{% else %}is-light{% endif %}">
+                                                {{ lang|upper }}
+                                                {% if lang == dish.originLang %}
+                                                    <span class="icon is-small"><i class="fa-solid fa-star"></i></span>
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>{{ trans ? trans.name : '-' }}</td>
+                                        <td>{{ trans ? trans.phonetic : '-' }}</td>
+                                        <td>
+                                            {% if is_granted('ROLE_USER') %}
+                                                <a href="{{ path('plugin_dishes_translate', {'id': dish.id, 'lang': lang}) }}" class="button is-small">
+                                                    {% if trans %}
+                                                        <span class="icon"><i class="fa-solid fa-pen"></i></span>
+                                                        <span>Edit</span>
+                                                    {% else %}
+                                                        <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                                                        <span>Add</span>
+                                                    {% endif %}
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="column is-4">
+                    <div class="box">
+                        <h3 class="title is-5">Info</h3>
+                        <p><strong>Added by:</strong> {{ get_user_name(dish.createdBy) }}</p>
+                        <p><strong>Added:</strong> {{ dish.createdAt|time_diff }}</p>
+                        <p><strong>Original language:</strong> {{ dish.originLang|upper }}</p>
+                        <p><strong>Likes:</strong> <span class="like-count-display">{{ dish.likes }}</span></p>
+                    </div>
+
+                    {% if is_granted('ROLE_USER') %}
+                    {% if userLists is not empty %}
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-list"></i></span>
+                            <span>Add to List</span>
+                        </h3>
+                        <div class="field">
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="add-to-list-select">
+                                        <option value="">Select a list...</option>
+                                        {% for list in userLists %}
+                                            <option value="{{ list.id }}" {% if list.hasDish(dish.id) %}disabled{% endif %}>
+                                                {{ list.name }}{% if list.hasDish(dish.id) %} (already added){% endif %}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="button is-link is-fullwidth add-to-list-btn" data-dish-id="{{ dish.id }}">
+                            <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                            <span>Add to List</span>
+                        </button>
+                        <p class="mt-2 is-size-7 has-text-centered">
+                            <a href="{{ path('plugin_dishes_lists_create') }}">Create new list</a>
+                        </p>
+                    </div>
+                    {% else %}
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-list"></i></span>
+                            <span>Add to List</span>
+                        </h3>
+                        <p class="has-text-grey is-size-7 mb-3">You don't have any lists yet.</p>
+                        <a href="{{ path('plugin_dishes_lists_create') }}" class="button is-link is-fullwidth">
+                            <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                            <span>Create a List</span>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-language"></i></span>
+                            <span>Add Translation</span>
+                        </h3>
+                        <p class="mb-3 is-size-7 has-text-grey">Help translate this dish to other languages</p>
+                        <div class="buttons">
+                            {% for lang in languages %}
+                                {% set trans = dish.findTranslation(lang) %}
+                                <a href="{{ path('plugin_dishes_translate', {'id': dish.id, 'lang': lang}) }}"
+                                   class="button {% if trans %}is-success is-light{% endif %}">
+                                    {{ lang|upper }}
+                                    {% if trans %}
+                                        <span class="icon is-small"><i class="fa-solid fa-check"></i></span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="box">
+                        <a href="{{ path('app_plugin_dishes') }}" class="button is-fullwidth">
+                            <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
+                            <span>Back to Dishes</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </section>
 
-{% endblock %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Like button
+        document.querySelectorAll('.like-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const dishId = this.dataset.dishId;
+                fetch('/dishes/like/' + dishId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelectorAll('.like-count, .like-count-display').forEach(function(el) {
+                        el.textContent = data.likes;
+                    });
+                });
+            });
+        });
 
+        // Add to list button
+        const addToListBtn = document.querySelector('.add-to-list-btn');
+        if (addToListBtn) {
+            addToListBtn.addEventListener('click', function() {
+                const dishId = this.dataset.dishId;
+                const select = document.getElementById('add-to-list-select');
+                const listId = select.value;
+
+                if (!listId) {
+                    alert('Please select a list');
+                    return;
+                }
+
+                fetch('/dishes/lists/' + listId + '/add/' + dishId, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mark as added in dropdown
+                        const option = select.querySelector('option[value="' + listId + '"]');
+                        option.disabled = true;
+                        option.textContent += ' (already added)';
+                        select.value = '';
+                        alert('Dish added to list!');
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            });
+        }
+    });
+    </script>
+
+{% endblock %}

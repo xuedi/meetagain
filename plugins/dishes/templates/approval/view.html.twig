@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Review Dish - {{ dish.getTranslatedName(dish.originLang ?? app.locale) }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dishes') }}">Dishes</a></li>
+                    <li><a href="{{ path('plugin_dishes_approval_pending') }}">Pending</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</a></li>
+                </ul>
+            </nav>
+
+            <div class="columns">
+                <div class="column is-8">
+                    <div class="box">
+                        <h1 class="title">
+                            <span class="icon"><i class="fa-solid fa-clock"></i></span>
+                            <span>Review New Dish</span>
+                        </h1>
+
+                        <div class="content">
+                            <h2>{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</h2>
+
+                            {% if dish.getPhonetic(dish.originLang ?? app.locale) %}
+                                <p><strong>Phonetic:</strong> {{ dish.getPhonetic(dish.originLang ?? app.locale) }}</p>
+                            {% endif %}
+
+                            {% if dish.getTranslatedDescription(dish.originLang ?? app.locale) %}
+                                <p><strong>Description:</strong></p>
+                                <blockquote>{{ dish.getTranslatedDescription(dish.originLang ?? app.locale)|nl2br }}</blockquote>
+                            {% endif %}
+
+                            {% if dish.getTranslatedRecipe(dish.originLang ?? app.locale) %}
+                                <p><strong>Recipe:</strong></p>
+                                <blockquote>{{ dish.getTranslatedRecipe(dish.originLang ?? app.locale)|nl2br }}</blockquote>
+                            {% endif %}
+
+                            {% if dish.origin %}
+                                <p><strong>Origin:</strong> {{ dish.origin }}</p>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+
+                        <div class="buttons">
+                            <a href="{{ path('plugin_dishes_approval_approve', {'id': dish.id}) }}" class="button is-success is-medium">
+                                <span class="icon"><i class="fa-solid fa-check"></i></span>
+                                <span>Approve Dish</span>
+                            </a>
+                            <a href="{{ path('plugin_dishes_approval_reject', {'id': dish.id}) }}" class="button is-danger is-medium">
+                                <span class="icon"><i class="fa-solid fa-times"></i></span>
+                                <span>Reject Dish</span>
+                            </a>
+                            <a href="{{ path('plugin_dishes_approval_pending') }}" class="button">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column is-4">
+                    {% if dish.previewImage %}
+                        <div class="box">
+                            <h3 class="title is-5">Preview Image</h3>
+                            {% include '_block/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
+                        </div>
+                    {% endif %}
+
+                    <div class="box">
+                        <h3 class="title is-5">Submission Info</h3>
+                        <p><strong>Submitted by:</strong> {{ get_user_name(dish.createdBy) }}</p>
+                        <p><strong>Submitted:</strong> {{ dish.createdAt|time_diff }}</p>
+                        <p><strong>Original Language:</strong> {{ dish.originLang|upper }}</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

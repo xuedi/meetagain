@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pending Dishes{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dishes') }}">Dishes</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">Pending Approval</a></li>
+                </ul>
+            </nav>
+
+            <h1 class="title">
+                <span class="icon"><i class="fa-solid fa-clock"></i></span>
+                <span>Dishes Pending Approval</span>
+            </h1>
+
+            {% if dishes is empty %}
+                <div class="notification is-success is-light">
+                    <span class="icon"><i class="fa-solid fa-check-circle"></i></span>
+                    <span>No dishes pending approval. All caught up!</span>
+                </div>
+            {% else %}
+                <div class="columns is-multiline">
+                    {% for dish in dishes %}
+                        <div class="column is-4">
+                            <div class="card">
+                                {% if dish.previewImage %}
+                                    <div class="card-image">
+                                        <figure class="image is-4by3">
+                                            {% include '_block/image.html.twig' with {'image': dish.previewImage, 'size': '400x300'} %}
+                                        </figure>
+                                    </div>
+                                {% endif %}
+                                <div class="card-content">
+                                    <p class="title is-5">{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</p>
+                                    <p class="subtitle is-6 has-text-grey">
+                                        <span class="icon"><i class="fa-solid fa-user"></i></span>
+                                        {{ get_user_name(dish.createdBy) }}
+                                        <br>
+                                        <span class="icon"><i class="fa-solid fa-clock"></i></span>
+                                        {{ dish.createdAt|time_diff }}
+                                    </p>
+                                    {% if dish.origin %}
+                                        <p class="is-size-7">
+                                            <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                                            {{ dish.origin }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                                <footer class="card-footer">
+                                    <a href="{{ path('plugin_dishes_approval_view', {'id': dish.id}) }}" class="card-footer-item">
+                                        <span class="icon"><i class="fa-solid fa-eye"></i></span>
+                                        <span>Review</span>
+                                    </a>
+                                    <a href="{{ path('plugin_dishes_approval_approve', {'id': dish.id}) }}" class="card-footer-item has-text-success">
+                                        <span class="icon"><i class="fa-solid fa-check"></i></span>
+                                        <span>Approve</span>
+                                    </a>
+                                    <a href="{{ path('plugin_dishes_approval_reject', {'id': dish.id}) }}" class="card-footer-item has-text-danger">
+                                        <span class="icon"><i class="fa-solid fa-times"></i></span>
+                                        <span>Reject</span>
+                                    </a>
+                                </footer>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="mt-5">
+                <a href="{{ path('app_plugin_dishes') }}" class="button">
+                    <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
+                    <span>Back to Dishes</span>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

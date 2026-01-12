@@ -3,7 +3,6 @@
 namespace Plugin\Dishes\Controller;
 
 use App\Controller\AbstractController;
-use App\Entity\User;
 use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,29 +11,37 @@ use Plugin\Dishes\Entity\DishTranslation;
 use Plugin\Dishes\Entity\ViewType;
 use Plugin\Dishes\Form\DishType;
 use Plugin\Dishes\Repository\DishRepository;
-use Plugin\Dishes\Repository\DishTranslationRepository;
+use Plugin\Dishes\Service\DishListService;
+use Plugin\Dishes\Service\DishService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 #[Route('/dishes')]
 class IndexController extends AbstractController
 {
     public function __construct(
         private readonly DishRepository $repo,
-        private readonly DishTranslationRepository $dishTransRepo,
         private readonly TranslationService $translationService,
         private readonly EntityManagerInterface $em,
-    ) {}
+        private readonly DishService $dishService,
+        private readonly DishListService $listService,
+    ) {
+    }
 
     #[Route('', name: 'app_plugin_dishes', methods: ['GET'])]
     public function index(Request $request): Response
     {
         $session = $request->getSession();
+        $isManager = $this->isGranted('ROLE_MANAGER');
+
+        $dishes = $isManager
+            ? $this->repo->findAll()
+            : $this->dishService->getApprovedDishes();
 
         return $this->render('@Dishes/index.html.twig', [
-            'list' => $this->repo->findAll(),
+            'list' => $dishes,
             'viewType' => $session->get('dishesViewType', ViewType::Tiles->value),
             'viewTypeList' => [
                 ViewType::List->value => 'list',
@@ -42,15 +49,38 @@ class IndexController extends AbstractController
                 ViewType::Grid->value => 'table-cells',
                 ViewType::Gallery->value => 'images',
             ],
+            'pendingCount' => $isManager ? count($this->dishService->getPendingDishes()) : 0,
+            'suggestionCount' => $isManager ? count($this->dishService->getDishesWithSuggestions()) : 0,
         ]);
     }
 
     #[Route('/view/{id}', name: 'plugin_dishes_item_show', methods: ['GET'])]
     public function view(int $id): Response
     {
+        $dish = $this->repo->findOneBy(['id' => $id]);
+        if ($dish === null) {
+            throw $this->createNotFoundException('Dish not found');
+        }
+
+        $userLists = [];
+        if ($this->isGranted('ROLE_USER')) {
+            $user = $this->getAuthedUser();
+            $userLists = $this->listService->getUserLists($user->getId());
+        }
+
         return $this->render('@Dishes/details.html.twig', [
-            'dish' => $this->repo->findOneBy(['id' => $id]),
+            'dish' => $dish,
+            'languages' => $this->translationService->getLanguageCodes(),
+            'userLists' => $userLists,
         ]);
+    }
+
+    #[Route('/like/{id}', name: 'plugin_dishes_like', methods: ['POST'])]
+    public function like(int $id): JsonResponse
+    {
+        $newCount = $this->dishService->incrementLike($id);
+
+        return new JsonResponse(['likes' => $newCount]);
     }
 
     #[Route('/filter/{name}/set/{value}', name: 'plugin_dishes_filter', methods: ['GET'])]
@@ -110,5 +140,4 @@ class IndexController extends AbstractController
             'languages' => $this->translationService->getLanguageCodes(),
         ]);
     }
-
 }

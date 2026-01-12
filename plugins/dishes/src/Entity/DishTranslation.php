@@ -31,6 +31,9 @@ class DishTranslation
     #[ORM\Column(type: Types::TEXT)]
     private null|string $description = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private null|string $recipe = null;
+
     public function getId(): null|int
     {
         return $this->id;
@@ -92,6 +95,18 @@ class DishTranslation
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getRecipe(): null|string
+    {
+        return $this->recipe;
+    }
+
+    public function setRecipe(null|string $recipe): static
+    {
+        $this->recipe = $recipe;
 
         return $this;
     }

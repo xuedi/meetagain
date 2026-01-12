@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ list.name }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dishes') }}">Dishes</a></li>
+                    <li><a href="{{ path('plugin_dishes_lists') }}">Lists</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ list.name }}</a></li>
+                </ul>
+            </nav>
+
+            <div class="level">
+                <div class="level-left">
+                    <div>
+                        <h1 class="title">
+                            {{ list.name }}
+                            {% if list.isPublic %}
+                                <span class="tag is-success is-light ml-2">Public</span>
+                            {% else %}
+                                <span class="tag is-light ml-2">Private</span>
+                            {% endif %}
+                        </h1>
+                        {% if list.description %}
+                            <p class="subtitle is-6 has-text-grey">{{ list.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if isOwner %}
+                    <div class="level-right">
+                        <div class="buttons">
+                            <a href="{{ path('plugin_dishes_lists_edit', {'id': list.id}) }}" class="button">
+                                <span class="icon"><i class="fa-solid fa-pen"></i></span>
+                                <span>Edit List</span>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <p class="mb-4 has-text-grey">
+                <span class="icon is-small"><i class="fa-solid fa-user"></i></span>
+                by {{ get_user_name(list.createdBy) }}
+                <span class="ml-3">
+                    <span class="icon is-small"><i class="fa-solid fa-calendar"></i></span>
+                    Created {{ list.createdAt|time_diff }}
+                </span>
+            </p>
+
+            {% if dishes is empty %}
+                <div class="notification is-info is-light">
+                    <p>This list is empty.</p>
+                    {% if isOwner %}
+                        <p class="mt-2">Browse <a href="{{ path('app_plugin_dishes') }}">dishes</a> and add some to this list!</p>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="columns is-multiline">
+                    {% for dish in dishes %}
+                        <div class="column is-3">
+                            <div class="card">
+                                <div class="card-image">
+                                    <figure class="image is-4by3">
+                                        {% include '_block/image.html.twig' with {'image': dish.previewImage, 'size': '400x300'} %}
+                                    </figure>
+                                </div>
+                                <div class="card-content p-3">
+                                    <p class="title is-6">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}</p>
+                                    <p class="is-size-7 has-text-grey">
+                                        <span class="icon is-small"><i class="fa-solid fa-heart"></i></span>
+                                        {{ dish.likes }}
+                                        {% if dish.origin %}
+                                            <span class="ml-2">
+                                                <span class="icon is-small"><i class="fa-solid fa-location-dot"></i></span>
+                                                {{ dish.origin }}
+                                            </span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <footer class="card-footer">
+                                    <a href="{{ path('plugin_dishes_item_show', {'id': dish.id}) }}" class="card-footer-item">
+                                        <span class="icon"><i class="fa-solid fa-eye"></i></span>
+                                        <span>View</span>
+                                    </a>
+                                    {% if isOwner %}
+                                        <a href="#" class="card-footer-item has-text-danger remove-from-list"
+                                           data-list-id="{{ list.id }}" data-dish-id="{{ dish.id }}">
+                                            <span class="icon"><i class="fa-solid fa-times"></i></span>
+                                            <span>Remove</span>
+                                        </a>
+                                    {% endif %}
+                                </footer>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="mt-5">
+                <a href="{{ path('plugin_dishes_lists') }}" class="button">
+                    <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
+                    <span>Back to Lists</span>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    {% if isOwner %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.remove-from-list').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!confirm('Remove this dish from the list?')) return;
+
+                const listId = this.dataset.listId;
+                const dishId = this.dataset.dishId;
+
+                fetch('/dishes/lists/' + listId + '/remove/' + dishId, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            });
+        });
+    });
+    </script>
+    {% endif %}
+
+{% endblock %}

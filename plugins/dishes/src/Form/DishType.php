@@ -16,7 +16,8 @@ class DishType extends AbstractType
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly DishTranslationRepository $dishTransRepo,
-    ) {}
+    ) {
+    }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Dish List{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dishes') }}">Dishes</a></li>
+                    <li><a href="{{ path('plugin_dishes_lists') }}">My Lists</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">Create</a></li>
+                </ul>
+            </nav>
+
+            <div class="columns">
+                <div class="column is-6">
+                    <div class="box">
+                        <h1 class="title is-4">
+                            <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                            <span>Create New List</span>
+                        </h1>
+
+                        {{ form_start(form) }}
+
+                        <div class="field">
+                            <label class="label">{{ form.name.vars.label }}</label>
+                            <div class="control">
+                                {{ form_widget(form.name, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.name) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">{{ form.description.vars.label }}</label>
+                            <div class="control">
+                                {{ form_widget(form.description, {'attr': {'class': 'textarea'}}) }}
+                            </div>
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        <div class="field">
+                            <div class="control">
+                                <label class="checkbox">
+                                    {{ form_widget(form.isPublic) }}
+                                    {{ form.isPublic.vars.label }}
+                                </label>
+                            </div>
+                            <p class="help">{{ form.isPublic.vars.help }}</p>
+                        </div>
+
+                        <div class="field is-grouped mt-5">
+                            <div class="control">
+                                <button type="submit" class="button is-link">
+                                    <span class="icon"><i class="fa-solid fa-check"></i></span>
+                                    <span>Create List</span>
+                                </button>
+                            </div>
+                            <div class="control">
+                                <a href="{{ path('plugin_dishes_lists') }}" class="button">Cancel</a>
+                            </div>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+
+                <div class="column is-6">
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
+                            <span>List Ideas</span>
+                        </h3>
+                        <div class="content">
+                            <ul>
+                                <li>Regional cuisines (Sichuan dishes, Cantonese dishes)</li>
+                                <li>Dietary preferences (Vegetarian, Spicy lovers)</li>
+                                <li>Meal types (Breakfast items, Street food)</li>
+                                <li>Occasions (Party dishes, Comfort food)</li>
+                                <li>Personal favorites (Must-try list, Childhood memories)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

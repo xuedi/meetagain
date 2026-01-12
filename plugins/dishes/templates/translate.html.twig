@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Translate Dish - {{ dish.getTranslatedName(dish.originLang ?? 'en') }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dishes') }}">Dishes</a></li>
+                    <li><a href="{{ path('plugin_dishes_item_show', {'id': dish.id}) }}">{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">Translate ({{ targetLanguage|upper }})</a></li>
+                </ul>
+            </nav>
+
+            <div class="columns">
+                <div class="column is-8">
+                    <div class="box">
+                        <h2 class="title is-4">
+                            <span class="icon"><i class="fa-solid fa-language"></i></span>
+                            <span>{% if existingTranslation %}Edit{% else %}Add{% endif %} Translation</span>
+                            <span class="tag is-info is-medium ml-2">{{ targetLanguage|upper }}</span>
+                        </h2>
+
+                        {% if existingTranslation %}
+                            <p class="mb-4 has-text-grey">
+                                {% if is_granted('ROLE_MANAGER') %}
+                                    Update the {{ targetLanguage|upper }} translation for this dish.
+                                {% else %}
+                                    Suggest changes to the {{ targetLanguage|upper }} translation. A manager will review your suggestions.
+                                {% endif %}
+                            </p>
+                        {% else %}
+                            <p class="mb-4 has-text-grey">
+                                {% if is_granted('ROLE_MANAGER') %}
+                                    Add a new {{ targetLanguage|upper }} translation for this dish.
+                                {% else %}
+                                    Suggest a {{ targetLanguage|upper }} translation for this dish. A manager will review your suggestion.
+                                {% endif %}
+                            </p>
+                        {% endif %}
+
+                        {{ form_start(form) }}
+
+                        <div class="field">
+                            <label class="label">{{ form.name.vars.label }}</label>
+                            <div class="control">
+                                {{ form_widget(form.name, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.name) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">{{ form.phonetic.vars.label }}</label>
+                            <div class="control">
+                                {{ form_widget(form.phonetic, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.phonetic) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">{{ form.description.vars.label }}</label>
+                            <div class="control">
+                                {{ form_widget(form.description, {'attr': {'class': 'textarea'}}) }}
+                            </div>
+                            {{ form_errors(form.description) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">{{ form.recipe.vars.label }}</label>
+                            <div class="control">
+                                {{ form_widget(form.recipe, {'attr': {'class': 'textarea'}}) }}
+                            </div>
+                            {{ form_errors(form.recipe) }}
+                        </div>
+
+                        <div class="field is-grouped mt-5">
+                            <div class="control">
+                                <button type="submit" class="button is-link">
+                                    <span class="icon"><i class="fa-solid fa-check"></i></span>
+                                    <span>{% if is_granted('ROLE_MANAGER') %}Save{% else %}Submit Suggestion{% endif %}</span>
+                                </button>
+                            </div>
+                            <div class="control">
+                                <a href="{{ path('plugin_dishes_item_show', {'id': dish.id}) }}" class="button">Cancel</a>
+                            </div>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+
+                <div class="column is-4">
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-info-circle"></i></span>
+                            <span>Original ({{ dish.originLang|upper }})</span>
+                        </h3>
+                        <div class="content">
+                            <p><strong>Name:</strong> {{ dish.getTranslatedName(dish.originLang ?? 'en') }}</p>
+                            {% if dish.getPhonetic(dish.originLang ?? 'en') %}
+                                <p><strong>Phonetic:</strong> {{ dish.getPhonetic(dish.originLang ?? 'en') }}</p>
+                            {% endif %}
+                            {% if dish.getTranslatedDescription(dish.originLang ?? 'en') %}
+                                <p><strong>Description:</strong> {{ dish.getTranslatedDescription(dish.originLang ?? 'en') }}</p>
+                            {% endif %}
+                            {% if dish.getTranslatedRecipe(dish.originLang ?? 'en') %}
+                                <p><strong>Recipe:</strong> {{ dish.getTranslatedRecipe(dish.originLang ?? 'en')|nl2br }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-globe"></i></span>
+                            <span>Other Languages</span>
+                        </h3>
+                        <div class="buttons">
+                            {% for lang in availableLanguages %}
+                                <a href="{{ path('plugin_dishes_translate', {'id': dish.id, 'lang': lang}) }}"
+                                   class="button {% if lang == targetLanguage %}is-link{% endif %} {% if dish.findTranslation(lang) %}is-success is-light{% endif %}">
+                                    {{ lang|upper }}
+                                    {% if dish.findTranslation(lang) %}
+                                        <span class="icon is-small"><i class="fa-solid fa-check"></i></span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
