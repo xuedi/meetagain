@@ -166,7 +166,7 @@ testSymfony +parameter='':
 [group('testing')]
 testPerformance:
     {{PHP}} mkdir -p tests/reports/performance
-    docker run -e NODE_TLS_REJECT_UNAUTHORIZED=0 --rm -v "$(pwd)/tests/reports/performance:/sitespeed.io" sitespeedio/sitespeed.io:39.3.1 --browsertime.chrome.args ignore-certificate-errors https://localhost/en
+    {{DOCKER}} run --rm sitespeed
 
 # Run PHPStan
 [group('checks')]

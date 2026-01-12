@@ -57,6 +57,18 @@ services:
     container_name: "ma-pa11y"
     network_mode: "host"
 
+  sitespeed:
+    image: sitespeedio/sitespeed.io:39.3.1
+    container_name: "ma-sitespeed"
+    network_mode: "host"
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    volumes:
+      - ../tests/reports/performance:/sitespeed.io
+    command: --browsertime.chrome.args ignore-certificate-errors https://localhost/en
+    profiles:
+      - tools
+
 volumes:
   ma-mysql-data:
   ma-caddy_data:
