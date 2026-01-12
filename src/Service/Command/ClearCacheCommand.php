@@ -13,6 +13,7 @@ readonly class ClearCacheCommand implements CommandInterface
     {
         return [
             'command' => $this->getCommand(),
+            '--no-warmup' => true,
         ];
     }
 }

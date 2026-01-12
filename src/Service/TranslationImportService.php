@@ -35,12 +35,15 @@ readonly class TranslationImportService
         $deletedTranslations = 0;
 
         $dataBase = $this->translationRepo->getUniqueList();
-        $importUser = $this->userRepo->findOneBy(['id' => $this->configService->getSystemUserId()]);
+        $systemUserId = $this->configService->getSystemUserId();
+        $importUser = $this->userRepo->findOneBy(['id' => $systemUserId]);
 
         if ($importUser === null) {
             throw new RuntimeException('System user not found for translation import');
         }
 
+        $batchSize = 100;
+        $i = 1;
         foreach ($this->fileManager->getTranslationFiles() as $file) {
             $parts = explode('.', (string) $file->getFilename());
             if (count($parts) !== 3) {
@@ -59,9 +62,17 @@ readonly class TranslationImportService
                     ++$newTranslations;
                 }
                 ++$numberTranslationCount;
+
+                if (($i % $batchSize) === 0) {
+                    $this->entityManager->flush();
+                    $this->entityManager->clear();
+                    $importUser = $this->userRepo->findOneBy(['id' => $systemUserId]);
+                }
+                ++$i;
             }
         }
         $this->entityManager->flush();
+        $this->entityManager->clear();
         $this->translationService->publish();
 
         return [
