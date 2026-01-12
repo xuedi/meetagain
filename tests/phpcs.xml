@@ -31,6 +31,7 @@
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
         <exclude-pattern>../public/install/*</exclude-pattern>
         <exclude-pattern>../tests/AiReadableSymfonyMetrics.php</exclude-pattern>
+        <exclude-pattern>../tests/AiReadableTestResults.php</exclude-pattern>
     </rule>
 
     <!-- Entry points and test bootstraps have side effects by design -->
@@ -38,6 +39,12 @@
         <exclude-pattern>../public/install/index.php</exclude-pattern>
         <exclude-pattern>../tests/Functional/InstallerTest.php</exclude-pattern>
         <exclude-pattern>../tests/AiReadableSymfonyMetrics.php</exclude-pattern>
+        <exclude-pattern>../tests/AiReadableTestResults.php</exclude-pattern>
+    </rule>
+
+    <!-- AI test results generator has pragmatic formatting for readability -->
+    <rule ref="PSR12.ControlStructures.ControlStructureSpacing">
+        <exclude-pattern>../tests/AiReadableTestResults.php</exclude-pattern>
     </rule>
 
 </ruleset>
