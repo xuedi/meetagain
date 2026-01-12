@@ -18,28 +18,33 @@ class TranslationRepository extends ServiceEntityRepository
 
     public function getMatrix(): array
     {
+        $rows = $this->createQueryBuilder('t')
+            ->select('t.id', 't.language', 't.placeholder', 't.translation')
+            ->orderBy('t.placeholder', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
         $structuredList = [];
-        $translations = $this->findAll();
-        foreach ($translations as $translation) {
-            $id = $translation->getId();
-            $lang = $translation->getLanguage();
-            $placeholder = $translation->getPlaceholder();
-            $translationText = $translation->getTranslation() ?? '';
-            $structuredList[$placeholder][$lang] = [
-                'id' => $id,
-                'value' => $translationText,
+        foreach ($rows as $row) {
+            $structuredList[$row['placeholder']][$row['language']] = [
+                'id' => $row['id'],
+                'value' => $row['translation'] ?? '',
             ];
         }
-        ksort($structuredList, SORT_NATURAL);
 
         return $structuredList;
     }
 
     public function buildKeyValueList(): array
     {
+        $rows = $this->createQueryBuilder('t')
+            ->select('t.id', 't.translation')
+            ->getQuery()
+            ->getArrayResult();
+
         $list = [];
-        foreach ($this->findAll() as $translation) {
-            $list[$translation->getId()] = $translation->getTranslation();
+        foreach ($rows as $row) {
+            $list[$row['id']] = $row['translation'];
         }
 
         return $list;
@@ -47,9 +52,14 @@ class TranslationRepository extends ServiceEntityRepository
 
     public function getUniqueList(): array
     {
+        $rows = $this->createQueryBuilder('t')
+            ->select('t.language', 'LOWER(t.placeholder) AS placeholder')
+            ->getQuery()
+            ->getArrayResult();
+
         $list = [];
-        foreach ($this->findAll() as $translation) {
-            $list[$translation->getLanguage()][] = strtolower($translation->getPlaceholder());
+        foreach ($rows as $row) {
+            $list[$row['language']][] = $row['placeholder'];
         }
 
         return $list;
@@ -57,15 +67,9 @@ class TranslationRepository extends ServiceEntityRepository
 
     public function getExportList(): array
     {
-        $list = [];
-        foreach ($this->findAll() as $translation) {
-            $list[] = [
-                'language' => $translation->getLanguage(),
-                'placeholder' => $translation->getPlaceholder(),
-                'translation' => $translation->getTranslation(),
-            ];
-        }
-
-        return $list;
+        return $this->createQueryBuilder('t')
+            ->select('t.language', 't.placeholder', 't.translation')
+            ->getQuery()
+            ->getArrayResult();
     }
 }
