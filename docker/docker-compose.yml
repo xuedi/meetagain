@@ -1,5 +1,6 @@
 services:
 
+  # Main PHP application server (FrankenPHP with Caddy)
   php:
     build: php
     container_name: "ma-php"
@@ -22,6 +23,7 @@ services:
       - valkey
     tty: true
 
+  # Database server
   mariadb:
     image: mariadb:12.1.2@sha256:e1bcd6f85781f4a875abefb11c4166c1d79e4237c23de597bf0df81fec225b40
     container_name: "ma-db"
@@ -37,6 +39,7 @@ services:
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
 
+  # Mail catcher for development (UI at localhost:8025)
   mailhog:
     container_name: "ma-mailhog"
     image: mailhog/mailhog:v1.0.1@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
@@ -45,6 +48,7 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  # Redis-compatible cache server
   valkey:
     container_name: "ma-valkey"
     image: valkey/valkey:latest@sha256:546304417feac0874c3dd576e0952c6bb8f06bb4093ea0c9ca303c73cf458f63
@@ -52,11 +56,35 @@ services:
     volumes:
       - ma-valkey-data:/data
 
+  # Accessibility testing tool (run via: just checkA11y)
   pa11y:
     build: pa11y
     container_name: "ma-pa11y"
     network_mode: "host"
 
+  # PHP server in prod mode for benchmarking (run via: just testPerformance)
+  php-bench:
+    build: php
+    container_name: "ma-php-bench"
+    user: ${HOST_UID}:${HOST_GID}
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ../:/var/www/html/
+      - ./php/Caddyfile:/etc/frankenphp/Caddyfile:ro
+    environment:
+      - UID=${HOST_UID}
+      - GID=${HOST_GID}
+      - USERNAME=${HOST_USERNAME}
+      - REDIS_URL=redis://valkey:6379
+      - APP_ENV=prod
+    depends_on:
+      - valkey
+    profiles:
+      - tools
+
+  # Page speed analyzer (run via: just testPerformance)
   sitespeed:
     image: sitespeedio/sitespeed.io:39.3.1
     container_name: "ma-sitespeed"
@@ -65,7 +93,7 @@ services:
       - NODE_TLS_REJECT_UNAUTHORIZED=0
     volumes:
       - ../tests/reports/performance:/sitespeed.io
-    command: --browsertime.chrome.args ignore-certificate-errors https://localhost/en
+    command: --browsertime.chrome.args ignore-certificate-errors https://localhost:8443/en https://localhost:8443/en/events https://localhost:8443/en/members https://localhost:8443/en/about
     profiles:
       - tools
 
