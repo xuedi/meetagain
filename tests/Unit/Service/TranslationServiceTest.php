@@ -115,10 +115,7 @@ class TranslationServiceTest extends TestCase
     {
         $this->languageService->method('getEnabledCodes')->willReturn(['de']);
 
-        $query = $this->getMockBuilder(\Doctrine\ORM\Query::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['setParameter', 'toIterable'])
-            ->getMock();
+        $query = $this->createStub(\Doctrine\ORM\Query::class);
         $query->method('setParameter')->willReturn($query);
         $query->method('toIterable')->willReturn([
             (new Translation())->setPlaceholder('key')->setTranslation('value'),

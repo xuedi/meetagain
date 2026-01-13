@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
@@ -52,6 +53,24 @@ readonly class ImageService
         $this->entityManager->persist($image);
 
         return $image;
+    }
+
+    /**
+     * @param UploadedFile[] $files
+     */
+    public function uploadForEvent(Event $event, array $files, User $user): int
+    {
+        foreach ($files as $uploadedFile) {
+            $image = $this->upload($uploadedFile, $user, ImageType::EventUpload);
+            $this->entityManager->persist($image);
+            $this->entityManager->flush();
+            $event->addImage($image);
+            $this->createThumbnails($image);
+        }
+        $this->entityManager->persist($event);
+        $this->entityManager->flush();
+
+        return count($files);
     }
 
     public function createThumbnails(Image $image, ?ImageType $imageType = null): int

@@ -144,12 +144,17 @@ testSetup:
 # Run unit tests
 [group('testing')]
 testUnit +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default --no-progress {{parameter}}
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=default --no-progress --log-junit tests/reports/junit.xml {{parameter}}
 
 # Run functional tests
 [group('testing')]
 testFunctional +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --no-progress {{parameter}}
+    {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --testsuite=functional --no-progress --log-junit tests/reports/junit.xml {{parameter}}
+
+# Show AI-readable test results (for Haiku agent)
+[group('testing')]
+testResults +parameter='':
+    {{PHP}} php tests/AiReadableTestResults.php {{parameter}}
 
 # Show coverage report
 [group('testing')]

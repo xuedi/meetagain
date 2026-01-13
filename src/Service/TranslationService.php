@@ -59,7 +59,7 @@ readonly class TranslationService
             )->setParameter('locale', $locale);
 
             foreach ($query->toIterable() as $translation) {
-                $translations[strtolower($translation->getPlaceholder())] = $translation->getTranslation() ?? '';
+                $translations[strtolower((string) $translation->getPlaceholder())] = $translation->getTranslation() ?? '';
                 ++$published;
                 $this->entityManager->detach($translation);
             }
