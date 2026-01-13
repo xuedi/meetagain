@@ -9,7 +9,6 @@ use App\Entity\EventFilterRsvp;
 use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
-use App\Entity\ImageType;
 use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
@@ -115,51 +114,26 @@ class EventController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
     ): Response {
-        // Get user and ensure it's properly managed
-        $sessionUser = $this->getAuthedUser();
-
-        // Debug: Check if email is null in the session user
-        if ($sessionUser->getEmail() === null) {
-            throw new RuntimeException('Session user email is null! ID: ' . $sessionUser->getId());
-        }
-
-        // Find fresh user from database instead of relying on session user
-        $user = $em->find(User::class, $sessionUser->getId());
+        $user = $em->find(User::class, $this->getAuthedUser()->getId());
         if ($user === null) {
-            throw new RuntimeException('User not found in database! ID: ' . $sessionUser->getId());
+            throw new RuntimeException('User not found');
         }
-
-        $response = $this->getResponse();
 
         $form = $this->createForm(EventUploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $files = $form->get('files')->getData();
-            foreach ($files as $uploadedFile) {
-                $image = $this->imageService->upload($uploadedFile, $user, ImageType::EventUpload);
-                $em->persist($image);
-                $em->flush();
-                $event->addImage($image);
-                $this->imageService->createThumbnails($image);
-            }
-            $em->persist($event);
-            $em->flush();
+            $count = $this->imageService->uploadForEvent($event, $files, $user);
 
             $this->activityService->log(ActivityType::EventImageUploaded, $user, [
                 'event_id' => $event->getId(),
-                'images' => count($files),
+                'images' => $count,
             ]);
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
 
-        return $this->render(
-            'events/upload.html.twig',
-            [
-                'form' => $form,
-            ],
-            $response,
-        );
+        return $this->render('events/upload.html.twig', ['form' => $form], $this->getResponse());
     }
 
     #[Route('/event/featured/', name: self::ROUTE_FEATURED)]
