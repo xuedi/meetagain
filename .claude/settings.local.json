@@ -33,7 +33,9 @@
       "Bash(just appRsvpNotify:*)",
       "Bash(just devModeFixtures:*)",
       "Bash(just checkRector:*)",
-      "Bash(just testPerformance:*)"
+      "Bash(just testPerformance:*)",
+      "Bash(git -C /home/xuedi/Projects/meetAgain show groups:src/DataFixtures/GroupCmsBlockFixture.php)",
+      "Bash(git -C /home/xuedi/Projects/meetAgain show groups:src/DataFixtures/GroupCmsSettingsFixture.php)"
     ]
   }
 }
