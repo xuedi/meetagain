@@ -22,7 +22,7 @@
         </div>
         <div class="message-body">
             <p>
-                {% include 'admin/cms/blocks/' ~ newBlock.name ~ '.html.twig' %}
+                {% include 'cms/blocks/_edit/' ~ newBlock.name ~ '.html.twig' %}
             </p>
             <div class="has-text-right">
                 <button class="button">{{ "button_add" | trans }}</button>
