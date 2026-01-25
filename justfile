@@ -101,6 +101,7 @@ devModeFixtures plugins='no':
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q
+    @test -x config/plugins-post-fixtures.sh && bash config/plugins-post-fixtures.sh || true
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console app:event:add-fixture
