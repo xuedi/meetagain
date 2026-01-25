@@ -1,12 +1,13 @@
 # MeetAgain
 
-[![Gitea Release](https://img.shields.io/badge/Version-v1.0.0-31c754.svg)](https://github.com/xuedi/meetAgain/releases)
+[![Version](https://img.shields.io/badge/Version-v1.0.0-31c754.svg)](https://codeberg.org/xuedi/meetAgain/releases)
 [![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
-[![EUPL Licence](https://img.shields.io/badge/Roadmap-1.0-31c754.svg)](https://github.com/xuedi/meetAgain/milestones?sort=title&direction=asc)
-[![PHP unit tests](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml/badge.svg)](https://github.com/xuedi/meetAgain/actions/workflows/phpunit.yml)
-[![Code Coverage](https://raw.githubusercontent.com/xuedi/meetAgain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetAgain/blob/master/tests/badgeGenerator.php)
 
 A self-hosted, open-source alternative to Meetup.com for organizing groups and scheduling events.
+
+**Primary Repository:** https://codeberg.org/xuedi/meetAgain
+
+> **Note:** The MultiSite plugin (multi-tenancy) is maintained separately in a private repository.
 
 ## Features
 
@@ -64,7 +65,7 @@ Run `just` to see all available commands.
 **Requirements:** PHP >= 8.4 (apcu, pdo_mysql, imagick, intl, iconv, ctype, redis), MariaDB/MySQL, web server (Caddy,
 Nginx, Apache)
 
-1. Clone repository and configure web server to serve `public/`
+1. Clone repository from https://codeberg.org/xuedi/meetAgain.git and configure web server to serve `public/`
 2. Navigate to your domain - redirects to `/install/`
 3. Follow the wizard:
     - **Step 1:** Verify PHP requirements, configure database
