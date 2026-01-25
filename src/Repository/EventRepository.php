@@ -22,6 +22,7 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
      * @return Event[]
      */
     public function findByFilters(
@@ -30,6 +31,7 @@ class EventRepository extends ServiceEntityRepository
         EventTypes $type,
         ?UserInterface $user = null,
         ?EventFilterRsvp $rsvp = null,
+        ?array $restrictToEventIds = null,
     ): array {
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
@@ -55,25 +57,44 @@ class EventRepository extends ServiceEntityRepository
             // Friends filtering not yet implemented
         }
 
+        // Apply multisite event ID filter if provided
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return []; // Empty filter = no results
+            }
+            $qb->andWhere('e.id IN (:eventIds)')
+                ->setParameter('eventIds', $restrictToEventIds);
+        }
+
         $qb->orderBy('e.start', $sort->value);
 
         return $qb->getQuery()->getResult();
     }
 
     /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
      * @return array<Event>
      */
-    public function findUpcomingEventsWithinRange(DateTimeInterface $start, DateTimeInterface $end): array
+    public function findUpcomingEventsWithinRange(DateTimeInterface $start, DateTimeInterface $end, ?array $restrictToEventIds = null): array
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.start BETWEEN :start AND :end')
             ->andWhere('e.published = :published')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
-            ->setParameter('published', true)
-            ->orderBy('e.start', 'ASC')
+            ->setParameter('published', true);
+
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return [];
+            }
+            $qb->andWhere('e.id IN (:eventIds)')
+                ->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->orderBy('e.start', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -95,32 +116,54 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
      * @return array<Event>
      */
-    public function getUpcomingEvents(int $number = 3): array
+    public function getUpcomingEvents(int $number = 3, ?array $restrictToEventIds = null): array
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.start > :date')
-            ->setParameter('date', new DateTime())
-            ->orderBy('e.start', 'ASC')
+            ->setParameter('date', new DateTime());
+
+        // Apply multisite event ID filter if provided
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return [];
+            }
+            $qb->andWhere('e.id IN (:eventIds)')
+                ->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->orderBy('e.start', 'ASC')
             ->setMaxResults($number)
             ->getQuery()
             ->getResult();
     }
 
     /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
      * @return array<Event>
      */
-    public function getPastEvents(int $number = 3): array
+    public function getPastEvents(int $number = 3, ?array $restrictToEventIds = null): array
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.start < :date')
-            ->setParameter('date', new DateTime())
-            ->orderBy('e.start', 'DESC')
+            ->setParameter('date', new DateTime());
+
+        // Apply multisite event ID filter if provided
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return [];
+            }
+            $qb->andWhere('e.id IN (:eventIds)')
+                ->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->orderBy('e.start', 'DESC')
             ->setMaxResults($number)
             ->getQuery()
             ->getResult();
