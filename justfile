@@ -8,6 +8,11 @@ PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 DB := DOCKER + " exec mariadb"
 JUST := just_executable() + " --justfile=" + justfile()
 
+# Import plugin justfiles
+# TODO: Switch to wildcard include when just supports it: import? 'plugins/*/justfile'
+# For now, we explicitly import each plugin's justfile
+import? 'plugins/multisite/justfile'
+
 # Show commands
 default:
     @echo ""
