@@ -10,6 +10,7 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\BlockingService;
+use App\Service\EventFilter\EventFilterService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,6 +29,7 @@ class ProfileController extends AbstractController
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
         private readonly BlockingService $blockingService,
+        private readonly EventFilterService $eventFilterService,
     ) {
     }
 
@@ -62,6 +64,10 @@ class ProfileController extends AbstractController
 
         $modal = $this->imageUploadController->imageReplaceModal('user', $user->getId(), true)->getContent();
 
+        // Apply content filtering from all registered filters
+        $filterResult = $this->eventFilterService->getEventIdFilter();
+        $eventIds = $filterResult->getEventIds();
+
         return $this->render(
             'profile/index.html.twig',
             [
@@ -71,8 +77,8 @@ class ProfileController extends AbstractController
                 'socialCounts' => $this->userRepo->getSocialCounts($user),
                 'blockedCount' => count($this->blockingService->getBlockedUsers($user)),
                 'user' => $this->getAuthedUser(),
-                'upcoming' => $this->repo->getUpcomingEvents(10),
-                'past' => $this->repo->getPastEvents(20),
+                'upcoming' => $this->repo->getUpcomingEvents(10, $eventIds),
+                'past' => $this->repo->getPastEvents(20, $eventIds),
                 'form' => $form,
             ],
             $response,

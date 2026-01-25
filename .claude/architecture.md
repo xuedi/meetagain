@@ -289,6 +289,115 @@ interface Plugin
 
 ---
 
+### Plugin Content Filtering Pattern
+
+**Problem:** Plugins need to filter content (events, CMS pages, etc.) without core code knowing about them.
+
+**❌ WRONG - Hardcoded Plugin Dependency:**
+```php
+// EventController.php - VIOLATES architecture!
+public function __construct(
+    #[Autowire(service: 'Plugin\MultiSite\Service\WhitelabelEventFilterService')]
+    private readonly ?object $whitelabelFilter = null,
+) {}
+
+public function index(): Response
+{
+    $eventIds = $this->whitelabelFilter?->getEventIdFilter(); // ❌ Core depends on plugin
+}
+```
+
+**✅ CORRECT - Tagged Service Pattern:**
+
+Core defines an interface with auto-tagging:
+```php
+// src/Service/EventFilter/EventFilterInterface.php
+#[AutoconfigureTag]
+interface EventFilterInterface
+{
+    public function getPriority(): int;
+    public function getEventIdFilter(): ?array;
+    public function isEventAccessible(int $eventId): ?bool;
+}
+```
+
+Core provides a composite service using `#[AutowireIterator]`:
+```php
+// src/Service/EventFilter/EventFilterService.php
+readonly class EventFilterService
+{
+    public function __construct(
+        #[AutowireIterator(EventFilterInterface::class)]
+        private iterable $filters,
+    ) {}
+
+    public function getEventIdFilter(): EventFilterResult
+    {
+        // Compose all filters using AND logic (intersection)
+        // Returns EventFilterResult with event IDs or null
+    }
+}
+```
+
+Plugins implement the interface:
+```php
+// plugins/multisite/src/Service/WhitelabelEventFilter.php
+readonly class WhitelabelEventFilter implements EventFilterInterface
+{
+    public function getPriority(): int { return 100; }
+
+    public function getEventIdFilter(): ?array
+    {
+        if (!$this->contextService->getCurrentContext()->isActive()) {
+            return null; // No filtering
+        }
+        return $this->mappingRepository->getEventIdsForGroup($group);
+    }
+}
+```
+
+Controllers use the core service (no plugin knowledge):
+```php
+// EventController.php - Clean separation
+public function __construct(
+    private readonly EventFilterService $eventFilterService, // ✅ Core service
+) {}
+
+public function index(): Response
+{
+    $filterResult = $this->eventFilterService->getEventIdFilter();
+    $events = $this->repo->findByFilters(..., $filterResult->getEventIds());
+}
+```
+
+**Benefits:**
+- Zero plugin-specific code in core
+- Multiple plugins can provide filters (composable)
+- Plugins auto-register via `#[AutoconfigureTag]`
+- Follows existing patterns (`Plugin`, `MessageInterface`)
+- Testable in isolation
+
+**Reference Implementation Plan:**
+See `.claude/plans/2026-01-25-plugin-content-filtering.md` for detailed migration guide.
+
+---
+
+### Current Plugin Architecture Violations (TODO)
+
+**KNOWN ISSUE:** The following files currently violate the "Main code MUST NOT depend on plugin code" principle:
+
+1. `src/Controller/EventController.php:41-42` - Hardcoded `#[Autowire(service: 'Plugin\MultiSite\Service\WhitelabelEventFilterService')]`
+2. `src/Controller/ProfileController.php:32-33` - Same violation
+3. `src/Service/CmsService.php:17-18` - Same violation
+
+**Status:** Architecture design completed (see plan above). Implementation pending.
+
+**Why This Exists:** Early implementation before plugin content filtering pattern was established.
+
+**Impact:** MultiSite plugin cannot be cleanly removed without code changes. Other plugins cannot provide content filters.
+
+---
+
 ## Symfony 8 Specific Features
 
 ### New in Symfony 8.0 (used in this project)
