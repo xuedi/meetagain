@@ -96,7 +96,7 @@
                         {% endif %}
                     {% endif %}
                     </div>
-                    {% include 'admin/cms/blocks/' ~ block.type.name ~ '.html.twig' with {
+                    {% include 'cms/blocks/_edit/' ~ block.type.name ~ '.html.twig' with {
                         'block': block.blockObject,
                         'blockId': block.id,
                         'blockImage': block.image,
