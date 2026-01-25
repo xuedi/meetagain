@@ -7,8 +7,6 @@ A self-hosted, open-source alternative to Meetup.com for organizing groups and s
 
 **Primary Repository:** https://codeberg.org/xuedi/meetAgain
 
-> **Note:** The MultiSite plugin (multi-tenancy) is maintained separately in a private repository.
-
 ## Features
 
 - Recurring events with flexible scheduling (daily, weekly, monthly)
