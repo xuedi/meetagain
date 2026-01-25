@@ -1,7 +1,5 @@
 {
 	admin off
-	# Disable auto HTTPS for local development
-	auto_https off
 	log default {
 		output stdout
 		format console
@@ -18,9 +16,29 @@
 	}
 }
 
-# Listen on HTTP only for local development
-http://* {
-	root /var/www/html/public
+# HTTPS with custom certificate for *.meetagain.local
+*.meetagain.local, meetagain.local {
+	tls /certs/meetagain.local.crt /certs/meetagain.local.key
+
+	root * /var/www/html/public
+	encode zstd br gzip
+
+	@phpRoute {
+		not file {path}
+	}
+	rewrite @phpRoute index.php
+
+	@frontController path index.php
+	php @frontController
+
+	file_server {
+		hide *.php
+	}
+}
+
+# Localhost (HTTP only, no certificate needed)
+http://localhost {
+	root * /var/www/html/public
 	encode zstd br gzip
 
 	@phpRoute {
