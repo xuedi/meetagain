@@ -7,6 +7,7 @@ use App\Repository\UserRepository;
 use App\Service\BlockingService;
 use App\Service\FriendshipService;
 use App\Service\ImageService;
+use App\Service\MemberFilter\MemberFilterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,7 @@ class MemberController extends AbstractController
         private readonly ImageService $imageService,
         private readonly Security $security,
         private readonly BlockingService $blockingService,
+        private readonly MemberFilterService $memberFilterService,
     ) {
     }
 
@@ -34,13 +36,17 @@ class MemberController extends AbstractController
         $offset = ($page - 1) * self::PAGE_SIZE;
         $currentUser = $this->getUser();
 
+        // Get member filter from all registered filters
+        $filterResult = $this->memberFilterService->getUserIdFilter();
+        $restrictToUserIds = $filterResult->getUserIds();
+
         if ($currentUser instanceof User) {
             $excludeIds = $this->blockingService->getExcludedUserIds($currentUser);
-            $userTotal = $this->repo->getNumberOfActiveMembers($excludeIds);
-            $users = $this->repo->findActiveMembers(self::PAGE_SIZE, $offset, $excludeIds);
+            $userTotal = $this->repo->getNumberOfActiveMembers($excludeIds, $restrictToUserIds);
+            $users = $this->repo->findActiveMembers(self::PAGE_SIZE, $offset, $excludeIds, $restrictToUserIds);
         } else {
-            $userTotal = $this->repo->getNumberOfActivePublicMembers();
-            $users = $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset);
+            $userTotal = $this->repo->getNumberOfActivePublicMembers($restrictToUserIds);
+            $users = $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset, $restrictToUserIds);
         }
 
         return $this->render(
