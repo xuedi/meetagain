@@ -2,6 +2,7 @@
 
 namespace Plugin\Karaoke;
 
+use App\Entity\AdminSection;
 use App\Plugin;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -24,5 +25,10 @@ class Kernel implements Plugin
 
     public function loadPostExtendFixtures(OutputInterface $output): void
     {
+    }
+
+    public function getAdminSystemLinks(): ?AdminSection
+    {
+        return null;
     }
 }

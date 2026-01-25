@@ -2,6 +2,7 @@
 
 namespace Plugin\Dishes;
 
+use App\Entity\AdminSection;
 use App\Entity\Link;
 use App\Plugin;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,5 +36,10 @@ readonly class Kernel implements Plugin
 
     public function loadPostExtendFixtures(OutputInterface $output): void
     {
+    }
+
+    public function getAdminSystemLinks(): ?AdminSection
+    {
+        return null;
     }
 }

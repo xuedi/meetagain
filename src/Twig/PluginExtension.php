@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Entity\AdminSection;
 use App\Plugin;
 use App\Service\PluginService;
 use Override;
@@ -24,6 +25,7 @@ final class PluginExtension extends AbstractExtension
     {
         return [
             new TwigFunction('get_plugins_links', $this->getPluginsLinks(...)),
+            new TwigFunction('get_plugins_admin_system_links', $this->getPluginsAdminSystemLinks(...)),
         ];
     }
 
@@ -45,5 +47,29 @@ final class PluginExtension extends AbstractExtension
         }
 
         return $links;
+    }
+
+    /**
+     * @return list<AdminSection>
+     */
+    public function getPluginsAdminSystemLinks(): array
+    {
+        $enabledPlugins = $this->pluginService->getActiveList();
+        $sections = [];
+        foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+            try {
+                $adminSection = $plugin->getAdminSystemLinks();
+                if ($adminSection !== null) {
+                    $sections[] = $adminSection;
+                }
+            } catch (Throwable) {
+                continue;
+            }
+        }
+
+        return $sections;
     }
 }

@@ -90,6 +90,75 @@ private Collection $events;
 
 ---
 
+### Value Objects Over Arrays
+
+Prefer value objects instead of complex arrays to avoid verbose type annotations:
+
+```php
+// ❌ Avoid - Requires complex annotations
+/**
+ * @return array{section: string, links: array<int, array{label: string, route: string, active?: string}>}
+ */
+public function getAdminSystemLinks(): array
+
+// ✅ Better - Self-documenting with value objects
+public function getAdminSystemLinks(): ?AdminSection
+```
+
+```php
+readonly class AdminSection
+{
+    /**
+     * @param list<AdminLink> $links
+     */
+    public function __construct(
+        private string $section,
+        private array $links,
+    ) {
+    }
+
+    public function getSection(): string
+    {
+        return $this->section;
+    }
+
+    /**
+     * @return list<AdminLink>
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+}
+
+readonly class AdminLink
+{
+    public function __construct(
+        private string $label,
+        private string $route,
+        private ?string $active = null,
+    ) {
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function getRoute(): string
+    {
+        return $this->route;
+    }
+
+    public function getActive(): ?string
+    {
+        return $this->active;
+    }
+}
+```
+
+---
+
 ### Use Statements
 
 Always use `use` statements, no FQCNs in code:
