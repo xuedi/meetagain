@@ -14,16 +14,6 @@
                 {% for pluginLink in get_plugins_links() %}
                     <a class="navbar-item" href="{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
                 {% endfor %}
-                {% if is_granted('ROLE_MANAGER') %}
-                    <a class="navbar-item" href="{{ path('app_manage') }}">
-                        {{ "menu_manage" | trans }}
-                        {% if has_manager_attention() %}
-                            <span class="icon has-text-danger ml-1">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </span>
-                        {% endif %}
-                    </a>
-                {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}
                     <a class="navbar-item" href="{{ path('app_admin') }}">
                         {{ "menu_admin" | trans }}

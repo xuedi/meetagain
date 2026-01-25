@@ -205,6 +205,19 @@ class AdminPagesTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testAdminTranslationSuggestionsPage(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $client->request('GET', '/en/admin/translations/suggestions');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+    }
+
     private function loginAsAdmin(KernelBrowser $client): void
     {
         // Act

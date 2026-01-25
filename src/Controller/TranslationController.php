@@ -83,7 +83,7 @@ class TranslationController extends AbstractController
     }
 
     #[Route('/translation/suggestion/deny/{id}', name: 'app_translation_suggestion_deny')]
-    public function suggestionDeny(int $id): Response
+    public function suggestionDeny(int $id, Request $request): Response
     {
         $suggestion = $this->getSuggestion($id);
         $suggestion->setApprovedAt(new DateTimeImmutable());
@@ -93,6 +93,10 @@ class TranslationController extends AbstractController
         $this->em->persist($suggestion);
         $this->em->flush();
 
+        if ($request->query->get('returnTo') === 'admin') {
+            return $this->redirectToRoute('app_admin_translation_suggestion');
+        }
+
         return $this->redirectToRoute('app_translation_edit', [
             'id' => $suggestion->getTranslation()?->getId(),
             'lang' => $suggestion->getLanguage(),
@@ -100,7 +104,7 @@ class TranslationController extends AbstractController
     }
 
     #[Route('/translation/suggestion/approve/{id}', name: 'app_translation_suggestion_approve')]
-    public function suggestionApprove(int $id): Response
+    public function suggestionApprove(int $id, Request $request): Response
     {
         $suggestion = $this->getSuggestion($id);
         $suggestion->setApprovedAt(new DateTimeImmutable());
@@ -116,6 +120,10 @@ class TranslationController extends AbstractController
         $this->em->persist($suggestion);
         $this->em->persist($translation);
         $this->em->flush();
+
+        if ($request->query->get('returnTo') === 'admin') {
+            return $this->redirectToRoute('app_admin_translation_suggestion');
+        }
 
         return $this->redirectToRoute('app_translation_edit', [
             'id' => $suggestion->getTranslation()?->getId(),
@@ -140,8 +148,8 @@ class TranslationController extends AbstractController
 
     private function getSuggestion(int $id): TranslationSuggestion
     {
-        if (!$this->getAuthedUser()->hasRole('ROLE_MANAGER')) {
-            throw $this->createAccessDeniedException('Only managers can approve or deny suggestions');
+        if (!$this->getAuthedUser()->hasRole('ROLE_MANAGER') && !$this->getAuthedUser()->hasRole('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Only managers or admins can approve or deny suggestions');
         }
         $suggestion = $this->translationSuggestionRepo->findOneBy(['id' => $id]);
         if (!($suggestion instanceof TranslationSuggestion)) {

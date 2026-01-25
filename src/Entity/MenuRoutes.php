@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Controller\AdminController;
 use App\Controller\EventController;
-use App\Controller\ManageController;
 use App\Controller\MemberController;
 use App\Controller\ProfileController;
 use App\Controller\SecurityController;
@@ -17,7 +16,6 @@ enum MenuRoutes: string
     case Events = EventController::ROUTE_EVENT;
     case EventsFeatured = EventController::ROUTE_FEATURED;
     case Members = MemberController::ROUTE_MEMBER;
-    case Manage = ManageController::ROUTE_MANAGE;
     case Admin = AdminController::ROUTE_ADMIN;
     case Login = SecurityController::LOGIN_ROUTE;
     case Translation = TranslationController::ROUTE_MANAGE;

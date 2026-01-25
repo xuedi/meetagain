@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Entity\TranslationSuggestionStatus;
+use App\Repository\TranslationSuggestionRepository;
 use App\Service\TranslationImportService;
 use App\Service\TranslationService;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +16,20 @@ class AdminTranslationController extends AbstractController
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly TranslationImportService $translationImportService,
+        private readonly TranslationSuggestionRepository $translationSuggestionRepo,
     ) {
+    }
+
+    #[Route('/admin/translations/suggestions', name: 'app_admin_translation_suggestion')]
+    public function translationsSuggestions(): Response
+    {
+        return $this->render('admin/translations/suggestions.html.twig', [
+            'active' => 'suggestions',
+            'translationSuggestions' => $this->translationSuggestionRepo->findBy(
+                ['status' => TranslationSuggestionStatus::Requested],
+                ['createdAt' => 'DESC'],
+            ),
+        ]);
     }
 
     #[Route('/admin/translations/edit', name: 'app_admin_translation_edit')]
