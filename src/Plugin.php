@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Entity\AdminSection;
+use App\Entity\Link;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -14,7 +16,9 @@ interface Plugin
     public function getPluginKey(): string;
 
     /**
-     * returned list of links to be displayed in the top menu or the footer.
+     * Returns list of links to be displayed in the top menu or the footer.
+     *
+     * @return list<Link>
      */
     public function getMenuLinks(): array;
 
@@ -28,4 +32,10 @@ interface Plugin
      * Called by app:event:add-fixture command.
      */
     public function loadPostExtendFixtures(OutputInterface $output): void;
+
+    /**
+     * Returns admin sidebar section with links for this plugin.
+     * Return null if the plugin has no admin links.
+     */
+    public function getAdminSystemLinks(): ?AdminSection;
 }
