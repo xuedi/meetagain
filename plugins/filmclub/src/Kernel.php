@@ -2,6 +2,7 @@
 
 namespace Plugin\Filmclub;
 
+use App\Entity\AdminSection;
 use App\Entity\Link;
 use App\Plugin;
 use App\Repository\EventRepository;
@@ -164,5 +165,10 @@ class Kernel implements Plugin
             $voteCount,
             $ballotCount
         ));
+    }
+
+    public function getAdminSystemLinks(): ?AdminSection
+    {
+        return null;
     }
 }
