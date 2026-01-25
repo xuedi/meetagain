@@ -191,4 +191,9 @@ class Kernel implements Plugin
     {
         // No cron tasks for this plugin
     }
+
+    public function getEventListItemTags(int $eventId): array
+    {
+        return [];
+    }
 }
