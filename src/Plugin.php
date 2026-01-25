@@ -58,4 +58,18 @@ interface Plugin
      * Return null if the plugin doesn't provide custom footer content.
      */
     public function getFooterAbout(): ?string;
+
+    /**
+     * Runs periodic maintenance/cron tasks for the plugin.
+     * Called by app:cron command (typically every 5 minutes).
+     *
+     * Use this for:
+     * - Data integrity checks
+     * - Cleanup tasks
+     * - Periodic synchronization
+     * - Notification processing
+     *
+     * Keep execution time under 30 seconds to avoid blocking the cron.
+     */
+    public function runCronTasks(OutputInterface $output): void;
 }
