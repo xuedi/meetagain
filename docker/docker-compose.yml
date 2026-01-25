@@ -12,6 +12,7 @@ services:
     volumes:
       - ../:/var/www/html/
       - ./php/Caddyfile:/etc/frankenphp/Caddyfile:ro
+      - ./certs:/certs:ro
       - ma-caddy_data:/data
       - ma-caddy_config:/config
     environment:
