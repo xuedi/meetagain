@@ -7,6 +7,14 @@
         <li><a class="{% if active == 'language' %}is-active{% endif %}" href="{{ path('app_admin_language') }}">{{ "menu_admin_language" | trans }}</a></li>
         <li><a class="{% if active == 'announcement' %}is-active{% endif %}" href="{{ path('app_admin_announcement') }}">{{ "menu_admin_announcement" | trans }}</a></li>
     </ul>
+    {% for section in get_plugins_admin_system_links() %}
+        <p class="menu-label">{{ section.section }}</p>
+        <ul class="menu-list">
+            {% for link in section.links %}
+                <li><a class="{% if active == link.active %}is-active{% endif %}" href="{{ path(link.route) }}">{{ link.label }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
     <p class="menu-label">Tables</p>
     <ul class="menu-list">
         <li><a class="{% if active == 'event' %}is-active{% endif %}" href="{{ path('app_admin_event') }}">{{ "menu_admin_event" | trans }}</a></li>
@@ -32,12 +40,4 @@
         <li><a class="{% if active == 'activity' %}is-active{% endif %}" href="{{ path('app_admin_logs_activity') }}">{{ "menu_admin_logs_activity" | trans }}</a></li>
         <li><a class="{% if active == '404' %}is-active{% endif %}" href="{{ path('app_admin_logs_not_found') }}">{{ "menu_admin_logs_404" | trans }}</a></li>
     </ul>
-    {% for section in get_plugins_admin_system_links() %}
-        <p class="menu-label">{{ section.section }}</p>
-        <ul class="menu-list">
-            {% for link in section.links %}
-                <li><a class="{% if active == link.active %}is-active{% endif %}" href="{{ path(link.route) }}">{{ link.label }}</a></li>
-            {% endfor %}
-        </ul>
-    {% endfor %}
 </aside>
