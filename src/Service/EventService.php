@@ -32,7 +32,7 @@ readonly class EventService
     }
 
     /**
-     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
      */
     public function getFilteredList(
         EventFilterTime $time,

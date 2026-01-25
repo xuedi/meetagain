@@ -22,7 +22,7 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return Event[]
      */
     public function findByFilters(
@@ -57,7 +57,7 @@ class EventRepository extends ServiceEntityRepository
             // Friends filtering not yet implemented
         }
 
-        // Apply multisite event ID filter if provided
+        // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
             if ($restrictToEventIds === []) {
                 return []; // Empty filter = no results
@@ -72,7 +72,7 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
     public function findUpcomingEventsWithinRange(DateTimeInterface $start, DateTimeInterface $end, ?array $restrictToEventIds = null): array
@@ -116,7 +116,7 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
     public function getUpcomingEvents(int $number = 3, ?array $restrictToEventIds = null): array
@@ -127,7 +127,7 @@ class EventRepository extends ServiceEntityRepository
             ->where('e.start > :date')
             ->setParameter('date', new DateTime());
 
-        // Apply multisite event ID filter if provided
+        // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
             if ($restrictToEventIds === []) {
                 return [];
@@ -143,7 +143,7 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
     public function getPastEvents(int $number = 3, ?array $restrictToEventIds = null): array
@@ -154,7 +154,7 @@ class EventRepository extends ServiceEntityRepository
             ->where('e.start < :date')
             ->setParameter('date', new DateTime());
 
-        // Apply multisite event ID filter if provided
+        // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
             if ($restrictToEventIds === []) {
                 return [];
