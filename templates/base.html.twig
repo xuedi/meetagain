@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Chinese/German Culture Exchange in Berlin">
+    <meta name="description" content="Self-hosted event management platform">
 
     {% for altLangCode, altLangLink in get_alternative_languages() %}
         <link rel=”alternate” hreflang="{{ altLangCode }}" href="{{ altLangLink }}" />
@@ -16,7 +16,13 @@
     <link rel="stylesheet" href="/stylesheet/fontawesome-solid.css"/>
     <link rel="stylesheet" href="/stylesheet/fonts.css"/>
     <link rel="stylesheet" href="/stylesheet/custom.css"/>
+    {% for stylesheet in get_plugin_stylesheets() %}
+        <link rel="stylesheet" href="{{ stylesheet }}"/>
+    {% endfor %}
     <script src="/javascript/custom.js" defer></script>
+    {% for javascript in get_plugin_javascripts() %}
+        <script src="{{ javascript }}" defer></script>
+    {% endfor %}
 
     {% set colors = get_theme_colors() %}
     <style>

@@ -26,6 +26,9 @@ final class PluginExtension extends AbstractExtension
         return [
             new TwigFunction('get_plugins_links', $this->getPluginsLinks(...)),
             new TwigFunction('get_plugins_admin_system_links', $this->getPluginsAdminSystemLinks(...)),
+            new TwigFunction('get_plugin_stylesheets', $this->getPluginStylesheets(...)),
+            new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
+            new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
         ];
     }
 
@@ -71,5 +74,74 @@ final class PluginExtension extends AbstractExtension
         }
 
         return $sections;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getPluginStylesheets(): array
+    {
+        $enabledPlugins = $this->pluginService->getActiveList();
+        $stylesheets = [];
+        foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+            try {
+                foreach ($plugin->getStylesheets() as $path) {
+                    $stylesheets[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
+                }
+            } catch (Throwable) {
+                continue;
+            }
+        }
+
+        return $stylesheets;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getPluginJavascripts(): array
+    {
+        $enabledPlugins = $this->pluginService->getActiveList();
+        $javascripts = [];
+        foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+            try {
+                foreach ($plugin->getJavascripts() as $path) {
+                    $javascripts[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
+                }
+            } catch (Throwable) {
+                continue;
+            }
+        }
+
+        return $javascripts;
+    }
+
+    /**
+     * Returns rendered HTML for footer "about" section from first plugin that provides it.
+     */
+    public function getPluginFooterAbout(): ?string
+    {
+        $enabledPlugins = $this->pluginService->getActiveList();
+        foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+            try {
+                $footerAbout = $plugin->getFooterAbout();
+                if ($footerAbout !== null) {
+                    return $footerAbout;
+                }
+            } catch (Throwable) {
+                continue;
+            }
+        }
+
+        return null;
     }
 }

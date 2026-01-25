@@ -38,4 +38,24 @@ interface Plugin
      * Return null if the plugin has no admin links.
      */
     public function getAdminSystemLinks(): ?AdminSection;
+
+    /**
+     * Returns list of stylesheet paths relative to /plugins/{plugin-key}/.
+     *
+     * @return list<string>
+     */
+    public function getStylesheets(): array;
+
+    /**
+     * Returns list of JavaScript paths relative to /plugins/{plugin-key}/.
+     *
+     * @return list<string>
+     */
+    public function getJavascripts(): array;
+
+    /**
+     * Returns rendered HTML for the footer "about" section (copyright/branding area).
+     * Return null if the plugin doesn't provide custom footer content.
+     */
+    public function getFooterAbout(): ?string;
 }

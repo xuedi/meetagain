@@ -2,8 +2,12 @@
     <div class="container">
         <div class="columns is-mobile is-multiline">
             <div class="column is-two-fifths is-hidden-mobile">
-                <span class="copyright">© 2014–2025 dragon-descendants.de</span><br>
-                <span>powered by</span> <a target="_blank" href="https://github.com/xuedi/meetAgain">meetAgain</a>
+                {% set pluginFooterAbout = get_plugin_footer_about() %}
+                {% if pluginFooterAbout %}
+                    {{ pluginFooterAbout | raw }}
+                {% else %}
+                    <span>powered by</span> <a target="_blank" href="https://github.com/xuedi/meetAgain">meetAgain</a>
+                {% endif %}
             </div>
             <div class="column is-6-mobile">
                 <p>{{ 'footer_col1' | trans }}</p>

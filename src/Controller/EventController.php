@@ -16,6 +16,7 @@ use App\Form\EventUploadType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\ActivityService;
+use App\Service\EventFilter\EventFilterService;
 use App\Service\EventService;
 use App\Service\ImageService;
 use DateTimeImmutable;
@@ -37,6 +38,7 @@ class EventController extends AbstractController
         private readonly EventRepository $repo,
         private readonly CommentRepository $comments,
         private readonly ImageService $imageService,
+        private readonly EventFilterService $eventFilterService,
     ) {
     }
 
@@ -58,10 +60,13 @@ class EventController extends AbstractController
             $rsvp = EventFilterRsvp::All;
         }
 
+        // Apply content filtering from all registered filters
+        $filterResult = $this->eventFilterService->getEventIdFilter();
+
         return $this->render(
             'events/index.html.twig',
             [
-                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser()),
+                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $filterResult->getEventIds()),
                 'filter' => $form,
             ],
             $response,
@@ -74,6 +79,11 @@ class EventController extends AbstractController
         Request $request,
         ?int $id = null,
     ): Response {
+        // Check if event is accessible using composite filter
+        if (!$this->eventFilterService->isEventAccessible($id)) {
+            throw $this->createNotFoundException();
+        }
+
         $response = $this->getResponse();
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);

@@ -31,14 +31,18 @@ readonly class EventService
     ) {
     }
 
+    /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter for multisite/whitelabel
+     */
     public function getFilteredList(
         EventFilterTime $time,
         EventFilterSort $sort,
         EventTypes $type,
         EventFilterRsvp $rsvp,
         ?UserInterface $user = null,
+        ?array $restrictToEventIds = null,
     ): array {
-        $result = $this->repo->findByFilters($time, $sort, $type, $user, $rsvp);
+        $result = $this->repo->findByFilters($time, $sort, $type, $user, $rsvp, $restrictToEventIds);
 
         return $this->structureList($result);
     }

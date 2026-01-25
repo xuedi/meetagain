@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use App\Service\EventFilter\EventFilterService;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -13,6 +14,7 @@ readonly class CmsService
         private Environment $twig,
         private CmsRepository $repo,
         private EventRepository $eventRepo,
+        private EventFilterService $eventFilterService,
     ) {
     }
 
@@ -40,10 +42,13 @@ readonly class CmsService
         }
 
         // actual CMS content
+        // Apply content filtering from all registered filters
+        $filterResult = $this->eventFilterService->getEventIdFilter();
+
         $content = $this->twig->render('cms/index.html.twig', [
             'title' => $cms->getPageTitle($locale) ?? 'No Title set',
             'blocks' => $blocks,
-            'events' => $this->eventRepo->getUpcomingEvents(),
+            'events' => $this->eventRepo->getUpcomingEvents(3, $filterResult->getEventIds()),
         ]);
 
         $response->setContent($content);
