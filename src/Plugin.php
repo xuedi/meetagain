@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Entity\AdminSection;
+use App\Entity\EventListItemTag;
 use App\Entity\Link;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -72,4 +73,11 @@ interface Plugin
      * Keep execution time under 30 seconds to avoid blocking the cron.
      */
     public function runCronTasks(OutputInterface $output): void;
+
+    /**
+     * Returns tags/badges to display for an event in list views.
+     *
+     * @return list<EventListItemTag>
+     */
+    public function getEventListItemTags(int $eventId): array;
 }
