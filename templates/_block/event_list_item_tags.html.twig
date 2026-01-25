@@ -1,0 +1,18 @@
+{# Render event list item tags from plugins #}
+{% for tag in tags %}
+    {% if tag.url %}
+        <a href="{{ tag.url }}" class="tag {{ tag.color }} ml-2">
+            {% if tag.icon %}
+                <span class="icon is-small"><i class="{{ tag.icon }}"></i></span>
+            {% endif %}
+            <span>{{ tag.text }}</span>
+        </a>
+    {% else %}
+        <span class="tag {{ tag.color }} ml-2">
+            {% if tag.icon %}
+                <span class="icon is-small"><i class="{{ tag.icon }}"></i></span>
+            {% endif %}
+            <span>{{ tag.text }}</span>
+        </span>
+    {% endif %}
+{% endfor %}
