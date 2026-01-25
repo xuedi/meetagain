@@ -30,6 +30,7 @@
     </ul>
     <p class="menu-label">Translation</p>
     <ul class="menu-list">
+        <li><a class="{% if active == 'suggestions' %}is-active{% endif %}" href="{{ path('app_admin_translation_suggestion') }}">{{ "menu_admin_translation_suggestions" | trans }}</a></li>
         <li><a class="{% if active == 'extract' %}is-active{% endif %}" href="{{ path('app_admin_translation_extract') }}">{{ "menu_admin_translation_extract" | trans }}</a></li>
         <li><a class="{% if active == 'edit' %}is-active{% endif %}" href="{{ path('app_admin_translation_edit') }}">{{ "menu_admin_translation_edit" | trans }}</a></li>
         <li><a class="{% if active == 'publish' %}is-active{% endif %}" href="{{ path('app_admin_translation_publish') }}">{{ "menu_admin_translation_publish" | trans }}</a></li>
