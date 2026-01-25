@@ -13,3 +13,4 @@ installed.lock
 /vendor/
 /.idea/
 /.deptrac.cache
+/plugins/multisite/
