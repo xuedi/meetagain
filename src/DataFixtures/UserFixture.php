@@ -196,7 +196,7 @@ class UserFixture extends AbstractFixture
             // upload file and create thumbnails
             $imageFile = __DIR__ . '/User/' . $name . '.jpg';
             $uploadedImage = new UploadedFile($imageFile, $user->getId() . '.jpg');
-            $image = $this->imageService->upload($uploadedImage, $user, ImageType::CmsBlock);
+            $image = $this->imageService->upload($uploadedImage, $user, ImageType::ProfilePicture);
             $this->imageService->createThumbnails($image);
 
             // associate image with a user
