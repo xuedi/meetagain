@@ -5,6 +5,7 @@ installed.lock
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /config/plugins.php
+/config/plugins-post-fixtures.sh
 /public/bundles/
 /tests/reports/clover.xml
 /tests/reports/junit.xml
