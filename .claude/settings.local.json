@@ -37,7 +37,8 @@
       "Bash(git -C /home/xuedi/Projects/meetAgain show groups:src/DataFixtures/GroupCmsBlockFixture.php)",
       "Bash(git -C /home/xuedi/Projects/meetAgain show groups:src/DataFixtures/GroupCmsSettingsFixture.php)",
       "Bash(just dockerDatabase:*)",
-      "Bash(just testResults:*)"
+      "Bash(just testResults:*)",
+      "Bash(wc:*)"
     ]
   }
 }
