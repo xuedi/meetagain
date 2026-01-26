@@ -8,11 +8,6 @@ PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 DB := DOCKER + " exec mariadb"
 JUST := just_executable() + " --justfile=" + justfile()
 
-# Import plugin justfiles
-# TODO: Switch to wildcard include when just supports it: import? 'plugins/*/justfile'
-# For now, we explicitly import each plugin's justfile
-import? 'plugins/multisite/justfile'
-
 # Show commands
 default:
     @echo ""
@@ -132,6 +127,23 @@ devResetToFreshCloneState:
 devResetDatabase:
     {{PHP}} php bin/console doctrine:database:drop --force --if-exists
     {{PHP}} php bin/console doctrine:database:create --if-not-exists
+
+# List available plugins with their manifest information
+[group('plugins')]
+plugin-list:
+    {{PHP}} php bin/console app:plugin --list
+
+# Enable a specific plugin without affecting others
+[group('plugins')]
+plugin-enable name:
+    {{PHP}} php bin/console app:plugin {{name}} --enable
+    {{PHP}} php bin/console cache:clear
+
+# Disable a specific plugin without affecting others
+[group('plugins')]
+plugin-disable name:
+    {{PHP}} php bin/console app:plugin {{name}} --disable
+    {{PHP}} php bin/console cache:clear
 
 # Run all tests and checks
 [group('testing')]
