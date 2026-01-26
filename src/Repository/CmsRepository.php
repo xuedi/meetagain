@@ -26,4 +26,30 @@ class CmsRepository extends ServiceEntityRepository
 
         return $list;
     }
+
+    /**
+     * Find published CMS page by slug, optionally filtered by allowed IDs.
+     *
+     * @param string $slug The page slug
+     * @param array<int>|null $allowedIds Allowed CMS IDs, or null for no filtering
+     * @return Cms|null
+     */
+    public function findPublishedBySlug(string $slug, ?array $allowedIds = null): ?Cms
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.slug = :slug')
+            ->andWhere('c.published = true')
+            ->setParameter('slug', $slug);
+
+        if ($allowedIds !== null) {
+            if ($allowedIds === []) {
+                return null; // No allowed IDs = no results
+            }
+
+            $qb->andWhere('c.id IN (:allowedIds)')
+               ->setParameter('allowedIds', $allowedIds);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }
