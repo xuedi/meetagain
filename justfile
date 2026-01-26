@@ -172,18 +172,18 @@ testFunctional +parameter='':
 # Show AI-readable test results (for Haiku agent)
 [group('testing')]
 testResults +parameter='':
-    {{PHP}} php tests/AiReadableTestResults.php {{parameter}}
+    {{PHP}} php bin/console app:test:results {{parameter}}
 
 # Show coverage report
 [group('testing')]
 testCoverage +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/phpunit.xml
-    {{PHP}} php tests/AiReadableCoverage.php {{parameter}}
+    {{PHP}} php bin/console app:test:coverage-report {{parameter}}
 
 # Analyze route performance
 [group('testing')]
 testSymfony +parameter='':
-    {{PHP}} php tests/AiReadableSymfonyMetrics.php {{parameter}}
+    {{PHP}} php bin/console app:test:metrics {{parameter}}
 
 # Analyze Page speed in various browsers
 [group('testing')]
@@ -244,5 +244,5 @@ fixRector:
 [group('fixing')]
 fixCoverageBadge:
 	{{PHP}} vendor/bin/phpunit -c tests/phpunit.xml --no-progress
-	{{PHP}} php tests/badgeGenerator.php
+	{{PHP}} php bin/console app:badge:generate
 	git add tests/badge/coverage.svg
