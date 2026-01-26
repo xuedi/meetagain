@@ -35,6 +35,12 @@ interface Plugin
     public function loadPostExtendFixtures(OutputInterface $output): void;
 
     /**
+     * Runs post-fixture tasks after doctrine:fixtures:load completes.
+     * Called by app:plugin:post-fixtures command.
+     */
+    public function postFixtures(OutputInterface $output): void;
+
+    /**
      * Returns admin sidebar section with links for this plugin.
      * Return null if the plugin has no admin links.
      */
