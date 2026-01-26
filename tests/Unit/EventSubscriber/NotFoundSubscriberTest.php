@@ -65,7 +65,8 @@ class NotFoundSubscriberTest extends TestCase
         $sitemapResponse = new Response($sitemapContent, Response::HTTP_OK);
 
         $sitemap = $this->createMock(SitemapService::class);
-        $sitemap->expects($this->once())
+        $sitemap
+            ->expects($this->once())
             ->method('getContent')
             ->with('dragon-descendants.de')
             ->willReturn($sitemapResponse);
@@ -94,14 +95,10 @@ class NotFoundSubscriberTest extends TestCase
         $notFoundResponse = new Response('Not Found', Response::HTTP_NOT_FOUND);
 
         $cms = $this->createMock(CmsService::class);
-        $cms->expects($this->once())
-            ->method('createNotFoundPage')
-            ->willReturn($notFoundResponse);
+        $cms->expects($this->once())->method('createNotFoundPage')->willReturn($notFoundResponse);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf(NotFoundLog::class));
+        $em->expects($this->once())->method('persist')->with($this->isInstanceOf(NotFoundLog::class));
         $em->expects($this->once())->method('flush');
 
         $subscriber = $this->createSubscriber(cms: $cms, em: $em);
@@ -123,9 +120,7 @@ class NotFoundSubscriberTest extends TestCase
         $okResponse = new Response('Found via redirect', Response::HTTP_OK);
 
         $cms = $this->createMock(CmsService::class);
-        $cms->expects($this->once())
-            ->method('createNotFoundPage')
-            ->willReturn($okResponse);
+        $cms->expects($this->once())->method('createNotFoundPage')->willReturn($okResponse);
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->never())->method('persist');

@@ -12,9 +12,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterface
 {
-    public function __construct(private readonly ImageService $imageService)
-    {
-    }
+    public function __construct(
+        private readonly ImageService $imageService,
+    ) {}
 
     public function load(ObjectManager $manager): void
     {

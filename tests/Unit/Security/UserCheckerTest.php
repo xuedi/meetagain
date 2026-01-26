@@ -128,10 +128,7 @@ class UserCheckerTest extends TestCase
     {
         // Arrange: mock session to verify only lastLogin is set (not hasNewMessage)
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock
-            ->expects($this->once())
-            ->method('set')
-            ->with('lastLogin', $this->anything());
+        $sessionMock->expects($this->once())->method('set')->with('lastLogin', $this->anything());
 
         $request = new Request();
         $request->setSession($sessionMock);
@@ -143,10 +140,7 @@ class UserCheckerTest extends TestCase
         $msgRepoStub = $this->createStub(MessageRepository::class);
         $msgRepoStub->method('hasNewMessages')->willReturn(false);
 
-        $subject = $this->createSubject(
-            requestStack: $requestStackStub,
-            msgRepo: $msgRepoStub,
-        );
+        $subject = $this->createSubject(requestStack: $requestStackStub, msgRepo: $msgRepoStub);
 
         // Act: check post-auth
         $subject->checkPostAuth($this->createStub(User::class));

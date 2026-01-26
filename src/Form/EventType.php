@@ -30,8 +30,7 @@ class EventType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

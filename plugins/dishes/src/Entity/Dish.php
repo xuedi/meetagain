@@ -16,41 +16,46 @@ class Dish
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
-    #[ORM\OneToMany(targetEntity: DishTranslation::class, mappedBy: 'dish', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        targetEntity: DishTranslation::class,
+        mappedBy: 'dish',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
     private Collection $translations;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private null|int $createdBy = null;
+    private ?int $createdBy = null;
 
     #[ORM\Column]
     private bool $approved = false;
 
     #[ORM\ManyToOne]
-    private null|Image $previewImage = null;
+    private ?Image $previewImage = null;
 
     #[ORM\Column(length: 2, nullable: true)]
-    private null|string $originLang = null;
+    private ?string $originLang = null;
 
     #[ORM\Column]
     private int $likes = 0;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private null|array $suggestions = null;
+    private ?array $suggestions = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private null|string $origin = null;
+    private ?string $origin = null;
 
     public function __construct()
     {
         $this->translations = new ArrayCollection();
     }
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -79,7 +84,7 @@ class Dish
         return $this;
     }
 
-    public function findTranslation(string $language): null|DishTranslation
+    public function findTranslation(string $language): ?DishTranslation
     {
         foreach ($this->translations as $translation) {
             if ($translation->getLanguage() === $language) {
@@ -119,7 +124,7 @@ class Dish
         return '';
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -131,12 +136,12 @@ class Dish
         return $this;
     }
 
-    public function getCreatedBy(): null|int
+    public function getCreatedBy(): ?int
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(null|int $createdBy): static
+    public function setCreatedBy(?int $createdBy): static
     {
         $this->createdBy = $createdBy;
 
@@ -155,24 +160,24 @@ class Dish
         return $this;
     }
 
-    public function getPreviewImage(): null|Image
+    public function getPreviewImage(): ?Image
     {
         return $this->previewImage;
     }
 
-    public function setPreviewImage(null|Image $previewImage): static
+    public function setPreviewImage(?Image $previewImage): static
     {
         $this->previewImage = $previewImage;
 
         return $this;
     }
 
-    public function getOriginLang(): null|string
+    public function getOriginLang(): ?string
     {
         return $this->originLang;
     }
 
-    public function setOriginLang(null|string $originLang): static
+    public function setOriginLang(?string $originLang): static
     {
         $this->originLang = $originLang;
 
@@ -198,12 +203,12 @@ class Dish
         return $this;
     }
 
-    public function getSuggestions(): null|array
+    public function getSuggestions(): ?array
     {
         return $this->suggestions;
     }
 
-    public function setSuggestions(null|array $suggestions): static
+    public function setSuggestions(?array $suggestions): static
     {
         $this->suggestions = $suggestions;
 
@@ -227,7 +232,7 @@ class Dish
 
         $this->suggestions = array_values(array_filter(
             $this->suggestions,
-            fn(array $s) => DishSuggestion::fromJson($s)->getHash() !== $hash
+            fn(array $s) => DishSuggestion::fromJson($s)->getHash() !== $hash,
         ));
 
         if ($this->suggestions === []) {
@@ -237,7 +242,7 @@ class Dish
         return $this;
     }
 
-    public function findSuggestionByHash(string $hash): null|DishSuggestion
+    public function findSuggestionByHash(string $hash): ?DishSuggestion
     {
         if ($this->suggestions === null) {
             return null;
@@ -262,10 +267,7 @@ class Dish
             return [];
         }
 
-        return array_map(
-            fn(array $s) => DishSuggestion::fromJson($s),
-            $this->suggestions
-        );
+        return array_map(fn(array $s) => DishSuggestion::fromJson($s), $this->suggestions);
     }
 
     public function hasSuggestions(): bool
@@ -273,12 +275,12 @@ class Dish
         return $this->suggestions !== null && $this->suggestions !== [];
     }
 
-    public function getOrigin(): null|string
+    public function getOrigin(): ?string
     {
         return $this->origin;
     }
 
-    public function setOrigin(null|string $origin): static
+    public function setOrigin(?string $origin): static
     {
         $this->origin = $origin;
 

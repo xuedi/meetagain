@@ -14,8 +14,7 @@ readonly class CmsFilterResult
     public function __construct(
         private ?array $cmsIds,
         private bool $hasActiveFilter,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<int>|null

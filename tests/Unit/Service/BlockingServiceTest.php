@@ -45,11 +45,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository indicates already blocked
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('isBlocked')
-            ->with($blocker, $blocked)
-            ->willReturn(true);
+        $blockRepoMock->expects($this->once())->method('isBlocked')->with($blocker, $blocked)->willReturn(true);
 
         // Arrange: entity manager should not be called
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -83,11 +79,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository indicates not blocked
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('isBlocked')
-            ->with($blocker, $blocked)
-            ->willReturn(false);
+        $blockRepoMock->expects($this->once())->method('isBlocked')->with($blocker, $blocked)->willReturn(false);
 
         // Arrange: entity manager should persist block and both users
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -97,26 +89,17 @@ class BlockingServiceTest extends TestCase
             ->with($this->logicalOr(
                 $this->isInstanceOf(UserBlock::class),
                 $this->identicalTo($blocker),
-                $this->identicalTo($blocked)
+                $this->identicalTo($blocked),
             ));
         $emMock->expects($this->once())->method('flush');
 
         // Arrange: activity service should log
         $activityServiceMock = $this->createMock(ActivityService::class);
-        $activityServiceMock
-            ->expects($this->once())
-            ->method('log')
-            ->with(
-                ActivityType::BlockedUser,
-                $blocker,
-                ['user_id' => 2]
-            );
+        $activityServiceMock->expects($this->once())->method('log')->with(ActivityType::BlockedUser, $blocker, [
+            'user_id' => 2,
+        ]);
 
-        $subject = new BlockingService(
-            blockRepo: $blockRepoMock,
-            em: $emMock,
-            activityService: $activityServiceMock,
-        );
+        $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $activityServiceMock);
 
         // Act: block user
         $subject->block($blocker, $blocked);
@@ -180,20 +163,11 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: activity service should log
         $activityServiceMock = $this->createMock(ActivityService::class);
-        $activityServiceMock
-            ->expects($this->once())
-            ->method('log')
-            ->with(
-                ActivityType::UnblockedUser,
-                $blocker,
-                ['user_id' => 42]
-            );
+        $activityServiceMock->expects($this->once())->method('log')->with(ActivityType::UnblockedUser, $blocker, [
+            'user_id' => 42,
+        ]);
 
-        $subject = new BlockingService(
-            blockRepo: $blockRepoMock,
-            em: $emMock,
-            activityService: $activityServiceMock,
-        );
+        $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $activityServiceMock);
 
         // Act: unblock user
         $subject->unblock($blocker, $blocked);
@@ -209,11 +183,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository returns true
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('isBlockedEitherWay')
-            ->with($user1, $user2)
-            ->willReturn(true);
+        $blockRepoMock->expects($this->once())->method('isBlockedEitherWay')->with($user1, $user2)->willReturn(true);
 
         $subject = new BlockingService(
             blockRepo: $blockRepoMock,
@@ -233,11 +203,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository returns true
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('isBlocked')
-            ->with($blocker, $blocked)
-            ->willReturn(true);
+        $blockRepoMock->expects($this->once())->method('isBlocked')->with($blocker, $blocked)->willReturn(true);
 
         $subject = new BlockingService(
             blockRepo: $blockRepoMock,
@@ -257,11 +223,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository returns false (not blocked)
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('isBlockedEitherWay')
-            ->with($actor, $target)
-            ->willReturn(false);
+        $blockRepoMock->expects($this->once())->method('isBlockedEitherWay')->with($actor, $target)->willReturn(false);
 
         $subject = new BlockingService(
             blockRepo: $blockRepoMock,
@@ -281,11 +243,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository returns true (blocked)
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('isBlockedEitherWay')
-            ->with($actor, $target)
-            ->willReturn(true);
+        $blockRepoMock->expects($this->once())->method('isBlockedEitherWay')->with($actor, $target)->willReturn(true);
 
         $subject = new BlockingService(
             blockRepo: $blockRepoMock,
@@ -309,11 +267,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository returns blocks
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('getBlockedUsers')
-            ->with($user)
-            ->willReturn($expectedBlocks);
+        $blockRepoMock->expects($this->once())->method('getBlockedUsers')->with($user)->willReturn($expectedBlocks);
 
         $subject = new BlockingService(
             blockRepo: $blockRepoMock,
@@ -335,11 +289,7 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: repository returns IDs
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
-        $blockRepoMock
-            ->expects($this->once())
-            ->method('getAllBlockRelatedIds')
-            ->with($user)
-            ->willReturn($expectedIds);
+        $blockRepoMock->expects($this->once())->method('getAllBlockRelatedIds')->with($user)->willReturn($expectedIds);
 
         $subject = new BlockingService(
             blockRepo: $blockRepoMock,

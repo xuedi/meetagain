@@ -11,8 +11,7 @@ final class AttentionExtension extends AbstractExtension
 {
     public function __construct(
         private readonly DashboardActionService $dashboardAction,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getFunctions(): array

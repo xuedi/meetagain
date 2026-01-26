@@ -21,17 +21,18 @@ final class NotificationServiceTest extends TestCase
     public function testNotifyWithRsvpYesCallsSendRsvp(): void
     {
         // Arrange: create activity with RsvpYes type
-        $user = (new UserStub())->setId(1);
+        $user = new UserStub()->setId(1);
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn($user);
         $activity->method('getType')->willReturn(ActivityType::RsvpYes);
         $activity->method('getMeta')->willReturn(['event_id' => 42]);
 
         $eventRepoMock = $this->createMock(EventRepository::class);
-        $eventRepoMock->expects($this->once())
+        $eventRepoMock
+            ->expects($this->once())
             ->method('findOneBy')
             ->with(['id' => 42])
-            ->willReturn((new EventStub())->setId(42));
+            ->willReturn(new EventStub()->setId(42));
 
         $service = new NotificationService(
             emailService: $this->createStub(EmailService::class),
@@ -49,8 +50,8 @@ final class NotificationServiceTest extends TestCase
     public function testNotifyWithSendMessageCallsSendMessage(): void
     {
         // Arrange: create activity with SendMessage type
-        $sender = (new UserStub())->setId(1);
-        $recipient = (new UserStub())->setId(2);
+        $sender = new UserStub()->setId(1);
+        $recipient = new UserStub()->setId(2);
 
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn($sender);
@@ -58,10 +59,7 @@ final class NotificationServiceTest extends TestCase
         $activity->method('getMeta')->willReturn(['user_id' => 2]);
 
         $userRepoMock = $this->createMock(UserRepository::class);
-        $userRepoMock->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => 2])
-            ->willReturn($recipient);
+        $userRepoMock->expects($this->once())->method('findOneBy')->with(['id' => 2])->willReturn($recipient);
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock->expects($this->once())->method('get');
@@ -109,7 +107,7 @@ final class NotificationServiceTest extends TestCase
     public function testSendRsvpReturnsEarlyWhenEventNotFound(): void
     {
         // Arrange: event does not exist
-        $user = (new UserStub())->setId(1);
+        $user = new UserStub()->setId(1);
 
         $eventRepoStub = $this->createStub(EventRepository::class);
         $eventRepoStub->method('findOneBy')->willReturn(null);
@@ -133,8 +131,8 @@ final class NotificationServiceTest extends TestCase
     public function testSendRsvpNotifiesFollowersWhenNotificationEnabled(): void
     {
         // Arrange: user with followers who have notifications enabled
-        $user = (new UserStub())->setId(1);
-        $follower = (new UserStub())->setId(2);
+        $user = new UserStub()->setId(1);
+        $follower = new UserStub()->setId(2);
         $follower->setNotification(true);
 
         $notificationSettings = new \App\Entity\NotificationSettings(['followingUpdates' => true]);
@@ -142,13 +140,14 @@ final class NotificationServiceTest extends TestCase
 
         $user->addFollower($follower);
 
-        $event = (new EventStub())->setId(42);
+        $event = new EventStub()->setId(42);
 
         $eventRepoStub = $this->createStub(EventRepository::class);
         $eventRepoStub->method('findOneBy')->willReturn($event);
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock->expects($this->once())
+        $cacheMock
+            ->expects($this->once())
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
@@ -172,19 +171,20 @@ final class NotificationServiceTest extends TestCase
     public function testSendRsvpSkipsFollowersWithNotificationsDisabled(): void
     {
         // Arrange: user with follower who has notifications disabled
-        $user = (new UserStub())->setId(1);
-        $follower = (new UserStub())->setId(2);
+        $user = new UserStub()->setId(1);
+        $follower = new UserStub()->setId(2);
         $follower->setNotification(false);
 
         $user->addFollower($follower);
 
-        $event = (new EventStub())->setId(42);
+        $event = new EventStub()->setId(42);
 
         $eventRepoStub = $this->createStub(EventRepository::class);
         $eventRepoStub->method('findOneBy')->willReturn($event);
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock->expects($this->once())
+        $cacheMock
+            ->expects($this->once())
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
@@ -228,7 +228,7 @@ final class NotificationServiceTest extends TestCase
     public function testSendMessageReturnsEarlyWhenRecipientNotFound(): void
     {
         // Arrange: recipient does not exist
-        $sender = (new UserStub())->setId(1);
+        $sender = new UserStub()->setId(1);
 
         $userRepoStub = $this->createStub(UserRepository::class);
         $userRepoStub->method('findOneBy')->willReturn(null);
@@ -253,8 +253,8 @@ final class NotificationServiceTest extends TestCase
     public function testSendMessageSendsEmailWhenConditionsAreMet(): void
     {
         // Arrange: sender and recipient with notifications enabled
-        $sender = (new UserStub())->setId(1);
-        $recipient = (new UserStub())->setId(2);
+        $sender = new UserStub()->setId(1);
+        $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
         $recipient->setLastLogin(new DateTime('-3 hours'));
 
@@ -269,7 +269,8 @@ final class NotificationServiceTest extends TestCase
         $emailServiceMock->expects($this->once())->method('sendQueue');
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock->expects($this->once())
+        $cacheMock
+            ->expects($this->once())
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);
@@ -294,8 +295,8 @@ final class NotificationServiceTest extends TestCase
     public function testSendMessageSkipsWhenRecipientRecentlyActive(): void
     {
         // Arrange: recipient logged in recently (within 2 hours)
-        $sender = (new UserStub())->setId(1);
-        $recipient = (new UserStub())->setId(2);
+        $sender = new UserStub()->setId(1);
+        $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
         $recipient->setLastLogin(new DateTime('-1 hour'));
 
@@ -309,7 +310,8 @@ final class NotificationServiceTest extends TestCase
         $emailServiceMock->expects($this->never())->method('prepareMessageNotification');
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock->expects($this->once())
+        $cacheMock
+            ->expects($this->once())
             ->method('get')
             ->willReturnCallback(function ($key, $callback) {
                 $item = $this->createStub(ItemInterface::class);

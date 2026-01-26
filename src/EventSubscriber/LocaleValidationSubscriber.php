@@ -11,9 +11,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 readonly class LocaleValidationSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LanguageService $languageService)
-    {
-    }
+    public function __construct(
+        private LanguageService $languageService,
+    ) {}
 
     #[Override]
     public static function getSubscribedEvents(): array

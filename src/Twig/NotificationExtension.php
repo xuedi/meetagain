@@ -12,8 +12,7 @@ final class NotificationExtension extends AbstractExtension
 {
     public function __construct(
         private readonly RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getFunctions(): array

@@ -20,8 +20,7 @@ readonly class ActivityService
         private NotificationService $notificationService,
         private MessageFactory $messageFactory,
         private LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     public function log(ActivityType $type, User $user, array $meta = []): void
     {

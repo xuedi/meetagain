@@ -23,10 +23,12 @@ class EventImageUploadTest extends WebTestCase
         $crawler = $client->request('GET', '/en/login');
         $this->assertResponseIsSuccessful();
 
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
         $client->submit($form);
         $this->assertResponseRedirects();
         $client->followRedirect();
@@ -87,7 +89,7 @@ class EventImageUploadTest extends WebTestCase
         $this->assertGreaterThan(
             $imageCountBefore,
             $imageCountAfter,
-            'A new image should be created in the database after upload'
+            'A new image should be created in the database after upload',
         );
 
         // Step 7: Verify the image is linked to the event

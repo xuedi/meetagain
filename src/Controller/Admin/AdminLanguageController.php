@@ -25,8 +25,7 @@ class AdminLanguageController extends AbstractController
         private readonly LanguageService $languageService,
         private readonly TranslationService $translationService,
         private readonly ImageService $imageService,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/language/', name: 'app_admin_language')]
     public function list(): Response

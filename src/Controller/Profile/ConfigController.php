@@ -20,8 +20,7 @@ class ConfigController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly ActivityService $activityService,
-    ) {
-    }
+    ) {}
 
     #[Route('/profile/config', name: 'app_profile_config')]
     public function config(Request $request): Response

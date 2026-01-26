@@ -11,13 +11,12 @@ readonly class ConsentService
 {
     public function __construct(
         private RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     public function getShowCookieConsent(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if (!($session instanceof SessionInterface)) {
+        if (!$session instanceof SessionInterface) {
             return true;
         }
 
@@ -27,7 +26,7 @@ readonly class ConsentService
     public function getShowOsm(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if (!($session instanceof SessionInterface)) {
+        if (!$session instanceof SessionInterface) {
             return true;
         }
 

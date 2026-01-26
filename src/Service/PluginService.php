@@ -55,7 +55,7 @@ readonly class PluginService
     {
         $config = $this->getPluginConfig();
 
-        return array_keys(array_filter($config, fn ($enabled) => $enabled === true));
+        return array_keys(array_filter($config, fn($enabled) => $enabled === true));
     }
 
     public function install(string $pluginKey): void

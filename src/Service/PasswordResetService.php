@@ -24,8 +24,7 @@ readonly class PasswordResetService
         private UserPasswordHasherInterface $hasher,
         private ActivityService $activityService,
         private EmailService $emailService,
-    ) {
-    }
+    ) {}
 
     /**
      * Request a password reset for the given email.

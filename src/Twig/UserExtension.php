@@ -11,8 +11,7 @@ final class UserExtension extends AbstractExtension
 {
     public function __construct(
         private readonly UserService $userService,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getFunctions(): array

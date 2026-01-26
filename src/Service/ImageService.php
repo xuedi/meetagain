@@ -25,8 +25,7 @@ readonly class ImageService
         private ExtendedFilesystem $filesystem,
         private LoggerInterface $logger,
         private string $kernelProjectDir,
-    ) {
-    }
+    ) {}
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
     {

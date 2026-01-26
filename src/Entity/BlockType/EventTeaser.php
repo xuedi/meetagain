@@ -12,8 +12,7 @@ class EventTeaser implements BlockType
         public string $headline,
         public string $text,
         public ?ImageEntity $image,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self

@@ -15,9 +15,9 @@ class SystemUserFixture extends AbstractFixture implements FixtureGroupInterface
     public const string IMPORT = 'import';
     public const string CRON = 'cron';
 
-    public function __construct(private readonly UserPasswordHasherInterface $hasher)
-    {
-    }
+    public function __construct(
+        private readonly UserPasswordHasherInterface $hasher,
+    ) {}
 
     public function load(ObjectManager $manager): void
     {

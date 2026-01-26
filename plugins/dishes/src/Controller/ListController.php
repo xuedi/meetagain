@@ -20,8 +20,7 @@ class ListController extends AbstractController
     public function __construct(
         private readonly DishListService $listService,
         private readonly DishRepository $dishRepo,
-    ) {
-    }
+    ) {}
 
     #[Route('', name: 'plugin_dishes_lists', methods: ['GET'])]
     public function index(): Response

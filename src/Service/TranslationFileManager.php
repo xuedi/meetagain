@@ -10,8 +10,7 @@ readonly class TranslationFileManager
     public function __construct(
         private Filesystem $fs,
         private string $kernelProjectDir,
-    ) {
-    }
+    ) {}
 
     public function cleanUpTranslationFiles(): int
     {

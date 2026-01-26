@@ -165,8 +165,7 @@ class UserFixture extends AbstractFixture
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
         private readonly ImageService $imageService,
-    ) {
-    }
+    ) {}
 
     public function load(ObjectManager $manager): void
     {

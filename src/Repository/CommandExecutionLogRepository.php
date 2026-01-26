@@ -25,7 +25,8 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
      */
     public function getLastExecutionsByCommand(): array
     {
-        $logs = $this->createQueryBuilder('c')
+        $logs = $this
+            ->createQueryBuilder('c')
             ->orderBy('c.startedAt', 'DESC')
             ->getQuery()
             ->getResult();
@@ -49,11 +50,12 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
      */
     public function getStats(DateTimeImmutable $since): array
     {
-        $result = $this->createQueryBuilder('c')
+        $result = $this
+            ->createQueryBuilder('c')
             ->select(
                 'COUNT(c.id) as total',
                 'SUM(CASE WHEN c.status = :success THEN 1 ELSE 0 END) as successful',
-                'SUM(CASE WHEN c.status IN (:failed, :timeout) THEN 1 ELSE 0 END) as failed'
+                'SUM(CASE WHEN c.status IN (:failed, :timeout) THEN 1 ELSE 0 END) as failed',
             )
             ->where('c.startedAt > :since')
             ->setParameter('since', $since)
@@ -77,7 +79,8 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
      */
     public function getRecentFailed(int $limit = 10): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->where('c.status IN (:statuses)')
             ->setParameter('statuses', [CommandExecutionStatus::Failed, CommandExecutionStatus::Timeout])
             ->orderBy('c.startedAt', 'DESC')
@@ -93,7 +96,8 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
      */
     public function getHistoryForCommand(string $commandName, int $limit = 20): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->where('c.commandName = :name')
             ->setParameter('name', $commandName)
             ->orderBy('c.startedAt', 'DESC')
@@ -107,7 +111,8 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
      */
     public function isCommandRunning(string $commandName): bool
     {
-        $count = $this->createQueryBuilder('c')
+        $count = $this
+            ->createQueryBuilder('c')
             ->select('COUNT(c.id)')
             ->where('c.commandName = :name')
             ->andWhere('c.status = :status')

@@ -18,8 +18,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly LanguageService $languageService,
         private readonly TranslationService $translationService,
         private readonly RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getGlobals(): array
@@ -43,7 +42,11 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
     public function getCurrentLocale(): string
     {
-        return $this->requestStack->getCurrentRequest()?->getLocale() ?? throw new RuntimeException('Could not get current locale');
+        return (
+            $this->requestStack->getCurrentRequest()?->getLocale() ?? throw new RuntimeException(
+                'Could not get current locale',
+            )
+        );
     }
 
     public function getAlternativeLanguageCodes(): array

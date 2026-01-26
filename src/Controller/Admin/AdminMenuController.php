@@ -31,8 +31,7 @@ class AdminMenuController extends AbstractController
         private readonly TranslationService $translationService,
         private readonly EventRepository $eventRepo,
         private readonly CmsRepository $cmsRepo,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/menu/{edit}', name: 'app_admin_menu', defaults: ['edit' => null])]
     public function menuList(Request $request, ?int $edit = null): Response

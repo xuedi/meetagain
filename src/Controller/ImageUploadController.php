@@ -30,8 +30,7 @@ class ImageUploadController extends AbstractController
         private readonly ImageService $imageService,
         private readonly CmsBlockRepository $cmsBlockRepo,
         private readonly ActivityService $activityService,
-    ) {
-    }
+    ) {}
 
     #[Route('/replace_image/{entity}/{id}', name: 'app_image_replace', requirements: [
         'entity' => 'user|cmsBlock',

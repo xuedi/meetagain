@@ -44,7 +44,7 @@ class DashboardActionServiceTest extends TestCase
             $this->imageRepoStub,
             $this->translationRepoStub,
             $this->messageRepoStub,
-            $this->commandLogRepoStub
+            $this->commandLogRepoStub,
         );
     }
 

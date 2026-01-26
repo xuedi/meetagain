@@ -48,8 +48,7 @@ class Announcement
             return null;
         }
 
-        return $this->cmsPage->getPageTitle($locale)
-            ?? $this->cmsPage->getPageTitle(self::FALLBACK_LOCALE);
+        return $this->cmsPage->getPageTitle($locale) ?? $this->cmsPage->getPageTitle(self::FALLBACK_LOCALE);
     }
 
     public function getContent(string $locale): ?string
@@ -58,8 +57,7 @@ class Announcement
             return null;
         }
 
-        return $this->cmsPage->getPageContent($locale)
-            ?? $this->cmsPage->getPageContent(self::FALLBACK_LOCALE);
+        return $this->cmsPage->getPageContent($locale) ?? $this->cmsPage->getPageContent(self::FALLBACK_LOCALE);
     }
 
     public function getStatus(): AnnouncementStatus

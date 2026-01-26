@@ -21,7 +21,8 @@ class CommentRepository extends ServiceEntityRepository
      */
     public function findByEventWithUser(int $eventId): array
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->leftJoin('c.user', 'u')
             ->addSelect('u')
             ->leftJoin('u.image', 'i')

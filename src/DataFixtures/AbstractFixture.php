@@ -50,7 +50,16 @@ abstract class AbstractFixture extends Fixture
                 try {
                     return $this->getReference($key, $entityClass);
                 } catch (Throwable $exception) {
-                    throw new RuntimeException(sprintf("Error retrieving reference '%s::%s' [%s]", $entityName, $params[0], $exception->getMessage()), $exception->getCode(), $exception);
+                    throw new RuntimeException(
+                        sprintf(
+                            "Error retrieving reference '%s::%s' [%s]",
+                            $entityName,
+                            $params[0],
+                            $exception->getMessage(),
+                        ),
+                        $exception->getCode(),
+                        $exception,
+                    );
                 }
             case 'addRef':
                 $this->addReference($key, $params[1]);

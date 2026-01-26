@@ -37,7 +37,8 @@ class DishListRepository extends ServiceEntityRepository
      */
     public function findPublicByOthers(int $currentUserId): array
     {
-        return $this->createQueryBuilder('dl')
+        return $this
+            ->createQueryBuilder('dl')
             ->where('dl.isPublic = true')
             ->andWhere('dl.createdBy != :userId')
             ->setParameter('userId', $currentUserId)

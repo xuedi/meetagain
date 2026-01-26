@@ -14,9 +14,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AdminLocationController extends AbstractController
 {
-    public function __construct(private readonly LocationRepository $repo)
-    {
-    }
+    public function __construct(
+        private readonly LocationRepository $repo,
+    ) {}
 
     #[Route('/admin/location/', name: 'app_admin_location')]
     public function locationList(): Response

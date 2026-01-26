@@ -55,8 +55,25 @@ readonly class EmailTemplateService
         EmailType::Welcome->value => ['host', 'url', 'lang'],
         EmailType::PasswordResetRequest->value => ['username', 'token', 'host', 'lang'],
         EmailType::NotificationMessage->value => ['username', 'sender', 'senderId', 'host', 'lang'],
-        EmailType::NotificationRsvpAggregated->value => ['username', 'attendeeNames', 'eventLocation', 'eventDate', 'eventId', 'eventTitle', 'host', 'lang'],
-        EmailType::NotificationEventCanceled->value => ['username', 'eventLocation', 'eventDate', 'eventId', 'eventTitle', 'host', 'lang'],
+        EmailType::NotificationRsvpAggregated->value => [
+            'username',
+            'attendeeNames',
+            'eventLocation',
+            'eventDate',
+            'eventId',
+            'eventTitle',
+            'host',
+            'lang',
+        ],
+        EmailType::NotificationEventCanceled->value => [
+            'username',
+            'eventLocation',
+            'eventDate',
+            'eventId',
+            'eventTitle',
+            'host',
+            'lang',
+        ],
         EmailType::Announcement->value => ['title', 'content', 'announcementUrl', 'username', 'host', 'lang'],
     ];
 
@@ -64,8 +81,7 @@ readonly class EmailTemplateService
         private EmailTemplateRepository $repo,
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
-    ) {
-    }
+    ) {}
 
     public function getTemplate(EmailType $identifier): ?EmailTemplate
     {
@@ -85,8 +101,7 @@ readonly class EmailTemplateService
         }
 
         // Try requested language first, fallback to English
-        $translation = $template->findTranslation($language)
-            ?? $template->findTranslation(self::DEFAULT_LANGUAGE);
+        $translation = $template->findTranslation($language) ?? $template->findTranslation(self::DEFAULT_LANGUAGE);
 
         if (!$translation instanceof EmailTemplateTranslation) {
             throw new RuntimeException(sprintf('No translation found for email template "%s".', $identifier->value));

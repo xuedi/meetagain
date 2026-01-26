@@ -286,7 +286,7 @@ class Event
 
     public function hasMap(): bool
     {
-        if (!($this->getLocation() instanceof Location)) {
+        if (!$this->getLocation() instanceof Location) {
             return false;
         }
 

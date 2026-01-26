@@ -16,8 +16,7 @@ readonly class DishService
     public function __construct(
         private EntityManagerInterface $em,
         private DishRepository $repo,
-    ) {
-    }
+    ) {}
 
     public function createDish(
         string $name,
@@ -114,12 +113,7 @@ readonly class DishService
             throw new RuntimeException('Dish not found');
         }
 
-        $suggestion = DishSuggestion::create(
-            createdBy: $userId,
-            field: $field,
-            language: $language,
-            value: $value,
-        );
+        $suggestion = DishSuggestion::create(createdBy: $userId, field: $field, language: $language, value: $value);
 
         $dish->addSuggestion($suggestion);
         $this->em->persist($dish);

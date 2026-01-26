@@ -32,12 +32,8 @@ class CleanupCommandTest extends TestCase
     public function testExecuteCallsCleanupMethodsAndReturnsSuccess(): void
     {
         $cleanupServiceMock = $this->createMock(CleanupService::class);
-        $cleanupServiceMock
-            ->expects($this->once())
-            ->method('removeImageCache');
-        $cleanupServiceMock
-            ->expects($this->once())
-            ->method('removeGhostedRegistrations');
+        $cleanupServiceMock->expects($this->once())->method('removeImageCache');
+        $cleanupServiceMock->expects($this->once())->method('removeGhostedRegistrations');
 
         $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
         $command = new CleanupCommand($cleanupServiceMock, $commandExecServiceStub);

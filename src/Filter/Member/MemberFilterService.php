@@ -16,8 +16,7 @@ readonly class MemberFilterService
     public function __construct(
         #[AutowireIterator(MemberFilterInterface::class)]
         private iterable $filters,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the combined user ID filter from all registered filters.
@@ -80,8 +79,12 @@ readonly class MemberFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort($filters, static fn (MemberFilterInterface $a, MemberFilterInterface $b): int =>
-            $b->getPriority() <=> $a->getPriority()
+        usort(
+            $filters,
+            static fn(
+                MemberFilterInterface $a,
+                MemberFilterInterface $b,
+            ): int => $b->getPriority() <=> $a->getPriority(),
         );
 
         return $filters;

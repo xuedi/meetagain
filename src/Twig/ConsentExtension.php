@@ -11,8 +11,7 @@ final class ConsentExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ConsentService $consentService,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getFunctions(): array

@@ -32,7 +32,8 @@ class UserBlockRepository extends ServiceEntityRepository
      */
     public function getBlockedUserIds(User $user): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->select('IDENTITY(b.blocked)')
             ->where('b.blocker = :user')
             ->setParameter('user', $user)
@@ -45,7 +46,8 @@ class UserBlockRepository extends ServiceEntityRepository
      */
     public function getBlockedByUserIds(User $user): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->select('IDENTITY(b.blocker)')
             ->where('b.blocked = :user')
             ->setParameter('user', $user)
@@ -73,7 +75,8 @@ class UserBlockRepository extends ServiceEntityRepository
      */
     public function getBlockedUsers(User $user): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->leftJoin('b.blocked', 'u')
             ->addSelect('u')
             ->leftJoin('u.image', 'i')

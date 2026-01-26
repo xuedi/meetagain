@@ -17,9 +17,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DishFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
 {
-    public function __construct(private readonly ImageService $imageService)
-    {
-    }
+    public function __construct(
+        private readonly ImageService $imageService,
+    ) {}
 
     #[\Override]
     public function load(ObjectManager $manager): void

@@ -25,41 +25,40 @@ final class EmailServiceTest extends TestCase
         $user = $this->makeUser('user@example.com', 'Alice', 'en', 'abc123');
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())
+        $emMock
+            ->expects($this->once())
             ->method('persist')
-            ->with(
-                $this->callback(function ($entity) {
-                    $this->assertInstanceOf(EmailQueue::class, $entity);
-                    /* @var EmailQueue $entity */
-                    $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
-                    $this->assertSame('user@example.com', $entity->getRecipient());
-                    $this->assertSame('Please Confirm your Email', $entity->getSubject());
-                    $this->assertSame('<p>Verification body</p>', $entity->getRenderedBody());
-                    $this->assertSame('en', $entity->getLang());
+            ->with($this->callback(function ($entity) {
+                $this->assertInstanceOf(EmailQueue::class, $entity);
+                /* @var EmailQueue $entity */
+                $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
+                $this->assertSame('user@example.com', $entity->getRecipient());
+                $this->assertSame('Please Confirm your Email', $entity->getSubject());
+                $this->assertSame('<p>Verification body</p>', $entity->getRenderedBody());
+                $this->assertSame('en', $entity->getLang());
 
-                    $ctx = $entity->getContext();
-                    $this->assertSame('https://example.com', $ctx['host']);
-                    $this->assertSame('abc123', $ctx['token']);
-                    $this->assertSame('example.com', $ctx['url']);
-                    $this->assertSame('Alice', $ctx['username']);
-                    $this->assertSame('en', $ctx['lang']);
+                $ctx = $entity->getContext();
+                $this->assertSame('https://example.com', $ctx['host']);
+                $this->assertSame('abc123', $ctx['token']);
+                $this->assertSame('example.com', $ctx['url']);
+                $this->assertSame('Alice', $ctx['username']);
+                $this->assertSame('en', $ctx['lang']);
 
-                    $this->assertNotNull($entity->getCreatedAt());
-                    $this->assertNull($entity->getSendAt());
+                $this->assertNotNull($entity->getCreatedAt());
+                $this->assertNull($entity->getSendAt());
 
-                    return true;
-                })
-            );
+                return true;
+            }));
         $emMock->expects($this->once())->method('flush');
 
         $templateService = $this->createStub(EmailTemplateService::class);
-        $templateService->method('getTemplateContent')->willReturn([
-            'subject' => 'Please Confirm your Email',
-            'body' => '<p>Verification body</p>',
-        ]);
-        $templateService->method('renderContent')->willReturnCallback(
-            fn (string $content) => $content
-        );
+        $templateService
+            ->method('getTemplateContent')
+            ->willReturn([
+                'subject' => 'Please Confirm your Email',
+                'body' => '<p>Verification body</p>',
+            ]);
+        $templateService->method('renderContent')->willReturnCallback(fn(string $content) => $content);
 
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
@@ -89,7 +88,7 @@ final class EmailServiceTest extends TestCase
     public function testSendQueueSendsPendingEmailsAndMarksAsSent(): void
     {
         // Arrange: create queued email
-        $queued = (new EmailQueue())
+        $queued = new EmailQueue()
             ->setSender('"email sender" <sender@email.com>')
             ->setRecipient('user@example.com')
             ->setSubject('Subject')
@@ -107,30 +106,23 @@ final class EmailServiceTest extends TestCase
 
         // Arrange: mock mailer to verify send is called
         $mailerMock = $this->createMock(MailerInterface::class);
-        $mailerMock
-            ->expects($this->once())
-            ->method('send')
-            ->with($this->isInstanceOf(TemplatedEmail::class));
+        $mailerMock->expects($this->once())->method('send')->with($this->isInstanceOf(TemplatedEmail::class));
 
         // Arrange: mock entity manager to verify persist/flush
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')
-            ->with(
-                $this->callback(function ($entity) use ($queued) {
-                    $this->assertSame($queued, $entity);
-                    $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
-                    $this->assertSame(EmailQueueStatus::Sent, $queued->getStatus());
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function ($entity) use ($queued) {
+                $this->assertSame($queued, $entity);
+                $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
+                $this->assertSame(EmailQueueStatus::Sent, $queued->getStatus());
 
-                    return true;
-                })
-            );
+                return true;
+            }));
         $emMock->expects($this->once())->method('flush');
 
-        $service = $this->createService(
-            mailer: $mailerMock,
-            mailRepo: $mailRepoMock,
-            em: $emMock,
-        );
+        $service = $this->createService(mailer: $mailerMock, mailRepo: $mailRepoMock, em: $emMock);
 
         // Act: send queue
         $service->sendQueue();
@@ -154,40 +146,39 @@ final class EmailServiceTest extends TestCase
         $event->setLocation($locationStub);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())
+        $emMock
+            ->expects($this->once())
             ->method('persist')
-            ->with(
-                $this->callback(function ($entity) {
-                    $this->assertInstanceOf(EmailQueue::class, $entity);
-                    /* @var EmailQueue $entity */
-                    $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
-                    $this->assertSame('user@example.com', $entity->getRecipient());
-                    $this->assertSame('Event canceled: Test Event', $entity->getSubject());
-                    $this->assertSame('<p>Event canceled body</p>', $entity->getRenderedBody());
-                    $this->assertSame('en', $entity->getLang());
+            ->with($this->callback(function ($entity) {
+                $this->assertInstanceOf(EmailQueue::class, $entity);
+                /* @var EmailQueue $entity */
+                $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
+                $this->assertSame('user@example.com', $entity->getRecipient());
+                $this->assertSame('Event canceled: Test Event', $entity->getSubject());
+                $this->assertSame('<p>Event canceled body</p>', $entity->getRenderedBody());
+                $this->assertSame('en', $entity->getLang());
 
-                    $ctx = $entity->getContext();
-                    $this->assertSame('Alice', $ctx['username']);
-                    $this->assertSame('Test Venue', $ctx['eventLocation']);
-                    $this->assertSame('2025-06-15', $ctx['eventDate']);
-                    $this->assertSame(42, $ctx['eventId']);
-                    $this->assertSame('Test Event', $ctx['eventTitle']);
-                    $this->assertSame('https://example.com', $ctx['host']);
-                    $this->assertSame('en', $ctx['lang']);
+                $ctx = $entity->getContext();
+                $this->assertSame('Alice', $ctx['username']);
+                $this->assertSame('Test Venue', $ctx['eventLocation']);
+                $this->assertSame('2025-06-15', $ctx['eventDate']);
+                $this->assertSame(42, $ctx['eventId']);
+                $this->assertSame('Test Event', $ctx['eventTitle']);
+                $this->assertSame('https://example.com', $ctx['host']);
+                $this->assertSame('en', $ctx['lang']);
 
-                    return true;
-                })
-            );
+                return true;
+            }));
         $emMock->expects($this->once())->method('flush');
 
         $templateService = $this->createStub(EmailTemplateService::class);
-        $templateService->method('getTemplateContent')->willReturn([
-            'subject' => 'Event canceled: Test Event',
-            'body' => '<p>Event canceled body</p>',
-        ]);
-        $templateService->method('renderContent')->willReturnCallback(
-            fn (string $content) => $content
-        );
+        $templateService
+            ->method('getTemplateContent')
+            ->willReturn([
+                'subject' => 'Event canceled: Test Event',
+                'body' => '<p>Event canceled body</p>',
+            ]);
+        $templateService->method('renderContent')->willReturnCallback(fn(string $content) => $content);
 
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
@@ -205,37 +196,36 @@ final class EmailServiceTest extends TestCase
         $recipient = $this->makeUser('recipient@example.com', 'Alice', 'de');
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())
+        $emMock
+            ->expects($this->once())
             ->method('persist')
-            ->with(
-                $this->callback(function ($entity) {
-                    $this->assertInstanceOf(EmailQueue::class, $entity);
-                    /* @var EmailQueue $entity */
-                    $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
-                    $this->assertSame('recipient@example.com', $entity->getRecipient());
-                    $this->assertSame('You received a message from Bob', $entity->getSubject());
-                    $this->assertSame('<p>Message notification body</p>', $entity->getRenderedBody());
-                    $this->assertSame('de', $entity->getLang());
+            ->with($this->callback(function ($entity) {
+                $this->assertInstanceOf(EmailQueue::class, $entity);
+                /* @var EmailQueue $entity */
+                $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
+                $this->assertSame('recipient@example.com', $entity->getRecipient());
+                $this->assertSame('You received a message from Bob', $entity->getSubject());
+                $this->assertSame('<p>Message notification body</p>', $entity->getRenderedBody());
+                $this->assertSame('de', $entity->getLang());
 
-                    $ctx = $entity->getContext();
-                    $this->assertSame('Alice', $ctx['username']);
-                    $this->assertSame('Bob', $ctx['sender']);
-                    $this->assertSame('https://example.com', $ctx['host']);
-                    $this->assertSame('de', $ctx['lang']);
+                $ctx = $entity->getContext();
+                $this->assertSame('Alice', $ctx['username']);
+                $this->assertSame('Bob', $ctx['sender']);
+                $this->assertSame('https://example.com', $ctx['host']);
+                $this->assertSame('de', $ctx['lang']);
 
-                    return true;
-                })
-            );
+                return true;
+            }));
         $emMock->expects($this->once())->method('flush');
 
         $templateService = $this->createStub(EmailTemplateService::class);
-        $templateService->method('getTemplateContent')->willReturn([
-            'subject' => 'You received a message from Bob',
-            'body' => '<p>Message notification body</p>',
-        ]);
-        $templateService->method('renderContent')->willReturnCallback(
-            fn (string $content) => $content
-        );
+        $templateService
+            ->method('getTemplateContent')
+            ->willReturn([
+                'subject' => 'You received a message from Bob',
+                'body' => '<p>Message notification body</p>',
+            ]);
+        $templateService->method('renderContent')->willReturnCallback(fn(string $content) => $content);
 
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
@@ -285,13 +275,15 @@ final class EmailServiceTest extends TestCase
 
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
-            $templateService->method('getTemplateContent')->willReturn([
-                'subject' => 'Test Subject',
-                'body' => '<p>Test Body</p>',
-            ]);
-            $templateService->method('renderContent')->willReturnCallback(
-                fn (string $content, array $context) => $content
-            );
+            $templateService
+                ->method('getTemplateContent')
+                ->willReturn([
+                    'subject' => 'Test Subject',
+                    'body' => '<p>Test Body</p>',
+                ]);
+            $templateService
+                ->method('renderContent')
+                ->willReturnCallback(fn(string $content, array $context) => $content);
         }
 
         return new EmailService(

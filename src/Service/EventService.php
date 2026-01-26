@@ -28,8 +28,7 @@ readonly class EventService
         private PluginService $pluginService,
         #[AutowireIterator(Plugin::class)]
         private iterable $plugins,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<int>|null $restrictToEventIds Optional event ID filter
@@ -71,10 +70,7 @@ readonly class EventService
             return 0;
         }
 
-        $children = $this->repo->findFollowUpEvents(
-            parentEventId: $parent->getId(),
-            greaterThan: $event->getStart(),
-        );
+        $children = $this->repo->findFollowUpEvents(parentEventId: $parent->getId(), greaterThan: $event->getStart());
 
         foreach ($children as $child) {
             $child->setLocation($event->getLocation());
@@ -121,7 +117,7 @@ readonly class EventService
 
     private function fillRecurringEvents(Event $event): void
     {
-        if (!($event->getRecurringRule() instanceof EventIntervals)) {
+        if (!$event->getRecurringRule() instanceof EventIntervals) {
             return;
         }
 

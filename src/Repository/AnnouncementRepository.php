@@ -21,7 +21,8 @@ class AnnouncementRepository extends ServiceEntityRepository
      */
     public function findAllOrderedByDate(): array
     {
-        return $this->createQueryBuilder('a')
+        return $this
+            ->createQueryBuilder('a')
             ->orderBy('a.createdAt', 'DESC')
             ->getQuery()
             ->getResult();

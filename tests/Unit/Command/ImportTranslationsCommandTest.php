@@ -41,10 +41,7 @@ class ImportTranslationsCommandTest extends TestCase
         $testUrl = 'https://example.com/api/translations';
 
         $serviceMock = $this->createMock(TranslationImportService::class);
-        $serviceMock
-            ->expects($this->once())
-            ->method('importForLocalDevelopment')
-            ->with($testUrl);
+        $serviceMock->expects($this->once())->method('importForLocalDevelopment')->with($testUrl);
 
         $command = new ImportTranslationsCommand($serviceMock);
         $commandTester = new CommandTester($command);

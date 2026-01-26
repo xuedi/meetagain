@@ -17,18 +17,16 @@ class AdminTranslationController extends AbstractController
         private readonly TranslationService $translationService,
         private readonly TranslationImportService $translationImportService,
         private readonly TranslationSuggestionRepository $translationSuggestionRepo,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/translations/suggestions', name: 'app_admin_translation_suggestion')]
     public function translationsSuggestions(): Response
     {
         return $this->render('admin/translations/suggestions.html.twig', [
             'active' => 'suggestions',
-            'translationSuggestions' => $this->translationSuggestionRepo->findBy(
-                ['status' => TranslationSuggestionStatus::Requested],
-                ['createdAt' => 'DESC'],
-            ),
+            'translationSuggestions' => $this->translationSuggestionRepo->findBy([
+                'status' => TranslationSuggestionStatus::Requested,
+            ], ['createdAt' => 'DESC']),
         ]);
     }
 

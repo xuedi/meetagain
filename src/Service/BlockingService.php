@@ -16,8 +16,7 @@ readonly class BlockingService
         private UserBlockRepository $blockRepo,
         private EntityManagerInterface $em,
         private ActivityService $activityService,
-    ) {
-    }
+    ) {}
 
     public function block(User $blocker, User $blocked): void
     {
@@ -45,11 +44,7 @@ readonly class BlockingService
         $this->em->persist($blocked);
         $this->em->flush();
 
-        $this->activityService->log(
-            ActivityType::BlockedUser,
-            $blocker,
-            ['user_id' => $blocked->getId()]
-        );
+        $this->activityService->log(ActivityType::BlockedUser, $blocker, ['user_id' => $blocked->getId()]);
     }
 
     public function unblock(User $blocker, User $blocked): void
@@ -66,11 +61,7 @@ readonly class BlockingService
         $this->em->remove($block);
         $this->em->flush();
 
-        $this->activityService->log(
-            ActivityType::UnblockedUser,
-            $blocker,
-            ['user_id' => $blocked->getId()]
-        );
+        $this->activityService->log(ActivityType::UnblockedUser, $blocker, ['user_id' => $blocked->getId()]);
     }
 
     public function isBlocked(User $user1, User $user2): bool

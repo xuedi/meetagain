@@ -14,8 +14,7 @@ class SuggestionController extends AbstractController
 {
     public function __construct(
         private readonly DishService $dishService,
-    ) {
-    }
+    ) {}
 
     #[Route('', name: 'plugin_dishes_suggestions_list', methods: ['GET'])]
     public function list(): Response

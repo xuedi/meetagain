@@ -92,24 +92,33 @@ class SitemapServiceTest extends TestCase
         $this->assertCount(10, $capturedSites);
 
         // Assert: CMS page entry exists
-        $this->assertContains([
-            'loc' => 'https://example.com/en/about',
-            'lastmod' => '2025-01-01',
-            'prio' => 0.7,
-        ], $capturedSites);
+        $this->assertContains(
+            [
+                'loc' => 'https://example.com/en/about',
+                'lastmod' => '2025-01-01',
+                'prio' => 0.7,
+            ],
+            $capturedSites,
+        );
 
         // Assert: event page entry exists
-        $this->assertContains([
-            'loc' => 'https://example.com/de/event/123',
-            'lastmod' => '2025-02-01',
-            'prio' => 0.6,
-        ], $capturedSites);
+        $this->assertContains(
+            [
+                'loc' => 'https://example.com/de/event/123',
+                'lastmod' => '2025-02-01',
+                'prio' => 0.6,
+            ],
+            $capturedSites,
+        );
 
         // Assert: static page entry exists
-        $this->assertContains([
-            'loc' => 'https://example.com/en/events',
-            'lastmod' => (new DateTime())->format('Y-m-d'),
-            'prio' => 0.9,
-        ], $capturedSites);
+        $this->assertContains(
+            [
+                'loc' => 'https://example.com/en/events',
+                'lastmod' => new DateTime()->format('Y-m-d'),
+                'prio' => 0.9,
+            ],
+            $capturedSites,
+        );
     }
 }

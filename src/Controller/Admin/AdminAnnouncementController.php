@@ -21,8 +21,7 @@ class AdminAnnouncementController extends AbstractController
         private readonly AnnouncementRepository $repo,
         private readonly AnnouncementService $announcementService,
         private readonly EntityManagerInterface $em,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/system/announcements', name: 'app_admin_announcement')]
     public function list(): Response

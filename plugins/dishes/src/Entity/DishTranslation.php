@@ -13,45 +13,45 @@ class DishTranslation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'translations')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Dish $dish = null;
+    private ?Dish $dish = null;
 
     #[ORM\Column(length: 2)]
-    private null|string $language = null;
+    private ?string $language = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $name = null;
+    private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private null|string $phonetic = null;
+    private ?string $phonetic = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private null|string $description = null;
+    private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private null|string $recipe = null;
+    private ?string $recipe = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDish(): null|Dish
+    public function getDish(): ?Dish
     {
         return $this->dish;
     }
 
-    public function setDish(null|Dish $dish): static
+    public function setDish(?Dish $dish): static
     {
         $this->dish = $dish;
 
         return $this;
     }
 
-    public function getLanguage(): null|string
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
@@ -63,7 +63,7 @@ class DishTranslation
         return $this;
     }
 
-    public function getName(): null|string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -75,19 +75,19 @@ class DishTranslation
         return $this;
     }
 
-    public function getPhonetic(): null|string
+    public function getPhonetic(): ?string
     {
         return $this->phonetic;
     }
 
-    public function setPhonetic(null|string $phonetic): static
+    public function setPhonetic(?string $phonetic): static
     {
         $this->phonetic = $phonetic;
 
         return $this;
     }
 
-    public function getDescription(): null|string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -99,12 +99,12 @@ class DishTranslation
         return $this;
     }
 
-    public function getRecipe(): null|string
+    public function getRecipe(): ?string
     {
         return $this->recipe;
     }
 
-    public function setRecipe(null|string $recipe): static
+    public function setRecipe(?string $recipe): static
     {
         $this->recipe = $recipe;
 

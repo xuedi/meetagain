@@ -203,15 +203,11 @@ class CmsFilterServiceTest extends TestCase
         // Arrange - High priority filter denies early
         $highPriorityFilter = $this->createMock(CmsFilterInterface::class);
         $highPriorityFilter->method('getPriority')->willReturn(200);
-        $highPriorityFilter->expects($this->once())
-            ->method('isCmsAccessible')
-            ->with(789)
-            ->willReturn(false);
+        $highPriorityFilter->expects($this->once())->method('isCmsAccessible')->with(789)->willReturn(false);
 
         $lowPriorityFilter = $this->createMock(CmsFilterInterface::class);
         $lowPriorityFilter->method('getPriority')->willReturn(50);
-        $lowPriorityFilter->expects($this->never()) // Should not be called
-            ->method('isCmsAccessible');
+        $lowPriorityFilter->expects($this->never())->method('isCmsAccessible'); // Should not be called
 
         $service = new CmsFilterService([$lowPriorityFilter, $highPriorityFilter]);
 

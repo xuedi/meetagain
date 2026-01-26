@@ -6,8 +6,7 @@ readonly class ExtractTranslationsCommand implements CommandInterface
 {
     public function __construct(
         private string $locale,
-    ) {
-    }
+    ) {}
 
     public function getCommand(): string
     {

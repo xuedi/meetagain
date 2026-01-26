@@ -30,10 +30,7 @@ class ActivityServiceTest extends TestCase
 
         // Arrange: mock MessageFactory to return the message mock
         $messageFactoryMock = $this->createMock(MessageFactory::class);
-        $messageFactoryMock
-            ->expects($this->once())
-            ->method('build')
-            ->willReturn($messageMock);
+        $messageFactoryMock->expects($this->once())->method('build')->willReturn($messageMock);
 
         // Arrange: mock NotificationService to verify notification is sent
         $notificationServiceMock = $this->createMock(NotificationService::class);
@@ -44,14 +41,14 @@ class ActivityServiceTest extends TestCase
         $entityManagerMock
             ->expects($this->once())
             ->method('persist')
-            ->with(
-                $this->callback(function (Activity $activity) use ($type, $user, $meta) {
-                    return $activity->getType() === $type
-                        && $activity->getUser() === $user
-                        && $activity->getMeta() === $meta
-                        && $activity->getCreatedAt() instanceof DateTimeImmutable;
-                })
-            );
+            ->with($this->callback(function (Activity $activity) use ($type, $user, $meta) {
+                return (
+                    $activity->getType() === $type
+                    && $activity->getUser() === $user
+                    && $activity->getMeta() === $meta
+                    && $activity->getCreatedAt() instanceof DateTimeImmutable
+                );
+            }));
         $entityManagerMock->expects($this->once())->method('flush');
 
         // Arrange: create subject with mocked dependencies
@@ -76,28 +73,16 @@ class ActivityServiceTest extends TestCase
 
         // Arrange: mock Activity entities that expect setMessage to be called
         $activity1 = $this->createMock(Activity::class);
-        $activity1
-            ->expects($this->once())
-            ->method('setMessage')
-            ->with('Message 1')
-            ->willReturn($activity1);
+        $activity1->expects($this->once())->method('setMessage')->with('Message 1')->willReturn($activity1);
 
         $activity2 = $this->createMock(Activity::class);
-        $activity2
-            ->expects($this->once())
-            ->method('setMessage')
-            ->with('Message 2')
-            ->willReturn($activity2);
+        $activity2->expects($this->once())->method('setMessage')->with('Message 2')->willReturn($activity2);
 
         $activities = [$activity1, $activity2];
 
         // Arrange: mock repository to return activities for the user
         $repoMock = $this->createMock(ActivityRepository::class);
-        $repoMock
-            ->expects($this->once())
-            ->method('getUserDisplay')
-            ->with($user)
-            ->willReturn($activities);
+        $repoMock->expects($this->once())->method('getUserDisplay')->with($user)->willReturn($activities);
 
         // Arrange: mock MessageInterface instances that render messages for user view (with links)
         $message1 = $this->createMock(MessageInterface::class);
@@ -133,18 +118,10 @@ class ActivityServiceTest extends TestCase
     {
         // Arrange: mock Activity entities that expect setMessage to be called
         $activity1 = $this->createMock(Activity::class);
-        $activity1
-            ->expects($this->once())
-            ->method('setMessage')
-            ->with('Message 1')
-            ->willReturn($activity1);
+        $activity1->expects($this->once())->method('setMessage')->with('Message 1')->willReturn($activity1);
 
         $activity2 = $this->createMock(Activity::class);
-        $activity2
-            ->expects($this->once())
-            ->method('setMessage')
-            ->with('Message 2')
-            ->willReturn($activity2);
+        $activity2->expects($this->once())->method('setMessage')->with('Message 2')->willReturn($activity2);
 
         $activities = [$activity1, $activity2];
 

@@ -27,8 +27,7 @@ class IndexController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly DishService $dishService,
         private readonly DishListService $listService,
-    ) {
-    }
+    ) {}
 
     #[Route('', name: 'app_plugin_dishes', methods: ['GET'])]
     public function index(Request $request): Response
@@ -36,9 +35,7 @@ class IndexController extends AbstractController
         $session = $request->getSession();
         $isManager = $this->isGranted('ROLE_MANAGER');
 
-        $dishes = $isManager
-            ? $this->repo->findAll()
-            : $this->dishService->getApprovedDishes();
+        $dishes = $isManager ? $this->repo->findAll() : $this->dishService->getApprovedDishes();
 
         return $this->render('@Dishes/index.html.twig', [
             'list' => $dishes,

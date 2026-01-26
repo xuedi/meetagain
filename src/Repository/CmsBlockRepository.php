@@ -20,7 +20,8 @@ class CmsBlockRepository extends ServiceEntityRepository
     public function getMaxPriority(): float
     {
         try {
-            return $this->createQueryBuilder('b')
+            return $this
+                ->createQueryBuilder('b')
                 ->select('MAX(b.priority)')
                 ->getQuery()
                 ->getSingleScalarResult();
@@ -31,7 +32,8 @@ class CmsBlockRepository extends ServiceEntityRepository
 
     public function getBlocks(int $pageId, string $locale)
     {
-        return $this->createQueryBuilder('cb')
+        return $this
+            ->createQueryBuilder('cb')
             ->select('cb')
             ->where('cb.page = :pageId')
             ->andWhere('cb.language = :locale')

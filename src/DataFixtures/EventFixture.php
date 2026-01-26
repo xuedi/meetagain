@@ -19,9 +19,9 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
 {
     public const string WEDNESDAY_MEETUP = 'Regular Wednesday meetup';
 
-    public function __construct(private readonly ImageService $imageService)
-    {
-    }
+    public function __construct(
+        private readonly ImageService $imageService,
+    ) {}
 
     public function load(ObjectManager $manager): void
     {
@@ -165,9 +165,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
     {
         $date = new DateTime('now');
 
-        return $date
-            ->modify('-2 month')
-            ->modify('first wednesday')
-            ->setTime(18, 00);
+        return $date->modify('-2 month')->modify('first wednesday')->setTime(18, 00);
     }
 }
