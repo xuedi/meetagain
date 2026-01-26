@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\MenuFilter;
+namespace App\Filter\Menu;
 
 /**
  * Value object representing menu filter results.

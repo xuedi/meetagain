@@ -7,7 +7,7 @@ use App\Repository\UserRepository;
 use App\Service\BlockingService;
 use App\Service\FriendshipService;
 use App\Service\ImageService;
-use App\Service\MemberFilter\MemberFilterService;
+use App\Filter\Member\MemberFilterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;

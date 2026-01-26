@@ -6,7 +6,7 @@ use App\Entity\Menu;
 use App\Entity\MenuLocation;
 use App\Entity\MenuType;
 use App\Entity\MenuVisibility;
-use App\Service\MenuFilter\MenuFilterService;
+use App\Filter\Menu\MenuFilterService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\RouterInterface;

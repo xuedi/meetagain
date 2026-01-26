@@ -4,8 +4,8 @@ namespace App\Service;
 
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
-use App\Service\CmsFilter\CmsFilterService;
-use App\Service\EventFilter\EventFilterService;
+use App\Filter\Cms\CmsFilterService;
+use App\Filter\Event\EventFilterService;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
