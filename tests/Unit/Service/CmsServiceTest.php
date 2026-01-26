@@ -5,7 +5,11 @@ namespace Tests\Unit\Service;
 use App\Entity\Cms;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use App\Service\CmsFilter\CmsFilterResult;
+use App\Service\CmsFilter\CmsFilterService;
 use App\Service\CmsService;
+use App\Service\EventFilter\EventFilterResult;
+use App\Service\EventFilter\EventFilterService;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +33,8 @@ class CmsServiceTest extends TestCase
             twig: $twigMock,
             repo: $this->createStub(CmsRepository::class),
             eventRepo: $this->createStub(EventRepository::class),
+            eventFilterService: $this->createStub(EventFilterService::class),
+            cmsFilterService: $this->createStub(CmsFilterService::class),
         );
 
         // Act: create not found page
@@ -57,6 +63,8 @@ class CmsServiceTest extends TestCase
             twig: $this->createStub(Environment::class),
             repo: $cmsRepoMock,
             eventRepo: $this->createStub(EventRepository::class),
+            eventFilterService: $this->createStub(EventFilterService::class),
+            cmsFilterService: $this->createStub(CmsFilterService::class),
         );
 
         // Act: get all sites
@@ -73,11 +81,17 @@ class CmsServiceTest extends TestCase
         $slug = 'non-existent-page';
         $expectedContent = '404 page content';
 
+        $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
+        $cmsFilterServiceMock
+            ->expects($this->once())
+            ->method('getCmsIdFilter')
+            ->willReturn(CmsFilterResult::noFilter());
+
         $cmsRepoMock = $this->createMock(CmsRepository::class);
         $cmsRepoMock
             ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['slug' => $slug, 'published' => true])
+            ->method('findPublishedBySlug')
+            ->with($slug, null)
             ->willReturn(null);
 
         $twigMock = $this->createMock(Environment::class);
@@ -91,6 +105,8 @@ class CmsServiceTest extends TestCase
             twig: $twigMock,
             repo: $cmsRepoMock,
             eventRepo: $this->createStub(EventRepository::class),
+            eventFilterService: $this->createStub(EventFilterService::class),
+            cmsFilterService: $cmsFilterServiceMock,
         );
 
         // Act: handle request for non-existent page
@@ -115,11 +131,17 @@ class CmsServiceTest extends TestCase
             ->with($locale)
             ->willReturn(new ArrayCollection());
 
+        $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
+        $cmsFilterServiceMock
+            ->expects($this->once())
+            ->method('getCmsIdFilter')
+            ->willReturn(CmsFilterResult::noFilter());
+
         $cmsRepoMock = $this->createMock(CmsRepository::class);
         $cmsRepoMock
             ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['slug' => $slug, 'published' => true])
+            ->method('findPublishedBySlug')
+            ->with($slug, null)
             ->willReturn($cmsMock);
 
         $twigMock = $this->createMock(Environment::class);
@@ -133,6 +155,8 @@ class CmsServiceTest extends TestCase
             twig: $twigMock,
             repo: $cmsRepoMock,
             eventRepo: $this->createStub(EventRepository::class),
+            eventFilterService: $this->createStub(EventFilterService::class),
+            cmsFilterService: $cmsFilterServiceMock,
         );
 
         // Act: handle request for page without content in requested language
@@ -165,17 +189,30 @@ class CmsServiceTest extends TestCase
             ->with($locale)
             ->willReturn($pageTitle);
 
+        $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
+        $cmsFilterServiceMock
+            ->expects($this->once())
+            ->method('getCmsIdFilter')
+            ->willReturn(CmsFilterResult::noFilter());
+
+        $eventFilterServiceMock = $this->createMock(EventFilterService::class);
+        $eventFilterServiceMock
+            ->expects($this->once())
+            ->method('getEventIdFilter')
+            ->willReturn(new EventFilterResult(null, false));
+
         $cmsRepoMock = $this->createMock(CmsRepository::class);
         $cmsRepoMock
             ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['slug' => $slug, 'published' => true])
+            ->method('findPublishedBySlug')
+            ->with($slug, null)
             ->willReturn($cmsMock);
 
         $eventRepoMock = $this->createMock(EventRepository::class);
         $eventRepoMock
             ->expects($this->once())
             ->method('getUpcomingEvents')
+            ->with(3, null)
             ->willReturn($upcomingEvents);
 
         $twigMock = $this->createMock(Environment::class);
@@ -193,6 +230,8 @@ class CmsServiceTest extends TestCase
             twig: $twigMock,
             repo: $cmsRepoMock,
             eventRepo: $eventRepoMock,
+            eventFilterService: $eventFilterServiceMock,
+            cmsFilterService: $cmsFilterServiceMock,
         );
 
         // Act: handle request for page with content
@@ -218,11 +257,18 @@ class CmsServiceTest extends TestCase
 
         // Arrange: stub repository to return the CMS entity
         $cmsRepoStub = $this->createStub(CmsRepository::class);
-        $cmsRepoStub->method('findOneBy')->willReturn($cmsStub);
+        $cmsRepoStub->method('findPublishedBySlug')->willReturn($cmsStub);
 
         // Arrange: stub event repository to return empty events
         $eventRepoStub = $this->createStub(EventRepository::class);
         $eventRepoStub->method('getUpcomingEvents')->willReturn([]);
+
+        // Arrange: stub filter services
+        $cmsFilterServiceStub = $this->createStub(CmsFilterService::class);
+        $cmsFilterServiceStub->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
+
+        $eventFilterServiceStub = $this->createStub(EventFilterService::class);
+        $eventFilterServiceStub->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
 
         // Arrange: mock Twig to verify default title is used
         $twigMock = $this->createMock(Environment::class);
@@ -240,6 +286,8 @@ class CmsServiceTest extends TestCase
             twig: $twigMock,
             repo: $cmsRepoStub,
             eventRepo: $eventRepoStub,
+            eventFilterService: $eventFilterServiceStub,
+            cmsFilterService: $cmsFilterServiceStub,
         );
 
         // Act: handle request for page without title
