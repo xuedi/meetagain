@@ -21,7 +21,8 @@ class EmailQueueRepository extends ServiceEntityRepository
 
     public function getPendingCount(): int
     {
-        return (int) $this->createQueryBuilder('eq')
+        return (int) $this
+            ->createQueryBuilder('eq')
             ->select('COUNT(eq.id)')
             ->where('eq.status = :status')
             ->setParameter('status', EmailQueueStatus::Pending)
@@ -31,7 +32,8 @@ class EmailQueueRepository extends ServiceEntityRepository
 
     public function getStaleCount(int $minutes = 60): int
     {
-        return (int) $this->createQueryBuilder('eq')
+        return (int) $this
+            ->createQueryBuilder('eq')
             ->select('COUNT(eq.id)')
             ->where('eq.status = :status')
             ->andWhere('eq.createdAt < :threshold')
@@ -48,7 +50,8 @@ class EmailQueueRepository extends ServiceEntityRepository
      */
     public function getPendingByTemplate(): array
     {
-        $result = $this->createQueryBuilder('eq')
+        $result = $this
+            ->createQueryBuilder('eq')
             ->select('eq.template', 'COUNT(eq.id) as count')
             ->where('eq.status = :status')
             ->setParameter('status', EmailQueueStatus::Pending)
@@ -72,11 +75,12 @@ class EmailQueueRepository extends ServiceEntityRepository
      */
     public function getDeliveryStats(DateTimeImmutable $since): array
     {
-        $result = $this->createQueryBuilder('eq')
+        $result = $this
+            ->createQueryBuilder('eq')
             ->select(
                 'COUNT(eq.id) as total',
                 'SUM(CASE WHEN eq.status = :sent THEN 1 ELSE 0 END) as sent',
-                'SUM(CASE WHEN eq.status = :failed THEN 1 ELSE 0 END) as failed'
+                'SUM(CASE WHEN eq.status = :failed THEN 1 ELSE 0 END) as failed',
             )
             ->where('eq.sendAt IS NOT NULL OR eq.status = :failed')
             ->andWhere('eq.createdAt > :since')

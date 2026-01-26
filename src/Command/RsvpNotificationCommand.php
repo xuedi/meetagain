@@ -26,8 +26,7 @@ class RsvpNotificationCommand extends LoggedCommand
 
     protected function configure(): void
     {
-        $this
-            ->addOption('days', 'd', InputOption::VALUE_OPTIONAL, 'How many days ahead to check for events', 7);
+        $this->addOption('days', 'd', InputOption::VALUE_OPTIONAL, 'How many days ahead to check for events', 7);
     }
 
     protected function doExecute(InputInterface $input, OutputInterface $output): int

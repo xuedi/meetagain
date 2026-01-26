@@ -11,8 +11,7 @@ class Image implements BlockType
     private function __construct(
         public string $id,
         public ?ImageEntity $image,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self

@@ -16,8 +16,7 @@ readonly class EventFilterService
     public function __construct(
         #[AutowireIterator(EventFilterInterface::class)]
         private iterable $filters,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the combined event ID filter from all registered filters.
@@ -80,8 +79,9 @@ readonly class EventFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort($filters, static fn (EventFilterInterface $a, EventFilterInterface $b): int =>
-            $b->getPriority() <=> $a->getPriority()
+        usort(
+            $filters,
+            static fn(EventFilterInterface $a, EventFilterInterface $b): int => $b->getPriority() <=> $a->getPriority(),
         );
 
         return $filters;

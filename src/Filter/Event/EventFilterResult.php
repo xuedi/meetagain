@@ -14,8 +14,7 @@ readonly class EventFilterResult
     public function __construct(
         private ?array $eventIds,
         private bool $hasActiveFilter,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<int>|null

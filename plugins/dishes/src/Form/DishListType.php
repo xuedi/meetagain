@@ -15,25 +15,22 @@ class DishListType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('name', TextType::class, [
-                'label' => 'List Name',
-                'required' => true,
-                'attr' => ['placeholder' => 'e.g., My Favorite Sichuan Dishes'],
-            ])
-            ->add('description', TextareaType::class, [
-                'label' => 'Description',
-                'required' => false,
-                'attr' => [
-                    'rows' => 3,
-                    'placeholder' => 'Optional: Describe what this list is about',
-                ],
-            ])
-            ->add('isPublic', CheckboxType::class, [
-                'label' => 'Make this list public',
-                'required' => false,
-                'help' => 'Public lists can be viewed by other users',
-            ]);
+        $builder->add('name', TextType::class, [
+            'label' => 'List Name',
+            'required' => true,
+            'attr' => ['placeholder' => 'e.g., My Favorite Sichuan Dishes'],
+        ])->add('description', TextareaType::class, [
+            'label' => 'Description',
+            'required' => false,
+            'attr' => [
+                'rows' => 3,
+                'placeholder' => 'Optional: Describe what this list is about',
+            ],
+        ])->add('isPublic', CheckboxType::class, [
+            'label' => 'Make this list public',
+            'required' => false,
+            'help' => 'Public lists can be viewed by other users',
+        ]);
     }
 
     #[\Override]

@@ -9,10 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(
-    name: 'app:badge:generate',
-    description: 'Generate coverage badge SVG from coverage report'
-)]
+#[AsCommand(name: 'app:badge:generate', description: 'Generate coverage badge SVG from coverage report')]
 class BadgeGenerateCommand extends Command
 {
     public function __construct(
@@ -89,7 +86,7 @@ class BadgeGenerateCommand extends Command
         file_put_contents($badge, $svg);
 
         $output->writeln("<info>Coverage badge generated: {$coverage}%</info>");
-        $output->writeln("Badge saved to: tests/badge/coverage.svg");
+        $output->writeln('Badge saved to: tests/badge/coverage.svg');
 
         return Command::SUCCESS;
     }

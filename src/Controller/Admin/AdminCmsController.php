@@ -33,8 +33,7 @@ class AdminCmsController extends AbstractController
         private readonly CmsBlockRepository $blockRepo,
         private readonly CmsBlockService $blockService,
         private readonly AnnouncementRepository $announcementRepo,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/cms/', name: 'app_admin_cms')]
     public function cmsList(): Response
@@ -50,11 +49,7 @@ class AdminCmsController extends AbstractController
         ]);
     }
 
-    #[Route(
-        '/admin/cms/{id}/edit/{locale}/{blockId}',
-        name: 'app_admin_cms_edit',
-        methods: ['GET', 'POST'],
-    )]
+    #[Route('/admin/cms/{id}/edit/{locale}/{blockId}', name: 'app_admin_cms_edit', methods: ['GET', 'POST'])]
     public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, ?int $blockId = null): Response
     {
         $locale = $this->getLastEditLocale($locale, $request->getSession());

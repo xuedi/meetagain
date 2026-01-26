@@ -375,7 +375,11 @@ class AnnouncementServiceTest extends TestCase
         $templateServiceMock
             ->expects($this->exactly(2))
             ->method('renderContent')
-            ->willReturnCallback(fn (string $content) => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content));
+            ->willReturnCallback(fn(string $content) => str_replace(
+                ['{{title}}', '{{content}}'],
+                ['My Title', ''],
+                $content,
+            ));
 
         // Arrange: config service
         $configService = $this->createStub(ConfigService::class);

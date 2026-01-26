@@ -14,8 +14,7 @@ class ApprovalController extends AbstractController
 {
     public function __construct(
         private readonly DishService $dishService,
-    ) {
-    }
+    ) {}
 
     #[Route('/pending', name: 'plugin_dishes_approval_pending', methods: ['GET'])]
     public function pending(): Response

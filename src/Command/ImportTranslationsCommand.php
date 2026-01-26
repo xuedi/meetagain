@@ -13,8 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:translation:import', description: 'imports online translations for local development')]
 class ImportTranslationsCommand extends Command
 {
-    public function __construct(private readonly TranslationImportService $translationImportService)
-    {
+    public function __construct(
+        private readonly TranslationImportService $translationImportService,
+    ) {
         parent::__construct();
     }
 

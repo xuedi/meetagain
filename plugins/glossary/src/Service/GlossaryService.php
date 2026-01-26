@@ -154,7 +154,7 @@ readonly class GlossaryService
         return $leftOver;
     }
 
-    public function get(int $id): Glossary|null
+    public function get(int $id): ?Glossary
     {
         return $this->repo->findOneBy(['id' => $id]);
     }

@@ -29,8 +29,7 @@ class AdminEventController extends AbstractController
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly EventService $eventService,
         private readonly EventRepository $repo,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/event/', name: 'app_admin_event')]
     public function eventList(): Response
@@ -105,7 +104,7 @@ class AdminEventController extends AbstractController
     public function eventDelete(): Response
     {
         dump('delete');
-        exit;
+        exit();
     }
 
     #[Route('/admin/event/{id}/cancel', name: 'app_admin_event_cancel')]

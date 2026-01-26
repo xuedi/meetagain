@@ -22,14 +22,15 @@ class LanguageRepository extends ServiceEntityRepository
     public function getEnabledCodes(): array
     {
         return array_column(
-            $this->createQueryBuilder('l')
+            $this
+                ->createQueryBuilder('l')
                 ->select('l.code')
                 ->where('l.enabled = :enabled')
                 ->setParameter('enabled', true)
                 ->orderBy('l.sortOrder', 'ASC')
                 ->getQuery()
                 ->getArrayResult(),
-            'code'
+            'code',
         );
     }
 

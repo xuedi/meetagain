@@ -37,20 +37,14 @@ class CleanupServiceTest extends TestCase
 
         // Arrange: mock repository to return images needing update
         $imageRepoMock = $this->createMock(ImageRepository::class);
-        $imageRepoMock
-            ->expects($this->once())
-            ->method('getOldImageUpdates')
-            ->willReturn([$imageMockA, $imageMockB]);
+        $imageRepoMock->expects($this->once())->method('getOldImageUpdates')->willReturn([$imageMockA, $imageMockB]);
 
         // Arrange: mock entity manager to verify persist and flush
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock->expects($this->exactly(2))->method('persist');
         $entityManagerMock->expects($this->once())->method('flush');
 
-        $subject = $this->createService(
-            imageRepo: $imageRepoMock,
-            entityManager: $entityManagerMock,
-        );
+        $subject = $this->createService(imageRepo: $imageRepoMock, entityManager: $entityManagerMock);
 
         // Act: remove image cache
         $subject->removeImageCache();
@@ -63,10 +57,7 @@ class CleanupServiceTest extends TestCase
 
         // Arrange: mock user to return activities collection
         $userMock = $this->createMock(User::class);
-        $userMock
-            ->expects($this->once())
-            ->method('getActivities')
-            ->willReturn(new ArrayCollection([$activityStub]));
+        $userMock->expects($this->once())->method('getActivities')->willReturn(new ArrayCollection([$activityStub]));
 
         // Arrange: mock user repository to return old registrations
         $userRepoMock = $this->createMock(UserRepository::class);
@@ -81,10 +72,7 @@ class CleanupServiceTest extends TestCase
         $entityManagerMock->expects($this->exactly(2))->method('remove');
         $entityManagerMock->expects($this->once())->method('flush');
 
-        $subject = $this->createService(
-            userRepo: $userRepoMock,
-            entityManager: $entityManagerMock,
-        );
+        $subject = $this->createService(userRepo: $userRepoMock, entityManager: $entityManagerMock);
 
         // Act: remove ghosted registrations
         $subject->removeGhostedRegistrations();

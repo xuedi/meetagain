@@ -60,9 +60,7 @@ class LoginSubscriberTest extends TestCase
         $user->setOsmConsent(false);
 
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())
-            ->method('set')
-            ->with('_locale', 'de');
+        $sessionMock->expects($this->once())->method('set')->with('_locale', 'de');
 
         $event = $this->createLoginEvent($user, $sessionMock);
 
@@ -78,9 +76,7 @@ class LoginSubscriberTest extends TestCase
         $user->setOsmConsent(false);
 
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())
-            ->method('set')
-            ->with('_locale', 'en');
+        $sessionMock->expects($this->once())->method('set')->with('_locale', 'en');
 
         $response = new Response();
         $event = $this->createLoginEvent($user, $sessionMock, $response);
@@ -110,7 +106,7 @@ class LoginSubscriberTest extends TestCase
         $cookies = $response->headers->getCookies();
         $this->assertNotEmpty($cookies);
 
-        $cookieNames = array_map(fn ($c) => $c->getName(), $cookies);
+        $cookieNames = array_map(fn($c) => $c->getName(), $cookies);
         $this->assertContains('consent_cookies_osm', $cookieNames);
         $this->assertContains('consent_cookies', $cookieNames);
     }

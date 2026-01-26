@@ -21,7 +21,8 @@ class ImageRepository extends ServiceEntityRepository
 
     public function getReportedCount(): int
     {
-        return (int) $this->createQueryBuilder('i')
+        return (int) $this
+            ->createQueryBuilder('i')
             ->select('COUNT(i.id)')
             ->where('i.reported IS NOT NULL')
             ->getQuery()
@@ -33,7 +34,8 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function getReported(int $limit = 10): array
     {
-        return $this->createQueryBuilder('i')
+        return $this
+            ->createQueryBuilder('i')
             ->where('i.reported IS NOT NULL')
             ->orderBy('i.createdAt', 'DESC')
             ->setMaxResults($limit)
@@ -46,12 +48,14 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function getStorageStats(DateTimeImmutable $weekStart, DateTimeImmutable $weekEnd): array
     {
-        $total = $this->createQueryBuilder('i')
+        $total = $this
+            ->createQueryBuilder('i')
             ->select('COUNT(i.id) as cnt, COALESCE(SUM(i.size), 0) as totalSize')
             ->getQuery()
             ->getSingleResult();
 
-        $weekCount = (int) $this->createQueryBuilder('i')
+        $weekCount = (int) $this
+            ->createQueryBuilder('i')
             ->select('COUNT(i.id)')
             ->where('i.createdAt >= :start')
             ->andWhere('i.createdAt <= :end')
@@ -83,7 +87,8 @@ class ImageRepository extends ServiceEntityRepository
 
     public function getEventList(User $user): array
     {
-        $result = $this->createQueryBuilder('i')
+        $result = $this
+            ->createQueryBuilder('i')
             ->leftJoin('i.event', 'e')
             ->addSelect('e')
             ->where('i.uploader = :user')

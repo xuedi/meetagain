@@ -36,7 +36,7 @@ class TranslationServiceTest extends TestCase
             $this->entityManager,
             $this->fileManager,
             $this->languageService,
-            $this->commandService
+            $this->commandService,
         );
     }
 
@@ -61,7 +61,7 @@ class TranslationServiceTest extends TestCase
             $this->entityManager,
             $this->fileManager,
             $this->languageService,
-            $this->commandService
+            $this->commandService,
         );
 
         $this->translationRepo
@@ -79,14 +79,17 @@ class TranslationServiceTest extends TestCase
     public function testSaveMatrixUpdatesExistingTranslation(): void
     {
         // Arrange: existing translation entity
-        $translationEntity = (new Translation())
+        $translationEntity = new Translation()
             ->setLanguage('en')
             ->setPlaceholder('key')
             ->setTranslation('old_value');
 
         $this->translationRepo = $this->createStub(TranslationRepository::class);
         $this->translationRepo->method('buildKeyValueList')->willReturn(['1' => 'old_value']);
-        $this->translationRepo->method('findOneBy')->with(['id' => '1'])->willReturn($translationEntity);
+        $this->translationRepo
+            ->method('findOneBy')
+            ->with(['id' => '1'])
+            ->willReturn($translationEntity);
 
         $requestStub = $this->createStub(Request::class);
         $requestStub->method('getPayload')->willReturn(new InputBag(['1' => 'new_value']));
@@ -98,10 +101,13 @@ class TranslationServiceTest extends TestCase
             $this->entityManager,
             $this->fileManager,
             $this->languageService,
-            $this->commandService
+            $this->commandService,
         );
 
-        $this->entityManager->expects($this->once())->method('persist')->with($translationEntity);
+        $this->entityManager
+            ->expects($this->once())
+            ->method('persist')
+            ->with($translationEntity);
         $this->entityManager->expects($this->once())->method('flush');
 
         // Act: save matrix
@@ -117,9 +123,13 @@ class TranslationServiceTest extends TestCase
 
         $query = $this->createStub(\Doctrine\ORM\Query::class);
         $query->method('setParameter')->willReturn($query);
-        $query->method('toIterable')->willReturn([
-            (new Translation())->setPlaceholder('key')->setTranslation('value'),
-        ]);
+        $query
+            ->method('toIterable')
+            ->willReturn([
+                new Translation()
+                    ->setPlaceholder('key')
+                    ->setTranslation('value'),
+            ]);
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->entityManager->method('createQuery')->willReturn($query);
@@ -131,11 +141,14 @@ class TranslationServiceTest extends TestCase
             $this->entityManager,
             $this->fileManager,
             $this->languageService,
-            $this->commandService
+            $this->commandService,
         );
 
         $this->fileManager->expects($this->once())->method('cleanUpTranslationFiles');
-        $this->fileManager->expects($this->once())->method('writeTranslationFile')->with('de', ['key' => 'value']);
+        $this->fileManager
+            ->expects($this->once())
+            ->method('writeTranslationFile')
+            ->with('de', ['key' => 'value']);
         $this->commandService->expects($this->once())->method('clearCache');
         $this->entityManager->expects($this->atLeastOnce())->method('detach');
         $this->entityManager->expects($this->atLeastOnce())->method('clear');
@@ -159,9 +172,9 @@ class TranslationServiceTest extends TestCase
     public function testIsValidLanguageCodesReturnsTrueForValidCode(): void
     {
         // Arrange: mock language service to validate codes
-        $this->languageService->method('isValidCode')->willReturnCallback(
-            fn (string $code) => in_array($code, ['en', 'de', 'fr'], true)
-        );
+        $this->languageService
+            ->method('isValidCode')
+            ->willReturnCallback(fn(string $code) => in_array($code, ['en', 'de', 'fr'], true));
 
         // Act & Assert: valid codes return true
         $this->assertTrue($this->subject->isValidLanguageCodes('en'));
@@ -172,9 +185,9 @@ class TranslationServiceTest extends TestCase
     public function testIsValidLanguageCodesReturnsFalseForInvalidCode(): void
     {
         // Arrange: mock language service to validate codes
-        $this->languageService->method('isValidCode')->willReturnCallback(
-            fn (string $code) => in_array($code, ['en', 'de', 'fr'], true)
-        );
+        $this->languageService
+            ->method('isValidCode')
+            ->willReturnCallback(fn(string $code) => in_array($code, ['en', 'de', 'fr'], true));
 
         // Act & Assert: invalid codes return false
         $this->assertFalse($this->subject->isValidLanguageCodes('es'));
@@ -206,7 +219,10 @@ class TranslationServiceTest extends TestCase
         // Act & Assert: replaces language code in various URI formats
         $this->assertSame('/de/events', $this->subject->replaceUriLanguageCode('/en/events', 'de'));
         $this->assertSame('/fr/events/42', $this->subject->replaceUriLanguageCode('/en/events/42', 'fr'));
-        $this->assertSame('/de/events/42/details', $this->subject->replaceUriLanguageCode('/en/events/42/details', 'de'));
+        $this->assertSame('/de/events/42/details', $this->subject->replaceUriLanguageCode(
+            '/en/events/42/details',
+            'de',
+        ));
     }
 
     public function testReplaceUriLanguageCodeHandlesJustLanguageUri(): void

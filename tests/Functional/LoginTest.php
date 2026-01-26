@@ -28,8 +28,16 @@ class LoginTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('form')->count(), 'Login form should exist');
-        $this->assertGreaterThan(0, $crawler->filter('input[name="_username"]')->count(), 'Username field should exist');
-        $this->assertGreaterThan(0, $crawler->filter('input[name="_password"]')->count(), 'Password field should exist');
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('input[name="_username"]')->count(),
+            'Username field should exist',
+        );
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('input[name="_password"]')->count(),
+            'Password field should exist',
+        );
     }
 
     public function testLoginWithValidCredentials(): void
@@ -39,10 +47,12 @@ class LoginTest extends WebTestCase
         $crawler = $client->request('GET', '/en/login');
         $this->assertResponseIsSuccessful();
 
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
 
         $client->submit($form);
         $this->assertResponseRedirects();
@@ -69,10 +79,12 @@ class LoginTest extends WebTestCase
 
         $crawler = $client->request('GET', '/en/login');
 
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => 'invalid@example.org',
-            '_password' => 'wrongpassword',
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => 'invalid@example.org',
+                '_password' => 'wrongpassword',
+            ]);
 
         $client->submit($form);
 
@@ -88,10 +100,12 @@ class LoginTest extends WebTestCase
 
         $crawler = $client->request('GET', '/en/login');
 
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => '',
-            '_password' => '',
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => '',
+                '_password' => '',
+            ]);
 
         $client->submit($form);
 
@@ -113,10 +127,12 @@ class LoginTest extends WebTestCase
 
         // Login
         $crawler = $client->request('GET', '/en/login');
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
         $client->submit($form);
         $client->followRedirect();
 
@@ -131,10 +147,12 @@ class LoginTest extends WebTestCase
 
         // Login first
         $crawler = $client->request('GET', '/en/login');
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
         $client->submit($form);
         $client->followRedirect();
 

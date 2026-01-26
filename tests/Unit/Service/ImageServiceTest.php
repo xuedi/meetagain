@@ -63,19 +63,13 @@ class ImageServiceTest extends TestCase
 
         // Arrange: mock entity manager to verify persist
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock
-            ->expects($this->once())
-            ->method('persist')
-            ->with($existingImage);
+        $entityManagerMock->expects($this->once())->method('persist')->with($existingImage);
 
         // Arrange: stub uploaded file
         $uploadedFile = $this->createStub(UploadedFile::class);
         $uploadedFile->method('getContent')->willReturn($imageContent);
 
-        $subject = $this->createService(
-            imageRepo: $imageRepoMock,
-            entityManager: $entityManagerMock,
-        );
+        $subject = $this->createService(imageRepo: $imageRepoMock, entityManager: $entityManagerMock);
 
         // Act: upload existing image
         $result = $subject->upload($uploadedFile, $user, $type);
@@ -98,11 +92,7 @@ class ImageServiceTest extends TestCase
 
         // Arrange: mock image repository to return null (no existing image)
         $imageRepoMock = $this->createMock(ImageRepository::class);
-        $imageRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['hash' => $hash])
-            ->willReturn(null);
+        $imageRepoMock->expects($this->once())->method('findOneBy')->with(['hash' => $hash])->willReturn(null);
 
         // Arrange: stub uploaded file
         $uploadedFile = $this->createStub(UploadedFile::class);
@@ -114,10 +104,10 @@ class ImageServiceTest extends TestCase
 
         // Arrange: mock filesystem service to verify copy
         $filesystemMock = $this->createMock(ExtendedFilesystem::class);
-        $filesystemMock->expects($this->once())->method('copy')->with(
-            $realPath,
-            $this->kernelProjectDir . '/data/images/' . $hash . '.' . $extension,
-        );
+        $filesystemMock
+            ->expects($this->once())
+            ->method('copy')
+            ->with($realPath, $this->kernelProjectDir . '/data/images/' . $hash . '.' . $extension);
 
         // Arrange: mock entity manager to verify persist with correct image data
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
@@ -125,7 +115,7 @@ class ImageServiceTest extends TestCase
             ->expects($this->once())
             ->method('persist')
             ->with($this->callback(function (Image $image) use ($hash, $mimeType, $extension, $type, $size, $user) {
-                return
+                return (
                     $image->getHash() === $hash
                     && $image->getMimeType() === $mimeType
                     && $image->getExtension() === $extension
@@ -133,7 +123,7 @@ class ImageServiceTest extends TestCase
                     && $image->getSize() === $size
                     && $image->getUploader() === $user
                     && $image->getCreatedAt() instanceof DateTimeImmutable
-                ;
+                );
             }));
 
         $subject = $this->createService(
@@ -158,7 +148,8 @@ class ImageServiceTest extends TestCase
     public function testCreateThumbnails(): void
     {
         // Arrange: create a partial mock to override Imagick-related functionality
-        $subject = $this->getMockBuilder(ImageService::class)
+        $subject = $this
+            ->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
                 $this->createStub(EntityManagerInterface::class),
@@ -189,7 +180,8 @@ class ImageServiceTest extends TestCase
     public function testRotateThumbNail(): void
     {
         // Arrange: create a partial mock to override Imagick-related functionality
-        $subject = $this->getMockBuilder(ImageService::class)
+        $subject = $this
+            ->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
                 $this->createStub(EntityManagerInterface::class),
@@ -246,13 +238,11 @@ class ImageServiceTest extends TestCase
                 'hash1' => ImageType::ProfilePicture,
                 'hash2' => ImageType::EventTeaser,
             ]);
-        $imageRepoMock
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(2);
+        $imageRepoMock->expects($this->once())->method('count')->willReturn(2);
 
         // Arrange: create partial mock to avoid calling getObsoleteThumbnails
-        $subject = $this->getMockBuilder(ImageService::class)
+        $subject = $this
+            ->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
                 $imageRepoMock,
                 $this->createStub(EntityManagerInterface::class),
@@ -354,7 +344,8 @@ class ImageServiceTest extends TestCase
         // Arrange: create partial mock to control getObsoleteThumbnails
         $filesystemMock = $this->createMock(ExtendedFilesystem::class);
 
-        $subject = $this->getMockBuilder(ImageService::class)
+        $subject = $this
+            ->getMockBuilder(ImageService::class)
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
                 $this->createStub(EntityManagerInterface::class),

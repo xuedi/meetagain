@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'app:test:metrics',
-    description: 'Analyze Symfony route performance metrics (queries, timing, memory)'
+    description: 'Analyze Symfony route performance metrics (queries, timing, memory)',
 )]
 class TestMetricsCommand extends Command
 {
@@ -21,7 +21,13 @@ class TestMetricsCommand extends Command
     {
         $this
             ->addOption('threshold', null, InputOption::VALUE_REQUIRED, 'Show only routes with >N queries', '20')
-            ->addOption('sort', null, InputOption::VALUE_REQUIRED, 'Sort by: queries (default), time, or memory', 'queries')
+            ->addOption(
+                'sort',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Sort by: queries (default), time, or memory',
+                'queries',
+            )
             ->addOption('filter', null, InputOption::VALUE_REQUIRED, 'Filter routes by name pattern')
             ->addOption('json', null, InputOption::VALUE_NONE, 'Output as JSON');
     }

@@ -19,7 +19,8 @@ class TranslationSuggestionRepository extends ServiceEntityRepository
 
     public function getPendingCount(): int
     {
-        return (int) $this->createQueryBuilder('ts')
+        return (int) $this
+            ->createQueryBuilder('ts')
             ->select('COUNT(ts.id)')
             ->where('ts.status = :status')
             ->setParameter('status', TranslationSuggestionStatus::Requested)
@@ -32,7 +33,8 @@ class TranslationSuggestionRepository extends ServiceEntityRepository
      */
     public function getPending(int $limit = 10): array
     {
-        return $this->createQueryBuilder('ts')
+        return $this
+            ->createQueryBuilder('ts')
             ->where('ts.status = :status')
             ->setParameter('status', TranslationSuggestionStatus::Requested)
             ->orderBy('ts.createdAt', 'DESC')

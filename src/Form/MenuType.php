@@ -28,8 +28,7 @@ class MenuType extends AbstractType
         private readonly MenuTranslationRepository $menuTransRepo,
         private readonly CmsRepository $cmsRepo,
         private readonly EventRepository $eventRepo,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -9,9 +9,9 @@ use Twig\TwigFunction;
 
 class RenderImageModalExtension extends AbstractExtension
 {
-    public function __construct(private readonly ImageUploadController $imageUploadController)
-    {
-    }
+    public function __construct(
+        private readonly ImageUploadController $imageUploadController,
+    ) {}
 
     #[Override]
     public function getFunctions(): array

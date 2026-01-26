@@ -26,11 +26,21 @@ class EventServiceTest extends TestCase
     public function testStructureListGroupsEventsByYearAndMonth(): void
     {
         // Arrange: create events across different months
-        $event1 = (new EventStub())->setId(1)->setStart(new DateTimeImmutable('2002-01-01'));
-        $event2 = (new EventStub())->setId(2)->setStart(new DateTimeImmutable('2002-01-05'));
-        $event3 = (new EventStub())->setId(3)->setStart(new DateTimeImmutable('2002-01-07'));
-        $event4 = (new EventStub())->setId(4)->setStart(new DateTimeImmutable('2002-04-02'));
-        $event5 = (new EventStub())->setId(5)->setStart(new DateTimeImmutable('2002-04-04'));
+        $event1 = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTimeImmutable('2002-01-01'));
+        $event2 = new EventStub()
+            ->setId(2)
+            ->setStart(new DateTimeImmutable('2002-01-05'));
+        $event3 = new EventStub()
+            ->setId(3)
+            ->setStart(new DateTimeImmutable('2002-01-07'));
+        $event4 = new EventStub()
+            ->setId(4)
+            ->setStart(new DateTimeImmutable('2002-04-02'));
+        $event5 = new EventStub()
+            ->setId(5)
+            ->setStart(new DateTimeImmutable('2002-04-04'));
 
         $eventList = [$event4, $event1, $event3, $event5, $event2];
 
@@ -43,7 +53,7 @@ class EventServiceTest extends TestCase
         );
 
         // Act: invoke private structureList method via reflection
-        $method = (new ReflectionClass($subject))->getMethod('structureList');
+        $method = new ReflectionClass($subject)->getMethod('structureList');
 
         $result = $method->invoke($subject, $eventList);
 
@@ -67,14 +77,12 @@ class EventServiceTest extends TestCase
         string $expectedDate,
     ): void {
         // Arrange: mock repository to return last recurring event or null
-        $returnValue = $dbResultDate !== null
-            ? (new EventStub())->setStart(new DateTimeImmutable($dbResultDate))
-            : null;
+        $returnValue = $dbResultDate !== null ? new EventStub()->setStart(new DateTimeImmutable($dbResultDate)) : null;
 
         $repoStub = $this->createStub(EventRepository::class);
         $repoStub->method('findOneBy')->willReturn($returnValue);
 
-        $event = (new EventStub())->setStart(new DateTimeImmutable($eventStartDate));
+        $event = new EventStub()->setStart(new DateTimeImmutable($eventStartDate));
 
         $subject = new EventService(
             repo: $repoStub,
@@ -85,7 +93,7 @@ class EventServiceTest extends TestCase
         );
 
         // Act: invoke private getLastRecurringEventDate method via reflection
-        $method = (new ReflectionClass($subject))->getMethod('getLastRecurringEventDate');
+        $method = new ReflectionClass($subject)->getMethod('getLastRecurringEventDate');
 
         $result = $method->invoke($subject, $event);
 
@@ -122,7 +130,7 @@ class EventServiceTest extends TestCase
         );
 
         // Act: invoke private updateDate method via reflection
-        $method = (new ReflectionClass($subject))->getMethod('updateDate');
+        $method = new ReflectionClass($subject)->getMethod('updateDate');
 
         $result = $method->invoke($subject, $targetDateTime, $occurrenceDateTime);
 
@@ -173,10 +181,12 @@ class EventServiceTest extends TestCase
     public function testCancelEventSetsCanceledFlagAndSendsNotifications(): void
     {
         // Arrange: create future event with RSVP users
-        $user1 = (new UserStub())->setId(1);
-        $user2 = (new UserStub())->setId(2);
+        $user1 = new UserStub()->setId(1);
+        $user2 = new UserStub()->setId(2);
 
-        $event = (new EventStub())->setId(1)->setStart(new DateTime('+1 week'));
+        $event = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTime('+1 week'));
         $event->addRsvp($user1);
         $event->addRsvp($user2);
 
@@ -185,9 +195,7 @@ class EventServiceTest extends TestCase
         $emMock->expects($this->once())->method('flush');
 
         $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->exactly(2))
-            ->method('prepareEventCanceledNotification')
-            ->willReturn(true);
+        $emailServiceMock->expects($this->exactly(2))->method('prepareEventCanceledNotification')->willReturn(true);
         $emailServiceMock->expects($this->once())->method('sendQueue');
 
         $subject = new EventService(
@@ -208,7 +216,9 @@ class EventServiceTest extends TestCase
     public function testCancelEventWithNoRsvpsDoesNotSendEmails(): void
     {
         // Arrange: create future event without RSVPs
-        $event = (new EventStub())->setId(1)->setStart(new DateTime('+1 week'));
+        $event = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTime('+1 week'));
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('persist')->with($event);
@@ -236,8 +246,10 @@ class EventServiceTest extends TestCase
     public function testCancelPastEventDoesNotSendNotifications(): void
     {
         // Arrange: create past event with RSVP users
-        $user = (new UserStub())->setId(1);
-        $event = (new EventStub())->setId(1)->setStart(new DateTime('-1 week'));
+        $user = new UserStub()->setId(1);
+        $event = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTime('-1 week'));
         $event->addRsvp($user);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -266,7 +278,7 @@ class EventServiceTest extends TestCase
     public function testUncancelEventRemovesCanceledFlag(): void
     {
         // Arrange: create canceled event
-        $event = (new EventStub())->setId(1);
+        $event = new EventStub()->setId(1);
         $event->setCanceled(true);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -290,7 +302,7 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithNoRecurringReturnZero(): void
     {
-        $event = (new EventStub())->setId(1);
+        $event = new EventStub()->setId(1);
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
@@ -304,9 +316,14 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithParentReturnsCount(): void
     {
-        $parent = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::Weekly);
+        $parent = new EventStub()
+            ->setId(1)
+            ->setRecurringRule(EventIntervals::Weekly);
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
-        $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
+        $child = new EventStub()
+            ->setId(2)
+            ->setRecurringOf(1)
+            ->setStart(new DateTime('+1 week'));
 
         $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findFollowUpEvents')->willReturn([$child]);
@@ -329,8 +346,12 @@ class EventServiceTest extends TestCase
     public function testCancelEventSendsEmailsAndFlushes(): void
     {
         // Arrange: create future event with RSVP
-        $user = (new UserStub())->setId(1)->setEmail('test@example.com');
-        $event = (new EventStub())->setId(1)->setStart(new DateTime('+1 week'));
+        $user = new UserStub()
+            ->setId(1)
+            ->setEmail('test@example.com');
+        $event = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTime('+1 week'));
         $event->addRsvp($user);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -356,7 +377,9 @@ class EventServiceTest extends TestCase
 
     public function testExtentRecurringEventsCallsFillForEachEvent(): void
     {
-        $event = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::Weekly);
+        $event = new EventStub()
+            ->setId(1)
+            ->setRecurringRule(EventIntervals::Weekly);
         $event->setStart(new DateTime('2025-01-01 10:00:00'));
         $event->setStop(new DateTime('2025-01-01 12:00:00'));
         $event->setPublished(true);
@@ -382,10 +405,15 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithChildUpdatesParent(): void
     {
-        $parent = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::Weekly);
+        $parent = new EventStub()
+            ->setId(1)
+            ->setRecurringRule(EventIntervals::Weekly);
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
 
-        $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
+        $child = new EventStub()
+            ->setId(2)
+            ->setRecurringOf(1)
+            ->setStart(new DateTime('+1 week'));
 
         $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findOneBy')->with(['id' => 1])->willReturn($parent);
@@ -408,7 +436,10 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithDeletedParentReturnsZero(): void
     {
-        $child = (new EventStub())->setId(2)->setRecurringOf(1)->setStart(new DateTime('+1 week'));
+        $child = new EventStub()
+            ->setId(2)
+            ->setRecurringOf(1)
+            ->setStart(new DateTime('+1 week'));
 
         $repoMock = $this->createStub(EventRepository::class);
         $repoMock->method('findOneBy')->with(['id' => 1])->willReturn(null);
@@ -426,7 +457,9 @@ class EventServiceTest extends TestCase
 
     public function testExtentRecurringEventsWithBiMonthly(): void
     {
-        $event = (new EventStub())->setId(1)->setRecurringRule(EventIntervals::BiMonthly);
+        $event = new EventStub()
+            ->setId(1)
+            ->setRecurringRule(EventIntervals::BiMonthly);
         $event->setStart(new DateTime('2025-01-01 10:00:00'));
         $event->setStop(new DateTime('2025-01-01 12:00:00'));
         $event->setPublished(true);

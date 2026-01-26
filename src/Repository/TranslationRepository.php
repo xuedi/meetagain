@@ -18,7 +18,8 @@ class TranslationRepository extends ServiceEntityRepository
 
     public function getMatrix(): array
     {
-        $rows = $this->createQueryBuilder('t')
+        $rows = $this
+            ->createQueryBuilder('t')
             ->select('t.id', 't.language', 't.placeholder', 't.translation')
             ->orderBy('t.placeholder', 'ASC')
             ->getQuery()
@@ -37,7 +38,8 @@ class TranslationRepository extends ServiceEntityRepository
 
     public function buildKeyValueList(): array
     {
-        $rows = $this->createQueryBuilder('t')
+        $rows = $this
+            ->createQueryBuilder('t')
             ->select('t.id', 't.translation')
             ->getQuery()
             ->getArrayResult();
@@ -52,7 +54,8 @@ class TranslationRepository extends ServiceEntityRepository
 
     public function getUniqueList(): array
     {
-        $rows = $this->createQueryBuilder('t')
+        $rows = $this
+            ->createQueryBuilder('t')
             ->select('t.language', 'LOWER(t.placeholder) AS placeholder')
             ->getQuery()
             ->getArrayResult();
@@ -67,7 +70,8 @@ class TranslationRepository extends ServiceEntityRepository
 
     public function getExportList(): array
     {
-        return $this->createQueryBuilder('t')
+        return $this
+            ->createQueryBuilder('t')
             ->select('t.language', 't.placeholder', 't.translation')
             ->getQuery()
             ->getArrayResult();

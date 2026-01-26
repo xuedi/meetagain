@@ -55,7 +55,8 @@ class InstallerTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         // Parse DATABASE_URL from environment, fallback to local Docker defaults
-        $databaseUrl = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? 'mysql://meetAgain:UserPassW0rd@ma-db:3306/meetAgain';
+        $databaseUrl =
+            $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? 'mysql://meetAgain:UserPassW0rd@ma-db:3306/meetAgain';
         $parsed = parse_url($databaseUrl);
 
         self::$dbHost = $parsed['host'] ?? 'ma-db';
@@ -161,7 +162,7 @@ class InstallerTest extends TestCase
 
         $this->assertEquals(
             'ses+api://AKIAIOSFODNN7EXAMPLE:wJalrXUtnFEMI%2FK7MDENG%2FbPxRfiCYEXAMPLEKEY@default?region=us-west-2',
-            $dsn
+            $dsn,
         );
     }
 
@@ -214,7 +215,7 @@ class InstallerTest extends TestCase
             self::$dbPort,
             self::$dbName,
             self::$dbUser,
-            self::$dbPassword
+            self::$dbPassword,
         );
 
         $this->assertTrue($result, 'Should connect to database with valid credentials');
@@ -228,7 +229,7 @@ class InstallerTest extends TestCase
             self::$dbPort,
             self::$dbName,
             'invalid_user',
-            'invalid_password'
+            'invalid_password',
         );
 
         $this->assertFalse($result, 'Should fail to connect with invalid credentials');
@@ -244,7 +245,7 @@ class InstallerTest extends TestCase
             self::$dbPort,
             self::$dbName,
             self::$dbUser,
-            self::$dbPassword
+            self::$dbPassword,
         );
 
         $this->assertFalse($result, 'Should fail to connect with invalid host');

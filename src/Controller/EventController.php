@@ -10,13 +10,13 @@ use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
 use App\Entity\User;
+use App\Filter\Event\EventFilterService;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
 use App\Form\EventUploadType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\ActivityService;
-use App\Filter\Event\EventFilterService;
 use App\Service\EventService;
 use App\Service\ImageService;
 use DateTimeImmutable;
@@ -39,8 +39,7 @@ class EventController extends AbstractController
         private readonly CommentRepository $comments,
         private readonly ImageService $imageService,
         private readonly EventFilterService $eventFilterService,
-    ) {
-    }
+    ) {}
 
     #[Route('/events', name: self::ROUTE_EVENT)]
     public function index(Request $request): Response
@@ -66,7 +65,14 @@ class EventController extends AbstractController
         return $this->render(
             'events/index.html.twig',
             [
-                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $filterResult->getEventIds()),
+                'structuredList' => $this->eventService->getFilteredList(
+                    $time,
+                    $sort,
+                    $type,
+                    $rsvp,
+                    $this->getUser(),
+                    $filterResult->getEventIds(),
+                ),
                 'filter' => $form,
             ],
             $response,
@@ -74,11 +80,8 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
-    public function details(
-        EntityManagerInterface $em,
-        Request $request,
-        ?int $id = null,
-    ): Response {
+    public function details(EntityManagerInterface $em, Request $request, ?int $id = null): Response
+    {
         // Check if event is accessible using composite filter
         if (!$this->eventFilterService->isEventAccessible($id)) {
             throw $this->createNotFoundException();
@@ -99,7 +102,7 @@ class EventController extends AbstractController
             $form = $this->createForm(CommentType::class);
         }
 
-        if (!($this->getUser() instanceof UserInterface)) {
+        if (!$this->getUser() instanceof UserInterface) {
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
         }
 
@@ -112,18 +115,15 @@ class EventController extends AbstractController
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id) : [],
                 'comments' => $this->comments->findByEventWithUser($id),
                 'event' => $event,
-                'user' => ($this->getUser() instanceof UserInterface) ? $this->getAuthedUser() : null,
+                'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
             ],
             $response,
         );
     }
 
     #[Route('/event/upload/{event}', name: 'app_event_upload', methods: ['GET', 'POST'])]
-    public function upload(
-        Event $event,
-        Request $request,
-        EntityManagerInterface $em,
-    ): Response {
+    public function upload(Event $event, Request $request, EntityManagerInterface $em): Response
+    {
         $user = $em->find(User::class, $this->getAuthedUser()->getId());
         if ($user === null) {
             throw new RuntimeException('User not found');

@@ -13,8 +13,7 @@ readonly class DishListService
     public function __construct(
         private EntityManagerInterface $em,
         private DishListRepository $repo,
-    ) {
-    }
+    ) {}
 
     public function createList(int $userId, string $name, ?string $description, bool $isPublic): DishList
     {

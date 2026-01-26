@@ -11,8 +11,7 @@ class Title implements BlockType
     private function __construct(
         public string $title,
         public ?ImageEntity $image,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self

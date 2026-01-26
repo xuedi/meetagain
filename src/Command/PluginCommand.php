@@ -13,10 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-    name: 'app:plugin',
-    description: 'List, enable, or disable plugins'
-)]
+#[AsCommand(name: 'app:plugin', description: 'List, enable, or disable plugins')]
 class PluginCommand extends Command
 {
     public function __construct(
@@ -83,8 +80,9 @@ class PluginCommand extends Command
 
         $rows = [];
         foreach ($plugins as $plugin) {
-            $status = $plugin['enabled'] ? '<fg=green>✓ Enabled</>' :
-                     ($plugin['installed'] ? '<fg=yellow>○ Installed</>' : '<fg=gray>○ Available</>');
+            $status = $plugin['enabled']
+                ? '<fg=green>✓ Enabled</>'
+                : ($plugin['installed'] ? '<fg=yellow>○ Installed</>' : '<fg=gray>○ Available</>');
 
             $rows[] = [
                 $plugin['key'],
@@ -95,10 +93,7 @@ class PluginCommand extends Command
             ];
         }
 
-        $io->table(
-            ['Key', 'Name', 'Version', 'Status', 'Description'],
-            $rows
-        );
+        $io->table(['Key', 'Name', 'Version', 'Status', 'Description'], $rows);
 
         $io->newLine();
         $io->text('Commands:');

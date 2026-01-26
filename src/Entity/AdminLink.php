@@ -8,8 +8,7 @@ readonly class AdminLink
         private string $label,
         private string $route,
         private ?string $active = null,
-    ) {
-    }
+    ) {}
 
     public function getLabel(): string
     {

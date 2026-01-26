@@ -23,7 +23,8 @@ class MessageRepository extends ServiceEntityRepository
      */
     public function getConversations(User $user, ?int $id = null, array $excludeUserIds = []): array
     {
-        $messages = $this->createQueryBuilder('m')
+        $messages = $this
+            ->createQueryBuilder('m')
             ->leftJoin('m.sender', 's')
             ->addSelect('s')
             ->leftJoin('s.image', 'si')
@@ -81,11 +82,12 @@ class MessageRepository extends ServiceEntityRepository
 
     public function getMessages(User $user, ?User $partner = null): ?array
     {
-        if (!($partner instanceof User)) {
+        if (!$partner instanceof User) {
             return null;
         }
 
-        return $this->createQueryBuilder('m')
+        return $this
+            ->createQueryBuilder('m')
             ->where('(m.sender = :self AND m.receiver = :partner) OR (m.sender = :partner AND m.receiver = :self)')
             ->setParameter('self', $user)
             ->setParameter('partner', $partner)
@@ -97,7 +99,8 @@ class MessageRepository extends ServiceEntityRepository
     public function getMessageCount(User $user): int
     {
         return count(
-            $this->createQueryBuilder('m')
+            $this
+                ->createQueryBuilder('m')
                 ->where('m.receiver = :self')
                 ->setParameter('self', $user)
                 ->orderBy('m.createdAt', 'ASC')
@@ -108,7 +111,8 @@ class MessageRepository extends ServiceEntityRepository
 
     public function hasNewMessages(User $user): bool
     {
-        $result = $this->createQueryBuilder('m')
+        $result = $this
+            ->createQueryBuilder('m')
             ->where('m.receiver = :user AND m.wasRead = false')
             ->setParameter('user', $user)
             ->orderBy('m.createdAt', 'ASC')
@@ -120,7 +124,8 @@ class MessageRepository extends ServiceEntityRepository
 
     public function markConversationRead(User $user, User $conversationPartner): void
     {
-        $this->createQueryBuilder('m')
+        $this
+            ->createQueryBuilder('m')
             ->update(Message::class, 'm')
             ->set('m.wasRead', true)
             ->where('m.receiver = :user AND m.sender = :partner')
@@ -137,12 +142,14 @@ class MessageRepository extends ServiceEntityRepository
      */
     public function getSystemStats(): array
     {
-        $total = (int) $this->createQueryBuilder('m')
+        $total = (int) $this
+            ->createQueryBuilder('m')
             ->select('COUNT(m.id)')
             ->getQuery()
             ->getSingleScalarResult();
 
-        $unread = (int) $this->createQueryBuilder('m')
+        $unread = (int) $this
+            ->createQueryBuilder('m')
             ->select('COUNT(m.id)')
             ->where('m.wasRead = false')
             ->getQuery()

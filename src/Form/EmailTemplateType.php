@@ -17,8 +17,7 @@ class EmailTemplateType extends AbstractType
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly EmailTemplateTranslationRepository $translationRepo,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

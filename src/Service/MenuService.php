@@ -10,8 +10,7 @@ readonly class MenuService
 {
     public function __construct(
         private MenuRepository $menuRepo,
-    ) {
-    }
+    ) {}
 
     /**
      * @return Menu[]

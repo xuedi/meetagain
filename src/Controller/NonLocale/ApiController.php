@@ -10,9 +10,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApiController extends AbstractController
 {
-    public function __construct(private readonly TranslationRepository $repo)
-    {
-    }
+    public function __construct(
+        private readonly TranslationRepository $repo,
+    ) {}
 
     #[Route('/api/', name: 'app_api')]
     public function index(): Response

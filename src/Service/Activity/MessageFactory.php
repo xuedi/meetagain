@@ -22,8 +22,7 @@ readonly class MessageFactory
         private EventRepository $eventRepository,
         private RequestStack $requestStack,
         private ImageHtmlRenderer $imageRenderer,
-    ) {
-    }
+    ) {}
 
     public function build(Activity $activity): MessageInterface
     {

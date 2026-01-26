@@ -24,13 +24,12 @@ readonly class UserChecker implements UserCheckerInterface
         private EntityManagerInterface $em,
         private RequestStack $requestStack,
         private MessageRepository $msgRepo,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function checkPreAuth(UserInterface $user): void
     {
-        if (!($user instanceof User)) {
+        if (!$user instanceof User) {
             return;
         }
 
@@ -42,12 +41,12 @@ readonly class UserChecker implements UserCheckerInterface
     #[Override]
     public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
-        if (!($user instanceof User)) {
+        if (!$user instanceof User) {
             return;
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        if (!($request instanceof Request)) {
+        if (!$request instanceof Request) {
             return;
         }
 

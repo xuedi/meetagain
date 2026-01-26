@@ -37,7 +37,8 @@ class DishRepository extends ServiceEntityRepository
      */
     public function findWithSuggestions(): array
     {
-        return $this->createQueryBuilder('d')
+        return $this
+            ->createQueryBuilder('d')
             ->where('d.suggestions IS NOT NULL')
             ->andWhere("d.suggestions != '[]'")
             ->orderBy('d.createdAt', 'DESC')
@@ -55,7 +56,8 @@ class DishRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('d')
+        return $this
+            ->createQueryBuilder('d')
             ->where('d.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()

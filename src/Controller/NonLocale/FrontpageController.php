@@ -16,8 +16,7 @@ class FrontpageController extends AbstractController
         private readonly ConfigService $configService,
         private readonly RouterInterface $router,
         private readonly LanguageService $languageService,
-    ) {
-    }
+    ) {}
 
     #[Route('/', name: 'app_frontpage')]
     public function index(): Response

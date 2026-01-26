@@ -21,8 +21,7 @@ readonly class DashboardActionService
         private TranslationSuggestionRepository $translationSuggestionRepo,
         private MessageRepository $messageRepo,
         private CommandExecutionLogRepository $commandLogRepo,
-    ) {
-    }
+    ) {}
 
     public function getNeedForApproval(): array
     {

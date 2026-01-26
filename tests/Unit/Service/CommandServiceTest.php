@@ -62,10 +62,7 @@ class CommandServiceTest extends TestCase
     {
         // Arrange: mock language service to return enabled codes
         $languageMock = $this->createMock(LanguageService::class);
-        $languageMock
-            ->expects($this->atLeastOnce())
-            ->method('getEnabledCodes')
-            ->willReturn(['de', 'en']);
+        $languageMock->expects($this->atLeastOnce())->method('getEnabledCodes')->willReturn(['de', 'en']);
 
         $service = $this->createService(languageService: $languageMock);
 

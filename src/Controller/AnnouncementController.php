@@ -11,9 +11,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AnnouncementController extends AbstractController
 {
-    public function __construct(private readonly AnnouncementRepository $announcementRepo)
-    {
-    }
+    public function __construct(
+        private readonly AnnouncementRepository $announcementRepo,
+    ) {}
 
     #[Route('/announcement/{hash}', name: 'app_announcement_redirect')]
     public function show(string $hash, Request $request): Response

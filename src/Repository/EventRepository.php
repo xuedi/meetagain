@@ -33,7 +33,8 @@ class EventRepository extends ServiceEntityRepository
         ?EventFilterRsvp $rsvp = null,
         ?array $restrictToEventIds = null,
     ): array {
-        $qb = $this->createQueryBuilder('e')
+        $qb = $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->andWhere('e.published = :published')
@@ -51,9 +52,9 @@ class EventRepository extends ServiceEntityRepository
 
         if ($rsvp instanceof EventFilterRsvp && $rsvp !== EventFilterRsvp::All && $user instanceof \App\Entity\User) {
             if ($rsvp === EventFilterRsvp::My) {
-                $qb->innerJoin('e.rsvp', 'u', 'WITH', 'u.id = :userId')
-                    ->setParameter('userId', $user->getId());
+                $qb->innerJoin('e.rsvp', 'u', 'WITH', 'u.id = :userId')->setParameter('userId', $user->getId());
             }
+
             // Friends filtering not yet implemented
         }
 
@@ -62,8 +63,7 @@ class EventRepository extends ServiceEntityRepository
             if ($restrictToEventIds === []) {
                 return []; // Empty filter = no results
             }
-            $qb->andWhere('e.id IN (:eventIds)')
-                ->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
         $qb->orderBy('e.start', $sort->value);
@@ -75,9 +75,13 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
-    public function findUpcomingEventsWithinRange(DateTimeInterface $start, DateTimeInterface $end, ?array $restrictToEventIds = null): array
-    {
-        $qb = $this->createQueryBuilder('e')
+    public function findUpcomingEventsWithinRange(
+        DateTimeInterface $start,
+        DateTimeInterface $end,
+        ?array $restrictToEventIds = null,
+    ): array {
+        $qb = $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.start BETWEEN :start AND :end')
@@ -90,18 +94,16 @@ class EventRepository extends ServiceEntityRepository
             if ($restrictToEventIds === []) {
                 return [];
             }
-            $qb->andWhere('e.id IN (:eventIds)')
-                ->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
-        return $qb->orderBy('e.start', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $qb->orderBy('e.start', 'ASC')->getQuery()->getResult();
     }
 
     public function getEventNameList(string $language): array
     {
-        $events = $this->createQueryBuilder('e')
+        $events = $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->getQuery()
@@ -121,7 +123,8 @@ class EventRepository extends ServiceEntityRepository
      */
     public function getUpcomingEvents(int $number = 3, ?array $restrictToEventIds = null): array
     {
-        $qb = $this->createQueryBuilder('e')
+        $qb = $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.start > :date')
@@ -132,14 +135,10 @@ class EventRepository extends ServiceEntityRepository
             if ($restrictToEventIds === []) {
                 return [];
             }
-            $qb->andWhere('e.id IN (:eventIds)')
-                ->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
-        return $qb->orderBy('e.start', 'ASC')
-            ->setMaxResults($number)
-            ->getQuery()
-            ->getResult();
+        return $qb->orderBy('e.start', 'ASC')->setMaxResults($number)->getQuery()->getResult();
     }
 
     /**
@@ -148,7 +147,8 @@ class EventRepository extends ServiceEntityRepository
      */
     public function getPastEvents(int $number = 3, ?array $restrictToEventIds = null): array
     {
-        $qb = $this->createQueryBuilder('e')
+        $qb = $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.start < :date')
@@ -159,14 +159,10 @@ class EventRepository extends ServiceEntityRepository
             if ($restrictToEventIds === []) {
                 return [];
             }
-            $qb->andWhere('e.id IN (:eventIds)')
-                ->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
-        return $qb->orderBy('e.start', 'DESC')
-            ->setMaxResults($number)
-            ->getQuery()
-            ->getResult();
+        return $qb->orderBy('e.start', 'DESC')->setMaxResults($number)->getQuery()->getResult();
     }
 
     /**
@@ -174,7 +170,8 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findAllRecurring(): array
     {
-        return $this->createQueryBuilder('e')
+        return $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.recurringRule IS NOT NULL')
@@ -220,7 +217,8 @@ class EventRepository extends ServiceEntityRepository
 
     public function getChoices(string $locale): array
     {
-        $events = $this->createQueryBuilder('e')
+        $events = $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.initial = :initial')
@@ -241,7 +239,8 @@ class EventRepository extends ServiceEntityRepository
      */
     public function getPastEventsWithoutPhotos(int $limit = 5): array
     {
-        return $this->createQueryBuilder('e')
+        return $this
+            ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->leftJoin('e.images', 'i')
@@ -256,7 +255,8 @@ class EventRepository extends ServiceEntityRepository
 
     public function getRecurringCount(): int
     {
-        return (int) $this->createQueryBuilder('e')
+        return (int) $this
+            ->createQueryBuilder('e')
             ->select('COUNT(e.id)')
             ->where('e.recurringRule IS NOT NULL')
             ->getQuery()

@@ -9,10 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(
-    name: 'app:test:results',
-    description: 'Parse JUnit XML and display test results in AI-friendly format'
-)]
+#[AsCommand(name: 'app:test:results', description: 'Parse JUnit XML and display test results in AI-friendly format')]
 class TestResultsCommand extends Command
 {
     public function __construct(
@@ -24,9 +21,12 @@ class TestResultsCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this
-            ->addOption('suite', null, InputOption::VALUE_REQUIRED, 'Filter by test suite name (unit, functional)')
-            ->addOption('failures-only', null, InputOption::VALUE_NONE, 'Show only failed/errored tests');
+        $this->addOption(
+            'suite',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Filter by test suite name (unit, functional)',
+        )->addOption('failures-only', null, InputOption::VALUE_NONE, 'Show only failed/errored tests');
     }
 
     #[Override]
@@ -91,7 +91,7 @@ class TestResultsCommand extends Command
             }
         }
 
-        $status = ($totalFailures === 0 && $totalErrors === 0) ? 'PASSED' : 'FAILED';
+        $status = $totalFailures === 0 && $totalErrors === 0 ? 'PASSED' : 'FAILED';
 
         $output->writeln("STATUS: {$status}");
         $summary = "{$totalTests} tests, {$totalAssertions} assertions";
@@ -133,7 +133,11 @@ class TestResultsCommand extends Command
         $lines = explode("\n", $fullMessage);
         foreach ($lines as $line) {
             $line = trim($line);
-            if (str_starts_with($line, 'Failed asserting') || str_starts_with($line, 'Exception:') || str_starts_with($line, 'Error:')) {
+            if (
+                str_starts_with($line, 'Failed asserting')
+                || str_starts_with($line, 'Exception:')
+                || str_starts_with($line, 'Error:')
+            ) {
                 return $line;
             }
         }

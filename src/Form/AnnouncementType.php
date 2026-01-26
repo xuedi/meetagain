@@ -17,19 +17,17 @@ class AnnouncementType extends AbstractType
     public function __construct(
         public readonly TranslatorInterface $translator,
         public readonly CmsRepository $cmsRepository,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('cmsPage', EntityType::class, [
-                'class' => Cms::class,
-                'label' => false,
-                'choice_label' => fn (Cms $cms) => $cms->getSlug() . ($cms->isPublished() ? '' : ' (unpublished)'),
-                'query_builder' => fn () => $this->cmsRepository->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
-            ]);
+        $builder->add('cmsPage', EntityType::class, [
+            'class' => Cms::class,
+            'label' => false,
+            'choice_label' => fn(Cms $cms) => $cms->getSlug() . ($cms->isPublished() ? '' : ' (unpublished)'),
+            'query_builder' => fn() => $this->cmsRepository->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
+        ]);
     }
 
     #[Override]

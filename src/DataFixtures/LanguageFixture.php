@@ -19,8 +19,7 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
 
     public function __construct(
         private readonly ImageService $imageService,
-    ) {
-    }
+    ) {}
 
     public function load(ObjectManager $manager): void
     {

@@ -15,8 +15,7 @@ readonly class TranslationService
         private TranslationFileManager $fileManager,
         private LanguageService $languageService,
         private CommandService $commandService,
-    ) {
-    }
+    ) {}
 
     /** TODO: move to repo */
     public function getMatrix(): array
@@ -55,11 +54,12 @@ readonly class TranslationService
         foreach ($locales as $locale) {
             $translations = [];
             $query = $this->entityManager->createQuery(
-                'SELECT t FROM App\Entity\Translation t WHERE t.language = :locale'
+                'SELECT t FROM App\Entity\Translation t WHERE t.language = :locale',
             )->setParameter('locale', $locale);
 
             foreach ($query->toIterable() as $translation) {
-                $translations[strtolower((string) $translation->getPlaceholder())] = $translation->getTranslation() ?? '';
+                $translations[strtolower((string) $translation->getPlaceholder())] =
+                    $translation->getTranslation() ?? '';
                 ++$published;
                 $this->entityManager->detach($translation);
             }

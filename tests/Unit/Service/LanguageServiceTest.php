@@ -30,7 +30,8 @@ class LanguageServiceTest extends TestCase
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
         $this->service = new LanguageService($this->languageRepo, $this->appCache);
 
-        $this->appCache->expects($this->once())
+        $this->appCache
+            ->expects($this->once())
             ->method('get')
             ->with('language.enabled_codes')
             ->willReturnCallback(function ($key, $callback) {
@@ -39,8 +40,7 @@ class LanguageServiceTest extends TestCase
                 return $callback($item);
             });
 
-        $this->languageRepo->method('getEnabledCodes')
-            ->willReturn(['en', 'de']);
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
 
         $this->assertEquals(['en', 'de'], $this->service->getEnabledCodes());
     }
@@ -50,15 +50,12 @@ class LanguageServiceTest extends TestCase
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
         $this->service = new LanguageService($this->languageRepo, $this->appCache);
 
-        $this->appCache->expects($this->once())
+        $this->appCache
+            ->expects($this->once())
             ->method('get')
-            ->willThrowException(
-                new class extends Exception implements InvalidArgumentException {
-                }
-            );
+            ->willThrowException(new class extends Exception implements InvalidArgumentException {});
 
-        $this->languageRepo->method('getEnabledCodes')
-            ->willReturn(['en']);
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en']);
 
         $this->assertEquals(['en'], $this->service->getEnabledCodes());
     }
@@ -76,25 +73,22 @@ class LanguageServiceTest extends TestCase
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
         $this->service = new LanguageService($this->languageRepo, $this->appCache);
 
-        $this->appCache->expects($this->exactly(2))
+        $this->appCache
+            ->expects($this->exactly(2))
             ->method('delete')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('language.enabled_codes'),
-                    $this->equalTo('language.all_languages')
-                )
-            );
+            ->with($this->logicalOr(
+                $this->equalTo('language.enabled_codes'),
+                $this->equalTo('language.all_languages'),
+            ));
 
         $this->service->invalidateCache();
     }
 
     public function testInvalidateCacheHandlesException(): void
     {
-        $this->appCache->method('delete')
-            ->willThrowException(
-                new class extends Exception implements InvalidArgumentException {
-                }
-            );
+        $this->appCache
+            ->method('delete')
+            ->willThrowException(new class extends Exception implements InvalidArgumentException {});
 
         $this->service->invalidateCache();
         $this->assertTrue(true); // Should not throw
@@ -117,7 +111,8 @@ class LanguageServiceTest extends TestCase
         $this->service = new LanguageService($this->languageRepo, $this->appCache);
 
         $langEn = new Language();
-        $this->appCache->expects($this->once())
+        $this->appCache
+            ->expects($this->once())
             ->method('get')
             ->with('language.all_languages')
             ->willReturnCallback(function ($key, $callback) {
@@ -126,8 +121,7 @@ class LanguageServiceTest extends TestCase
                 return $callback($item);
             });
 
-        $this->languageRepo->method('findAllOrdered')
-            ->willReturn([$langEn]);
+        $this->languageRepo->method('findAllOrdered')->willReturn([$langEn]);
 
         $this->assertEquals([$langEn], $this->service->getAllLanguages());
     }
@@ -137,15 +131,12 @@ class LanguageServiceTest extends TestCase
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
         $this->service = new LanguageService($this->languageRepo, $this->appCache);
 
-        $this->appCache->expects($this->once())
+        $this->appCache
+            ->expects($this->once())
             ->method('get')
-            ->willThrowException(
-                new class extends Exception implements InvalidArgumentException {
-                }
-            );
+            ->willThrowException(new class extends Exception implements InvalidArgumentException {});
 
-        $this->languageRepo->method('findAllOrdered')
-            ->willReturn([]);
+        $this->languageRepo->method('findAllOrdered')->willReturn([]);
 
         $this->assertEquals([], $this->service->getAllLanguages());
     }
@@ -153,7 +144,8 @@ class LanguageServiceTest extends TestCase
     public function testFindByCode(): void
     {
         $lang = new Language();
-        $this->languageRepo->method('findByCode')
+        $this->languageRepo
+            ->method('findByCode')
             ->with('en')
             ->willReturn($lang);
 

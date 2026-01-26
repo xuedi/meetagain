@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'app:test:coverage-report',
-    description: 'Parse coverage report and display statistics in AI-friendly format'
+    description: 'Parse coverage report and display statistics in AI-friendly format',
 )]
 class TestCoverageReportCommand extends Command
 {
@@ -26,7 +26,13 @@ class TestCoverageReportCommand extends Command
     {
         $this
             ->addOption('threshold', null, InputOption::VALUE_REQUIRED, 'Show only files below N% coverage', '100')
-            ->addOption('sort', null, InputOption::VALUE_REQUIRED, 'Sort by: coverage (default) or uncovered', 'coverage')
+            ->addOption(
+                'sort',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Sort by: coverage (default) or uncovered',
+                'coverage',
+            )
             ->addOption('detailed', null, InputOption::VALUE_NONE, 'Show detailed method-level coverage');
     }
 
@@ -109,9 +115,9 @@ class TestCoverageReportCommand extends Command
 
         // Sort
         if ($sortBy === 'uncovered') {
-            usort($files, fn ($a, $b) => $b['uncovered'] <=> $a['uncovered']);
+            usort($files, fn($a, $b) => $b['uncovered'] <=> $a['uncovered']);
         } else {
-            usort($files, fn ($a, $b) => $a['percentage'] <=> $b['percentage']);
+            usort($files, fn($a, $b) => $a['percentage'] <=> $b['percentage']);
         }
 
         // Get total metrics
@@ -129,7 +135,7 @@ class TestCoverageReportCommand extends Command
             $output->writeln("All files above {$threshold}% threshold");
         } else {
             // Only show files below 80% (needs attention)
-            $needsWork = array_filter($files, fn ($f) => $f['percentage'] < 80);
+            $needsWork = array_filter($files, fn($f) => $f['percentage'] < 80);
 
             if (!empty($needsWork)) {
                 $output->writeln('NEEDS ATTENTION:');
@@ -140,7 +146,7 @@ class TestCoverageReportCommand extends Command
                         $file['percentage'],
                         $file['name'],
                         $file['uncovered'],
-                        $impact
+                        $impact,
                     ));
                 }
             }

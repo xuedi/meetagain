@@ -72,8 +72,7 @@ class PasswordResetServiceTest extends TestCase
         $userRepoStub->method('findOneBy')->willReturn($user);
 
         $activityMock = $this->createMock(ActivityService::class);
-        $activityMock->expects($this->once())->method('log')
-            ->with(ActivityType::PasswordResetRequest, $user);
+        $activityMock->expects($this->once())->method('log')->with(ActivityType::PasswordResetRequest, $user);
 
         $emailMock = $this->createMock(EmailService::class);
         $emailMock->expects($this->once())->method('prepareResetPassword')->with($user);
@@ -122,7 +121,8 @@ class PasswordResetServiceTest extends TestCase
         $user->setPassword('old-hashed-password');
 
         $hasherMock = $this->createMock(UserPasswordHasherInterface::class);
-        $hasherMock->expects($this->once())
+        $hasherMock
+            ->expects($this->once())
             ->method('hashPassword')
             ->with($user, 'newPassword123')
             ->willReturn('new-hashed-password');
@@ -147,8 +147,7 @@ class PasswordResetServiceTest extends TestCase
         $hasherStub->method('hashPassword')->willReturn('hashed');
 
         $activityMock = $this->createMock(ActivityService::class);
-        $activityMock->expects($this->once())->method('log')
-            ->with(ActivityType::PasswordReset, $user);
+        $activityMock->expects($this->once())->method('log')->with(ActivityType::PasswordReset, $user);
 
         $service = $this->createService(hasher: $hasherStub, activityService: $activityMock);
 

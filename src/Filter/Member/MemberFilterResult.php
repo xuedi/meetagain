@@ -14,8 +14,7 @@ readonly class MemberFilterResult
     public function __construct(
         private ?array $userIds,
         private bool $hasActiveFilter,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<int>|null

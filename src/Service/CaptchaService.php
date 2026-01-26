@@ -13,8 +13,7 @@ readonly class CaptchaService
 {
     public function __construct(
         private RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     private function getSession(): SessionInterface
     {

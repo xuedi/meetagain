@@ -21,8 +21,7 @@ class ProfileType extends AbstractType
     public function __construct(
         private readonly LanguageService $languageService,
         private readonly TranslatorInterface $translator,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,47 +34,39 @@ class ProfileType extends AbstractType
             $languageList[$this->translator->trans('language_' . $locale)] = $locale;
         }
 
-        $builder
-            ->add('image', FileType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => false,
-                'attr' => ['class' => 'is-hidden'],
-                'constraints' => [
-                    new File(
-                        maxSize: '10M',
-                        mimeTypes: ['image/*'],
-                        mimeTypesMessage: 'Please upload a valid image, preferable a square format',
-                    ),
-                ],
-            ])
-            ->add('name', TextType::class, [
-                'label' => 'Username',
-                'constraints' => [
-                    new Length(
-                        max: 64,
-                        maxMessage: 'usernames cant be longer than 64 characters (less with chinese)',
-                    ),
-                ],
-            ])
-            ->add('public', ChoiceType::class, [
-                'data' => $user->isPublic(),
-                'mapped' => false,
-                'label' => 'Public profile:',
-                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
-            ])
-            ->add('languages', ChoiceType::class, [
-                'data' => $user->getLocale(),
-                'mapped' => false,
-                'label' => 'Language after login:',
-                'choices' => $languageList,
-            ])
-            ->add('bio', TextareaType::class, [
-                'data' => $user->getBio(),
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Bio:',
-            ]);
+        $builder->add('image', FileType::class, [
+            'mapped' => false,
+            'required' => false,
+            'label' => false,
+            'attr' => ['class' => 'is-hidden'],
+            'constraints' => [
+                new File(
+                    maxSize: '10M',
+                    mimeTypes: ['image/*'],
+                    mimeTypesMessage: 'Please upload a valid image, preferable a square format',
+                ),
+            ],
+        ])->add('name', TextType::class, [
+            'label' => 'Username',
+            'constraints' => [
+                new Length(max: 64, maxMessage: 'usernames cant be longer than 64 characters (less with chinese)'),
+            ],
+        ])->add('public', ChoiceType::class, [
+            'data' => $user->isPublic(),
+            'mapped' => false,
+            'label' => 'Public profile:',
+            'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+        ])->add('languages', ChoiceType::class, [
+            'data' => $user->getLocale(),
+            'mapped' => false,
+            'label' => 'Language after login:',
+            'choices' => $languageList,
+        ])->add('bio', TextareaType::class, [
+            'data' => $user->getBio(),
+            'required' => false,
+            'mapped' => false,
+            'label' => 'Bio:',
+        ]);
     }
 
     #[Override]

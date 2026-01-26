@@ -164,10 +164,12 @@ class CookieConsentTest extends WebTestCase
         $crawler = $client->request('GET', '/en/cookie/');
         $this->assertResponseIsSuccessful();
 
-        $form = $crawler->selectButton('cookie_consent_save')->form([
-            'cookie_consent[cookies]' => true,
-            'cookie_consent[osm]' => true,
-        ]);
+        $form = $crawler
+            ->selectButton('cookie_consent_save')
+            ->form([
+                'cookie_consent[cookies]' => true,
+                'cookie_consent[osm]' => true,
+            ]);
         $client->submit($form);
 
         $this->assertResponseRedirects('/en/cookie/');
@@ -189,9 +191,11 @@ class CookieConsentTest extends WebTestCase
         $crawler = $client->request('GET', '/en/cookie/');
         $this->assertResponseIsSuccessful();
 
-        $form = $crawler->selectButton('cookie_consent_save')->form([
-            'cookie_consent[cookies]' => false,
-        ]);
+        $form = $crawler
+            ->selectButton('cookie_consent_save')
+            ->form([
+                'cookie_consent[cookies]' => false,
+            ]);
         $client->submit($form);
 
         $this->assertResponseRedirects('/en/cookie/');

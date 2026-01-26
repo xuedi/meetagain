@@ -4,13 +4,13 @@ namespace App\Controller;
 
 use App\Entity\ActivityType;
 use App\Entity\Event;
+use App\Filter\Event\EventFilterService;
 use App\Form\ProfileType;
 use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\BlockingService;
-use App\Filter\Event\EventFilterService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,14 +30,11 @@ class ProfileController extends AbstractController
         private readonly UserRepository $userRepo,
         private readonly BlockingService $blockingService,
         private readonly EventFilterService $eventFilterService,
-    ) {
-    }
+    ) {}
 
     #[Route('/profile/', name: self::ROUTE_PROFILE)]
-    public function index(
-        Request $request,
-        EntityManagerInterface $entityManager,
-    ): Response {
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    {
         $response = $this->getResponse();
         $user = $this->getAuthedUser();
         $oldUserName = $user->getName();

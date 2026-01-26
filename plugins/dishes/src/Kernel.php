@@ -10,9 +10,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class Kernel implements Plugin
 {
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
-    {
-    }
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+    ) {}
 
     public function getPluginKey(): string
     {
@@ -22,10 +22,7 @@ readonly class Kernel implements Plugin
     public function getMenuLinks(): array
     {
         return [
-            new Link(
-                slug: $this->urlGenerator->generate('app_plugin_dishes'),
-                name: 'Dishes',
-            )
+            new Link(slug: $this->urlGenerator->generate('app_plugin_dishes'), name: 'Dishes'),
         ];
     }
 

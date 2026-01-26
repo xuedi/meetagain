@@ -54,19 +54,21 @@ class PluginServiceTest extends TestCase
         ]));
 
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('getRealPath')->willReturnCallback(fn ($path) => match ($path) {
-            $this->tempDir . '/plugins' => $pluginDir,
-            $this->tempDir . '/config' => $this->tempDir . '/config',
-            default => false,
-        });
+        $fsMock
+            ->method('getRealPath')
+            ->willReturnCallback(fn($path) => match ($path) {
+                $this->tempDir . '/plugins' => $pluginDir,
+                $this->tempDir . '/config' => $this->tempDir . '/config',
+                default => false,
+            });
         $fsMock
             ->expects($this->once())
             ->method('glob')
             ->with($pluginDir . '/*', GLOB_ONLYDIR)
             ->willReturn([$pluginDir . '/plugin1', $pluginDir . '/plugin2']);
-        $fsMock->method('exists')->willReturnCallback(fn ($path) => is_dir($path) || file_exists($path));
-        $fsMock->method('fileExists')->willReturnCallback(fn ($path) => file_exists($path));
-        $fsMock->method('getFileContents')->willReturnCallback(fn ($path) => file_get_contents($path));
+        $fsMock->method('exists')->willReturnCallback(fn($path) => is_dir($path) || file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
 
         $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir);
 
@@ -119,11 +121,13 @@ class PluginServiceTest extends TestCase
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
         $fsStub->method('fileExists')->willReturn(true);
-        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
-            file_put_contents($this->configFile, $content);
+        $fsStub
+            ->method('putFileContents')
+            ->willReturnCallback(function ($path, $content) {
+                file_put_contents($this->configFile, $content);
 
-            return true;
-        });
+                return true;
+            });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
@@ -163,11 +167,13 @@ class PluginServiceTest extends TestCase
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
         $fsStub->method('fileExists')->willReturn(true);
-        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
-            file_put_contents($this->configFile, $content);
+        $fsStub
+            ->method('putFileContents')
+            ->willReturnCallback(function ($path, $content) {
+                file_put_contents($this->configFile, $content);
 
-            return true;
-        });
+                return true;
+            });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
@@ -207,11 +213,13 @@ class PluginServiceTest extends TestCase
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
         $fsStub->method('fileExists')->willReturn(true);
-        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
-            file_put_contents($this->configFile, $content);
+        $fsStub
+            ->method('putFileContents')
+            ->willReturnCallback(function ($path, $content) {
+                file_put_contents($this->configFile, $content);
 
-            return true;
-        });
+                return true;
+            });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
@@ -269,11 +277,13 @@ class PluginServiceTest extends TestCase
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
         $fsStub->method('fileExists')->willReturn(true);
-        $fsStub->method('putFileContents')->willReturnCallback(function ($path, $content) {
-            file_put_contents($this->configFile, $content);
+        $fsStub
+            ->method('putFileContents')
+            ->willReturnCallback(function ($path, $content) {
+                file_put_contents($this->configFile, $content);
 
-            return true;
-        });
+                return true;
+            });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');

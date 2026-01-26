@@ -17,8 +17,7 @@ readonly class SitemapService
         private CmsService $cms,
         private EventRepository $events,
         private LanguageService $languageService,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws RuntimeError

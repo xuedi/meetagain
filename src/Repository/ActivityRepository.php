@@ -25,7 +25,8 @@ class ActivityRepository extends ServiceEntityRepository
         $em = $this->getEntityManager();
 
         // Get RSVP event IDs with a single query instead of lazy-loading collection
-        $events = $em->createQueryBuilder()
+        $events = $em
+            ->createQueryBuilder()
             ->select('e.id')
             ->from(Event::class, 'e')
             ->innerJoin('e.rsvp', 'u')
@@ -35,7 +36,8 @@ class ActivityRepository extends ServiceEntityRepository
             ->getSingleColumnResult();
 
         // Get following user IDs with a single query instead of lazy-loading collection
-        $following = $em->createQueryBuilder()
+        $following = $em
+            ->createQueryBuilder()
             ->select('f.id')
             ->from(User::class, 'u')
             ->innerJoin('u.following', 'f')
@@ -45,7 +47,8 @@ class ActivityRepository extends ServiceEntityRepository
             ->getSingleColumnResult();
 
         // Get all activities of the wanted types with user eager-loaded
-        $userActivities = $this->createQueryBuilder('a')
+        $userActivities = $this
+            ->createQueryBuilder('a')
             ->leftJoin('a.user', 'u')
             ->addSelect('u')
             ->where('a.type IN (:types)')
@@ -105,7 +108,8 @@ class ActivityRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('a')
+        return $this
+            ->createQueryBuilder('a')
             ->leftJoin('a.user', 'u')
             ->addSelect('u')
             ->leftJoin('u.image', 'i')
@@ -124,7 +128,8 @@ class ActivityRepository extends ServiceEntityRepository
      */
     public function getRsvpStats(DateTimeImmutable $start, DateTimeImmutable $end): array
     {
-        $yes = (int) $this->createQueryBuilder('a')
+        $yes = (int) $this
+            ->createQueryBuilder('a')
             ->select('COUNT(a.id)')
             ->where('a.type = :type')
             ->andWhere('a.createdAt >= :start')
@@ -135,7 +140,8 @@ class ActivityRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
-        $no = (int) $this->createQueryBuilder('a')
+        $no = (int) $this
+            ->createQueryBuilder('a')
             ->select('COUNT(a.id)')
             ->where('a.type = :type')
             ->andWhere('a.createdAt >= :start')
@@ -160,7 +166,8 @@ class ActivityRepository extends ServiceEntityRepository
      */
     public function getLoginTrend(DateTimeImmutable $start, DateTimeImmutable $end): array
     {
-        $result = $this->getEntityManager()
+        $result = $this
+            ->getEntityManager()
             ->createQueryBuilder()
             ->select("DATE_FORMAT(a.createdAt, '%W') AS day", 'COUNT(a.id) as count')
             ->from(Activity::class, 'a')
