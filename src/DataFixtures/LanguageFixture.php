@@ -50,7 +50,6 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
             }
 
             $manager->persist($language);
-            $this->tick();
         }
 
         $manager->flush();
