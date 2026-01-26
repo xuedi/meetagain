@@ -6,6 +6,7 @@ use App\Entity\Menu;
 use App\Entity\MenuLocation;
 use App\Entity\MenuType;
 use App\Entity\MenuVisibility;
+use App\Service\MenuFilter\MenuFilterService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\RouterInterface;
@@ -22,6 +23,7 @@ class MenuRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         private readonly RouterInterface $router,
+        private readonly MenuFilterService $menuFilterService,
     ) {
         parent::__construct($registry, Menu::class);
     }
@@ -34,7 +36,26 @@ class MenuRepository extends ServiceEntityRepository
         // Load all menus once per request
         if ($this->menuCache === null) {
             $this->menuCache = [];
-            $allMenus = $this->findBy([], ['priority' => 'ASC']);
+
+            // Apply menu filtering
+            $filterResult = $this->menuFilterService->getMenuIdFilter();
+            $allowedIds = $filterResult->getMenuIds();
+
+            // Build query with filter
+            $qb = $this->createQueryBuilder('m')
+                ->orderBy('m.priority', 'ASC');
+
+            if ($allowedIds !== null) {
+                if ($allowedIds === []) {
+                    // No menus allowed
+                    return [];
+                }
+                $qb->where('m.id IN (:allowedIds)')
+                   ->setParameter('allowedIds', $allowedIds);
+            }
+
+            $allMenus = $qb->getQuery()->getResult();
+
             foreach ($allMenus as $menu) {
                 $loc = $menu->getLocation()->value ?? 'default';
                 $this->menuCache[$loc][] = $menu;
