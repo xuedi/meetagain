@@ -147,7 +147,7 @@ plugin-disable name:
 
 # Run all tests and checks
 [group('testing')]
-test: testSetup testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer checkDeptrac checkMago checkMagoAnalyze checkMagoGuard
+test: testSetup testUnit testFunctional checkStan checkRector checkMago checkMagoAnalyze checkMagoGuard
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -204,21 +204,6 @@ checkStan +parameter='':
 checkRector:
     {{PHP}} vendor/bin/rector process src --dry-run -c tests/config/rector.php
 
-# Check PHPCS
-[group('checks')]
-checkPhpcs:
-    {{PHP}} vendor/bin/phpcs --standard=./tests/config/phpcs.xml --cache=var/cache/phpcs.cache -q
-
-# Check PHP-CS-Fixer (dry-run)
-[group('checks')]
-checkPhpCsFixer:
-    {{PHP}} vendor/bin/php-cs-fixer fix --dry-run --diff --quiet --config=tests/config/.php-cs-fixer.php
-
-# Check Deptrac
-[group('checks')]
-checkDeptrac:
-    {{PHP}} vendor/bin/deptrac analyse --config-file=tests/config/deptrac.yaml --no-progress
-
 # Check Mago (linter)
 [group('checks')]
 checkMago:
@@ -244,16 +229,6 @@ checkMagoAll: checkMago checkMagoAnalyze checkMagoGuard
 checkA11y url='http://localhost/':
     {{DOCKER}} build pa11y -q
     {{DOCKER}} run --rm pa11y {{url}} --reporter cli --standard WCAG2AA
-
-# Fix PHPCS violations
-[group('fixing')]
-fixPhpcs:
-    {{PHP}} vendor/bin/phpcbf --standard=./tests/config/phpcs.xml --cache=var/cache/phpcs.cache
-
-# Fix with PHP-CS-Fixer
-[group('fixing')]
-fixPhpCsFixer:
-    {{PHP}} vendor/bin/php-cs-fixer fix --verbose --config=tests/config/.php-cs-fixer.php
 
 # Apply Rector fixes
 [group('fixing')]
