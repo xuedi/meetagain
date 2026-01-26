@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.1/phpunit.xsd"
-         bootstrap="./bootstrap.php"
-         cacheDirectory="../var/cache/"
+         bootstrap="../bootstrap.php"
+         cacheDirectory="../../var/cache/"
          executionOrder="depends,defects"
          beStrictAboutOutputDuringTests="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
@@ -20,10 +20,10 @@
     </extensions>
     <testsuites>
         <testsuite name="default">
-            <directory>./Unit</directory>
+            <directory>../Unit</directory>
         </testsuite>
         <testsuite name="functional">
-            <directory>./Functional</directory>
+            <directory>../Functional</directory>
         </testsuite>
     </testsuites>
     <php>
@@ -34,8 +34,8 @@
     </php>
     <coverage>
         <report>
-            <clover outputFile="reports/clover.xml"/>
-            <html outputDirectory="./reports/coverage/" lowUpperBound="50" highLowerBound="90"/>
+            <clover outputFile="../reports/clover.xml"/>
+            <html outputDirectory="../reports/coverage/" lowUpperBound="50" highLowerBound="90"/>
         </report>
     </coverage>
     <source>

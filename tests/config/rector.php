@@ -7,11 +7,11 @@ use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRec
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '/../plugins',
-        __DIR__ . '/../config',
-        __DIR__ . '/../public',
-        __DIR__ . '/../src',
-        __DIR__ . '/../tests',
+        __DIR__ . '/../../plugins',
+        __DIR__ . '/../../config',
+        __DIR__ . '/../../public',
+        __DIR__ . '/../../src',
+        __DIR__ . '/../../tests',
     ])
     ->withPhpSets(php84: true)
     ->withSkip([
@@ -28,7 +28,7 @@ return RectorConfig::configure()
         phpunit: true,
     )
     ->withTypeCoverageLevel(0)
-    ->withSymfonyContainerXml(__DIR__ . '/../var/cache/dev/App_KernelDevDebugContainer.xml')
+    ->withSymfonyContainerXml(__DIR__ . '/../../var/cache/dev/App_KernelDevDebugContainer.xml')
     ->withSets([
         SymfonySetList::SYMFONY_74,
         SymfonySetList::SYMFONY_CODE_QUALITY,
