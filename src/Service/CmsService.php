@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use App\Service\CmsFilter\CmsFilterService;
 use App\Service\EventFilter\EventFilterService;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -15,6 +16,7 @@ readonly class CmsService
         private CmsRepository $repo,
         private EventRepository $eventRepo,
         private EventFilterService $eventFilterService,
+        private CmsFilterService $cmsFilterService,
     ) {
     }
 
@@ -25,10 +27,13 @@ readonly class CmsService
 
     public function handle(string $locale, string $slug, Response $response): Response
     {
-        $cms = $this->repo->findOneBy([
-            'slug' => $slug,
-            'published' => true,
-        ]);
+        // Apply CMS filtering based on current context
+        $cmsFilterResult = $this->cmsFilterService->getCmsIdFilter();
+
+        $cms = $this->repo->findPublishedBySlug(
+            $slug,
+            $cmsFilterResult->getCmsIds()
+        );
 
         if ($cms === null) {
             return $this->createNotFoundPage();
