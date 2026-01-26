@@ -1,35 +1,35 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\MemberFilter;
+namespace App\Filter\Event;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
- * Composite member filter service that collects all registered MemberFilterInterface implementations.
- * Combines multiple filters using AND logic for user ID restrictions.
+ * Composite event filter service that collects all registered EventFilterInterface implementations.
+ * Combines multiple filters using AND logic for event ID restrictions.
  */
-readonly class MemberFilterService
+readonly class EventFilterService
 {
     /**
-     * @param iterable<MemberFilterInterface> $filters
+     * @param iterable<EventFilterInterface> $filters
      */
     public function __construct(
-        #[AutowireIterator(MemberFilterInterface::class)]
+        #[AutowireIterator(EventFilterInterface::class)]
         private iterable $filters,
     ) {
     }
 
     /**
-     * Get the combined user ID filter from all registered filters.
-     * Uses intersection (AND) logic: a member must pass ALL filters.
+     * Get the combined event ID filter from all registered filters.
+     * Uses intersection (AND) logic: an event must pass ALL filters.
      */
-    public function getUserIdFilter(): MemberFilterResult
+    public function getEventIdFilter(): EventFilterResult
     {
         $resultSet = null;
         $hasActiveFilter = false;
 
         foreach ($this->getSortedFilters() as $filter) {
-            $filterResult = $filter->getUserIdFilter();
+            $filterResult = $filter->getEventIdFilter();
 
             if ($filterResult === null) {
                 continue; // No filtering from this filter
@@ -38,32 +38,32 @@ readonly class MemberFilterService
             $hasActiveFilter = true;
 
             if ($filterResult === []) {
-                return MemberFilterResult::emptyResult();
+                return EventFilterResult::emptyResult();
             }
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
             } else {
-                // Intersect: member must pass ALL filters
+                // Intersect: event must pass ALL filters
                 $resultSet = array_values(array_intersect($resultSet, $filterResult));
                 if ($resultSet === []) {
-                    return MemberFilterResult::emptyResult();
+                    return EventFilterResult::emptyResult();
                 }
             }
         }
 
-        return new MemberFilterResult($resultSet, $hasActiveFilter);
+        return new EventFilterResult($resultSet, $hasActiveFilter);
     }
 
     /**
-     * Check if a member is accessible according to all registered filters.
+     * Check if an event is accessible according to all registered filters.
      * Any filter returning false will deny access.
      * Returns true only if all filters allow (or have no opinion).
      */
-    public function isMemberAccessible(int $userId): bool
+    public function isEventAccessible(int $eventId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
-            $result = $filter->isMemberAccessible($userId);
+            $result = $filter->isEventAccessible($eventId);
 
             if ($result === false) {
                 return false; // Explicit deny
@@ -74,13 +74,13 @@ readonly class MemberFilterService
     }
 
     /**
-     * @return array<MemberFilterInterface>
+     * @return array<EventFilterInterface>
      */
     private function getSortedFilters(): array
     {
         $filters = iterator_to_array($this->filters);
 
-        usort($filters, static fn (MemberFilterInterface $a, MemberFilterInterface $b): int =>
+        usort($filters, static fn (EventFilterInterface $a, EventFilterInterface $b): int =>
             $b->getPriority() <=> $a->getPriority()
         );
 

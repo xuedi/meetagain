@@ -16,7 +16,7 @@ use App\Form\EventUploadType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\ActivityService;
-use App\Service\EventFilter\EventFilterService;
+use App\Filter\Event\EventFilterService;
 use App\Service\EventService;
 use App\Service\ImageService;
 use DateTimeImmutable;

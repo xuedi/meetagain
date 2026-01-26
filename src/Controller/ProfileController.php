@@ -10,7 +10,7 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\BlockingService;
-use App\Service\EventFilter\EventFilterService;
+use App\Filter\Event\EventFilterService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;

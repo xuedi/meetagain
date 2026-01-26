@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\EventFilter;
+namespace App\Filter\Event;
 
 /**
  * Result from composing multiple event filters.

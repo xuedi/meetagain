@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\CmsFilter;
+namespace App\Filter\Member;
 
 /**
- * Result from composing multiple CMS page filters.
+ * Result from composing multiple member filters.
  */
-readonly class CmsFilterResult
+readonly class MemberFilterResult
 {
     /**
-     * @param array<int>|null $cmsIds Restricted CMS page IDs, or null for no restriction
+     * @param array<int>|null $userIds Restricted user IDs, or null for no restriction
      * @param bool $hasActiveFilter Whether any filter is actively restricting
      */
     public function __construct(
-        private ?array $cmsIds,
+        private ?array $userIds,
         private bool $hasActiveFilter,
     ) {
     }
@@ -20,9 +20,9 @@ readonly class CmsFilterResult
     /**
      * @return array<int>|null
      */
-    public function getCmsIds(): ?array
+    public function getUserIds(): ?array
     {
-        return $this->cmsIds;
+        return $this->userIds;
     }
 
     public function hasActiveFilter(): bool
@@ -32,7 +32,7 @@ readonly class CmsFilterResult
 
     public function isEmpty(): bool
     {
-        return $this->cmsIds === [];
+        return $this->userIds === [];
     }
 
     public static function noFilter(): self
