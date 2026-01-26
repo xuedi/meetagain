@@ -540,7 +540,7 @@ return array_merge($groupIds, $platformIds);
 
 ---
 
-### Junction Table Pattern (MultiSite Plugin)
+### Junction Table Pattern
 
 **Purpose:** Map groups to core entities without modifying core schemas.
 
