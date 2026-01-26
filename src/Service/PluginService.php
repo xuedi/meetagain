@@ -98,6 +98,23 @@ readonly class PluginService
         $this->setPluginConfig($config);
     }
 
+    public function isInstalled(string $pluginKey): bool
+    {
+        $config = $this->getPluginConfig();
+
+        return isset($config[$pluginKey]);
+    }
+
+    public function isEnabled(string $pluginKey): bool
+    {
+        $config = $this->getPluginConfig();
+        if (!isset($config[$pluginKey])) {
+            return false;
+        }
+
+        return $config[$pluginKey] === true;
+    }
+
     private function parsePluginDir(): array
     {
         if (!$this->filesystem->exists($this->pluginDir)) {
@@ -133,22 +150,5 @@ readonly class PluginService
             }
             $this->commandService->clearCache();
         }
-    }
-
-    private function isInstalled(string $pluginKey): bool
-    {
-        $config = $this->getPluginConfig();
-
-        return isset($config[$pluginKey]);
-    }
-
-    private function isEnabled(string $pluginKey): bool
-    {
-        $config = $this->getPluginConfig();
-        if (!isset($config[$pluginKey])) {
-            return false;
-        }
-
-        return $config[$pluginKey] === true;
     }
 }
