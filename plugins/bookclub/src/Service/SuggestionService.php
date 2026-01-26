@@ -21,7 +21,9 @@ readonly class SuggestionService
     {
         $existingPending = $this->suggestionRepo->findUserPendingSuggestion($userId);
         if ($existingPending !== null) {
-            throw new RuntimeException('You already have a pending suggestion. Withdraw it first to suggest another book.');
+            throw new RuntimeException(
+                'You already have a pending suggestion. Withdraw it first to suggest another book.',
+            );
         }
 
         $suggestion = new BookSuggestion();
@@ -109,8 +111,9 @@ readonly class SuggestionService
     {
         $suggestions = $this->getPendingSuggestions();
 
-        usort($suggestions, fn(BookSuggestion $a, BookSuggestion $b) =>
-            $this->calculatePriority($b) <=> $this->calculatePriority($a)
+        usort(
+            $suggestions,
+            fn(BookSuggestion $a, BookSuggestion $b) => $this->calculatePriority($b) <=> $this->calculatePriority($a),
         );
 
         return $suggestions;
@@ -121,9 +124,7 @@ readonly class SuggestionService
         $resubmitBonus = $suggestion->getResubmitCount() * 10;
 
         $suggestedAt = $suggestion->getSuggestedAt();
-        $daysSinceSuggested = $suggestedAt !== null
-            ? $suggestedAt->diff(new DateTimeImmutable())->days
-            : 0;
+        $daysSinceSuggested = $suggestedAt !== null ? $suggestedAt->diff(new DateTimeImmutable())->days : 0;
         $timeBonus = $daysSinceSuggested * 1;
 
         return $resubmitBonus + $timeBonus;

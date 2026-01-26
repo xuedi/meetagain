@@ -12,28 +12,28 @@ use Plugin\Bookclub\Repository\BookPollRepository;
 class BookPoll
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private null|string $title = null;
+    private ?string $title = null;
 
     #[ORM\Column]
-    private null|int $createdBy = null;
+    private ?int $createdBy = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private null|DateTimeImmutable $startDate = null;
+    private ?DateTimeImmutable $startDate = null;
 
     #[ORM\Column(nullable: true)]
-    private null|DateTimeImmutable $endDate = null;
+    private ?DateTimeImmutable $endDate = null;
 
     #[ORM\Column(enumType: PollStatus::class)]
     private PollStatus $status = PollStatus::Draft;
 
     #[ORM\Column(nullable: true)]
-    private null|int $eventId = null;
+    private ?int $eventId = null;
 
     /** @var Collection<int, BookSuggestion> */
     #[ORM\OneToMany(targetEntity: BookSuggestion::class, mappedBy: 'poll')]
@@ -49,24 +49,24 @@ class BookPoll
         $this->votes = new ArrayCollection();
     }
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): null|string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(null|string $title): static
+    public function setTitle(?string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getCreatedBy(): null|int
+    public function getCreatedBy(): ?int
     {
         return $this->createdBy;
     }
@@ -78,7 +78,7 @@ class BookPoll
         return $this;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -90,24 +90,24 @@ class BookPoll
         return $this;
     }
 
-    public function getStartDate(): null|DateTimeImmutable
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->startDate;
     }
 
-    public function setStartDate(null|DateTimeImmutable $startDate): static
+    public function setStartDate(?DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
 
         return $this;
     }
 
-    public function getEndDate(): null|DateTimeImmutable
+    public function getEndDate(): ?DateTimeImmutable
     {
         return $this->endDate;
     }
 
-    public function setEndDate(null|DateTimeImmutable $endDate): static
+    public function setEndDate(?DateTimeImmutable $endDate): static
     {
         $this->endDate = $endDate;
 
@@ -148,12 +148,12 @@ class BookPoll
         return $this->votes;
     }
 
-    public function getEventId(): null|int
+    public function getEventId(): ?int
     {
         return $this->eventId;
     }
 
-    public function setEventId(null|int $eventId): static
+    public function setEventId(?int $eventId): static
     {
         $this->eventId = $eventId;
 

@@ -10,17 +10,17 @@ use Plugin\Bookclub\Repository\BookSuggestionRepository;
 class BookSuggestion
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'suggestions')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Book $book = null;
+    private ?Book $book = null;
 
     #[ORM\Column]
-    private null|int $suggestedBy = null;
+    private ?int $suggestedBy = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $suggestedAt = null;
+    private ?DateTimeImmutable $suggestedAt = null;
 
     #[ORM\Column]
     private int $resubmitCount = 0;
@@ -29,14 +29,14 @@ class BookSuggestion
     private SuggestionStatus $status = SuggestionStatus::Pending;
 
     #[ORM\ManyToOne(inversedBy: 'suggestions')]
-    private null|BookPoll $poll = null;
+    private ?BookPoll $poll = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getBook(): null|Book
+    public function getBook(): ?Book
     {
         return $this->book;
     }
@@ -48,7 +48,7 @@ class BookSuggestion
         return $this;
     }
 
-    public function getSuggestedBy(): null|int
+    public function getSuggestedBy(): ?int
     {
         return $this->suggestedBy;
     }
@@ -60,7 +60,7 @@ class BookSuggestion
         return $this;
     }
 
-    public function getSuggestedAt(): null|DateTimeImmutable
+    public function getSuggestedAt(): ?DateTimeImmutable
     {
         return $this->suggestedAt;
     }
@@ -96,12 +96,12 @@ class BookSuggestion
         return $this;
     }
 
-    public function getPoll(): null|BookPoll
+    public function getPoll(): ?BookPoll
     {
         return $this->poll;
     }
 
-    public function setPoll(null|BookPoll $poll): static
+    public function setPoll(?BookPoll $poll): static
     {
         $this->poll = $poll;
 
