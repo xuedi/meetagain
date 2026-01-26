@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 #[AsCommand(
     name: 'app:event:add-fixture',
-    description: 'Add random RSVPs, comments and plugin fixtures to extended recurring events'
+    description: 'Add random RSVPs, comments and plugin fixtures to extended recurring events',
 )]
 class EventAddFixtureCommand extends Command
 {
@@ -55,33 +55,21 @@ class EventAddFixtureCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this->addOption(
-            'min-rsvps',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Minimum number of RSVPs per event',
-            '2'
-        );
-        $this->addOption(
-            'max-rsvps',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Maximum number of RSVPs per event',
-            '5'
-        );
+        $this->addOption('min-rsvps', null, InputOption::VALUE_REQUIRED, 'Minimum number of RSVPs per event', '2');
+        $this->addOption('max-rsvps', null, InputOption::VALUE_REQUIRED, 'Maximum number of RSVPs per event', '5');
         $this->addOption(
             'min-comments',
             null,
             InputOption::VALUE_REQUIRED,
             'Minimum number of comments per event',
-            '1'
+            '1',
         );
         $this->addOption(
             'max-comments',
             null,
             InputOption::VALUE_REQUIRED,
             'Maximum number of comments per event',
-            '4'
+            '4',
         );
     }
 
@@ -94,9 +82,9 @@ class EventAddFixtureCommand extends Command
         $maxComments = (int) $input->getOption('max-comments');
 
         // Find all recurring events (events that have a parent)
-        $recurringEvents = $this->em->createQuery(
-            'SELECT e FROM App\Entity\Event e WHERE e.recurringOf IS NOT NULL'
-        )->getResult();
+        $recurringEvents = $this->em
+            ->createQuery('SELECT e FROM App\Entity\Event e WHERE e.recurringOf IS NOT NULL')
+            ->getResult();
 
         if (empty($recurringEvents)) {
             $output->writeln('<comment>No recurring events found to enhance.</comment>');
@@ -140,9 +128,7 @@ class EventAddFixtureCommand extends Command
 
                 // Create timestamp between event creation and now
                 $daysAfterEvent = random_int(0, 7);
-                $comment->setCreatedAt(
-                    (clone $event->getCreatedAt())->modify("+{$daysAfterEvent} days")
-                );
+                $comment->setCreatedAt((clone $event->getCreatedAt())->modify("+{$daysAfterEvent} days"));
 
                 $this->em->persist($comment);
                 ++$commentCount;
@@ -155,7 +141,7 @@ class EventAddFixtureCommand extends Command
             '<info>Successfully added %d RSVPs and %d comments to %d recurring events.</info>',
             $rsvpCount,
             $commentCount,
-            count($recurringEvents)
+            count($recurringEvents),
         ));
 
         // Run plugin fixtures for enabled plugins only

@@ -42,11 +42,7 @@ class FriendshipServiceTest extends TestCase
         $securityStub->method('getUser')->willReturn($currentUserMock);
 
         $userRepoMock = $this->createMock(UserRepository::class);
-        $userRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => $userId])
-            ->willReturn($targetUser);
+        $userRepoMock->expects($this->once())->method('findOneBy')->with(['id' => $userId])->willReturn($targetUser);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('persist')->with($currentUserMock);
@@ -110,11 +106,7 @@ class FriendshipServiceTest extends TestCase
         $securityStub->method('getUser')->willReturn($currentUserMock);
 
         $userRepoMock = $this->createMock(UserRepository::class);
-        $userRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => $userId])
-            ->willReturn($targetUser);
+        $userRepoMock->expects($this->once())->method('findOneBy')->with(['id' => $userId])->willReturn($targetUser);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('persist')->with($currentUserMock);

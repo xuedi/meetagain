@@ -14,8 +14,7 @@ readonly class MenuFilterResult
     public function __construct(
         public ?array $menuIds,
         public bool $hasActiveFilter,
-    ) {
-    }
+    ) {}
 
     public function getMenuIds(): ?array
     {

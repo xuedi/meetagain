@@ -19,8 +19,7 @@ readonly class DashboardStatsService
         private EmailQueueRepository $mailRepo,
         private NotFoundLogRepository $notFoundRepo,
         private ActivityRepository $activityRepo,
-    ) {
-    }
+    ) {}
 
     public function getTimeControl(int $year, int $week): array
     {
@@ -31,11 +30,7 @@ readonly class DashboardStatsService
             'year' => $year,
             'weekNext' => $week + 1,
             'weekPrevious' => $week - 1,
-            'weekDetails' => sprintf(
-                '%s - %s',
-                $dates['start']->format('Y-m-d'),
-                $dates['stop']->format('Y-m-d'),
-            ),
+            'weekDetails' => sprintf('%s - %s', $dates['start']->format('Y-m-d'), $dates['stop']->format('Y-m-d')),
         ];
     }
 

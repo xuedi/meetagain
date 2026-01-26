@@ -40,8 +40,7 @@ class SecurityController extends AbstractController
         private readonly ConsentService $consentService,
         private readonly CaptchaService $captchaService,
         private readonly PasswordResetService $passwordResetService,
-    ) {
-    }
+    ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
     public function login(Request $request): Response
@@ -78,10 +77,8 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(
-        Request $request,
-        EntityManagerInterface $em,
-    ): Response {
+    public function register(Request $request, EntityManagerInterface $em): Response
+    {
         $user = new User();
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);

@@ -15,8 +15,7 @@ class AddController extends AbstractController
 {
     public function __construct(
         private readonly DishService $dishService,
-    ) {
-    }
+    ) {}
 
     #[Route('/add', name: 'plugin_dishes_add', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
@@ -40,9 +39,7 @@ class AddController extends AbstractController
                 origin: $form->get('origin')->getData(),
             );
 
-            $this->addFlash('success', $isManager
-                ? 'Dish has been added.'
-                : 'Dish has been submitted for approval.');
+            $this->addFlash('success', $isManager ? 'Dish has been added.' : 'Dish has been submitted for approval.');
 
             return $this->redirectToRoute('app_plugin_dishes');
         }

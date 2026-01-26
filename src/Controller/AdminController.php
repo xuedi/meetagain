@@ -17,8 +17,7 @@ class AdminController extends AbstractController
         private readonly DashboardStatsService $dashboardStats,
         private readonly DashboardActionService $dashboardAction,
         private readonly HealthCheckService $healthCheckService,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
     public function index(?int $year = null, ?int $week = null): Response

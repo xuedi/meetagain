@@ -11,9 +11,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ThemeColorsType extends AbstractType
 {
-    public function __construct(private readonly ConfigService $configService)
-    {
-    }
+    public function __construct(
+        private readonly ConfigService $configService,
+    ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

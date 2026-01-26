@@ -49,16 +49,19 @@ class RsvpNotificationServiceTest extends TestCase
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
         $event->method('hasRsvp')->with($follower)->willReturn(false);
 
-        $this->appCache->method('get')->willReturnCallback(function ($key, $callback) {
-            if (str_starts_with($key, 'rsvp_following_notif_')) {
-                // For wasNotificationSent, callback returns false (default value if not in cache)
-                return $callback($this->createStub(ItemInterface::class));
-            }
+        $this->appCache
+            ->method('get')
+            ->willReturnCallback(function ($key, $callback) {
+                if (str_starts_with($key, 'rsvp_following_notif_')) {
+                    // For wasNotificationSent, callback returns false (default value if not in cache)
+                    return $callback($this->createStub(ItemInterface::class));
+                }
 
-            return null;
-        });
+                return null;
+            });
 
-        $this->emailService->expects($this->once())
+        $this->emailService
+            ->expects($this->once())
             ->method('prepareAggregatedRsvpNotification')
             ->with($follower, [$attendee], $event);
 
@@ -90,15 +93,18 @@ class RsvpNotificationServiceTest extends TestCase
         $attendee2->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
         $event->method('hasRsvp')->with($follower)->willReturn(false);
 
-        $this->appCache->method('get')->willReturnCallback(function ($key, $callback) {
-            if (str_starts_with($key, 'rsvp_following_notif_')) {
-                return $callback($this->createStub(ItemInterface::class));
-            }
+        $this->appCache
+            ->method('get')
+            ->willReturnCallback(function ($key, $callback) {
+                if (str_starts_with($key, 'rsvp_following_notif_')) {
+                    return $callback($this->createStub(ItemInterface::class));
+                }
 
-            return null;
-        });
+                return null;
+            });
 
-        $this->emailService->expects($this->once())
+        $this->emailService
+            ->expects($this->once())
             ->method('prepareAggregatedRsvpNotification')
             ->with($follower, [$attendee1, $attendee2], $event);
 
@@ -126,8 +132,7 @@ class RsvpNotificationServiceTest extends TestCase
 
         $this->appCache->method('get')->willReturn(true);
 
-        $this->emailService->expects($this->never())
-            ->method('prepareAggregatedRsvpNotification');
+        $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count);
@@ -144,8 +149,7 @@ class RsvpNotificationServiceTest extends TestCase
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
 
-        $this->emailService->expects($this->never())
-            ->method('prepareAggregatedRsvpNotification');
+        $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count);
@@ -160,8 +164,7 @@ class RsvpNotificationServiceTest extends TestCase
 
         $this->eventRepo->method('findUpcomingEventsWithinRange')->willReturn([$event1, $event2]);
 
-        $this->emailService->expects($this->never())
-            ->method('prepareAggregatedRsvpNotification');
+        $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->processUpcomingEvents(5);
         $this->assertEquals(0, $count);
@@ -172,8 +175,7 @@ class RsvpNotificationServiceTest extends TestCase
         $event = $this->createStub(Event::class);
         $event->method('getRsvp')->willReturn(new ArrayCollection([]));
 
-        $this->emailService->expects($this->never())
-            ->method('prepareAggregatedRsvpNotification');
+        $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count);
@@ -197,8 +199,7 @@ class RsvpNotificationServiceTest extends TestCase
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
         $event->method('hasRsvp')->with($follower)->willReturn(true);
 
-        $this->emailService->expects($this->never())
-            ->method('prepareAggregatedRsvpNotification');
+        $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count);
@@ -226,8 +227,9 @@ class RsvpNotificationServiceTest extends TestCase
         // Simulate cache storage - tracks which keys have been marked as sent
         $cacheStorage = [];
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(
-            function ($key, $callback, $beta = null) use (&$cacheStorage) {
+        $this->appCache
+            ->method('get')
+            ->willReturnCallback(function ($key, $callback, $beta = null) use (&$cacheStorage) {
                 if (isset($cacheStorage[$key])) {
                     return $cacheStorage[$key];
                 }
@@ -239,13 +241,13 @@ class RsvpNotificationServiceTest extends TestCase
                 }
 
                 return $value;
-            }
-        );
+            });
 
         $this->service = new RsvpNotificationService($this->eventRepo, $this->emailService, $this->appCache);
 
         // Email should be sent exactly once across both calls
-        $this->emailService->expects($this->once())
+        $this->emailService
+            ->expects($this->once())
             ->method('prepareAggregatedRsvpNotification')
             ->with($follower, [$attendee], $event);
 

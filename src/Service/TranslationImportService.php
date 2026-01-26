@@ -20,8 +20,7 @@ readonly class TranslationImportService
         private CommandService $commandService,
         private ConfigService $configService,
         private TranslationService $translationService,
-    ) {
-    }
+    ) {}
 
     public function extract(): array
     {

@@ -17,8 +17,7 @@ class EditController extends AbstractController
     public function __construct(
         private readonly DishService $dishService,
         private readonly TranslationService $translationService,
-    ) {
-    }
+    ) {}
 
     #[Route('/translate/{id}/{lang}', name: 'plugin_dishes_translate', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
@@ -58,9 +57,10 @@ class EditController extends AbstractController
                 recipe: $form->get('recipe')->getData(),
             );
 
-            $this->addFlash('success', $isManager
-                ? 'Translation has been updated.'
-                : 'Translation suggestion has been submitted for review.');
+            $this->addFlash(
+                'success',
+                $isManager ? 'Translation has been updated.' : 'Translation suggestion has been submitted for review.',
+            );
 
             return $this->redirectToRoute('plugin_dishes_item_show', ['id' => $id]);
         }
@@ -89,9 +89,10 @@ class EditController extends AbstractController
 
         $this->dishService->updateOrigin($id, $user->getId(), $isManager, $origin);
 
-        $this->addFlash('success', $isManager
-            ? 'Origin has been updated.'
-            : 'Origin suggestion has been submitted for review.');
+        $this->addFlash(
+            'success',
+            $isManager ? 'Origin has been updated.' : 'Origin suggestion has been submitted for review.',
+        );
 
         return $this->redirectToRoute('plugin_dishes_item_show', ['id' => $id]);
     }

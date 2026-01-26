@@ -16,8 +16,7 @@ class DishType extends AbstractType
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly DishTranslationRepository $dishTransRepo,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -25,7 +24,9 @@ class DishType extends AbstractType
         $dish = $options['data'] ?? null;
         $dishId = $dish?->getId();
         foreach ($this->translationService->getLanguageCodes() as $languageCode) {
-            $translation = $dishId !== null ? $this->dishTransRepo->findOneBy(['dish' => $dishId, 'language' => $languageCode]) : null;
+            $translation = $dishId !== null
+                ? $this->dishTransRepo->findOneBy(['dish' => $dishId, 'language' => $languageCode])
+                : null;
             $builder->add("name-$languageCode", TextType::class, [
                 'label' => "Name ($languageCode)",
                 'data' => $translation?->getName() ?? '',

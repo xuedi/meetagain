@@ -14,8 +14,7 @@ readonly class CmsBlockService
     public function __construct(
         private EntityManagerInterface $em,
         private CmsBlockRepository $blockRepo,
-    ) {
-    }
+    ) {}
 
     public function createBlock(Cms $page, string $locale, CmsBlockTypes $type, array $payload): CmsBlock
     {
@@ -85,10 +84,7 @@ readonly class CmsBlockService
 
     private function reorderBlocks(int $pageId, string $locale): void
     {
-        $blocks = $this->blockRepo->findBy(
-            ['page' => $pageId, 'language' => $locale],
-            ['priority' => 'ASC']
-        );
+        $blocks = $this->blockRepo->findBy(['page' => $pageId, 'language' => $locale], ['priority' => 'ASC']);
 
         $priority = 1;
         foreach ($blocks as $block) {

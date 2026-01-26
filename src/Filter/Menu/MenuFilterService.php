@@ -16,8 +16,7 @@ readonly class MenuFilterService
     public function __construct(
         #[AutowireIterator(MenuFilterInterface::class)]
         private iterable $filters,
-    ) {
-    }
+    ) {}
 
     /**
      * Get combined menu ID filter from all registered filters.
@@ -26,7 +25,10 @@ readonly class MenuFilterService
     {
         // Collect filters ordered by priority (highest first)
         $orderedFilters = iterator_to_array($this->filters);
-        usort($orderedFilters, static fn(MenuFilterInterface $a, MenuFilterInterface $b) => $b->getPriority() <=> $a->getPriority());
+        usort(
+            $orderedFilters,
+            static fn(MenuFilterInterface $a, MenuFilterInterface $b) => $b->getPriority() <=> $a->getPriority(),
+        );
 
         $allowedIds = null;
         $hasActiveFilter = false;
@@ -66,7 +68,10 @@ readonly class MenuFilterService
     {
         // Collect filters ordered by priority (highest first)
         $orderedFilters = iterator_to_array($this->filters);
-        usort($orderedFilters, static fn(MenuFilterInterface $a, MenuFilterInterface $b) => $b->getPriority() <=> $a->getPriority());
+        usort(
+            $orderedFilters,
+            static fn(MenuFilterInterface $a, MenuFilterInterface $b) => $b->getPriority() <=> $a->getPriority(),
+        );
 
         foreach ($orderedFilters as $filter) {
             $accessible = $filter->isMenuAccessible($menuId);

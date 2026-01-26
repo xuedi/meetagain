@@ -7,8 +7,7 @@ readonly class Link
     public function __construct(
         private string $slug,
         private string $name,
-    ) {
-    }
+    ) {}
 
     public function getSlug(): string
     {

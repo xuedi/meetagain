@@ -24,8 +24,7 @@ readonly class FriendshipService
         private Security $security,
         private RequestStack $requestStack,
         private ActivityService $activityService,
-    ) {
-    }
+    ) {}
 
     public function toggleFollow(int $id, string $returnRoute): RedirectResponse
     {
@@ -67,8 +66,10 @@ readonly class FriendshipService
     private function getAuthedUser(): User
     {
         $user = $this->security->getUser();
-        if (!($user instanceof User)) {
-            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException(
+                'Should never happen, see: config/packages/security.yaml',
+            );
         }
 
         return $user;

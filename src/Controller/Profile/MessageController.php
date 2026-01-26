@@ -24,8 +24,7 @@ class MessageController extends AbstractController
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
         private readonly BlockingService $blockingService,
-    ) {
-    }
+    ) {}
 
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
     public function index(Request $request, ?int $id = null): Response
@@ -55,7 +54,8 @@ class MessageController extends AbstractController
                     $this->em->persist($msg);
                     $this->em->flush();
 
-                    $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' => $conversationPartner->getId()]);
+                    $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' =>
+                        $conversationPartner->getId()]);
                 }
             }
             // preRender then flush when no new messages
@@ -67,7 +67,8 @@ class MessageController extends AbstractController
         }
 
         // Check if current user has blocked the partner (for showing block/unblock button)
-        $hasBlockedPartner = $conversationPartner !== null && $this->blockingService->hasBlocked($user, $conversationPartner);
+        $hasBlockedPartner =
+            $conversationPartner !== null && $this->blockingService->hasBlocked($user, $conversationPartner);
 
         // Get excluded user IDs for filtering conversations list
         $excludeUserIds = $this->blockingService->getExcludedUserIds($user);

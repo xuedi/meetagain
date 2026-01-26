@@ -10,9 +10,9 @@ use Twig\Environment;
 
 class ErrorController extends AbstractController
 {
-    public function __construct(private readonly Environment $twig)
-    {
-    }
+    public function __construct(
+        private readonly Environment $twig,
+    ) {}
 
     public function show(Throwable $exception, Request $request): Response
     {

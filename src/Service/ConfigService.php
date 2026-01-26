@@ -20,8 +20,7 @@ readonly class ConfigService
         private ConfigRepository $repo,
         private EntityManagerInterface $em,
         private CacheInterface $cache,
-    ) {
-    }
+    ) {}
 
     public function getThumbnailSizes(ImageType $type): array
     {

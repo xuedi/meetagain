@@ -26,8 +26,7 @@ readonly class AnnouncementService
         private ConfigService $configService,
         private EmailTemplateService $templateService,
         private EmailService $emailService,
-    ) {
-    }
+    ) {}
 
     public function send(Announcement $announcement): int
     {
@@ -48,7 +47,12 @@ readonly class AnnouncementService
 
         foreach ($subscribers as $subscriber) {
             $renderedContent = $this->renderContent($cmsPage, $subscriber->getLocale());
-            $this->emailService->prepareAnnouncementEmail($subscriber, $renderedContent, $announcementUrl, flush: false);
+            $this->emailService->prepareAnnouncementEmail(
+                $subscriber,
+                $renderedContent,
+                $announcementUrl,
+                flush: false,
+            );
             ++$recipientCount;
         }
 
@@ -69,10 +73,9 @@ readonly class AnnouncementService
     {
         $subscribers = $this->userRepo->findAnnouncementSubscribers();
 
-        return array_filter(
-            $subscribers,
-            fn (User $user) => $user->getNotificationSettings()->isActive('announcements')
-        );
+        return array_filter($subscribers, fn(User $user) => $user->getNotificationSettings()->isActive(
+            'announcements',
+        ));
     }
 
     private function generateLinkHash(): string
@@ -95,8 +98,12 @@ readonly class AnnouncementService
 
             match ($block->getType()) {
                 CmsBlockTypes::Title => $title = TitleType::fromJson($block->getJson())->title,
-                CmsBlockTypes::Text => $contentParts[] = '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
-                CmsBlockTypes::Image => $contentParts[] = $this->renderImageBlock(ImageType::fromJson($block->getJson(), $block->getImage())),
+                CmsBlockTypes::Text => $contentParts[] =
+                    '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
+                CmsBlockTypes::Image => $contentParts[] = $this->renderImageBlock(ImageType::fromJson(
+                    $block->getJson(),
+                    $block->getImage(),
+                )),
                 default => null,
             };
         }
@@ -147,7 +154,9 @@ readonly class AnnouncementService
     {
         $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
         if (!$dbTemplate instanceof EmailTemplate) {
-            throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
+            throw new RuntimeException(
+                'Announcement email template not found in database. Run app:email-templates:seed command.',
+            );
         }
 
         $context = $this->getPreviewContext($announcement, $locale);

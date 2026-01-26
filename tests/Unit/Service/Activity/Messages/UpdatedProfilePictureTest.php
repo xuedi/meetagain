@@ -28,11 +28,11 @@ class UpdatedProfilePictureTest extends TestCase
         $oldImageHtml = '<img src="old-image.jpg" alt="Old Image">';
         $newImageHtml = '<img src="new-image.jpg" alt="New Image">';
         $expectedHtml =
-            'User changed their profile picture<div class="is-pulled-top-right">' .
-            $oldImageHtml .
-            '<i class="fa-solid fa-arrow-right"></i>' .
-            $newImageHtml .
-            '</div>';
+            'User changed their profile picture<div class="is-pulled-top-right">'
+            . $oldImageHtml
+            . '<i class="fa-solid fa-arrow-right"></i>'
+            . $newImageHtml
+            . '</div>';
         $meta = ['old' => 0, 'new' => 1];
 
         // Set up expectations for renderThumbnail

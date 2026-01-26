@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Filter\Member\MemberFilterService;
 use App\Repository\UserRepository;
 use App\Service\BlockingService;
 use App\Service\FriendshipService;
 use App\Service\ImageService;
-use App\Filter\Member\MemberFilterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,8 +26,7 @@ class MemberController extends AbstractController
         private readonly Security $security,
         private readonly BlockingService $blockingService,
         private readonly MemberFilterService $memberFilterService,
-    ) {
-    }
+    ) {}
 
     #[Route('/members/{page}', name: self::ROUTE_MEMBER)]
     public function index(int $page = 1): Response

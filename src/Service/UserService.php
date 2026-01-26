@@ -8,8 +8,7 @@ readonly class UserService
 {
     public function __construct(
         private UserRepository $userRepo,
-    ) {
-    }
+    ) {}
 
     public function resolveUserName(int $id): string
     {

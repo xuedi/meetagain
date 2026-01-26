@@ -62,7 +62,7 @@ class CronCommand extends LoggedCommand
                     '  - Activity #%d (%s): %s',
                     $invalid['id'],
                     $invalid['type'],
-                    $invalid['error']
+                    $invalid['error'],
                 ));
             }
         }

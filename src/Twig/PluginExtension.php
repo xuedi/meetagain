@@ -25,8 +25,7 @@ final class PluginExtension extends AbstractExtension
         private readonly iterable $plugins,
         private readonly PluginService $pluginService,
         private readonly Environment $twig,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getFunctions(): array

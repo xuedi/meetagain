@@ -12,10 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-#[AsCommand(
-    name: 'app:plugin:post-fixtures',
-    description: 'Execute post-fixture tasks for all enabled plugins'
-)]
+#[AsCommand(name: 'app:plugin:post-fixtures', description: 'Execute post-fixture tasks for all enabled plugins')]
 class PluginPostFixturesCommand extends Command
 {
     public function __construct(

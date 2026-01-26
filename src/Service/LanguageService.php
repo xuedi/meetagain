@@ -17,8 +17,7 @@ readonly class LanguageService
     public function __construct(
         private LanguageRepository $languageRepo,
         private TagAwareCacheInterface $appCache,
-    ) {
-    }
+    ) {}
 
     /**
      * @return string[] Array of enabled language codes ordered by sortOrder
@@ -26,14 +25,11 @@ readonly class LanguageService
     public function getEnabledCodes(): array
     {
         try {
-            return $this->appCache->get(
-                self::CACHE_KEY_ENABLED_CODES,
-                function (ItemInterface $item): array {
-                    $item->expiresAfter(self::CACHE_TTL);
+            return $this->appCache->get(self::CACHE_KEY_ENABLED_CODES, function (ItemInterface $item): array {
+                $item->expiresAfter(self::CACHE_TTL);
 
-                    return $this->languageRepo->getEnabledCodes();
-                }
-            );
+                return $this->languageRepo->getEnabledCodes();
+            });
         } catch (InvalidArgumentException) {
             return $this->languageRepo->getEnabledCodes();
         }
@@ -67,14 +63,11 @@ readonly class LanguageService
     public function getAllLanguages(): array
     {
         try {
-            return $this->appCache->get(
-                self::CACHE_KEY_ALL_LANGUAGES,
-                function (ItemInterface $item): array {
-                    $item->expiresAfter(self::CACHE_TTL);
+            return $this->appCache->get(self::CACHE_KEY_ALL_LANGUAGES, function (ItemInterface $item): array {
+                $item->expiresAfter(self::CACHE_TTL);
 
-                    return $this->languageRepo->findAllOrdered();
-                }
-            );
+                return $this->languageRepo->findAllOrdered();
+            });
         } catch (InvalidArgumentException) {
             return $this->languageRepo->findAllOrdered();
         }

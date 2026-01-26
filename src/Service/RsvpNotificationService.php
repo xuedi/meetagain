@@ -18,13 +18,12 @@ readonly class RsvpNotificationService
         private EventRepository $eventRepo,
         private EmailService $emailService,
         private TagAwareCacheInterface $appCache,
-    ) {
-    }
+    ) {}
 
     public function processUpcomingEvents(int $daysAhead = 7): int
     {
         $start = new DateTime();
-        $end = (new DateTime())->modify(sprintf('+%d days', $daysAhead));
+        $end = new DateTime()->modify(sprintf('+%d days', $daysAhead));
 
         $events = $this->eventRepo->findUpcomingEventsWithinRange($start, $end);
         $totalNotifications = 0;
@@ -109,7 +108,7 @@ readonly class RsvpNotificationService
     {
         $key = $this->getCacheKey($recipient, $attendee, $event);
         try {
-            return (bool) $this->appCache->get($key, fn (ItemInterface $item) => false);
+            return (bool) $this->appCache->get($key, fn(ItemInterface $item) => false);
         } catch (InvalidArgumentException) {
             return false;
         }
@@ -119,11 +118,15 @@ readonly class RsvpNotificationService
     {
         $key = $this->getCacheKey($recipient, $attendee, $event);
         try {
-            $this->appCache->get($key, function (ItemInterface $item) {
-                $item->expiresAfter(self::THIRTY_DAYS);
+            $this->appCache->get(
+                $key,
+                function (ItemInterface $item) {
+                    $item->expiresAfter(self::THIRTY_DAYS);
 
-                return true;
-            }, beta: INF); // beta: INF forces the callback to run and save the new value
+                    return true;
+                },
+                beta: INF,
+            ); // beta: INF forces the callback to run and save the new value
         } catch (InvalidArgumentException) {
             // Log error if needed
         }

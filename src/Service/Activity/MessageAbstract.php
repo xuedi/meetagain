@@ -50,7 +50,11 @@ abstract class MessageAbstract implements MessageInterface
     protected function ensureIsNumeric(string $key): void
     {
         if (!is_numeric($this->meta[$key])) {
-            throw new InvalidArgumentException(sprintf("Value '%s' has to be numeric in '%s'", $key, $this->getType()->name));
+            throw new InvalidArgumentException(sprintf(
+                "Value '%s' has to be numeric in '%s'",
+                $key,
+                $this->getType()->name,
+            ));
         }
     }
 }

@@ -21,14 +21,13 @@ class GlossaryType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('phrase', TextType::class)
-            ->add('pinyin', TextType::class)
-            ->add('explanation', TextareaType::class)
-            ->add('category', ChoiceType::class, [
-                'data' => $builder->getData()?->getCategory(),
-                'choices' => Category::getChoices($this->translator),
-            ]);
+        $builder->add('phrase', TextType::class)->add('pinyin', TextType::class)->add(
+            'explanation',
+            TextareaType::class,
+        )->add('category', ChoiceType::class, [
+            'data' => $builder->getData()?->getCategory(),
+            'choices' => Category::getChoices($this->translator),
+        ]);
     }
 
     #[\Override]

@@ -17,8 +17,7 @@ class AdminSystemController extends AbstractController
     public function __construct(
         private readonly ImageService $imageService,
         private readonly ConfigService $configService,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/system', name: 'app_admin_system')]
     public function index(Request $request): Response

@@ -15,8 +15,7 @@ class ReportController extends AbstractController
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly ImageRepository $repo,
-    ) {
-    }
+    ) {}
 
     #[Route('/report/image/{id}', name: 'app_report_image')]
     public function index(Request $request, ?int $id = null): Response

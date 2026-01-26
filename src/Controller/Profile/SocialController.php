@@ -15,8 +15,7 @@ class SocialController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly UserRepository $repo,
         private readonly FriendshipService $service,
-    ) {
-    }
+    ) {}
 
     #[Route('/profile/social', name: 'app_profile_social')]
     public function social(string $show = 'friends'): Response

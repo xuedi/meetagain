@@ -34,7 +34,7 @@ class DashboardStatsServiceTest extends TestCase
             $this->userRepoStub,
             $this->mailRepoStub,
             $this->notFoundRepoStub,
-            $this->activityRepoStub
+            $this->activityRepoStub,
         );
     }
 

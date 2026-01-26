@@ -22,8 +22,7 @@ readonly class NotificationService
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
-    ) {
-    }
+    ) {}
 
     public function notify(Activity $activity): void
     {
@@ -78,7 +77,7 @@ readonly class NotificationService
 
     private function sendMessage(?User $user, ?int $userId = null): void
     {
-        if (!($user instanceof User) || $userId === null) {
+        if (!$user instanceof User || $userId === null) {
             return;
         }
         $recipient = $this->userRepo->findOneBy(['id' => $userId]);

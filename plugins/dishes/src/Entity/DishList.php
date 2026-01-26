@@ -13,13 +13,13 @@ class DishList
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $name = null;
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private null|string $description = null;
+    private ?string $description = null;
 
     #[ORM\Column]
     private int $createdBy;
@@ -33,12 +33,12 @@ class DishList
     #[ORM\Column(type: Types::JSON)]
     private array $dishIds = [];
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): null|string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -50,12 +50,12 @@ class DishList
         return $this;
     }
 
-    public function getDescription(): null|string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(null|string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -121,10 +121,7 @@ class DishList
 
     public function removeDishId(int $dishId): static
     {
-        $this->dishIds = array_values(array_filter(
-            $this->dishIds,
-            fn(int $id) => $id !== $dishId
-        ));
+        $this->dishIds = array_values(array_filter($this->dishIds, fn(int $id) => $id !== $dishId));
 
         return $this;
     }

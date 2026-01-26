@@ -10,8 +10,7 @@ readonly class HealthCheckService
     public function __construct(
         private TagAwareCacheInterface $appCache,
         private string $kernelProjectDir,
-    ) {
-    }
+    ) {}
 
     public function runAll(): array
     {
@@ -29,7 +28,7 @@ readonly class HealthCheckService
             $expected = sprintf('test_%d', random_int(0, 100));
             $cacheKey = 'app_admin_health_test';
             $this->appCache->delete($cacheKey);
-            $stored = $this->appCache->get($cacheKey, fn () => $expected);
+            $stored = $this->appCache->get($cacheKey, fn() => $expected);
             $this->appCache->delete($cacheKey);
 
             return ['ok' => $expected === $stored];

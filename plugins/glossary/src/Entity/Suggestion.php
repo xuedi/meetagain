@@ -48,12 +48,7 @@ class Suggestion implements JsonSerializable
         SuggestionField $field,
         string $value,
     ): self {
-        return new self(
-            createdBy: $createdBy,
-            createdAt: $createdAt,
-            field: $field,
-            value: $value,
-        );
+        return new self(createdBy: $createdBy, createdAt: $createdAt, field: $field, value: $value);
     }
 
     private function __construct(int $createdBy, DateTimeImmutable $createdAt, SuggestionField $field, string $value)

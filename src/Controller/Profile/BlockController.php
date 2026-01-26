@@ -14,8 +14,7 @@ class BlockController extends AbstractController
     public function __construct(
         private readonly BlockingService $blockingService,
         private readonly UserRepository $userRepo,
-    ) {
-    }
+    ) {}
 
     #[Route('/profile/block/{id}', name: 'app_profile_block_user', methods: ['POST'])]
     public function blockUser(Request $request, int $id): Response

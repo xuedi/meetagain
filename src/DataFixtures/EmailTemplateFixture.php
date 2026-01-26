@@ -16,8 +16,7 @@ class EmailTemplateFixture extends AbstractFixture implements FixtureGroupInterf
     public function __construct(
         private readonly EmailTemplateService $templateService,
         private readonly LanguageService $languageService,
-    ) {
-    }
+    ) {}
 
     public function load(ObjectManager $manager): void
     {

@@ -23,8 +23,7 @@ readonly class EmailService
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
         private EmailTemplateService $templateService,
-    ) {
-    }
+    ) {}
 
     public function prepareVerificationRequest(User $user): bool
     {
@@ -77,7 +76,7 @@ readonly class EmailService
     public function prepareAggregatedRsvpNotification(User $recipient, array $attendees, Event $event): bool
     {
         $language = $recipient->getLocale();
-        $attendeeNames = implode(', ', array_map(fn (User $user) => $user->getName(), $attendees));
+        $attendeeNames = implode(', ', array_map(fn(User $user) => $user->getName(), $attendees));
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
@@ -137,8 +136,12 @@ readonly class EmailService
         return $this->addToEmailQueue($email, EmailType::NotificationEventCanceled);
     }
 
-    public function prepareAnnouncementEmail(User $recipient, array $renderedContent, string $announcementUrl, bool $flush = true): bool
-    {
+    public function prepareAnnouncementEmail(
+        User $recipient,
+        array $renderedContent,
+        string $announcementUrl,
+        bool $flush = true,
+    ): bool {
         $locale = $recipient->getLocale();
 
         $email = new TemplatedEmail();

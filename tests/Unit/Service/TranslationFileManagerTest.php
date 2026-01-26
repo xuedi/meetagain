@@ -32,7 +32,7 @@ class TranslationFileManagerTest extends TestCase
     {
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
-            (is_dir("$dir/$file")) ? $this->removeDir("$dir/$file") : unlink("$dir/$file");
+            is_dir("$dir/$file") ? $this->removeDir("$dir/$file") : unlink("$dir/$file");
         }
         rmdir($dir);
     }
@@ -42,7 +42,10 @@ class TranslationFileManagerTest extends TestCase
         $this->fs = $this->createMock(Filesystem::class);
         $this->subject = new TranslationFileManager($this->fs, $this->projectDir);
         $this->fs->method('exists')->willReturn(true);
-        $this->fs->expects($this->once())->method('exists')->with($this->projectDir . '/translations/');
+        $this->fs
+            ->expects($this->once())
+            ->method('exists')
+            ->with($this->projectDir . '/translations/');
 
         $this->subject->cleanUpTranslationFiles();
     }

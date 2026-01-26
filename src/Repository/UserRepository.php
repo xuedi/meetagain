@@ -36,7 +36,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return $this->userNameList;
         }
 
-        $result = $this->createQueryBuilder('u')
+        $result = $this
+            ->createQueryBuilder('u')
             ->select('u.id', 'u.name')
             ->getQuery()
             ->getArrayResult();
@@ -97,7 +98,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     #[Override]
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        if (!($user instanceof User)) {
+        if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
         }
 
@@ -111,7 +112,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function findActivePublicMembers(int $limit = 500, int $offset = 0, ?array $restrictToUserIds = null): array
     {
-        $qb = $this->createQueryBuilder('u')
+        $qb = $this
+            ->createQueryBuilder('u')
             ->select('u, i') // forces to fet all columns from user and image table
             ->leftJoin('u.image', 'i') // Assuming 'image' is the property name
             ->where('u.status = :status')
@@ -127,8 +129,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             if ($restrictToUserIds === []) {
                 return []; // Empty filter = no results
             }
-            $qb->andWhere('u.id IN (:userIds)')
-                ->setParameter('userIds', $restrictToUserIds);
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
         }
 
         return $qb->getQuery()->getResult();
@@ -138,9 +139,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @param int[] $excludeIds User IDs to exclude from results (e.g., blocked users)
      * @param array<int>|null $restrictToUserIds Optional user ID filter
      */
-    public function findActiveMembers(int $limit = 500, int $offset = 0, array $excludeIds = [], ?array $restrictToUserIds = null): array
-    {
-        $qb = $this->createQueryBuilder('u')
+    public function findActiveMembers(
+        int $limit = 500,
+        int $offset = 0,
+        array $excludeIds = [],
+        ?array $restrictToUserIds = null,
+    ): array {
+        $qb = $this
+            ->createQueryBuilder('u')
             ->select('u, i') // forces to fet all columns from user and image table
             ->leftJoin('u.image', 'i') // Assuming 'image' is the property name
             ->where('u.status = :status')
@@ -150,8 +156,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setFirstResult($offset);
 
         if ($excludeIds !== []) {
-            $qb->andWhere('u.id NOT IN (:excludeIds)')
-                ->setParameter('excludeIds', $excludeIds);
+            $qb->andWhere('u.id NOT IN (:excludeIds)')->setParameter('excludeIds', $excludeIds);
         }
 
         // Apply user ID filter if provided
@@ -159,8 +164,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             if ($restrictToUserIds === []) {
                 return []; // Empty filter = no results
             }
-            $qb->andWhere('u.id IN (:userIds)')
-                ->setParameter('userIds', $restrictToUserIds);
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
         }
 
         return $qb->getQuery()->getResult();
@@ -171,7 +175,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getNumberOfActivePublicMembers(?array $restrictToUserIds = null): int
     {
-        $qb = $this->createQueryBuilder('u')
+        $qb = $this
+            ->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.status = :status')
             ->andWhere('u.public = :public')
@@ -183,8 +188,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             if ($restrictToUserIds === []) {
                 return 0; // Empty filter = no results
             }
-            $qb->andWhere('u.id IN (:userIds)')
-                ->setParameter('userIds', $restrictToUserIds);
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -196,15 +200,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getNumberOfActiveMembers(array $excludeIds = [], ?array $restrictToUserIds = null): int
     {
-        $qb = $this->createQueryBuilder('u')
+        $qb = $this
+            ->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.status = :status')
             ->andwhere('u.id <> 1')
             ->setParameter('status', UserStatus::Active);
 
         if ($excludeIds !== []) {
-            $qb->andWhere('u.id NOT IN (:excludeIds)')
-                ->setParameter('excludeIds', $excludeIds);
+            $qb->andWhere('u.id NOT IN (:excludeIds)')->setParameter('excludeIds', $excludeIds);
         }
 
         // Apply user ID filter if provided
@@ -212,8 +216,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             if ($restrictToUserIds === []) {
                 return 0; // Empty filter = no results
             }
-            $qb->andWhere('u.id IN (:userIds)')
-                ->setParameter('userIds', $restrictToUserIds);
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -247,7 +250,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getAllUserChoice(): array
     {
-        $result = $this->createQueryBuilder('u')
+        $result = $this
+            ->createQueryBuilder('u')
             ->select('u.id', 'u.name')
             ->getQuery()
             ->getArrayResult();
@@ -260,7 +264,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getStatusBreakdown(): array
     {
-        $result = $this->createQueryBuilder('u')
+        $result = $this
+            ->createQueryBuilder('u')
             ->select('u.status, COUNT(u.id) as cnt')
             ->groupBy('u.status')
             ->getQuery()
@@ -280,7 +285,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function getRecentlyActiveCount(int $days = 7): int
     {
-        return (int) $this->createQueryBuilder('u')
+        return (int) $this
+            ->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.lastLogin > :date')
             ->setParameter('date', new DateTime('-' . $days . ' days'))
@@ -293,7 +299,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getUnverifiedCount(): int
     {
-        return (int) $this->createQueryBuilder('u')
+        return (int) $this
+            ->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.status = :status')
             ->setParameter('status', UserStatus::EmailVerified)
@@ -310,9 +317,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $em = $this->getEntityManager();
 
-        $total = (int) $em->getConnection()
-            ->executeQuery('SELECT COUNT(*) FROM user_user')
-            ->fetchOne();
+        $total = (int) $em->getConnection()->executeQuery('SELECT COUNT(*) FROM user_user')->fetchOne();
 
         return [
             'total' => $total,
@@ -329,7 +334,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $em = $this->getEntityManager();
         $userId = $user->getId();
 
-        $followingCount = (int) $em->createQueryBuilder()
+        $followingCount = (int) $em
+            ->createQueryBuilder()
             ->select('COUNT(f.id)')
             ->from(User::class, 'u')
             ->innerJoin('u.following', 'f')
@@ -338,7 +344,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getSingleScalarResult();
 
-        $followersCount = (int) $em->createQueryBuilder()
+        $followersCount = (int) $em
+            ->createQueryBuilder()
             ->select('COUNT(f.id)')
             ->from(User::class, 'u')
             ->innerJoin('u.followers', 'f')
@@ -347,7 +354,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getSingleScalarResult();
 
-        $rsvpCount = (int) $em->createQueryBuilder()
+        $rsvpCount = (int) $em
+            ->createQueryBuilder()
             ->select('COUNT(e.id)')
             ->from(\App\Entity\Event::class, 'e')
             ->innerJoin('e.rsvp', 'u')
@@ -372,7 +380,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function findAnnouncementSubscribers(): array
     {
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->where('u.status = :status')
             ->andWhere('u.notification = :notificationEnabled')
             ->setParameter('status', UserStatus::Active)

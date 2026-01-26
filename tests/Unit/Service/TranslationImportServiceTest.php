@@ -42,13 +42,13 @@ class TranslationImportServiceTest extends TestCase
             $this->fileManager,
             $this->commandService,
             $this->configService,
-            $this->translationService
+            $this->translationService,
         );
     }
 
     public function testExtractProcessesFilesCorrectly(): void
     {
-        $importUser = (new UserStub())->setId(1);
+        $importUser = new UserStub()->setId(1);
         $this->userRepo->method('findOneBy')->willReturn($importUser);
         $this->configService->method('getSystemUserId')->willReturn(1);
 
@@ -68,7 +68,7 @@ class TranslationImportServiceTest extends TestCase
 
     public function testImportForLocalDevelopmentBatchesCorrectly(): void
     {
-        $importUser = (new UserStub())->setId(1);
+        $importUser = new UserStub()->setId(1);
         $this->userRepo->method('findOneBy')->willReturn($importUser);
         $this->configService->method('getSystemUserId')->willReturn(1);
 

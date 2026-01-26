@@ -10,8 +10,7 @@ readonly class AdminSection
     public function __construct(
         private string $section,
         private array $links,
-    ) {
-    }
+    ) {}
 
     public function getSection(): string
     {

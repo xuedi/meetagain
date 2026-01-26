@@ -24,10 +24,7 @@ class ChangePassword extends AbstractType
             'attr' => ['autocomplete' => 'new-password'],
             'constraints' => [
                 new NotBlank(message: 'Please enter a password'),
-                new Length(
-                    min: 5,
-                    minMessage: 'Your password should be at least {{ limit }} characters',
-                ),
+                new Length(min: 5, minMessage: 'Your password should be at least {{ limit }} characters'),
             ],
         ]);
     }

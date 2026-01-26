@@ -16,8 +16,7 @@ readonly class CmsFilterService
     public function __construct(
         #[AutowireIterator(CmsFilterInterface::class)]
         private iterable $filters,
-    ) {
-    }
+    ) {}
 
     /**
      * Get the combined CMS ID filter from all registered filters.
@@ -80,8 +79,9 @@ readonly class CmsFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort($filters, static fn (CmsFilterInterface $a, CmsFilterInterface $b): int =>
-            $b->getPriority() <=> $a->getPriority()
+        usort(
+            $filters,
+            static fn(CmsFilterInterface $a, CmsFilterInterface $b): int => $b->getPriority() <=> $a->getPriority(),
         );
 
         return $filters;

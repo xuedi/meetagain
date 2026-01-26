@@ -16,8 +16,7 @@ final class MenuExtension extends AbstractExtension
         private readonly RequestStack $requestStack,
         private readonly MenuService $menuService,
         private readonly Security $security,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getFunctions(): array
@@ -32,10 +31,6 @@ final class MenuExtension extends AbstractExtension
         $request = $this->requestStack->getCurrentRequest();
         $locale = $request instanceof Request ? $request->getLocale() : 'en';
 
-        return $this->menuService->getMenuForContext(
-            type: $type,
-            user: $this->security->getUser(),
-            locale: $locale
-        );
+        return $this->menuService->getMenuForContext(type: $type, user: $this->security->getUser(), locale: $locale);
     }
 }

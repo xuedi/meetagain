@@ -28,8 +28,7 @@ class AdminEmailController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly TranslationService $translationService,
         private readonly EmailTemplateTranslationRepository $translationRepo,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/email/', name: 'app_admin_email')]
     public function list(): Response
@@ -45,7 +44,10 @@ class AdminEmailController extends AbstractController
                 'subject' => $mockData['subject'],
                 'context' => $mockData['context'],
                 'renderedBody' => $dbTemplate
-                    ? $this->templateService->renderContent($dbTemplate->getBody(self::DEFAULT_LANGUAGE), $mockData['context'])
+                    ? $this->templateService->renderContent(
+                        $dbTemplate->getBody(self::DEFAULT_LANGUAGE),
+                        $mockData['context'],
+                    )
                     : '<p>Template not found. Run app:email-templates:seed</p>',
                 'template' => $dbTemplate,
             ];
@@ -114,14 +116,8 @@ class AdminEmailController extends AbstractController
         $mockList = $this->emailService->getMockEmailList();
         $mockContext = $this->getMockContextForTemplate($template->getIdentifier(), $mockList);
 
-        $renderedSubject = $this->templateService->renderContent(
-            $template->getSubject($language),
-            $mockContext
-        );
-        $renderedBody = $this->templateService->renderContent(
-            $template->getBody($language),
-            $mockContext
-        );
+        $renderedSubject = $this->templateService->renderContent($template->getSubject($language), $mockContext);
+        $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
 
         return $this->render('admin/email/preview.html.twig', [
             'active' => 'email',

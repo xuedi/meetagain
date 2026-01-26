@@ -80,10 +80,12 @@ class AdminEmailTest extends WebTestCase
         $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/edit');
 
         // Act - form fields are now language-specific
-        $form = $crawler->filter('button[type="submit"]')->form([
-            'email_template[subject-en]' => 'Updated Subject',
-            'email_template[body-en]' => '<h1>Updated Body</h1>',
-        ]);
+        $form = $crawler
+            ->filter('button[type="submit"]')
+            ->form([
+                'email_template[subject-en]' => 'Updated Subject',
+                'email_template[body-en]' => '<h1>Updated Body</h1>',
+            ]);
         $client->submit($form);
 
         // Assert
@@ -107,10 +109,12 @@ class AdminEmailTest extends WebTestCase
 
         // First change the template
         $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/edit');
-        $form = $crawler->filter('button[type="submit"]')->form([
-            'email_template[subject-en]' => 'Modified Subject',
-            'email_template[body-en]' => '<p>Modified</p>',
-        ]);
+        $form = $crawler
+            ->filter('button[type="submit"]')
+            ->form([
+                'email_template[subject-en]' => 'Modified Subject',
+                'email_template[body-en]' => '<p>Modified</p>',
+            ]);
         $client->submit($form);
         $client->followRedirect();
 
@@ -128,10 +132,12 @@ class AdminEmailTest extends WebTestCase
     private function loginAsAdmin($client): void
     {
         $crawler = $client->request('GET', '/en/login');
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
         $client->submit($form);
         $client->followRedirect();
     }

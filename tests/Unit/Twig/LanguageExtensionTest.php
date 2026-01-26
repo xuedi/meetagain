@@ -26,7 +26,7 @@ class LanguageExtensionTest extends TestCase
         $this->subject = new LanguageExtension(
             $this->languageServiceStub,
             $this->translationServiceStub,
-            $this->requestStackStub
+            $this->requestStackStub,
         );
     }
 
@@ -46,7 +46,7 @@ class LanguageExtensionTest extends TestCase
 
         $this->assertCount(5, $functions);
 
-        $functionNames = array_map(fn ($f) => $f->getName(), $functions);
+        $functionNames = array_map(fn($f) => $f->getName(), $functions);
         $this->assertContains('get_enabled_locales', $functionNames);
         $this->assertContains('get_all_languages', $functionNames);
         $this->assertContains('current_locale', $functionNames);

@@ -3,13 +3,13 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\Cms;
-use App\Repository\CmsRepository;
-use App\Repository\EventRepository;
 use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
-use App\Service\CmsService;
 use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
+use App\Repository\CmsRepository;
+use App\Repository\EventRepository;
+use App\Service\CmsService;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,10 +54,7 @@ class CmsServiceTest extends TestCase
         ];
 
         $cmsRepoMock = $this->createMock(CmsRepository::class);
-        $cmsRepoMock
-            ->expects($this->once())
-            ->method('findAll')
-            ->willReturn($expectedSites);
+        $cmsRepoMock->expects($this->once())->method('findAll')->willReturn($expectedSites);
 
         $subject = new CmsService(
             twig: $this->createStub(Environment::class),
@@ -88,11 +85,7 @@ class CmsServiceTest extends TestCase
             ->willReturn(CmsFilterResult::noFilter());
 
         $cmsRepoMock = $this->createMock(CmsRepository::class);
-        $cmsRepoMock
-            ->expects($this->once())
-            ->method('findPublishedBySlug')
-            ->with($slug, null)
-            ->willReturn(null);
+        $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn(null);
 
         $twigMock = $this->createMock(Environment::class);
         $twigMock
@@ -138,11 +131,7 @@ class CmsServiceTest extends TestCase
             ->willReturn(CmsFilterResult::noFilter());
 
         $cmsRepoMock = $this->createMock(CmsRepository::class);
-        $cmsRepoMock
-            ->expects($this->once())
-            ->method('findPublishedBySlug')
-            ->with($slug, null)
-            ->willReturn($cmsMock);
+        $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn($cmsMock);
 
         $twigMock = $this->createMock(Environment::class);
         $twigMock
@@ -183,11 +172,7 @@ class CmsServiceTest extends TestCase
             ->method('getLanguageFilteredBlockJsonList')
             ->with($locale)
             ->willReturn($blocks);
-        $cmsMock
-            ->expects($this->once())
-            ->method('getPageTitle')
-            ->with($locale)
-            ->willReturn($pageTitle);
+        $cmsMock->expects($this->once())->method('getPageTitle')->with($locale)->willReturn($pageTitle);
 
         $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
         $cmsFilterServiceMock
@@ -202,18 +187,10 @@ class CmsServiceTest extends TestCase
             ->willReturn(new EventFilterResult(null, false));
 
         $cmsRepoMock = $this->createMock(CmsRepository::class);
-        $cmsRepoMock
-            ->expects($this->once())
-            ->method('findPublishedBySlug')
-            ->with($slug, null)
-            ->willReturn($cmsMock);
+        $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn($cmsMock);
 
         $eventRepoMock = $this->createMock(EventRepository::class);
-        $eventRepoMock
-            ->expects($this->once())
-            ->method('getUpcomingEvents')
-            ->with(3, null)
-            ->willReturn($upcomingEvents);
+        $eventRepoMock->expects($this->once())->method('getUpcomingEvents')->with(3, null)->willReturn($upcomingEvents);
 
         $twigMock = $this->createMock(Environment::class);
         $twigMock

@@ -10,8 +10,7 @@ readonly class ImageHtmlRenderer
     public function __construct(
         private ImageRepository $imageRepo,
         private Environment $twig,
-    ) {
-    }
+    ) {}
 
     public function renderThumbnail(int $id, string $size = '50x50'): string
     {

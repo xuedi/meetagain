@@ -28,11 +28,8 @@ class MenuRepository extends ServiceEntityRepository
         parent::__construct($registry, Menu::class);
     }
 
-    public function getAllSlugified(
-        ?UserInterface $user = null,
-        string $locale = 'en',
-        ?string $location = null,
-    ): array {
+    public function getAllSlugified(?UserInterface $user = null, string $locale = 'en', ?string $location = null): array
+    {
         // Load all menus once per request
         if ($this->menuCache === null) {
             $this->menuCache = [];
@@ -42,16 +39,14 @@ class MenuRepository extends ServiceEntityRepository
             $allowedIds = $filterResult->getMenuIds();
 
             // Build query with filter
-            $qb = $this->createQueryBuilder('m')
-                ->orderBy('m.priority', 'ASC');
+            $qb = $this->createQueryBuilder('m')->orderBy('m.priority', 'ASC');
 
             if ($allowedIds !== null) {
                 if ($allowedIds === []) {
                     // No menus allowed
                     return [];
                 }
-                $qb->where('m.id IN (:allowedIds)')
-                   ->setParameter('allowedIds', $allowedIds);
+                $qb->where('m.id IN (:allowedIds)')->setParameter('allowedIds', $allowedIds);
             }
 
             $allMenus = $qb->getQuery()->getResult();
@@ -73,7 +68,7 @@ class MenuRepository extends ServiceEntityRepository
         };
 
         $all = $locationKey !== null
-            ? ($this->menuCache[$locationKey] ?? [])
+            ? $this->menuCache[$locationKey] ?? []
             : array_merge(...array_values($this->menuCache));
         $list = [];
         foreach ($all as $menu) {
@@ -101,7 +96,8 @@ class MenuRepository extends ServiceEntityRepository
         return match ($visibility) {
             MenuVisibility::Everyone => true,
             MenuVisibility::User => $user instanceof UserInterface && in_array('ROLE_USER', $user->getRoles(), true),
-            MenuVisibility::Manager => $user instanceof UserInterface && in_array('ROLE_MANAGER', $user->getRoles(), true),
+            MenuVisibility::Manager => $user instanceof UserInterface
+                && in_array('ROLE_MANAGER', $user->getRoles(), true),
             MenuVisibility::Admin => $user instanceof UserInterface && in_array('ROLE_ADMIN', $user->getRoles(), true),
         };
     }

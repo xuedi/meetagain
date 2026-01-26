@@ -23,11 +23,7 @@ class MenuExtensionTest extends TestCase
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->menuServiceStub = $this->createStub(MenuService::class);
         $this->securityStub = $this->createStub(Security::class);
-        $this->subject = new MenuExtension(
-            $this->requestStackStub,
-            $this->menuServiceStub,
-            $this->securityStub
-        );
+        $this->subject = new MenuExtension($this->requestStackStub, $this->menuServiceStub, $this->securityStub);
     }
 
     public function testGetFunctionsReturnsGetMenuFunction(): void
@@ -51,9 +47,7 @@ class MenuExtensionTest extends TestCase
             ['label' => 'Home', 'url' => '/de/'],
             ['label' => 'Events', 'url' => '/de/events'],
         ];
-        $this->menuServiceStub
-            ->method('getMenuForContext')
-            ->willReturn($expectedMenu);
+        $this->menuServiceStub->method('getMenuForContext')->willReturn($expectedMenu);
 
         $result = $this->subject->getMenu('main');
 
@@ -65,9 +59,7 @@ class MenuExtensionTest extends TestCase
         $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
         $this->securityStub->method('getUser')->willReturn(null);
 
-        $this->menuServiceStub
-            ->method('getMenuForContext')
-            ->willReturn([]);
+        $this->menuServiceStub->method('getMenuForContext')->willReturn([]);
 
         $result = $this->subject->getMenu('main');
 

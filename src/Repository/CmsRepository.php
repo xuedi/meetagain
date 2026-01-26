@@ -36,7 +36,8 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function findPublishedBySlug(string $slug, ?array $allowedIds = null): ?Cms
     {
-        $qb = $this->createQueryBuilder('c')
+        $qb = $this
+            ->createQueryBuilder('c')
             ->where('c.slug = :slug')
             ->andWhere('c.published = true')
             ->setParameter('slug', $slug);
@@ -46,15 +47,13 @@ class CmsRepository extends ServiceEntityRepository
                 return null; // No allowed IDs = no results
             }
 
-            $qb->andWhere('c.id IN (:allowedIds)')
-               ->setParameter('allowedIds', $allowedIds);
+            $qb->andWhere('c.id IN (:allowedIds)')->setParameter('allowedIds', $allowedIds);
         }
 
         // Order by ID and limit to 1 to handle duplicates gracefully
         // In multisite context, the filter should ensure only one result
         // Without filtering, we get the first available page
-        $qb->orderBy('c.id', 'ASC')
-           ->setMaxResults(1);
+        $qb->orderBy('c.id', 'ASC')->setMaxResults(1);
 
         $results = $qb->getQuery()->getResult();
 
