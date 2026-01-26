@@ -30,7 +30,8 @@ class BookPollVoteRepository extends ServiceEntityRepository
      */
     public function getVoteCounts(BookPoll $poll): array
     {
-        $qb = $this->createQueryBuilder('v')
+        $qb = $this
+            ->createQueryBuilder('v')
             ->select('IDENTITY(v.suggestion) as suggestionId, COUNT(v.id) as voteCount')
             ->where('v.poll = :poll')
             ->setParameter('poll', $poll)

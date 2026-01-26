@@ -3,7 +3,18 @@
 php-version = "8.4"
 
 [source]
-paths = ["plugins/dishes/src/", "plugins/glossary/src/", "plugins/karaoke/src/", "src/", "tests/"]
+# NOTE: Mago does not support wildcards (plugins/*/src/ won't work)
+# If plugins are added/removed, update this list manually
+# MultiSite plugin is excluded (not in base repo)
+paths = [
+    "plugins/bookclub/src/",
+    "plugins/dishes/src/",
+    "plugins/filmclub/src/",
+    "plugins/glossary/src/",
+    "plugins/karaoke/src/",
+    "src/",
+    "tests/"
+]
 includes = ["vendor"]
 excludes = []
 

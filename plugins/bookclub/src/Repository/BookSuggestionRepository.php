@@ -28,9 +28,6 @@ class BookSuggestionRepository extends ServiceEntityRepository
     /** @return BookSuggestion[] */
     public function findAllPending(): array
     {
-        return $this->findBy(
-            ['status' => SuggestionStatus::Pending],
-            ['suggestedAt' => 'ASC']
-        );
+        return $this->findBy(['status' => SuggestionStatus::Pending], ['suggestedAt' => 'ASC']);
     }
 }

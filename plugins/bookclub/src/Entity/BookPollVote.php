@@ -11,28 +11,28 @@ use Plugin\Bookclub\Repository\BookPollVoteRepository;
 class BookPollVote
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'votes')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|BookPoll $poll = null;
+    private ?BookPoll $poll = null;
 
     #[ORM\Column]
-    private null|int $userId = null;
+    private ?int $userId = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private null|BookSuggestion $suggestion = null;
+    private ?BookSuggestion $suggestion = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $votedAt = null;
+    private ?DateTimeImmutable $votedAt = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPoll(): null|BookPoll
+    public function getPoll(): ?BookPoll
     {
         return $this->poll;
     }
@@ -44,7 +44,7 @@ class BookPollVote
         return $this;
     }
 
-    public function getUserId(): null|int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
@@ -56,7 +56,7 @@ class BookPollVote
         return $this;
     }
 
-    public function getSuggestion(): null|BookSuggestion
+    public function getSuggestion(): ?BookSuggestion
     {
         return $this->suggestion;
     }
@@ -68,7 +68,7 @@ class BookPollVote
         return $this;
     }
 
-    public function getVotedAt(): null|DateTimeImmutable
+    public function getVotedAt(): ?DateTimeImmutable
     {
         return $this->votedAt;
     }

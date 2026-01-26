@@ -30,8 +30,13 @@ readonly class PollService
      * @param int[] $suggestionIds Existing suggestion IDs to include
      * @param int[] $bookIds Book IDs to add directly (manager picks)
      */
-    public function create(string $title, array $suggestionIds, array $bookIds, int $userId, ?int $eventId = null): BookPoll
-    {
+    public function create(
+        string $title,
+        array $suggestionIds,
+        array $bookIds,
+        int $userId,
+        ?int $eventId = null,
+    ): BookPoll {
         $poll = new BookPoll();
         $poll->setTitle($title);
         $poll->setCreatedBy($userId);

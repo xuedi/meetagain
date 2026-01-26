@@ -28,9 +28,6 @@ class BookNoteRepository extends ServiceEntityRepository
     /** @return BookNote[] */
     public function findUserNotes(int $userId): array
     {
-        return $this->findBy(
-            ['userId' => $userId],
-            ['updatedAt' => 'DESC', 'createdAt' => 'DESC']
-        );
+        return $this->findBy(['userId' => $userId], ['updatedAt' => 'DESC', 'createdAt' => 'DESC']);
     }
 }

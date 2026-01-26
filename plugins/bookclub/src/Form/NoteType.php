@@ -13,17 +13,16 @@ class NoteType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('content', TextareaType::class, [
-                'label' => 'Your Notes',
-                'attr' => [
-                    'rows' => 10,
-                    'placeholder' => 'Write your reading notes here...',
-                ],
-                'constraints' => [
-                    new NotBlank(),
-                ],
-            ]);
+        $builder->add('content', TextareaType::class, [
+            'label' => 'Your Notes',
+            'attr' => [
+                'rows' => 10,
+                'placeholder' => 'Write your reading notes here...',
+            ],
+            'constraints' => [
+                new NotBlank(),
+            ],
+        ]);
     }
 
     #[\Override]

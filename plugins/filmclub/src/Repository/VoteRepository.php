@@ -35,7 +35,8 @@ class VoteRepository extends ServiceEntityRepository
      */
     public function findOpenVotes(): array
     {
-        return $this->createQueryBuilder('v')
+        return $this
+            ->createQueryBuilder('v')
             ->where('v.isClosed = false')
             ->andWhere('v.closesAt > :now')
             ->setParameter('now', new \DateTimeImmutable())
@@ -49,7 +50,8 @@ class VoteRepository extends ServiceEntityRepository
      */
     public function findClosedVotes(): array
     {
-        return $this->createQueryBuilder('v')
+        return $this
+            ->createQueryBuilder('v')
             ->where('v.isClosed = true OR v.closesAt <= :now')
             ->setParameter('now', new \DateTimeImmutable())
             ->orderBy('v.createdAt', 'DESC')
