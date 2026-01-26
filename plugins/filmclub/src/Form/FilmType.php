@@ -15,15 +15,14 @@ class FilmType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('title', TextType::class)
-            ->add('year', IntegerType::class)
-            ->add('runtime', IntegerType::class)
-            ->add('genres', EnumType::class, [
-                'class' => FilmGenre::class,
-                'multiple' => true,
-                'expanded' => true,
-            ]);
+        $builder->add('title', TextType::class)->add('year', IntegerType::class)->add(
+            'runtime',
+            IntegerType::class,
+        )->add('genres', EnumType::class, [
+            'class' => FilmGenre::class,
+            'multiple' => true,
+            'expanded' => true,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

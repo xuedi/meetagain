@@ -27,8 +27,7 @@ class Kernel implements Plugin
         private readonly FilmRepository $filmRepository,
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $em,
-    ) {
-    }
+    ) {}
 
     public function getPluginKey(): string
     {
@@ -38,14 +37,8 @@ class Kernel implements Plugin
     public function getMenuLinks(): array
     {
         return [
-            new Link(
-                slug: $this->urlGenerator->generate('app_filmclub_filmlist'),
-                name: 'Filme',
-            ),
-            new Link(
-                slug: $this->urlGenerator->generate('app_filmclub_vote'),
-                name: 'Vote',
-            )
+            new Link(slug: $this->urlGenerator->generate('app_filmclub_filmlist'), name: 'Filme'),
+            new Link(slug: $this->urlGenerator->generate('app_filmclub_vote'), name: 'Vote'),
         ];
     }
 
@@ -113,7 +106,9 @@ class Kernel implements Plugin
                 $ballot->setVote($vote);
                 $ballot->setFilm($votableFilms[array_rand($votableFilms)]);
                 $ballot->setMemberId($voter->getId());
-                $ballot->setCreatedAt(new DateTimeImmutable($event->getStart()->format('Y-m-d H:i:s') . ' -' . rand(2, 13) . ' days'));
+                $ballot->setCreatedAt(
+                    new DateTimeImmutable($event->getStart()->format('Y-m-d H:i:s') . ' -' . rand(2, 13) . ' days'),
+                );
                 $this->em->persist($ballot);
                 ++$ballotCount;
             }
@@ -160,11 +155,7 @@ class Kernel implements Plugin
 
         $this->em->flush();
 
-        $output->writeln(sprintf(
-            '<info>Filmclub: Created %d votes with %d ballots.</info>',
-            $voteCount,
-            $ballotCount
-        ));
+        $output->writeln(sprintf('<info>Filmclub: Created %d votes with %d ballots.</info>', $voteCount, $ballotCount));
     }
 
     public function postFixtures(OutputInterface $output): void

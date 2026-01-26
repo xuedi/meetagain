@@ -14,37 +14,37 @@ use Plugin\Bookclub\Repository\BookRepository;
 class Book
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 17, unique: true)]
-    private null|string $isbn = null;
+    private ?string $isbn = null;
 
     #[ORM\Column(length: 255)]
-    private null|string $title = null;
+    private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private null|string $author = null;
+    private ?string $author = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private null|string $description = null;
+    private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    private null|int $pageCount = null;
+    private ?int $pageCount = null;
 
     #[ORM\Column(nullable: true)]
-    private null|int $publishedYear = null;
+    private ?int $publishedYear = null;
 
     #[ORM\ManyToOne]
-    private null|Image $coverImage = null;
+    private ?Image $coverImage = null;
 
     #[ORM\Column]
     private bool $approved = false;
 
     #[ORM\Column]
-    private null|int $createdBy = null;
+    private ?int $createdBy = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     /** @var Collection<int, BookSuggestion> */
     #[ORM\OneToMany(targetEntity: BookSuggestion::class, mappedBy: 'book')]
@@ -65,12 +65,12 @@ class Book
         $this->notes = new ArrayCollection();
     }
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getIsbn(): null|string
+    public function getIsbn(): ?string
     {
         return $this->isbn;
     }
@@ -82,7 +82,7 @@ class Book
         return $this;
     }
 
-    public function getTitle(): null|string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -94,60 +94,60 @@ class Book
         return $this;
     }
 
-    public function getAuthor(): null|string
+    public function getAuthor(): ?string
     {
         return $this->author;
     }
 
-    public function setAuthor(null|string $author): static
+    public function setAuthor(?string $author): static
     {
         $this->author = $author;
 
         return $this;
     }
 
-    public function getDescription(): null|string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(null|string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getPageCount(): null|int
+    public function getPageCount(): ?int
     {
         return $this->pageCount;
     }
 
-    public function setPageCount(null|int $pageCount): static
+    public function setPageCount(?int $pageCount): static
     {
         $this->pageCount = $pageCount;
 
         return $this;
     }
 
-    public function getPublishedYear(): null|int
+    public function getPublishedYear(): ?int
     {
         return $this->publishedYear;
     }
 
-    public function setPublishedYear(null|int $publishedYear): static
+    public function setPublishedYear(?int $publishedYear): static
     {
         $this->publishedYear = $publishedYear;
 
         return $this;
     }
 
-    public function getCoverImage(): null|Image
+    public function getCoverImage(): ?Image
     {
         return $this->coverImage;
     }
 
-    public function setCoverImage(null|Image $coverImage): static
+    public function setCoverImage(?Image $coverImage): static
     {
         $this->coverImage = $coverImage;
 
@@ -166,7 +166,7 @@ class Book
         return $this;
     }
 
-    public function getCreatedBy(): null|int
+    public function getCreatedBy(): ?int
     {
         return $this->createdBy;
     }
@@ -178,7 +178,7 @@ class Book
         return $this;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }

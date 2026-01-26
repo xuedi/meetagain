@@ -59,7 +59,7 @@ readonly class BookService
         ?string $author,
         ?string $description,
         int $userId,
-        bool $isManager
+        bool $isManager,
     ): Book {
         $normalizedIsbn = preg_replace('/[^0-9X]/', '', strtoupper($isbn)) ?? $isbn;
 

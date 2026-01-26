@@ -14,20 +14,16 @@ class BookIsbnType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('isbn', TextType::class, [
-                'label' => 'ISBN',
-                'attr' => [
-                    'placeholder' => 'e.g. 978-0-13-468599-1',
-                ],
-                'constraints' => [
-                    new NotBlank(),
-                    new Regex(
-                        pattern: '/^[\d\-X]+$/',
-                        message: 'Please enter a valid ISBN (digits, hyphens, and X only)',
-                    ),
-                ],
-            ]);
+        $builder->add('isbn', TextType::class, [
+            'label' => 'ISBN',
+            'attr' => [
+                'placeholder' => 'e.g. 978-0-13-468599-1',
+            ],
+            'constraints' => [
+                new NotBlank(),
+                new Regex(pattern: '/^[\d\-X]+$/', message: 'Please enter a valid ISBN (digits, hyphens, and X only)'),
+            ],
+        ]);
     }
 
     #[\Override]

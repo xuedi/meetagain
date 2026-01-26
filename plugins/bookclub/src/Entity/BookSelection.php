@@ -12,28 +12,28 @@ use Plugin\Bookclub\Repository\BookSelectionRepository;
 class BookSelection
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'selections')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Book $book = null;
+    private ?Book $book = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Event $event = null;
+    private ?Event $event = null;
 
     #[ORM\Column]
-    private null|int $selectedBy = null;
+    private ?int $selectedBy = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $selectedAt = null;
+    private ?DateTimeImmutable $selectedAt = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getBook(): null|Book
+    public function getBook(): ?Book
     {
         return $this->book;
     }
@@ -45,7 +45,7 @@ class BookSelection
         return $this;
     }
 
-    public function getEvent(): null|Event
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
@@ -57,7 +57,7 @@ class BookSelection
         return $this;
     }
 
-    public function getSelectedBy(): null|int
+    public function getSelectedBy(): ?int
     {
         return $this->selectedBy;
     }
@@ -69,7 +69,7 @@ class BookSelection
         return $this;
     }
 
-    public function getSelectedAt(): null|DateTimeImmutable
+    public function getSelectedAt(): ?DateTimeImmutable
     {
         return $this->selectedAt;
     }

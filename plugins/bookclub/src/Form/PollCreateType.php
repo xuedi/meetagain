@@ -33,10 +33,11 @@ class PollCreateType extends AbstractType
         $suggestionChoices = [];
         foreach ($suggestions as $suggestion) {
             $book = $suggestion->getBook();
-            $label = sprintf('%s - %s (Priority: %.0f)',
+            $label = sprintf(
+                '%s - %s (Priority: %.0f)',
                 $book->getTitle(),
                 $book->getAuthor() ?? 'Unknown',
-                $options['suggestion_service'] ? $options['suggestion_service']->calculatePriority($suggestion) : 0
+                $options['suggestion_service'] ? $options['suggestion_service']->calculatePriority($suggestion) : 0,
             );
             $suggestionChoices[$label] = $suggestion->getId();
         }
@@ -47,36 +48,32 @@ class PollCreateType extends AbstractType
             $bookChoices[$label] = $book->getId();
         }
 
-        $builder
-            ->add('event_id', ChoiceType::class, [
-                'label' => 'For Event',
-                'choices' => $eventChoices,
-                'required' => false,
-                'placeholder' => '-- Select an event --',
-            ])
-            ->add('title', TextType::class, [
-                'label' => 'Poll Title',
-                'attr' => [
-                    'placeholder' => 'e.g. January 2025 Book Selection',
-                ],
-                'constraints' => [
-                    new NotBlank(),
-                ],
-            ])
-            ->add('suggestions', ChoiceType::class, [
-                'label' => 'Member Suggestions',
-                'choices' => $suggestionChoices,
-                'multiple' => true,
-                'expanded' => true,
-                'required' => false,
-            ])
-            ->add('books', ChoiceType::class, [
-                'label' => 'Add Books Directly',
-                'choices' => $bookChoices,
-                'multiple' => true,
-                'expanded' => true,
-                'required' => false,
-            ]);
+        $builder->add('event_id', ChoiceType::class, [
+            'label' => 'For Event',
+            'choices' => $eventChoices,
+            'required' => false,
+            'placeholder' => '-- Select an event --',
+        ])->add('title', TextType::class, [
+            'label' => 'Poll Title',
+            'attr' => [
+                'placeholder' => 'e.g. January 2025 Book Selection',
+            ],
+            'constraints' => [
+                new NotBlank(),
+            ],
+        ])->add('suggestions', ChoiceType::class, [
+            'label' => 'Member Suggestions',
+            'choices' => $suggestionChoices,
+            'multiple' => true,
+            'expanded' => true,
+            'required' => false,
+        ])->add('books', ChoiceType::class, [
+            'label' => 'Add Books Directly',
+            'choices' => $bookChoices,
+            'multiple' => true,
+            'expanded' => true,
+            'required' => false,
+        ]);
     }
 
     #[\Override]

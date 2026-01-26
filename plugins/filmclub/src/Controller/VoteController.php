@@ -24,8 +24,7 @@ class VoteController extends AbstractController
         private readonly FilmRepository $filmRepository,
         private readonly EventRepository $eventRepository,
         private readonly ConfigService $configService,
-    ) {
-    }
+    ) {}
 
     #[Route('/', name: 'app_filmclub_vote', methods: ['GET'])]
     public function index(): Response
@@ -74,10 +73,7 @@ class VoteController extends AbstractController
                 return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);
             }
 
-            $closesAt = \DateTimeImmutable::createFromFormat(
-                $this->configService->getDateFormat(),
-                $closesAtString
-            );
+            $closesAt = \DateTimeImmutable::createFromFormat($this->configService->getDateFormat(), $closesAtString);
             if (!$closesAt) {
                 $this->addFlash('error', 'Invalid date format');
                 return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);

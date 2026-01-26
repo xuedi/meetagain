@@ -24,9 +24,6 @@ class BookPollRepository extends ServiceEntityRepository
 
     public function findLatestClosed(): ?BookPoll
     {
-        return $this->findOneBy(
-            ['status' => PollStatus::Closed],
-            ['createdAt' => 'DESC']
-        );
+        return $this->findOneBy(['status' => PollStatus::Closed], ['createdAt' => 'DESC']);
     }
 }

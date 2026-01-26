@@ -20,8 +20,7 @@ class FilmController extends AbstractController
         private readonly FilmRepository $filmRepository,
         private readonly VoteRepository $voteRepository,
         private readonly EventRepository $eventRepository,
-    ) {
-    }
+    ) {}
 
     #[Route('/', name: 'app_filmclub_filmlist', methods: ['GET'])]
     public function films(): Response

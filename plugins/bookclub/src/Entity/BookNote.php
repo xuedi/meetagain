@@ -12,30 +12,30 @@ use Plugin\Bookclub\Repository\BookNoteRepository;
 class BookNote
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    private null|int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
     #[ORM\JoinColumn(nullable: false)]
-    private null|Book $book = null;
+    private ?Book $book = null;
 
     #[ORM\Column]
-    private null|int $userId = null;
+    private ?int $userId = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private null|string $content = null;
+    private ?string $content = null;
 
     #[ORM\Column]
-    private null|DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private null|DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
-    public function getId(): null|int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getBook(): null|Book
+    public function getBook(): ?Book
     {
         return $this->book;
     }
@@ -47,7 +47,7 @@ class BookNote
         return $this;
     }
 
-    public function getUserId(): null|int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
@@ -59,7 +59,7 @@ class BookNote
         return $this;
     }
 
-    public function getContent(): null|string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -71,7 +71,7 @@ class BookNote
         return $this;
     }
 
-    public function getCreatedAt(): null|DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -83,12 +83,12 @@ class BookNote
         return $this;
     }
 
-    public function getUpdatedAt(): null|DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(null|DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

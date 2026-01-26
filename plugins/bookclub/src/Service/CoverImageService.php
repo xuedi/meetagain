@@ -34,7 +34,10 @@ readonly class CoverImageService
             $response = $this->httpClient->request('GET', $url);
 
             if ($response->getStatusCode() !== 200) {
-                $this->logger->warning('Cover image not available', ['url' => $url, 'status' => $response->getStatusCode()]);
+                $this->logger->warning('Cover image not available', [
+                    'url' => $url,
+                    'status' => $response->getStatusCode(),
+                ]);
                 return null;
             }
 
@@ -51,19 +54,9 @@ readonly class CoverImageService
             $tempFile = $tempDir . uniqid('cover_') . '.jpg';
             file_put_contents($tempFile, $content);
 
-            $uploadedFile = new UploadedFile(
-                $tempFile,
-                'cover.jpg',
-                'image/jpeg',
-                null,
-                true
-            );
+            $uploadedFile = new UploadedFile($tempFile, 'cover.jpg', 'image/jpeg', null, true);
 
-            $image = $this->imageService->upload(
-                $uploadedFile,
-                $user,
-                ImageType::PluginBookclubCover
-            );
+            $image = $this->imageService->upload($uploadedFile, $user, ImageType::PluginBookclubCover);
 
             if ($image !== null) {
                 $this->imageService->createThumbnails($image);
