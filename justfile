@@ -147,7 +147,7 @@ plugin-disable name:
 
 # Run all tests and checks
 [group('testing')]
-test: testSetup testUnit testFunctional checkRector checkMago checkMagoAnalyze checkMagoGuard
+test: testSetup testUnit testFunctional checkMago checkMagoAnalyze checkMagoGuard
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -194,10 +194,6 @@ testPerformance:
     {{DOCKER}} stop php-bench
     xdg-open "$(find tests/reports/performance/sitespeed-result -name 'index.html' -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2)"
 
-# Check Rector (dry-run)
-[group('checks')]
-checkRector:
-    {{PHP}} vendor/bin/rector process src --dry-run -c tests/config/rector.php
 
 # Check Mago (linter)
 [group('checks')]
@@ -224,11 +220,6 @@ checkMagoAll: checkMago checkMagoAnalyze checkMagoGuard
 checkA11y url='http://localhost/':
     {{DOCKER}} build pa11y -q
     {{DOCKER}} run --rm pa11y {{url}} --reporter cli --standard WCAG2AA
-
-# Apply Rector fixes
-[group('fixing')]
-fixRector:
-    {{PHP}} vendor/bin/rector process src -c tests/config/rector.php
 
 # Format code with Mago
 [group('fixing')]
