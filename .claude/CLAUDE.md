@@ -61,7 +61,6 @@ just test               # Run all tests + checks
 
 | Command                | Purpose                         |
 |------------------------|---------------------------------|
-| `just checkStan`       | Run PHPStan static analysis     |
 | `just checkRector`     | Check Rector (dry-run)          |
 | `just checkMago`       | Run Mago linter                 |
 | `just checkMagoAnalyze`| Mago static analysis            |

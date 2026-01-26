@@ -147,7 +147,7 @@ plugin-disable name:
 
 # Run all tests and checks
 [group('testing')]
-test: testSetup testUnit testFunctional checkStan checkRector checkMago checkMagoAnalyze checkMagoGuard
+test: testSetup testUnit testFunctional checkRector checkMago checkMagoAnalyze checkMagoGuard
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -193,11 +193,6 @@ testPerformance:
     {{DOCKER}} run --rm sitespeed
     {{DOCKER}} stop php-bench
     xdg-open "$(find tests/reports/performance/sitespeed-result -name 'index.html' -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2)"
-
-# Run PHPStan
-[group('checks')]
-checkStan +parameter='':
-    {{PHP}} vendor/bin/phpstan analyse -c tests/config/phpstan.neon --memory-limit=256M --no-progress {{parameter}}
 
 # Check Rector (dry-run)
 [group('checks')]
