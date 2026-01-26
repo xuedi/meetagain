@@ -95,9 +95,12 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: activity service should log
         $activityServiceMock = $this->createMock(ActivityService::class);
-        $activityServiceMock->expects($this->once())->method('log')->with(ActivityType::BlockedUser, $blocker, [
-            'user_id' => 2,
-        ]);
+        $activityServiceMock
+            ->expects($this->once())
+            ->method('log')
+            ->with(ActivityType::BlockedUser, $blocker, [
+                'user_id' => 2,
+            ]);
 
         $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $activityServiceMock);
 
@@ -163,9 +166,12 @@ class BlockingServiceTest extends TestCase
 
         // Arrange: activity service should log
         $activityServiceMock = $this->createMock(ActivityService::class);
-        $activityServiceMock->expects($this->once())->method('log')->with(ActivityType::UnblockedUser, $blocker, [
-            'user_id' => 42,
-        ]);
+        $activityServiceMock
+            ->expects($this->once())
+            ->method('log')
+            ->with(ActivityType::UnblockedUser, $blocker, [
+                'user_id' => 42,
+            ]);
 
         $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $activityServiceMock);
 

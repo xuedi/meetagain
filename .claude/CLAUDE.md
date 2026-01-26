@@ -30,6 +30,7 @@ just test               # Run all tests + checks
 
 - **Docker only** via `just` command runner - never run commands on host
 - Run `just` to see available commands (don't parse the justfile itself)
+- **Code Quality Workflow**: Always run `just fixMago` before `just test`
 - Avoid `just test` to save tokens, ask user to run it after coding is complete
 - If you must run a test, use `just testUnit <specific test>` only on the test to be run
 
@@ -68,9 +69,11 @@ just test               # Run all tests + checks
 
 ### Fixes
 
-| Command      | Purpose                |
-|--------------|------------------------|
-| `just fixMago` | Format code with Mago  |
+| Command      | Purpose                                                    |
+|--------------|------------------------------------------------------------|
+| `just fixMago` | Format code with Mago (run this before `just test`)     |
+
+**Note:** Always run `just fixMago` after making code changes and before running `just test` to ensure code style consistency.
 
 ### Database
 
@@ -183,12 +186,14 @@ Model: opus
 
 Before marking work complete, verify:
 
-- [ ] Tests pass: `just testUnit` for affected components
-- [ ] Code style: PHPStan level 9 compliant
+- [ ] Code formatted: Run `just fixMago` to auto-format code
+- [ ] Tests pass: `just test` (includes unit tests, functional tests, and all Mago checks)
 - [ ] Architecture: Follows layer dependencies (see [architecture.md](architecture.md))
 - [ ] No inline scripts in templates
 - [ ] Readonly services where applicable
 - [ ] AAA pattern in tests with comments
+
+**IMPORTANT: After major refactoring or removing code quality tools, always run `just fixMago` before `just test`**
 
 ---
 
