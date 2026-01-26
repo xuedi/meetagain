@@ -61,7 +61,6 @@ just test               # Run all tests + checks
 
 | Command                | Purpose                         |
 |------------------------|---------------------------------|
-| `just checkRector`     | Check Rector (dry-run)          |
 | `just checkMago`       | Run Mago linter                 |
 | `just checkMagoAnalyze`| Mago static analysis            |
 | `just checkMagoGuard`  | Mago architectural rules        |
@@ -69,10 +68,9 @@ just test               # Run all tests + checks
 
 ### Fixes
 
-| Command          | Purpose                |
-|------------------|------------------------|
-| `just fixRector` | Apply Rector fixes     |
-| `just fixMago`   | Format code with Mago  |
+| Command      | Purpose                |
+|--------------|------------------------|
+| `just fixMago` | Format code with Mago  |
 
 ### Database
 
