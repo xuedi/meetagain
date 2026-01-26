@@ -29,33 +29,44 @@ class PluginCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('plugin', InputArgument::OPTIONAL, 'Plugin key to enable/disable')
-            ->addOption('enable', null, InputOption::VALUE_NONE, 'Enable the specified plugin')
-            ->addOption('disable', null, InputOption::VALUE_NONE, 'Disable the specified plugin')
-            ->addOption('list', 'l', InputOption::VALUE_NONE, 'List all available plugins (default if no options given)');
+            ->addOption('mode', 'm', InputOption::VALUE_REQUIRED, 'Mode: plugin-key (enable), all, none, or no')
+            ->addOption('disable', 'd', InputOption::VALUE_NONE, 'Disable mode (applies to plugin-key)')
+            ->addOption('list', 'l', InputOption::VALUE_NONE, 'List all available plugins (default if no mode given)');
     }
 
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $pluginKey = $input->getArgument('plugin');
-        $enable = $input->getOption('enable');
+        $mode = $input->getOption('mode');
         $disable = $input->getOption('disable');
-        $list = $input->getOption('list');
-
-        // Enable plugin
-        if ($enable && $pluginKey) {
-            return $this->enablePlugin($io, $pluginKey);
-        }
-
-        // Disable plugin
-        if ($disable && $pluginKey) {
-            return $this->disablePlugin($io, $pluginKey);
-        }
 
         // List plugins (default)
-        return $this->listPlugins($io);
+        if (!$mode && !$disable) {
+            return $this->listPlugins($io);
+        }
+
+        // Enable all plugins
+        if ($mode === 'all') {
+            return $this->enableAllPlugins($io);
+        }
+
+        // Disable all plugins (support both 'none' and 'no')
+        if ($mode === 'none' || $mode === 'no') {
+            return $this->disableAllPlugins($io);
+        }
+
+        // Plugin key provided
+        if ($mode) {
+            if ($disable) {
+                return $this->disablePlugins($io, $mode);
+            }
+
+            return $this->enablePlugins($io, $mode);
+        }
+
+        $io->error('Invalid mode or option combination.');
+        return Command::FAILURE;
     }
 
     private function listPlugins(SymfonyStyle $io): int
@@ -91,38 +102,111 @@ class PluginCommand extends Command
 
         $io->newLine();
         $io->text('Commands:');
-        $io->text('  Enable:  <comment>php bin/console app:plugin <plugin-key> --enable</comment>');
-        $io->text('  Disable: <comment>php bin/console app:plugin <plugin-key> --disable</comment>');
+        $io->text('  Enable:  <comment>php bin/console app:plugin --mode=<plugin-key></comment>');
+        $io->text('  Disable: <comment>php bin/console app:plugin --mode=<plugin-key> --disable</comment>');
 
         return Command::SUCCESS;
     }
 
-    private function enablePlugin(SymfonyStyle $io, string $pluginKey): int
+    private function enablePlugins(SymfonyStyle $io, string $pluginKeys): int
+    {
+        $keys = array_map('trim', explode(',', $pluginKeys));
+        $plugins = $this->getPluginsWithKeys();
+        $availableKeys = array_column($plugins, 'key');
+
+        $enabled = [];
+        $notFound = [];
+
+        foreach ($keys as $key) {
+            if (!in_array($key, $availableKeys, true)) {
+                $notFound[] = $key;
+                continue;
+            }
+
+            // First install if not already installed
+            if (!$this->pluginService->isInstalled($key)) {
+                $this->pluginService->install($key);
+            }
+
+            $this->pluginService->enable($key);
+            $enabled[] = $key;
+        }
+
+        if (!empty($notFound)) {
+            $io->error(sprintf('Plugin(s) not found: %s', implode(', ', $notFound)));
+            $io->text('Run <comment>php bin/console app:plugin --list</comment> to see available plugins.');
+        }
+
+        if (!empty($enabled)) {
+            $io->success(sprintf('Enabled plugin(s): %s', implode(', ', $enabled)));
+            $io->note([
+                'Plugin configuration updated in config/plugins.php',
+                'Run migrations if needed: php bin/console doctrine:migrations:migrate',
+                'Clear cache: php bin/console cache:clear',
+            ]);
+        }
+
+        return empty($notFound) ? Command::SUCCESS : Command::FAILURE;
+    }
+
+    private function disablePlugins(SymfonyStyle $io, string $pluginKeys): int
+    {
+        $keys = array_map('trim', explode(',', $pluginKeys));
+        $plugins = $this->getPluginsWithKeys();
+        $availableKeys = array_column($plugins, 'key');
+
+        $disabled = [];
+        $notFound = [];
+
+        foreach ($keys as $key) {
+            if (!in_array($key, $availableKeys, true)) {
+                $notFound[] = $key;
+                continue;
+            }
+
+            $this->pluginService->disable($key);
+            $disabled[] = $key;
+        }
+
+        if (!empty($notFound)) {
+            $io->error(sprintf('Plugin(s) not found: %s', implode(', ', $notFound)));
+            $io->text('Run <comment>php bin/console app:plugin --list</comment> to see available plugins.');
+        }
+
+        if (!empty($disabled)) {
+            $io->success(sprintf('Disabled plugin(s): %s', implode(', ', $disabled)));
+            $io->note([
+                'Plugin configuration updated in config/plugins.php',
+                'Clear cache: php bin/console cache:clear',
+            ]);
+        }
+
+        return empty($notFound) ? Command::SUCCESS : Command::FAILURE;
+    }
+
+    private function enableAllPlugins(SymfonyStyle $io): int
     {
         $plugins = $this->getPluginsWithKeys();
-        $pluginExists = false;
+        $enabled = [];
 
         foreach ($plugins as $plugin) {
-            if ($plugin['key'] === $pluginKey) {
-                $pluginExists = true;
-                break;
+            $key = $plugin['key'];
+
+            // First install if not already installed
+            if (!$this->pluginService->isInstalled($key)) {
+                $this->pluginService->install($key);
             }
+
+            $this->pluginService->enable($key);
+            $enabled[] = $key;
         }
 
-        if (!$pluginExists) {
-            $io->error("Plugin '{$pluginKey}' not found.");
-            $io->text('Run <comment>php bin/console app:plugin --list</comment> to see available plugins.');
-
-            return Command::FAILURE;
+        if (empty($enabled)) {
+            $io->warning('No plugins found to enable.');
+            return Command::SUCCESS;
         }
 
-        // First install if not already installed
-        if (!$this->pluginService->isInstalled($pluginKey)) {
-            $this->pluginService->install($pluginKey);
-        }
-
-        $this->pluginService->enable($pluginKey);
-        $io->success("Plugin '{$pluginKey}' has been enabled.");
+        $io->success(sprintf('Enabled all plugins: %s', implode(', ', $enabled)));
         $io->note([
             'Plugin configuration updated in config/plugins.php',
             'Run migrations if needed: php bin/console doctrine:migrations:migrate',
@@ -132,29 +216,14 @@ class PluginCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function disablePlugin(SymfonyStyle $io, string $pluginKey): int
+    private function disableAllPlugins(SymfonyStyle $io): int
     {
-        $plugins = $this->getPluginsWithKeys();
-        $pluginExists = false;
+        $config = [];
+        $this->pluginService->setPluginConfig($config);
 
-        foreach ($plugins as $plugin) {
-            if ($plugin['key'] === $pluginKey) {
-                $pluginExists = true;
-                break;
-            }
-        }
-
-        if (!$pluginExists) {
-            $io->error("Plugin '{$pluginKey}' not found.");
-            $io->text('Run <comment>php bin/console app:plugin --list</comment> to see available plugins.');
-
-            return Command::FAILURE;
-        }
-
-        $this->pluginService->disable($pluginKey);
-        $io->success("Plugin '{$pluginKey}' has been disabled.");
+        $io->success('Disabled all plugins (cleared plugin configuration).');
         $io->note([
-            'Plugin configuration updated in config/plugins.php',
+            'Plugin configuration cleared in config/plugins.php',
             'Clear cache: php bin/console cache:clear',
         ]);
 

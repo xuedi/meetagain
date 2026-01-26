@@ -83,20 +83,20 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -q
 
-# Reset dev with fixtures (plugins: 'no', 'all', or plugin name like 'dishes')
+# Reset dev with fixtures (plugins: 'no', 'all', 'multisite', or plugin name like 'dishes')
 [group('development')]
 devModeFixtures plugins='no':
     {{JUST}} dockerStop
     {{JUST}} devResetConfigs
     cp .env.dist .env
-    php bin/generate-plugins-config.php {{plugins}}
     touch installed.lock
     {{JUST}} dockerStart
     {{JUST}} do "composer install"
+    {{PHP}} php bin/console app:plugin --mode={{plugins}}
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q
-    @test -x config/plugins-post-fixtures.sh && bash config/plugins-post-fixtures.sh || true
+    {{PHP}} php bin/console app:plugin:post-fixtures
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console app:event:add-fixture
@@ -136,13 +136,13 @@ plugin-list:
 # Enable a specific plugin without affecting others
 [group('plugins')]
 plugin-enable name:
-    {{PHP}} php bin/console app:plugin {{name}} --enable
+    {{PHP}} php bin/console app:plugin --mode={{name}}
     {{PHP}} php bin/console cache:clear
 
 # Disable a specific plugin without affecting others
 [group('plugins')]
 plugin-disable name:
-    {{PHP}} php bin/console app:plugin {{name}} --disable
+    {{PHP}} php bin/console app:plugin --mode={{name}} --disable
     {{PHP}} php bin/console cache:clear
 
 # Run all tests and checks
