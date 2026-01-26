@@ -17,15 +17,6 @@
             "ref": "dfc51177476fb39d014ed89944cde53dc3326d23"
         }
     },
-    "deptrac/deptrac": {
-        "version": "3.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "3.0",
-            "ref": "05ab8813714080c7bc915cb10c780e6cfdbdb991"
-        }
-    },
     "doctrine/deprecations": {
         "version": "1.1",
         "recipe": {
@@ -72,18 +63,6 @@
         "files": [
             "config/packages/doctrine_migrations.yaml",
             "migrations/.gitignore"
-        ]
-    },
-    "friendsofphp/php-cs-fixer": {
-        "version": "3.92",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "3.0",
-            "ref": "be2103eb4a20942e28a6dd87736669b757132435"
-        },
-        "files": [
-            ".php-cs-fixer.dist.php"
         ]
     },
     "knplabs/knp-time-bundle": {
@@ -137,18 +116,6 @@
         },
         "files": [
             "config/packages/sentry.yaml"
-        ]
-    },
-    "squizlabs/php_codesniffer": {
-        "version": "3.10",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "3.6",
-            "ref": "1019e5c08d4821cb9b77f4891f8e9c31ff20ac6f"
-        },
-        "files": [
-            "phpcs.xml.dist"
         ]
     },
     "symfony/console": {
