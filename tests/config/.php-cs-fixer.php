@@ -2,9 +2,9 @@
 
 $finder = (new PhpCsFixer\Finder())
     ->in([
-        __DIR__ . '/../src',
-        __DIR__ . '/../tests',
-        __DIR__ . '/../public/install',
+        __DIR__ . '/../../src',
+        __DIR__ . '/../../tests',
+        __DIR__ . '/../../public/install',
     ])
     ->exclude('var');
 
@@ -18,5 +18,5 @@ return (new PhpCsFixer\Config())
         'concat_space' => ['spacing' => 'one'],
     ])
     ->setFinder($finder)
-    ->setCacheFile(__DIR__ . '/../var/cache/.php-cs-fixer.cache')
+    ->setCacheFile(__DIR__ . '/../../var/cache/.php-cs-fixer.cache')
     ->setParallelConfig(new PhpCsFixer\Runner\Parallel\ParallelConfig());
