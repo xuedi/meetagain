@@ -167,6 +167,11 @@ class Kernel implements Plugin
         ));
     }
 
+    public function postFixtures(OutputInterface $output): void
+    {
+        // No post-fixture tasks for this plugin
+    }
+
     public function getAdminSystemLinks(): ?AdminSection
     {
         return null;
