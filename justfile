@@ -147,7 +147,7 @@ plugin-disable name:
 
 # Run all tests and checks
 [group('testing')]
-test: testSetup testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer checkDeptrac
+test: testSetup testUnit testFunctional checkStan checkRector checkPhpcs checkPhpCsFixer checkDeptrac checkMago checkMagoAnalyze checkMagoGuard
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -233,6 +233,11 @@ checkMagoAnalyze:
 [group('checks')]
 checkMagoGuard:
     {{PHP}} vendor/bin/mago --config=tests/config/mago.toml guard
+
+# Run all Mago checks (lint + analyze + guard)
+[group('checks')]
+checkMagoAll: checkMago checkMagoAnalyze checkMagoGuard
+    echo "All Mago checks complete"
 
 # Check accessibility (Pa11y)
 [group('checks')]

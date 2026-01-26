@@ -66,6 +66,10 @@ just test               # Run all tests + checks
 | `just checkPhpcs`      | Check PHPCS code style          |
 | `just checkPhpCsFixer` | Check PHP-CS-Fixer (dry-run)    |
 | `just checkDeptrac`    | Check architecture dependencies |
+| `just checkMago`       | Run Mago linter                 |
+| `just checkMagoAnalyze`| Mago static analysis            |
+| `just checkMagoGuard`  | Mago architectural rules        |
+| `just checkMagoAll`    | Run all 3 Mago checks           |
 
 ### Fixes
 
@@ -74,6 +78,7 @@ just test               # Run all tests + checks
 | `just fixPhpcs`      | Fix PHPCS violations    |
 | `just fixPhpCsFixer` | Fix PHP-CS-Fixer issues |
 | `just fixRector`     | Apply Rector fixes      |
+| `just fixMago`       | Format code with Mago   |
 
 ### Database
 
