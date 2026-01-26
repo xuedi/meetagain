@@ -76,11 +76,6 @@ abstract class AbstractFixture extends Fixture
         echo 'Creating ' . $this->getClassName() . ' ...';
     }
 
-    protected function tick(): void
-    {
-        echo '.';
-    }
-
     protected function stop(): void
     {
         echo ' OK' . PHP_EOL;

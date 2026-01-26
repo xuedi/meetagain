@@ -323,7 +323,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
         $manager->persist($event);
         $this->addRefEvent(self::WEDNESDAY_MEETUP, $event);
 
-        $this->tick();   // Helper: prints "."
         $manager->flush();
         $this->stop();   // Helper: prints " OK\n"
     }
@@ -370,7 +369,6 @@ addRefEvent(string $name, Event $entity): void
 **Helper methods:**
 ```php
 $this->start();  // Prints "Creating FixtureName ..."
-$this->tick();   // Prints "." (for progress)
 $this->stop();   // Prints " OK\n"
 
 $text = $this->getText('filename'); // Reads from DataFixtures/FixtureName/filename.txt
@@ -399,7 +397,6 @@ class CommentFixture extends AbstractFixture implements DependentFixtureInterfac
         $comment->setContent('Looking forward to it!');
 
         $manager->persist($comment);
-        $this->tick();
         $manager->flush();
         $this->stop();
     }

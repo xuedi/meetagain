@@ -357,7 +357,7 @@ class EventFixture extends AbstractFixture
 - Type-safe magic methods: `getRefUser()`, `addRefEvent()`, etc.
 - No constant keys needed
 - PHPDoc hints for PHPStan
-- Helper methods: `start()`, `tick()`, `stop()`, `getText()`
+- Helper methods: `start()`, `stop()`, `getText()`
 
 See [testing.md](testing.md#custom-abstractfixture) for detailed usage.
 
