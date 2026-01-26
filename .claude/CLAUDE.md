@@ -63,9 +63,6 @@ just test               # Run all tests + checks
 |------------------------|---------------------------------|
 | `just checkStan`       | Run PHPStan static analysis     |
 | `just checkRector`     | Check Rector (dry-run)          |
-| `just checkPhpcs`      | Check PHPCS code style          |
-| `just checkPhpCsFixer` | Check PHP-CS-Fixer (dry-run)    |
-| `just checkDeptrac`    | Check architecture dependencies |
 | `just checkMago`       | Run Mago linter                 |
 | `just checkMagoAnalyze`| Mago static analysis            |
 | `just checkMagoGuard`  | Mago architectural rules        |
@@ -73,12 +70,10 @@ just test               # Run all tests + checks
 
 ### Fixes
 
-| Command              | Purpose                 |
-|----------------------|-------------------------|
-| `just fixPhpcs`      | Fix PHPCS violations    |
-| `just fixPhpCsFixer` | Fix PHP-CS-Fixer issues |
-| `just fixRector`     | Apply Rector fixes      |
-| `just fixMago`       | Format code with Mago   |
+| Command          | Purpose                |
+|------------------|------------------------|
+| `just fixRector` | Apply Rector fixes     |
+| `just fixMago`   | Format code with Mago  |
 
 ### Database
 
