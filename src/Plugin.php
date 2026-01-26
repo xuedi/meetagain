@@ -54,7 +54,6 @@ interface Plugin
 
     /**
      * Returns tags/badges to display for an event in list views.
-     *
      * @return list<EventListItemTag>
      */
     public function getEventListItemTags(int $eventId): array;
