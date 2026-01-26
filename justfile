@@ -219,6 +219,21 @@ checkPhpCsFixer:
 checkDeptrac:
     {{PHP}} vendor/bin/deptrac analyse --config-file=tests/config/deptrac.yaml --no-progress
 
+# Check Mago (linter)
+[group('checks')]
+checkMago:
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml lint
+
+# Analyze code with Mago
+[group('checks')]
+checkMagoAnalyze:
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml analyze
+
+# Check architectural rules with Mago
+[group('checks')]
+checkMagoGuard:
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml guard
+
 # Check accessibility (Pa11y)
 [group('checks')]
 checkA11y url='http://localhost/':
@@ -239,6 +254,11 @@ fixPhpCsFixer:
 [group('fixing')]
 fixRector:
     {{PHP}} vendor/bin/rector process src -c tests/config/rector.php
+
+# Format code with Mago
+[group('fixing')]
+fixMago:
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml format
 
 # Generate coverage badge (CI)
 [group('fixing')]
