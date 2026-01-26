@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\MemberFilter;
+namespace App\Filter\Member;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

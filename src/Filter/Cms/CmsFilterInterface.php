@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\CmsFilter;
+namespace App\Filter\Cms;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

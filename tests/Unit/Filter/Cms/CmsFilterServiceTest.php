@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Unit\Service\CmsFilter;
+namespace App\Tests\Unit\Filter\Cms;
 
-use App\Service\CmsFilter\CmsFilterInterface;
-use App\Service\CmsFilter\CmsFilterResult;
-use App\Service\CmsFilter\CmsFilterService;
+use App\Filter\Cms\CmsFilterInterface;
+use App\Filter\Cms\CmsFilterResult;
+use App\Filter\Cms\CmsFilterService;
 use PHPUnit\Framework\TestCase;
 
 class CmsFilterServiceTest extends TestCase
