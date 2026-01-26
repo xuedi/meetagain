@@ -120,7 +120,6 @@
     "ext-xdebug": "*",
     "carthage-software/mago": "^1.0.0",
     "dama/doctrine-test-bundle": "^8.4",
-    "phpstan/phpstan": "^2",
     "phpunit/phpunit": "^12",
     "rector/rector": "^2",
     "roave/security-advisories": "dev-latest",
