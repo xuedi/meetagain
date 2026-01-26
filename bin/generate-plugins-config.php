@@ -37,16 +37,17 @@ if (is_dir($pluginsDir)) {
 sort($availablePlugins);
 
 // Build plugin configuration based on mode
+// IMPORTANT: Only add plugins to the array if they should be enabled.
+// Presence in config/plugins.php = Services loaded by Symfony
+// true value = Routes also loaded
 $enabledPlugins = [];
 
 switch ($mode) {
     case 'no':
     case 'none':
     case '':
-        // All plugins disabled
-        foreach ($availablePlugins as $plugin) {
-            $enabledPlugins[$plugin] = false;
-        }
+        // No plugins - empty array
+        // This ensures Symfony doesn't load any plugin services
         break;
 
     case 'all':
@@ -69,9 +70,9 @@ switch ($mode) {
             }
         }
 
-        // Enable only requested plugins
-        foreach ($availablePlugins as $plugin) {
-            $enabledPlugins[$plugin] = in_array($plugin, $requestedPlugins, true);
+        // Add only requested plugins with true value
+        foreach ($requestedPlugins as $plugin) {
+            $enabledPlugins[$plugin] = true;
         }
         break;
 }
@@ -79,8 +80,7 @@ switch ($mode) {
 // Generate PHP config file
 $configContent = "<?php declare(strict_types=1); return [\n";
 foreach ($enabledPlugins as $plugin => $enabled) {
-    $value = $enabled ? 'true' : 'false';
-    $configContent .= "    '$plugin' => $value,\n";
+    $configContent .= "    '$plugin' => true,\n";
 }
 $configContent .= "];\n";
 
