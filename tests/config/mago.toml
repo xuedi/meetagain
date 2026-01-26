@@ -3,8 +3,8 @@
 php_version = "8.4.0"
 
 [source]
-paths = ["plugins/dishes/src/", "plugins/glossary/src/", "plugins/karaoke/src/", "src/", "tests/"]
-includes = ["vendor"]
+paths = ["../plugins/dishes/src/", "../plugins/glossary/src/", "../plugins/karaoke/src/", "../src/", "../tests/"]
+includes = ["../vendor"]
 excludes = []
 
 [format]

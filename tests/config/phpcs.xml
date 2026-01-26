@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../vendor/squizlabs/php_codesniffer/phpcs.xsd">
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../vendor/squizlabs/php_codesniffer/phpcs.xsd">
 
-    <arg name="basepath" value=".."/>
-    <arg name="cache" value=".phpcs-cache"/>
+    <arg name="basepath" value="../.."/>
+    <arg name="cache" value="var/cache/phpcs.cache"/>
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
 
@@ -23,28 +23,28 @@
         <exclude name="Generic.Files.LineLength"/>
     </rule>
 
-    <file>../src/</file>
-    <file>../tests/</file>
-    <file>../public/install/</file>
+    <file>../../src/</file>
+    <file>../../tests/</file>
+    <file>../../public/install/</file>
 
     <!-- Installer is standalone and doesn't use namespaces by design -->
     <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
-        <exclude-pattern>../public/install/*</exclude-pattern>
-        <exclude-pattern>../tests/AiReadableSymfonyMetrics.php</exclude-pattern>
-        <exclude-pattern>../tests/AiReadableTestResults.php</exclude-pattern>
+        <exclude-pattern>../../public/install/*</exclude-pattern>
+        <exclude-pattern>../../tests/AiReadableSymfonyMetrics.php</exclude-pattern>
+        <exclude-pattern>../../tests/AiReadableTestResults.php</exclude-pattern>
     </rule>
 
     <!-- Entry points and test bootstraps have side effects by design -->
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
-        <exclude-pattern>../public/install/index.php</exclude-pattern>
-        <exclude-pattern>../tests/Functional/InstallerTest.php</exclude-pattern>
-        <exclude-pattern>../tests/AiReadableSymfonyMetrics.php</exclude-pattern>
-        <exclude-pattern>../tests/AiReadableTestResults.php</exclude-pattern>
+        <exclude-pattern>../../public/install/index.php</exclude-pattern>
+        <exclude-pattern>../../tests/Functional/InstallerTest.php</exclude-pattern>
+        <exclude-pattern>../../tests/AiReadableSymfonyMetrics.php</exclude-pattern>
+        <exclude-pattern>../../tests/AiReadableTestResults.php</exclude-pattern>
     </rule>
 
     <!-- AI test results generator has pragmatic formatting for readability -->
     <rule ref="PSR12.ControlStructures.ControlStructureSpacing">
-        <exclude-pattern>../tests/AiReadableTestResults.php</exclude-pattern>
+        <exclude-pattern>../../tests/AiReadableTestResults.php</exclude-pattern>
     </rule>
 
 </ruleset>

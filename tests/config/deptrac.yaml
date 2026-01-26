@@ -1,8 +1,8 @@
 deptrac:
   paths:
-    - ../src
+    - ../../src
 
-  cache_file: var/cache/deptrac.cache
+  cache_file: /var/www/html/var/cache/deptrac.cache
 
   layers:
     - name: Controller
