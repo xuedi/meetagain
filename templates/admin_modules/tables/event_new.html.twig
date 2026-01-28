@@ -1,0 +1,39 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {{ form_start(form) }}
+
+        <div class="columns">
+            <div class="column is-3">
+                {{ form_row(form.start) }}
+            </div>
+            <div class="column is-3">
+                {{ form_row(form.stop) }}
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column is-2">
+                {{ form_row(form.recurringRule, { 'attr': {'class': 'is-fullwidth'} }) }}
+            </div>
+            <div class="column is-2">
+                {{ form_row(form.type, { 'attr': {'class': 'is-fullwidth'} }) }}
+            </div>
+            <div class="column is-2">
+                {{ form_row(form.location, { 'attr': {'class': 'is-fullwidth'} }) }}
+            </div>
+        </div>
+
+
+        {{ form_row(form.host) }}
+
+        {{ form_widget(form) }}
+        <button class="button">{{ "button_add" | trans }}</button>
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}

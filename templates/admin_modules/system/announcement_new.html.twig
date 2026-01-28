@@ -1,0 +1,32 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h1 class="title">{{ 'announcement_new' | trans }}</h1>
+
+        {{ form_start(form) }}
+
+        <div class="columns">
+            <div class="column is-8">
+
+                <p class="mb-3">
+                    Please select a CMS page you want to create an announcement from, this page will generate the content, and the announcement will link to this page for a web view.
+                </p>
+                {{ form_widget(form.cmsPage) }}
+
+                <div class="field mt-3">
+                    <div class="control">
+                        <button class="button is-primary">{{ 'button_create' | trans }}</button>
+                        <a href="{{ path('app_admin_announcement') }}" class="button">{{ 'button_cancel' | trans }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}

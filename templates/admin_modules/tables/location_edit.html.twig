@@ -1,0 +1,14 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="button">{{ "button_save" | trans }}</button>
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}
