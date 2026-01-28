@@ -3,15 +3,9 @@
 php-version = "8.4"
 
 [source]
-# NOTE: Mago does not support wildcards (plugins/*/src/ won't work)
-# If plugins are added/removed, update this list manually
-# MultiSite plugin is excluded (not in base repo)
+# Wildcard pattern automatically includes all plugins
 paths = [
-    "plugins/bookclub/src/",
-    "plugins/dishes/src/",
-    "plugins/filmclub/src/",
-    "plugins/glossary/src/",
-    "plugins/karaoke/src/",
+    "plugins/*/src/",
     "src/",
     "tests/"
 ]
