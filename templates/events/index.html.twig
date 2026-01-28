@@ -27,6 +27,10 @@
                         {{ form_row(filter.type) }}
                         {{ form_row(filter.rsvp) }}
 
+                        {% if filter.group is defined %}
+                            {{ form_row(filter.group) }}
+                        {% endif %}
+
                         <button class="button is-link">{{ "button_filter" | trans }}</button>
                         {{ form_end(filter) }}
                     </div>
