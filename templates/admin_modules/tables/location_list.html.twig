@@ -1,0 +1,37 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table id="filteredTable"  class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>CreateBy</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Street</th>
+                <th>Postcode</th>
+                <th>City</th>
+                <th><a href="{{ path('app_admin_location_add') }}"><span class="icon"><i class="fa fa-add"></i></span></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for location in locations %}
+                <tr>
+                    <td>{{ location.user.name }}</td>
+                    <td>{{ location.name }}</td>
+                    <td>{{ location.description|slice(0, 20) }}</td>
+                    <td>{{ location.street }}</td>
+                    <td>{{ location.postcode }}</td>
+                    <td>{{ location.city }}</td>
+                    <td><a href="{{ path('app_admin_location_edit', {'id': location.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
+
