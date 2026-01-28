@@ -3,6 +3,8 @@
 php-version = "8.4"
 
 [source]
+# Wildcard pattern automatically includes all plugins
+# Uses recursive glob to match all PHP files in any plugin's src directory
 paths = [
     "plugins/**/src/**/*.php",
     "src/",
