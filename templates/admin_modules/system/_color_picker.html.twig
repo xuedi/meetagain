@@ -1,0 +1,16 @@
+{# Color picker field with live preview #}
+{# Parameters: field (form field), help (string), text_preview (bool, default false) #}
+<div class="column is-3">
+    <div class="field">
+        {{ form_label(field) }}
+        <div class="control is-flex is-align-items-center">
+            {{ form_widget(field) }}
+            {% if text_preview|default(false) %}
+                <span class="ml-3" style="color: {{ field.vars.data }};">Sample text</span>
+            {% else %}
+                <span class="tag ml-3" style="background-color: {{ field.vars.data }}; color: {{ light_text|default(true) ? 'white' : 'black' }};">Preview</span>
+            {% endif %}
+        </div>
+        <p class="help">{{ help }}</p>
+    </div>
+</div>

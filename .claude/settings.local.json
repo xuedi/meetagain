@@ -40,7 +40,8 @@
       "Bash(just testResults:*)",
       "Bash(wc:*)",
       "Bash(tree:*)",
-      "Bash(just checkMago:*)"
+      "Bash(just checkMago:*)",
+      "Bash(just fixMago:*)"
     ]
   }
 }
