@@ -1,0 +1,57 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <article class="message is-success is-hidden" id="cms-add">
+            {{ form_start(form) }}
+            <div class="message-header">
+                <p>Add new cms page</p>
+                <button class="delete toggleTrigger" data-id="cms-add" aria-label="delete"></button>
+            </div>
+            <div class="message-body">
+                <p>
+                    Please enter the url part og the new page, all else cam be added in the following step
+                </p>
+                <p>
+                    {{ form_row(form.slug) }}
+                </p>
+                <div class="has-text-right">
+                    <button class="button">{{ "button_add" | trans }}</button>
+                </div>
+            </div>
+            {{ form_end(form, {'render_rest': false}) }}
+        </article>
+
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Slug</th>
+                <th>CreatedBy</th>
+                <th>CreatedAt</th>
+                <th>Status</th>
+                <th>Blocks</th>
+                <th>Translations</th>
+                <th><a class="toggleTrigger" data-id="cms-add" href="#"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for page in cms %}
+                <tr>
+                    <td>{{ page.slug }}</td>
+                    <td>{{ page.createdBy.name }}</td>
+                    <td>{{ page.createdAt|date('Y-m-d') }}</td>
+                    <td>{% if page.published %}{{ 'published' | trans }}{% else %}{{ 'draft' | trans }}{% endif %}</td>
+                    <td>{{ page.blocks|length }}</td>
+                    <td>{{ page.languages|length }}</td>
+                    <td><a href="{{ path('app_admin_cms_edit', {'id': page.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
