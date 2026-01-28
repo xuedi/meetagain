@@ -1,0 +1,23 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        Add Host
+
+        <div class="columns">
+            <div class="column is-3">
+                {{ form_row(form.name) }}
+                {{ form_row(form.user) }}
+            </div>
+        </div>
+
+        {{ form_widget(form) }}
+        <button class="button">{{ "button_add" | trans }}</button>
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}
+
