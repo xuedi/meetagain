@@ -1,44 +1,10 @@
 <aside class="menu">
-    <p class="menu-label">System</p>
-    <ul class="menu-list">
-        <li><a class="{% if active == 'plugin' %}is-active{% endif %}" href="{{ path('app_admin_plugin') }}">{{ "menu_admin_plugin" | trans }}</a></li>
-        <li><a class="{% if active == 'system' %}is-active{% endif %}" href="{{ path('app_admin_system') }}">{{ "menu_admin_system" | trans }}</a></li>
-        <li><a class="{% if active == 'email' %}is-active{% endif %}" href="{{ path('app_admin_email') }}">{{ "menu_admin_email" | trans }}</a></li>
-        <li><a class="{% if active == 'language' %}is-active{% endif %}" href="{{ path('app_admin_language') }}">{{ "menu_admin_language" | trans }}</a></li>
-        <li><a class="{% if active == 'announcement' %}is-active{% endif %}" href="{{ path('app_admin_announcement') }}">{{ "menu_admin_announcement" | trans }}</a></li>
-    </ul>
-    {% for section in get_plugins_admin_system_links() %}
-        <p class="menu-label">{{ section.section }}</p>
+    {% for section in get_admin_sections() %}
+        <p class="menu-label">{{ section.name }}</p>
         <ul class="menu-list">
             {% for link in section.links %}
-                <li><a class="{% if active == link.active %}is-active{% endif %}" href="{{ path(link.route) }}">{{ link.label }}</a></li>
+                <li><a class="{% if active == link.active %}is-active{% endif %}" href="{{ path(link.route) }}">{{ link.label | trans }}</a></li>
             {% endfor %}
         </ul>
     {% endfor %}
-    <p class="menu-label">Tables</p>
-    <ul class="menu-list">
-        <li><a class="{% if active == 'event' %}is-active{% endif %}" href="{{ path('app_admin_event') }}">{{ "menu_admin_event" | trans }}</a></li>
-        <li><a class="{% if active == 'location' %}is-active{% endif %}" href="{{ path('app_admin_location') }}">{{ "menu_admin_location" | trans }}</a></li>
-        <li><a class="{% if active == 'host' %}is-active{% endif %}" href="{{ path('app_admin_host') }}">{{ "menu_admin_host" | trans }}</a></li>
-        <li><a class="{% if active == 'image' %}is-active{% endif %}" href="{{ path('app_admin_image') }}">{{ "menu_admin_images" | trans }}</a></li>
-        <li><a class="{% if active == 'user' %}is-active{% endif %}" href="{{ path('app_admin_user') }}">{{ "menu_admin_user" | trans }}</a></li>
-    </ul>
-    <p class="menu-label">CMS</p>
-    <ul class="menu-list">
-        <li><a class="{% if active == 'cms' %}is-active{% endif %}" href="{{ path('app_admin_cms') }}">{{ "menu_admin_cms" | trans }}</a></li>
-        <li><a class="{% if active == 'menu' %}is-active{% endif %}" href="{{ path('app_admin_menu') }}">{{ "menu_admin_menu" | trans }}</a></li>
-    </ul>
-    <p class="menu-label">Translation</p>
-    <ul class="menu-list">
-        <li><a class="{% if active == 'suggestions' %}is-active{% endif %}" href="{{ path('app_admin_translation_suggestion') }}">{{ "menu_admin_translation_suggestions" | trans }}</a></li>
-        <li><a class="{% if active == 'extract' %}is-active{% endif %}" href="{{ path('app_admin_translation_extract') }}">{{ "menu_admin_translation_extract" | trans }}</a></li>
-        <li><a class="{% if active == 'edit' %}is-active{% endif %}" href="{{ path('app_admin_translation_edit') }}">{{ "menu_admin_translation_edit" | trans }}</a></li>
-        <li><a class="{% if active == 'publish' %}is-active{% endif %}" href="{{ path('app_admin_translation_publish') }}">{{ "menu_admin_translation_publish" | trans }}</a></li>
-    </ul>
-    <p class="menu-label">Logs</p>
-    <ul class="menu-list">
-        <li><a class="{% if active == 'logs' %}is-active{% endif %}" href="{{ path('app_admin_logs_system') }}">{{ "menu_admin_logs_system" | trans }}</a></li>
-        <li><a class="{% if active == 'activity' %}is-active{% endif %}" href="{{ path('app_admin_logs_activity') }}">{{ "menu_admin_logs_activity" | trans }}</a></li>
-        <li><a class="{% if active == '404' %}is-active{% endif %}" href="{{ path('app_admin_logs_not_found') }}">{{ "menu_admin_logs_404" | trans }}</a></li>
-    </ul>
 </aside>
