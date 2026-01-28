@@ -7,6 +7,7 @@ use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,6 +18,8 @@ class EventFilterType extends AbstractType
 {
     public function __construct(
         public readonly TranslatorInterface $translator,
+        #[AutowireIterator(EventFilterFormContributorInterface::class)]
+        private readonly iterable $contributors = [],
     ) {}
 
     #[Override]
@@ -55,6 +58,10 @@ class EventFilterType extends AbstractType
                 $this->translator->trans('event_filter_who_my_friends') => EventFilterRsvp::Friends,
             ],
         ]);
+
+        foreach ($this->contributors as $contributor) {
+            $contributor->addFields($builder);
+        }
     }
 
     #[Override]
