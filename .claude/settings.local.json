@@ -39,7 +39,8 @@
       "Bash(just dockerDatabase:*)",
       "Bash(just testResults:*)",
       "Bash(wc:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(just checkMago:*)"
     ]
   }
 }

@@ -3,9 +3,8 @@
 php-version = "8.4"
 
 [source]
-# Wildcard pattern automatically includes all plugins
 paths = [
-    "plugins/*/src/",
+    "plugins/**/src/**/*.php",
     "src/",
     "tests/"
 ]
