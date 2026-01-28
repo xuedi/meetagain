@@ -1,0 +1,30 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>CreatedAt</th>
+                <th>Type</th>
+                <th>Level</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.date | date('Y-m-d  H:i') }}</td>
+                    <td>{{ log.type }}</td>
+                    <td>{{ log.level }}</td>
+                    <td>{{ log.message }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

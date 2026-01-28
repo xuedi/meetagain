@@ -1,0 +1,32 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th colspan="2">CreatedAt</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.createdAt | date('Y-m-d') }}</td>
+                    <td>{{ activity.createdAt | date('H:i') }}</td>
+                    <td>{{ activity.user.email }}</td>
+                    <td>{{ activity.type.name }}</td>
+                    <td>{{ activity.message }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
+
