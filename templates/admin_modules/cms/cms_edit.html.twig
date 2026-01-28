@@ -1,0 +1,116 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <article class="message is-danger is-hidden" id="cms-delete-warning">
+        <div class="message-header">
+            <p>Delete the Page</p>
+            <button class="delete toggleTrigger" data-id="cms-delete-warning" aria-label="delete"></button>
+        </div>
+        <div class="message-body">
+            <p>
+                If you delete this page, all of its connected blocks and images and so on will be also removed. Also,
+                all language variation! Please consider to set this Page just offline.
+            </p>
+            <div class="has-text-right">
+                <a class="button is-danger" href="{{ path('app_admin_cms_delete', {'id': cms.id}) }}">
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                    <span>Yes, Delete</span>
+                </a>
+            </div>
+        </div>
+    </article>
+
+    <div class="box">
+        {{ form_start(form) }}
+        <div class="columns">
+            <div class="column is-3">
+                {{ form_row(form.slug) }}
+            </div>
+            <div class="column is-2">
+                {{ form_row(form.published) }}
+            </div>
+            <div class="column is-3">
+                <div class="buttons has-addons">
+                    {% for locale in enabled_locales %}
+                        {% set link = path('app_admin_cms_edit', {'id': cms.id, 'locale': locale}) %}
+                        <a class="button {% if locale == editLocale %}is-active{% endif %}" href="{{ link }}">{{ locale }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="column is-4">
+                <div class="has-text-right">
+                    <button class="button">{{ "button_save" | trans }}</button>
+                    <a class="button is-danger toggleTrigger" data-id="cms-delete-warning"
+                       href="{{ path('app_admin_cms_delete', {'id': cms.id}) }}">
+                        <span class="icon"><i class="fa fa-trash"></i></span>
+                    </a>
+                    {% if linkedAnnouncement %}
+                        <a class="button is-info" href="{{ path('app_admin_announcement_view', {'id': linkedAnnouncement.id}) }}">
+                            <span class="icon"><i class="fa fa-bullhorn"></i></span>
+                            <span>open</span>
+                        </a>
+                    {% else %}
+                        <a class="button is-info" href="{{ path('app_admin_announcement_from_cms', {'id': cms.id}) }}">
+                            <span class="icon"><i class="fa fa-bullhorn"></i></span>
+                            <span>Create</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+
+
+    <div class="container">
+        {% for block in blocks %}
+            {% set formAction = path('app_admin_cms_edit_block_save') %}
+            {% set moveDownLink = path('app_admin_cms_edit_block_down', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
+            {% set moveUpLink = path('app_admin_cms_edit_block_up', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
+            {% set editBlockLink = path('app_admin_cms_edit', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
+            {% set cancelLink = path('app_admin_cms_edit', {'id': cms.id, 'locale': editLocale}) %}
+            {% set deleteBlockLink = path('app_admin_cms_block_delete', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
+            <div class="box">
+                <form method="post" action="{{ formAction }}">
+                    <input type="hidden" name="id" value="{{ cms.id }}"/>
+                    <input type="hidden" name="locale" value="{{ editLocale }}"/>
+                    <input type="hidden" name="blockId" value="{{ block.id }}"/>
+                    <input type="hidden" name="blockType" value="{{ block.type.value }}"/>
+                    <div class="is-pulled-right">
+                    {% if editBlock == block.id %}
+                        <a class="button is-danger is-small" href="{{ deleteBlockLink }}">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                        </a>
+                        <a class="button is-small" href="{{ cancelLink }}">{{ "button_cancel" | trans }}</a>
+                        <button class="button is-small">{{ "button_save" | trans }}</button>
+                    {% else %}
+                        {% if editBlock is not null %}
+                            <span class="icon"><i class="fa fa-angle-down"></i></span>
+                            <span class="icon"><i class="fa fa-angle-up"></i></span>
+                            <span class="icon"><i class="fa fa-edit"></i></span>
+                        {% else %}
+                            <a href="{{ moveDownLink }}"><span class="icon"><i class="fa fa-angle-down"></i></span></a>
+                            <a href="{{ moveUpLink }}"><span class="icon"><i class="fa fa-angle-up"></i></span></a>
+                            <a href="{{ editBlockLink }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                    {% include 'cms/blocks/_edit/' ~ block.type.name ~ '.html.twig' with {
+                        'block': block.blockObject,
+                        'blockId': block.id,
+                        'blockImage': block.image,
+                        'cmsId': cms.id,
+                    } %}
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if editBlock is null %}
+        <div class="container mt-6">
+            {% include 'admin/cms/newBlocks.html.twig' %}
+        </div>
+    {% endif %}
+
+{% endblock %}
