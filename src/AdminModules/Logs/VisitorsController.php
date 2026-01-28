@@ -1,0 +1,29 @@
+<?php declare(strict_types=1);
+
+namespace App\AdminModules\Logs;
+
+use App\Entity\UserStatus;
+use App\Repository\UserRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted('ROLE_ADMIN')]
+class VisitorsController extends AbstractController
+{
+    public function __construct(
+        private readonly UserRepository $userRepo,
+    ) {}
+
+    public function index(): Response
+    {
+        $users = $this->userRepo->findBy([], ['createdAt' => 'desc']);
+        $needForApproval = array_filter($users, fn($u) => $u->getStatus() === UserStatus::EmailVerified);
+
+        return $this->render('admin_modules/logs/visitors_index.html.twig', [
+            'active' => 'visitors',
+            'users' => $users,
+            'needForApproval' => $needForApproval,
+        ]);
+    }
+}
