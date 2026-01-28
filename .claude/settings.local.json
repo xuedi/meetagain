@@ -41,7 +41,8 @@
       "Bash(wc:*)",
       "Bash(tree:*)",
       "Bash(just checkMago:*)",
-      "Bash(just fixMago:*)"
+      "Bash(just fixMago:*)",
+      "Bash(just checkMagoAll:*)"
     ]
   }
 }
