@@ -16,3 +16,7 @@ api:
 ajax:
     type: attribute
     resource: ../src/Controller/NonLocale/AjaxController.php
+
+admin_modules:
+    resource: .
+    type: admin_module
