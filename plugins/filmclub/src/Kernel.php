@@ -158,6 +158,11 @@ class Kernel implements Plugin
         $output->writeln(sprintf('<info>Filmclub: Created %d votes with %d ballots.</info>', $voteCount, $ballotCount));
     }
 
+    public function preFixtures(OutputInterface $output): void
+    {
+        // No pre-fixture tasks for this plugin
+    }
+
     public function postFixtures(OutputInterface $output): void
     {
         // No post-fixture tasks for this plugin
