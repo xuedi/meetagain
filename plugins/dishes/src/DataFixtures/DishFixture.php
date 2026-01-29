@@ -64,9 +64,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface, Depe
     #[\Override]
     public function getDependencies(): array
     {
-        return [
-            UserFixture::class,
-        ];
+        return [];
     }
 
     private function getData(): array

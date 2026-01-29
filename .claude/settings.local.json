@@ -42,7 +42,12 @@
       "Bash(tree:*)",
       "Bash(just checkMago:*)",
       "Bash(just fixMago:*)",
-      "Bash(just checkMagoAll:*)"
+      "Bash(just checkMagoAll:*)",
+      "Bash(for file in /home/xuedi/Projects/meetAgain/plugins/multisite/src/DataFixtures/*Fixture.php)",
+      "Bash(do)",
+      "Bash(if grep -q \"getGroups.*plugin\" \"$file\")",
+      "Bash(then)",
+      "Bash(fi)"
     ]
   }
 }

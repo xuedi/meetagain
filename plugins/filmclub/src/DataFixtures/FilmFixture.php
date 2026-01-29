@@ -101,8 +101,6 @@ class FilmFixture extends AbstractFixture implements DependentFixtureInterface
 
     public function getDependencies(): array
     {
-        return [
-            UserFixture::class,
-        ];
+        return [];
     }
 }
