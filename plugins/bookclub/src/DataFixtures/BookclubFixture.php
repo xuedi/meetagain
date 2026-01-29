@@ -45,9 +45,7 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface, 
     #[\Override]
     public function getDependencies(): array
     {
-        return [
-            UserFixture::class,
-        ];
+        return [];
     }
 
     /**
