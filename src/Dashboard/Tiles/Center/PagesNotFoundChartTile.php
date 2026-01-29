@@ -4,8 +4,11 @@ namespace App\Dashboard\Tiles\Center;
 
 use App\Dashboard\DashboardCenterTileInterface;
 use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use App\Service\DashboardStatsService;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class PagesNotFoundChartTile implements DashboardCenterTileInterface
 {
     public function __construct(
@@ -22,12 +25,12 @@ readonly class PagesNotFoundChartTile implements DashboardCenterTileInterface
         return 60;
     }
 
-    public function isAccessible(User $user, ?object $group): bool
+    public function isAccessible(User $user): bool
     {
-        return in_array('ROLE_ADMIN', $user->getRoles(), true);
+        return $user->hasUserRole(UserRole::Admin);
     }
 
-    public function getData(User $user, ?object $group, int $year, int $week): array
+    public function getData(User $user, int $year, int $week): array
     {
         return [
             'pagesNotFound' => $this->statsService->getPagesNotFound($year, $week),

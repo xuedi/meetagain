@@ -4,8 +4,12 @@ namespace App\AdminModules\Tables;
 
 use App\AdminModules\AdminModuleInterface;
 use App\Entity\AdminLink;
+use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use Symfony\Bundle\SecurityBundle\Security;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class LocationModule implements AdminModuleInterface
 {
     public function __construct(
@@ -59,6 +63,10 @@ readonly class LocationModule implements AdminModuleInterface
 
     public function isAccessible(): bool
     {
-        return $this->security->isGranted('ROLE_ADMIN');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return false;
+        }
+        return $user->hasUserRole(UserRole::Admin);
     }
 }

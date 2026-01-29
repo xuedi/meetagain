@@ -15,10 +15,10 @@ interface DashboardSideTileInterface
     public function getPriority(): int;
 
     /** Check if user can see this tile */
-    public function isAccessible(User $user, ?object $group): bool;
+    public function isAccessible(User $user): bool;
 
     /** Fetch tile data - no time parameters */
-    public function getData(User $user, ?object $group): array;
+    public function getData(User $user): array;
 
     /** Template path */
     public function getTemplate(): string;

@@ -4,8 +4,12 @@ namespace App\AdminModules\Cms;
 
 use App\AdminModules\AdminModuleInterface;
 use App\Entity\AdminLink;
+use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use Symfony\Bundle\SecurityBundle\Security;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class MenuModule implements AdminModuleInterface
 {
     public function __construct(
@@ -39,24 +43,37 @@ readonly class MenuModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_menu',
-                'path' => '/admin/menu/{edit}',
+                'path' => '/admin/menu',
                 'controller' => [MenuController::class, 'menuList'],
-                'defaults' => ['edit' => null],
             ],
             [
-                'name' => 'app_admin_menu_up',
-                'path' => '/admin/menu/{id}/up',
-                'controller' => [MenuController::class, 'menuUp'],
+                'name' => 'app_admin_menu_add',
+                'path' => '/admin/menu/add',
+                'controller' => [MenuController::class, 'menuAdd'],
+                'methods' => ['POST'],
             ],
             [
-                'name' => 'app_admin_menu_down',
-                'path' => '/admin/menu/{id}/down',
-                'controller' => [MenuController::class, 'menuDown'],
+                'name' => 'app_admin_menu_edit',
+                'path' => '/admin/menu/edit/{id}',
+                'controller' => [MenuController::class, 'menuEdit'],
+                'methods' => ['POST'],
             ],
             [
                 'name' => 'app_admin_menu_delete',
-                'path' => '/admin/menu/{id}/delete',
+                'path' => '/admin/menu/delete',
                 'controller' => [MenuController::class, 'menuDelete'],
+                'methods' => ['GET'],
+            ],
+            [
+                'name' => 'app_admin_menu_up',
+                'path' => '/admin/menu/up',
+                'controller' => [MenuController::class, 'menuUp'],
+                'methods' => ['GET'],
+            ],
+            [
+                'name' => 'app_admin_menu_down',
+                'path' => '/admin/menu/down',
+                'controller' => [MenuController::class, 'menuDown'],
                 'methods' => ['GET'],
             ],
         ];
@@ -64,6 +81,10 @@ readonly class MenuModule implements AdminModuleInterface
 
     public function isAccessible(): bool
     {
-        return $this->security->isGranted('ROLE_ADMIN');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return false;
+        }
+        return $user->hasUserRole(UserRole::Admin);
     }
 }

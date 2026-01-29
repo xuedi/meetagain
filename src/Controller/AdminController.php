@@ -21,7 +21,6 @@ class AdminController extends AbstractController
         private readonly DashboardActionService $dashboardAction,
         private readonly HealthCheckService $healthCheckService,
         private readonly DashboardService $dashboardService,
-        private readonly ?object $groupContextService = null,
     ) {}
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
@@ -33,45 +32,30 @@ class AdminController extends AbstractController
         $year ??= (int) $now->format('Y');
         $week ??= (int) $now->format('W');
 
-        // Get group context (null for admins without context, or selected group)
-        $groupContext = null;
-        if ($this->groupContextService && method_exists($this->groupContextService, 'getCurrentContext')) {
-            $context = $this->groupContextService->getCurrentContext();
-            $groupContext = $context->group ?? null;
-        }
-
         // Get accessible center tiles (time-series)
-        $centerTiles = $this->dashboardService->getCenterTilesForUser($user, $groupContext);
+        $centerTiles = $this->dashboardService->getCenterTilesForUser($user);
         $centerTileData = [];
         foreach ($centerTiles as $tile) {
             $centerTileData[] = [
                 'template' => $tile->getTemplate(),
-                'data' => $tile->getData($user, $groupContext, $year, $week),
+                'data' => $tile->getData($user, $year, $week),
             ];
         }
 
         // Get accessible side tiles (fixed info)
-        $sideTiles = $this->dashboardService->getSideTilesForUser($user, $groupContext);
+        $sideTiles = $this->dashboardService->getSideTilesForUser($user);
         $sideTileData = [];
         foreach ($sideTiles as $tile) {
             $sideTileData[] = [
                 'template' => $tile->getTemplate(),
-                'data' => $tile->getData($user, $groupContext),
+                'data' => $tile->getData($user),
             ];
-        }
-
-        // Get managed groups for context switcher (future enhancement)
-        $managedGroups = [];
-        if ($this->groupContextService && method_exists($this->groupContextService, 'getManagedGroupsForUser')) {
-            $managedGroups = $this->groupContextService->getManagedGroupsForUser($user);
         }
 
         return $this->render('admin/index.html.twig', [
             'active' => 'dashboard',
             'centerTiles' => $centerTileData,
             'sideTiles' => $sideTileData,
-            'managedGroups' => $managedGroups,
-            'currentGroup' => $groupContext,
             'time' => $this->dashboardStats->getTimeControl($year, $week),
         ]);
     }

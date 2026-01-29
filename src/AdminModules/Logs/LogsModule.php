@@ -4,8 +4,12 @@ namespace App\AdminModules\Logs;
 
 use App\AdminModules\AdminModuleInterface;
 use App\Entity\AdminLink;
+use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use Symfony\Bundle\SecurityBundle\Security;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class LogsModule implements AdminModuleInterface
 {
     public function __construct(
@@ -14,7 +18,7 @@ readonly class LogsModule implements AdminModuleInterface
 
     public function getKey(): string
     {
-        return 'logs';
+        return 'activity_log';
     }
 
     public function getPriority(): int
@@ -30,9 +34,7 @@ readonly class LogsModule implements AdminModuleInterface
     public function getLinks(): array
     {
         return [
-            new AdminLink(label: 'menu_admin_logs_activity', route: 'app_admin_logs_activity', active: 'activity'),
-            new AdminLink(label: 'menu_admin_logs_system', route: 'app_admin_logs_system', active: 'logs'),
-            new AdminLink(label: 'menu_admin_logs_404', route: 'app_admin_logs_not_found', active: '404'),
+            new AdminLink(label: 'menu_admin_activity_log', route: 'app_admin_activity_log', active: 'activity_log'),
         ];
     }
 
@@ -40,25 +42,29 @@ readonly class LogsModule implements AdminModuleInterface
     {
         return [
             [
-                'name' => 'app_admin_logs_activity',
+                'name' => 'app_admin_activity_log',
                 'path' => '/admin/logs/activity',
-                'controller' => [LogsController::class, 'activityList'],
+                'controller' => [LogsController::class, 'activityLog'],
             ],
             [
-                'name' => 'app_admin_logs_system',
+                'name' => 'app_admin_system_log',
                 'path' => '/admin/logs/system',
-                'controller' => [LogsController::class, 'systemLogs'],
+                'controller' => [LogsController::class, 'systemLog'],
             ],
             [
-                'name' => 'app_admin_logs_not_found',
-                'path' => '/admin/logs/404',
-                'controller' => [LogsController::class, 'notFoundLogs'],
+                'name' => 'app_admin_not_found_log',
+                'path' => '/admin/logs/not-found',
+                'controller' => [LogsController::class, 'notFoundLog'],
             ],
         ];
     }
 
     public function isAccessible(): bool
     {
-        return $this->security->isGranted('ROLE_ADMIN');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return false;
+        }
+        return $user->hasUserRole(UserRole::Admin);
     }
 }

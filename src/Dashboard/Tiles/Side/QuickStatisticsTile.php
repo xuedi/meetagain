@@ -4,9 +4,12 @@ namespace App\Dashboard\Tiles\Side;
 
 use App\Dashboard\DashboardSideTileInterface;
 use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use App\Service\DashboardActionService;
 use App\Service\DashboardStatsService;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class QuickStatisticsTile implements DashboardSideTileInterface
 {
     public function __construct(
@@ -24,12 +27,12 @@ readonly class QuickStatisticsTile implements DashboardSideTileInterface
         return 80;
     }
 
-    public function isAccessible(User $user, ?object $group): bool
+    public function isAccessible(User $user): bool
     {
-        return in_array('ROLE_ADMIN', $user->getRoles(), true);
+        return $user->hasUserRole(UserRole::Admin);
     }
 
-    public function getData(User $user, ?object $group): array
+    public function getData(User $user): array
     {
         // Use current week for stats
         $now = new \DateTime();

@@ -15,10 +15,10 @@ interface DashboardCenterTileInterface
     public function getPriority(): int;
 
     /** Check if user can see this tile */
-    public function isAccessible(User $user, ?object $group): bool;
+    public function isAccessible(User $user): bool;
 
     /** Fetch tile data - includes year/week for time-series */
-    public function getData(User $user, ?object $group, int $year, int $week): array;
+    public function getData(User $user, int $year, int $week): array;
 
     /** Template path */
     public function getTemplate(): string;
