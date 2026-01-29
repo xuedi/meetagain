@@ -1,0 +1,29 @@
+<div class="box">
+    <h2 class="title is-6">Statistics</h2>
+    <table class="table is-narrow is-fullwidth">
+        <thead>
+            <tr>
+                <th>Metric</th>
+                <th class="has-text-right">All</th>
+                <th class="has-text-right">Week</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for title, data in details %}
+            <tr>
+                <td>{{ title }}</td>
+                <td class="has-text-right">{{ data.count }}</td>
+                <td class="has-text-right">{{ data.week }}</td>
+            </tr>
+        {% endfor %}
+        <tr class="has-background-light">
+            <td><strong>Active (7 days)</strong></td>
+            <td class="has-text-right" colspan="2"><strong>{{ activeUsers }}</strong></td>
+        </tr>
+        <tr>
+            <td>Recurring Events</td>
+            <td class="has-text-right" colspan="2">{{ recurringEvents }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

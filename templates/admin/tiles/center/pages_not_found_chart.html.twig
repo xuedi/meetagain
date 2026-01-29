@@ -1,0 +1,17 @@
+now i get <div class="box">
+    <h2 class="title is-6">Pages not found (this week)</h2>
+    <canvas id="notFoundChart" style="max-height: 200px;"></canvas>
+</div>
+
+<script type="text/javascript">
+new Chart(document.getElementById('notFoundChart'), {
+    type: 'bar',
+    data: {
+        datasets: [{
+            data: [{% for day, count in pagesNotFound.list %}{x: '{{ day }}', y: {{ count }}},{% endfor %}],
+            backgroundColor: 'rgba(255, 99, 132, 0.5)'
+        }]
+    },
+    options: {plugins: {legend: {display: false}}}
+});
+</script>
