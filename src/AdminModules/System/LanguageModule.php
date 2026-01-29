@@ -39,7 +39,7 @@ readonly class LanguageModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_language',
-                'path' => '/admin/language/',
+                'path' => '/admin/language',
                 'controller' => [LanguageController::class, 'list'],
             ],
             [

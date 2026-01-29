@@ -39,7 +39,7 @@ readonly class UserModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_user',
-                'path' => '/admin/user/',
+                'path' => '/admin/user',
                 'controller' => [UserController::class, 'userList'],
             ],
             [

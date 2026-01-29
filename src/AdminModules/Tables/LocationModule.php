@@ -39,7 +39,7 @@ readonly class LocationModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_location',
-                'path' => '/admin/location/',
+                'path' => '/admin/location',
                 'controller' => [LocationController::class, 'locationList'],
             ],
             [
