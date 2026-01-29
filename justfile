@@ -83,7 +83,7 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -q
 
-# Reset dev with fixtures (plugins: 'no', 'all', 'multisite', or plugin name like 'dishes')
+# Reset dev with fixtures (plugins: 'no', 'all' or plugin name like 'dishes')
 [group('development')]
 devModeFixtures plugins='no':
     {{JUST}} dockerStop
