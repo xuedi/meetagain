@@ -4,8 +4,12 @@ namespace App\AdminModules\Translation;
 
 use App\AdminModules\AdminModuleInterface;
 use App\Entity\AdminLink;
+use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use Symfony\Bundle\SecurityBundle\Security;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class TranslationModule implements AdminModuleInterface
 {
     public function __construct(
@@ -30,22 +34,7 @@ readonly class TranslationModule implements AdminModuleInterface
     public function getLinks(): array
     {
         return [
-            new AdminLink(
-                label: 'menu_admin_translation_suggestions',
-                route: 'app_admin_translation_suggestion',
-                active: 'suggestions',
-            ),
-            new AdminLink(label: 'menu_admin_translation_edit', route: 'app_admin_translation_edit', active: 'edit'),
-            new AdminLink(
-                label: 'menu_admin_translation_extract',
-                route: 'app_admin_translation_extract',
-                active: 'extract',
-            ),
-            new AdminLink(
-                label: 'menu_admin_translation_publish',
-                route: 'app_admin_translation_publish',
-                active: 'publish',
-            ),
+            new AdminLink(label: 'menu_admin_translation', route: 'app_admin_translation', active: 'translation'),
         ];
     }
 
@@ -53,35 +42,37 @@ readonly class TranslationModule implements AdminModuleInterface
     {
         return [
             [
-                'name' => 'app_admin_translation_suggestion',
-                'path' => '/admin/translations/suggestions',
-                'controller' => [TranslationController::class, 'translationsSuggestions'],
+                'name' => 'app_admin_translation',
+                'path' => '/admin/translation',
+                'controller' => [TranslationController::class, 'translationList'],
+            ],
+            [
+                'name' => 'app_admin_translation_add',
+                'path' => '/admin/translation/add',
+                'controller' => [TranslationController::class, 'translationAdd'],
+                'methods' => ['POST'],
             ],
             [
                 'name' => 'app_admin_translation_edit',
-                'path' => '/admin/translations/edit',
-                'controller' => [TranslationController::class, 'translationsIndex'],
+                'path' => '/admin/translation/edit/{id}',
+                'controller' => [TranslationController::class, 'translationEdit'],
+                'methods' => ['POST'],
             ],
             [
-                'name' => 'app_admin_translation_save',
-                'path' => '/admin/translations/save',
-                'controller' => [TranslationController::class, 'translationsSave'],
-            ],
-            [
-                'name' => 'app_admin_translation_extract',
-                'path' => '/admin/translations/extract',
-                'controller' => [TranslationController::class, 'translationsExtract'],
-            ],
-            [
-                'name' => 'app_admin_translation_publish',
-                'path' => '/admin/translations/publish',
-                'controller' => [TranslationController::class, 'translationsPublish'],
+                'name' => 'app_admin_translation_delete',
+                'path' => '/admin/translation/delete',
+                'controller' => [TranslationController::class, 'translationDelete'],
+                'methods' => ['GET'],
             ],
         ];
     }
 
     public function isAccessible(): bool
     {
-        return $this->security->isGranted('ROLE_ADMIN');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return false;
+        }
+        return $user->hasUserRole(UserRole::Admin);
     }
 }

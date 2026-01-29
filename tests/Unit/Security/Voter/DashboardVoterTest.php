@@ -3,6 +3,7 @@
 namespace Tests\Unit\Security\Voter;
 
 use App\Entity\User;
+use App\Entity\UserRole;
 use App\Security\Voter\DashboardVoter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -21,7 +22,7 @@ class DashboardVoterTest extends TestCase
     {
         // Arrange: Create admin user
         $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn(['ROLE_ADMIN', 'ROLE_USER']);
+        $user->method('hasUserRole')->with(UserRole::Admin)->willReturn(true);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
@@ -37,7 +38,7 @@ class DashboardVoterTest extends TestCase
     {
         // Arrange: Create regular user without admin role
         $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn(['ROLE_USER']);
+        $user->method('hasUserRole')->with(UserRole::Admin)->willReturn(false);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
@@ -75,7 +76,7 @@ class DashboardVoterTest extends TestCase
         $voter = new DashboardVoter($groupContextService);
 
         $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn(['ROLE_USER']);
+        $user->method('hasUserRole')->with(UserRole::Admin)->willReturn(false);
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($user);

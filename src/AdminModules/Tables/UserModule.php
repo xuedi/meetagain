@@ -4,8 +4,12 @@ namespace App\AdminModules\Tables;
 
 use App\AdminModules\AdminModuleInterface;
 use App\Entity\AdminLink;
+use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use Symfony\Bundle\SecurityBundle\Security;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class UserModule implements AdminModuleInterface
 {
     public function __construct(
@@ -43,34 +47,26 @@ readonly class UserModule implements AdminModuleInterface
                 'controller' => [UserController::class, 'userList'],
             ],
             [
-                'name' => 'app_admin_user_edit',
-                'path' => '/admin/user/{id}',
-                'controller' => [UserController::class, 'userEdit'],
+                'name' => 'app_admin_user_add',
+                'path' => '/admin/user/add',
+                'controller' => [UserController::class, 'userAdd'],
                 'methods' => ['GET', 'POST'],
             ],
             [
-                'name' => 'app_admin_user_approve',
-                'path' => '/admin/user/{id}/approve',
-                'controller' => [UserController::class, 'userApprove'],
-                'methods' => ['GET'],
-            ],
-            [
-                'name' => 'app_admin_user_deny',
-                'path' => '/admin/user/{id}/deny',
-                'controller' => [UserController::class, 'userDeny'],
-                'methods' => ['GET'],
-            ],
-            [
-                'name' => 'app_admin_user_delete',
-                'path' => '/admin/user/{id}/delete',
-                'controller' => [UserController::class, 'userDelete'],
-                'methods' => ['GET'],
+                'name' => 'app_admin_user_edit',
+                'path' => '/admin/user/edit/{id}',
+                'controller' => [UserController::class, 'userEdit'],
+                'methods' => ['GET', 'POST'],
             ],
         ];
     }
 
     public function isAccessible(): bool
     {
-        return $this->security->isGranted('ROLE_ADMIN');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return false;
+        }
+        return $user->hasUserRole(UserRole::Admin);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Security\Voter;
 
 use App\Entity\User;
+use App\Entity\UserRole;
 use Override;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -15,9 +16,13 @@ class DashboardVoter extends Voter
 {
     public const ACCESS = 'DASHBOARD_ACCESS';
 
-    public function __construct(
-        private readonly ?object $groupContextService = null,
-    ) {}
+    /** @var object|null Group context service for multisite support */
+    private ?object $groupContextService;
+
+    public function __construct(?object $groupContextService = null)
+    {
+        $this->groupContextService = $groupContextService;
+    }
 
     #[Override]
     protected function supports(string $attribute, mixed $subject): bool
@@ -37,21 +42,22 @@ class DashboardVoter extends Voter
             return false;
         }
 
-        // ROLE_ADMIN always granted
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        // Admin users always get access
+        if ($user->hasUserRole(UserRole::Admin)) {
             return true;
         }
 
-        // Group owners/organizers granted if Multisite enabled
-        if ($this->groupContextService === null) {
-            return false; // Plugin not installed
+        // Group owners get access if multisite plugin is available
+        if (
+            $this->groupContextService !== null
+            && method_exists($this->groupContextService, 'getManagedGroupsForUser')
+        ) {
+            $managedGroups = $this->groupContextService->getManagedGroupsForUser($user);
+            if (!empty($managedGroups)) {
+                return true;
+            }
         }
 
-        if (!method_exists($this->groupContextService, 'getManagedGroupsForUser')) {
-            return false;
-        }
-
-        $managedGroups = $this->groupContextService->getManagedGroupsForUser($user);
-        return count($managedGroups) > 0;
+        return false;
     }
 }

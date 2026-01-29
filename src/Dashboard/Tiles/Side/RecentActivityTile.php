@@ -4,9 +4,12 @@ namespace App\Dashboard\Tiles\Side;
 
 use App\Dashboard\DashboardSideTileInterface;
 use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use App\Service\DashboardActionService;
 use App\Service\DashboardStatsService;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class RecentActivityTile implements DashboardSideTileInterface
 {
     public function __construct(
@@ -24,29 +27,23 @@ readonly class RecentActivityTile implements DashboardSideTileInterface
         return 70;
     }
 
-    public function isAccessible(User $user, ?object $group): bool
+    public function isAccessible(User $user): bool
     {
-        // Both admin and group owners see this
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            return true;
-        }
-        return $group !== null;
+        return $user->hasUserRole(UserRole::Admin);
     }
 
-    public function getData(User $user, ?object $group): array
+    public function getData(User $user): array
     {
         // Get current week stats
         $now = new \DateTime();
         $year = (int) $now->format('Y');
         $week = (int) $now->format('W');
 
-        $contextLabel = $group && method_exists($group, 'getName') ? $group->getName() : 'Platform';
-
         return [
-            'rsvpStats' => $this->statsService->getRsvpStats($year, $week, $group),
+            'rsvpStats' => $this->statsService->getRsvpStats($year, $week),
             'socialStats' => $this->statsService->getSocialNetworkStats($year, $week),
             'messageStats' => $this->actionService->getMessageStats(),
-            'contextLabel' => $contextLabel,
+            'contextLabel' => 'Platform',
         ];
     }
 

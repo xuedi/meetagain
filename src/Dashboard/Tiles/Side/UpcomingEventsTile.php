@@ -4,8 +4,11 @@ namespace App\Dashboard\Tiles\Side;
 
 use App\Dashboard\DashboardSideTileInterface;
 use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use App\Service\DashboardActionService;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class UpcomingEventsTile implements DashboardSideTileInterface
 {
     public function __construct(
@@ -22,22 +25,16 @@ readonly class UpcomingEventsTile implements DashboardSideTileInterface
         return 90;
     }
 
-    public function isAccessible(User $user, ?object $group): bool
+    public function isAccessible(User $user): bool
     {
-        // Both admin and group owners see this
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            return true;
-        }
-        return $group !== null;
+        return $user->hasUserRole(UserRole::Admin);
     }
 
-    public function getData(User $user, ?object $group): array
+    public function getData(User $user): array
     {
-        $contextLabel = $group && method_exists($group, 'getName') ? $group->getName() : 'All Events';
-
         return [
-            'upcomingEvents' => $this->actionService->getUpcomingEvents(3, $group),
-            'contextLabel' => $contextLabel,
+            'upcomingEvents' => $this->actionService->getUpcomingEvents(3),
+            'contextLabel' => 'All Events',
         ];
     }
 
