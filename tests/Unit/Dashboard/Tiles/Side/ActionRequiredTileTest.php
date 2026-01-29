@@ -4,6 +4,7 @@ namespace Tests\Unit\Dashboard\Tiles\Side;
 
 use App\Dashboard\Tiles\Side\ActionRequiredTile;
 use App\Entity\User;
+use App\Entity\UserRole;
 use App\Service\DashboardActionService;
 use PHPUnit\Framework\TestCase;
 
@@ -41,14 +42,14 @@ class ActionRequiredTileTest extends TestCase
     {
         // Arrange: Create admin user
         $adminUser = $this->createMock(User::class);
-        $adminUser->method('getRoles')->willReturn(['ROLE_ADMIN', 'ROLE_USER']);
+        $adminUser->method('hasUserRole')->with(UserRole::Admin)->willReturn(true);
 
         // Act & Assert: Admin can access
         $this->assertTrue($this->tile->isAccessible($adminUser, null), 'Admin should have access');
 
         // Arrange: Create regular user
         $regularUser = $this->createMock(User::class);
-        $regularUser->method('getRoles')->willReturn(['ROLE_USER']);
+        $regularUser->method('hasUserRole')->with(UserRole::Admin)->willReturn(false);
 
         // Act & Assert: Regular user cannot access
         $this->assertFalse($this->tile->isAccessible($regularUser, null), 'Regular user should not have access');

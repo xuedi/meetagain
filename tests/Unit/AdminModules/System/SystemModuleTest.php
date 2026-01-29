@@ -3,6 +3,8 @@
 namespace Tests\Unit\AdminModules\System;
 
 use App\AdminModules\System\SystemModule;
+use App\Entity\User;
+use App\Entity\UserRole;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -83,9 +85,12 @@ class SystemModuleTest extends TestCase
 
     public function testIsAccessibleWithAdminRole(): void
     {
-        // Arrange
+        // Arrange: Create admin user
+        $user = $this->createMock(User::class);
+        $user->method('hasUserRole')->with(UserRole::Admin)->willReturn(true);
+
         $security = $this->createMock(Security::class);
-        $security->method('isGranted')->with('ROLE_ADMIN')->willReturn(true);
+        $security->method('getUser')->willReturn($user);
 
         $module = new SystemModule($security);
 
@@ -98,9 +103,12 @@ class SystemModuleTest extends TestCase
 
     public function testIsNotAccessibleWithoutAdminRole(): void
     {
-        // Arrange
+        // Arrange: Create regular user
+        $user = $this->createMock(User::class);
+        $user->method('hasUserRole')->with(UserRole::Admin)->willReturn(false);
+
         $security = $this->createMock(Security::class);
-        $security->method('isGranted')->with('ROLE_ADMIN')->willReturn(false);
+        $security->method('getUser')->willReturn($user);
 
         $module = new SystemModule($security);
 

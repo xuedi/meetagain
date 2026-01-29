@@ -70,26 +70,16 @@ readonly class DashboardActionService
     /**
      * Upcoming events.
      */
-    public function getUpcomingEvents(int $limit = 3, ?object $group = null): array
+    public function getUpcomingEvents(int $limit = 3): array
     {
-        if ($group && method_exists($group, 'getId')) {
-            // Multisite plugin enabled - filter by group
-            // TODO: Call GroupEventService->getUpcomingEventsForGroup() if available
-            // For now, return empty (will be implemented with Multisite integration)
-            return [];
-        }
         return $this->eventRepo->getUpcomingEvents($limit);
     }
 
     /**
      * Past events without photos.
      */
-    public function getPastEventsWithoutPhotos(int $limit = 5, ?object $group = null): array
+    public function getPastEventsWithoutPhotos(int $limit = 5): array
     {
-        if ($group && method_exists($group, 'getId')) {
-            // Multisite plugin enabled - filter by group
-            return [];
-        }
         return $this->eventRepo->getPastEventsWithoutPhotos($limit);
     }
 

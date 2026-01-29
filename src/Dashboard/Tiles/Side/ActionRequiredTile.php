@@ -4,8 +4,11 @@ namespace App\Dashboard\Tiles\Side;
 
 use App\Dashboard\DashboardSideTileInterface;
 use App\Entity\User;
+use App\Entity\UserRole;
+use App\Security\Attribute\RequiresRole;
 use App\Service\DashboardActionService;
 
+#[RequiresRole(UserRole::Admin)]
 readonly class ActionRequiredTile implements DashboardSideTileInterface
 {
     public function __construct(
@@ -22,12 +25,12 @@ readonly class ActionRequiredTile implements DashboardSideTileInterface
         return 100;
     }
 
-    public function isAccessible(User $user, ?object $group): bool
+    public function isAccessible(User $user): bool
     {
-        return in_array('ROLE_ADMIN', $user->getRoles(), true);
+        return $user->hasUserRole(UserRole::Admin);
     }
 
-    public function getData(User $user, ?object $group): array
+    public function getData(User $user): array
     {
         return [
             'actionItems' => $this->actionService->getActionItems(),

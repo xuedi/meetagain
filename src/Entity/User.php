@@ -168,6 +168,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return in_array($role, $this->roles, true);
     }
 
+    /**
+     * @return list<UserRole>
+     */
+    public function getUserRoles(): array
+    {
+        return array_map(fn(string $role) => UserRole::fromRoleString($role), $this->roles);
+    }
+
+    public function hasUserRole(UserRole $role): bool
+    {
+        return in_array($role->toRoleString(), $this->roles, true);
+    }
+
+    /**
+     * @param list<UserRole> $roles
+     */
+    public function setUserRoles(array $roles): static
+    {
+        $this->roles = array_map(fn(UserRole $role) => $role->toRoleString(), $roles);
+
+        return $this;
+    }
+
     #[Override]
     public function getPassword(): ?string
     {

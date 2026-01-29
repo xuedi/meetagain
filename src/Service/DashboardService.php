@@ -17,26 +17,26 @@ readonly class DashboardService
     ) {}
 
     /** Get center tiles accessible to user, sorted by priority */
-    public function getCenterTilesForUser(User $user, ?object $group): array
+    public function getCenterTilesForUser(User $user): array
     {
-        return $this->filterAndSort($this->centerTiles, $user, $group);
+        return $this->filterAndSort($this->centerTiles, $user);
     }
 
     /** Get side tiles accessible to user, sorted by priority */
-    public function getSideTilesForUser(User $user, ?object $group): array
+    public function getSideTilesForUser(User $user): array
     {
-        return $this->filterAndSort($this->sideTiles, $user, $group);
+        return $this->filterAndSort($this->sideTiles, $user);
     }
 
     /**
      * @param iterable<DashboardCenterTileInterface|DashboardSideTileInterface> $tiles
      * @return array<DashboardCenterTileInterface|DashboardSideTileInterface>
      */
-    private function filterAndSort(iterable $tiles, User $user, ?object $group): array
+    private function filterAndSort(iterable $tiles, User $user): array
     {
         $accessible = [];
         foreach ($tiles as $tile) {
-            if ($tile->isAccessible($user, $group)) {
+            if ($tile->isAccessible($user)) {
                 $accessible[] = $tile;
             }
         }
