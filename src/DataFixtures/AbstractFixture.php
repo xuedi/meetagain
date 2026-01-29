@@ -8,6 +8,7 @@ use App\Entity\Host;
 use App\Entity\Location;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\FixtureGroupInterface;
 use Error;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -28,8 +29,12 @@ use Throwable;
  * @method Event    getRefEvent(string $name)
  * @method void     addRefEvent(string $name, Event $entity)
  */
-abstract class AbstractFixture extends Fixture
+abstract class AbstractFixture extends Fixture implements FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
     protected ?Filesystem $fs = null;
 
     public function __call($methodName, $params = null)
