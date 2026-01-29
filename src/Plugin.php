@@ -35,6 +35,13 @@ interface Plugin
     public function loadPostExtendFixtures(OutputInterface $output): void;
 
     /**
+     * Runs pre-fixture tasks before plugin fixtures are loaded.
+     * Called by app:plugin:pre-fixtures command, after base fixtures load.
+     * Use this for migration tasks that need to run before plugin fixtures.
+     */
+    public function preFixtures(OutputInterface $output): void;
+
+    /**
      * Runs post-fixture tasks after doctrine:fixtures:load completes.
      * Called by app:plugin:post-fixtures command.
      */

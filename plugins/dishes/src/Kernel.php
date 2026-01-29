@@ -35,6 +35,11 @@ readonly class Kernel implements Plugin
     {
     }
 
+    public function preFixtures(OutputInterface $output): void
+    {
+        // No pre-fixture tasks for this plugin
+    }
+
     public function postFixtures(OutputInterface $output): void
     {
         // No post-fixture tasks for this plugin
