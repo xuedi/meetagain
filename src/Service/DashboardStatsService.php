@@ -76,9 +76,14 @@ readonly class DashboardStatsService
      *
      * @return array{yes: int, no: int, total: int}
      */
-    public function getRsvpStats(int $year, int $week): array
+    public function getRsvpStats(int $year, int $week, ?object $group = null): array
     {
         $dates = $this->calculateDates($year, $week);
+
+        if ($group && method_exists($group, 'getId')) {
+            // Multisite plugin enabled - filter RSVPs to group's events
+            return ['yes' => 0, 'no' => 0, 'total' => 0]; // TODO: Implement filtering
+        }
 
         return $this->activityRepo->getRsvpStats($dates['start'], $dates['stop']);
     }
@@ -88,9 +93,14 @@ readonly class DashboardStatsService
      *
      * @return array<string, int>
      */
-    public function getLoginTrend(int $year, int $week): array
+    public function getLoginTrend(int $year, int $week, ?object $group = null): array
     {
         $dates = $this->calculateDates($year, $week);
+
+        if ($group && method_exists($group, 'getId')) {
+            // Multisite plugin enabled - filter logins to group members
+            return []; // TODO: Implement filtering
+        }
 
         return $this->activityRepo->getLoginTrend($dates['start'], $dates['stop']);
     }
