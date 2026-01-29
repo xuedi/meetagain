@@ -6,12 +6,17 @@ use App\DataFixtures\AbstractFixture;
 use App\DataFixtures\UserFixture;
 use DateTimeImmutable;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Common\DataFixtures\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Filmclub\Entity\Film;
 use Plugin\Filmclub\Entity\FilmGenre;
 
-class FilmFixture extends AbstractFixture implements DependentFixtureInterface
+class FilmFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ['plugin'];
+    }
     private const array TITLES = [
         'The Shawshank Redemption',
         'The Godfather',
