@@ -39,7 +39,7 @@ readonly class EmailModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_email',
-                'path' => '/admin/email/',
+                'path' => '/admin/email',
                 'controller' => [EmailController::class, 'list'],
             ],
             [

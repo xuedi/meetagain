@@ -80,7 +80,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
-    public function details(EntityManagerInterface $em, Request $request, ?int $id = null): Response
+    public function details(EntityManagerInterface $em, Request $request, int $id): Response
     {
         // Check if event is accessible using composite filter
         if (!$this->eventFilterService->isEventAccessible($id)) {

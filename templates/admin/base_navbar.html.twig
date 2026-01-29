@@ -1,6 +1,6 @@
 <aside class="menu">
     {% for section in get_admin_sections() %}
-        <p class="menu-label">{{ section.name }}</p>
+        <p class="menu-label">{{ section.section }}</p>
         <ul class="menu-list">
             {% for link in section.links %}
                 <li><a class="{% if active == link.active %}is-active{% endif %}" href="{{ path(link.route) }}">{{ link.label | trans }}</a></li>

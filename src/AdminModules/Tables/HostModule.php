@@ -39,7 +39,7 @@ readonly class HostModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_host',
-                'path' => '/admin/host/',
+                'path' => '/admin/host',
                 'controller' => [HostController::class, 'hostList'],
             ],
             [
