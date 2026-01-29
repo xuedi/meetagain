@@ -39,7 +39,7 @@ readonly class EventModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_event',
-                'path' => '/admin/event/',
+                'path' => '/admin/event',
                 'controller' => [EventController::class, 'eventList'],
             ],
             [

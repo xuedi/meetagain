@@ -31,11 +31,13 @@ class AdminModuleRouteLoader extends Loader
 
         foreach ($this->adminService->getAllModules() as $module) {
             foreach ($module->getRoutes() as $routeDefinition) {
+                $defaults = array_merge($routeDefinition['defaults'] ?? [], [
+                    '_controller' => $routeDefinition['controller'],
+                ]);
+
                 $route = new Route(
                     path: $routeDefinition['path'],
-                    defaults: [
-                        '_controller' => $routeDefinition['controller'],
-                    ],
+                    defaults: $defaults,
                     methods: $routeDefinition['methods'] ?? ['GET'],
                 );
 

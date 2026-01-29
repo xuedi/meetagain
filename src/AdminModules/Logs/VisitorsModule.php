@@ -39,7 +39,7 @@ readonly class VisitorsModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_visitors',
-                'path' => '/admin/visitors/',
+                'path' => '/admin/visitors',
                 'controller' => [VisitorsController::class, 'index'],
             ],
         ];

@@ -39,7 +39,7 @@ readonly class ImageModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_image',
-                'path' => '/admin/image/',
+                'path' => '/admin/image',
                 'controller' => [ImageController::class, 'imageList'],
             ],
         ];

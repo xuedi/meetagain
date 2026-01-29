@@ -39,7 +39,7 @@ readonly class CmsModule implements AdminModuleInterface
         return [
             [
                 'name' => 'app_admin_cms',
-                'path' => '/admin/cms/',
+                'path' => '/admin/cms',
                 'controller' => [CmsController::class, 'cmsList'],
             ],
             [
@@ -47,6 +47,8 @@ readonly class CmsModule implements AdminModuleInterface
                 'path' => '/admin/cms/{id}/edit/{locale}/{blockId}',
                 'controller' => [CmsController::class, 'cmsEdit'],
                 'methods' => ['GET', 'POST'],
+                'defaults' => ['locale' => null, 'blockId' => null],
+                'requirements' => ['locale' => '.+', 'blockId' => '\d+'],
             ],
             [
                 'name' => 'app_admin_cms_delete',
