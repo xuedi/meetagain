@@ -12,6 +12,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
     public const string INDEX = 'index';
     public const string PRIVACY = 'privacy';
     public const string ABOUT = 'about';
+    public const string RULES = 'rules';
     public const string IMPRINT = 'imprint';
     public const string ANNOUNCEMENT = '2026-01-new-website';
 
@@ -45,6 +46,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             [self::INDEX],
             [self::PRIVACY],
             [self::ABOUT],
+            [self::RULES],
             [self::IMPRINT],
             [self::ANNOUNCEMENT],
         ];

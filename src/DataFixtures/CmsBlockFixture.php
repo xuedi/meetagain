@@ -252,6 +252,96 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 ],
                 'group-cn.jpg',
             ],
+            // ========== Rules Page ==========
+            [
+                CmsFixture::RULES,
+                LanguageFixture::ENGLISH,
+                CmsBlockTypes::Headline,
+                [
+                    'title' => 'Game Rules',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::ENGLISH,
+                CmsBlockTypes::Text,
+                [
+                    'title' => 'Introduction to Go',
+                    'content' => 'Go (Weiqi in Chinese, Baduk in Korean) is an ancient board game for two players that originated in China over 2,500 years ago. The game is played on a 19×19 grid, though beginners often start with smaller 9×9 or 13×13 boards.',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::ENGLISH,
+                CmsBlockTypes::Text,
+                [
+                    'title' => 'Basic Rules',
+                    'content' => '1. Players alternate placing stones on empty intersections\n2. Stones are captured when surrounded (no liberties)\n3. The game ends when both players pass\n4. Winner is determined by controlled territory plus captures\n\nFor detailed rules and strategy guides, join our beginner workshops!',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::GERMAN,
+                CmsBlockTypes::Headline,
+                [
+                    'title' => 'Spielregeln',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::GERMAN,
+                CmsBlockTypes::Text,
+                [
+                    'title' => 'Einführung in Go',
+                    'content' => 'Go (Weiqi auf Chinesisch, Baduk auf Koreanisch) ist ein altes Brettspiel für zwei Spieler, das vor über 2.500 Jahren in China entstand. Das Spiel wird auf einem 19×19-Gitter gespielt, obwohl Anfänger oft mit kleineren 9×9- oder 13×13-Brettern beginnen.',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::GERMAN,
+                CmsBlockTypes::Text,
+                [
+                    'title' => 'Grundregeln',
+                    'content' => '1. Spieler platzieren abwechselnd Steine auf leeren Schnittpunkten\n2. Steine werden gefangen, wenn sie umzingelt sind (keine Freiheiten)\n3. Das Spiel endet, wenn beide Spieler passen\n4. Der Gewinner wird durch kontrolliertes Gebiet plus Gefangene bestimmt\n\nFür detaillierte Regeln und Strategieanleitungen besuchen Sie unsere Anfänger-Workshops!',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::CHINESE,
+                CmsBlockTypes::Headline,
+                [
+                    'title' => '游戏规则',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::CHINESE,
+                CmsBlockTypes::Text,
+                [
+                    'title' => '围棋简介',
+                    'content' => '围棋（中文称围棋，韩文称바둑）是一种起源于中国2500多年前的古老双人棋盘游戏。游戏在19×19的棋盘上进行，虽然初学者通常从较小的9×9或13×13棋盘开始。',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::CHINESE,
+                CmsBlockTypes::Text,
+                [
+                    'title' => '基本规则',
+                    'content' => '1. 玩家轮流在空交叉点上放置棋子\n2. 当棋子被包围时（无气）会被吃掉\n3. 当双方都选择弃权时游戏结束\n4. 赢家由控制的地盘加上吃掉的棋子数决定\n\n详细规则和策略指南，请参加我们的初学者工作坊！',
+                ],
+                null,
+            ],
+
+            // ========== Announcement Page ==========
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::ENGLISH,
