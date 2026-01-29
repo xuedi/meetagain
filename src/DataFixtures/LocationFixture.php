@@ -9,12 +9,12 @@ use Doctrine\Persistence\ObjectManager;
 
 class LocationFixture extends AbstractFixture implements DependentFixtureInterface
 {
-    public const string CAFE_LINDENHOF = 'Cafe Lindenhof';
-    public const string KAFFEE_WERK = 'Kaffeewerk Mitte';
-    public const string SPREE_BLICK = 'Spreeblick Cafe';
+    public const string WEIQI_CAFE = 'Weiqi Cafe Berlin';
+    public const string COMMUNITY_CENTER = 'Community Center Mitte';
+    public const string OSTBAHNHOF_STUDY = 'Ostbahnhof Study Room';
     public const string GRUNEWALD_CAMPING = 'Grunewald Camping';
-    public const string ICC_BERLIN = 'ICC Berlin';
-    public const string AIRPORT_BER = 'BER Flughafen';
+    public const string ONLINE_PLATFORM = 'Online Platform';
+    public const string VOLKSPARK_FRIEDRICHSHAIN = 'Volkspark Friedrichshain';
 
     public function load(ObjectManager $manager): void
     {
@@ -50,12 +50,60 @@ class LocationFixture extends AbstractFixture implements DependentFixtureInterfa
     private function getData(): array
     {
         return [
-            [self::KAFFEE_WERK, 'Invalidenstraße 100', 'Berlin', '10115', '', '52.5321', '13.3799'],
-            [self::CAFE_LINDENHOF, 'Lindenstraße 45', 'Berlin', '10969', '', '52.5035', '13.4052'],
-            [self::SPREE_BLICK, 'Friedrichstraße 210a', 'Berlin', '10117', '', '52.5106', '13.3880'],
-            [self::GRUNEWALD_CAMPING, 'Im Gruenen 3', 'Berlin', '10137', '', '52.44934', '13.1687'],
-            [self::ICC_BERLIN, 'Messedamm 22', 'Berlin', '14055', '', '52.5070', '13.2729'],
-            [self::AIRPORT_BER, 'Willy-Brandt-Platz', 'Schönefeld', '12529', '', '52.3667', '13.5033'],
+            [
+                self::WEIQI_CAFE,
+                'Brunnenstraße 181',
+                'Berlin',
+                '10119',
+                'Dedicated Go cafe with 10 traditional goban tables and a cozy atmosphere. Perfect for casual games and study sessions.',
+                '52.5321',
+                '13.3799',
+            ],
+            [
+                self::COMMUNITY_CENTER,
+                'Invalidenstraße 50',
+                'Berlin',
+                '10115',
+                'Large community center with spacious hall, projector, and seating for 100 people. Ideal for tournaments and lectures.',
+                '52.5035',
+                '13.4052',
+            ],
+            [
+                self::OSTBAHNHOF_STUDY,
+                'Koppenstraße 3',
+                'Berlin',
+                '10243',
+                'Small meeting room near Ostbahnhof station. Quiet space for focused study groups, capacity 12 people.',
+                '52.5106',
+                '13.3880',
+            ],
+            [
+                self::GRUNEWALD_CAMPING,
+                'Am Grunewaldsee 1',
+                'Berlin',
+                '14193',
+                'Nature retreat location in Grunewald forest. Perfect for weekend intensive training sessions away from the city.',
+                '52.4693',
+                '13.2687',
+            ],
+            [
+                self::ONLINE_PLATFORM,
+                '',
+                '',
+                '',
+                'Online Go Server (OGS) - Virtual location for remote events and teaching games.',
+                '0',
+                '0',
+            ],
+            [
+                self::VOLKSPARK_FRIEDRICHSHAIN,
+                'Friedenstraße',
+                'Berlin',
+                '10249',
+                'Beautiful outdoor park location for summer Go sessions. Bring your own boards and enjoy nature!',
+                '52.5267',
+                '13.4333',
+            ],
         ];
     }
 }
