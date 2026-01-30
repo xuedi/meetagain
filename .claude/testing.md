@@ -298,7 +298,7 @@ public function testCreateEventWithValidData(): void
 
 This project uses a custom `AbstractFixture` with type-safe magic methods for managing references.
 
-**Pattern:**
+**Quick Example:**
 ```php
 use App\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -334,44 +334,26 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
 }
 ```
 
-**How the custom reference system works:**
+**For comprehensive fixture system documentation, see:**
+- [Architecture - Fixture System](architecture.md#fixture-system-architecture)
+  - Reference system internals (`__call()` implementation)
+  - Plugin fixture extension (AbstractPluginFixture)
+  - Fixture groups & loading order
+  - Dependency trees for base and plugin fixtures
+  - Migration script integration
+  - Best practices and known issues
 
+**Quick Reference - Available Methods:**
 ```php
-// AbstractFixture provides magic methods:
+// Magic methods (via __call):
 $user = $this->getRefUser('john_doe');      // Get User by name
 $this->addRefUser('jane_doe', $userEntity); // Store User reference
+// Also: getRefHost, getRefLocation, getRefCms, getRefEvent
 
-$event = $this->getRefEvent('meetup');      // Get Event by name
-$this->addRefEvent('meetup', $eventEntity); // Store Event reference
-```
-
-**Benefits:**
-- Type-safe (PHPDoc hints for PHPStan)
-- No constant keys needed
-- Cleaner syntax: `getRefUser('name')` vs `getReference(UserFixture::USER_1)`
-- Auto-generates internal keys: `UserFixture::md5($name)`
-
-**Available magic methods:**
-```php
-// Defined in AbstractFixture PHPDoc:
-getRefUser(string $name): User
-addRefUser(string $name, User $entity): void
-getRefHost(string $name): Host
-addRefHost(string $name, Host $entity): void
-getRefLocation(string $name): Location
-addRefLocation(string $name, Location $entity): void
-getRefCms(string $name): Cms
-addRefCms(string $name, Cms $entity): void
-getRefEvent(string $name): Event
-addRefEvent(string $name, Event $entity): void
-```
-
-**Helper methods:**
-```php
-$this->start();  // Prints "Creating FixtureName ..."
-$this->stop();   // Prints " OK\n"
-
-$text = $this->getText('filename'); // Reads from DataFixtures/FixtureName/filename.txt
+// Helper methods:
+$this->start();                      // Progress: "Creating FixtureName ..."
+$this->stop();                       // Progress: " OK\n"
+$text = $this->getText('filename');  // Read DataFixtures/FixtureName/filename.txt
 ```
 
 ---

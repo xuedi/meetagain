@@ -359,7 +359,439 @@ class EventFixture extends AbstractFixture
 - PHPDoc hints for PHPStan
 - Helper methods: `start()`, `stop()`, `getText()`
 
-See [testing.md](testing.md#custom-abstractfixture) for detailed usage.
+See [Fixture System Architecture](#fixture-system-architecture) below for comprehensive details.
+
+---
+
+## Fixture System Architecture
+
+### Overview
+
+The application uses a sophisticated fixture system for development and testing data. It features:
+- **Custom reference system** with type-safe magic methods
+- **Fixture groups** for staged loading (install → base → plugin)
+- **Plugin fixture inheritance** for extended entity support
+- **Migration integration** for multisite data transformation
+
+### Inheritance Hierarchy
+
+```
+Doctrine\Common\DataFixtures\AbstractFixture (vendor)
+       ↓ extends
+Doctrine\Bundle\FixturesBundle\Fixture (vendor)
+       ↓ extends
+App\DataFixtures\AbstractFixture (project)
+       ↓ extends (for plugins)
+Plugin\MultiSite\DataFixtures\AbstractPluginFixture (plugin)
+```
+
+**Key Files:**
+- `/src/DataFixtures/AbstractFixture.php` - Base class for core fixtures
+- `/plugins/multisite/src/DataFixtures/AbstractPluginFixture.php` - Extended for plugin entities
+
+---
+
+### Custom Reference System
+
+The project implements a type-safe reference system using PHP's `__call()` magic method.
+
+#### How It Works
+
+**Core AbstractFixture `__call()` implementation:**
+
+```php
+public function __call($methodName, $params = null)
+{
+    // 1. Validate method prefix (getRef* or addRef*)
+    if (!in_array(substr((string) $methodName, 0, 6), ['getRef', 'addRef'])) {
+        throw new Error('Call to undefined method');
+    }
+
+    // 2. Extract entity name and build class
+    $entityName = substr((string) $methodName, 6);  // getRefUser -> User
+    $entityClass = sprintf('App\\Entity\\%s', $entityName);
+
+    // 3. Generate reference key: EntityFixture::md5(name)
+    $key = sprintf('%s::%s', $entityName . 'Fixture', md5((string) ($params[0] ?? '')));
+
+    // 4. Delegate to Doctrine's reference system
+    if (str_starts_with($methodName, 'getRef')) {
+        return $this->getReference($key, $entityClass);
+    } else {
+        $this->addReference($key, $params[1]);
+    }
+}
+```
+
+**Reference Key Format:**
+```
+{EntityName}Fixture::{md5(name)}
+Example: "UserFixture::098f6bcd4621d373cade4e832627b4f6" for "John Doe"
+```
+
+**Benefits:**
+- ✅ Type-safe calls: `getRefUser('name')` returns `User`
+- ✅ PHPStan support via `@method` annotations
+- ✅ No manual key management
+- ✅ Cross-fixture references work automatically
+- ✅ Consistent key format enables sharing between base and plugin fixtures
+
+**Available Magic Methods (Base):**
+```php
+@method User getRefUser(string $name)
+@method void addRefUser(string $name, User $entity)
+@method Host getRefHost(string $name)
+@method void addRefHost(string $name, Host $entity)
+@method Location getRefLocation(string $name)
+@method void addRefLocation(string $name, Location $entity)
+@method Cms getRefCms(string $name)
+@method void addRefCms(string $name, Cms $entity)
+@method Event getRefEvent(string $name)
+@method void addRefEvent(string $name, Event $entity)
+```
+
+---
+
+### Plugin Fixture Extension
+
+**AbstractPluginFixture** overrides `__call()` to support plugin-specific entities.
+
+**Why the override is necessary:**
+
+The base `AbstractFixture` only checks `App\Entity\*` namespace. Plugin fixtures need to:
+1. Check `Plugin\MultiSite\Entity\*` first (for plugin entities)
+2. Fall back to `App\Entity\*` (for core entities)
+
+**AbstractPluginFixture `__call()` implementation:**
+
+```php
+public function __call($methodName, $params = null)
+{
+    // Same validation as base
+
+    $entityName = substr((string) $methodName, 6);
+
+    // ✅ KEY DIFFERENCE: Check plugin namespace first
+    $pluginEntityClass = sprintf('Plugin\\MultiSite\\Entity\\%s', $entityName);
+    $coreEntityClass = sprintf('App\\Entity\\%s', $entityName);
+
+    if (class_exists($pluginEntityClass)) {
+        $entityClass = $pluginEntityClass;
+    } elseif (class_exists($coreEntityClass)) {
+        $entityClass = $coreEntityClass;
+    } else {
+        throw new RuntimeException('Class not found in plugin or core');
+    }
+
+    // Same key generation and delegation as base
+}
+```
+
+**Additional Magic Methods (Plugin):**
+```php
+@method Group getRefGroup(string $name)
+@method void addRefGroup(string $name, Group $entity)
+@method GroupMember getRefGroupMember(string $name)
+@method void addRefGroupMember(string $name, GroupMember $entity)
+@method GroupInvitation getRefGroupInvitation(string $name)
+@method void addRefGroupInvitation(string $name, GroupInvitation $entity)
+```
+
+**Example - Plugin fixture using both core and plugin entities:**
+```php
+class GroupEventFixture extends AbstractPluginFixture
+{
+    public function load(ObjectManager $manager): void
+    {
+        // ✅ Plugin entity (checks Plugin\MultiSite\Entity\Group first)
+        $group = $this->getRefGroup('Berlin Tech Meetup');
+
+        // ✅ Core entities (falls back to App\Entity\*)
+        $user = $this->getRefUser('john_doe');
+        $location = $this->getRefLocation('office');
+
+        $event = new Event();
+        $event->setUser($user);
+        $event->setLocation($location);
+        // ... map to group via service
+    }
+}
+```
+
+---
+
+### Fixture Groups & Loading Order
+
+Fixtures are organized into groups for staged loading:
+
+| Group | Purpose | Loaded By |
+|-------|---------|-----------|
+| `install` | System users, config, languages, email templates | `--group=install` |
+| `base` | Core dev data (users, events, locations, CMS, etc.) | `--group=base` |
+| `plugin` | Plugin-specific dev data (groups, members, etc.) | `--group=plugin --append` |
+
+**Loading Sequence (`just devModeFixtures`):**
+
+```bash
+# 1. Reset database
+doctrine:database:drop --force
+doctrine:database:create
+doctrine:migrations:migrate --no-interaction
+
+# 2. Load base fixtures
+doctrine:fixtures:load --group=install        # System users first
+doctrine:fixtures:load --append --group=base   # Core dev data
+
+# 3. Run plugin migrations
+app:plugin:pre-fixtures  # Executes multisite:migrate-to-multi-tenant
+
+# 4. Load plugin fixtures
+doctrine:fixtures:load --append --group=plugin
+app:plugin:post-fixtures
+```
+
+**Key Points:**
+- `--append` flag preserves references from previous groups
+- Migration runs BETWEEN base and plugin fixtures
+- Plugin fixtures can access all base fixture references
+
+---
+
+### Base Fixture Dependency Tree
+
+**Install Group (System Foundation):**
+```
+SystemUserFixture (provides: import, cron users)
+    ↓
+├─ LanguageFixture (depends: SystemUserFixture)
+├─ ConfigFixture (depends: SystemUserFixture)
+└─ EmailTemplateFixture (depends: LanguageFixture)
+```
+
+**Base Group (Development Data):**
+```
+UserFixture (provides: 150+ users)
+    ↓
+├─ LocationFixture ─┐
+├─ HostFixture ─────┼─→ EventFixture (provides: events)
+├─ CmsFixture ──────┤
+│                   │
+├─ ActivityFixture  │
+├─ MessageFixture   │
+│                   │
+└─ CmsBlockFixture ─┴─→ MenuFixture
+```
+
+**Execution Order (topologically sorted):**
+```
+1. SystemUserFixture        (install)
+2. LanguageFixture          (install)
+3. ConfigFixture            (install)
+4. EmailTemplateFixture     (install)
+5. UserFixture              (base)
+6. LocationFixture          (base)
+7. HostFixture              (base)
+8. CmsFixture               (base)
+9. ActivityFixture          (base)
+10. MessageFixture          (base)
+11. EventFixture            (base)
+12. CmsBlockFixture         (base)
+13. MenuFixture             (base)
+```
+
+---
+
+### Plugin Fixture Dependency Tree
+
+**MultiSite Plugin:**
+```
+GroupFixture (provides: 4 demo groups)
+    ↓
+├─ GroupMemberFixture ──────┐
+├─ GroupInvitationFixture ──┤
+├─ GroupEventFixture ────────┤  (Level 1: needs Group + core refs)
+├─ GroupCmsFixture ──────────┤
+└─ MessageFixture ───────────┤
+                             ↓
+                  ┌──────────┴──────────┐
+                  │                     │
+      GroupCmsBlockFixture    GroupMenuFixture      (Level 2)
+      GroupCmsSettingsFixture
+```
+
+**Execution Order:**
+```
+1. GroupFixture
+2. GroupMemberFixture, GroupInvitationFixture, GroupEventFixture (parallel)
+3. GroupCmsFixture, MessageFixture (parallel)
+4. GroupCmsBlockFixture, GroupMenuFixture, GroupCmsSettingsFixture (parallel)
+```
+
+**Cross-Reference Example:**
+```php
+// GroupCmsSettingsFixture references BOTH plugin and base entities
+$group = $this->getRefGroup('Berlin Tech Meetup');  // Plugin entity
+$cms = $this->getRefCms('about');                   // Base entity (created before migration)
+```
+
+---
+
+### Migration Script Integration
+
+The `multisite:migrate-to-multi-tenant` command runs between base and plugin fixtures.
+
+**What it does:**
+1. Creates 2 initial groups:
+   - "Main Site" (platform, domain = NULL)
+   - "Weiqi Club" (migrated single-tenant data, domain = weiqi.meetagain.local)
+2. Adds ALL base users as members to BOTH groups (~150 users × 2)
+3. Maps ALL base entities to "Weiqi Club":
+   - Events (`multisite_group_event`)
+   - Locations (`multisite_group_location`)
+   - CMS pages (`multisite_group_cms`)
+   - Announcements (`multisite_group_announcement`)
+
+**Triggered by:**
+```php
+// Plugin\MultiSite\Kernel::preFixtures()
+public function preFixtures(): void
+{
+    $this->application->find('multisite:migrate-to-multi-tenant')->run($input, $output);
+}
+```
+
+**Important Notes:**
+- Migration groups ≠ Fixture groups
+- Migration creates "existing data" groups (Main Site, Weiqi Club)
+- Fixtures create "demo data" groups (Berlin Tech Meetup, etc.)
+- Both can coexist - migration for single→multi tenant, fixtures for demos
+
+**Data Integrity:**
+- Migration only CREATES new entities (groups, mappings)
+- Does NOT modify or delete base fixture data
+- Plugin fixtures can safely reference all base entities
+- Base entities remain unchanged in core tables
+
+**GroupFixture handles migration gracefully:**
+```php
+// Check if group already exists (e.g., from migration command)
+$existingGroup = $manager->getRepository(Group::class)->findOneBy(['name' => $data['name']]);
+if ($existingGroup !== null) {
+    // Update fields if needed, store reference
+    $this->addRefGroup($data['name'], $existingGroup);
+    continue;  // Skip creation
+}
+```
+
+---
+
+### Helper Methods
+
+**AbstractFixture provides:**
+
+```php
+// Progress output
+$this->start();  // Prints "Creating FixtureName ..."
+$this->stop();   // Prints " OK\n"
+
+// Load text content from companion files
+$content = $this->getText('description');
+// Reads from: src/DataFixtures/EventFixture/description.txt
+
+// Get fixture group
+public function getGroups(): array {
+    return ['base'];  // Override for custom groups
+}
+```
+
+**Example with text files:**
+```
+src/DataFixtures/
+├── EventFixture.php
+└── EventFixture/
+    ├── weekly_description.txt
+    └── tournament_description.txt
+```
+
+```php
+class EventFixture extends AbstractFixture
+{
+    public function load(ObjectManager $manager): void
+    {
+        $event = new Event();
+        $event->setDescription($this->getText('weekly_description'));
+        // Reads from EventFixture/weekly_description.txt
+    }
+}
+```
+
+---
+
+### Best Practices
+
+**Do's:**
+- ✅ Use `getDependencies()` to declare fixture dependencies
+- ✅ Use constants for reference names: `const ADMIN = 'admin';`
+- ✅ Call `start()` / `stop()` for progress output
+- ✅ Organize large text content in companion `.txt` files
+- ✅ Use `addRef*()` to store references for other fixtures
+- ✅ Check if entity exists before creating (for migration compatibility)
+
+**Don'ts:**
+- ❌ Don't hardcode entity IDs (IDs are auto-generated)
+- ❌ Don't create circular dependencies
+- ❌ Don't reference entities from later fixtures (use `getDependencies()`)
+- ❌ Don't assume fixture load order without declaring dependencies
+- ❌ Don't modify entities from other fixtures (immutable references)
+
+**Example - Proper fixture structure:**
+```php
+class EventFixture extends AbstractFixture implements DependentFixtureInterface
+{
+    public const string WEEKLY_MEETUP = 'Weekly Go Study';
+
+    public function load(ObjectManager $manager): void
+    {
+        $this->start();
+
+        $event = new Event();
+        $event->setTitle(self::WEEKLY_MEETUP);
+        $event->setUser($this->getRefUser(UserFixture::ADMIN));
+        $event->setLocation($this->getRefLocation(LocationFixture::OFFICE));
+
+        $manager->persist($event);
+        $this->addRefEvent(self::WEEKLY_MEETUP, $event);
+
+        $manager->flush();
+        $this->stop();
+    }
+
+    public function getDependencies(): array
+    {
+        return [UserFixture::class, LocationFixture::class];
+    }
+
+    public function getGroups(): array
+    {
+        return ['base'];  // Loaded with --group=base
+    }
+}
+```
+
+---
+
+### Known Issues & Future Improvements
+
+**Current Issues:**
+1. Some base fixtures reference `SystemUserFixture::IMPORT` but don't declare it as dependency
+2. DependentFixtureInterface declarations don't always match actual reference usage
+3. No smoke tests for fixture instantiation (syntax errors only caught at runtime)
+
+**Future Improvements:**
+1. **Fixture validation** - Static analysis to verify reference providers exist
+2. **Dependency graph visualization** - Auto-generate dependency diagrams
+3. **Fixture isolation testing** - Load each fixture independently to catch missing dependencies
+4. **Reference type validation** - Verify reference types match entity expectations at compile time
 
 ---
 
