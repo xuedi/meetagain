@@ -97,7 +97,7 @@ devModeFixtures plugins='no':
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=base
     {{PHP}} php bin/console app:plugin:pre-fixtures
-    @if [ "{{plugins}}" != "no" ]; then {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=plugin; fi
+    {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=plugin
     {{PHP}} php bin/console app:plugin:post-fixtures
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
