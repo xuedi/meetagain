@@ -193,4 +193,9 @@ class MessageFixture extends AbstractFixture implements DependentFixtureInterfac
             ],
         ];
     }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
 }

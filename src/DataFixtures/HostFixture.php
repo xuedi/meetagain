@@ -48,4 +48,9 @@ class HostFixture extends AbstractFixture implements DependentFixtureInterface
             [self::MOLLIE, UserFixture::MOLLIE_HALL],
         ];
     }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
 }
