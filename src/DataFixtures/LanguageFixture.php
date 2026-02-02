@@ -58,7 +58,7 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
     public function getDependencies(): array
     {
         return [
-            UserFixture::class,
+            SystemUserFixture::class,
         ];
     }
 
