@@ -122,6 +122,8 @@ readonly class ImageService
                 $imagick = new Imagick();
                 $imagick->readImage($thumbnail);
                 $imagick->rotateImage(new ImagickPixel('white'), 90);
+                // Use lossless WebP encoding for rotation to avoid generation loss
+                $imagick->setOption('webp:lossless', 'true');
                 $imagick->writeImage($thumbnail);
                 $image->setUpdatedAt(new DateTimeImmutable());
                 $this->entityManager->persist($image);
