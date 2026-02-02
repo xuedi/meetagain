@@ -3,15 +3,14 @@
 namespace App\Command;
 
 use App\Service\PluginService;
-use JsonException;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'app:plugin', description: 'List, enable, or disable plugins')]
+#[AsCommand(name: 'app:plugin', description: 'Enable or disable plugins')]
 class PluginCommand extends Command
 {
     public function __construct(
@@ -23,202 +22,82 @@ class PluginCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this
-            ->addOption('mode', 'm', InputOption::VALUE_REQUIRED, 'Mode: plugin-key (enable), all, none, or no')
-            ->addOption('disable', 'd', InputOption::VALUE_NONE, 'Disable mode (applies to plugin-key)')
-            ->addOption('list', 'l', InputOption::VALUE_NONE, 'List all available plugins (default if no mode given)');
+        $this->addArgument('action', InputArgument::OPTIONAL, 'Action: enable or disable')->addArgument(
+            'plugin',
+            InputArgument::OPTIONAL,
+            'Plugin key or "all"',
+        );
     }
 
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $mode = $input->getOption('mode');
-        $disable = $input->getOption('disable');
+        $action = $input->getArgument('action');
+        $plugin = $input->getArgument('plugin');
 
-        // List plugins (default)
-        if (!$mode && !$disable) {
-            return $this->listPlugins($output);
-        }
-
-        // Enable all plugins
-        if ($mode === 'all') {
-            return $this->enableAllPlugins($output);
-        }
-
-        // Disable all plugins (support both 'none' and 'no')
-        if ($mode === 'none' || $mode === 'no') {
-            return $this->disableAllPlugins($output);
-        }
-
-        // Plugin key provided
-        if ($mode) {
-            if ($disable) {
-                return $this->disablePlugins($output, $mode);
-            }
-
-            return $this->enablePlugins($output, $mode);
-        }
-
-        $output->writeln('Invalid mode or option combination.');
-        return Command::FAILURE;
-    }
-
-    private function listPlugins(OutputInterface $output): int
-    {
-        $plugins = $this->getPluginsWithKeys();
-
-        if (empty($plugins)) {
-            $output->writeln('No plugins found in plugins/ directory.');
-
+        // No arguments - do nothing
+        if ($action === null) {
             return Command::SUCCESS;
         }
 
-        $output->writeln('Available Plugins:');
-        $output->writeln('');
-
-        foreach ($plugins as $plugin) {
-            $status = $plugin['enabled'] ? 'Enabled' : ($plugin['installed'] ? 'Installed' : 'Available');
-
-            $output->writeln(sprintf(
-                '  %s - %s (%s) [%s]',
-                $plugin['key'],
-                $plugin['name'],
-                $plugin['version'],
-                $status,
-            ));
-            if ($plugin['description']) {
-                $output->writeln(sprintf('    %s', $plugin['description']));
-            }
+        // Validate action
+        if ($action !== 'enable' && $action !== 'disable') {
+            return Command::FAILURE;
         }
 
-        $output->writeln('');
-        $output->writeln('Commands:');
-        $output->writeln('  Enable:  php bin/console app:plugin --mode=<plugin-key>');
-        $output->writeln('  Disable: php bin/console app:plugin --mode=<plugin-key> --disable');
+        // No plugin argument - do nothing (enable/disable zero plugins)
+        if ($plugin === null || $plugin === '') {
+            return Command::SUCCESS;
+        }
+
+        // Route to appropriate method
+        if ($action === 'enable') {
+            return $this->enablePlugins($plugin);
+        }
+
+        return $this->disablePlugins($plugin);
+    }
+
+    private function enablePlugins(string $plugin): int
+    {
+        if ($plugin === 'all') {
+            return $this->enableAllPlugins();
+        }
+
+        $this->pluginService->install($plugin);
+        $this->pluginService->enable($plugin);
 
         return Command::SUCCESS;
     }
 
-    private function enablePlugins(OutputInterface $output, string $pluginKeys): int
+    private function disablePlugins(string $plugin): int
     {
-        $keys = array_map('trim', explode(',', $pluginKeys));
-        $plugins = $this->getPluginsWithKeys();
-        $availableKeys = array_column($plugins, 'key');
-
-        $enabled = [];
-        $notFound = [];
-
-        foreach ($keys as $key) {
-            if (!in_array($key, $availableKeys, true)) {
-                $notFound[] = $key;
-                continue;
-            }
-
-            // First install if not already installed
-            if (!$this->pluginService->isInstalled($key)) {
-                $this->pluginService->install($key);
-            }
-
-            $this->pluginService->enable($key);
-            $enabled[] = $key;
+        if ($plugin === 'all') {
+            return $this->disableAllPlugins();
         }
 
-        if (!empty($notFound)) {
-            $output->writeln(sprintf('Plugin(s) not found: %s', implode(', ', $notFound)));
-            $output->writeln('Run php bin/console app:plugin --list to see available plugins.');
-        }
-
-        if (!empty($enabled)) {
-            $output->writeln(sprintf('Enabled plugin(s): %s', implode(', ', $enabled)));
-            $output->writeln('Plugin configuration updated in config/plugins.php');
-        }
-
-        return empty($notFound) ? Command::SUCCESS : Command::FAILURE;
-    }
-
-    private function disablePlugins(OutputInterface $output, string $pluginKeys): int
-    {
-        $keys = array_map('trim', explode(',', $pluginKeys));
-        $plugins = $this->getPluginsWithKeys();
-        $availableKeys = array_column($plugins, 'key');
-
-        $disabled = [];
-        $notFound = [];
-
-        foreach ($keys as $key) {
-            if (!in_array($key, $availableKeys, true)) {
-                $notFound[] = $key;
-                continue;
-            }
-
-            $this->pluginService->disable($key);
-            $disabled[] = $key;
-        }
-
-        if (!empty($notFound)) {
-            $output->writeln(sprintf('Plugin(s) not found: %s', implode(', ', $notFound)));
-            $output->writeln('Run php bin/console app:plugin --list to see available plugins.');
-        }
-
-        if (!empty($disabled)) {
-            $output->writeln(sprintf('Disabled plugin(s): %s', implode(', ', $disabled)));
-            $output->writeln('Plugin configuration updated in config/plugins.php');
-        }
-
-        return empty($notFound) ? Command::SUCCESS : Command::FAILURE;
-    }
-
-    private function enableAllPlugins(OutputInterface $output): int
-    {
-        $plugins = $this->getPluginsWithKeys();
-        $enabled = [];
-
-        foreach ($plugins as $plugin) {
-            $key = $plugin['key'];
-
-            // First install if not already installed
-            if (!$this->pluginService->isInstalled($key)) {
-                $this->pluginService->install($key);
-            }
-
-            $this->pluginService->enable($key);
-            $enabled[] = $key;
-        }
-
-        if (empty($enabled)) {
-            $output->writeln('No plugins found to enable.');
-            return Command::SUCCESS;
-        }
-
-        $output->writeln(sprintf('Enabled all plugins: %s', implode(', ', $enabled)));
-        $output->writeln('Plugin configuration updated in config/plugins.php');
+        $this->pluginService->disable($plugin);
 
         return Command::SUCCESS;
     }
 
-    private function disableAllPlugins(OutputInterface $output): int
+    private function enableAllPlugins(): int
     {
-        $config = [];
-        $this->pluginService->setPluginConfig($config);
+        $pluginKeys = $this->getAvailablePluginKeys();
 
-        $output->writeln('Disabled all plugins (cleared plugin configuration).');
-        $output->writeln('Plugin configuration cleared in config/plugins.php');
+        foreach ($pluginKeys as $key) {
+            $this->pluginService->install($key);
+            $this->pluginService->enable($key);
+        }
 
         return Command::SUCCESS;
     }
 
     /**
-     * Get plugins with their directory keys included.
-     *
-     * @return array<int, array{key: string, name: string, version: string, description: string, installed: bool, enabled: bool}>
+     * @return array<int, string>
      */
-    private function getPluginsWithKeys(): array
+    private function getAvailablePluginKeys(): array
     {
-        $adminList = $this->pluginService->getAdminList();
-        $pluginsWithKeys = [];
-
-        // We need to re-scan the plugin directory to get the keys (directory names)
-        // because getAdminList() doesn't include them
         $pluginDir = dirname(__DIR__, 2) . '/plugins';
         if (!is_dir($pluginDir)) {
             return [];
@@ -229,47 +108,23 @@ class PluginCommand extends Command
             return [];
         }
 
+        $keys = [];
         foreach ($directories as $dir) {
             $key = basename($dir);
             $manifestFile = $dir . '/manifest.json';
 
-            if (!file_exists($manifestFile)) {
-                continue;
+            if (file_exists($manifestFile)) {
+                $keys[] = $key;
             }
-
-            $manifestContent = file_get_contents($manifestFile);
-            if ($manifestContent === false) {
-                continue;
-            }
-
-            try {
-                $manifestData = json_decode($manifestContent, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                continue;
-            }
-
-            // Find matching entry from admin list to get installed/enabled status
-            $installed = false;
-            $enabled = false;
-            foreach ($adminList as $plugin) {
-                // Match by name from manifest
-                if ($plugin['name'] === ($manifestData['name'] ?? $key)) {
-                    $installed = $plugin['installed'];
-                    $enabled = $plugin['enabled'];
-                    break;
-                }
-            }
-
-            $pluginsWithKeys[] = [
-                'key' => $key,
-                'name' => $manifestData['name'] ?? $key,
-                'version' => $manifestData['version'] ?? '0.0.0',
-                'description' => $manifestData['description'] ?? '',
-                'installed' => $installed,
-                'enabled' => $enabled,
-            ];
         }
 
-        return $pluginsWithKeys;
+        return $keys;
+    }
+
+    private function disableAllPlugins(): int
+    {
+        $this->pluginService->setPluginConfig([]);
+
+        return Command::SUCCESS;
     }
 }
