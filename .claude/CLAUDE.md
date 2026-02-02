@@ -24,6 +24,13 @@ just test               # Run all tests + checks
 - Use Haiku agent for running tests
 - See [architecture.md](architecture.md) for layer dependencies
 
+**Plugin Documentation:**
+
+- **IMPORTANT:** When working with plugins, ALWAYS check plugin-specific guidelines
+- Each plugin has its own `CLAUDE.md` file (e.g., `plugins/dishes/CLAUDE.md`)
+- Core code must not contain plugin-specific documentation or dependencies
+- Read both core AND plugin guidelines before making changes
+
 ---
 
 ## Environment

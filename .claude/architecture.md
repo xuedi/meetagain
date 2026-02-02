@@ -33,18 +33,6 @@ MeetAgain is a **Symfony 8.0 / PHP 8.4** event management system with a plugin a
 - 4 content filter systems
 - 20+ unit test suites
 
-### MultiSite Plugin
-- 73 PHP files in plugins/multisite/src/
-- 12 entities (including 5 junction tables)
-- 14 services (including 4 filter implementations)
-- 10 repositories
-- 6 controllers
-- 4 security voters
-- 3 event subscribers
-- 11 unit tests
-- 3 database migrations
-
----
 
 ## Content Filter System Architecture ⭐
 
@@ -371,7 +359,7 @@ The application uses a sophisticated fixture system for development and testing 
 - **Custom reference system** with type-safe magic methods
 - **Fixture groups** for staged loading (install → base → plugin)
 - **Plugin fixture inheritance** for extended entity support
-- **Migration integration** for multisite data transformation
+- **Pre/post-fixture hooks** for plugin setup and data transformation
 
 ### Inheritance Hierarchy
 
@@ -542,8 +530,8 @@ doctrine:migrations:migrate --no-interaction
 doctrine:fixtures:load --group=install        # System users first
 doctrine:fixtures:load --append --group=base   # Core dev data
 
-# 3. Run plugin migrations
-app:plugin:pre-fixtures  # Executes multisite:migrate-to-multi-tenant
+# 3. Run plugin pre-fixture hooks
+app:plugin:pre-fixtures  # Plugins can run setup commands before plugin fixtures
 
 # 4. Load plugin fixtures
 doctrine:fixtures:load --append --group=plugin
@@ -603,87 +591,6 @@ UserFixture (provides: 150+ users)
 
 ### Plugin Fixture Dependency Tree
 
-**MultiSite Plugin:**
-```
-GroupFixture (provides: 4 demo groups)
-    ↓
-├─ GroupMemberFixture ──────┐
-├─ GroupInvitationFixture ──┤
-├─ GroupEventFixture ────────┤  (Level 1: needs Group + core refs)
-├─ GroupCmsFixture ──────────┤
-└─ MessageFixture ───────────┤
-                             ↓
-                  ┌──────────┴──────────┐
-                  │                     │
-      GroupCmsBlockFixture    GroupMenuFixture      (Level 2)
-      GroupCmsSettingsFixture
-```
-
-**Execution Order:**
-```
-1. GroupFixture
-2. GroupMemberFixture, GroupInvitationFixture, GroupEventFixture (parallel)
-3. GroupCmsFixture, MessageFixture (parallel)
-4. GroupCmsBlockFixture, GroupMenuFixture, GroupCmsSettingsFixture (parallel)
-```
-
-**Cross-Reference Example:**
-```php
-// GroupCmsSettingsFixture references BOTH plugin and base entities
-$group = $this->getRefGroup('Berlin Tech Meetup');  // Plugin entity
-$cms = $this->getRefCms('about');                   // Base entity (created before migration)
-```
-
----
-
-### Migration Script Integration
-
-The `multisite:migrate-to-multi-tenant` command runs between base and plugin fixtures.
-
-**What it does:**
-1. Creates 2 initial groups:
-   - "Main Site" (platform, domain = NULL)
-   - "Weiqi Club" (migrated single-tenant data, domain = weiqi.meetagain.local)
-2. Adds ALL base users as members to BOTH groups (~150 users × 2)
-3. Maps ALL base entities to "Weiqi Club":
-   - Events (`multisite_group_event`)
-   - Locations (`multisite_group_location`)
-   - CMS pages (`multisite_group_cms`)
-   - Announcements (`multisite_group_announcement`)
-
-**Triggered by:**
-```php
-// Plugin\MultiSite\Kernel::preFixtures()
-public function preFixtures(): void
-{
-    $this->application->find('multisite:migrate-to-multi-tenant')->run($input, $output);
-}
-```
-
-**Important Notes:**
-- Migration groups ≠ Fixture groups
-- Migration creates "existing data" groups (Main Site, Weiqi Club)
-- Fixtures create "demo data" groups (Berlin Tech Meetup, etc.)
-- Both can coexist - migration for single→multi tenant, fixtures for demos
-
-**Data Integrity:**
-- Migration only CREATES new entities (groups, mappings)
-- Does NOT modify or delete base fixture data
-- Plugin fixtures can safely reference all base entities
-- Base entities remain unchanged in core tables
-
-**GroupFixture handles migration gracefully:**
-```php
-// Check if group already exists (e.g., from migration command)
-$existingGroup = $manager->getRepository(Group::class)->findOneBy(['name' => $data['name']]);
-if ($existingGroup !== null) {
-    // Update fields if needed, store reference
-    $this->addRefGroup($data['name'], $existingGroup);
-    continue;  // Skip creation
-}
-```
-
----
 
 ### Helper Methods
 
@@ -965,10 +872,8 @@ return array_merge($groupIds, $platformIds);
 - Easy content management (just don't map it)
 - Consistent behavior across filter types
 
-**Examples in MultiSite Plugin:**
-- `GroupCmsMappingRepository::getPlatformCmsIds()` - Unmapped CMS pages
-- `GroupMenuMappingRepository::getPlatformMenuIds()` - Unmapped menus
-- `GroupEventMappingRepository::getPlatformEventIds()` - Unmapped events
+**Implementation Note:**
+See plugin documentation for specific implementations (e.g., `plugins/multisite/CLAUDE.md`).
 
 ---
 
@@ -985,22 +890,18 @@ return array_merge($groupIds, $platformIds);
 **Structure:**
 ```php
 #[ORM\Entity]
-#[ORM\Table(name: 'multisite_group_event')]
-class GroupEventMapping {
-    #[ORM\ManyToOne(targetEntity: Group::class)]
-    private ?Group $group = null;
+#[ORM\Table(name: 'plugin_entity_mapping')]
+class PluginEntityMapping {
+    #[ORM\ManyToOne(targetEntity: PluginEntity::class)]
+    private ?PluginEntity $pluginEntity = null;
 
-    #[ORM\Column(name: 'event_id', type: 'integer')]  // NOT a FK!
-    private ?int $eventId = null;
+    #[ORM\Column(name: 'core_entity_id', type: 'integer')]  // NOT a FK!
+    private ?int $coreEntityId = null;
 }
 ```
 
-**Junction Tables in MultiSite Plugin:**
-- `multisite_group_event` - Maps events
-- `multisite_group_cms` - Maps CMS pages
-- `multisite_group_menu` - Maps menus (NEW 2026-01-26)
-- `multisite_group_location` - Maps locations
-- `multisite_group_announcement` - Maps announcements
+**Example Use Case:**
+Plugins that need to associate their entities with core entities can use junction tables to maintain clean separation. See plugin documentation for specific implementations.
 
 **Query Pattern:**
 ```php
