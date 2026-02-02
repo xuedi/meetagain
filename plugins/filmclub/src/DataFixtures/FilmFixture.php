@@ -3,15 +3,14 @@
 namespace Plugin\Filmclub\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
-use App\DataFixtures\UserFixture;
+use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Filmclub\Entity\Film;
 use Plugin\Filmclub\Entity\FilmGenre;
 
-class FilmFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
+class FilmFixture extends AbstractFixture implements FixtureGroupInterface
 {
     public static function getGroups(): array
     {
@@ -72,16 +71,23 @@ class FilmFixture extends AbstractFixture implements DependentFixtureInterface, 
     ];
 
     public function __construct(
-        private readonly UserFixture $userFixture,
+        private readonly UserRepository $userRepository,
     ) {}
 
     public function load(ObjectManager $manager): void
     {
-        $this->start();
+        echo 'Creating films ... ';
+
+        // Get all users from database
+        $users = $this->userRepository->findAll();
+        if (empty($users)) {
+            echo 'SKIP (no users found)' . PHP_EOL;
+            return;
+        }
+
         $titles = self::TITLES;
         shuffle($titles);
         $titles = array_slice($titles, 0, 30);
-        $usernames = $this->userFixture->getUsernames();
 
         foreach ($titles as $title) {
             $film = new Film();
@@ -94,19 +100,14 @@ class FilmFixture extends AbstractFixture implements DependentFixtureInterface, 
             $selectedGenres = array_slice($genres, 0, rand(1, 3));
             $film->setGenres($selectedGenres);
 
-            $randomUser = $usernames[array_rand($usernames)];
-            $film->setCreatedBy($this->getRefUser($randomUser)->getId());
+            $randomUser = $users[array_rand($users)];
+            $film->setCreatedBy($randomUser->getId());
             $film->setCreatedAt(new DateTimeImmutable(sprintf('-%d days', rand(1, 100))));
 
             $manager->persist($film);
         }
 
         $manager->flush();
-        $this->stop();
-    }
-
-    public function getDependencies(): array
-    {
-        return [];
+        echo 'OK' . PHP_EOL;
     }
 }

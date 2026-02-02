@@ -3,31 +3,35 @@
 namespace Plugin\Dishes\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
-use App\DataFixtures\SystemUserFixture;
-use App\DataFixtures\UserFixture;
 use App\Entity\ImageType;
+use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Entity\DishTranslation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class DishFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
+class DishFixture extends AbstractFixture implements FixtureGroupInterface
 {
     public function __construct(
         private readonly ImageService $imageService,
+        private readonly UserRepository $userRepository,
     ) {}
 
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
+        $importUser = $this->userRepository->findOneBy(['email' => 'import@example.com']);
+        if (!$importUser instanceof User) {
+            echo 'Creating dishes ... SKIP (import user not found)' . PHP_EOL;
+            return;
+        }
 
         echo 'Creating dishes ... ';
-        foreach ($this->getData() as [$imagePreview, $translations]) {
+        foreach ($this->getData() as [$imageFile, $translations]) {
             $dish = new Dish();
             $dish->setOriginLang('cn');
             $dish->setApproved(true);
@@ -46,25 +50,19 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface, Depe
                 $dish->addTranslation($translation);
             }
 
-            // upload file & thumbnails
-            $imageFile = __DIR__ . "/dishes/$imagePreview";
-            $uploadedImage = new UploadedFile($imageFile, $imagePreview);
-            $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginDishPreview);
-            $this->imageService->createThumbnails($image);
-
-            // associate image with a user
-            $dish->setPreviewImage($image);
+            // upload file & thumbnails if exists
+            $imagePath = __DIR__ . "/dishes/$imageFile";
+            if (file_exists($imagePath)) {
+                $uploadedImage = new UploadedFile($imagePath, $imageFile);
+                $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginDishPreview);
+                $this->imageService->createThumbnails($image);
+                $dish->setPreviewImage($image);
+            }
 
             $manager->persist($dish);
         }
         $manager->flush();
         echo 'OK' . PHP_EOL;
-    }
-
-    #[\Override]
-    public function getDependencies(): array
-    {
-        return [];
     }
 
     private function getData(): array
@@ -74,19 +72,19 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface, Depe
                 '1.jpg',
                 [
                     'cn' => [
-                        'name' => '炒饼',
-                        'phonetic' => 'Chǎo bǐng',
-                        'description' => 'Description cn',
+                        'name' => '麻婆豆腐',
+                        'phonetic' => 'má po tofu',
+                        'description' => 'Spicy tofu in chili and bean-based sauce. Originated in Chengdu.',
                     ],
                     'en' => [
-                        'name' => 'Stir-fried pancakes',
+                        'name' => 'Mapo Tofu',
                         'phonetic' => null,
-                        'description' => 'Description en',
+                        'description' => 'Spicy tofu in chili and bean-based sauce.',
                     ],
                     'de' => [
-                        'name' => 'Gebratener Fladen',
+                        'name' => 'Mapo Tofu',
                         'phonetic' => null,
-                        'description' => 'Description de',
+                        'description' => 'Würziger Tofu in Chili- und Bohnensauce.',
                     ],
                 ],
             ],
@@ -94,19 +92,19 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface, Depe
                 '2.jpg',
                 [
                     'cn' => [
-                        'name' => '麻婆豆腐',
-                        'phonetic' => 'Má pó dòufu',
-                        'description' => 'Description cn',
+                        'name' => '宫保鸡丁',
+                        'phonetic' => 'gōng bǎo jī dīng',
+                        'description' => 'Diced chicken stir-fried with vegetables, peanuts, dried chilis and soy sauce.',
                     ],
                     'en' => [
-                        'name' => 'Mapo tofu',
+                        'name' => 'Kung Pao Chicken',
                         'phonetic' => null,
-                        'description' => 'Description en',
+                        'description' => 'Diced chicken stir-fried with peanuts and chilis.',
                     ],
                     'de' => [
-                        'name' => 'Mapo-Tofu',
+                        'name' => 'Kung Pao Hühnchen',
                         'phonetic' => null,
-                        'description' => 'Description de',
+                        'description' => 'Gehacktes Hähnchen mit Erdnüssen und Chilis angebraten.',
                     ],
                 ],
             ],
@@ -114,19 +112,19 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface, Depe
                 '3.jpg',
                 [
                     'cn' => [
-                        'name' => '宫保鸡丁',
-                        'phonetic' => 'Gōng bǎo jī dīng',
-                        'description' => 'Description cn',
+                        'name' => '红烧肉',
+                        'phonetic' => 'hóng shāo ròu',
+                        'description' => 'Braised pork belly in soy sauce, a classic Chinese comfort food.',
                     ],
                     'en' => [
-                        'name' => 'Kung Pao Chicken',
+                        'name' => 'Braised Pork Belly',
                         'phonetic' => null,
-                        'description' => 'Description en',
+                        'description' => 'Tender pork belly braised in soy sauce.',
                     ],
                     'de' => [
-                        'name' => 'Kung Pao Hühnchen',
+                        'name' => 'Geschmorter Schweinebauch',
                         'phonetic' => null,
-                        'description' => 'Description de',
+                        'description' => 'Zarter Schweinebauch geschmort in Sojasauce.',
                     ],
                 ],
             ],
