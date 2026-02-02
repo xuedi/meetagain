@@ -385,4 +385,9 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
 
         return $date->modify('-2 month')->modify('first wednesday')->setTime(18, 00);
     }
+
+    public static function getGroups(): array
+    {
+        return ['tempOffline'];
+    }
 }

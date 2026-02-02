@@ -48,7 +48,8 @@
       "Bash(if grep -q \"getGroups.*plugin\" \"$file\")",
       "Bash(then)",
       "Bash(fi)",
-      "Bash(docker-compose:*)"
+      "Bash(docker-compose:*)",
+      "Bash(find:*)"
     ]
   }
 }

@@ -139,4 +139,9 @@ class ActivityFixture extends AbstractFixture implements DependentFixtureInterfa
             ],
         ];
     }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
 }

@@ -51,4 +51,9 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             [self::ANNOUNCEMENT],
         ];
     }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
 }

@@ -5342,4 +5342,9 @@ class UserFixture extends AbstractFixture
 
         return $data[array_rand($data, 1)];
     }
+
+    public static function getGroups(): array
+    {
+        return ['base'];
+    }
 }
