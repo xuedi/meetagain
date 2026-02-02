@@ -40,3 +40,8 @@ services:
             - '../src/DataFixtures/AbstractFixture.php'
         tags:
             - { name: 'doctrine.fixture.orm.class' }
+
+    App\Service\FixturesLoaderInterface:
+        class: App\Service\SymfonyFixturesLoaderAdapter
+        arguments:
+            - '@doctrine.fixtures.loader'
