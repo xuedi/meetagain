@@ -150,7 +150,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->select('u, i') // forces to fet all columns from user and image table
             ->leftJoin('u.image', 'i') // Assuming 'image' is the property name
             ->where('u.status = :status')
+            ->andWhere('u.public = :public')
             ->setParameter('status', UserStatus::Active)
+            ->setParameter('public', true)
             ->orderBy('u.createdAt', 'ASC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -204,8 +206,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.status = :status')
+            ->andWhere('u.public = :public')
             ->andwhere('u.id <> 1')
-            ->setParameter('status', UserStatus::Active);
+            ->setParameter('status', UserStatus::Active)
+            ->setParameter('public', true);
 
         if ($excludeIds !== []) {
             $qb->andWhere('u.id NOT IN (:excludeIds)')->setParameter('excludeIds', $excludeIds);
