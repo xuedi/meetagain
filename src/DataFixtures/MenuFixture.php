@@ -206,6 +206,6 @@ class MenuFixture extends AbstractFixture implements DependentFixtureInterface
 
     public static function getGroups(): array
     {
-        return ['tempOffline'];
+        return ['base'];
     }
 }
