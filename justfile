@@ -83,7 +83,6 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -q
 
-# Reset dev with fixtures (plugins: 'no', 'all' or plugin name like 'dishes')
 [group('development')]
 devModeFixtures plugins='no':
     {{JUST}} dockerStop
@@ -96,9 +95,8 @@ devModeFixtures plugins='no':
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
-    {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=base
     {{PHP}} php bin/console app:plugin:pre-fixtures
-    {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=plugin
+    @if [ "{{plugins}}" != "no" ]; then {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=plugin; fi
     {{PHP}} php bin/console app:plugin:post-fixtures
     {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
     {{PHP}} php bin/console app:event:extent
