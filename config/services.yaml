@@ -33,3 +33,10 @@ services:
     App\Routing\AdminModuleRouteLoader:
         tags:
             - { name: 'routing.loader' }
+
+    App\DataFixtures\:
+        resource: '../src/DataFixtures/'
+        exclude:
+            - '../src/DataFixtures/AbstractFixture.php'
+        tags:
+            - { name: 'doctrine.fixture.orm.class' }
