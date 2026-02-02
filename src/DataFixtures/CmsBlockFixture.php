@@ -20,7 +20,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
     {
         $this->start();
         $priority = 1; // it is OK to increase the priority of the blocks
-        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
+        $importUser = $this->getRefUser(UserFixture::ADMIN);
         foreach ($this->getData() as [$page, $lang, $type, $json, $imageName]) {
             $block = new CmsBlock();
             $block->setPage($this->getRefCms($page));

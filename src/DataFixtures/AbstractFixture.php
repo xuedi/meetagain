@@ -8,7 +8,7 @@ use App\Entity\Host;
 use App\Entity\Location;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\FixtureGroupInterface;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Error;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
