@@ -135,6 +135,6 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface, Depe
 
     public static function getGroups(): array
     {
-        return ['Dishes'];
+        return ['plugin'];
     }
 }

@@ -2,14 +2,14 @@
 
 namespace Plugin\Glossary\DataFixtures;
 
+use App\DataFixtures\AbstractFixture;
 use DateTimeImmutable;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\Glossary;
 
-class GlossaryFixture extends Fixture implements FixtureGroupInterface
+class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
 {
     #[\Override]
     public function load(ObjectManager $manager): void
@@ -71,6 +71,6 @@ class GlossaryFixture extends Fixture implements FixtureGroupInterface
 
     public static function getGroups(): array
     {
-        return ['Glossary'];
+        return ['plugin'];
     }
 }

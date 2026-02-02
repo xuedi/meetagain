@@ -95,7 +95,8 @@ devModeFixtures plugins='no':
     {{PHP}} php bin/console app:plugin --mode={{plugins}}
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
-    {{PHP}} php bin/console doctrine:fixtures:load -q --group=base
+    {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
+    {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=base
     {{PHP}} php bin/console app:plugin:pre-fixtures
     {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=plugin
     {{PHP}} php bin/console app:plugin:post-fixtures
