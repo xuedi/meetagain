@@ -659,6 +659,6 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface, 
 
     public static function getGroups(): array
     {
-        return ['Bookclub'];
+        return ['plugin'];
     }
 }

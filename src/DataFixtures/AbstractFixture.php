@@ -35,6 +35,7 @@ abstract class AbstractFixture extends Fixture implements FixtureGroupInterface
     {
         return ['base'];
     }
+
     protected ?Filesystem $fs = null;
 
     public function __call($methodName, $params = null)

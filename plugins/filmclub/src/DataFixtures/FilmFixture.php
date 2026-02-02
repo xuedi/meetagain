@@ -17,6 +17,7 @@ class FilmFixture extends AbstractFixture implements DependentFixtureInterface, 
     {
         return ['plugin'];
     }
+
     private const array TITLES = [
         'The Shawshank Redemption',
         'The Godfather',
