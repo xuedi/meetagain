@@ -81,18 +81,20 @@ appClearCache:
 # Run migrations
 [group('app')]
 appMigrate:
-    {{PHP}} php bin/console doctrine:migrations:migrate -q
+    {{PHP}} php bin/console doctrine:migrations:migrate -n -q
 
 [group('development')]
-devModeFixtures plugins='no':
+devModeFixtures plugins='':
     {{JUST}} dockerStop
     {{JUST}} devResetConfigs
     cp .env.dist .env
     touch installed.lock
     {{JUST}} dockerStart
     {{JUST}} do "composer install"
-    {{PHP}} php bin/console app:plugin --mode={{plugins}}
+    {{PHP}} php bin/console app:plugin disable all
+    {{PHP}} php bin/console app:plugin enable {{plugins}}
     {{JUST}} devResetDatabase
+    {{PHP}} php bin/console cache:clear
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=base
@@ -133,18 +135,18 @@ devResetDatabase:
 # List available plugins with their manifest information
 [group('plugins')]
 plugin-list:
-    {{PHP}} php bin/console app:plugin --list
+    {{PHP}} php bin/console app:plugin:list
 
 # Enable a specific plugin without affecting others
 [group('plugins')]
 plugin-enable name:
-    {{PHP}} php bin/console app:plugin --mode={{name}}
+    {{PHP}} php bin/console app:plugin enable {{name}}
     {{PHP}} php bin/console cache:clear
 
 # Disable a specific plugin without affecting others
 [group('plugins')]
 plugin-disable name:
-    {{PHP}} php bin/console app:plugin --mode={{name}} --disable
+    {{PHP}} php bin/console app:plugin disable {{name}}
     {{PHP}} php bin/console cache:clear
 
 # Run all tests and checks
