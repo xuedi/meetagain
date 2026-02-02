@@ -28,9 +28,26 @@ class AdminModuleRouteLoader extends Loader
         }
 
         $routes = new RouteCollection();
+        $routeNames = []; // Track route names for conflict detection
 
         foreach ($this->adminService->getAllModules() as $module) {
             foreach ($module->getRoutes() as $routeDefinition) {
+                $routeName = $routeDefinition['name'];
+
+                // Conflict detection
+                if (isset($routeNames[$routeName])) {
+                    throw new \RuntimeException(sprintf(
+                        "Route name conflict: '%s'\n"
+                        . "  First defined by: %s\n"
+                        . "  Duplicate in: %s\n\n"
+                        . 'Each AdminModuleInterface must define unique route names.',
+                        $routeName,
+                        $routeNames[$routeName],
+                        get_class($module),
+                    ));
+                }
+                $routeNames[$routeName] = get_class($module);
+
                 $defaults = array_merge($routeDefinition['defaults'] ?? [], [
                     '_controller' => $routeDefinition['controller'],
                 ]);
@@ -41,7 +58,7 @@ class AdminModuleRouteLoader extends Loader
                     methods: $routeDefinition['methods'] ?? ['GET'],
                 );
 
-                $routes->add($routeDefinition['name'], $route);
+                $routes->add($routeName, $route);
             }
         }
 
