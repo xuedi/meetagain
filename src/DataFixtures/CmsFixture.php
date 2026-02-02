@@ -23,7 +23,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             $cms = new Cms();
             $cms->setSlug($slug);
             $cms->setCreatedAt(new DateTimeImmutable());
-            $cms->setCreatedBy($this->getRefUser(SystemUserFixture::IMPORT));
+            $cms->setCreatedBy($this->getRefUser(UserFixture::ADMIN));
             $cms->setPublished(true);
 
             $manager->persist($cms);
