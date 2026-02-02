@@ -3,14 +3,12 @@
 namespace Plugin\Bookclub\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
-use App\DataFixtures\SystemUserFixture;
-use App\DataFixtures\UserFixture;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Bookclub\Entity\Book;
 use Plugin\Bookclub\Entity\BookNote;
@@ -21,10 +19,11 @@ use Plugin\Bookclub\Entity\PollStatus;
 use Plugin\Bookclub\Entity\SuggestionStatus;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class BookclubFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
+class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
 {
     public function __construct(
         private readonly ImageService $imageService,
+        private readonly UserRepository $userRepository,
     ) {}
 
     #[\Override]
@@ -32,7 +31,12 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface, 
     {
         echo 'Creating bookclub data ... ';
 
-        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
+        $importUser = $this->userRepository->findOneBy(['email' => 'import@example.com']);
+        if (!$importUser instanceof User) {
+            echo 'SKIP (import user not found)' . PHP_EOL;
+            return;
+        }
+
         $books = $this->createBooks($manager, $importUser);
         $this->createClosedPollWithVotes($manager, $books);
         $this->createPendingSuggestions($manager, $books);
@@ -40,12 +44,6 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface, 
 
         $manager->flush();
         echo 'OK' . PHP_EOL;
-    }
-
-    #[\Override]
-    public function getDependencies(): array
-    {
-        return [];
     }
 
     /**
