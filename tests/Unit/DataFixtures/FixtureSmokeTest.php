@@ -15,6 +15,7 @@ use App\DataFixtures\MenuFixture;
 use App\DataFixtures\MessageFixture;
 use App\DataFixtures\SystemUserFixture;
 use App\DataFixtures\UserFixture;
+use App\Repository\UserRepository;
 use App\Service\EmailTemplateService;
 use App\Service\ImageService;
 use App\Service\LanguageService;
@@ -284,9 +285,10 @@ class FixtureSmokeTest extends TestCase
     {
         // Arrange
         $imageService = $this->createMock(ImageService::class);
+        $userRepository = $this->createMock(UserRepository::class);
 
         // Act
-        $fixture = new DishFixture($imageService);
+        $fixture = new DishFixture($imageService, $userRepository);
 
         // Assert
         $this->assertInstanceOf(DishFixture::class, $fixture);
@@ -296,9 +298,10 @@ class FixtureSmokeTest extends TestCase
     {
         // Arrange
         $imageService = $this->createMock(ImageService::class);
+        $userRepository = $this->createMock(UserRepository::class);
 
         // Act
-        $fixture = new BookclubFixture($imageService);
+        $fixture = new BookclubFixture($imageService, $userRepository);
 
         // Assert
         $this->assertInstanceOf(BookclubFixture::class, $fixture);
@@ -307,10 +310,10 @@ class FixtureSmokeTest extends TestCase
     public function testFilmFixtureCanInstantiate(): void
     {
         // Arrange
-        $userFixture = $this->createMock(\App\DataFixtures\UserFixture::class);
+        $userRepository = $this->createMock(UserRepository::class);
 
         // Act
-        $fixture = new FilmFixture($userFixture);
+        $fixture = new FilmFixture($userRepository);
 
         // Assert
         $this->assertInstanceOf(FilmFixture::class, $fixture);
