@@ -36,6 +36,24 @@ just test               # Run all tests + checks
 
 ---
 
+## Git Workflow
+
+**IMPORTANT: NEVER create git commits yourself**
+
+- **NEVER** run `git commit`, `git add`, or any other git commands that create commits
+- **ALWAYS** ask the user to commit changes themselves
+- After completing work, remind the user to review and commit the changes
+- You may run `git status` or `git diff` to check the current state if needed
+- Exception: You MAY use git commands when the user explicitly asks you to create a commit (e.g., "commit these changes" or "/commit")
+
+**Pattern:**
+1. Complete the implementation
+2. Run `just fixMago` and verify tests pass
+3. Tell the user: "The implementation is complete. Please review the changes and commit when ready."
+4. Do NOT create commits automatically
+
+---
+
 ## Commands Reference
 
 ### Development
