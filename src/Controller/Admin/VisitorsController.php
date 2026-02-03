@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\Logs;
+namespace App\Controller\Admin;
 
 use App\Entity\UserStatus;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -15,6 +16,7 @@ class VisitorsController extends AbstractController
         private readonly UserRepository $userRepo,
     ) {}
 
+    #[Route('/admin/visitors', name: 'app_admin_visitors')]
     public function index(): Response
     {
         $users = $this->userRepo->findBy([], ['createdAt' => 'desc']);

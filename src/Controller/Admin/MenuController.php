@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\Cms;
+namespace App\Controller\Admin;
 
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -34,6 +35,7 @@ class MenuController extends AbstractController
         private readonly CmsRepository $cmsRepo,
     ) {}
 
+    #[Route('/admin/menu', name: 'app_admin_menu')]
     public function menuList(Request $request, ?int $edit = null): Response
     {
         $menu = $edit !== null ? $this->repo->find($edit) : new Menu();
@@ -88,16 +90,30 @@ class MenuController extends AbstractController
         ]);
     }
 
-    public function menuUp(int $id): Response
+    #[Route('/admin/menu/add', name: 'app_admin_menu_add', methods: ['POST'])]
+    public function menuAdd(Request $request): Response
     {
-        $this->adjustPriority($id, -1.5);
+        return $this->menuList($request);
+    }
+
+    #[Route('/admin/menu/edit/{id}', name: 'app_admin_menu_edit', methods: ['POST'])]
+    public function menuEdit(Request $request, int $id): Response
+    {
+        return $this->menuList($request, $id);
+    }
+
+    #[Route('/admin/menu/up', name: 'app_admin_menu_up', methods: ['GET'])]
+    public function menuUp(Request $request): Response
+    {
+        $this->adjustPriority((int) $request->query->get('id'), -1.5);
 
         return $this->redirectToRoute('app_admin_menu');
     }
 
-    public function menuDown(int $id): Response
+    #[Route('/admin/menu/down', name: 'app_admin_menu_down', methods: ['GET'])]
+    public function menuDown(Request $request): Response
     {
-        $this->adjustPriority($id, 1.5);
+        $this->adjustPriority((int) $request->query->get('id'), 1.5);
 
         return $this->redirectToRoute('app_admin_menu');
     }
@@ -112,8 +128,10 @@ class MenuController extends AbstractController
         return new MenuTranslation();
     }
 
-    public function menuDelete(int $id): Response
+    #[Route('/admin/menu/delete', name: 'app_admin_menu_delete', methods: ['GET'])]
+    public function menuDelete(Request $request): Response
     {
+        $id = (int) $request->query->get('id');
         $menu = $this->repo->findOneBy(['id' => $id]);
         if ($menu !== null) {
             $translations = $this->menuTransRepo->findBy(['menu' => $menu->getId()]);

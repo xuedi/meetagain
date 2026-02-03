@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\Tables;
+namespace App\Controller\Admin;
 
 use App\Entity\Host;
 use App\Form\HostType;
@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -18,6 +19,7 @@ class HostController extends AbstractController
         private readonly HostRepository $repo,
     ) {}
 
+    #[Route('/admin/host', name: 'app_admin_host')]
     public function hostList(): Response
     {
         return $this->render('admin_modules/tables/host_list.html.twig', [
@@ -26,6 +28,7 @@ class HostController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/host/edit/{id}', name: 'app_admin_host_edit', methods: ['GET', 'POST'])]
     public function hostEdit(Request $request, Host $host, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(HostType::class, $host);
@@ -44,6 +47,7 @@ class HostController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/host/add', name: 'app_admin_host_add', methods: ['GET', 'POST'])]
     public function hostAdd(Request $request, EntityManagerInterface $entityManager): Response
     {
         $host = new Host();

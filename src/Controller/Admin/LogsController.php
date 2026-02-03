@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\Logs;
+namespace App\Controller\Admin;
 
 use App\Entity\ValueObjects\LogEntry;
 use App\Repository\NotFoundLogRepository;
 use App\Service\ActivityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -17,6 +18,7 @@ class LogsController extends AbstractController
         private readonly NotFoundLogRepository $foundLogRepo,
     ) {}
 
+    #[Route('/admin/logs/activity', name: 'app_admin_activity_log')]
     public function activityList(): Response
     {
         return $this->render('admin_modules/logs/logs_activity_list.html.twig', [
@@ -25,6 +27,7 @@ class LogsController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/logs/system', name: 'app_admin_system_log')]
     public function systemLogs(int $id = 0): Response
     {
         return $this->render('admin_modules/logs/logs_system_list.html.twig', [
@@ -33,6 +36,7 @@ class LogsController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/logs/404', name: 'app_admin_not_found_log')]
     public function notFoundLogs(): Response
     {
         return $this->render('admin_modules/logs/logs_notFound_list.html.twig', [

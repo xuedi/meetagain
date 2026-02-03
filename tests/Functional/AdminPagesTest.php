@@ -69,7 +69,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/event/');
+        $client->request('GET', '/en/admin/event');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -82,7 +82,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/user/');
+        $client->request('GET', '/en/admin/user');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -95,7 +95,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/location/');
+        $client->request('GET', '/en/admin/location');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -108,7 +108,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/host/');
+        $client->request('GET', '/en/admin/host');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -121,7 +121,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/language/');
+        $client->request('GET', '/en/admin/language');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -134,7 +134,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/image/');
+        $client->request('GET', '/en/admin/image');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -147,7 +147,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/cms/');
+        $client->request('GET', '/en/admin/cms');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -199,7 +199,7 @@ class AdminPagesTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/visitors/');
+        $client->request('GET', '/en/admin/visitors');
 
         // Assert
         $this->assertResponseIsSuccessful();
