@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\Tables;
+namespace App\Controller\Admin;
 
 use App\Entity\Event;
 use App\Entity\EventTranslation;
@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -32,6 +33,7 @@ class EventController extends AbstractController
         private readonly EventRepository $repo,
     ) {}
 
+    #[Route('/admin/event', name: 'app_admin_event')]
     public function eventList(): Response
     {
         return $this->render('admin_modules/tables/event_list.html.twig', [
@@ -41,6 +43,7 @@ class EventController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/event/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function eventEdit(Request $request, Event $event): Response
     {
         $form = $this->createForm(EventType::class, $event);
@@ -99,12 +102,14 @@ class EventController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/event/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
     public function eventDelete(): Response
     {
         dump('delete');
         exit();
     }
 
+    #[Route('/admin/event/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
     public function eventCancel(Event $event): Response
     {
         $rsvpCount = $event->getRsvp()->count();
@@ -116,6 +121,7 @@ class EventController extends AbstractController
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
 
+    #[Route('/admin/event/{id}/uncancel', name: 'app_admin_event_uncancel', methods: ['POST'])]
     public function eventUncancel(Event $event): Response
     {
         $this->eventService->uncancelEvent($event);
@@ -133,6 +139,7 @@ class EventController extends AbstractController
         return new EventTranslation();
     }
 
+    #[Route('/admin/event/add', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
     public function eventAdd(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\System;
+namespace App\Controller\Admin;
 
 use App\Entity\Image;
 use App\Entity\ImageType;
@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -28,6 +29,7 @@ class LanguageController extends AbstractController
         private readonly ImageService $imageService,
     ) {}
 
+    #[Route('/admin/language', name: 'app_admin_language')]
     public function list(): Response
     {
         return $this->render('admin_modules/system/language_list.html.twig', [
@@ -36,6 +38,7 @@ class LanguageController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/language/add', name: 'app_admin_language_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
         $language = new Language();
@@ -63,6 +66,7 @@ class LanguageController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/language/{id}/edit', name: 'app_admin_language_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Language $language): Response
     {
         $form = $this->createForm(LanguageType::class, $language, ['is_edit' => true]);
@@ -88,6 +92,7 @@ class LanguageController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/language/{id}/toggle', name: 'app_admin_language_toggle', methods: ['POST'])]
     public function toggle(Language $language): Response
     {
         $language->setEnabled(!$language->isEnabled());
