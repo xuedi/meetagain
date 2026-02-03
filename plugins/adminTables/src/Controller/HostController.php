@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace Plugin\AdminTables\Controller;
 
 use App\Entity\Host;
-use App\Form\HostType;
 use App\Repository\HostRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Plugin\AdminTables\Form\HostType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +22,7 @@ class HostController extends AbstractController
     #[Route('/admin/host', name: 'app_admin_host')]
     public function hostList(): Response
     {
-        return $this->render('admin_modules/tables/host_list.html.twig', [
+        return $this->render('@AdminTables/tables/host_list.html.twig', [
             'active' => 'host',
             'hosts' => $this->repo->findAll(),
         ]);
@@ -40,7 +40,7 @@ class HostController extends AbstractController
             return $this->redirectToRoute('app_admin_host');
         }
 
-        return $this->render('admin_modules/tables/host_edit.html.twig', [
+        return $this->render('@AdminTables/tables/host_edit.html.twig', [
             'active' => 'host',
             'host' => $host,
             'form' => $form,
@@ -61,7 +61,7 @@ class HostController extends AbstractController
             return $this->redirectToRoute('app_admin_host');
         }
 
-        return $this->render('admin_modules/tables/host_new.html.twig', [
+        return $this->render('@AdminTables/tables/host_new.html.twig', [
             'active' => 'host',
             'form' => $form,
         ]);
