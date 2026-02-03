@@ -24,11 +24,7 @@ final class AdminNavigationServiceTest extends TestCase
     public function testGetSidebarSectionsReturnsStaticSectionsOnly(): void
     {
         // Arrange - no extensions
-        $service = new AdminNavigationService(
-            $this->security,
-            [],
-            __DIR__ . '/../../..',
-        );
+        $service = new AdminNavigationService($this->security, [], __DIR__ . '/../../..');
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -56,21 +52,14 @@ final class AdminNavigationServiceTest extends TestCase
             public function getAdminSections(): array
             {
                 return [
-                    new AdminSection(
-                        section: 'Test Plugin',
-                        links: [
-                            new AdminLink('Test Link', 'test_route', 'test'),
-                        ],
-                    ),
+                    new AdminSection(section: 'Test Plugin', links: [
+                        new AdminLink('Test Link', 'test_route', 'test'),
+                    ]),
                 ];
             }
         };
 
-        $service = new AdminNavigationService(
-            $this->security,
-            [$mockExtension],
-            __DIR__ . '/../../..',
-        );
+        $service = new AdminNavigationService($this->security, [$mockExtension], __DIR__ . '/../../..');
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -98,10 +87,7 @@ final class AdminNavigationServiceTest extends TestCase
             public function getAdminSections(): array
             {
                 return [
-                    new AdminSection(
-                        section: 'Low Priority',
-                        links: [new AdminLink('Link', 'route', 'active')],
-                    ),
+                    new AdminSection(section: 'Low Priority', links: [new AdminLink('Link', 'route', 'active')]),
                 ];
             }
         };
@@ -115,10 +101,7 @@ final class AdminNavigationServiceTest extends TestCase
             public function getAdminSections(): array
             {
                 return [
-                    new AdminSection(
-                        section: 'High Priority',
-                        links: [new AdminLink('Link', 'route', 'active')],
-                    ),
+                    new AdminSection(section: 'High Priority', links: [new AdminLink('Link', 'route', 'active')]),
                 ];
             }
         };
@@ -148,11 +131,7 @@ final class AdminNavigationServiceTest extends TestCase
     public function testGetSidebarSectionsRespectsRoleRestrictions(): void
     {
         // Arrange
-        $service = new AdminNavigationService(
-            $this->security,
-            [],
-            __DIR__ . '/../../..',
-        );
+        $service = new AdminNavigationService($this->security, [], __DIR__ . '/../../..');
 
         // Deny ROLE_ADMIN (required for System section)
         $this->security->method('isGranted')->willReturn(false);
@@ -177,23 +156,21 @@ final class AdminNavigationServiceTest extends TestCase
             public function getAdminSections(): array
             {
                 return [
-                    new AdminSection(
-                        section: 'Plugin Section 1',
-                        links: [new AdminLink('Link 1', 'route1', 'active1')],
-                    ),
-                    new AdminSection(
-                        section: 'Plugin Section 2',
-                        links: [new AdminLink('Link 2', 'route2', 'active2')],
-                    ),
+                    new AdminSection(section: 'Plugin Section 1', links: [new AdminLink(
+                        'Link 1',
+                        'route1',
+                        'active1',
+                    )]),
+                    new AdminSection(section: 'Plugin Section 2', links: [new AdminLink(
+                        'Link 2',
+                        'route2',
+                        'active2',
+                    )]),
                 ];
             }
         };
 
-        $service = new AdminNavigationService(
-            $this->security,
-            [$multiSectionExtension],
-            __DIR__ . '/../../..',
-        );
+        $service = new AdminNavigationService($this->security, [$multiSectionExtension], __DIR__ . '/../../..');
 
         $this->security->method('isGranted')->willReturn(true);
 

@@ -19,17 +19,6 @@ admin_navigation:
                 - { label: 'menu_admin_language', route: 'app_admin_language', active: 'language' }
                 - { label: 'menu_admin_announcement', route: 'app_admin_announcement', active: 'announcement' }
 
-        tables:
-            label: 'Tables'
-            priority: 800
-            role: 'ROLE_ADMIN'
-            links:
-                - { label: 'menu_admin_event', route: 'app_admin_event', active: 'event' }
-                - { label: 'menu_admin_location', route: 'app_admin_location', active: 'location' }
-                - { label: 'menu_admin_host', route: 'app_admin_host', active: 'host' }
-                - { label: 'menu_admin_image', route: 'app_admin_image', active: 'image' }
-                - { label: 'menu_admin_user', route: 'app_admin_user', active: 'user' }
-
         cms:
             label: 'CMS'
             priority: 600

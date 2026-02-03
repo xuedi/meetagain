@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace Plugin\AdminTables\Controller;
 
 use App\Repository\ImageRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,7 +18,7 @@ class ImageController extends AbstractController
     #[Route('/admin/image', name: 'app_admin_image')]
     public function imageList(): Response
     {
-        return $this->render('admin_modules/tables/image_list.html.twig', [
+        return $this->render('@AdminTables/tables/image_list.html.twig', [
             'active' => 'image',
             'images' => $this->repo->findAll(),
         ]);

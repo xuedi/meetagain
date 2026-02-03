@@ -1,12 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace Plugin\AdminTables\Controller;
 
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
 use App\Entity\ImageType;
-use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\EventService;
@@ -14,6 +13,7 @@ use App\Service\ImageService;
 use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Plugin\AdminTables\Form\EventType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +36,7 @@ class EventController extends AbstractController
     #[Route('/admin/event', name: 'app_admin_event')]
     public function eventList(): Response
     {
-        return $this->render('admin_modules/tables/event_list.html.twig', [
+        return $this->render('@AdminTables/tables/event_list.html.twig', [
             'nextEvent' => $this->repo->getNextEventId(),
             'events' => $this->repo->findBy([], ['start' => 'ASC']),
             'active' => 'event',
@@ -95,7 +95,7 @@ class EventController extends AbstractController
             $this->addFlash('success', 'Event saved' . $followUp);
         }
 
-        return $this->render('admin_modules/tables/event_edit.html.twig', [
+        return $this->render('@AdminTables/tables/event_edit.html.twig', [
             'active' => 'event',
             'event' => $event,
             'form' => $form,
@@ -168,7 +168,7 @@ class EventController extends AbstractController
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
         }
 
-        return $this->render('admin_modules/tables/event_new.html.twig', [
+        return $this->render('@AdminTables/tables/event_new.html.twig', [
             'active' => 'event',
             'location' => $event,
             'form' => $form,
