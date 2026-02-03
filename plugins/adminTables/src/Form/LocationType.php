@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Form;
+namespace Plugin\AdminTables\Form;
 
 use App\Entity\Location;
 use App\Entity\User;

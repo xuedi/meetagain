@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace Plugin\AdminTables\Controller;
 
 use App\Entity\Location;
-use App\Form\LocationType;
 use App\Repository\LocationRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Plugin\AdminTables\Form\LocationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +23,7 @@ class LocationController extends AbstractController
     #[Route('/admin/location', name: 'app_admin_location')]
     public function locationList(): Response
     {
-        return $this->render('admin_modules/tables/location_list.html.twig', [
+        return $this->render('@AdminTables/tables/location_list.html.twig', [
             'active' => 'location',
             'locations' => $this->repo->findAll(),
         ]);
@@ -41,7 +41,7 @@ class LocationController extends AbstractController
             return $this->redirectToRoute('app_admin_location');
         }
 
-        return $this->render('admin_modules/tables/location_edit.html.twig', [
+        return $this->render('@AdminTables/tables/location_edit.html.twig', [
             'active' => 'location',
             'location' => $location,
             'form' => $form,
@@ -69,7 +69,7 @@ class LocationController extends AbstractController
             return $this->redirectToRoute('app_admin_location');
         }
 
-        return $this->render('admin_modules/tables/location_edit.html.twig', [
+        return $this->render('@AdminTables/tables/location_edit.html.twig', [
             'active' => 'location',
             'location' => $location,
             'form' => $form,

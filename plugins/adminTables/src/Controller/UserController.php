@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace Plugin\AdminTables\Controller;
 
 use App\Entity\User;
 use App\Entity\UserStatus;
-use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
+use Plugin\AdminTables\Form\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,7 @@ class UserController extends AbstractController
     #[Route('/admin/user', name: 'app_admin_user')]
     public function userList(): Response
     {
-        return $this->render('admin_modules/tables/user_list.html.twig', [
+        return $this->render('@AdminTables/tables/user_list.html.twig', [
             'active' => 'user',
             'users' => $this->repo->findBy([], ['createdAt' => 'desc']),
         ]);
@@ -43,7 +43,7 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_admin_user');
         }
 
-        return $this->render('admin_modules/tables/user_edit.html.twig', [
+        return $this->render('@AdminTables/tables/user_edit.html.twig', [
             'active' => 'user',
             'user' => $user,
             'form' => $form,
