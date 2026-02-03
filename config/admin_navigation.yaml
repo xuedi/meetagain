@@ -1,0 +1,54 @@
+# Static admin navigation configuration
+# Replaces dynamic AdminModuleInterface system with a simple YAML config
+#
+# Structure:
+# - sections: Ordered map of section keys to section config
+# - Each section has: label, priority (for ordering), role (for access control), links
+# - Each link has: label (translation key), route (Symfony route name), active (active state identifier)
+
+admin_navigation:
+    sections:
+        system:
+            label: 'System'
+            priority: 1000
+            role: 'ROLE_ADMIN'
+            links:
+                - { label: 'menu_admin_system', route: 'app_admin_system', active: 'system' }
+                - { label: 'menu_admin_plugin', route: 'app_admin_plugin', active: 'plugin' }
+                - { label: 'menu_admin_email', route: 'app_admin_email', active: 'email' }
+                - { label: 'menu_admin_language', route: 'app_admin_language', active: 'language' }
+                - { label: 'menu_admin_announcement', route: 'app_admin_announcement', active: 'announcement' }
+
+        tables:
+            label: 'Tables'
+            priority: 800
+            role: 'ROLE_ADMIN'
+            links:
+                - { label: 'menu_admin_event', route: 'app_admin_event', active: 'event' }
+                - { label: 'menu_admin_location', route: 'app_admin_location', active: 'location' }
+                - { label: 'menu_admin_host', route: 'app_admin_host', active: 'host' }
+                - { label: 'menu_admin_image', route: 'app_admin_image', active: 'image' }
+                - { label: 'menu_admin_user', route: 'app_admin_user', active: 'user' }
+
+        cms:
+            label: 'CMS'
+            priority: 600
+            role: 'ROLE_ADMIN'
+            links:
+                - { label: 'menu_admin_cms', route: 'app_admin_cms', active: 'cms' }
+                - { label: 'menu_admin_menu', route: 'app_admin_menu', active: 'menu' }
+
+        translation:
+            label: 'Translation'
+            priority: 500
+            role: 'ROLE_ADMIN'
+            links:
+                - { label: 'menu_admin_translation', route: 'app_admin_translation', active: 'translation' }
+
+        logs:
+            label: 'Logs'
+            priority: 400
+            role: 'ROLE_ADMIN'
+            links:
+                - { label: 'menu_admin_activity_log', route: 'app_admin_activity_log', active: 'activity_log' }
+                - { label: 'menu_admin_visitors', route: 'app_admin_visitors', active: 'visitors' }

@@ -5,10 +5,10 @@ namespace App\Dashboard\Tiles\Side;
 use App\Dashboard\DashboardSideTileInterface;
 use App\Entity\User;
 use App\Entity\UserRole;
-use App\Security\Attribute\RequiresRole;
 use App\Service\HealthCheckService;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[RequiresRole(UserRole::Admin)]
+#[IsGranted('ROLE_ADMIN')]
 readonly class HealthChecksTile implements DashboardSideTileInterface
 {
     public function __construct(

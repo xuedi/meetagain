@@ -3,14 +3,14 @@
 namespace App\Twig;
 
 use App\Entity\AdminSection;
-use App\Service\AdminService;
+use App\Service\AdminNavigationService;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class AdminExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly AdminService $adminService,
+        private readonly AdminNavigationService $adminNavigationService,
     ) {}
 
     public function getFunctions(): array
@@ -25,6 +25,6 @@ class AdminExtension extends AbstractExtension
      */
     public function getAdminSections(): array
     {
-        return $this->adminService->getSidebarSections();
+        return $this->adminNavigationService->getSidebarSections();
     }
 }

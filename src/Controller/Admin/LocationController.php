@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\Tables;
+namespace App\Controller\Admin;
 
 use App\Entity\Location;
 use App\Form\LocationType;
@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -19,6 +20,7 @@ class LocationController extends AbstractController
         private readonly LocationRepository $repo,
     ) {}
 
+    #[Route('/admin/location', name: 'app_admin_location')]
     public function locationList(): Response
     {
         return $this->render('admin_modules/tables/location_list.html.twig', [
@@ -27,6 +29,7 @@ class LocationController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/location/edit/{id}', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
     public function locationEdit(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(LocationType::class, $location);
@@ -45,6 +48,7 @@ class LocationController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/location/add', name: 'app_admin_location_add', methods: ['GET', 'POST'])]
     public function locationAdd(Request $request, EntityManagerInterface $entityManager): Response
     {
         $location = new Location();

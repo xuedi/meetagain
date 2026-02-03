@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\System;
+namespace App\Controller\Admin;
 
 use App\Service\CommandService;
 use App\Service\PluginService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -16,6 +17,7 @@ class PluginController extends AbstractController
         private readonly CommandService $commandService,
     ) {}
 
+    #[Route('/admin/plugin', name: 'app_admin_plugin')]
     public function list(): Response
     {
         return $this->render('admin_modules/system/plugin_list.html.twig', [
@@ -24,6 +26,7 @@ class PluginController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/plugin/install/{name}', name: 'admin_plugin_install', methods: ['POST'])]
     public function install(string $name): Response
     {
         $this->pluginService->install($name);
@@ -31,6 +34,7 @@ class PluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
+    #[Route('/admin/plugin/uninstall/{name}', name: 'admin_plugin_uninstall', methods: ['POST'])]
     public function uninstall(string $name): Response
     {
         $this->pluginService->uninstall($name);
@@ -38,6 +42,7 @@ class PluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
+    #[Route('/admin/plugin/enable/{name}', name: 'admin_plugin_enable', methods: ['POST'])]
     public function enable(string $name): Response
     {
         $this->pluginService->enable($name);
@@ -45,6 +50,7 @@ class PluginController extends AbstractController
         return $this->redirectToRoute('admin_plugin_migrate');
     }
 
+    #[Route('/admin/plugin/migrate', name: 'admin_plugin_migrate', methods: ['POST'])]
     public function migrate(): Response
     {
         $this->commandService->executeMigrations();
@@ -52,6 +58,7 @@ class PluginController extends AbstractController
         return $this->redirectToRoute('app_admin_plugin');
     }
 
+    #[Route('/admin/plugin/disable/{name}', name: 'admin_plugin_disable', methods: ['POST'])]
     public function disable(string $name): Response
     {
         $this->pluginService->disable($name);

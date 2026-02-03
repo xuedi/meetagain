@@ -5,10 +5,10 @@ namespace App\Dashboard\Tiles\Center;
 use App\Dashboard\DashboardCenterTileInterface;
 use App\Entity\User;
 use App\Entity\UserRole;
-use App\Security\Attribute\RequiresRole;
 use App\Service\DashboardStatsService;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[RequiresRole(UserRole::Admin)]
+#[IsGranted('ROLE_ADMIN')]
 readonly class PagesNotFoundChartTile implements DashboardCenterTileInterface
 {
     public function __construct(

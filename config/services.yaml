@@ -30,10 +30,6 @@ services:
         arguments:
             - '@Redis'
 
-    App\Routing\AdminModuleRouteLoader:
-        tags:
-            - { name: 'routing.loader' }
-
     App\DataFixtures\:
         resource: '../src/DataFixtures/'
         exclude:

@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\Tables;
+namespace App\Controller\Admin;
 
 use App\Repository\ImageRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -14,6 +15,7 @@ class ImageController extends AbstractController
         private readonly ImageRepository $repo,
     ) {}
 
+    #[Route('/admin/image', name: 'app_admin_image')]
     public function imageList(): Response
     {
         return $this->render('admin_modules/tables/image_list.html.twig', [

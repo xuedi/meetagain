@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\System;
+namespace App\Controller\Admin;
 
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -31,6 +32,7 @@ class EmailController extends AbstractController
         private readonly EmailTemplateTranslationRepository $translationRepo,
     ) {}
 
+    #[Route('/admin/email', name: 'app_admin_email')]
     public function list(): Response
     {
         $templates = $this->templateRepo->findAll();
@@ -74,6 +76,7 @@ class EmailController extends AbstractController
         return $result;
     }
 
+    #[Route('/admin/email/{id}/edit', name: 'app_admin_email_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, EmailTemplate $template): Response
     {
         $form = $this->createForm(EmailTemplateType::class, $template);
@@ -108,6 +111,7 @@ class EmailController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/email/{id}/preview', name: 'app_admin_email_preview')]
     public function preview(Request $request, EmailTemplate $template): Response
     {
         $language = $request->query->getString('lang', self::DEFAULT_LANGUAGE);
@@ -128,6 +132,7 @@ class EmailController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/email/{id}/reset', name: 'app_admin_email_reset', methods: ['POST'])]
     public function reset(EmailTemplate $template): Response
     {
         $identifier = $template->getIdentifier();

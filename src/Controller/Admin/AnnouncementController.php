@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\AdminModules\System;
+namespace App\Controller\Admin;
 
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -24,6 +25,7 @@ class AnnouncementController extends AbstractController
         private readonly EntityManagerInterface $em,
     ) {}
 
+    #[Route('/admin/system/announcements', name: 'app_admin_announcement')]
     public function list(): Response
     {
         return $this->render('admin_modules/system/announcement_list.html.twig', [
@@ -32,6 +34,7 @@ class AnnouncementController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/system/announcements/new', name: 'app_admin_announcement_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $announcement = new Announcement();
@@ -55,6 +58,7 @@ class AnnouncementController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/system/announcements/from-cms/{id}', name: 'app_admin_announcement_from_cms')]
     public function createFromCms(Cms $cmsPage): Response
     {
         $announcement = new Announcement();
@@ -69,6 +73,7 @@ class AnnouncementController extends AbstractController
         return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
     }
 
+    #[Route('/admin/system/announcements/{id}', name: 'app_admin_announcement_view')]
     public function view(Announcement $announcement, Request $request): Response
     {
         $locale = $request->query->get('locale', 'en');
@@ -85,6 +90,7 @@ class AnnouncementController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/system/announcements/{id}/send', name: 'app_admin_announcement_send', methods: ['POST'])]
     public function send(Announcement $announcement): Response
     {
         if (!$announcement->isDraft()) {
@@ -100,6 +106,7 @@ class AnnouncementController extends AbstractController
         return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
     }
 
+    #[Route('/admin/system/announcements/{id}/delete', name: 'app_admin_announcement_delete', methods: ['POST'])]
     public function delete(Announcement $announcement): Response
     {
         if (!$announcement->isDraft()) {
