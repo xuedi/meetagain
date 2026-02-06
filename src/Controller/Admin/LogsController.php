@@ -5,14 +5,21 @@ namespace App\Controller\Admin;
 use App\Entity\ValueObjects\LogEntry;
 use App\Repository\NotFoundLogRepository;
 use App\Service\ActivityService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class LogsController extends AbstractController
+class LogsController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'Logs',
+            label: 'menu_admin_activity_log',
+            route: 'app_admin_activity_log',
+            active: 'activity_log',
+        );
+    }
+
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly NotFoundLogRepository $foundLogRepo,
@@ -21,7 +28,7 @@ class LogsController extends AbstractController
     #[Route('/admin/logs/activity', name: 'app_admin_activity_log')]
     public function activityList(): Response
     {
-        return $this->render('admin_modules/logs/logs_activity_list.html.twig', [
+        return $this->render('admin/logs/logs_activity_list.html.twig', [
             'active' => 'activity',
             'activities' => $this->activityService->getAdminList(),
         ]);
@@ -30,7 +37,7 @@ class LogsController extends AbstractController
     #[Route('/admin/logs/system', name: 'app_admin_system_log')]
     public function systemLogs(int $id = 0): Response
     {
-        return $this->render('admin_modules/logs/logs_system_list.html.twig', [
+        return $this->render('admin/logs/logs_system_list.html.twig', [
             'active' => 'logs',
             'logs' => $this->getLogs(),
         ]);
@@ -39,7 +46,7 @@ class LogsController extends AbstractController
     #[Route('/admin/logs/404', name: 'app_admin_not_found_log')]
     public function notFoundLogs(): Response
     {
-        return $this->render('admin_modules/logs/logs_notFound_list.html.twig', [
+        return $this->render('admin/logs/logs_notFound_list.html.twig', [
             'active' => '404',
             'list' => $this->foundLogRepo->getTop100(),
         ]);

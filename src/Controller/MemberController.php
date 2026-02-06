@@ -105,7 +105,7 @@ class MemberController extends AbstractController
     #[Route('/members/rotate-avatar/{id}', name: 'app_member_rotate_avatar')]
     public function rotateProfileImage(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         if ($user->getImage() !== null) {
@@ -118,7 +118,7 @@ class MemberController extends AbstractController
     #[Route('/members/remove-image/{id}', name: 'app_member_remove_avatar')]
     public function removeProfileImage(EntityManagerInterface $em, int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $user->setImage(null);
@@ -131,7 +131,7 @@ class MemberController extends AbstractController
     #[Route('/members/restrict/{id}', name: 'app_member_restrict')]
     public function restrictUser(EntityManagerInterface $em, int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $user->setRestricted(!$user->isRestricted());
@@ -144,7 +144,7 @@ class MemberController extends AbstractController
     #[Route('/members/verify/{id}', name: 'app_member_verify')]
     public function verifyUser(EntityManagerInterface $em, int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $user->setVerified(!$user->isVerified());

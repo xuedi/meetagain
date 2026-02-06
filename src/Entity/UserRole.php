@@ -4,10 +4,14 @@ namespace App\Entity;
 
 enum UserRole: string
 {
-    case MetaAdmin = 'META_ADMIN';
     case Admin = 'ADMIN';
-    case Organizer = 'MANAGER';
+    case Organizer = 'ORGANIZER';
     case User = 'USER';
+
+    // Constants for use in attributes like #[IsGranted()]
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
+    public const ROLE_ORGANIZER = 'ROLE_ORGANIZER';
+    public const ROLE_USER = 'ROLE_USER';
 
     public function toRoleString(): string
     {
@@ -18,8 +22,8 @@ enum UserRole: string
     {
         return match ($role) {
             'ROLE_ADMIN' => self::Admin,
-            'ROLE_META_ADMIN' => self::MetaAdmin,
-            'ROLE_MANAGER' => self::Organizer,
+            'ROLE_ORGANIZER' => self::Organizer,
+            'ROLE_MANAGER' => self::Organizer, // Backwards compatibility
             'ROLE_USER' => self::User,
             default => self::User,
         };

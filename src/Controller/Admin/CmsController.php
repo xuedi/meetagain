@@ -19,16 +19,24 @@ use App\Service\CmsBlockService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class CmsController extends AbstractController
+class CmsController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'CMS',
+            label: 'menu_admin_cms',
+            route: 'app_admin_cms',
+            active: 'cms',
+            linkRole: 'ROLE_ORGANIZER',
+        );
+    }
+
     public function __construct(
         private readonly CmsRepository $repo,
         private readonly EntityManagerInterface $em,
@@ -44,7 +52,7 @@ class CmsController extends AbstractController
             'action' => $this->generateUrl('app_admin_cms_add'),
         ]);
 
-        return $this->render('admin_modules/cms/cms_list.html.twig', [
+        return $this->render('admin/cms/cms_list.html.twig', [
             'active' => 'cms',
             'form' => $newForm,
             'cms' => $this->repo->findAll(),
@@ -80,7 +88,7 @@ class CmsController extends AbstractController
             Title::getType(),
         ];
 
-        return $this->render('admin_modules/cms/cms_edit.html.twig', [
+        return $this->render('admin/cms/cms_edit.html.twig', [
             'active' => 'cms',
             'newBlocks' => $newBlocks,
             'editLocale' => $locale,

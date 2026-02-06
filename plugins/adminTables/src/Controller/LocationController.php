@@ -2,20 +2,29 @@
 
 namespace Plugin\AdminTables\Controller;
 
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Location;
 use App\Repository\LocationRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\AdminTables\Form\LocationType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class LocationController extends AbstractController
+class LocationController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'Tables',
+            label: 'menu_admin_location',
+            route: 'app_admin_location',
+            active: 'location',
+        );
+    }
+
     public function __construct(
         private readonly LocationRepository $repo,
     ) {}

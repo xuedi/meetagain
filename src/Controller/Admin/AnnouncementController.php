@@ -10,15 +10,23 @@ use App\Repository\AnnouncementRepository;
 use App\Service\AnnouncementService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class AnnouncementController extends AbstractController
+class AnnouncementController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'System',
+            label: 'menu_admin_announcement',
+            route: 'app_admin_announcement',
+            active: 'announcement',
+            linkRole: 'ROLE_ORGANIZER',
+        );
+    }
+
     public function __construct(
         private readonly AnnouncementRepository $repo,
         private readonly AnnouncementService $announcementService,
@@ -28,7 +36,7 @@ class AnnouncementController extends AbstractController
     #[Route('/admin/system/announcements', name: 'app_admin_announcement')]
     public function list(): Response
     {
-        return $this->render('admin_modules/system/announcement_list.html.twig', [
+        return $this->render('admin/system/announcement_list.html.twig', [
             'active' => 'announcement',
             'announcements' => $this->repo->findAllOrderedByDate(),
         ]);
@@ -52,7 +60,7 @@ class AnnouncementController extends AbstractController
             return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
         }
 
-        return $this->render('admin_modules/system/announcement_new.html.twig', [
+        return $this->render('admin/system/announcement_new.html.twig', [
             'active' => 'announcement',
             'form' => $form,
         ]);
@@ -82,7 +90,7 @@ class AnnouncementController extends AbstractController
             $preview = $this->announcementService->renderPreview($announcement, $locale);
         }
 
-        return $this->render('admin_modules/system/announcement_view.html.twig', [
+        return $this->render('admin/system/announcement_view.html.twig', [
             'active' => 'announcement',
             'announcement' => $announcement,
             'preview' => $preview,

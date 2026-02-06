@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/bookclub/manage')]
-#[IsGranted('ROLE_MANAGER')]
+#[IsGranted('ROLE_ORGANIZER')]
 class SelectionController extends AbstractController
 {
     public function __construct(

@@ -2,6 +2,8 @@
 
 namespace Plugin\AdminTables\Controller;
 
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
@@ -14,16 +16,23 @@ use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\AdminTables\Form\EventType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class EventController extends AbstractController
+class EventController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'Tables',
+            label: 'menu_admin_event',
+            route: 'app_admin_event',
+            active: 'event',
+        );
+    }
+
     public function __construct(
         private readonly ImageService $imageService,
         private readonly EntityManagerInterface $entityManager,

@@ -26,7 +26,7 @@
 
                         {% if existingTranslation %}
                             <p class="mb-4 has-text-grey">
-                                {% if is_granted('ROLE_MANAGER') %}
+                                {% if is_granted('ROLE_ORGANIZER') %}
                                     Update the {{ targetLanguage|upper }} translation for this dish.
                                 {% else %}
                                     Suggest changes to the {{ targetLanguage|upper }} translation. A manager will review your suggestions.
@@ -34,7 +34,7 @@
                             </p>
                         {% else %}
                             <p class="mb-4 has-text-grey">
-                                {% if is_granted('ROLE_MANAGER') %}
+                                {% if is_granted('ROLE_ORGANIZER') %}
                                     Add a new {{ targetLanguage|upper }} translation for this dish.
                                 {% else %}
                                     Suggest a {{ targetLanguage|upper }} translation for this dish. A manager will review your suggestion.
@@ -80,7 +80,7 @@
                             <div class="control">
                                 <button type="submit" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-check"></i></span>
-                                    <span>{% if is_granted('ROLE_MANAGER') %}Save{% else %}Submit Suggestion{% endif %}</span>
+                                    <span>{% if is_granted('ROLE_ORGANIZER') %}Save{% else %}Submit Suggestion{% endif %}</span>
                                 </button>
                             </div>
                             <div class="control">

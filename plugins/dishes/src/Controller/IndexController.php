@@ -33,7 +33,7 @@ class IndexController extends AbstractController
     public function index(Request $request): Response
     {
         $session = $request->getSession();
-        $isManager = $this->isGranted('ROLE_MANAGER');
+        $isManager = $this->isGranted('ROLE_ORGANIZER');
 
         $dishes = $isManager ? $this->repo->findAll() : $this->dishService->getApprovedDishes();
 

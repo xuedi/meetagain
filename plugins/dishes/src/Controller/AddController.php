@@ -26,7 +26,7 @@ class AddController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getAuthedUser();
-            $isManager = $this->isGranted('ROLE_MANAGER');
+            $isManager = $this->isGranted('ROLE_ORGANIZER');
 
             $this->dishService->createDish(
                 name: $form->get('name')->getData(),

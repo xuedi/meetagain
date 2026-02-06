@@ -2,21 +2,30 @@
 
 namespace Plugin\AdminTables\Controller;
 
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Repository\UserRepository;
 use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\AdminTables\Form\UserType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class UserController extends AbstractController
+class UserController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'Tables',
+            label: 'menu_admin_user',
+            route: 'app_admin_user',
+            active: 'user',
+        );
+    }
+
     public function __construct(
         private readonly UserRepository $repo,
         private readonly EmailService $emailService,

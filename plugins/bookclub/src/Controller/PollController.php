@@ -86,7 +86,7 @@ class PollController extends AbstractController
     }
 
     #[Route('/create', name: 'app_plugin_bookclub_poll_create', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_MANAGER')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function create(Request $request): Response
     {
         $pendingSuggestions = $this->suggestionService->getPendingSuggestionsWithPriority();
@@ -126,7 +126,7 @@ class PollController extends AbstractController
     }
 
     #[Route('/manage/{id}', name: 'app_plugin_bookclub_poll_manage', methods: ['GET'])]
-    #[IsGranted('ROLE_MANAGER')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function manage(int $id): Response
     {
         $poll = $this->pollService->get($id);
@@ -146,7 +146,7 @@ class PollController extends AbstractController
     }
 
     #[Route('/{id}/activate', name: 'app_plugin_bookclub_poll_activate', methods: ['POST'])]
-    #[IsGranted('ROLE_MANAGER')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function activate(int $id): Response
     {
         try {
@@ -160,7 +160,7 @@ class PollController extends AbstractController
     }
 
     #[Route('/{id}/close', name: 'app_plugin_bookclub_poll_close', methods: ['POST'])]
-    #[IsGranted('ROLE_MANAGER')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function close(int $id): Response
     {
         try {

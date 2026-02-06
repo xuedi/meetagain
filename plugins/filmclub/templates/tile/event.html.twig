@@ -24,7 +24,7 @@
     {% endif %}
 {% else %}
     <p class="has-text-grey">{{ "No vote started yet"|trans }}</p>
-    {% if is_granted('ROLE_MANAGER') %}
+    {% if is_granted('ROLE_ORGANIZER') %}
         <a href="{{ path('app_filmclub_vote_create', {eventId: eventId}) }}" class="button is-small is-success mt-2">
             <span class="icon"><i class="fa fa-plus"></i></span>
             <span>{{ "Create vote"|trans }}</span>

@@ -2,100 +2,101 @@
 
 namespace App\Service;
 
+use App\Controller\Admin\AdminNavigationInterface;
 use App\Entity\AdminLink;
 use App\Entity\AdminSection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\Yaml\Yaml;
 
 /**
- * Builds admin sidebar navigation from static YAML configuration and plugin extensions.
+ * Builds admin sidebar navigation from controllers.
  *
- * Core sections are defined in config/admin_navigation.yaml.
- * Plugins can add dynamic sections by implementing AdminNavigationExtensionInterface.
+ * All admin controllers implement AdminNavigationInterface to define their navigation.
+ * Sections and links are sorted alphabetically.
  */
 readonly class AdminNavigationService
 {
-    private array $config;
-
     /**
-     * @param iterable<AdminNavigationExtensionInterface> $extensions
+     * @param iterable<AdminNavigationInterface> $controllers
      */
     public function __construct(
         private Security $security,
-        #[AutowireIterator(AdminNavigationExtensionInterface::class)]
-        private iterable $extensions,
-        string $kernelProjectDir,
-    ) {
-        $configPath = $kernelProjectDir . '/config/admin_navigation.yaml';
-        $this->config = Yaml::parseFile($configPath)['admin_navigation'] ?? [];
-    }
+        #[AutowireIterator(AdminNavigationInterface::class)]
+        private iterable $controllers,
+    ) {}
 
     /**
      * Get all sidebar sections for the current user.
      *
-     * Merges static YAML sections with dynamic plugin-provided sections,
-     * sorted by priority (higher values appear first).
+     * Collects navigation from all controllers, groups by section, sorts alphabetically,
+     * and filters by user roles.
      *
      * @return list<AdminSection>
      */
     public function getSidebarSections(): array
     {
-        $sectionsWithPriority = [];
+        $sectionsMap = [];
 
-        // Build static sections from YAML
-        $staticSections = $this->config['sections'] ?? [];
-        foreach ($staticSections as $sectionKey => $sectionConfig) {
-            // Check if user has required role for this section
-            $requiredRole = $sectionConfig['role'] ?? null;
-            if ($requiredRole && !$this->security->isGranted($requiredRole)) {
+        // Collect from controllers
+        foreach ($this->controllers as $controller) {
+            $config = $controller->getAdminNavigation();
+            if ($config === null) {
+                continue; // Skip controllers without navigation
+            }
+
+            $sectionKey = $config->section;
+
+            // Initialize section if new
+            if (!isset($sectionsMap[$sectionKey])) {
+                $sectionsMap[$sectionKey] = [
+                    'role' => $config->sectionRole,
+                    'links' => [],
+                ];
+            }
+
+            // Add link to section
+            $sectionsMap[$sectionKey]['links'][] = new AdminLink(
+                label: $config->label,
+                route: $config->route,
+                active: $config->active,
+                role: $config->linkRole,
+            );
+        }
+
+        // Sort sections alphabetically by section name
+        ksort($sectionsMap);
+
+        // Sort links within each section alphabetically by label
+        foreach ($sectionsMap as &$sectionData) {
+            usort($sectionData['links'], static fn($a, $b): int => strcmp($a->getLabel(), $b->getLabel()));
+        }
+
+        // Build AdminSection objects and filter by role
+        $sections = [];
+        foreach ($sectionsMap as $sectionName => $data) {
+            // Filter section by role
+            if ($data['role'] && !$this->security->isGranted($data['role'])) {
                 continue;
             }
 
-            // Build AdminLink objects
-            $links = [];
-            foreach ($sectionConfig['links'] ?? [] as $linkConfig) {
-                $links[] = new AdminLink(
-                    label: $linkConfig['label'],
-                    route: $linkConfig['route'],
-                    active: $linkConfig['active'] ?? null,
-                );
+            // Filter links by role
+            $visibleLinks = array_filter(
+                $data['links'],
+                fn($link) => !$link->getRole() || $this->security->isGranted($link->getRole()),
+            );
+
+            // Skip sections with no visible links
+            if (empty($visibleLinks)) {
+                continue;
             }
 
-            // Only add section if it has links
-            if (!empty($links)) {
-                $sectionsWithPriority[] = [
-                    'priority' => $sectionConfig['priority'] ?? 0,
-                    'section' => new AdminSection(section: $sectionConfig['label'], links: $links),
-                ];
-            }
+            $sections[] = new AdminSection(
+                section: $sectionName,
+                links: array_values($visibleLinks),
+                role: $data['role'],
+            );
         }
 
-        // Collect sections from plugin extensions
-        foreach ($this->getSortedExtensions() as $extension) {
-            foreach ($extension->getAdminSections() as $section) {
-                $sectionsWithPriority[] = [
-                    'priority' => $extension->getPriority(),
-                    'section' => $section,
-                ];
-            }
-        }
-
-        // Sort all sections by priority (higher first)
-        usort($sectionsWithPriority, static fn(array $a, array $b): int => $b['priority'] <=> $a['priority']);
-
-        return array_column($sectionsWithPriority, 'section');
-    }
-
-    /**
-     * Get extensions sorted by priority (higher first).
-     *
-     * @return array<AdminNavigationExtensionInterface>
-     */
-    private function getSortedExtensions(): array
-    {
-        $extensions = iterator_to_array($this->extensions);
-        usort($extensions, static fn($a, $b): int => $b->getPriority() <=> $a->getPriority());
-        return $extensions;
+        return $sections;
     }
 }

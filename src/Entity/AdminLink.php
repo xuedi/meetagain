@@ -8,6 +8,7 @@ readonly class AdminLink
         private string $label,
         private string $route,
         private ?string $active = null,
+        private ?string $role = null,
     ) {}
 
     public function getLabel(): string
@@ -23,5 +24,10 @@ readonly class AdminLink
     public function getActive(): ?string
     {
         return $this->active;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
     }
 }
