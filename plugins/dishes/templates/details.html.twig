@@ -72,7 +72,7 @@
                             </p>
                         {% endif %}
 
-                        {% if dish.hasSuggestions and is_granted('ROLE_MANAGER') %}
+                        {% if dish.hasSuggestions and is_granted('ROLE_ORGANIZER') %}
                             <div class="notification is-info is-light mt-4">
                                 <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
                                 This dish has {{ dish.suggestionObjects|length }} pending suggestion(s).

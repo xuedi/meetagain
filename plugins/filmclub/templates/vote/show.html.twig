@@ -118,7 +118,7 @@
                     {% endif %}
                 </div>
 
-                {% if is_granted('ROLE_MANAGER') and vote.votingOpen %}
+                {% if is_granted('ROLE_ORGANIZER') and vote.votingOpen %}
                     <div class="box">
                         <h3 class="title is-5">{{ "Manager actions"|trans }}</h3>
                         <form method="post" action="{{ path('app_filmclub_vote_close', {id: vote.id}) }}">

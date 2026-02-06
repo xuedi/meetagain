@@ -1,5 +1,5 @@
 <aside class="menu">
-    {% for section in get_admin_sections() %}
+    {% for section in admin_navigation.sidebarSections %}
         <p class="menu-label">{{ section.section }}</p>
         <ul class="menu-list">
             {% for link in section.links %}

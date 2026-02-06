@@ -97,7 +97,7 @@ class MenuRepository extends ServiceEntityRepository
             MenuVisibility::Everyone => true,
             MenuVisibility::User => $user instanceof UserInterface && in_array('ROLE_USER', $user->getRoles(), true),
             MenuVisibility::Manager => $user instanceof UserInterface
-                && in_array('ROLE_MANAGER', $user->getRoles(), true),
+                && in_array('ROLE_ORGANIZER', $user->getRoles(), true),
             MenuVisibility::Admin => $user instanceof UserInterface && in_array('ROLE_ADMIN', $user->getRoles(), true),
         };
     }

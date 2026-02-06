@@ -15,16 +15,23 @@ use App\Repository\MenuRepository;
 use App\Repository\MenuTranslationRepository;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN')]
-class MenuController extends AbstractController
+class MenuController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'CMS',
+            label: 'menu_admin_menu',
+            route: 'app_admin_menu',
+            active: 'menu',
+        );
+    }
+
     public function __construct(
         private readonly MenuRepository $repo,
         private readonly TranslatorInterface $translator,
@@ -79,7 +86,7 @@ class MenuController extends AbstractController
             return $this->redirectToRoute('app_admin_menu', ['edit' => $menu->getId()]);
         }
 
-        return $this->render('admin_modules/cms/menu_index.html.twig', [
+        return $this->render('admin/cms/menu_index.html.twig', [
             'active' => 'menu',
             'form' => $form,
             'edit' => $edit,

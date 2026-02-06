@@ -23,7 +23,7 @@
                     <a href="{{ path('app_filmclub_vote_show', {id: existingVote.id}) }}" class="button is-primary mt-3">
                         {{ "View current vote"|trans }}
                     </a>
-                {% elseif is_granted('ROLE_MANAGER') %}
+                {% elseif is_granted('ROLE_ORGANIZER') %}
                     <a href="{{ path('app_filmclub_vote_create', {eventId: nextEvent.id}) }}" class="button is-success mt-3">
                         <span class="icon"><i class="fa fa-plus"></i></span>
                         <span>{{ "Create vote"|trans }}</span>

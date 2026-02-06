@@ -51,7 +51,7 @@ class VoteController extends AbstractController
     }
 
     #[Route('/create/{eventId}', name: 'app_filmclub_vote_create', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_MANAGER')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function create(int $eventId, Request $request): Response
     {
         $event = $this->eventRepository->find($eventId);
@@ -152,7 +152,7 @@ class VoteController extends AbstractController
     }
 
     #[Route('/{id}/close', name: 'app_filmclub_vote_close', methods: ['POST'])]
-    #[IsGranted('ROLE_MANAGER')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function close(Vote $vote): Response
     {
         $vote->setIsClosed(true);

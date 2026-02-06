@@ -2,16 +2,19 @@
 
 namespace App\Tests\Unit\Service;
 
+use App\Controller\Admin\AdminNavigationConfig;
+use App\Controller\Admin\AdminNavigationInterface;
 use App\Entity\AdminLink;
 use App\Entity\AdminSection;
-use App\Service\AdminNavigationExtensionInterface;
 use App\Service\AdminNavigationService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @covers \App\Service\AdminNavigationService
  */
+#[AllowMockObjectsWithoutExpectations]
 final class AdminNavigationServiceTest extends TestCase
 {
     private Security $security;
@@ -21,45 +24,22 @@ final class AdminNavigationServiceTest extends TestCase
         $this->security = $this->createMock(Security::class);
     }
 
-    public function testGetSidebarSectionsReturnsStaticSectionsOnly(): void
+    public function testGetSidebarSectionsWithControllers(): void
     {
-        // Arrange - no extensions
-        $service = new AdminNavigationService($this->security, [], __DIR__ . '/../../..');
-
-        $this->security->method('isGranted')->willReturn(true);
-
-        // Act
-        $sections = $service->getSidebarSections();
-
-        // Assert - should have static sections from YAML
-        $this->assertNotEmpty($sections);
-        $this->assertContainsOnlyInstancesOf(AdminSection::class, $sections);
-
-        // Check one known section from config/admin_navigation.yaml
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
-        $this->assertContains('System', $sectionNames);
-    }
-
-    public function testGetSidebarSectionsMergesPluginExtensions(): void
-    {
-        // Arrange - create a mock extension
-        $mockExtension = new class implements AdminNavigationExtensionInterface {
-            public function getPriority(): int
+        // Arrange - create mock controller
+        $mockController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return 300;
-            }
-
-            public function getAdminSections(): array
-            {
-                return [
-                    new AdminSection(section: 'Test Plugin', links: [
-                        new AdminLink('Test Link', 'test_route', 'test'),
-                    ]),
-                ];
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    label: 'menu_admin_system',
+                    route: 'app_admin_system',
+                    active: 'system',
+                );
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$mockExtension], __DIR__ . '/../../..');
+        $service = new AdminNavigationService($this->security, [$mockController], [], __DIR__ . '/../../..');
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -68,47 +48,40 @@ final class AdminNavigationServiceTest extends TestCase
 
         // Assert
         $this->assertNotEmpty($sections);
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
+        $this->assertContainsOnlyInstancesOf(AdminSection::class, $sections);
 
-        // Should contain both static sections and plugin section
+        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
         $this->assertContains('System', $sectionNames);
-        $this->assertContains('Test Plugin', $sectionNames);
     }
 
-    public function testGetSidebarSectionsSortsByPriority(): void
+    public function testGetSidebarSectionsSortsAlphabetically(): void
     {
-        // Arrange - create two extensions with different priorities
-        $lowPriorityExtension = new class implements AdminNavigationExtensionInterface {
-            public function getPriority(): int
+        // Arrange - create controllers with different section names
+        $controllerZ = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return 100;
-            }
-
-            public function getAdminSections(): array
-            {
-                return [
-                    new AdminSection(section: 'Low Priority', links: [new AdminLink('Link', 'route', 'active')]),
-                ];
+                return new AdminNavigationConfig(section: 'Zebra', label: 'menu_zebra', route: 'app_zebra');
             }
         };
 
-        $highPriorityExtension = new class implements AdminNavigationExtensionInterface {
-            public function getPriority(): int
+        $controllerA = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return 500;
+                return new AdminNavigationConfig(section: 'Apple', label: 'menu_apple', route: 'app_apple');
             }
+        };
 
-            public function getAdminSections(): array
+        $controllerM = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return [
-                    new AdminSection(section: 'High Priority', links: [new AdminLink('Link', 'route', 'active')]),
-                ];
+                return new AdminNavigationConfig(section: 'Mango', label: 'menu_mango', route: 'app_mango');
             }
         };
 
         $service = new AdminNavigationService(
             $this->security,
-            [$lowPriorityExtension, $highPriorityExtension],
+            [$controllerZ, $controllerA, $controllerM],
+            [],
             __DIR__ . '/../../..',
         );
 
@@ -117,60 +90,54 @@ final class AdminNavigationServiceTest extends TestCase
         // Act
         $sections = $service->getSidebarSections();
 
-        // Assert - high priority should come before low priority
+        // Assert - sections should be in alphabetical order
         $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
 
-        $highPriorityIndex = array_search('High Priority', $sectionNames, true);
-        $lowPriorityIndex = array_search('Low Priority', $sectionNames, true);
-
-        $this->assertNotFalse($highPriorityIndex);
-        $this->assertNotFalse($lowPriorityIndex);
-        $this->assertLessThan($lowPriorityIndex, $highPriorityIndex, 'High priority section should appear first');
+        $this->assertSame(['Apple', 'Mango', 'Zebra'], $sectionNames, 'Sections should be sorted alphabetically');
     }
 
-    public function testGetSidebarSectionsRespectsRoleRestrictions(): void
+    public function testGetSidebarSectionsSortsLinksAlphabetically(): void
     {
-        // Arrange
-        $service = new AdminNavigationService($this->security, [], __DIR__ . '/../../..');
-
-        // Deny ROLE_ADMIN (required for System section)
-        $this->security->method('isGranted')->willReturn(false);
-
-        // Act
-        $sections = $service->getSidebarSections();
-
-        // Assert - should not contain admin-only sections
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
-        $this->assertNotContains('System', $sectionNames, 'System section should be hidden without ROLE_ADMIN');
-    }
-
-    public function testExtensionCanProvideMultipleSections(): void
-    {
-        // Arrange - extension that returns multiple sections
-        $multiSectionExtension = new class implements AdminNavigationExtensionInterface {
-            public function getPriority(): int
+        // Arrange - create multiple controllers contributing to same section
+        $controllerZ = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return 300;
-            }
-
-            public function getAdminSections(): array
-            {
-                return [
-                    new AdminSection(section: 'Plugin Section 1', links: [new AdminLink(
-                        'Link 1',
-                        'route1',
-                        'active1',
-                    )]),
-                    new AdminSection(section: 'Plugin Section 2', links: [new AdminLink(
-                        'Link 2',
-                        'route2',
-                        'active2',
-                    )]),
-                ];
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    label: 'menu_admin_zebra',
+                    route: 'app_admin_zebra',
+                );
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$multiSectionExtension], __DIR__ . '/../../..');
+        $controllerA = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    label: 'menu_admin_apple',
+                    route: 'app_admin_apple',
+                );
+            }
+        };
+
+        $controllerM = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    label: 'menu_admin_mango',
+                    route: 'app_admin_mango',
+                );
+            }
+        };
+
+        $service = new AdminNavigationService(
+            $this->security,
+            [$controllerZ, $controllerA, $controllerM],
+            [],
+            __DIR__ . '/../../..',
+        );
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -178,8 +145,63 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
-        $this->assertContains('Plugin Section 1', $sectionNames);
-        $this->assertContains('Plugin Section 2', $sectionNames);
+        $this->assertCount(1, $sections, 'Should have one section');
+        $systemSection = $sections[0];
+        $this->assertSame('System', $systemSection->getSection());
+
+        $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $systemSection->getLinks());
+        $this->assertSame(
+            ['menu_admin_apple', 'menu_admin_mango', 'menu_admin_zebra'],
+            $linkLabels,
+            'Links should be sorted alphabetically by label',
+        );
+    }
+
+    public function testGetSidebarSectionsRespectsRoleRestrictions(): void
+    {
+        // Arrange - controller with role requirement
+        $mockController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    label: 'menu_admin_system',
+                    route: 'app_admin_system',
+                    sectionRole: 'ROLE_ADMIN',
+                );
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, [$mockController], [], __DIR__ . '/../../..');
+
+        // Deny ROLE_ADMIN
+        $this->security->method('isGranted')->willReturn(false);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert - should not contain admin-only sections
+        $this->assertEmpty($sections, 'System section should be hidden without ROLE_ADMIN');
+    }
+
+    public function testControllerReturningNullIsSkipped(): void
+    {
+        // Arrange - controller that returns null (no navigation)
+        $mockController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return null;
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, [$mockController], [], __DIR__ . '/../../..');
+
+        $this->security->method('isGranted')->willReturn(true);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert - should have no sections (YAML file doesn't exist in test context)
+        $this->assertEmpty($sections, 'Controllers returning null should not appear in navigation');
     }
 }

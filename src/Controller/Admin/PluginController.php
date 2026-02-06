@@ -4,14 +4,22 @@ namespace App\Controller\Admin;
 
 use App\Service\CommandService;
 use App\Service\PluginService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class PluginController extends AbstractController
+class PluginController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'System',
+            label: 'menu_admin_plugin',
+            route: 'app_admin_plugin',
+            active: 'plugin',
+            linkRole: 'ROLE_META_ADMIN',
+        );
+    }
+
     public function __construct(
         private readonly PluginService $pluginService,
         private readonly CommandService $commandService,
@@ -20,7 +28,7 @@ class PluginController extends AbstractController
     #[Route('/admin/plugin', name: 'app_admin_plugin')]
     public function list(): Response
     {
-        return $this->render('admin_modules/system/plugin_list.html.twig', [
+        return $this->render('admin/system/plugin_list.html.twig', [
             'plugins' => $this->pluginService->getAdminList(),
             'active' => 'plugin',
         ]);

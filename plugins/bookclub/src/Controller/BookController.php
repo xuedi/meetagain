@@ -49,7 +49,7 @@ class BookController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $isbn = $form->get('isbn')->getData();
             $user = $this->getAuthedUser();
-            $isManager = $this->isGranted('ROLE_MANAGER');
+            $isManager = $this->isGranted('ROLE_ORGANIZER');
 
             try {
                 $book = $this->bookService->createFromIsbn($isbn, $user->getId(), $isManager);

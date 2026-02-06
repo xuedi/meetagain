@@ -6,16 +6,24 @@ use App\Form\SettingsType;
 use App\Form\ThemeColorsType;
 use App\Service\ConfigService;
 use App\Service\ImageService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class SystemController extends AbstractController
+class SystemController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'System',
+            label: 'menu_admin_system',
+            route: 'app_admin_system',
+            active: 'system',
+            linkRole: 'ROLE_META_ADMIN',
+        );
+    }
+
     public function __construct(
         private readonly ImageService $imageService,
         private readonly ConfigService $configService,
@@ -40,7 +48,7 @@ class SystemController extends AbstractController
             $this->addFlash('success', 'Theme colors saved');
         }
 
-        return $this->render('admin_modules/system/index.html.twig', [
+        return $this->render('admin/system/index.html.twig', [
             'active' => 'system',
             'form' => $form,
             'colorsForm' => $colorsForm,

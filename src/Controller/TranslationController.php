@@ -50,7 +50,7 @@ class TranslationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($this->getAuthedUser()->hasRole('ROLE_MANAGER')) {
+            if ($this->getAuthedUser()->hasRole('ROLE_ORGANIZER')) {
                 $translation->setCreatedAt(new DateTimeImmutable());
                 $translation->setUser($this->getAuthedUser());
 
@@ -146,7 +146,7 @@ class TranslationController extends AbstractController
 
     private function getSuggestion(int $id): TranslationSuggestion
     {
-        if (!$this->getAuthedUser()->hasRole('ROLE_MANAGER') && !$this->getAuthedUser()->hasRole('ROLE_ADMIN')) {
+        if (!$this->getAuthedUser()->hasRole('ROLE_ORGANIZER') && !$this->getAuthedUser()->hasRole('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('Only managers or admins can approve or deny suggestions');
         }
         $suggestion = $this->translationSuggestionRepo->findOneBy(['id' => $id]);

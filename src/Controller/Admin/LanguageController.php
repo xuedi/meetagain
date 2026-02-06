@@ -11,16 +11,23 @@ use App\Service\ImageService;
 use App\Service\LanguageService;
 use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class LanguageController extends AbstractController
+class LanguageController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'System',
+            label: 'menu_admin_language',
+            route: 'app_admin_language',
+            active: 'language',
+        );
+    }
+
     public function __construct(
         private readonly LanguageRepository $repo,
         private readonly EntityManagerInterface $em,
@@ -32,7 +39,7 @@ class LanguageController extends AbstractController
     #[Route('/admin/language', name: 'app_admin_language')]
     public function list(): Response
     {
-        return $this->render('admin_modules/system/language_list.html.twig', [
+        return $this->render('admin/system/language_list.html.twig', [
             'active' => 'language',
             'languages' => $this->repo->findAllOrdered(),
         ]);
@@ -58,7 +65,7 @@ class LanguageController extends AbstractController
             return $this->redirectToRoute('app_admin_language');
         }
 
-        return $this->render('admin_modules/system/language_edit.html.twig', [
+        return $this->render('admin/system/language_edit.html.twig', [
             'active' => 'language',
             'form' => $form,
             'language' => $language,
@@ -84,7 +91,7 @@ class LanguageController extends AbstractController
             return $this->redirectToRoute('app_admin_language');
         }
 
-        return $this->render('admin_modules/system/language_edit.html.twig', [
+        return $this->render('admin/system/language_edit.html.twig', [
             'active' => 'language',
             'form' => $form,
             'language' => $language,

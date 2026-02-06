@@ -6,15 +6,22 @@ use App\Entity\TranslationSuggestionStatus;
 use App\Repository\TranslationSuggestionRepository;
 use App\Service\TranslationImportService;
 use App\Service\TranslationService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class TranslationController extends AbstractController
+class TranslationController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'Translation',
+            label: 'menu_admin_translation',
+            route: 'app_admin_translation',
+            active: 'translation',
+        );
+    }
+
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly TranslationImportService $translationImportService,
@@ -24,7 +31,7 @@ class TranslationController extends AbstractController
     #[Route('/admin/translations/suggestions', name: 'app_admin_translation_suggestion')]
     public function translationsSuggestions(): Response
     {
-        return $this->render('admin_modules/translation/translation_suggestions.html.twig', [
+        return $this->render('admin/translation/translation_suggestions.html.twig', [
             'active' => 'suggestions',
             'translationSuggestions' => $this->translationSuggestionRepo->findBy([
                 'status' => TranslationSuggestionStatus::Requested,
@@ -35,7 +42,7 @@ class TranslationController extends AbstractController
     #[Route('/admin/translation', name: 'app_admin_translation')]
     public function translationsIndex(): Response
     {
-        return $this->render('admin_modules/translation/translation_list.html.twig', [
+        return $this->render('admin/translation/translation_list.html.twig', [
             'active' => 'edit',
             'translationMatrix' => $this->translationService->getMatrix(),
         ]);
@@ -54,7 +61,7 @@ class TranslationController extends AbstractController
     #[Route('/admin/translation/extract', name: 'app_admin_translation_extract')]
     public function translationsExtract(): Response
     {
-        return $this->render('admin_modules/translation/translation_extract.html.twig', [
+        return $this->render('admin/translation/translation_extract.html.twig', [
             'active' => 'extract',
             'result' => $this->translationImportService->extract(),
         ]);
@@ -63,7 +70,7 @@ class TranslationController extends AbstractController
     #[Route('/admin/translation/publish', name: 'app_admin_translation_publish')]
     public function translationsPublish(): Response
     {
-        return $this->render('admin_modules/translation/translation_publish.html.twig', [
+        return $this->render('admin/translation/translation_publish.html.twig', [
             'active' => 'publish',
             'result' => $this->translationService->publish(),
         ]);

@@ -23,7 +23,7 @@
                             {{ form_row(form.category) }}
                             <div class="has-text-right mt-6">
                                 <a href="{{ path('app_plugin_glossary') }}" class="button">cancel</a>
-                                {% if is_granted('ROLE_MANAGER') %}
+                                {% if is_granted('ROLE_ORGANIZER') %}
                                     <button type="submit" class="button is-link">Save</button>
                                 {% else %}
                                     <button type="submit" class="button is-link">Suggest change</button>

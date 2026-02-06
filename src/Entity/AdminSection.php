@@ -10,6 +10,7 @@ readonly class AdminSection
     public function __construct(
         private string $section,
         private array $links,
+        private ?string $role = null,
     ) {}
 
     public function getSection(): string
@@ -23,5 +24,10 @@ readonly class AdminSection
     public function getLinks(): array
     {
         return $this->links;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
     }
 }

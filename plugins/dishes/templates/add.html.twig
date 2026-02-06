@@ -120,7 +120,7 @@
                         <div class="content">
                             <ol>
                                 <li>Add the dish in your language</li>
-                                <li>{% if is_granted('ROLE_MANAGER') %}Your dish will be added immediately{% else %}Wait for approval from a manager{% endif %}</li>
+                                <li>{% if is_granted('ROLE_ORGANIZER') %}Your dish will be added immediately{% else %}Wait for approval from a manager{% endif %}</li>
                                 <li>Other users can suggest translations</li>
                                 <li>Build a multilingual dish collection together!</li>
                             </ol>
