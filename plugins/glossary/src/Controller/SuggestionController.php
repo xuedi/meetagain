@@ -13,7 +13,7 @@ class SuggestionController extends AbstractGlossaryController
     #[Route('/list/{id}', name: 'app_plugin_glossary_suggestion_list', methods: ['GET'])]
     public function suggestionList(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         return $this->renderList('@Glossary/suggestion.html.twig', [
             'categoryFieldValue' => SuggestionField::Category->value,
@@ -25,7 +25,7 @@ class SuggestionController extends AbstractGlossaryController
     #[Route('/apply/{id}/{hash}', name: 'app_plugin_glossary_suggestion_apply', methods: ['GET'])]
     public function suggestionApply(int $id, string $hash): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
         $leftOver = $this->service->applySuggestion($id, $hash);
 
         if ($leftOver === 0) {
@@ -38,7 +38,7 @@ class SuggestionController extends AbstractGlossaryController
     #[Route('/delete/{id}/{hash}', name: 'app_plugin_glossary_suggestion_delete', methods: ['GET'])]
     public function suggestionDelete(int $id, string $hash): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_MANAGER');
+        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
         $leftOver = $this->service->denySuggestion($id, $hash);
 
         if ($leftOver === 0) {

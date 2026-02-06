@@ -12,15 +12,22 @@ use App\Service\EmailTemplateService;
 use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class EmailController extends AbstractController
+class EmailController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'System',
+            label: 'menu_admin_email',
+            route: 'app_admin_email',
+            active: 'email',
+        );
+    }
+
     private const string DEFAULT_LANGUAGE = 'en';
 
     public function __construct(
@@ -55,7 +62,7 @@ class EmailController extends AbstractController
             ];
         }
 
-        return $this->render('admin_modules/system/email_list.html.twig', [
+        return $this->render('admin/system/email_list.html.twig', [
             'active' => 'email',
             'emails' => $emails,
         ]);
@@ -103,7 +110,7 @@ class EmailController extends AbstractController
             return $this->redirectToRoute('app_admin_email');
         }
 
-        return $this->render('admin_modules/system/email_edit.html.twig', [
+        return $this->render('admin/system/email_edit.html.twig', [
             'active' => 'email',
             'form' => $form,
             'template' => $template,
@@ -121,7 +128,7 @@ class EmailController extends AbstractController
         $renderedSubject = $this->templateService->renderContent($template->getSubject($language), $mockContext);
         $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
 
-        return $this->render('admin_modules/system/email_preview.html.twig', [
+        return $this->render('admin/system/email_preview.html.twig', [
             'active' => 'email',
             'template' => $template,
             'renderedSubject' => $renderedSubject,

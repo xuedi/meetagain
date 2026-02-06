@@ -2,19 +2,28 @@
 
 namespace Plugin\AdminTables\Controller;
 
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Host;
 use App\Repository\HostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\AdminTables\Form\HostType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
-class HostController extends AbstractController
+class HostController extends AbstractAdminController
 {
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'Tables',
+            label: 'menu_admin_host',
+            route: 'app_admin_host',
+            active: 'host',
+        );
+    }
+
     public function __construct(
         private readonly HostRepository $repo,
     ) {}

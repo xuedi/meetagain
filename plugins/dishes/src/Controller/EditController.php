@@ -44,7 +44,7 @@ class EditController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getAuthedUser();
-            $isManager = $this->isGranted('ROLE_MANAGER');
+            $isManager = $this->isGranted('ROLE_ORGANIZER');
 
             $this->dishService->updateTranslation(
                 dishId: $id,
@@ -85,7 +85,7 @@ class EditController extends AbstractController
 
         $origin = $request->request->get('origin');
         $user = $this->getAuthedUser();
-        $isManager = $this->isGranted('ROLE_MANAGER');
+        $isManager = $this->isGranted('ROLE_ORGANIZER');
 
         $this->dishService->updateOrigin($id, $user->getId(), $isManager, $origin);
 

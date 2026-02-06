@@ -26,7 +26,7 @@
                     <span>My Notes</span>
                 </a>
             {% endif %}
-            {% if is_granted('ROLE_MANAGER') %}
+            {% if is_granted('ROLE_ORGANIZER') %}
                 <a href="{{ path('app_plugin_bookclub_pending') }}" class="button is-danger">
                     <span class="icon"><i class="fas fa-check-circle"></i></span>
                     <span>Pending Approval</span>

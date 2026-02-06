@@ -7,7 +7,7 @@
     <section class="section">
         <div class="container">
 
-            <h1 class="title">{% if is_granted('ROLE_MANAGER') %}Edit{% else %}Suggest{% endif %} Translation</h1>
+            <h1 class="title">{% if is_granted('ROLE_ORGANIZER') %}Edit{% else %}Suggest{% endif %} Translation</h1>
 
             <div class="columns">
                 <div class="column is-half">
@@ -34,7 +34,7 @@
                         </div>
                         <div class="field is-grouped">
                             <div class="control">
-                                {% if is_granted('ROLE_MANAGER') %}
+                                {% if is_granted('ROLE_ORGANIZER') %}
                                     <button type="submit" class="button is-link">Save</button>
                                 {% else %}
                                     <button type="submit" class="button is-link">Suggest</button>
@@ -98,7 +98,7 @@
                             <td>{{ suggestion.suggestion }}</td>
                             <td>{{ suggestion.approvedAt is empty ? '' : suggestion.approvedAt|date(get_date_format()) }}</td>
                             <td>{{ suggestion.approvedByName }}</td>
-                            {% if is_granted('ROLE_MANAGER') and suggestion.status.value == 0 %}
+                            {% if is_granted('ROLE_ORGANIZER') and suggestion.status.value == 0 %}
                                 <td>
                                     <a class="button is-small is-danger" href="{{ path('app_translation_suggestion_deny', {id: suggestion.id}) }}">Deny</a>
                                     <a class="button is-small is-success" href="{{ path('app_translation_suggestion_approve', {id: suggestion.id}) }}">Approve</a>

@@ -30,7 +30,7 @@ class EditController extends AbstractGlossaryController
                 newGlossary: $newGlossary,
                 id: $id,
                 userId: $this->getUser()->getId(),
-                isManager: $this->isGranted('ROLE_MANAGER'),
+                isManager: $this->isGranted('ROLE_ORGANIZER'),
             );
 
             return $this->redirectToRoute('app_plugin_glossary');
