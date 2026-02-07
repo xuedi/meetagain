@@ -50,7 +50,8 @@
       "Bash(fi)",
       "Bash(docker-compose:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git log:*)"
     ]
   }
 }

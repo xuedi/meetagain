@@ -9,7 +9,7 @@
                 <tr>
                     <td>{{ event.start|date('Y-m-d') }}</td>
                     <td>
-                        <a href="{{ path('app_admin_event_edit', {'id': event.id}) }}">
+                        <a href="{{ path('app_event_details', {'id': event.id}) }}">
                             {{ event.getTitle('en')|u.truncate(25) }}
                         </a>
                     </td>
