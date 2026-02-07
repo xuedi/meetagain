@@ -29,12 +29,15 @@
                             <td>{{ user.email }}</td>
                             <td>{{ user.name }}</td>
                             <td>
+                                {# User approval/deny actions disabled - requires adminTables plugin
                                 <a href="{{ path('app_admin_user_approve', {'id': user.id}) }}">
                                     <span class="icon is-success"><i class="fa fa-check-square"></i></span>
                                 </a>
                                 <a href="{{ path('app_admin_user_deny', {'id': user.id}) }}">
                                     <span class="icon is-danger"><i class="fa fa-minus-square"></i></span>
                                 </a>
+                                #}
+                                <span class="has-text-grey-light">Requires adminTables plugin</span>
                             </td>
                         </tr>
                     {% endif %}
@@ -69,8 +72,9 @@
                         <td>{{ user.rsvpEvents|length }}</td>
                         <td>{{ user.createdAt|date('Y-m-d') }}</td>
                         <td>{% if user.verified %}Yes{% else %}No{% endif %}</td>
-                        <td><a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"><span class="icon"><i
-                                            class="fa fa-edit"></i></span></a></td>
+                        <td>{# Edit user link disabled - requires adminTables plugin
+                            <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
+                            #}</td>
                     </tr>
                 {% endif %}
             {% endfor %}
