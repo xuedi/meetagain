@@ -6,8 +6,7 @@
 
 {% block content %}
 <div class="container">
-    {# Week navigation (only show if center tiles exist) #}
-    {% if centerTiles|length > 0 %}
+    {# Week navigation #}
     <div class="buttons has-addons is-centered mb-4">
         <a class="button" href="{{ path('app_admin', {'week': time.weekPrevious, 'year': time.year}) }}">
             <span class="icon"><i class="fa fa-arrow-left"></i></span>
@@ -20,22 +19,247 @@
             <span class="icon"><i class="fa fa-arrow-right"></i></span>
         </a>
     </div>
-    {% endif %}
 
     <div class="columns">
-        {# Center column (8-wide) - Time-series tiles #}
+        {# Center column (8-wide) - Time-series data #}
         <div class="column is-8">
-            {% for tileData in centerTiles %}
-                {% include tileData.template with tileData.data %}
-            {% endfor %}
+            {# Login Activity Chart (Priority 80) #}
+            <div class="box">
+                <h2 class="title is-6">Login activity (this week)</h2>
+                <canvas id="loginChart" style="max-height: 200px;"></canvas>
+            </div>
+
+            {# RSVP Trend Table (Priority 70) #}
+            <div class="box">
+                <h2 class="title is-6">RSVP Activity (this week)</h2>
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <td>Yes</td>
+                            <td class="has-text-right">{{ rsvpStats.yes }}</td>
+                        </tr>
+                        <tr>
+                            <td>No</td>
+                            <td class="has-text-right">{{ rsvpStats.no }}</td>
+                        </tr>
+                        <tr class="has-background-light">
+                            <td><strong>Total</strong></td>
+                            <td class="has-text-right"><strong>{{ rsvpStats.total }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {# Pages Not Found Chart (Priority 60) #}
+            <div class="box">
+                <h2 class="title is-6">Pages not found (this week)</h2>
+                <canvas id="notFoundChart" style="max-height: 200px;"></canvas>
+            </div>
         </div>
 
-        {# Side column (4-wide) - Fixed info tiles #}
+        {# Side column (4-wide) - Fixed info #}
         <div class="column is-4">
-            {% for tileData in sideTiles %}
-                {% include tileData.template with tileData.data %}
-            {% endfor %}
+            {# Action Required (Priority 100) #}
+            {% if actionItems.reportedImages > 0 or actionItems.pendingTranslations > 0 or actionItems.staleEmails > 0 or unverifiedCount > 0 %}
+            <div class="box has-background-warning-light">
+                <h2 class="title is-6">
+                    <span class="icon"><i class="fa fa-exclamation-triangle"></i></span>
+                    Action Required
+                </h2>
+                <div class="tags">
+                    {% if actionItems.reportedImages > 0 %}
+                        {# Link disabled - requires adminTables plugin
+                        <a href="{{ path('app_admin_image') }}" class="tag is-danger is-medium"> #}
+                        <span class="tag is-danger is-medium">
+                            <span class="icon"><i class="fa fa-flag"></i></span>
+                            <span>{{ actionItems.reportedImages }} Reported Image{{ actionItems.reportedImages > 1 ? 's' : '' }}</span>
+                        </span>
+                        {# </a> #}
+                    {% endif %}
+                    {% if actionItems.pendingTranslations > 0 %}
+                        <a href="{{ path('app_admin_translation_suggestion') }}" class="tag is-warning is-medium">
+                            <span class="icon"><i class="fa fa-language"></i></span>
+                            <span>{{ actionItems.pendingTranslations }} Pending Translation{{ actionItems.pendingTranslations > 1 ? 's' : '' }}</span>
+                        </a>
+                    {% endif %}
+                    {% if actionItems.staleEmails > 0 %}
+                        <span class="tag is-danger is-medium">
+                            <span class="icon"><i class="fa fa-envelope"></i></span>
+                            <span>{{ actionItems.staleEmails }} Stale Email{{ actionItems.staleEmails > 1 ? 's' : '' }} (>1h)</span>
+                        </span>
+                    {% endif %}
+                    {% if unverifiedCount > 0 %}
+                        {# Link disabled - requires adminTables plugin
+                        <a href="{{ path('app_admin_user') }}" class="tag is-info is-medium"> #}
+                        <span class="tag is-info is-medium">
+                            <span class="icon"><i class="fa fa-user-clock"></i></span>
+                            <span>{{ unverifiedCount }} Unverified Account{{ unverifiedCount > 1 ? 's' : '' }}</span>
+                        </span>
+                        {# </a> #}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {# Upcoming Events (Priority 90) #}
+            <div class="box">
+                <h2 class="title is-6">Upcoming Events - Platform</h2>
+                {% if upcomingEvents|length == 0 %}
+                    <p class="has-text-grey">No upcoming events</p>
+                {% else %}
+                    <table class="table is-fullwidth is-narrow">
+                        <tbody>
+                        {% for event in upcomingEvents %}
+                            <tr>
+                                <td>{{ event.start|date('Y-m-d') }}</td>
+                                <td>
+                                    <a href="{{ path('app_event_details', {'id': event.id}) }}">
+                                        {{ event.getTitle('en')|u.truncate(25) }}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+
+            {# Quick Statistics (Priority 80) #}
+            <div class="box">
+                <h2 class="title is-6">Statistics</h2>
+                <table class="table is-narrow is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th class="has-text-right">All</th>
+                            <th class="has-text-right">Week</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for title, data in details %}
+                        <tr>
+                            <td>{{ title }}</td>
+                            <td class="has-text-right">{{ data.count }}</td>
+                            <td class="has-text-right">{{ data.week }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr class="has-background-light">
+                        <td><strong>Active (7 days)</strong></td>
+                        <td class="has-text-right" colspan="2"><strong>{{ activeUsers }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Recurring Events</td>
+                        <td class="has-text-right" colspan="2">{{ recurringEvents }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {# Recent Activity (Priority 70) #}
+            <div class="box">
+                <h2 class="title is-6">Recent Activity - Platform</h2>
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <td><span class="icon"><i class="fa fa-calendar-check"></i></span> RSVP Yes</td>
+                            <td class="has-text-right">{{ rsvpStats.yes }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="icon"><i class="fa fa-calendar-times"></i></span> RSVP No</td>
+                            <td class="has-text-right">{{ rsvpStats.no }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="icon"><i class="fa fa-users"></i></span> Social Connections</td>
+                            <td class="has-text-right">{{ socialStats.total ?? 0 }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="icon"><i class="fa fa-comments"></i></span> Messages</td>
+                            <td class="has-text-right">{{ messageStats.total }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {# Health Checks (Priority 40) #}
+            <div class="box">
+                <h2 class="title is-6">Health Checks</h2>
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <td>Cache</td>
+                            <td class="has-text-right">
+                                {% if tests.cache.ok %}
+                                    <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
+                                {% else %}
+                                    <span class="icon has-text-danger"><i class="fa fa-times-circle"></i></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Log Size
+                                <span class="is-size-7 has-text-grey">({{ (tests.logSize.size / 1024 / 1024)|number_format(1) }}MB)</span>
+                            </td>
+                            <td class="has-text-right">
+                                {% if tests.logSize.ok %}
+                                    <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
+                                {% else %}
+                                    <span class="icon has-text-danger"><i class="fa fa-times-circle"></i></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Disk Space
+                                <span class="is-size-7 has-text-grey">({{ tests.diskSpace.percentFree }}% free)</span>
+                            </td>
+                            <td class="has-text-right">
+                                {% if tests.diskSpace.ok %}
+                                    <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
+                                {% else %}
+                                    <span class="icon has-text-danger"><i class="fa fa-times-circle"></i></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                PHP Version
+                                <span class="is-size-7 has-text-grey">({{ tests.phpVersion.version }})</span>
+                            </td>
+                            <td class="has-text-right">
+                                <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+// Login Activity Chart
+new Chart(document.getElementById('loginChart'), {
+    type: 'bar',
+    data: {
+        datasets: [{
+            data: [{% for day, count in loginTrend %}{x: '{{ day }}', y: {{ count }}},{% endfor %}],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)'
+        }]
+    },
+    options: {plugins: {legend: {display: false}}}
+});
+
+// Pages Not Found Chart
+new Chart(document.getElementById('notFoundChart'), {
+    type: 'bar',
+    data: {
+        datasets: [{
+            data: [{% for day, count in pagesNotFound.list %}{x: '{{ day }}', y: {{ count }}},{% endfor %}],
+            backgroundColor: 'rgba(255, 99, 132, 0.5)'
+        }]
+    },
+    options: {plugins: {legend: {display: false}}}
+});
+</script>
 {% endblock %}
