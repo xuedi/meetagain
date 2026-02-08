@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Security\Voter\DashboardVoter;
 use App\Service\DashboardActionService;
-use App\Service\DashboardService;
 use App\Service\DashboardStatsService;
 use App\Service\HealthCheckService;
 use DateTime;
@@ -20,43 +19,36 @@ class AdminController extends AbstractController
         private readonly DashboardStatsService $dashboardStats,
         private readonly DashboardActionService $dashboardAction,
         private readonly HealthCheckService $healthCheckService,
-        private readonly DashboardService $dashboardService,
     ) {}
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
     #[IsGranted(DashboardVoter::ACCESS)]
     public function index(?int $year = null, ?int $week = null): Response
     {
-        $user = $this->getAuthedUser();
         $now = new DateTime();
         $year ??= (int) $now->format('Y');
         $week ??= (int) $now->format('W');
 
-        // Get accessible center tiles (time-series)
-        $centerTiles = $this->dashboardService->getCenterTilesForUser($user);
-        $centerTileData = [];
-        foreach ($centerTiles as $tile) {
-            $centerTileData[] = [
-                'template' => $tile->getTemplate(),
-                'data' => $tile->getData($user, $year, $week),
-            ];
-        }
-
-        // Get accessible side tiles (fixed info)
-        $sideTiles = $this->dashboardService->getSideTilesForUser($user);
-        $sideTileData = [];
-        foreach ($sideTiles as $tile) {
-            $sideTileData[] = [
-                'template' => $tile->getTemplate(),
-                'data' => $tile->getData($user),
-            ];
-        }
+        // Fetch rsvpStats once (shared by center RSVP table and side Recent Activity)
+        $rsvpStats = $this->dashboardStats->getRsvpStats($year, $week);
 
         return $this->render('admin/index.html.twig', [
             'active' => 'dashboard',
-            'centerTiles' => $centerTileData,
-            'sideTiles' => $sideTileData,
             'time' => $this->dashboardStats->getTimeControl($year, $week),
+            // Center tiles data
+            'loginTrend' => $this->dashboardStats->getLoginTrend($year, $week),
+            'rsvpStats' => $rsvpStats,
+            'pagesNotFound' => $this->dashboardStats->getPagesNotFound($year, $week),
+            // Side tiles data
+            'actionItems' => $this->dashboardAction->getActionItems(),
+            'unverifiedCount' => $this->dashboardAction->getUnverifiedCount(),
+            'upcomingEvents' => $this->dashboardAction->getUpcomingEvents(3),
+            'details' => $this->dashboardStats->getDetails($year, $week),
+            'activeUsers' => $this->dashboardAction->getActiveUsersCount(),
+            'recurringEvents' => $this->dashboardAction->getRecurringEventsCount(),
+            'socialStats' => $this->dashboardStats->getSocialNetworkStats($year, $week),
+            'messageStats' => $this->dashboardAction->getMessageStats(),
+            'tests' => $this->healthCheckService->runAll(),
         ]);
     }
 }
