@@ -11,6 +11,7 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
+use App\Filter\Cms\CmsFilterService;
 use App\Form\CmsType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
@@ -43,6 +44,7 @@ class CmsController extends AbstractAdminController
         private readonly CmsBlockRepository $blockRepo,
         private readonly CmsBlockService $blockService,
         private readonly AnnouncementRepository $announcementRepo,
+        private readonly CmsFilterService $cmsFilterService,
     ) {}
 
     #[Route('/admin/cms', name: 'app_admin_cms')]
@@ -52,10 +54,13 @@ class CmsController extends AbstractAdminController
             'action' => $this->generateUrl('app_admin_cms_add'),
         ]);
 
+        // Apply CMS filtering
+        $filterResult = $this->cmsFilterService->getCmsIdFilter();
+
         return $this->render('admin/cms/cms_list.html.twig', [
             'active' => 'cms',
             'form' => $newForm,
-            'cms' => $this->repo->findAll(),
+            'cms' => $this->repo->findByIds($filterResult->getCmsIds()),
         ]);
     }
 
@@ -68,6 +73,11 @@ class CmsController extends AbstractAdminController
     )]
     public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, ?int $blockId = null): Response
     {
+        // Validate CMS is accessible in current context
+        if (!$this->cmsFilterService->isCmsAccessible($cms->getId())) {
+            throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
+        }
+
         $locale = $this->getLastEditLocale($locale, $request->getSession());
 
         $form = $this->createForm(CmsType::class, $cms);
@@ -106,6 +116,11 @@ class CmsController extends AbstractAdminController
         $id = $request->query->get('id');
         $cmsPage = $this->repo->find($id);
         if ($cmsPage !== null) {
+            // Validate CMS is accessible in current context
+            if (!$this->cmsFilterService->isCmsAccessible($cmsPage->getId())) {
+                throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
+            }
+
             $this->em->remove($cmsPage);
             $this->em->flush();
         }
@@ -139,6 +154,11 @@ class CmsController extends AbstractAdminController
         $cmsPage = $this->repo->find($id);
         if ($cmsPage === null) {
             throw new RuntimeException('Could not find valid page');
+        }
+
+        // Validate CMS is accessible in current context
+        if (!$this->cmsFilterService->isCmsAccessible($cmsPage->getId())) {
+            throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
         }
 
         $locale = $request->request->get('editLocale');
