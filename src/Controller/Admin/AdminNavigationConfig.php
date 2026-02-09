@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
+
 /**
  * Configuration for a controller's admin navigation entry.
  *
@@ -10,12 +12,30 @@ namespace App\Controller\Admin;
  */
 readonly class AdminNavigationConfig
 {
+    /**
+     * @param list<AdminLink> $links
+     */
     public function __construct(
         public string $section, // Section name (e.g., "System")
-        public string $label, // Translation key (e.g., "menu_admin_system")
-        public string $route, // Route name (e.g., "app_admin_system")
-        public ?string $active = null, // Active state identifier (e.g., "system")
-        public ?string $linkRole = null, // Required role for this link
+        public array $links, // Array of AdminLink objects
         public ?string $sectionRole = null, // Required role for entire section
     ) {}
+
+    /**
+     * Convenience factory for the common single-link case.
+     */
+    public static function single(
+        string $section,
+        string $label,
+        string $route,
+        ?string $active = null,
+        ?string $linkRole = null,
+        ?string $sectionRole = null,
+    ): self {
+        return new self(
+            section: $section,
+            links: [new AdminLink(label: $label, route: $route, active: $active, role: $linkRole)],
+            sectionRole: $sectionRole,
+        );
+    }
 }

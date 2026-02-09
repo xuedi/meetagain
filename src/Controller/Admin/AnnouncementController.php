@@ -18,7 +18,7 @@ class AnnouncementController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'System',
             label: 'menu_admin_announcement',
             route: 'app_admin_announcement',

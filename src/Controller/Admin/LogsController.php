@@ -12,8 +12,8 @@ class LogsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
-            section: 'Logs',
+        return AdminNavigationConfig::single(
+            section: 'System',
             label: 'menu_admin_activity_log',
             route: 'app_admin_activity_log',
             active: 'activity_log',
