@@ -30,8 +30,8 @@ class CmsController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return AdminNavigationConfig::single(
-            section: 'CMS',
-            label: 'menu_admin_cms',
+            section: 'System',
+            label: 'CMS',
             route: 'app_admin_cms',
             active: 'cms',
             linkRole: 'ROLE_ORGANIZER',
