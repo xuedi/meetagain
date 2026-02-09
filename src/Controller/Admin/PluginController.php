@@ -11,7 +11,7 @@ class PluginController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'System',
             label: 'menu_admin_plugin',
             route: 'app_admin_plugin',

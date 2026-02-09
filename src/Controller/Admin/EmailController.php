@@ -20,7 +20,7 @@ class EmailController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'System',
             label: 'menu_admin_email',
             route: 'app_admin_email',

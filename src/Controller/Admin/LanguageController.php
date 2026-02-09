@@ -20,7 +20,7 @@ class LanguageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'System',
             label: 'menu_admin_language',
             route: 'app_admin_language',

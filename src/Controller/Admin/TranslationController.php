@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\TranslationSuggestionStatus;
 use App\Repository\TranslationSuggestionRepository;
 use App\Service\TranslationImportService;
@@ -14,12 +15,19 @@ class TranslationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
-            section: 'Translation',
-            label: 'menu_admin_translation',
-            route: 'app_admin_translation',
-            active: 'translation',
-        );
+        return new AdminNavigationConfig(section: 'Translation', links: [
+            new AdminLink(label: 'menu_admin_translation', route: 'app_admin_translation', active: 'edit'),
+            new AdminLink(
+                label: 'menu_admin_translation_extract',
+                route: 'app_admin_translation_extract',
+                active: 'extract',
+            ),
+            new AdminLink(
+                label: 'menu_admin_translation_publish',
+                route: 'app_admin_translation_publish',
+                active: 'publish',
+            ),
+        ]);
     }
 
     public function __construct(
