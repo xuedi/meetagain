@@ -318,4 +318,201 @@ final class AdminNavigationServiceTest extends TestCase
         $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $links);
         $this->assertSame(['menu_admin_public'], $linkLabels, 'Restricted link should be filtered out');
     }
+
+    public function testModifiesChangesLinkSection(): void
+    {
+        // Arrange - base controller provides link, modifier changes its section
+        $baseController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return AdminNavigationConfig::single(
+                    section: 'CMS',
+                    label: 'Base CMS',
+                    route: 'app_admin_cms',
+                    active: 'cms',
+                );
+            }
+        };
+
+        $modifierController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'Group',
+                    links: [],
+                    modifies: [
+                        'app_admin_cms' => [
+                            'section' => 'Group Section',
+                            'label' => 'Modified CMS',
+                        ],
+                    ],
+                );
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, [$baseController, $modifierController]);
+
+        $this->security->method('isGranted')->willReturn(true);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert - link should appear in modified section with modified label
+        $this->assertCount(1, $sections, 'Should have one section');
+        $this->assertEquals('Group Section', $sections[0]->getSection(), 'Section should be modified');
+
+        $links = $sections[0]->getLinks();
+        $this->assertCount(1, $links, 'Should have one link');
+        $this->assertEquals('Modified CMS', $links[0]->getLabel(), 'Label should be modified');
+        $this->assertEquals('app_admin_cms', $links[0]->getRoute(), 'Route should remain unchanged');
+    }
+
+    public function testModifiesOnlyAffectsSpecifiedRoute(): void
+    {
+        // Arrange - multiple controllers, only one route is modified
+        $cmsController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return AdminNavigationConfig::single(section: 'CMS', label: 'Base CMS', route: 'app_admin_cms');
+            }
+        };
+
+        $systemController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return AdminNavigationConfig::single(section: 'System', label: 'System', route: 'app_admin_system');
+            }
+        };
+
+        $modifierController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'Group',
+                    links: [],
+                    modifies: [
+                        'app_admin_cms' => ['section' => 'Group'],
+                    ],
+                );
+            }
+        };
+
+        $service = new AdminNavigationService(
+            $this->security,
+            [$cmsController, $systemController, $modifierController],
+        );
+
+        $this->security->method('isGranted')->willReturn(true);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert
+        $this->assertCount(2, $sections, 'Should have two sections (System and Group)');
+
+        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
+        $this->assertContains('System', $sectionNames, 'System section should be visible');
+        $this->assertContains('Group', $sectionNames, 'Group section should be visible');
+        $this->assertNotContains('CMS', $sectionNames, 'CMS section should not exist (link moved to Group)');
+    }
+
+    public function testMultipleModificationsOverwriteEachOther(): void
+    {
+        // Arrange - multiple controllers modifying the same route (last one wins)
+        $cmsController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return AdminNavigationConfig::single(section: 'CMS', label: 'CMS', route: 'app_admin_cms');
+            }
+        };
+
+        $modifier1 = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'Plugin1',
+                    links: [],
+                    modifies: [
+                        'app_admin_cms' => ['section' => 'Modified Section 1', 'label' => 'Label 1'],
+                    ],
+                );
+            }
+        };
+
+        $modifier2 = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'Plugin2',
+                    links: [],
+                    modifies: [
+                        'app_admin_cms' => ['section' => 'Modified Section 2', 'label' => 'Label 2'],
+                    ],
+                );
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, [$cmsController, $modifier1, $modifier2]);
+
+        $this->security->method('isGranted')->willReturn(true);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert - last modification wins
+        $this->assertCount(1, $sections, 'Should have one section');
+        $this->assertEquals('Modified Section 2', $sections[0]->getSection(), 'Last modifier should win');
+
+        $links = $sections[0]->getLinks();
+        $this->assertEquals('Label 2', $links[0]->getLabel(), 'Last modifier should set label');
+    }
+
+    public function testModifiesCanChangeMultipleProperties(): void
+    {
+        // Arrange - modifier changes section, label, and active
+        $baseController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return AdminNavigationConfig::single(
+                    section: 'Original',
+                    label: 'Original Label',
+                    route: 'app_admin_test',
+                    active: 'original',
+                );
+            }
+        };
+
+        $modifierController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'Modified',
+                    links: [],
+                    modifies: [
+                        'app_admin_test' => [
+                            'section' => 'New Section',
+                            'label' => 'New Label',
+                            'active' => 'new_active',
+                        ],
+                    ],
+                );
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, [$baseController, $modifierController]);
+
+        $this->security->method('isGranted')->willReturn(true);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert
+        $this->assertCount(1, $sections);
+        $this->assertEquals('New Section', $sections[0]->getSection());
+
+        $link = $sections[0]->getLinks()[0];
+        $this->assertEquals('New Label', $link->getLabel());
+        $this->assertEquals('new_active', $link->getActive());
+        $this->assertEquals('app_admin_test', $link->getRoute());
+    }
 }

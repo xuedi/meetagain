@@ -29,33 +29,65 @@ readonly class AdminNavigationService
      * Get all sidebar sections for the current user.
      *
      * Collects navigation from all controllers, groups by section, sorts alphabetically,
-     * and filters by user roles.
+     * and filters by user roles. Also applies route modifications from plugins.
      *
      * @return list<AdminSection>
      */
     public function getSidebarSections(): array
     {
         $sectionsMap = [];
+        $modifications = [];
 
-        // Collect from controllers
+        // First pass: collect all route modifications
+        foreach ($this->controllers as $controller) {
+            $config = $controller->getAdminNavigation();
+            if ($config === null) {
+                continue;
+            }
+
+            if ($config->modifies !== null) {
+                foreach ($config->modifies as $route => $changes) {
+                    $modifications[$route] = $changes;
+                }
+            }
+        }
+
+        // Second pass: collect navigation, applying modifications
         foreach ($this->controllers as $controller) {
             $config = $controller->getAdminNavigation();
             if ($config === null) {
                 continue; // Skip controllers without navigation
             }
 
-            $sectionKey = $config->section;
+            foreach ($config->links as $link) {
+                // Apply modifications if they exist for this route
+                $section = $config->section;
+                $label = $link->getLabel();
+                $route = $link->getRoute();
+                $active = $link->getActive();
+                $role = $link->getRole();
 
-            // Initialize section if new
-            if (!isset($sectionsMap[$sectionKey])) {
-                $sectionsMap[$sectionKey] = [
-                    'role' => $config->sectionRole,
-                    'links' => [],
-                ];
+                if (isset($modifications[$route])) {
+                    $mods = $modifications[$route];
+                    $section = $mods['section'] ?? $section;
+                    $label = $mods['label'] ?? $label;
+                    $active = $mods['active'] ?? $active;
+                    $role = $mods['role'] ?? $role;
+                }
+
+                // Initialize section if new
+                if (!isset($sectionsMap[$section])) {
+                    $sectionsMap[$section] = [
+                        'role' => $config->sectionRole,
+                        'links' => [],
+                    ];
+                }
+
+                // Create modified link
+                $modifiedLink = new AdminLink(label: $label, route: $route, active: $active, role: $role);
+
+                $sectionsMap[$section]['links'][] = $modifiedLink;
             }
-
-            // Add links to section
-            array_push($sectionsMap[$sectionKey]['links'], ...$config->links);
         }
 
         // Sort sections alphabetically by section name
