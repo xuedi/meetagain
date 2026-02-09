@@ -12,7 +12,7 @@ class ImageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'Tables',
             label: 'menu_admin_image',
             route: 'app_admin_image',

@@ -18,7 +18,7 @@ class UserController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'Tables',
             label: 'menu_admin_user',
             route: 'app_admin_user',

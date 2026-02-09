@@ -28,7 +28,7 @@ class CmsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'CMS',
             label: 'menu_admin_cms',
             route: 'app_admin_cms',

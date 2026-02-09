@@ -24,8 +24,8 @@ class MenuController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
-            section: 'CMS',
+        return AdminNavigationConfig::single(
+            section: 'System',
             label: 'menu_admin_menu',
             route: 'app_admin_menu',
             active: 'menu',

@@ -25,7 +25,7 @@ class EventController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'Tables',
             label: 'menu_admin_event',
             route: 'app_admin_event',

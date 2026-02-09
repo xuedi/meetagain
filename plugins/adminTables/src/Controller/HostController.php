@@ -16,7 +16,7 @@ class HostController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'Tables',
             label: 'menu_admin_host',
             route: 'app_admin_host',

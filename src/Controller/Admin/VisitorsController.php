@@ -11,7 +11,7 @@ class VisitorsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
+        return AdminNavigationConfig::single(
             section: 'Logs',
             label: 'menu_admin_visitors',
             route: 'app_admin_visitors',

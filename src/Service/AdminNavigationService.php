@@ -54,13 +54,8 @@ readonly class AdminNavigationService
                 ];
             }
 
-            // Add link to section
-            $sectionsMap[$sectionKey]['links'][] = new AdminLink(
-                label: $config->label,
-                route: $config->route,
-                active: $config->active,
-                role: $config->linkRole,
-            );
+            // Add links to section
+            array_push($sectionsMap[$sectionKey]['links'], ...$config->links);
         }
 
         // Sort sections alphabetically by section name
