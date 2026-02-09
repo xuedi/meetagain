@@ -233,6 +233,15 @@
             "tests/bootstrap.php"
         ]
     },
+    "symfony/postmark-mailer": {
+        "version": "8.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.4",
+            "ref": "631f81f2fbf58126ae699a04b1d0984442613a19"
+        }
+    },
     "symfony/property-info": {
         "version": "7.3",
         "recipe": {
@@ -270,15 +279,6 @@
             "config/packages/security.yaml",
             "config/routes/security.yaml"
         ]
-    },
-    "symfony/sendgrid-mailer": {
-        "version": "7.3",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "4.4",
-            "ref": "224aedffb66812dc2b0965dabc14d5f800941da6"
-        }
     },
     "symfony/translation": {
         "version": "7.1",
