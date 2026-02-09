@@ -59,4 +59,30 @@ class CmsRepository extends ServiceEntityRepository
 
         return $results[0] ?? null;
     }
+
+    /**
+     * Find CMS pages by IDs, optionally filtered by allowed IDs.
+     * If no IDs provided, returns all pages.
+     *
+     * @param array<int>|null $ids CMS IDs to fetch, or null for all pages
+     * @return array<Cms>
+     */
+    public function findByIds(?array $ids): array
+    {
+        if ($ids === null) {
+            return $this->findBy([], ['createdAt' => 'DESC']);
+        }
+
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this
+            ->createQueryBuilder('c')
+            ->where('c.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
