@@ -3,6 +3,13 @@
 {% block content %}
 
     <div class="container">
+        {# Group-specific messaging (multisite mode) #}
+        {% if group is defined and group.startPage is null %}
+            <p class="has-text-grey-light mb-4">
+                No home page selected. Visitors will see a default landing page.
+                <a href="{{ path('app_admin_group_settings') }}">Configure in Settings</a>
+            </p>
+        {% endif %}
 
         <article class="message is-success is-hidden" id="cms-add">
             {{ form_start(form) }}
@@ -12,7 +19,7 @@
             </div>
             <div class="message-body">
                 <p>
-                    Please enter the url part og the new page, all else cam be added in the following step
+                    Please enter the URL slug for the new page. You can add content blocks in the next step.
                 </p>
                 <p>
                     {{ form_row(form.slug) }}
@@ -24,6 +31,9 @@
             {{ form_end(form, {'render_rest': false}) }}
         </article>
 
+        {% if cms|length == 0 %}
+            <p class="has-text-grey-light">No pages created yet. Click the + icon to create your first page!</p>
+        {% endif %}
 
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
@@ -40,10 +50,22 @@
             <tbody>
             {% for page in cms %}
                 <tr>
-                    <td>{{ page.slug }}</td>
+                    <td>
+                        {{ page.slug }}
+                        {# Show home indicator in multisite mode #}
+                        {% if group is defined and group.startPage and group.startPage.id == page.id %}
+                            <span class="has-text-info"> (Home)</span>
+                        {% endif %}
+                    </td>
                     <td>{{ page.createdBy.name }}</td>
                     <td>{{ page.createdAt|date('Y-m-d') }}</td>
-                    <td>{% if page.published %}{{ 'published' | trans }}{% else %}{{ 'draft' | trans }}{% endif %}</td>
+                    <td>
+                        {% if page.published %}
+                            <span class="has-text-success">{{ 'published' | trans }}</span>
+                        {% else %}
+                            <span class="has-text-grey-light">{{ 'draft' | trans }}</span>
+                        {% endif %}
+                    </td>
                     <td>{{ page.blocks|length }}</td>
                     <td>{{ page.languages|length }}</td>
                     <td><a href="{{ path('app_admin_cms_edit', {'id': page.id, 'locale': app.request.locale}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
