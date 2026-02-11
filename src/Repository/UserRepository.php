@@ -116,13 +116,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return []; // Empty filter = no results
         }
 
-        return $this->buildActiveMembersQuery(
-            excludeIds: [],
-            restrictToUserIds: $restrictToUserIds,
-            excludeSystemUser: false,
-            limit: $limit,
-            offset: $offset,
-        )->getQuery()->getResult();
+        return $this
+            ->buildActiveMembersQuery(
+                excludeIds: [],
+                restrictToUserIds: $restrictToUserIds,
+                excludeSystemUser: false,
+                limit: $limit,
+                offset: $offset,
+            )
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -139,13 +142,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return []; // Empty filter = no results
         }
 
-        return $this->buildActiveMembersQuery(
-            excludeIds: $excludeIds,
-            restrictToUserIds: $restrictToUserIds,
-            excludeSystemUser: false,
-            limit: $limit,
-            offset: $offset,
-        )->getQuery()->getResult();
+        return $this
+            ->buildActiveMembersQuery(
+                excludeIds: $excludeIds,
+                restrictToUserIds: $restrictToUserIds,
+                excludeSystemUser: false,
+                limit: $limit,
+                offset: $offset,
+            )
+            ->getQuery()
+            ->getResult();
     }
 
     /**
