@@ -48,7 +48,7 @@ class FixtureSmokeTest extends TestCase
     public function testSystemUserFixtureCanInstantiate(): void
     {
         // Arrange
-        $hasher = $this->createMock(UserPasswordHasherInterface::class);
+        $hasher = $this->createStub(UserPasswordHasherInterface::class);
 
         // Act
         $fixture = new SystemUserFixture($hasher);
@@ -60,7 +60,7 @@ class FixtureSmokeTest extends TestCase
     public function testLanguageFixtureCanInstantiate(): void
     {
         // Arrange
-        $imageService = $this->createMock(ImageService::class);
+        $imageService = $this->createStub(ImageService::class);
 
         // Act
         $fixture = new LanguageFixture($imageService);
@@ -81,8 +81,8 @@ class FixtureSmokeTest extends TestCase
     public function testEmailTemplateFixtureCanInstantiate(): void
     {
         // Arrange
-        $templateService = $this->createMock(EmailTemplateService::class);
-        $languageService = $this->createMock(LanguageService::class);
+        $templateService = $this->createStub(EmailTemplateService::class);
+        $languageService = $this->createStub(LanguageService::class);
 
         // Act
         $fixture = new EmailTemplateFixture($templateService, $languageService);
@@ -96,8 +96,8 @@ class FixtureSmokeTest extends TestCase
     public function testUserFixtureCanInstantiate(): void
     {
         // Arrange
-        $hasher = $this->createMock(UserPasswordHasherInterface::class);
-        $imageService = $this->createMock(ImageService::class);
+        $hasher = $this->createStub(UserPasswordHasherInterface::class);
+        $imageService = $this->createStub(ImageService::class);
 
         // Act
         $fixture = new UserFixture($hasher, $imageService);
@@ -136,7 +136,7 @@ class FixtureSmokeTest extends TestCase
     public function testCmsBlockFixtureCanInstantiate(): void
     {
         // Arrange
-        $imageService = $this->createMock(ImageService::class);
+        $imageService = $this->createStub(ImageService::class);
 
         // Act
         $fixture = new CmsBlockFixture($imageService);
@@ -157,7 +157,7 @@ class FixtureSmokeTest extends TestCase
     public function testEventFixtureCanInstantiate(): void
     {
         // Arrange
-        $imageService = $this->createMock(ImageService::class);
+        $imageService = $this->createStub(ImageService::class);
 
         // Act
         $fixture = new EventFixture($imageService);
@@ -216,7 +216,7 @@ class FixtureSmokeTest extends TestCase
     public function testGroupCmsFixtureCanInstantiate(): void
     {
         // Arrange
-        $groupCmsService = $this->createMock(GroupCmsService::class);
+        $groupCmsService = $this->createStub(GroupCmsService::class);
 
         // Act
         $fixture = new GroupCmsFixture($groupCmsService);
@@ -228,7 +228,7 @@ class FixtureSmokeTest extends TestCase
     public function testGroupCmsBlockFixtureCanInstantiate(): void
     {
         // Arrange
-        $imageService = $this->createMock(ImageService::class);
+        $imageService = $this->createStub(ImageService::class);
 
         // Act
         $fixture = new GroupCmsBlockFixture($imageService);
@@ -240,7 +240,7 @@ class FixtureSmokeTest extends TestCase
     public function testGroupMenuFixtureCanInstantiate(): void
     {
         // Arrange
-        $menuMappingRepository = $this->createMock(GroupMenuMappingRepository::class);
+        $menuMappingRepository = $this->createStub(GroupMenuMappingRepository::class);
 
         // Act
         $fixture = new GroupMenuFixture($menuMappingRepository);
@@ -252,7 +252,7 @@ class FixtureSmokeTest extends TestCase
     public function testGroupEventFixtureCanInstantiate(): void
     {
         // Arrange
-        $imageService = $this->createMock(ImageService::class);
+        $imageService = $this->createStub(ImageService::class);
 
         // Act
         $fixture = new GroupEventFixture($imageService);
@@ -284,8 +284,8 @@ class FixtureSmokeTest extends TestCase
     public function testDishFixtureCanInstantiate(): void
     {
         // Arrange
-        $imageService = $this->createMock(ImageService::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $imageService = $this->createStub(ImageService::class);
+        $userRepository = $this->createStub(UserRepository::class);
 
         // Act
         $fixture = new DishFixture($imageService, $userRepository);
@@ -297,8 +297,8 @@ class FixtureSmokeTest extends TestCase
     public function testBookclubFixtureCanInstantiate(): void
     {
         // Arrange
-        $imageService = $this->createMock(ImageService::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $imageService = $this->createStub(ImageService::class);
+        $userRepository = $this->createStub(UserRepository::class);
 
         // Act
         $fixture = new BookclubFixture($imageService, $userRepository);
@@ -310,7 +310,7 @@ class FixtureSmokeTest extends TestCase
     public function testFilmFixtureCanInstantiate(): void
     {
         // Arrange
-        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository = $this->createStub(UserRepository::class);
 
         // Act
         $fixture = new FilmFixture($userRepository);
