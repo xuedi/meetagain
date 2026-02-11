@@ -21,6 +21,12 @@ use-tabs = false
 [linter]
 integrations = ["symfony", "php-unit"]
 
+[linter.rules.too-many-methods]
+threshold = 12
+
+[linter.rules.kan-defect]
+threshold = 2.0
+
 [analyzer]
 
 [guard]
