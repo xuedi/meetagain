@@ -95,6 +95,7 @@ devModeFixtures plugins='':
     {{PHP}} php bin/console app:plugin enable {{plugins}}
     {{JUST}} devResetDatabase
     {{PHP}} php bin/console cache:clear
+    {{PHP}} php bin/console cache:warmup
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=base
@@ -142,12 +143,14 @@ plugin-list:
 plugin-enable name:
     {{PHP}} php bin/console app:plugin enable {{name}}
     {{PHP}} php bin/console cache:clear
+    {{PHP}} php bin/console cache:warmup
 
 # Disable a specific plugin without affecting others
 [group('plugins')]
 plugin-disable name:
     {{PHP}} php bin/console app:plugin disable {{name}}
     {{PHP}} php bin/console cache:clear
+    {{PHP}} php bin/console cache:warmup
 
 # Run all tests and checks
 [group('testing')]
