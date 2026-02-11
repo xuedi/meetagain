@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Security\Voter\DashboardVoter;
 use App\Service\DashboardActionService;
 use App\Service\DashboardStatsService;
 use App\Service\HealthCheckService;
@@ -22,7 +21,7 @@ class AdminController extends AbstractController
     ) {}
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
-    #[IsGranted(DashboardVoter::ACCESS)]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function index(?int $year = null, ?int $week = null): Response
     {
         $now = new DateTime();

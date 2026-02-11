@@ -23,13 +23,16 @@
     <div class="columns">
         {# Center column (8-wide) - Time-series data #}
         <div class="column is-8">
-            {# Login Activity Chart (Priority 80) #}
+            {# Login Activity Chart (Priority 80) - ROLE_ADMIN only #}
+            {% if is_granted('ROLE_ADMIN') %}
             <div class="box">
                 <h2 class="title is-6">Login activity (this week)</h2>
                 <canvas id="loginChart" style="max-height: 200px;"></canvas>
             </div>
+            {% endif %}
 
-            {# RSVP Trend Table (Priority 70) #}
+            {# RSVP Trend Table (Priority 70) - ROLE_ORGANIZER #}
+            {% if is_granted('ROLE_ORGANIZER') %}
             <div class="box">
                 <h2 class="title is-6">RSVP Activity (this week)</h2>
                 <table class="table is-narrow is-fullwidth">
@@ -49,17 +52,21 @@
                     </tbody>
                 </table>
             </div>
+            {% endif %}
 
-            {# Pages Not Found Chart (Priority 60) #}
+            {# Pages Not Found Chart (Priority 60) - ROLE_ADMIN only #}
+            {% if is_granted('ROLE_ADMIN') %}
             <div class="box">
                 <h2 class="title is-6">Pages not found (this week)</h2>
                 <canvas id="notFoundChart" style="max-height: 200px;"></canvas>
             </div>
+            {% endif %}
         </div>
 
         {# Side column (4-wide) - Fixed info #}
         <div class="column is-4">
-            {# Action Required (Priority 100) #}
+            {# Action Required (Priority 100) - ROLE_ADMIN only #}
+            {% if is_granted('ROLE_ADMIN') %}
             {% if actionItems.reportedImages > 0 or actionItems.pendingTranslations > 0 or actionItems.staleEmails > 0 or unverifiedCount > 0 %}
             <div class="box has-background-warning-light">
                 <h2 class="title is-6">
@@ -100,8 +107,10 @@
                 </div>
             </div>
             {% endif %}
+            {% endif %}
 
-            {# Upcoming Events (Priority 90) #}
+            {# Upcoming Events (Priority 90) - ROLE_ORGANIZER #}
+            {% if is_granted('ROLE_ORGANIZER') %}
             <div class="box">
                 <h2 class="title is-6">Upcoming Events - Platform</h2>
                 {% if upcomingEvents|length == 0 %}
@@ -123,8 +132,10 @@
                     </table>
                 {% endif %}
             </div>
+            {% endif %}
 
-            {# Quick Statistics (Priority 80) #}
+            {# Quick Statistics (Priority 80) - ROLE_ADMIN only #}
+            {% if is_granted('ROLE_ADMIN') %}
             <div class="box">
                 <h2 class="title is-6">Statistics</h2>
                 <table class="table is-narrow is-fullwidth">
@@ -154,8 +165,10 @@
                     </tbody>
                 </table>
             </div>
+            {% endif %}
 
-            {# Recent Activity (Priority 70) #}
+            {# Recent Activity (Priority 70) - ROLE_ORGANIZER #}
+            {% if is_granted('ROLE_ORGANIZER') %}
             <div class="box">
                 <h2 class="title is-6">Recent Activity - Platform</h2>
                 <table class="table is-narrow is-fullwidth">
@@ -179,8 +192,10 @@
                     </tbody>
                 </table>
             </div>
+            {% endif %}
 
-            {# Health Checks (Priority 40) #}
+            {# Health Checks (Priority 40) - ROLE_ADMIN only #}
+            {% if is_granted('ROLE_ADMIN') %}
             <div class="box">
                 <h2 class="title is-6">Health Checks</h2>
                 <table class="table is-narrow is-fullwidth">
@@ -233,11 +248,13 @@
                     </tbody>
                 </table>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
+{% if is_granted('ROLE_ADMIN') %}
 // Login Activity Chart
 new Chart(document.getElementById('loginChart'), {
     type: 'bar',
@@ -261,5 +278,6 @@ new Chart(document.getElementById('notFoundChart'), {
     },
     options: {plugins: {legend: {display: false}}}
 });
+{% endif %}
 </script>
 {% endblock %}
