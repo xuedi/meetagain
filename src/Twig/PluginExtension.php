@@ -42,22 +42,7 @@ final class PluginExtension extends AbstractExtension
 
     public function getPluginsLinks(): array
     {
-        $enabledPlugins = $this->pluginService->getActiveList();
-        $links = [];
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
-            }
-            try {
-                foreach ($plugin->getMenuLinks() as $link) {
-                    $links[] = $link;
-                }
-            } catch (Throwable) {
-                continue;
-            }
-        }
-
-        return $links;
+        return $this->collectFromPlugins(fn(Plugin $p) => $p->getMenuLinks());
     }
 
     /**
@@ -65,23 +50,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginsAdminSystemLinks(): array
     {
-        $enabledPlugins = $this->pluginService->getActiveList();
-        $sections = [];
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
-            }
-            try {
-                $adminSection = $plugin->getAdminSystemLinks();
-                if ($adminSection !== null) {
-                    $sections[] = $adminSection;
-                }
-            } catch (Throwable) {
-                continue;
-            }
-        }
-
-        return $sections;
+        return $this->collectFromPlugins(fn(Plugin $p) => $p->getAdminSystemLinks());
     }
 
     /**
@@ -89,22 +58,13 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginStylesheets(): array
     {
-        $enabledPlugins = $this->pluginService->getActiveList();
-        $stylesheets = [];
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
+        return $this->collectFromPlugins(function (Plugin $plugin) {
+            $paths = [];
+            foreach ($plugin->getStylesheets() as $path) {
+                $paths[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
             }
-            try {
-                foreach ($plugin->getStylesheets() as $path) {
-                    $stylesheets[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
-                }
-            } catch (Throwable) {
-                continue;
-            }
-        }
-
-        return $stylesheets;
+            return $paths;
+        });
     }
 
     /**
@@ -112,22 +72,13 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginJavascripts(): array
     {
-        $enabledPlugins = $this->pluginService->getActiveList();
-        $javascripts = [];
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
+        return $this->collectFromPlugins(function (Plugin $plugin) {
+            $paths = [];
+            foreach ($plugin->getJavascripts() as $path) {
+                $paths[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
             }
-            try {
-                foreach ($plugin->getJavascripts() as $path) {
-                    $javascripts[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
-                }
-            } catch (Throwable) {
-                continue;
-            }
-        }
-
-        return $javascripts;
+            return $paths;
+        });
     }
 
     /**
@@ -135,22 +86,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginFooterAbout(): ?string
     {
-        $enabledPlugins = $this->pluginService->getActiveList();
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
-            }
-            try {
-                $footerAbout = $plugin->getFooterAbout();
-                if ($footerAbout !== null) {
-                    return $footerAbout;
-                }
-            } catch (Throwable) {
-                continue;
-            }
-        }
-
-        return null;
+        return $this->findFirstFromPlugins(fn(Plugin $p) => $p->getFooterAbout());
     }
 
     public function getEventListItemTags(int $eventId): string
@@ -159,8 +95,32 @@ final class PluginExtension extends AbstractExtension
             return $this->renderTags($this->tagCache[$eventId]);
         }
 
+        $tags = $this->collectFromPlugins(function (Plugin $plugin) use ($eventId) {
+            $validTags = [];
+            foreach ($plugin->getEventListItemTags($eventId) as $tag) {
+                if ($tag instanceof EventListItemTag) {
+                    $validTags[] = $tag;
+                }
+            }
+            return $validTags;
+        });
+
+        $this->tagCache[$eventId] = $tags;
+
+        return $this->renderTags($tags);
+    }
+
+    /**
+     * Collects results from all enabled plugins using the provided callback.
+     *
+     * @template T
+     * @param callable(Plugin): (T|list<T>|null) $callback
+     * @return list<T>
+     */
+    private function collectFromPlugins(callable $callback): array
+    {
         $enabledPlugins = $this->pluginService->getActiveList();
-        $tags = [];
+        $results = [];
 
         foreach ($this->plugins as $plugin) {
             if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
@@ -168,10 +128,12 @@ final class PluginExtension extends AbstractExtension
             }
 
             try {
-                $pluginTags = $plugin->getEventListItemTags($eventId);
-                foreach ($pluginTags as $tag) {
-                    if ($tag instanceof EventListItemTag) {
-                        $tags[] = $tag;
+                $result = $callback($plugin);
+                if ($result !== null) {
+                    if (is_array($result)) {
+                        array_push($results, ...$result);
+                    } else {
+                        $results[] = $result;
                     }
                 }
             } catch (Throwable) {
@@ -179,9 +141,36 @@ final class PluginExtension extends AbstractExtension
             }
         }
 
-        $this->tagCache[$eventId] = $tags;
+        return $results;
+    }
 
-        return $this->renderTags($tags);
+    /**
+     * Returns first non-null result from enabled plugins.
+     *
+     * @template T
+     * @param callable(Plugin): ?T $callback
+     * @return ?T
+     */
+    private function findFirstFromPlugins(callable $callback): mixed
+    {
+        $enabledPlugins = $this->pluginService->getActiveList();
+
+        foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+
+            try {
+                $result = $callback($plugin);
+                if ($result !== null) {
+                    return $result;
+                }
+            } catch (Throwable) {
+                continue;
+            }
+        }
+
+        return null;
     }
 
     /**
