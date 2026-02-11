@@ -11,6 +11,7 @@ class PluginServiceTest extends TestCase
 {
     private string $tempDir;
     private string $configFile;
+    private string $envConfigFile;
 
     protected function setUp(): void
     {
@@ -22,8 +23,9 @@ class PluginServiceTest extends TestCase
         mkdir($configDir, 0777, true);
 
         $this->configFile = $configDir . '/plugins.php';
+        $this->envConfigFile = $configDir . '/plugins_test.php';
         file_put_contents(
-            $this->configFile,
+            $this->envConfigFile,
             '<?php declare(strict_types=1); return ["plugin1" => true, "plugin2" => false];',
         );
     }
@@ -70,7 +72,7 @@ class PluginServiceTest extends TestCase
         $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsMock->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
 
-        $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir);
+        $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir, 'test');
 
         // Act: get admin list
         $result = $subject->getAdminList();
@@ -91,7 +93,7 @@ class PluginServiceTest extends TestCase
         $fsMock->method('exists')->willReturn(false);
         $fsMock->expects($this->never())->method('glob');
 
-        $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir);
+        $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir, 'test');
 
         // Act: get admin list
         $result = $subject->getAdminList();
@@ -104,9 +106,9 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem to return config directory
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturn(true);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
 
-        $subject = new PluginService($this->createStub(CommandService::class), $fsStub, $this->tempDir);
+        $subject = new PluginService($this->createStub(CommandService::class), $fsStub, $this->tempDir, 'test');
 
         // Act: get active list
         $result = $subject->getActiveList();
@@ -120,24 +122,24 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturn(true);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsStub
             ->method('putFileContents')
             ->willReturnCallback(function ($path, $content) {
-                file_put_contents($this->configFile, $content);
-
+                // Write to the standard plugins.php file
+                file_put_contents($path, $content);
                 return true;
             });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir, 'test');
 
         // Act: install new plugin
         $subject->install('test-plugin');
 
-        // Assert: plugin is added as disabled
+        // Assert: plugin is added as disabled to the main plugins.php file
         $config = include $this->configFile;
         $this->assertArrayHasKey('test-plugin', $config);
         $this->assertFalse($config['test-plugin']);
@@ -147,18 +149,18 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturn(true);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir, 'test');
 
         // Act: try to install already installed plugin
         $subject->install('plugin1');
 
         // Assert: config unchanged (plugin1 was already in config)
-        $config = include $this->configFile;
+        $config = include $this->envConfigFile;
         $this->assertTrue($config['plugin1']);
     }
 
@@ -166,19 +168,18 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturn(true);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsStub
             ->method('putFileContents')
             ->willReturnCallback(function ($path, $content) {
-                file_put_contents($this->configFile, $content);
-
+                file_put_contents($path, $content);
                 return true;
             });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir, 'test');
 
         // Act: uninstall plugin
         $subject->uninstall('plugin1');
@@ -192,19 +193,19 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturn(true);
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir, 'test');
 
         // Act: try to uninstall non-existent plugin
         $subject->uninstall('non-existent-plugin');
 
         // Assert: config unchanged
-        $config = include $this->configFile;
+        $config = include $this->envConfigFile;
         $this->assertArrayNotHasKey('non-existent-plugin', $config);
     }
 
@@ -212,19 +213,18 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturn(true);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsStub
             ->method('putFileContents')
             ->willReturnCallback(function ($path, $content) {
-                file_put_contents($this->configFile, $content);
-
+                file_put_contents($path, $content);
                 return true;
             });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir, 'test');
 
         // Act: enable disabled plugin (plugin2 is false)
         $subject->enable('plugin2');
@@ -238,13 +238,13 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturn(true);
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir, 'test');
 
         // Act: try to enable non-existent plugin
         $subject->enable('non-existent-plugin');
@@ -257,13 +257,13 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturn(true);
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir, 'test');
 
         // Act: try to enable already enabled plugin (plugin1 is true)
         $subject->enable('plugin1');
@@ -276,19 +276,18 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturn(true);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsStub
             ->method('putFileContents')
             ->willReturnCallback(function ($path, $content) {
-                file_put_contents($this->configFile, $content);
-
+                file_put_contents($path, $content);
                 return true;
             });
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->once())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir, 'test');
 
         // Act: disable enabled plugin (plugin1 is true)
         $subject->disable('plugin1');
@@ -302,13 +301,13 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturn(true);
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir, 'test');
 
         // Act: try to disable non-existent plugin
         $subject->disable('non-existent-plugin');
@@ -321,13 +320,13 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturn(true);
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsMock, $this->tempDir, 'test');
 
         // Act: try to disable already disabled plugin (plugin2 is false)
         $subject->disable('plugin2');
@@ -341,11 +340,12 @@ class PluginServiceTest extends TestCase
         // Arrange: mock filesystem to return false for config path
         $fsStub = $this->createStub(ExtendedFilesystem::class);
         $fsStub->method('putFileContents')->willReturn(false);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
 
-        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir);
+        $subject = new PluginService($cmdMock, $fsStub, $this->tempDir, 'test');
 
         // Act: try to set plugin config
         $subject->setPluginConfig(['test-plugin' => true]);

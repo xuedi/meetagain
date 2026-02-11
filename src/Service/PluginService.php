@@ -15,6 +15,7 @@ readonly class PluginService
         private CommandService $commandService,
         private ExtendedFilesystem $filesystem,
         string $kernelProjectDir,
+        private string $environment,
     ) {
         $this->configDir = $kernelProjectDir . '/config';
         $this->pluginDir = $kernelProjectDir . '/plugins';
@@ -126,6 +127,19 @@ readonly class PluginService
 
     private function getPluginConfig(): array
     {
+        // Check for environment-specific config first (e.g., plugins_test.php)
+        $envConfigFile = $this->configDir . '/plugins_' . $this->environment . '.php';
+        if ($this->filesystem->fileExists($envConfigFile)) {
+            try {
+                $config = include $envConfigFile;
+
+                return is_array($config) ? $config : [];
+            } catch (Throwable) {
+                // Fall through to default config
+            }
+        }
+
+        // Fallback to default plugins.php
         $configFile = $this->configDir . '/plugins.php';
         if (!$this->filesystem->fileExists($configFile)) {
             return [];
