@@ -170,10 +170,10 @@ Skills automatically use the Haiku model for efficiency and follow project conve
 **Examples:**
 
 ```bash
-/reset-dev              # Reset with all enabled plugins
-/reset-dev multisite    # Reset with multisite plugin
-/cache-clear            # Clear dev cache
-/cache-clear test       # Clear test cache
+/reset-dev                # Reset with all enabled plugins
+/reset-dev <plugin-name>  # Reset with specific plugin
+/cache-clear              # Clear dev cache
+/cache-clear test         # Clear test cache
 /db-query "SELECT COUNT(*) FROM users"
 ```
 
@@ -187,9 +187,11 @@ Skills automatically use the Haiku model for efficiency and follow project conve
 **Examples:**
 
 ```bash
-/plugin-enable dishes     # Enable dishes plugin
-/plugin-disable multisite # Disable multisite plugin
+/plugin-enable <plugin-name>   # Enable a plugin
+/plugin-disable <plugin-name>  # Disable a plugin
 ```
+
+**Note:** Check `plugins/` directory for available plugins. Each plugin has its own `CLAUDE.md` for documentation.
 
 ---
 
