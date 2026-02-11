@@ -10,7 +10,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class SystemController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -20,7 +22,7 @@ class SystemController extends AbstractAdminController
             label: 'menu_admin_system',
             route: 'app_admin_system',
             active: 'system',
-            linkRole: 'ROLE_META_ADMIN',
+            linkRole: 'ROLE_ADMIN',
         );
     }
 

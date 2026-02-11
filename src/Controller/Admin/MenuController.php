@@ -18,8 +18,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[IsGranted('ROLE_ADMIN')]
 class MenuController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -29,6 +31,7 @@ class MenuController extends AbstractAdminController
             label: 'menu_admin_menu',
             route: 'app_admin_menu',
             active: 'menu',
+            linkRole: 'ROLE_ADMIN',
         );
     }
 
