@@ -524,11 +524,9 @@ FAILURES:
 
 ## CI Pipeline
 
-From `.github/workflows/phpunit.yml`:
-
 1. **Unit tests** (parallel)
 2. **Functional tests** (requires database)
-3. **Code quality checks** (PHPStan, Rector, etc.)
+3. **Code quality checks** (Mago linter, analyzer, guard)
 4. **Coverage report** (uploaded to CI)
 
 All must pass before merge.

@@ -227,14 +227,13 @@ Before marking work complete, verify:
 | Pattern           | Example File                                 | Why                                        |
 |-------------------|----------------------------------------------|--------------------------------------------|
 | Service           | `src/Service/CleanupService.php`             | Focused SRP, minimal dependencies          |
-| Controller        | `src/Controller/ManageController.php`        | Thin, pure delegation (30 lines)           |
 | Repository        | `src/Repository/EventRepository.php`         | Intent-revealing names, query builder      |
 | Entity + Enums    | `src/Entity/Event.php`                       | Proper attributes, enum usage              |
 | Plugin            | `src/Plugin.php`                             | Interface contract definition              |
 | Unit test (AAA)   | `tests/Unit/Service/ActivityServiceTest.php` | Excellent AAA comments, mock/stub use      |
 | Fixtures (custom) | `src/DataFixtures/EventFixture.php`          | Custom AbstractFixture with type-safe refs |
 | AbstractFixture   | `src/DataFixtures/AbstractFixture.php`       | Magic methods for fixture references       |
-| Voter             | `src/Security/Voter/EventVoter.php`          | Authorization logic                        |
+| Admin Controller  | `src/Controller/Admin/SystemController.php`  | #[IsGranted] + AdminNavigationConfig       |
 | Command           | `src/Command/EventExtentCommand.php`         | CLI with progress, error handling          |
 | Form Type         | `src/Form/EventType.php`                     | Form building, validation                  |
 

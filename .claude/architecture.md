@@ -16,7 +16,7 @@ MeetAgain is a **Symfony 8.0 / PHP 8.4** event management system with a plugin a
 - **Database:** MariaDB
 - **Cache:** Valkey/Redis (Symfony Cache)
 - **Testing:** PHPUnit 12, DAMA DoctrineTestBundle
-- **Quality:** PHPStan level 9, Rector, PHP-CS-Fixer, Deptrac
+- **Quality:** Mago (linter, analyzer, guard, formatter)
 
 **Codebase Statistics** (as of 2026-01-26):
 
@@ -306,7 +306,7 @@ class Event
 
 #### Security Layer
 **Can depend on:** Entity, Repository, Service
-**Purpose:** Authentication, authorization (UserChecker, Voters)
+**Purpose:** Authentication, authorization (UserChecker, #[IsGranted] role checks)
 
 #### Twig Layer
 **Can depend on:** Entity, Service
@@ -381,130 +381,19 @@ Plugin\MultiSite\DataFixtures\AbstractPluginFixture (plugin)
 
 ### Custom Reference System
 
-The project implements a type-safe reference system using PHP's `__call()` magic method.
-
-#### How It Works
-
-**Core AbstractFixture `__call()` implementation:**
-
-```php
-public function __call($methodName, $params = null)
-{
-    // 1. Validate method prefix (getRef* or addRef*)
-    if (!in_array(substr((string) $methodName, 0, 6), ['getRef', 'addRef'])) {
-        throw new Error('Call to undefined method');
-    }
-
-    // 2. Extract entity name and build class
-    $entityName = substr((string) $methodName, 6);  // getRefUser -> User
-    $entityClass = sprintf('App\\Entity\\%s', $entityName);
-
-    // 3. Generate reference key: EntityFixture::md5(name)
-    $key = sprintf('%s::%s', $entityName . 'Fixture', md5((string) ($params[0] ?? '')));
-
-    // 4. Delegate to Doctrine's reference system
-    if (str_starts_with($methodName, 'getRef')) {
-        return $this->getReference($key, $entityClass);
-    } else {
-        $this->addReference($key, $params[1]);
-    }
-}
-```
-
-**Reference Key Format:**
-```
-{EntityName}Fixture::{md5(name)}
-Example: "UserFixture::098f6bcd4621d373cade4e832627b4f6" for "John Doe"
-```
+The project implements a type-safe reference system using PHP's `__call()` magic method. Instead of manually managing reference keys, fixtures use magic methods like `getRefUser('name')` and `addRefEvent('name', $entity)`.
 
 **Benefits:**
-- ✅ Type-safe calls: `getRefUser('name')` returns `User`
-- ✅ PHPStan support via `@method` annotations
-- ✅ No manual key management
-- ✅ Cross-fixture references work automatically
-- ✅ Consistent key format enables sharing between base and plugin fixtures
-
-**Available Magic Methods (Base):**
-```php
-@method User getRefUser(string $name)
-@method void addRefUser(string $name, User $entity)
-@method Host getRefHost(string $name)
-@method void addRefHost(string $name, Host $entity)
-@method Location getRefLocation(string $name)
-@method void addRefLocation(string $name, Location $entity)
-@method Cms getRefCms(string $name)
-@method void addRefCms(string $name, Cms $entity)
-@method Event getRefEvent(string $name)
-@method void addRefEvent(string $name, Event $entity)
-```
+- Type-safe calls with PHPStan support via `@method` annotations
+- No manual key management
+- Cross-fixture references work automatically
+- Works for both core entities (`App\Entity\*`) and plugin entities (`Plugin\*\Entity\*`)
 
 ---
 
 ### Plugin Fixture Extension
 
-**AbstractPluginFixture** overrides `__call()` to support plugin-specific entities.
-
-**Why the override is necessary:**
-
-The base `AbstractFixture` only checks `App\Entity\*` namespace. Plugin fixtures need to:
-1. Check `Plugin\MultiSite\Entity\*` first (for plugin entities)
-2. Fall back to `App\Entity\*` (for core entities)
-
-**AbstractPluginFixture `__call()` implementation:**
-
-```php
-public function __call($methodName, $params = null)
-{
-    // Same validation as base
-
-    $entityName = substr((string) $methodName, 6);
-
-    // ✅ KEY DIFFERENCE: Check plugin namespace first
-    $pluginEntityClass = sprintf('Plugin\\MultiSite\\Entity\\%s', $entityName);
-    $coreEntityClass = sprintf('App\\Entity\\%s', $entityName);
-
-    if (class_exists($pluginEntityClass)) {
-        $entityClass = $pluginEntityClass;
-    } elseif (class_exists($coreEntityClass)) {
-        $entityClass = $coreEntityClass;
-    } else {
-        throw new RuntimeException('Class not found in plugin or core');
-    }
-
-    // Same key generation and delegation as base
-}
-```
-
-**Additional Magic Methods (Plugin):**
-```php
-@method Group getRefGroup(string $name)
-@method void addRefGroup(string $name, Group $entity)
-@method GroupMember getRefGroupMember(string $name)
-@method void addRefGroupMember(string $name, GroupMember $entity)
-@method GroupInvitation getRefGroupInvitation(string $name)
-@method void addRefGroupInvitation(string $name, GroupInvitation $entity)
-```
-
-**Example - Plugin fixture using both core and plugin entities:**
-```php
-class GroupEventFixture extends AbstractPluginFixture
-{
-    public function load(ObjectManager $manager): void
-    {
-        // ✅ Plugin entity (checks Plugin\MultiSite\Entity\Group first)
-        $group = $this->getRefGroup('Berlin Tech Meetup');
-
-        // ✅ Core entities (falls back to App\Entity\*)
-        $user = $this->getRefUser('john_doe');
-        $location = $this->getRefLocation('office');
-
-        $event = new Event();
-        $event->setUser($user);
-        $event->setLocation($location);
-        // ... map to group via service
-    }
-}
-```
+Plugin fixtures extend `AbstractPluginFixture` which overrides `__call()` to check both plugin and core entity namespaces. This allows plugin fixtures to reference both their own entities (e.g., `getRefGroup()`) and core entities (e.g., `getRefUser()`, `getRefEvent()`).
 
 ---
 
@@ -589,116 +478,24 @@ UserFixture (provides: 150+ users)
 
 ---
 
-### Plugin Fixture Dependency Tree
-
-
 ### Helper Methods
 
-**AbstractFixture provides:**
-
 ```php
-// Progress output
-$this->start();  // Prints "Creating FixtureName ..."
-$this->stop();   // Prints " OK\n"
-
-// Load text content from companion files
-$content = $this->getText('description');
-// Reads from: src/DataFixtures/EventFixture/description.txt
-
-// Get fixture group
-public function getGroups(): array {
-    return ['base'];  // Override for custom groups
-}
-```
-
-**Example with text files:**
-```
-src/DataFixtures/
-├── EventFixture.php
-└── EventFixture/
-    ├── weekly_description.txt
-    └── tournament_description.txt
-```
-
-```php
-class EventFixture extends AbstractFixture
-{
-    public function load(ObjectManager $manager): void
-    {
-        $event = new Event();
-        $event->setDescription($this->getText('weekly_description'));
-        // Reads from EventFixture/weekly_description.txt
-    }
-}
+$this->start();                      // Prints "Creating FixtureName ..."
+$this->stop();                       // Prints " OK\n"
+$content = $this->getText('file');   // Reads from DataFixtures/FixtureName/file.txt
 ```
 
 ---
 
 ### Best Practices
 
-**Do's:**
-- ✅ Use `getDependencies()` to declare fixture dependencies
-- ✅ Use constants for reference names: `const ADMIN = 'admin';`
-- ✅ Call `start()` / `stop()` for progress output
-- ✅ Organize large text content in companion `.txt` files
-- ✅ Use `addRef*()` to store references for other fixtures
-- ✅ Check if entity exists before creating (for migration compatibility)
-
-**Don'ts:**
-- ❌ Don't hardcode entity IDs (IDs are auto-generated)
-- ❌ Don't create circular dependencies
-- ❌ Don't reference entities from later fixtures (use `getDependencies()`)
-- ❌ Don't assume fixture load order without declaring dependencies
-- ❌ Don't modify entities from other fixtures (immutable references)
-
-**Example - Proper fixture structure:**
-```php
-class EventFixture extends AbstractFixture implements DependentFixtureInterface
-{
-    public const string WEEKLY_MEETUP = 'Weekly Go Study';
-
-    public function load(ObjectManager $manager): void
-    {
-        $this->start();
-
-        $event = new Event();
-        $event->setTitle(self::WEEKLY_MEETUP);
-        $event->setUser($this->getRefUser(UserFixture::ADMIN));
-        $event->setLocation($this->getRefLocation(LocationFixture::OFFICE));
-
-        $manager->persist($event);
-        $this->addRefEvent(self::WEEKLY_MEETUP, $event);
-
-        $manager->flush();
-        $this->stop();
-    }
-
-    public function getDependencies(): array
-    {
-        return [UserFixture::class, LocationFixture::class];
-    }
-
-    public function getGroups(): array
-    {
-        return ['base'];  // Loaded with --group=base
-    }
-}
-```
-
----
-
-### Known Issues & Future Improvements
-
-**Current Issues:**
-1. Some base fixtures reference `SystemUserFixture::IMPORT` but don't declare it as dependency
-2. DependentFixtureInterface declarations don't always match actual reference usage
-3. No smoke tests for fixture instantiation (syntax errors only caught at runtime)
-
-**Future Improvements:**
-1. **Fixture validation** - Static analysis to verify reference providers exist
-2. **Dependency graph visualization** - Auto-generate dependency diagrams
-3. **Fixture isolation testing** - Load each fixture independently to catch missing dependencies
-4. **Reference type validation** - Verify reference types match entity expectations at compile time
+- Use `getDependencies()` to declare fixture dependencies
+- Use constants for reference names: `const ADMIN = 'admin';`
+- Call `start()` / `stop()` for progress output
+- Don't hardcode entity IDs (auto-generated)
+- Don't create circular dependencies
+- See `testing.md` for detailed fixture examples
 
 ---
 
@@ -950,22 +747,6 @@ private readonly ?object $whitelabelFilter = null;
 
 ---
 
-### Current Plugin Architecture Violations (TODO)
-
-**KNOWN ISSUE:** The following files currently violate the "Main code MUST NOT depend on plugin code" principle:
-
-1. `src/Controller/EventController.php:41-42` - Hardcoded `#[Autowire(service: 'Plugin\MultiSite\Service\WhitelabelEventFilterService')]`
-2. `src/Controller/ProfileController.php:32-33` - Same violation
-3. `src/Service/CmsService.php:17-18` - Same violation
-
-**Status:** Architecture design completed (see plan above). Implementation pending.
-
-**Why This Exists:** Early implementation before plugin content filtering pattern was established.
-
-**Impact:** MultiSite plugin cannot be cleanly removed without code changes. Other plugins cannot provide content filters.
-
----
-
 ## Symfony 8 Specific Features
 
 ### New in Symfony 8.0 (used in this project)
@@ -1056,10 +837,10 @@ $cache->invalidateTags(['menu']);
 
 ### Code Quality Tools
 
-- **PHPStan Level 9** - Strictest static analysis, zero tolerance for type issues
-- **Rector** - Automated code modernization and PHP version upgrades
-- **PHP-CS-Fixer** - Code style enforcement (PSR-12 + custom rules)
-- **Deptrac** - Architecture layer validation and dependency enforcement
+- **Mago Linter** - Code quality and PHP 8.4 checks
+- **Mago Analyzer** - Static analysis
+- **Mago Guard** - Architecture layer validation
+- **Mago Formatter** - Code style enforcement
 
 ### Testing Strategy
 
@@ -1080,55 +861,14 @@ $cache->invalidateTags(['menu']);
 - **QueryBuilder** - Eager loading with `addSelect()` to avoid N+1
 - **Array Hydration** - For list views where entities aren't needed
 - **Indexed Junction Tables** - Optimized queries for group mappings
-- **Permission Caching** - Voter results cached per request
 - **Early Hints** - HTTP/2 asset preloading for faster page loads
-
----
-
-## Future Improvements
-
-### Filter System Enhancements
-
-1. **Common Base Classes** - Extract shared logic (priority sorting, AND composition)
-2. **Generic Filter Interface** - Possible with PHP 8.4+ generics
-3. **Filter Decorators** - Caching layer, logging, performance monitoring
-4. **Filter Composition Strategies** - OR logic option alongside AND
-
-### Plugin Architecture Evolution
-
-1. **Plugin Marketplace** - Discovery and installation system
-2. **Plugin Versioning** - Compatibility checks and dependency management
-3. **Plugin Dependencies** - Inter-plugin relationships and load ordering
-4. **Plugin Events** - Standardized event system for plugin communication
-
-### Performance & Scalability
-
-1. **Database Views** - Materialized views for complex junction queries
-2. **Caching Layer** - Redis cache for filter results and permission checks
-3. **Query Optimization** - Batch loading, cursor pagination for large datasets
-4. **Async Processing** - Background jobs for heavy operations
 
 ---
 
 ## Known Architectural Debt
 
-From `tests/deptrac.yaml` skip violations:
-
-1. **MenuRoutes enum references controllers** for route names
-   - Location: `src/Entity/MenuRoutes.php`
-   - TODO: Refactor to use route string constants
-
-2. **EventSubscriber references controller** for route comparison
-   - Location: `src/EventSubscriber/KernelRequestSubscriber.php`
-   - TODO: Use route names instead
-
-3. **Twig extension references controller**
-   - Location: `src/Twig/RenderImageModalExtension.php`
-   - TODO: Refactor reference pattern
-
-4. **Commands with direct repository access**
-   - Location: `src/Command/EventAddFixtureCommand.php`, `src/Command/EmailTemplateSeedCommand.php`
-   - Reason: Bulk operations, performance
+1. **Repository in Controller** - Some controllers access repositories directly instead of using services
+2. **Commands with direct repository access** - Bulk operations bypass service layer for performance
 
 ---
 
@@ -1145,14 +885,14 @@ From `tests/deptrac.yaml` skip violations:
 
 ---
 
-## Validation with Deptrac
+## Validation with Mago Guard
 
 Run architecture validation:
 ```bash
-just checkDeptrac
+just checkMagoGuard
 ```
 
-This enforces all layer dependency rules and fails if violations are introduced.
+This enforces architectural rules and fails if violations are introduced.
 
 ---
 
@@ -1193,74 +933,6 @@ readonly class MyEventFilter implements EventFilterInterface
 }
 ```
 
-### Platform Content Pattern
-
-```php
-// Repository method to find unmapped content
-public function getPlatformCmsIds(): array
-{
-    return $this->em->createQueryBuilder()
-        ->select('c.id')
-        ->from(Cms::class, 'c')
-        ->leftJoin(GroupCmsMapping::class, 'gcm', 'WITH', 'c.id = gcm.cmsId')
-        ->where('gcm.id IS NULL')  // Not in junction table = platform
-        ->getQuery()
-        ->getSingleColumnResult();
-}
-
-// Filter implementation
-public function getCmsIdFilter(): ?array
-{
-    $platformIds = $this->mappingRepository->getPlatformCmsIds();
-
-    if (!$context->isActive()) {
-        return $platformIds;  // Main domain: platform only
-    }
-
-    $groupIds = $this->mappingRepository->getCmsIdsForGroup($context->group);
-    return array_merge($groupIds, $platformIds);  // Group + platform
-}
-```
-
-### Junction Table Query
-
-```php
-// Get entity IDs for a group, then query core repository
-public function getEventsForGroup(Group $group): array
-{
-    // Step 1: Query junction table (plugin)
-    $eventIds = $this->groupEventMappingRepo->getEventIdsForGroup($group);
-
-    // Step 2: Query core entities (no knowledge of groups)
-    return $this->eventRepo->findById($eventIds);
-}
-```
-
-### Service Layer Pattern
-
-```php
-// All services are readonly
-readonly class CleanupService
-{
-    public function __construct(
-        private EventRepository $eventRepo,
-        private EntityManagerInterface $em,
-    ) {}
-
-    public function removeOrphanedImages(): int
-    {
-        // Business logic here
-        $orphaned = $this->imageRepo->findOrphaned();
-
-        foreach ($orphaned as $image) {
-            $this->em->remove($image);
-        }
-        $this->em->flush();
-
-        return count($orphaned);
-    }
-}
-```
 
 ---
 

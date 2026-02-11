@@ -30,7 +30,7 @@ just plugin-enable adminTables
 - **Controllers:** `src/Controller/` - Admin CRUD controllers
 - **Forms:** `src/Form/` - Symfony form types for entities
 - **Templates:** `templates/tables/` - Twig templates (extend core `admin/base.html.twig`)
-- **Navigation:** Uses `AdminNavigationExtensionInterface` at priority 800
+- **Navigation:** Uses `AdminNavigationInterface` with `AdminNavigationConfig`
 
 ---
 

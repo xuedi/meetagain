@@ -590,38 +590,34 @@ if ($form->isSubmitted() && $form->isValid()) {
 
 ### Authorization
 
-Use Security Voters:
+Use `#[IsGranted]` attributes for role-based access control:
 
 ```php
-// src/Security/Voter/EventVoter.php
-class EventVoter extends Voter
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+// Class-level: Require role for all controller actions
+#[IsGranted('ROLE_ADMIN')]
+class SystemController extends AbstractAdminController
 {
-    public const EDIT = 'EVENT_EDIT';
-    public const DELETE = 'EVENT_DELETE';
+    // All actions require ROLE_ADMIN
+}
 
-    protected function supports(string $attribute, mixed $subject): bool
+// Method-level: Require role for specific action
+class EventController extends AbstractController
+{
+    #[IsGranted('ROLE_ORGANIZER')]
+    public function create(): Response
     {
-        return in_array($attribute, [self::EDIT, self::DELETE])
-            && $subject instanceof Event;
-    }
-
-    protected function voteOnAttribute(
-        string $attribute,
-        mixed $subject,
-        TokenInterface $token
-    ): bool {
-        $user = $token->getUser();
-
-        return match($attribute) {
-            self::EDIT => $subject->getOrganizer() === $user,
-            self::DELETE => $subject->getOrganizer() === $user,
-            default => false,
-        };
+        // Only users with ROLE_ORGANIZER can create events
     }
 }
 
-// Controller
-$this->denyAccessUnlessGranted('EVENT_EDIT', $event);
+// Inline check in controller method
+public function edit(Event $event): Response
+{
+    $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
+    // Continue with edit logic
+}
 ```
 
 ---
