@@ -67,51 +67,67 @@
 
 ## File Locations
 
-Skills are defined in YAML files:
+Skills are defined in SKILL.md files:
 
 ```
 .claude/skills/
-  testing/          # test-unit, test-functional, test-all
-  quality/          # check-quality, quality-fix
-  database/         # reset-dev, cache-clear, db-query
-  plugins/          # plugin-enable, plugin-disable
+├── test-unit/SKILL.md
+├── test-functional/SKILL.md
+├── test-all/SKILL.md
+├── check-quality/SKILL.md
+├── quality-fix/SKILL.md
+├── reset-dev/SKILL.md
+├── cache-clear/SKILL.md
+├── db-query/SKILL.md
+├── plugin-enable/SKILL.md
+└── plugin-disable/SKILL.md
 ```
 
 ---
 
 ## Creating Custom Skills
 
-1. Create YAML file in `.claude/skills/<category>/<name>.yaml`
-2. Use `model: haiku` for token efficiency
-3. Define arguments with required/optional flags
-4. Provide clear examples
+1. Create directory in `.claude/skills/<skill-name>/`
+2. Create `SKILL.md` file with frontmatter and instructions
+3. Use `disable-model-invocation: true` for user-only invocation
+4. Use `$ARGUMENTS` placeholder for arguments
 
 **Template:**
-```yaml
+```markdown
+---
 name: my-skill
-description: What this skill does
-model: haiku
-category: custom
+description: When to use this skill (triggers automatic invocation)
+disable-model-invocation: true
+---
 
-arguments:
-  - name: arg_name
-    description: What this argument does
-    required: false
-    default: ""
+# My Skill Title
 
-steps:
-  - task:
-      subagent_type: Bash
-      model: haiku
-      description: Short description
-      prompt: |
-        Instructions for the Haiku agent
-        1. Run: just <command>
-        2. Return formatted results
+Description of what this skill does.
 
-examples:
-  - description: Example usage
-    command: /my-skill
+## Arguments
+
+- **arg1** (optional): What this argument does
+
+## Workflow
+
+Run the following commands using a Haiku agent:
+
+```
+Task(
+  subagent_type: "Bash",
+  model: "haiku",
+  description: "Short description",
+  prompt: |
+    Instructions for the Haiku agent
+    1. Run: just <command> $ARGUMENTS
+    2. Return formatted results
+)
+```
+
+## Examples
+
+- `/my-skill` - Example usage
+- `/my-skill arg` - Example with argument
 ```
 
 ---
