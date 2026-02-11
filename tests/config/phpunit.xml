@@ -32,23 +32,23 @@
         <server name="APP_ENV" value="test" force="true"/>
         <server name="KERNEL_CLASS" value="App\Kernel" force="true"/>
     </php>
+    <source>
+        <include>
+            <directory>../../src</directory>
+        </include>
+        <exclude>
+            <directory>../../src/DataFixtures</directory>
+            <directory>../../src/Enum</directory>
+            <directory>../../src/Exception</directory>
+            <directory>../../src/Repository</directory>
+            <directory>../../src/Entity</directory>
+            <directory>../../src/Command</directory>
+        </exclude>
+    </source>
     <coverage>
         <report>
             <clover outputFile="../reports/clover.xml"/>
             <html outputDirectory="../reports/coverage/" lowUpperBound="50" highLowerBound="90"/>
         </report>
     </coverage>
-    <source>
-        <include>
-            <directory>../src</directory>
-        </include>
-        <exclude>
-            <directory>../src/DataFixtures</directory>
-            <directory>../src/Enum</directory>
-            <directory>../src/Exception</directory>
-            <directory>../src/Repository</directory>
-            <directory>../src/Entity</directory>
-            <directory>../src/Command</directory>
-        </exclude>
-    </source>
 </phpunit>
