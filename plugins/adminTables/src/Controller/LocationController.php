@@ -12,7 +12,9 @@ use Plugin\AdminTables\Form\LocationType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class LocationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
