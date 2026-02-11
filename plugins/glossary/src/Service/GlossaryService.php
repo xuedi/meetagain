@@ -45,53 +45,68 @@ readonly class GlossaryService
         $this->em->flush();
     }
 
-    public function generateSuggestions(Glossary $newGlossary, int $id, int $userId, bool $isManager): void
+    /**
+     * Update glossary directly (manager permission required).
+     */
+    public function update(Glossary $newGlossary, int $id): void
     {
         $current = $this->repo->findOneBy(['id' => $id]);
         if ($current === null) {
             return;
         }
 
-        if ($isManager) {
-            $current->setPhrase($newGlossary->getPhrase());
-            $current->setPinyin($newGlossary->getPinyin());
-            $current->setCategory($newGlossary->getCategory());
-            $current->setExplanation($newGlossary->getExplanation());
+        $current->setPhrase($newGlossary->getPhrase());
+        $current->setPinyin($newGlossary->getPinyin());
+        $current->setCategory($newGlossary->getCategory());
+        $current->setExplanation($newGlossary->getExplanation());
 
-            $this->em->persist($current);
-            $this->em->flush();
+        $this->em->persist($current);
+        $this->em->flush();
+    }
 
+    /**
+     * Generate suggestions for changes (regular user).
+     */
+    public function generateSuggestions(Glossary $newGlossary, int $id, int $userId): void
+    {
+        $current = $this->repo->findOneBy(['id' => $id]);
+        if ($current === null) {
             return;
         }
+
+        $timestamp = new DateTimeImmutable();
 
         if ($current->getPhrase() !== $newGlossary->getPhrase()) {
             $current->addSuggestions(Suggestion::fromParams(
                 createdBy: $userId,
-                createdAt: new DateTimeImmutable(),
+                createdAt: $timestamp,
                 field: SuggestionField::Phrase,
                 value: $newGlossary->getPhrase(),
             ));
         }
+
         if ($current->getPinyin() !== $newGlossary->getPinyin()) {
             $current->addSuggestions(Suggestion::fromParams(
                 createdBy: $userId,
-                createdAt: new DateTimeImmutable(),
+                createdAt: $timestamp,
                 field: SuggestionField::Pinyin,
                 value: $newGlossary->getPinyin(),
             ));
         }
+
         if ($current->getCategory() !== $newGlossary->getCategory()) {
             $current->addSuggestions(Suggestion::fromParams(
                 createdBy: $userId,
-                createdAt: new DateTimeImmutable(),
+                createdAt: $timestamp,
                 field: SuggestionField::Category,
                 value: (string) $newGlossary->getCategory()->value,
             ));
         }
+
         if ($current->getExplanation() !== $newGlossary->getExplanation()) {
             $current->addSuggestions(Suggestion::fromParams(
                 createdBy: $userId,
-                createdAt: new DateTimeImmutable(),
+                createdAt: $timestamp,
                 field: SuggestionField::Explanation,
                 value: $newGlossary->getExplanation(),
             ));
@@ -101,14 +116,27 @@ readonly class GlossaryService
         $this->em->flush();
     }
 
-    public function createNew(Glossary $glossary, int $userId, bool $isManager): void
+    /**
+     * Create new glossary entry.
+     *
+     * @param bool $autoApprove Whether to auto-approve (for managers)
+     */
+    public function create(Glossary $glossary, int $userId, bool $autoApprove = false): void
     {
         $glossary->setCreatedBy($userId);
         $glossary->setCreatedAt(new DateTimeImmutable());
-        $glossary->setApproved($isManager);
+        $glossary->setApproved($autoApprove);
 
         $this->em->persist($glossary);
         $this->em->flush();
+    }
+
+    /**
+     * @deprecated Use create() with $autoApprove parameter instead
+     */
+    public function createNew(Glossary $glossary, int $userId, bool $isManager): void
+    {
+        $this->create($glossary, $userId, $isManager);
     }
 
     public function applySuggestion(int $id, string $hash): int

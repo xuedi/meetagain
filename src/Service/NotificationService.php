@@ -70,7 +70,7 @@ readonly class NotificationService
                     return 'send';
                 });
             } catch (InvalidArgumentException) {
-                // TODO: do some logging
+                // Cache write failure for RSVP notification tracking - non-critical, continue without cache
             }
         }
     }

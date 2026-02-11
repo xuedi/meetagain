@@ -81,6 +81,7 @@ class Consent implements JsonSerializable
             $consent->setCookies(ConsentType::from($data[self::TYPE_COOKIES] ?? 'unknown'));
             $consent->setOsm(ConsentType::from($data[self::TYPE_OSM] ?? 'unknown'));
         } catch (Throwable) {
+            // Session data missing/invalid - return empty consent object with default values
         }
 
         return $consent;

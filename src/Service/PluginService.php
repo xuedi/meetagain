@@ -135,7 +135,7 @@ readonly class PluginService
 
                 return is_array($config) ? $config : [];
             } catch (Throwable) {
-                // Fall through to default config
+                // Environment config invalid/corrupt - fall through to default plugins.php
             }
         }
 
