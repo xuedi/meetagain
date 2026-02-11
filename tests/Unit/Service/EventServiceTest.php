@@ -78,8 +78,7 @@ class EventServiceTest extends TestCase
         EventFilterSort $sort,
         EventTypes $types,
         EventFilterRsvp $rsvp,
-    ): void
-    {
+    ): void {
         // Arrange: mock repository to verify call and return empty array
         $repoMock = $this->createMock(EventRepository::class);
         $repoMock
@@ -246,11 +245,7 @@ class EventServiceTest extends TestCase
         $event = new EventStub()->setId(1);
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock
-            ->expects($this->once())
-            ->method('updateRecurringEvents')
-            ->with($event)
-            ->willReturn(0);
+        $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($event)->willReturn(0);
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
@@ -274,11 +269,7 @@ class EventServiceTest extends TestCase
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock
-            ->expects($this->once())
-            ->method('updateRecurringEvents')
-            ->with($parent)
-            ->willReturn(1);
+        $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($parent)->willReturn(1);
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
@@ -330,9 +321,7 @@ class EventServiceTest extends TestCase
     {
         // Arrange: create mock that verifies call to recurring service
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock
-            ->expects($this->once())
-            ->method('extentRecurringEvents');
+        $recurringServiceMock->expects($this->once())->method('extentRecurringEvents');
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
@@ -358,11 +347,7 @@ class EventServiceTest extends TestCase
             ->setStart(new DateTime('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock
-            ->expects($this->once())
-            ->method('updateRecurringEvents')
-            ->with($child)
-            ->willReturn(1);
+        $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($child)->willReturn(1);
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
@@ -386,11 +371,7 @@ class EventServiceTest extends TestCase
             ->setStart(new DateTime('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock
-            ->expects($this->once())
-            ->method('updateRecurringEvents')
-            ->with($child)
-            ->willReturn(0);
+        $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($child)->willReturn(0);
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
@@ -409,9 +390,7 @@ class EventServiceTest extends TestCase
     {
         // Arrange: create mock that verifies call to recurring service
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock
-            ->expects($this->once())
-            ->method('extentRecurringEvents');
+        $recurringServiceMock->expects($this->once())->method('extentRecurringEvents');
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
