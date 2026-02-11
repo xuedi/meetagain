@@ -11,6 +11,7 @@ use App\Repository\EventRepository;
 use App\Service\EmailService;
 use App\Service\EventService;
 use App\Service\PluginService;
+use App\Service\RecurringEventService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,6 +50,7 @@ class EventServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
         );
 
@@ -70,81 +72,14 @@ class EventServiceTest extends TestCase
         $this->assertCount(2, $result['2002-04']['events']);
     }
 
-    #[DataProvider('lastRecurringEventDataProvider')]
-    public function testGetLastRecurringEventDateReturnsCorrectDate(
-        ?string $dbResultDate,
-        string $eventStartDate,
-        string $expectedDate,
-    ): void {
-        // Arrange: mock repository to return last recurring event or null
-        $returnValue = $dbResultDate !== null ? new EventStub()->setStart(new DateTimeImmutable($dbResultDate)) : null;
-
-        $repoStub = $this->createStub(EventRepository::class);
-        $repoStub->method('findOneBy')->willReturn($returnValue);
-
-        $event = new EventStub()->setStart(new DateTimeImmutable($eventStartDate));
-
-        $subject = new EventService(
-            repo: $repoStub,
-            em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
-            pluginService: $this->createStub(PluginService::class),
-            plugins: [],
-        );
-
-        // Act: invoke private getLastRecurringEventDate method via reflection
-        $method = new ReflectionClass($subject)->getMethod('getLastRecurringEventDate');
-
-        $result = $method->invoke($subject, $event);
-
-        // Assert: returns correct date string
-        $this->assertSame($expectedDate, $result);
-    }
-
-    public static function lastRecurringEventDataProvider(): Generator
-    {
-        yield 'returns last recurring event date when exists' => [
-            'dbResultDate' => '2017-04-26',
-            'eventStartDate' => '2002-01-01',
-            'expectedDate' => '2017-04-26',
-        ];
-        yield 'returns event start date when no recurring events exist' => [
-            'dbResultDate' => null,
-            'eventStartDate' => '2002-01-01',
-            'expectedDate' => '2002-01-01',
-        ];
-    }
-
-    public function testUpdateDatePreservesTimeButChangesDate(): void
-    {
-        // Arrange: create target datetime with specific time and occurrence with different date
-        $targetDateTime = new DateTime('2010-10-10 10:10:10');
-        $occurrenceDateTime = new DateTime('2002-02-02 20:20:20');
-
-        $subject = new EventService(
-            repo: $this->createStub(EventRepository::class),
-            em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
-            pluginService: $this->createStub(PluginService::class),
-            plugins: [],
-        );
-
-        // Act: invoke private updateDate method via reflection
-        $method = new ReflectionClass($subject)->getMethod('updateDate');
-
-        $result = $method->invoke($subject, $targetDateTime, $occurrenceDateTime);
-
-        // Assert: date is from occurrence, time is from target
-        $this->assertSame('2002-02-02 10:10:10', $result->format('Y-m-d H:i:s'));
-    }
-
     #[DataProvider('filteredListDataProvider')]
     public function testGetFilteredListAppliesCorrectCriteria(
         EventFilterTime $time,
         EventFilterSort $sort,
         EventTypes $types,
         EventFilterRsvp $rsvp,
-    ): void {
+    ): void
+    {
         // Arrange: mock repository to verify call and return empty array
         $repoMock = $this->createMock(EventRepository::class);
         $repoMock
@@ -158,6 +93,7 @@ class EventServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
         );
 
@@ -203,6 +139,7 @@ class EventServiceTest extends TestCase
             em: $emMock,
             emailService: $emailServiceMock,
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
         );
 
@@ -233,6 +170,7 @@ class EventServiceTest extends TestCase
             em: $emMock,
             emailService: $emailServiceMock,
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
         );
 
@@ -265,6 +203,7 @@ class EventServiceTest extends TestCase
             em: $emMock,
             emailService: $emailServiceMock,
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
         );
 
@@ -290,6 +229,7 @@ class EventServiceTest extends TestCase
             em: $emMock,
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
         );
 
@@ -302,44 +242,54 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithNoRecurringReturnZero(): void
     {
+        // Arrange: create event without recurring rule
         $event = new EventStub()->setId(1);
+
+        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock
+            ->expects($this->once())
+            ->method('updateRecurringEvents')
+            ->with($event)
+            ->willReturn(0);
+
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $recurringServiceMock,
             plugins: [],
         );
 
+        // Act & Assert
         $this->assertSame(0, $subject->updateRecurringEvents($event));
     }
 
     public function testUpdateRecurringEventsWithParentReturnsCount(): void
     {
+        // Arrange: create parent event with recurring rule
         $parent = new EventStub()
             ->setId(1)
             ->setRecurringRule(EventIntervals::Weekly);
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
-        $child = new EventStub()
-            ->setId(2)
-            ->setRecurringOf(1)
-            ->setStart(new DateTime('+1 week'));
 
-        $repoMock = $this->createStub(EventRepository::class);
-        $repoMock->method('findFollowUpEvents')->willReturn([$child]);
-
-        $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->atLeastOnce())->method('persist');
-        $emMock->expects($this->once())->method('flush');
+        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock
+            ->expects($this->once())
+            ->method('updateRecurringEvents')
+            ->with($parent)
+            ->willReturn(1);
 
         $subject = new EventService(
-            repo: $repoMock,
-            em: $emMock,
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $recurringServiceMock,
             plugins: [],
         );
 
+        // Act & Assert
         $this->assertSame(1, $subject->updateRecurringEvents($parent));
     }
 
@@ -367,119 +317,114 @@ class EventServiceTest extends TestCase
             em: $emMock,
             emailService: $emailMock,
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
         );
 
+        // Act & Assert
         $subject->cancelEvent($event);
-
         $this->assertTrue($event->isCanceled());
     }
 
-    public function testExtentRecurringEventsCallsFillForEachEvent(): void
+    public function testExtentRecurringEventsCallsRecurringService(): void
     {
-        $event = new EventStub()
-            ->setId(1)
-            ->setRecurringRule(EventIntervals::Weekly);
-        $event->setStart(new DateTime('2025-01-01 10:00:00'));
-        $event->setStop(new DateTime('2025-01-01 12:00:00'));
-        $event->setPublished(true);
-
-        $repoMock = $this->createStub(EventRepository::class);
-        $repoMock->method('findAllRecurring')->willReturn([$event]);
-        $repoMock->method('findOneBy')->willReturn(null);
-
-        $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->atLeastOnce())->method('persist');
-        $emMock->expects($this->atLeastOnce())->method('flush');
+        // Arrange: create mock that verifies call to recurring service
+        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock
+            ->expects($this->once())
+            ->method('extentRecurringEvents');
 
         $subject = new EventService(
-            repo: $repoMock,
-            em: $emMock,
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $recurringServiceMock,
             plugins: [],
         );
 
+        // Act
         $subject->extentRecurringEvents();
+
+        // Assert: verified through mock expectations
     }
 
     public function testUpdateRecurringEventsWithChildUpdatesParent(): void
     {
-        $parent = new EventStub()
-            ->setId(1)
-            ->setRecurringRule(EventIntervals::Weekly);
-        $parent->setStart(new DateTime('2025-01-01 10:00:00'));
-
+        // Arrange: create child event with parent reference
         $child = new EventStub()
             ->setId(2)
             ->setRecurringOf(1)
             ->setStart(new DateTime('+1 week'));
 
-        $repoMock = $this->createStub(EventRepository::class);
-        $repoMock->method('findOneBy')->with(['id' => 1])->willReturn($parent);
-        $repoMock->method('findFollowUpEvents')->willReturn([$child]);
-
-        $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->atLeastOnce())->method('persist');
-        $emMock->expects($this->once())->method('flush');
+        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock
+            ->expects($this->once())
+            ->method('updateRecurringEvents')
+            ->with($child)
+            ->willReturn(1);
 
         $subject = new EventService(
-            repo: $repoMock,
-            em: $emMock,
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $recurringServiceMock,
             plugins: [],
         );
 
+        // Act & Assert
         $this->assertSame(1, $subject->updateRecurringEvents($child));
     }
 
     public function testUpdateRecurringEventsWithDeletedParentReturnsZero(): void
     {
+        // Arrange: create child event with deleted parent reference
         $child = new EventStub()
             ->setId(2)
             ->setRecurringOf(1)
             ->setStart(new DateTime('+1 week'));
 
-        $repoMock = $this->createStub(EventRepository::class);
-        $repoMock->method('findOneBy')->with(['id' => 1])->willReturn(null);
+        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock
+            ->expects($this->once())
+            ->method('updateRecurringEvents')
+            ->with($child)
+            ->willReturn(0);
 
         $subject = new EventService(
-            repo: $repoMock,
+            repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $recurringServiceMock,
             plugins: [],
         );
 
+        // Act & Assert
         $this->assertSame(0, $subject->updateRecurringEvents($child));
     }
 
     public function testExtentRecurringEventsWithBiMonthly(): void
     {
-        $event = new EventStub()
-            ->setId(1)
-            ->setRecurringRule(EventIntervals::BiMonthly);
-        $event->setStart(new DateTime('2025-01-01 10:00:00'));
-        $event->setStop(new DateTime('2025-01-01 12:00:00'));
-        $event->setPublished(true);
-
-        $repoMock = $this->createStub(EventRepository::class);
-        $repoMock->method('findAllRecurring')->willReturn([$event]);
-        $repoMock->method('findOneBy')->willReturn(null);
-
-        $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->atLeastOnce())->method('persist');
-        $emMock->expects($this->atLeastOnce())->method('flush');
+        // Arrange: create mock that verifies call to recurring service
+        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock
+            ->expects($this->once())
+            ->method('extentRecurringEvents');
 
         $subject = new EventService(
-            repo: $repoMock,
-            em: $emMock,
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
             emailService: $this->createStub(EmailService::class),
             pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $recurringServiceMock,
             plugins: [],
         );
 
+        // Act
         $subject->extentRecurringEvents();
+
+        // Assert: verified through mock expectations
     }
 }

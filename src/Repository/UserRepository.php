@@ -112,27 +112,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function findActivePublicMembers(int $limit = 500, int $offset = 0, ?array $restrictToUserIds = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('u')
-            ->select('u, i') // forces to fet all columns from user and image table
-            ->leftJoin('u.image', 'i') // Assuming 'image' is the property name
-            ->where('u.status = :status')
-            ->andWhere('u.public = :public')
-            ->setParameter('status', UserStatus::Active)
-            ->setParameter('public', true)
-            ->orderBy('u.createdAt', 'ASC')
-            ->setMaxResults($limit)
-            ->setFirstResult($offset);
-
-        // Apply user ID filter if provided
-        if ($restrictToUserIds !== null) {
-            if ($restrictToUserIds === []) {
-                return []; // Empty filter = no results
-            }
-            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
+        if ($restrictToUserIds === []) {
+            return []; // Empty filter = no results
         }
 
-        return $qb->getQuery()->getResult();
+        return $this->buildActiveMembersQuery(
+            excludeIds: [],
+            restrictToUserIds: $restrictToUserIds,
+            excludeSystemUser: false,
+            limit: $limit,
+            offset: $offset,
+        )->getQuery()->getResult();
     }
 
     /**
@@ -145,31 +135,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         array $excludeIds = [],
         ?array $restrictToUserIds = null,
     ): array {
-        $qb = $this
-            ->createQueryBuilder('u')
-            ->select('u, i') // forces to fet all columns from user and image table
-            ->leftJoin('u.image', 'i') // Assuming 'image' is the property name
-            ->where('u.status = :status')
-            ->andWhere('u.public = :public')
-            ->setParameter('status', UserStatus::Active)
-            ->setParameter('public', true)
-            ->orderBy('u.createdAt', 'ASC')
-            ->setMaxResults($limit)
-            ->setFirstResult($offset);
-
-        if ($excludeIds !== []) {
-            $qb->andWhere('u.id NOT IN (:excludeIds)')->setParameter('excludeIds', $excludeIds);
+        if ($restrictToUserIds === []) {
+            return []; // Empty filter = no results
         }
 
-        // Apply user ID filter if provided
-        if ($restrictToUserIds !== null) {
-            if ($restrictToUserIds === []) {
-                return []; // Empty filter = no results
-            }
-            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
-        }
-
-        return $qb->getQuery()->getResult();
+        return $this->buildActiveMembersQuery(
+            excludeIds: $excludeIds,
+            restrictToUserIds: $restrictToUserIds,
+            excludeSystemUser: false,
+            limit: $limit,
+            offset: $offset,
+        )->getQuery()->getResult();
     }
 
     /**
@@ -177,21 +153,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getNumberOfActivePublicMembers(?array $restrictToUserIds = null): int
     {
-        $qb = $this
-            ->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->where('u.status = :status')
-            ->andWhere('u.public = :public')
-            ->setParameter('status', UserStatus::Active)
-            ->setParameter('public', true);
-
-        // Apply user ID filter if provided
-        if ($restrictToUserIds !== null) {
-            if ($restrictToUserIds === []) {
-                return 0; // Empty filter = no results
-            }
-            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
+        if ($restrictToUserIds === []) {
+            return 0; // Empty filter = no results
         }
+
+        $qb = $this->buildActiveMembersQuery(
+            excludeIds: [],
+            restrictToUserIds: $restrictToUserIds,
+            excludeSystemUser: false,
+        );
+
+        $qb->select('COUNT(u.id)');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
@@ -202,28 +174,65 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getNumberOfActiveMembers(array $excludeIds = [], ?array $restrictToUserIds = null): int
     {
+        if ($restrictToUserIds === []) {
+            return 0; // Empty filter = no results
+        }
+
+        $qb = $this->buildActiveMembersQuery(
+            excludeIds: $excludeIds,
+            restrictToUserIds: $restrictToUserIds,
+            excludeSystemUser: true,
+        );
+
+        $qb->select('COUNT(u.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Builds a query for active public members with optional filters.
+     *
+     * @param int[] $excludeIds User IDs to exclude
+     * @param array<int>|null $restrictToUserIds Optional user ID filter
+     */
+    private function buildActiveMembersQuery(
+        array $excludeIds = [],
+        ?array $restrictToUserIds = null,
+        bool $excludeSystemUser = false,
+        ?int $limit = null,
+        ?int $offset = null,
+    ): \Doctrine\ORM\QueryBuilder {
         $qb = $this
             ->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
+            ->select('u, i')
+            ->leftJoin('u.image', 'i')
             ->where('u.status = :status')
             ->andWhere('u.public = :public')
-            ->andwhere('u.id <> 1')
             ->setParameter('status', UserStatus::Active)
-            ->setParameter('public', true);
+            ->setParameter('public', true)
+            ->orderBy('u.createdAt', 'ASC');
+
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
+        }
+
+        if ($offset !== null) {
+            $qb->setFirstResult($offset);
+        }
+
+        if ($excludeSystemUser) {
+            $qb->andWhere('u.id <> 1');
+        }
 
         if ($excludeIds !== []) {
             $qb->andWhere('u.id NOT IN (:excludeIds)')->setParameter('excludeIds', $excludeIds);
         }
 
-        // Apply user ID filter if provided
         if ($restrictToUserIds !== null) {
-            if ($restrictToUserIds === []) {
-                return 0; // Empty filter = no results
-            }
             $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return $qb;
     }
 
     public function resolveUserName(int $userId): string
