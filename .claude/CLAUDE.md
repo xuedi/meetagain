@@ -1,6 +1,6 @@
 # Claude Code Guidelines
 
-**Quick Links:** [Architecture](architecture.md) | [Conventions](conventions.md) | [Testing](testing.md)
+**Quick Links:** [Architecture](architecture.md) | [Conventions](conventions.md) | [Design](design.md) | [Testing](testing.md)
 
 ---
 
@@ -337,4 +337,5 @@ Before marking work complete, verify:
 
 - [Architecture](architecture.md) - Layer dependencies, design patterns, Symfony 8 features
 - [Conventions](conventions.md) - PHP style, Doctrine, Frontend, Security, Performance
+- [Design](design.md) - UI/UX guidelines, admin interface patterns, component usage
 - [Testing](testing.md) - PHPUnit patterns, fixtures, coverage

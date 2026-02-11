@@ -51,7 +51,8 @@
       "Bash(docker-compose:*)",
       "Bash(find:*)",
       "Bash(ls:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(just checkMagoAnalyze:*)"
     ]
   }
 }
