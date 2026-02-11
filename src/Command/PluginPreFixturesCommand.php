@@ -35,9 +35,8 @@ class PluginPreFixturesCommand extends Command
             }
 
             try {
-                $output->write(sprintf('Running %s plugin pre-fixtures ... ', $plugin->getPluginKey()));
+                $output->writeln(sprintf('Running %s plugin pre-fixtures', $plugin->getPluginKey()));
                 $plugin->preFixtures($output);
-                $output->writeln('OK');
             } catch (Exception $e) {
                 $hasErrors = true;
                 $output->writeln(sprintf('<error>FAILED: %s</error>', $e->getMessage()));
