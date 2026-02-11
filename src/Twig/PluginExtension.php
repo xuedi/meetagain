@@ -37,12 +37,18 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
+            new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),
         ];
     }
 
     public function getPluginsLinks(): array
     {
         return $this->collectFromPlugins(fn(Plugin $p) => $p->getMenuLinks());
+    }
+
+    public function isPluginEnabled(string $pluginKey): bool
+    {
+        return in_array($pluginKey, $this->pluginService->getActiveList(), true);
     }
 
     /**
