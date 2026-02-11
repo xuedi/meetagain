@@ -1,0 +1,36 @@
+name: check-quality
+description: Format code and run quality checks with Haiku model
+model: haiku
+category: quality
+
+steps:
+  - task:
+      subagent_type: Bash
+      model: haiku
+      description: Run code quality workflow
+      prompt: |
+        Execute code quality checks:
+
+        1. Run: just fixMago
+        2. Run: just checkMago
+
+        Return a concise summary including:
+        - Files formatted by fixMago
+        - Remaining issues from checkMago (if any)
+        - Overall status (CLEAN/ISSUES FOUND)
+
+        Format as:
+        ```
+        Code Quality Check
+        ==================
+        Formatting: X files modified
+
+        Mago Checks: PASSED/FAILED
+        [If issues found, list categories and counts]
+
+        Overall: CLEAN/ISSUES FOUND
+        ```
+
+examples:
+  - description: Format and check code quality
+    command: /check-quality

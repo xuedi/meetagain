@@ -1,0 +1,41 @@
+name: db-query
+description: Execute SQL query on database
+model: haiku
+category: database
+
+arguments:
+  - name: query
+    description: SQL query to execute (e.g., "SELECT COUNT(*) FROM users")
+    required: true
+
+steps:
+  - task:
+      subagent_type: Bash
+      model: haiku
+      description: Execute database query
+      prompt: |
+        Execute SQL query on database:
+
+        1. Run: just dockerDatabase "{{ query }}"
+
+        Return query results in readable format:
+        ```
+        Database Query
+        ==============
+        Query: {{ query }}
+
+        Results:
+        [Query output]
+
+        Status: SUCCESS/FAILED
+        ```
+
+examples:
+  - description: Count users
+    command: /db-query "SELECT COUNT(*) FROM users"
+
+  - description: List recent events
+    command: /db-query "SELECT id, title, start FROM events ORDER BY start DESC LIMIT 5"
+
+  - description: Check plugin status
+    command: /db-query "SELECT name, enabled FROM plugins"
