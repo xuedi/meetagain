@@ -40,6 +40,7 @@ readonly class AdminNavigationConfig
         public array $links, // Array of AdminLink objects
         public ?array $modifies = null, // Route modifications
         public ?string $sectionRole = null, // Required role for entire section
+        public ?string $linkRole = null,
     ) {}
 
     /**

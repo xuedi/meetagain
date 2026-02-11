@@ -10,24 +10,33 @@ use App\Service\TranslationService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class TranslationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'Translation', links: [
-            new AdminLink(label: 'menu_admin_translation', route: 'app_admin_translation', active: 'edit'),
-            new AdminLink(
-                label: 'menu_admin_translation_extract',
-                route: 'app_admin_translation_extract',
-                active: 'extract',
-            ),
-            new AdminLink(
-                label: 'menu_admin_translation_publish',
-                route: 'app_admin_translation_publish',
-                active: 'publish',
-            ),
-        ]);
+        return new AdminNavigationConfig(
+            section: 'Translation',
+            links: [
+                new AdminLink(
+                    label: 'menu_admin_translation',
+                    route: 'app_admin_translation',
+                    active: 'edit'
+                ),
+                new AdminLink(
+                    label: 'menu_admin_translation_extract',
+                    route: 'app_admin_translation_extract',
+                    active: 'extract',
+                ),
+                new AdminLink(
+                    label: 'menu_admin_translation_publish',
+                    route: 'app_admin_translation_publish',
+                    active: 'publish',
+                ),
+            ],
+            linkRole: 'ROLE_ADMIN');
     }
 
     public function __construct(

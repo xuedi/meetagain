@@ -24,7 +24,6 @@ security:
                 interval: '15 minutes'
 
     access_control:
-        - { path: "^/[a-z]{2}/manage", roles: ROLE_ORGANIZER }
         - { path: "^/[a-z]{2}/profile", roles: ROLE_USER }
         - { path: "^/[a-z]{2}/translation", roles: ROLE_USER }
 
