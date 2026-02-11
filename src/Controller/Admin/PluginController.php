@@ -6,7 +6,9 @@ use App\Service\CommandService;
 use App\Service\PluginService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class PluginController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -16,7 +18,7 @@ class PluginController extends AbstractAdminController
             label: 'menu_admin_plugin',
             route: 'app_admin_plugin',
             active: 'plugin',
-            linkRole: 'ROLE_META_ADMIN',
+            linkRole: 'ROLE_ADMIN',
         );
     }
 

@@ -7,7 +7,9 @@ use App\Repository\NotFoundLogRepository;
 use App\Service\ActivityService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class LogsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -17,6 +19,7 @@ class LogsController extends AbstractAdminController
             label: 'menu_admin_activity_log',
             route: 'app_admin_activity_log',
             active: 'activity_log',
+            linkRole: 'ROLE_ADMIN',
         );
     }
 

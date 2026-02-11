@@ -24,7 +24,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ORGANIZER')]
 class CmsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -67,9 +69,9 @@ class CmsController extends AbstractAdminController
     #[Route(
         '/admin/cms/{id}/edit/{locale}/{blockId}',
         name: 'app_admin_cms_edit',
-        methods: ['GET', 'POST'],
-        defaults: ['locale' => null, 'blockId' => null],
         requirements: ['locale' => '.+', 'blockId' => '\d+'],
+        defaults: ['locale' => null, 'blockId' => null],
+        methods: ['GET', 'POST'],
     )]
     public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, ?int $blockId = null): Response
     {
