@@ -5,222 +5,80 @@ namespace Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Smoke test for core admin routes.
+ *
+ * This test verifies critical admin routes load successfully.
+ * Plugin-specific routes should be tested in their respective plugin test folders.
+ */
 class AdminPagesTest extends WebTestCase
 {
     private const ADMIN_EMAIL = 'Admin@example.org';
     private const ADMIN_PASSWORD = '1234';
 
-    public function testAdminDashboardPage(): void
+    public function testCoreAdminRoutesLoadForAdmin(): void
     {
         // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
 
-        // Act
-        $client->request('GET', '/en/admin/dashboard');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminLogsActivityPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/logs/activity');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminLogsSystemPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/logs/system');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminLogs404Page(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/logs/404');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminEventListPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/event');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminUserListPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/user');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminLocationListPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/location');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminHostListPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/host');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminLanguageListPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/language');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminImageListPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/image');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminCmsListPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
+        // Test CMS route
         $client->request('GET', '/en/admin/cms');
+        $this->assertResponseIsSuccessful('CMS route should load for admin');
 
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminMenuPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/menu');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testAdminSystemPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
+        // Test System route
         $client->request('GET', '/en/admin/system');
+        $this->assertResponseIsSuccessful('System route should load for admin');
 
-        // Assert
-        $this->assertResponseIsSuccessful();
+        // Test Email route
+        $client->request('GET', '/en/admin/email');
+        $this->assertResponseIsSuccessful('Email route should load for admin');
+
+        // Test Translation route
+        $client->request('GET', '/en/admin/translation');
+        $this->assertResponseIsSuccessful('Translation route should load for admin');
+
+        // Test Menu route
+        $client->request('GET', '/en/admin/menu');
+        $this->assertResponseIsSuccessful('Menu route should load for admin');
+
+        // Test Announcements route
+        $client->request('GET', '/en/admin/system/announcements');
+        $this->assertResponseIsSuccessful('Announcements route should load for admin');
     }
 
-    public function testAdminPluginPage(): void
+    public function testCoreAdminRoutesRequireAuthentication(): void
     {
         // Arrange
         $client = static::createClient();
-        $this->loginAsAdmin($client);
 
-        // Act
-        $client->request('GET', '/en/admin/plugin');
+        // Test CMS route
+        $client->request('GET', '/en/admin/cms');
+        $this->assertResponseRedirects();
 
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
+        // Test System route
+        $client->request('GET', '/en/admin/system');
+        $this->assertResponseRedirects();
 
-    public function testAdminVisitorsPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
+        // Test Email route
+        $client->request('GET', '/en/admin/email');
+        $this->assertResponseRedirects();
 
-        // Act
-        $client->request('GET', '/en/admin/visitors');
+        // Test Translation route
+        $client->request('GET', '/en/admin/translation');
+        $this->assertResponseRedirects();
 
-        // Assert
-        $this->assertResponseIsSuccessful();
-    }
+        // Test Menu route
+        $client->request('GET', '/en/admin/menu');
+        $this->assertResponseRedirects();
 
-    public function testAdminTranslationSuggestionsPage(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $client->request('GET', '/en/admin/translations/suggestions');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
+        // Test Announcements route
+        $client->request('GET', '/en/admin/system/announcements');
+        $this->assertResponseRedirects();
     }
 
     private function loginAsAdmin(KernelBrowser $client): void
     {
-        // Act
         $crawler = $client->request('GET', '/en/login');
         $form = $crawler
             ->selectButton('Login')

@@ -17,7 +17,7 @@ class AdminEmailTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/en/admin/email/');
+        $client->request('GET', '/en/admin/email');
 
         // Assert
         $this->assertResponseRedirects();
@@ -30,7 +30,7 @@ class AdminEmailTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/email/');
+        $crawler = $client->request('GET', '/en/admin/email');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -89,7 +89,7 @@ class AdminEmailTest extends WebTestCase
         $client->submit($form);
 
         // Assert
-        $this->assertResponseRedirects('/en/admin/email/');
+        $this->assertResponseRedirects('/en/admin/email');
 
         // Verify changes persisted
         $client->followRedirect();
