@@ -45,19 +45,32 @@ just test               # Run all tests + checks
 
 ## Git Workflow
 
-**IMPORTANT: NEVER create git commits yourself**
+**CRITICAL: NEVER create git commits yourself**
 
 - **NEVER** run `git commit`, `git add`, or any other git commands that create commits
+- **NEVER** say "I will commit" or "Let me commit" - only the user commits
 - **ALWAYS** ask the user to commit changes themselves
-- After completing work, remind the user to review and commit the changes
+- You may suggest good points to commit, but ALWAYS wait for user to do it
 - You may run `git status` or `git diff` to check the current state if needed
-- Exception: You MAY use git commands when the user explicitly asks you to create a commit (e.g., "commit these changes" or "/commit")
+- Exception: You MAY use git commands ONLY when the user explicitly asks you to create a commit (e.g., "commit these
+  changes" or "/commit")
 
-**Pattern:**
+**Correct Pattern:**
+
 1. Complete the implementation
 2. Run `just fixMago` and verify tests pass
-3. Tell the user: "The implementation is complete. Please review the changes and commit when ready."
-4. Do NOT create commits automatically
+3. Tell the user: "This is a good point to commit. Please review the changes and commit when ready."
+4. **WAIT** for user to confirm they've committed
+5. Ask: "Ready to continue?" or "Let me know when you're ready for the next step."
+
+**Example Phrasing:**
+
+- ✅ "The implementation is complete. This would be a good point to commit. Please review and commit the changes, then
+  let me know when you're ready to continue."
+- ✅ "I've completed step 1. You may want to commit these changes before we proceed to step 2. Let me know when ready."
+- ❌ "Let me commit these changes for you."
+- ❌ "I'll create a commit now."
+- ❌ Automatically proceeding to next step without asking user to commit
 
 ---
 
@@ -85,20 +98,21 @@ just test               # Run all tests + checks
 
 ### Code Quality Checks
 
-| Command                | Purpose                         |
-|------------------------|---------------------------------|
-| `just checkMago`       | Run Mago linter                 |
-| `just checkMagoAnalyze`| Mago static analysis            |
-| `just checkMagoGuard`  | Mago architectural rules        |
-| `just checkMagoAll`    | Run all 3 Mago checks           |
+| Command                 | Purpose                  |
+|-------------------------|--------------------------|
+| `just checkMago`        | Run Mago linter          |
+| `just checkMagoAnalyze` | Mago static analysis     |
+| `just checkMagoGuard`   | Mago architectural rules |
+| `just checkMagoAll`     | Run all 3 Mago checks    |
 
 ### Fixes
 
-| Command      | Purpose                                                    |
-|--------------|------------------------------------------------------------|
-| `just fixMago` | Format code with Mago (run this before `just test`)     |
+| Command        | Purpose                                             |
+|----------------|-----------------------------------------------------|
+| `just fixMago` | Format code with Mago (run this before `just test`) |
 
-**Note:** Always run `just fixMago` after making code changes and before running `just test` to ensure code style consistency.
+**Note:** Always run `just fixMago` after making code changes and before running `just test` to ensure code style
+consistency.
 
 ### Database
 
@@ -108,10 +122,82 @@ just test               # Run all tests + checks
 
 ---
 
+## Available Skills
+
+**Use skills instead of manually invoking Task with Haiku model for common workflows.**
+
+Skills automatically use the Haiku model for efficiency and follow project conventions.
+
+### Testing Skills
+
+| Skill                       | Purpose                                    |
+|-----------------------------|--------------------------------------------|
+| `/test-unit [filter]`       | Run unit tests (optionally filtered)       |
+| `/test-functional [filter]` | Run functional tests (optionally filtered) |
+| `/test-all`                 | Run complete test suite with coverage      |
+
+**Examples:**
+
+```bash
+/test-unit                    # Run all unit tests
+/test-unit EventServiceTest   # Run specific test class
+/test-functional LoginTest    # Run functional login tests
+/test-all                     # Full test suite + coverage
+```
+
+### Code Quality Skills
+
+| Skill            | Purpose                                              |
+|------------------|------------------------------------------------------|
+| `/check-quality` | Format code and run quality checks                   |
+| `/quality-fix`   | Complete pre-commit workflow (format + test + check) |
+
+**Examples:**
+
+```bash
+/check-quality   # Auto-format + check for issues
+/quality-fix     # Full pre-commit workflow
+```
+
+### Database & Environment Skills
+
+| Skill                 | Purpose                             |
+|-----------------------|-------------------------------------|
+| `/reset-dev [plugin]` | Reset dev environment with fixtures |
+| `/cache-clear [env]`  | Clear Symfony cache (dev/test/prod) |
+| `/db-query "query"`   | Execute SQL query on database       |
+
+**Examples:**
+
+```bash
+/reset-dev              # Reset with all enabled plugins
+/reset-dev multisite    # Reset with multisite plugin
+/cache-clear            # Clear dev cache
+/cache-clear test       # Clear test cache
+/db-query "SELECT COUNT(*) FROM users"
+```
+
+### Plugin Management Skills
+
+| Skill                    | Purpose                    |
+|--------------------------|----------------------------|
+| `/plugin-enable <name>`  | Enable plugin + migrations |
+| `/plugin-disable <name>` | Disable plugin             |
+
+**Examples:**
+
+```bash
+/plugin-enable dishes     # Enable dishes plugin
+/plugin-disable multisite # Disable multisite plugin
+```
+
+---
+
 ## Token Efficiency
 
 - Default to `model: "sonnet"` for subagents
-- **Always use `model: "haiku"` for running `just` commands** (see Haiku Agent section below)
+- **Use skills for `just` commands** (skills automatically use Haiku model)
+- For custom just commands not covered by skills, use `Task(model: "haiku")`
 - Prefer asking user to run tests locally over AI execution
 - For codebase exploration, use `subagent_type: "Explore"` over multiple greps
 - Only read files that are directly relevant to the task
@@ -121,17 +207,23 @@ just test               # Run all tests + checks
 
 ## Haiku Agent for `just` Commands
 
-All `just` command execution MUST use the Haiku model via Task tool:
+**IMPORTANT: Use skills (e.g., `/test-unit`) instead of manual Haiku agent invocation.**
+
+Skills are pre-configured shortcuts that automatically use Haiku model and follow best practices.
+
+### When Skills Don't Cover Your Use Case
+
+For custom `just` commands not covered by skills, use the Haiku model via Task tool:
 
 ```
 Task(
   subagent_type: "Bash",
   model: "haiku",
-  prompt: "Run: just testUnit Tests\\Unit\\Service\\ExampleTest && just testResults"
+  prompt: "Run: just <custom-command> && just testResults"
 )
 ```
 
-**Pattern for running tests:**
+**Pattern for running tests manually:**
 
 1. Run test command: `just testUnit [TestClass]` (generates JUnit XML)
 2. Get results: `just testResults` (AI-readable format)
