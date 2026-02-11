@@ -35,9 +35,8 @@ class PluginPostFixturesCommand extends Command
             }
 
             try {
-                $output->write(sprintf('Running %s plugin post-fixtures ... ', $plugin->getPluginKey()));
+                $output->writeln(sprintf('Running %s plugin post-fixtures', $plugin->getPluginKey()));
                 $plugin->postFixtures($output);
-                $output->writeln('OK');
             } catch (Exception $e) {
                 $hasErrors = true;
                 $output->writeln(sprintf('<error>FAILED: %s</error>', $e->getMessage()));
