@@ -14,7 +14,7 @@
                 {% for pluginLink in get_plugins_links() %}
                     <a class="navbar-item" href="{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
                 {% endfor %}
-                {% if is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_ORGANIZER') %}
                     <a class="navbar-item" href="{{ path('app_admin') }}">
                         {{ "menu_admin" | trans }}
                         {% if has_admin_attention() %}
