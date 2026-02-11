@@ -1,0 +1,86 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Start date</th>
+                <th>Stop date</th>
+                <th>Recurring</th>
+                <th>Location</th>
+                <th>Rsvp</th>
+                <th>Type</th>
+                <th><a href="{{ path('app_admin_event_add') }}"><span class="icon"><i class="fa fa-add"></i></span></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for event in events %}
+                {% set textColor = '' %}
+                {% if event.canceled %}
+                    {% set textColor = 'has-background-danger-light' %}
+                {% elseif event.recurringOf is not null %}
+                    {% set textColor = 'has-text-grey-light' %}
+                {% elseif event.recurringRule is not null %}
+                    {% set textColor = 'has-background-info-light' %}
+                {% endif %}
+                <tr class="{{ textColor }} {% if event.id == nextEvent and not event.canceled %}has-background-warning-light{% endif %}">
+                    <td>{{ event.title(app.locale) }}</td>
+                    <td>{{ event.start|date('Y-m-d') }}</td>
+                    <td>{{ event.stop|date('Y-m-d') }}</td>
+                    <td>
+                        {% if event.recurringOf is not null %}
+                            auto
+                        {% else %}
+                            {% if event.recurringRule is null %}{{ 'No'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}
+                        {% endif %}
+                    </td>
+                    <td>{{ event.location.name }}</td>
+                    <td>{{ event.rsvp|length }}</td>
+                    <td>{{ event.type.name }}</td>
+                    <td>
+                        <a href="{{ path('app_admin_event_edit', {'id': event.id}) }}">
+                            <span class="icon"><i class="fa fa-edit"></i></span>
+                        </a>
+                        {% if event.featured %}
+                            <span class="icon has-text-warning"><i class="fa fa-star"></i></span>
+                        {% endif %}
+                        {% if event.canceled %}
+                            <a href="{{ path('app_admin_event_uncancel', {'id': event.id}) }}" onclick="return confirm('Are you sure you want to uncancel this event?')">
+                                <span class="tag is-danger is-light">Canceled</span>
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_admin_event_cancel', {'id': event.id}) }}" onclick="return confirm('Are you sure you want to cancel this event? All RSVPd users will be notified.')">
+                                <span class="icon has-text-danger"><i class="fa fa-ban"></i></span>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="mt-4 has-text-centered">
+            <span class="tag has-background-info-light">
+                <span>Recurring events</span>
+            </span>
+            <span class="tag is-white">
+                <span class="">One time events</span>
+            </span>
+            <span class="tag has-text-grey-light is-white">
+                <span>Automatic generated from a recurring event</span>
+            </span>
+            <span class="tag has-background-warning-light">
+                <span>The next event</span>
+            </span>
+            <span class="tag has-background-danger-light">
+                <span>Canceled events</span>
+            </span>
+        </div>
+
+    </div>
+
+{% endblock %}

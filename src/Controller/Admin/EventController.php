@@ -1,13 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\AdminTables\Controller;
+namespace App\Controller\Admin;
 
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
 use App\Entity\ImageType;
+use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\EventService;
@@ -15,7 +14,6 @@ use App\Service\ImageService;
 use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Plugin\AdminTables\Form\EventType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,18 +42,18 @@ class EventController extends AbstractAdminController
         private readonly EventRepository $repo,
     ) {}
 
-    #[Route('/admin/event', name: 'app_admin_event')]
-    public function eventList(): Response
+    #[Route('/admin/events', name: 'app_admin_event')]
+    public function list(): Response
     {
-        return $this->render('@AdminTables/tables/event_list.html.twig', [
+        return $this->render('admin/event/list.html.twig', [
             'nextEvent' => $this->repo->getNextEventId(),
             'events' => $this->repo->findBy([], ['start' => 'ASC']),
             'active' => 'event',
         ]);
     }
 
-    #[Route('/admin/event/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
-    public function eventEdit(Request $request, Event $event): Response
+    #[Route('/admin/events/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Event $event): Response
     {
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
@@ -106,22 +104,22 @@ class EventController extends AbstractAdminController
             $this->addFlash('success', 'Event saved' . $followUp);
         }
 
-        return $this->render('@AdminTables/tables/event_edit.html.twig', [
+        return $this->render('admin/event/edit.html.twig', [
             'active' => 'event',
             'event' => $event,
             'form' => $form,
         ]);
     }
 
-    #[Route('/admin/event/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
-    public function eventDelete(): Response
+    #[Route('/admin/events/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
+    public function delete(): Response
     {
         dump('delete');
         exit();
     }
 
-    #[Route('/admin/event/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
-    public function eventCancel(Event $event): Response
+    #[Route('/admin/events/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
+    public function cancel(Event $event): Response
     {
         $rsvpCount = $event->getRsvp()->count();
         $this->eventService->cancelEvent($event);
@@ -132,8 +130,8 @@ class EventController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
 
-    #[Route('/admin/event/{id}/uncancel', name: 'app_admin_event_uncancel', methods: ['POST'])]
-    public function eventUncancel(Event $event): Response
+    #[Route('/admin/events/{id}/uncancel', name: 'app_admin_event_uncancel', methods: ['POST'])]
+    public function uncancel(Event $event): Response
     {
         $this->eventService->uncancelEvent($event);
 
@@ -150,8 +148,8 @@ class EventController extends AbstractAdminController
         return new EventTranslation();
     }
 
-    #[Route('/admin/event/add', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
-    public function eventAdd(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/admin/events/new', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
@@ -179,7 +177,7 @@ class EventController extends AbstractAdminController
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
         }
 
-        return $this->render('@AdminTables/tables/event_new.html.twig', [
+        return $this->render('admin/event/new.html.twig', [
             'active' => 'event',
             'location' => $event,
             'form' => $form,
