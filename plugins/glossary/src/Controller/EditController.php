@@ -26,12 +26,14 @@ class EditController extends AbstractGlossaryController
             if (!$this->getUser() instanceof User) {
                 throw new AuthenticationException('Only for logged in users');
             }
-            $this->service->generateSuggestions(
-                newGlossary: $newGlossary,
-                id: $id,
-                userId: $this->getUser()->getId(),
-                isManager: $this->isGranted('ROLE_ORGANIZER'),
-            );
+
+            if ($this->isGranted('ROLE_ORGANIZER')) {
+                // Managers can update directly
+                $this->service->update($newGlossary, $id);
+            } else {
+                // Regular users create suggestions
+                $this->service->generateSuggestions($newGlossary, $id, $this->getUser()->getId());
+            }
 
             return $this->redirectToRoute('app_plugin_glossary');
         }

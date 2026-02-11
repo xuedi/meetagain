@@ -128,7 +128,7 @@ readonly class RsvpNotificationService
                 beta: INF,
             ); // beta: INF forces the callback to run and save the new value
         } catch (InvalidArgumentException) {
-            // Log error if needed
+            // Cache write failures are non-critical - notification tracking continues without cache
         }
     }
 
