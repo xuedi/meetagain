@@ -7,7 +7,9 @@ use App\Controller\Admin\AdminNavigationConfig;
 use App\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class ImageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
