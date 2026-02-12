@@ -12,6 +12,7 @@ use App\Service\TranslationService;
 use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -100,14 +101,11 @@ class EventType extends AbstractType
                     ),
                 ],
             ])
-            ->add('allFollowing', ChoiceType::class, [
-                'label' => 'Also update all following events',
+            ->add('allFollowing', CheckboxType::class, [
+                'label' => false,
                 'data' => false,
                 'mapped' => false,
-                'choices' => [
-                    $this->translator->trans('yes') => true,
-                    $this->translator->trans('no') => false,
-                ],
+                'required' => false,
             ]);
 
         $eventId = $event?->getId();
