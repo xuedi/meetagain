@@ -97,6 +97,39 @@
                         </p>
                     </div>
 
+                    <div class="box">
+                        <h2 class="title is-5">Blocked Users</h2>
+                        {% if blockedUsers|length == 0 %}
+                            <p>You have not blocked any users.</p>
+                        {% else %}
+                            <table class="table is-fullwidth">
+                                <tbody>
+                                {% for block in blockedUsers %}
+                                    <tr id="block-{{ block.blocked.id }}">
+                                        <td style="width: 60px;">
+                                            {% include '_block/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
+                                        </td>
+                                        <td>
+                                            {{ block.blocked.name }}
+                                        </td>
+                                        <td style="width: 60px; text-align: right;">
+                                            <a href="{{ path('app_profile_unblock_user', {'id': block.blocked.id}) }}"
+                                               class="ajax-unblock"
+                                               data-user-id="{{ block.blocked.id }}"
+                                               data-user-name="{{ block.blocked.name }}">
+                                                <span class="icon"><i class="fa fa-unlock"></i></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <p class="mt-2">
+                                <a href="{{ path('app_profile_blocked_users') }}">View all blocked users</a>
+                            </p>
+                        {% endif %}
+                    </div>
+
                 </div>
             </div>
 
