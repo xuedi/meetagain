@@ -1,39 +1,52 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block content %}
-
     <div class="container">
+        <h1 class="title">Create New Event</h1>
 
         {{ form_start(form) }}
 
         <div class="columns">
-            <div class="column is-3">
-                {{ form_row(form.start) }}
+            <div class="column is-8">
+                <div class="columns">
+                    <div class="column is-6">
+                        {{ form_row(form.start) }}
+                    </div>
+                    <div class="column is-6">
+                        {{ form_row(form.stop) }}
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-4">
+                        {{ form_row(form.recurringRule) }}
+                    </div>
+                    <div class="column is-4">
+                        {{ form_row(form.type) }}
+                    </div>
+                    <div class="column is-4">
+                        {{ form_row(form.location) }}
+                    </div>
+                </div>
             </div>
-            <div class="column is-3">
-                {{ form_row(form.stop) }}
+
+            <div class="column is-4">
+                {{ form_row(form.host) }}
             </div>
         </div>
-
-        <div class="columns">
-            <div class="column is-2">
-                {{ form_row(form.recurringRule, { 'attr': {'class': 'is-fullwidth'} }) }}
-            </div>
-            <div class="column is-2">
-                {{ form_row(form.type, { 'attr': {'class': 'is-fullwidth'} }) }}
-            </div>
-            <div class="column is-2">
-                {{ form_row(form.location, { 'attr': {'class': 'is-fullwidth'} }) }}
-            </div>
-        </div>
-
-
-        {{ form_row(form.host) }}
 
         {{ form_widget(form) }}
-        <button class="button">{{ "button_add" | trans }}</button>
+
+        <div class="field mt-5">
+            <button type="submit" class="button is-link">
+                <span class="icon"><i class="fa fa-plus"></i></span>
+                <span>{{ "button_add" | trans }}</span>
+            </button>
+            <a href="{{ path('app_admin_event') }}" class="button is-light">
+                <span>{{ "button_cancel" | trans }}</span>
+            </a>
+        </div>
+
         {{ form_end(form) }}
-
     </div>
-
 {% endblock %}
