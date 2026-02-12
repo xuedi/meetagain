@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\UserRole;
 use App\Entity\UserStatus;
 use App\Filter\Member\MemberFilterService;
 use App\Form\UserType;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_ORGANIZER')]
 class MemberController extends AbstractAdminController
 {
     public function __construct(
@@ -57,6 +58,16 @@ class MemberController extends AbstractAdminController
             throw $this->createNotFoundException('Member not found in current context.');
         }
 
+        // Route to appropriate view based on role
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->editAdmin($request, $user);
+        }
+
+        return $this->editOrganizer($user);
+    }
+
+    private function editAdmin(Request $request, User $user): Response
+    {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
@@ -80,7 +91,16 @@ class MemberController extends AbstractAdminController
         ]);
     }
 
+    private function editOrganizer(User $user): Response
+    {
+        return $this->render('admin/member/edit_organizer.html.twig', [
+            'active' => 'member',
+            'user' => $user,
+        ]);
+    }
+
     #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function approve(User $user): Response
     {
         if (!$this->filterService->isMemberAccessible($user->getId())) {
@@ -99,6 +119,7 @@ class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deny(User $user): Response
     {
         if (!$this->filterService->isMemberAccessible($user->getId())) {
@@ -114,6 +135,7 @@ class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(User $user): Response
     {
         if (!$this->filterService->isMemberAccessible($user->getId())) {
@@ -126,5 +148,58 @@ class MemberController extends AbstractAdminController
         $this->em->flush();
 
         return $this->redirectToRoute('app_admin_member');
+    }
+
+    #[Route('/admin/member/{id}/promote-organizer', name: 'app_admin_member_promote_organizer', methods: ['POST'])]
+    public function promoteToOrganizer(User $user): Response
+    {
+        // Validate member is accessible
+        if (!$this->filterService->isMemberAccessible($user->getId())) {
+            throw $this->createNotFoundException('Member not found in current context.');
+        }
+
+        // Prevent self-promotion
+        if ($user->getId() === $this->getUser()->getId()) {
+            $this->addFlash('error', 'You cannot promote yourself.');
+
+            return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
+        }
+
+        // Prevent promoting system users
+        if ($user->hasUserRole(UserRole::System)) {
+            throw $this->createAccessDeniedException('Cannot modify system users.');
+        }
+
+        // Add ROLE_ORGANIZER if not already present
+        if (!in_array('ROLE_ORGANIZER', $user->getRoles(), true)) {
+            $roles = $user->getRoles();
+            $roles[] = 'ROLE_ORGANIZER';
+            $user->setRoles($roles);
+            $this->em->flush();
+            $this->addFlash('success', 'Member promoted to organizer.');
+        }
+
+        return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
+    }
+
+    #[Route('/admin/member/{id}/toggle-verified', name: 'app_admin_member_toggle_verified', methods: ['POST'])]
+    public function toggleVerified(User $user): Response
+    {
+        // Validate member is accessible
+        if (!$this->filterService->isMemberAccessible($user->getId())) {
+            throw $this->createNotFoundException('Member not found in current context.');
+        }
+
+        // Prevent modifying system users
+        if ($user->hasUserRole(UserRole::System)) {
+            throw $this->createAccessDeniedException('Cannot modify system users.');
+        }
+
+        $user->setVerified(!$user->isVerified());
+        $this->em->flush();
+
+        $this->addFlash('success', $user->isVerified() ? 'Member verified.' : 'Member unverified.');
+
+        return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
     }
 }
