@@ -47,8 +47,7 @@ class CmsController extends AbstractAdminController
         private readonly CmsBlockService $blockService,
         private readonly AnnouncementRepository $announcementRepo,
         private readonly CmsFilterService $cmsFilterService,
-    ) {
-    }
+    ) {}
 
     #[Route('/admin/cms', name: 'app_admin_cms')]
     public function cmsList(): Response
@@ -165,7 +164,7 @@ class CmsController extends AbstractAdminController
         }
 
         $locale = $request->request->get('editLocale');
-        $blockType = CmsBlockTypes::from((int)$request->request->get('blockType'));
+        $blockType = CmsBlockTypes::from((int) $request->request->get('blockType'));
 
         $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
 
@@ -178,8 +177,8 @@ class CmsController extends AbstractAdminController
     #[Route('/admin/cms/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
     public function cmsBlockMoveDown(Request $request): Response
     {
-        $pageId = (int)$request->query->get('id');
-        $blockId = (int)$request->query->get('blockId');
+        $pageId = (int) $request->query->get('id');
+        $blockId = (int) $request->query->get('blockId');
         $locale = $request->query->get('locale');
 
         $this->blockService->moveBlockDown($pageId, $blockId, $locale);
@@ -193,8 +192,8 @@ class CmsController extends AbstractAdminController
     #[Route('/admin/cms/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
     public function cmsBlockMoveUp(Request $request): Response
     {
-        $pageId = (int)$request->query->get('id');
-        $blockId = (int)$request->query->get('blockId');
+        $pageId = (int) $request->query->get('id');
+        $blockId = (int) $request->query->get('blockId');
         $locale = $request->query->get('locale');
 
         $this->blockService->moveBlockUp($pageId, $blockId, $locale);
@@ -208,8 +207,8 @@ class CmsController extends AbstractAdminController
     #[Route('/admin/cms/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
     public function cmsBlockSave(Request $request): Response
     {
-        $blockId = (int)$request->request->get('blockId');
-        $type = CmsBlockTypes::from((int)$request->request->get('blockType'));
+        $blockId = (int) $request->request->get('blockId');
+        $type = CmsBlockTypes::from((int) $request->request->get('blockType'));
 
         $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
 
@@ -222,7 +221,7 @@ class CmsController extends AbstractAdminController
     #[Route('/admin/cms/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
     public function cmsBlockDelete(Request $request): Response
     {
-        $this->blockService->deleteBlock((int)$request->query->get('blockId'));
+        $this->blockService->deleteBlock((int) $request->query->get('blockId'));
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $request->query->get('id'),
