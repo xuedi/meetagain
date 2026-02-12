@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
 use App\Entity\ImageType;
+use App\Filter\Event\EventFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
@@ -40,14 +41,19 @@ class EventController extends AbstractAdminController
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly EventService $eventService,
         private readonly EventRepository $repo,
+        private readonly EventFilterService $eventFilterService,
     ) {}
 
     #[Route('/admin/events', name: 'app_admin_event')]
     public function list(): Response
     {
+        // Apply multisite filtering if enabled
+        $filterResult = $this->eventFilterService->getEventIdFilter();
+        $eventIds = $filterResult->getEventIds();
+
         return $this->render('admin/event/list.html.twig', [
-            'nextEvent' => $this->repo->getNextEventId(),
-            'events' => $this->repo->findBy([], ['start' => 'ASC']),
+            'nextEvent' => $this->repo->getNextEventId($eventIds),
+            'events' => $this->repo->findAllForAdmin($eventIds),
             'active' => 'event',
         ]);
     }
