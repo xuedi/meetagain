@@ -95,7 +95,7 @@ class EventController extends AbstractAdminController
 
             // create thumbnail
             if ($image instanceof Image) {
-                $this->imageService->createThumbnails($image);
+                $this->imageService->createThumbnails($image, ImageType::EventTeaser);
             }
 
             $followUp = '';

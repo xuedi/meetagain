@@ -44,7 +44,7 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
             if (file_exists($imageFile)) {
                 $uploadedImage = new UploadedFile($imageFile, $data['image'], null, null, true);
                 $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::LanguageTile);
-                $this->imageService->createThumbnails($image);
+                $this->imageService->createThumbnails($image, ImageType::LanguageTile);
                 $language->setTileImage($image);
             }
 
