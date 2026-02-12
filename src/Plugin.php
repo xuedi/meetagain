@@ -70,4 +70,10 @@ interface Plugin
      * @return list<EventListItemTag>
      */
     public function getEventListItemTags(int $eventId): array;
+
+    /**
+     * Returns rendered HTML to display at the top of the admin member list page.
+     * Return null if the plugin doesn't provide content for this section.
+     */
+    public function getMemberPageTop(): ?string;
 }
