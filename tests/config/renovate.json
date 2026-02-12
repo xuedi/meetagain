@@ -1,12 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Local dependency update checker - runs in dry-run mode, no PRs created",
+  "description": "Local dependency update checker - creates commits for available updates",
   "extends": [
     "config:recommended"
   ],
-  "dryRun": "full",
+  "dryRun": false,
   "platform": "local",
   "requireConfig": "optional",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "onboarding": false,
   "ignoreDeps": [],
   "packageRules": [
     {
@@ -32,7 +34,7 @@
   "assignees": [],
   "reviewers": [],
   "prConcurrentLimit": 0,
-  "prCreation": "not-pending",
+  "prCreation": "immediate",
   "automerge": false,
   "platformAutomerge": false
 }
