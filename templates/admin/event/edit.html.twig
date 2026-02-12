@@ -44,7 +44,7 @@
         </div>
 
         <div class="columns">
-            <div class="column is-10">
+            <div class="column is-9">
 
                 <div class="box">
 
@@ -71,59 +71,70 @@
                     {% endfor %}
                 </div>
 
+                <div class="field mt-5">
+                    <button type="submit" class="button is-link">
+                        {{ "button_save" | trans }}
+                    </button>
+                    <a href="{{ path('app_admin_event') }}" class="button is-light">
+                        {{ "button_cancel" | trans }}
+                    </a>
+                </div>
+
             </div>
-            <div class="column is-2">
+            <div class="column is-3">
 
                 <div class="mt-3">
                     {{ form_row(form.image) }}
                     {% include '_block/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
                 </div>
 
-                <div class="mt-5">
-                    {{ form_row(form.published) }}
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="mt-5">
+                            {{ form_row(form.published) }}
+                        </div>
+
+                        <div class="mt-5">
+                            {{ form_row(form.featured) }}
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="mt-5">
+                            {{ form_row(form.host) }}
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-5">
-                    {{ form_row(form.featured) }}
-                </div>
+                <fieldset class="mt-5 p-4" style="border: 2px solid #f14668; border-radius: 4px;">
+                    <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">Danger Zone</legend>
 
-                <div class="mt-5">
-                    {{ form_row(form.host) }}
-                </div>
-
-                <div class="mt-5 p-3 has-background-warning-light has-text-centered">
-                    {{ form_row(form.allFollowing) }}
-                </div>
-
-                <div class="mt-5">
-                    <a class="button is-danger toggleTrigger" data-id="event-delete-warning"
-                       href="{{ path('app_admin_event_delete', {'id': event.id}) }}">
-                        <span class="icon"><i class="fa fa-trash"></i></span>
-                    </a>
-                    <button class="button">
-                        {{ "button_save" | trans }}
-                    </button>
-                    <a href="{{ path('app_admin_event') }}" class="button">
-                        <span class="icon"><i class="fa fa-arrow-up-right-from-square"></i></span>
-                    </a>
-                </div>
-
-                <div class="mt-2">
+                    <div class="field mb-2">
+                        <label class="button is-light is-fullwidth" style="justify-content: flex-start;">
+                            {{ form_widget(form.allFollowing, {'attr': {'style': 'margin-right: 0.5rem;'}}) }}
+                            <span>Update all following</span>
+                        </label>
+                    </div>
                     {% if event.canceled %}
                         <a href="{{ path('app_admin_event_uncancel', {'id': event.id}) }}"
-                           class="button is-warning is-light">
+                           class="button is-light is-fullwidth mb-2"
+                           onclick="return confirm('Are you sure you want to uncancel this event?')">
                             <span class="icon"><i class="fa fa-check"></i></span>
-                            <span>Uncancel</span>
+                            <span>Uncancel Event</span>
                         </a>
                     {% else %}
                         <a href="{{ path('app_admin_event_cancel', {'id': event.id}) }}"
-                           class="button is-danger is-light"
+                           class="button is-light is-fullwidth mb-2"
                            onclick="return confirm('Are you sure you want to cancel this event? All RSVPd users will be notified.')">
                             <span class="icon"><i class="fa fa-ban"></i></span>
                             <span>Cancel Event</span>
                         </a>
                     {% endif %}
-                </div>
+                    <a class="button is-light is-fullwidth toggleTrigger" data-id="event-delete-warning"
+                       href="{{ path('app_admin_event_delete', {'id': event.id}) }}">
+                        <span class="icon"><i class="fa fa-trash"></i></span>
+                        <span>Delete Event</span>
+                    </a>
+                </fieldset>
             </div>
         </div>
 
