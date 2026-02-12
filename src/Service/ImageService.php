@@ -64,7 +64,7 @@ readonly class ImageService
             $this->entityManager->persist($image);
             $this->entityManager->flush();
             $event->addImage($image);
-            $this->createThumbnails($image);
+            $this->createThumbnails($image, ImageType::EventUpload);
         }
         $this->entityManager->persist($event);
         $this->entityManager->flush();

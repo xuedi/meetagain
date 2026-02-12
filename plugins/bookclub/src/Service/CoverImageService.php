@@ -59,7 +59,7 @@ readonly class CoverImageService
             $image = $this->imageService->upload($uploadedFile, $user, ImageType::PluginBookclubCover);
 
             if ($image !== null) {
-                $this->imageService->createThumbnails($image);
+                $this->imageService->createThumbnails($image, ImageType::PluginBookclubCover);
             }
 
             @unlink($tempFile);

@@ -69,7 +69,7 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
             if (file_exists($coverFile)) {
                 $uploadedImage = new UploadedFile($coverFile, $data['isbn'] . '.jpg');
                 $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginBookclubCover);
-                $this->imageService->createThumbnails($image);
+                $this->imageService->createThumbnails($image, ImageType::PluginBookclubCover);
                 $book->setCoverImage($image);
             }
 

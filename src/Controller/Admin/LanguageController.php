@@ -128,7 +128,7 @@ class LanguageController extends AbstractAdminController
         $image = $this->imageService->upload($imageData, $user, ImageType::LanguageTile);
         if ($image instanceof Image) {
             $language->setTileImage($image);
-            $this->imageService->createThumbnails($image);
+            $this->imageService->createThumbnails($image, ImageType::LanguageTile);
         }
     }
 }
