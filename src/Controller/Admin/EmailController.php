@@ -27,7 +27,7 @@ class EmailController extends AbstractAdminController
             label: 'menu_admin_email',
             route: 'app_admin_email',
             active: 'email',
-            linkRole: 'ROLE_ORGANIZER',
+            linkRole: 'ROLE_FOUNDER',
         );
     }
 

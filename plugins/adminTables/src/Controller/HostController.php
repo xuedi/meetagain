@@ -23,6 +23,7 @@ class HostController extends AbstractAdminController
             label: 'menu_admin_host',
             route: 'app_admin_host',
             active: 'host',
+            linkRole: 'ROLE_FOUNDER',
         );
     }
 

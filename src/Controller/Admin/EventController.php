@@ -31,6 +31,7 @@ class EventController extends AbstractAdminController
             label: 'menu_admin_event',
             route: 'app_admin_event',
             active: 'event',
+            linkRole: 'ROLE_FOUNDER',
         );
     }
 

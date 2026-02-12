@@ -34,6 +34,7 @@ class MemberController extends AbstractAdminController
             label: 'Members',
             route: 'app_admin_member',
             active: 'member',
+            linkRole: 'ROLE_ORGANIZER',
         );
     }
 
