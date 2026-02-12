@@ -7,7 +7,6 @@
   "dryRun": "full",
   "platform": "local",
   "requireConfig": "optional",
-  "printConfig": true,
   "ignoreDeps": [],
   "packageRules": [
     {

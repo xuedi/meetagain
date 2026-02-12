@@ -107,7 +107,7 @@ services:
       - ../:/usr/src/app:ro
     environment:
       - LOG_LEVEL=info
-      - RENOVATE_CONFIG_FILE=/usr/src/app/config/renovate.json
+      - RENOVATE_CONFIG_FILE=/usr/src/app/tests/config/renovate.json
     command: renovate --platform=local
     profiles:
       - tools
