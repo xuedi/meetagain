@@ -35,14 +35,13 @@
                 <div class="level-left"></div>
                 <div class="level-right">
                     {% if hasBlockedPartner %}
-                        <form action="{{ path('app_profile_unblock_user', {'id': conversationsId}) }}" method="post" class="is-inline">
+                        <form action="{{ path('app_profile_unblock_user', {'id': conversationsId}) }}" method="post" class="is-inline ajax-block-form">
                             <button type="submit" class="button is-warning is-small">
                                 <span class="icon"><i class="fa fa-unlock"></i></span><span>Unblock</span>
                             </button>
                         </form>
                     {% else %}
-                        <form action="{{ path('app_profile_block_user', {'id': conversationsId}) }}" method="post" class="is-inline"
-                              onsubmit="return confirm('Block this user? They will not be able to see your profile or message you.')">
+                        <form action="{{ path('app_profile_block_user', {'id': conversationsId}) }}" method="post" class="is-inline ajax-block-form">
                             <button type="submit" class="button is-dark is-small">
                                 <span class="icon"><i class="fa fa-ban"></i></span><span>Block</span>
                             </button>
