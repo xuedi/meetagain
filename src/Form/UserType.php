@@ -54,6 +54,7 @@ class UserType extends AbstractType
                 'choices' => [
                     $this->translator->trans('role_system') => 'ROLE_SYSTEM',
                     $this->translator->trans('role_admin') => 'ROLE_ADMIN',
+                    $this->translator->trans('role_founder') => 'ROLE_FOUNDER',
                     $this->translator->trans('role_organizer') => 'ROLE_ORGANIZER',
                     $this->translator->trans('role_user') => 'ROLE_USER',
                 ],

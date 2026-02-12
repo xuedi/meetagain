@@ -65,8 +65,8 @@
 
         {# Side column (4-wide) - Fixed info #}
         <div class="column is-4">
-            {# Action Required (Priority 100) - ROLE_ADMIN only #}
-            {% if is_granted('ROLE_ADMIN') %}
+            {# Action Required (Priority 100) - ROLE_FOUNDER only #}
+            {% if is_granted('ROLE_FOUNDER') %}
             {% if actionItems.reportedImages > 0 or actionItems.pendingTranslations > 0 or actionItems.staleEmails > 0 or unverifiedCount > 0 %}
             <div class="box has-background-warning-light">
                 <h2 class="title is-6">
@@ -131,8 +131,8 @@
             </div>
             {% endif %}
 
-            {# Quick Statistics (Priority 80) - ROLE_ADMIN only #}
-            {% if is_granted('ROLE_ADMIN') %}
+            {# Quick Statistics (Priority 80) - ROLE_FOUNDER only #}
+            {% if is_granted('ROLE_FOUNDER') %}
             <div class="box">
                 <h2 class="title is-6">Statistics</h2>
                 <table class="table is-narrow is-fullwidth">
