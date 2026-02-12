@@ -199,11 +199,16 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function getNextEventId(): ?int
+    /**
+     * Get the ID of the next upcoming event.
+     *
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
+     */
+    public function getNextEventId(?array $restrictToEventIds = null): ?int
     {
         $now = new DateTime();
         $now->setTime(0, 0, 0);
-        foreach ($this->findBy([], ['start' => 'ASC']) as $event) {
+        foreach ($this->findAllForAdmin($restrictToEventIds) as $event) {
             /** @var DateTime $start */
             $start = clone $event->getStart();
             $start->setTime(0, 0);
@@ -261,5 +266,26 @@ class EventRepository extends ServiceEntityRepository
             ->where('e.recurringRule IS NOT NULL')
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Find all events for admin interface with optional filtering.
+     *
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
+     * @return array<Event>
+     */
+    public function findAllForAdmin(?array $restrictToEventIds = null): array
+    {
+        $qb = $this->createQueryBuilder('e')->leftJoin('e.translations', 't')->addSelect('t');
+
+        // Apply event ID filter if provided
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return []; // Empty filter = no results
+            }
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->orderBy('e.start', 'ASC')->getQuery()->getResult();
     }
 }
