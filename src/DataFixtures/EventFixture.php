@@ -39,7 +39,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
             $this->getRefUser(UserFixture::ADMIN),
             ImageType::EventTeaser,
         );
-        $this->imageService->createThumbnails($previewImage);
+        $this->imageService->createThumbnails($previewImage, ImageType::EventTeaser);
 
         foreach ($this->getData() as $data) {
             $event = new Event();

@@ -35,7 +35,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 $imageFile = __DIR__ . "/CmsBlock/$imageName";
                 $uploadedImage = new UploadedFile($imageFile, $block->getId() . '.jpg');
                 $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
-                $this->imageService->createThumbnails($image);
+                $this->imageService->createThumbnails($image, ImageType::CmsBlock);
 
                 // associate image with a user
                 $block->setImage($image);
