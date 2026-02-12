@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ORGANIZER')]
+#[IsGranted('ROLE_FOUNDER')]
 class CmsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
