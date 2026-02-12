@@ -31,7 +31,7 @@ class MenuController extends AbstractAdminController
             label: 'menu_admin_menu',
             route: 'app_admin_menu',
             active: 'menu',
-            linkRole: 'ROLE_ADMIN',
+            linkRole: 'ROLE_FOUNDER',
         );
     }
 

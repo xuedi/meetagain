@@ -36,7 +36,7 @@ class CmsController extends AbstractAdminController
             label: 'CMS',
             route: 'app_admin_cms',
             active: 'cms',
-            linkRole: 'ROLE_ORGANIZER',
+            linkRole: 'ROLE_FOUNDER',
         );
     }
 
