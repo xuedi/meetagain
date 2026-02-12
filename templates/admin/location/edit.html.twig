@@ -1,0 +1,57 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="title">{{ location.id ? 'Edit Location' : 'Create Location' }}</h1>
+
+        {{ form_start(form) }}
+
+        <div class="columns">
+            <div class="column is-8">
+                {{ form_row(form.name) }}
+                {{ form_row(form.description) }}
+
+                <div class="columns">
+                    <div class="column is-8">
+                        {{ form_row(form.street) }}
+                    </div>
+                    <div class="column is-4">
+                        {{ form_row(form.postcode) }}
+                    </div>
+                </div>
+
+                {{ form_row(form.city) }}
+            </div>
+
+            <div class="column is-4">
+                <div class="columns">
+                    <div class="column is-6">
+                        {{ form_row(form.longitude) }}
+                    </div>
+                    <div class="column is-6">
+                        {{ form_row(form.latitude) }}
+                    </div>
+                </div>
+
+                {% if form.createdAt is defined %}
+                    {{ form_row(form.createdAt) }}
+                {% endif %}
+
+                {% if form.user is defined %}
+                    {{ form_row(form.user) }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="field mt-5">
+            <button type="submit" class="button is-link">
+                <span>{{ "button_save" | trans }}</span>
+            </button>
+            <a href="{{ path('app_admin_location') }}" class="button is-light">
+                <span>{{ "button_cancel" | trans }}</span>
+            </a>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
