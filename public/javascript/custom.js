@@ -1,9 +1,18 @@
 
 // maFetch: thin fetch wrapper supporting XML (XHR-like) and FormData requests
-function maFetch(url, isXml = false, formData) {
-    const options = (formData instanceof FormData)
-        ? { method: 'POST', body: formData }
-        : { method: 'GET' };
+function maFetch(url, isXml = false, formDataOrMethod = null) {
+    let options;
+
+    if (formDataOrMethod instanceof FormData) {
+        // FormData provided - use POST with body
+        options = { method: 'POST', body: formDataOrMethod };
+    } else if (typeof formDataOrMethod === 'string') {
+        // HTTP method provided as string (e.g., 'POST', 'GET')
+        options = { method: formDataOrMethod.toUpperCase() };
+    } else {
+        // Default to GET
+        options = { method: 'GET' };
+    }
 
     if (isXml) {
         options.headers = { 'X-Requested-With': 'XMLHttpRequest' };
@@ -174,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
 
             let url = event.target.getAttribute('href');
-            maFetch(url, true).then(response => {
+            maFetch(url, true, 'POST').then(response => {
                 const toggleBlock = event.target.parentNode;
                 const links = toggleBlock.querySelectorAll('a');
                 links.forEach(link => {
