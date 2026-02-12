@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Local dependency update checker - runs in dry-run mode, no PRs created",
+  "extends": [
+    "config:recommended"
+  ],
+  "dryRun": "full",
+  "platform": "local",
+  "requireConfig": "optional",
+  "printConfig": true,
+  "ignoreDeps": [],
+  "packageRules": [
+    {
+      "description": "Group all Symfony packages together",
+      "matchPackagePrefixes": ["symfony/"],
+      "groupName": "Symfony packages"
+    },
+    {
+      "description": "Group all Doctrine packages together",
+      "matchPackagePrefixes": ["doctrine/"],
+      "groupName": "Doctrine packages"
+    },
+    {
+      "description": "Group all Twig packages together",
+      "matchPackagePrefixes": ["twig/"],
+      "groupName": "Twig packages"
+    }
+  ],
+  "composer": {
+    "enabled": true
+  },
+  "labels": [],
+  "assignees": [],
+  "reviewers": [],
+  "prConcurrentLimit": 0,
+  "prCreation": "not-pending",
+  "automerge": false,
+  "platformAutomerge": false
+}
