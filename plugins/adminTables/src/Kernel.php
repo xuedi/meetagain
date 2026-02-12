@@ -53,4 +53,9 @@ readonly class Kernel implements Plugin
     {
         return [];
     }
+
+    public function getMemberPageTop(): ?string
+    {
+        return null;
+    }
 }

@@ -36,6 +36,7 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_stylesheets', $this->getPluginStylesheets(...)),
             new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
+            new TwigFunction('get_member_page_top', $this->getMemberPageTop(...), ['is_safe' => ['html']]),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),
         ];
@@ -93,6 +94,14 @@ final class PluginExtension extends AbstractExtension
     public function getPluginFooterAbout(): ?string
     {
         return $this->findFirstFromPlugins(fn(Plugin $p) => $p->getFooterAbout());
+    }
+
+    /**
+     * Returns rendered HTML for member page top section from first plugin that provides it.
+     */
+    public function getMemberPageTop(): ?string
+    {
+        return $this->findFirstFromPlugins(fn(Plugin $p) => $p->getMemberPageTop());
     }
 
     public function getEventListItemTags(int $eventId): string
