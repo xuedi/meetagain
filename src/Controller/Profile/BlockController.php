@@ -38,8 +38,22 @@ class BlockController extends AbstractController
 
         $this->blockingService->block($currentUser, $targetUser);
 
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => true]);
+        }
+
         $this->addFlash('success', 'User has been blocked.');
 
+        // Redirect based on context
+        $referer = $request->headers->get('referer');
+        if ($referer !== null && str_contains($referer, '/profile/messages/')) {
+            // Blocked from messages page - redirect to messages without conversation
+            return $this->redirectToRoute('app_profile_messages', [
+                '_locale' => $request->getLocale(),
+            ]);
+        }
+
+        // Default: redirect to members page
         return $this->redirectToRoute('app_member', [
             '_locale' => $request->getLocale(),
             'page' => 1,

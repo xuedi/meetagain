@@ -221,3 +221,26 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// Ajax block/unblock: handle block forms on messages page
+document.addEventListener('DOMContentLoaded', function () {
+    (document.querySelectorAll('.ajax-block-form') || []).forEach((form) => {
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+
+            const url = form.getAttribute('action');
+            const isBlockAction = url.includes('/block/');
+
+            if (isBlockAction) {
+                if (!confirm('Block this user? They will not be able to see your profile or message you.')) {
+                    return;
+                }
+            }
+
+            maFetch(url, true, 'POST').then(() => {
+                // Reload the page to update the conversation state
+                window.location.reload();
+            });
+        });
+    });
+});
