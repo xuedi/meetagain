@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\AdminTables\Form;
+namespace App\Form;
 
 use App\Entity\User;
 use App\Entity\UserStatus;

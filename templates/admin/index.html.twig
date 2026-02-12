@@ -96,13 +96,10 @@
                         </span>
                     {% endif %}
                     {% if unverifiedCount > 0 %}
-                        {# Link disabled - requires adminTables plugin
-                        <a href="{{ path('app_admin_user') }}" class="tag is-info is-medium"> #}
-                        <span class="tag is-info is-medium">
+                        <a href="{{ path('app_admin_member') }}" class="tag is-info is-medium">
                             <span class="icon"><i class="fa fa-user-clock"></i></span>
                             <span>{{ unverifiedCount }} Unverified Account{{ unverifiedCount > 1 ? 's' : '' }}</span>
-                        </span>
-                        {# </a> #}
+                        </a>
                     {% endif %}
                 </div>
             </div>

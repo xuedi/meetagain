@@ -1,0 +1,115 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% if pendingRequests is not empty %}
+            <p class="subtitle">Pending Join Requests ({{ pendingRequests|length }})</p>
+            <table class="table is-fullwidth mb-5">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Requested At</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in pendingRequests %}
+                    <tr>
+                        <td>{{ request.user.name }}</td>
+                        <td>{{ request.user.email }}</td>
+                        <td>{{ request.joinedAt|date('Y-m-d H:i') }}</td>
+                        <td>
+                            <form method="post" action="{{ path('app_admin_member_request_approve', {id: request.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ request.id) }}">
+                                <button type="submit" class="is-text" title="Approve">
+                                    <span class="icon has-text-success"><i class="fa fa-check"></i></span>
+                                </button>
+                            </form>
+                            <form method="post" action="{{ path('app_admin_member_request_reject', {id: request.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ request.id) }}">
+                                <button type="submit" class="is-text" title="Reject">
+                                    <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <p class="subtitle">Members ({{ users|length }})</p>
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Lang</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Last Login</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                {% set rowClass = '' %}
+                {% if user.status.value == 1 %}
+                    {% set rowClass = 'has-background-warning-light' %}
+                {% elseif user.status.value in [3, 4, 5] %}
+                    {% set rowClass = 'has-background-danger-light' %}
+                {% elseif user.status.value == 0 %}
+                    {% set rowClass = 'has-background-info-light' %}
+                {% endif %}
+                <tr class="{{ rowClass }}">
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.locale }}</td>
+                    <td>
+                        <div class="hidden">{{ user.roles|join }}</div>
+                        {% set color = 'has-text-grey' %}
+                        {% if 'ROLE_ORGANIZER' in user.roles %}{% set color = 'has-text-info' %}{% endif %}
+                        {% if 'ROLE_ADMIN' in user.roles %}{% set color = 'has-text-success' %}{% endif %}
+                        <span class="icon {{ color }}"><i class="fa fa-user"></i></span>
+                    </td>
+                    <td>{{ user.status.name }}</td>
+                    <td>{{ user.createdAt|date('Y-m-d') }}</td>
+                    <td>
+                        {% if user.lastLogin %}
+                            {{ user.lastLogin|date('Y-m-d') }}
+                        {% else %}
+                            <span class="has-text-grey-light">Never</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_admin_member_edit', {'id': user.id}) }}">
+                            <span class="icon"><i class="fa fa-edit"></i></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="mt-4 has-text-centered">
+            <span class="icon-text">
+                <span class="icon has-text-grey"><i class="fas fa-user"></i></span>
+                <span class="has-text-grey">Member</span>
+            </span>
+            <span class="icon-text">
+                <span class="icon has-text-info"><i class="fas fa-user"></i></span>
+                <span class="has-text-info">Organizer</span>
+            </span>
+            <span class="icon-text">
+                <span class="icon has-text-success"><i class="fas fa-user"></i></span>
+                <span class="has-text-success">Admin</span>
+            </span>
+        </div>
+
+    </div>
+
+{% endblock %}

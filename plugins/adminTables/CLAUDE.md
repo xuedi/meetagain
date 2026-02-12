@@ -11,7 +11,8 @@ The Admin Tables plugin provides CRUD management interfaces for core entities:
 - **Locations** - Address/geocoding management
 - **Hosts** - Event host assignment
 - **Images** - Read-only gallery
-- **Users** - User management, roles, approval workflow
+
+**Note:** User/Member management has been migrated to core (`src/Controller/Admin/MemberController.php`).
 
 ---
 
@@ -50,7 +51,6 @@ All routes maintain original names:
 - Locations: `app_admin_location`, `app_admin_location_edit`, `app_admin_location_add`
 - Hosts: `app_admin_host`, `app_admin_host_edit`, `app_admin_host_add`
 - Images: `app_admin_image`
-- Users: `app_admin_user`, `app_admin_user_edit`, `app_admin_user_approve`, `app_admin_user_deny`, etc.
 
 ---
 

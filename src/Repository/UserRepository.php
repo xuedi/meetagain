@@ -408,4 +408,31 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Find all users for admin interface with optional ID filtering.
+     * Orders pending approvals first, then by creation date.
+     *
+     * @param array<int>|null $restrictToUserIds Optional user ID filter
+     * @return User[]
+     */
+    public function findAllForAdmin(?array $restrictToUserIds = null): array
+    {
+        if ($restrictToUserIds === []) {
+            return []; // Empty filter = no results
+        }
+
+        $qb = $this
+            ->createQueryBuilder('u')
+            ->select('u, i')
+            ->leftJoin('u.image', 'i')
+            ->orderBy('u.status', 'ASC')
+            ->addOrderBy('u.createdAt', 'DESC');
+
+        if ($restrictToUserIds !== null) {
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
