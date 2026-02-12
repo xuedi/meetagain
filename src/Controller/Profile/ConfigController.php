@@ -6,6 +6,7 @@ use App\Controller\AbstractController;
 use App\Entity\ActivityType;
 use App\Form\ChangePassword;
 use App\Service\ActivityService;
+use App\Service\BlockingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,6 +21,7 @@ class ConfigController extends AbstractController
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly ActivityService $activityService,
+        private readonly BlockingService $blockingService,
     ) {}
 
     #[Route('/profile/config', name: 'app_profile_config')]
@@ -43,9 +45,12 @@ class ConfigController extends AbstractController
             }
         }
 
+        $user = $this->getAuthedUser();
+
         return $this->render('profile/config.html.twig', [
-            'user' => $this->getAuthedUser(),
+            'user' => $user,
             'form' => $form,
+            'blockedUsers' => $this->blockingService->getBlockedUsers($user),
         ]);
     }
 

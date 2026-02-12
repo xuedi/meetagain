@@ -5,6 +5,7 @@ namespace App\Controller\Profile;
 use App\Controller\AbstractController;
 use App\Repository\UserRepository;
 use App\Service\BlockingService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -56,6 +57,10 @@ class BlockController extends AbstractController
         }
 
         $this->blockingService->unblock($currentUser, $targetUser);
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => true]);
+        }
 
         $this->addFlash('success', 'User has been unblocked.');
 

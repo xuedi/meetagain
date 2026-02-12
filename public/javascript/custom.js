@@ -197,3 +197,27 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// Ajax unblock: remove user from blocked list
+document.addEventListener('DOMContentLoaded', function () {
+    (document.querySelectorAll('.ajax-unblock') || []).forEach((link) => {
+        link.addEventListener('click', event => {
+            event.preventDefault();
+
+            const userName = event.currentTarget.dataset.userName;
+            if (!confirm('Unblock ' + userName + '?')) {
+                return;
+            }
+
+            const url = event.currentTarget.getAttribute('href');
+            const userId = event.currentTarget.dataset.userId;
+
+            maFetch(url, true, 'POST').then(() => {
+                const row = document.getElementById('block-' + userId);
+                if (row) {
+                    row.remove();
+                }
+            });
+        });
+    });
+});
