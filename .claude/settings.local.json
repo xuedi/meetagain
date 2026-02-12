@@ -52,7 +52,8 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(git log:*)",
-      "Bash(just checkMagoAnalyze:*)"
+      "Bash(just checkMagoAnalyze:*)",
+      "Bash(just checkVersions:*)"
     ]
   }
 }

@@ -98,6 +98,20 @@ services:
     profiles:
       - tools
 
+  # Dependency update checker (run via: just checkVersions)
+  renovate:
+    image: renovate/renovate:latest
+    container_name: "ma-renovate"
+    working_dir: /usr/src/app
+    volumes:
+      - ../:/usr/src/app:ro
+    environment:
+      - LOG_LEVEL=info
+      - RENOVATE_CONFIG_FILE=/usr/src/app/config/renovate.json
+    command: renovate --platform=local
+    profiles:
+      - tools
+
 volumes:
   ma-mysql-data:
   ma-caddy_data:
