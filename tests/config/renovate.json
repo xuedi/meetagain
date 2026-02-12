@@ -1,11 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Local dependency update checker - creates commits for available updates",
+  "description": "Dependency update checker - creates PRs on Codeberg",
   "extends": [
     "config:recommended"
   ],
   "dryRun": false,
-  "platform": "local",
+  "platform": "gitea",
+  "endpoint": "https://codeberg.org/api/v1",
+  "repositories": ["xuedi/meetAgain"],
   "requireConfig": "optional",
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
   "onboarding": false,
@@ -30,7 +32,7 @@
   "composer": {
     "enabled": true
   },
-  "labels": [],
+  "labels": ["dependencies"],
   "assignees": [],
   "reviewers": [],
   "prConcurrentLimit": 0,
