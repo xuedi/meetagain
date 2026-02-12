@@ -104,11 +104,11 @@ services:
     container_name: "ma-renovate"
     working_dir: /usr/src/app
     volumes:
-      - ../:/usr/src/app:ro
+      - ../:/usr/src/app
     environment:
       - LOG_LEVEL=info
       - RENOVATE_CONFIG_FILE=/usr/src/app/tests/config/renovate.json
-    command: renovate --platform=local
+      - RENOVATE_TOKEN=${RENOVATE_TOKEN}
     profiles:
       - tools
 
