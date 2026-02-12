@@ -228,6 +228,11 @@ checkA11y url='http://localhost/':
     {{DOCKER}} build pa11y -q
     {{DOCKER}} run --rm pa11y {{url}} --reporter cli --standard WCAG2AA
 
+# Check for outdated dependencies (Renovate)
+[group('checks')]
+checkVersions:
+    {{DOCKER}} run --rm renovate
+
 # Format code with Mago
 [group('fixing')]
 fixMago:
