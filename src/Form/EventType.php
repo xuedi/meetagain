@@ -81,6 +81,8 @@ class EventType extends AbstractType
             ->add('location', EntityType::class, [
                 'class' => Location::class,
                 'choice_label' => 'name',
+                'choice_value' => 'id',
+                'required' => true,
             ])
             ->add('host', EntityType::class, [
                 'class' => Host::class,
