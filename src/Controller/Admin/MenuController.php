@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_FOUNDER')]
 class MenuController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig

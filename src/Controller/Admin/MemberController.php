@@ -72,6 +72,19 @@ class MemberController extends AbstractAdminController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Restrict role assignment for FOUNDERs
+            if ($this->isGranted('ROLE_FOUNDER') && !$this->isGranted('ROLE_ADMIN')) {
+                $requestedRoles = $form->get('roles')->getData();
+                $restrictedRoles = ['ROLE_ADMIN', 'ROLE_FOUNDER'];
+                $hasRestricted = !empty(array_intersect($requestedRoles, $restrictedRoles));
+
+                if ($hasRestricted) {
+                    $this->addFlash('error', 'You cannot assign FOUNDER or ADMIN roles');
+
+                    return $this->redirectToRoute('app_admin_member');
+                }
+            }
+
             // Handle unmapped boolean fields
             $user->setVerified((bool) $form->get('verified')->getData());
             $user->setRestricted((bool) $form->get('restricted')->getData());
@@ -100,7 +113,7 @@ class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_FOUNDER')]
     public function approve(User $user): Response
     {
         if (!$this->filterService->isMemberAccessible($user->getId())) {
@@ -119,7 +132,7 @@ class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_FOUNDER')]
     public function deny(User $user): Response
     {
         if (!$this->filterService->isMemberAccessible($user->getId())) {
@@ -135,7 +148,7 @@ class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_FOUNDER')]
     public function delete(User $user): Response
     {
         if (!$this->filterService->isMemberAccessible($user->getId())) {
