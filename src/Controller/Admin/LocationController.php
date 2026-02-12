@@ -22,6 +22,7 @@ class LocationController extends AbstractAdminController
             label: 'Locations',
             route: 'app_admin_location',
             active: 'location',
+            linkRole: 'ROLE_FOUNDER',
         );
     }
 

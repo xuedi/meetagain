@@ -19,6 +19,7 @@ class ImageController extends AbstractAdminController
             label: 'menu_admin_image',
             route: 'app_admin_image',
             active: 'image',
+            linkRole: 'ROLE_FOUNDER',
         );
     }
 
