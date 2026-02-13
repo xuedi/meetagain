@@ -17,11 +17,11 @@
             </p>
             <p class="subtitle is-6">
                 {% set link = path('app_admin_menu', {'edit': item.id}) %}
-                <a href="{{ link }}" class="is-small is-link is-light">
-                    <span class="icon"><i class="fas fa-edit has-text-grey"></i></span>
+                <a href="{{ link }}">
+                    <span class="icon"><i class="fas fa-edit"></i></span>
                 </a>
                 <a href="{{ item.slug }}" target="_blank">
-                    <span class="icon"><i class="fas fa-arrow-up-right-from-square has-text-grey"></i></span>
+                    <span class="icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
                 </a>
             </p>
         </div>
