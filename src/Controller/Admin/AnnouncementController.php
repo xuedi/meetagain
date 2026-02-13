@@ -21,13 +21,14 @@ class AnnouncementController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_announcement',
-            route: 'app_admin_announcement',
-            active: 'announcement',
-            linkRole: 'ROLE_ORGANIZER',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(
+                label: 'menu_admin_announcement',
+                route: 'app_admin_announcement',
+                active: 'announcement',
+                role: 'ROLE_ORGANIZER',
+            ),
+        ]);
     }
 
     public function __construct(
