@@ -4,12 +4,6 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 
-/**
- * Admin sidebar navigation configuration.
- *
- * Sections and links are sorted alphabetically.
- * Optional $modifies allows plugins to override existing navigation links by route name.
- */
 readonly class AdminNavigationConfig
 {
     /**

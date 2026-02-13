@@ -26,8 +26,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Get user id => name mapping without loading full entities.
-     *
      * @return array<int, string>
      */
     public function getUserNameList(): array
@@ -263,8 +261,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Get user name => id mapping for form choices without loading full entities.
-     *
      * @return array<string, int>
      */
     public function getAllUserChoice(): array
@@ -328,8 +324,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Get total social network connections (following relationships).
-     *
      * @return array{total: int}
      */
     public function getSocialNetworkStats(DateTimeImmutable $weekStart): array
@@ -344,8 +338,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Get social counts for a user without loading full collections.
-     *
      * @return array{following: int, followers: int, rsvp: int}
      */
     public function getSocialCounts(User $user): array
