@@ -20,11 +20,7 @@ class TranslationController extends AbstractAdminController
         return new AdminNavigationConfig(
             section: 'Translation',
             links: [
-                new AdminLink(
-                    label: 'menu_admin_translation_edit',
-                    route: 'app_admin_translation',
-                    active: 'edit'
-                ),
+                new AdminLink(label: 'menu_admin_translation_edit', route: 'app_admin_translation', active: 'edit'),
                 new AdminLink(
                     label: 'menu_admin_translation_extract',
                     route: 'app_admin_translation_extract',
