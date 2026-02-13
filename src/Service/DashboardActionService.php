@@ -28,9 +28,6 @@ readonly class DashboardActionService
         return $this->userRepo->findBy(['status' => 1], ['createdAt' => 'desc']);
     }
 
-    /**
-     * Items requiring admin attention.
-     */
     public function getActionItems(): array
     {
         return [
@@ -42,8 +39,6 @@ readonly class DashboardActionService
     }
 
     /**
-     * User status breakdown.
-     *
      * @return array<string, int>
      */
     public function getUserStatusBreakdown(): array
@@ -51,41 +46,26 @@ readonly class DashboardActionService
         return $this->userRepo->getStatusBreakdown();
     }
 
-    /**
-     * Users active in last 7 days.
-     */
     public function getActiveUsersCount(): int
     {
         return $this->userRepo->getRecentlyActiveCount(7);
     }
 
-    /**
-     * Image storage statistics.
-     */
     public function getImageStats(DateTimeImmutable $start, DateTimeImmutable $stop): array
     {
         return $this->imageRepo->getStorageStats($start, $stop);
     }
 
-    /**
-     * Upcoming events.
-     */
     public function getUpcomingEvents(int $limit = 3): array
     {
         return $this->eventRepo->getUpcomingEvents($limit);
     }
 
-    /**
-     * Past events without photos.
-     */
     public function getPastEventsWithoutPhotos(int $limit = 5): array
     {
         return $this->eventRepo->getPastEventsWithoutPhotos($limit);
     }
 
-    /**
-     * Recurring events count.
-     */
     public function getRecurringEventsCount(): int
     {
         return $this->eventRepo->getRecurringCount();
@@ -96,17 +76,12 @@ readonly class DashboardActionService
         return $this->translationSuggestionRepo->getPendingCount();
     }
 
-    /**
-     * Count users stuck in EmailVerified status.
-     */
     public function getUnverifiedCount(): int
     {
         return $this->userRepo->getUnverifiedCount();
     }
 
     /**
-     * Get system-wide message statistics.
-     *
      * @return array{total: int, unread: int}
      */
     public function getMessageStats(): array
@@ -115,8 +90,6 @@ readonly class DashboardActionService
     }
 
     /**
-     * Get pending emails by template type.
-     *
      * @return array<string, int>
      */
     public function getEmailQueueBreakdown(): array
@@ -125,8 +98,6 @@ readonly class DashboardActionService
     }
 
     /**
-     * Get command execution statistics for the last 24 hours.
-     *
      * @return array{total: int, successful: int, failed: int}
      */
     public function getCommandExecutionStats(): array
@@ -137,8 +108,6 @@ readonly class DashboardActionService
     }
 
     /**
-     * Get last execution for each command.
-     *
      * @return array<string, \App\Entity\CommandExecutionLog>
      */
     public function getLastCommandExecutions(): array
@@ -147,8 +116,6 @@ readonly class DashboardActionService
     }
 
     /**
-     * Get email delivery statistics for the last 24 hours.
-     *
      * @return array{total: int, sent: int, failed: int}
      */
     public function getEmailDeliveryStats(): array
@@ -158,9 +125,6 @@ readonly class DashboardActionService
         return $this->mailRepo->getDeliveryStats($since);
     }
 
-    /**
-     * Get email delivery success rate for the last 24 hours.
-     */
     public function getEmailDeliverySuccessRate(): float
     {
         $since = new DateTimeImmutable('-24 hours');

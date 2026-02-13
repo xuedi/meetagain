@@ -26,11 +26,6 @@ readonly class AdminNavigationService
     ) {}
 
     /**
-     * Get all sidebar sections for the current user.
-     *
-     * Collects navigation from all controllers, groups by section, sorts alphabetically,
-     * and filters by user roles. Also applies route modifications from plugins.
-     *
      * @return list<AdminSection>
      */
     public function getSidebarSections(): array

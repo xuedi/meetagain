@@ -56,8 +56,6 @@ class UserBlockRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get all user IDs that should be excluded from lists (blocked + blocked by).
-     *
      * @return int[]
      */
     public function getAllBlockRelatedIds(User $user): array
@@ -69,8 +67,6 @@ class UserBlockRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get all users blocked by the given user (for blocked users list page).
-     *
      * @return UserBlock[]
      */
     public function getBlockedUsers(User $user): array
