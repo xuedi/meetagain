@@ -54,57 +54,11 @@ final class AdminNavigationConfigTest extends TestCase
         $this->assertNull($config->sectionRole);
     }
 
-    public function testSingleFactoryCreatesConfigWithOneLink(): void
-    {
-        // Act
-        $config = AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_system',
-            route: 'app_admin_system',
-            active: 'system',
-            linkRole: 'ROLE_ADMIN',
-            sectionRole: 'ROLE_META_ADMIN',
-        );
-
-        // Assert
-        $this->assertSame('System', $config->section);
-        $this->assertCount(1, $config->links);
-        $this->assertSame('ROLE_META_ADMIN', $config->sectionRole);
-
-        $link = $config->links[0];
-        $this->assertInstanceOf(AdminLink::class, $link);
-        $this->assertSame('menu_admin_system', $link->getLabel());
-        $this->assertSame('app_admin_system', $link->getRoute());
-        $this->assertSame('system', $link->getActive());
-        $this->assertSame('ROLE_ADMIN', $link->getRole());
-    }
-
-    public function testSingleFactoryWithOptionalParametersDefaultsToNull(): void
-    {
-        // Act
-        $config = AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_system',
-            route: 'app_admin_system',
-        );
-
-        // Assert
-        $this->assertNull($config->sectionRole);
-        $this->assertCount(1, $config->links);
-
-        $link = $config->links[0];
-        $this->assertNull($link->getActive());
-        $this->assertNull($link->getRole());
-    }
-
     public function testReadonlyPropertiesCannotBeModified(): void
     {
         // Arrange
-        $config = AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_system',
-            route: 'app_admin_system',
-        );
+        $link = new AdminLink(label: 'menu_admin_system', route: 'app_admin_system');
+        $config = new AdminNavigationConfig(section: 'System', links: [$link]);
 
         // Assert - readonly class prevents property modification
         $this->expectException(\Error::class);

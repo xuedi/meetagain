@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Service\CommandService;
 use App\Service\PluginService;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,13 +14,9 @@ class PluginController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_plugin',
-            route: 'app_admin_plugin',
-            active: 'plugin',
-            linkRole: 'ROLE_ADMIN',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'menu_admin_plugin', route: 'app_admin_plugin', active: 'plugin', role: 'ROLE_ADMIN'),
+        ]);
     }
 
     public function __construct(

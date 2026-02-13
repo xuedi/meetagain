@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Form\SettingsType;
 use App\Form\ThemeColorsType;
 use App\Service\ConfigService;
@@ -17,13 +18,9 @@ class SystemController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_system',
-            route: 'app_admin_system',
-            active: 'system',
-            linkRole: 'ROLE_ADMIN',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'menu_admin_system', route: 'app_admin_system', active: 'system', role: 'ROLE_ADMIN'),
+        ]);
     }
 
     public function __construct(

@@ -30,12 +30,9 @@ final class AdminNavigationServiceTest extends TestCase
         $mockController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
-                    section: 'System',
-                    label: 'menu_admin_system',
-                    route: 'app_admin_system',
-                    active: 'system',
-                );
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'menu_admin_system', route: 'app_admin_system', active: 'system'),
+                ]);
             }
         };
 
@@ -60,21 +57,30 @@ final class AdminNavigationServiceTest extends TestCase
         $controllerZ = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(section: 'Zebra', label: 'menu_zebra', route: 'app_zebra');
+                return new AdminNavigationConfig(section: 'Zebra', links: [new AdminLink(
+                    label: 'menu_zebra',
+                    route: 'app_zebra',
+                )]);
             }
         };
 
         $controllerA = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(section: 'Apple', label: 'menu_apple', route: 'app_apple');
+                return new AdminNavigationConfig(section: 'Apple', links: [new AdminLink(
+                    label: 'menu_apple',
+                    route: 'app_apple',
+                )]);
             }
         };
 
         $controllerM = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(section: 'Mango', label: 'menu_mango', route: 'app_mango');
+                return new AdminNavigationConfig(section: 'Mango', links: [new AdminLink(
+                    label: 'menu_mango',
+                    route: 'app_mango',
+                )]);
             }
         };
 
@@ -97,33 +103,27 @@ final class AdminNavigationServiceTest extends TestCase
         $controllerZ = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
-                    section: 'System',
-                    label: 'menu_admin_zebra',
-                    route: 'app_admin_zebra',
-                );
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'menu_admin_zebra', route: 'app_admin_zebra'),
+                ]);
             }
         };
 
         $controllerA = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
-                    section: 'System',
-                    label: 'menu_admin_apple',
-                    route: 'app_admin_apple',
-                );
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'menu_admin_apple', route: 'app_admin_apple'),
+                ]);
             }
         };
 
         $controllerM = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
-                    section: 'System',
-                    label: 'menu_admin_mango',
-                    route: 'app_admin_mango',
-                );
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'menu_admin_mango', route: 'app_admin_mango'),
+                ]);
             }
         };
 
@@ -153,10 +153,11 @@ final class AdminNavigationServiceTest extends TestCase
         $mockController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
+                return new AdminNavigationConfig(
                     section: 'System',
-                    label: 'menu_admin_system',
-                    route: 'app_admin_system',
+                    links: [
+                        new AdminLink(label: 'menu_admin_system', route: 'app_admin_system'),
+                    ],
                     sectionRole: 'ROLE_ADMIN',
                 );
             }
@@ -246,11 +247,9 @@ final class AdminNavigationServiceTest extends TestCase
         $singleLinkController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
-                    section: 'System',
-                    label: 'menu_admin_banana',
-                    route: 'app_admin_banana',
-                );
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'menu_admin_banana', route: 'app_admin_banana'),
+                ]);
             }
         };
 
@@ -325,12 +324,9 @@ final class AdminNavigationServiceTest extends TestCase
         $baseController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
-                    section: 'CMS',
-                    label: 'Base CMS',
-                    route: 'app_admin_cms',
-                    active: 'cms',
-                );
+                return new AdminNavigationConfig(section: 'CMS', links: [
+                    new AdminLink(label: 'Base CMS', route: 'app_admin_cms', active: 'cms'),
+                ]);
             }
         };
 
@@ -373,14 +369,20 @@ final class AdminNavigationServiceTest extends TestCase
         $cmsController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(section: 'CMS', label: 'Base CMS', route: 'app_admin_cms');
+                return new AdminNavigationConfig(section: 'CMS', links: [new AdminLink(
+                    label: 'Base CMS',
+                    route: 'app_admin_cms',
+                )]);
             }
         };
 
         $systemController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(section: 'System', label: 'System', route: 'app_admin_system');
+                return new AdminNavigationConfig(section: 'System', links: [new AdminLink(
+                    label: 'System',
+                    route: 'app_admin_system',
+                )]);
             }
         };
 
@@ -422,7 +424,10 @@ final class AdminNavigationServiceTest extends TestCase
         $cmsController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(section: 'CMS', label: 'CMS', route: 'app_admin_cms');
+                return new AdminNavigationConfig(section: 'CMS', links: [new AdminLink(
+                    label: 'CMS',
+                    route: 'app_admin_cms',
+                )]);
             }
         };
 
@@ -473,12 +478,9 @@ final class AdminNavigationServiceTest extends TestCase
         $baseController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return AdminNavigationConfig::single(
-                    section: 'Original',
-                    label: 'Original Label',
-                    route: 'app_admin_test',
-                    active: 'original',
-                );
+                return new AdminNavigationConfig(section: 'Original', links: [
+                    new AdminLink(label: 'Original Label', route: 'app_admin_test', active: 'original'),
+                ]);
             }
         };
 

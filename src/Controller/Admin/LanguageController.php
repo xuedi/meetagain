@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\Language;
@@ -22,13 +23,14 @@ class LanguageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_language',
-            route: 'app_admin_language',
-            active: 'language',
-            linkRole: 'ROLE_ADMIN',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(
+                label: 'menu_admin_language',
+                route: 'app_admin_language',
+                active: 'language',
+                role: 'ROLE_ADMIN',
+            ),
+        ]);
     }
 
     public function __construct(
