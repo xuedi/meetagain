@@ -4,6 +4,7 @@ namespace Plugin\AdminTables\Controller;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Entity\AdminLink;
 use App\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,13 +15,9 @@ class ImageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'Tables',
-            label: 'menu_admin_image',
-            route: 'app_admin_image',
-            active: 'image',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'Tables', links: [
+            new AdminLink(label: 'menu_admin_image', route: 'app_admin_image', active: 'image', role: 'ROLE_FOUNDER'),
+        ]);
     }
 
     public function __construct(

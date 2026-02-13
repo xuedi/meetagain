@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\Location;
 use App\Form\LocationType;
 use App\Repository\LocationRepository;
@@ -17,13 +18,9 @@ class LocationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'Locations',
-            route: 'app_admin_location',
-            active: 'location',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'Locations', route: 'app_admin_location', active: 'location', role: 'ROLE_FOUNDER'),
+        ]);
     }
 
     public function __construct(

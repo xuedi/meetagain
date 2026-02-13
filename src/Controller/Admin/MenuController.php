@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\Menu;
 use App\Entity\MenuLocation;
 use App\Entity\MenuRoutes;
@@ -26,13 +27,9 @@ class MenuController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_menu',
-            route: 'app_admin_menu',
-            active: 'menu',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'menu_admin_menu', route: 'app_admin_menu', active: 'menu', role: 'ROLE_FOUNDER'),
+        ]);
     }
 
     public function __construct(

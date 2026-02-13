@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\User;
 use App\Entity\UserRole;
 use App\Entity\UserStatus;
@@ -29,13 +30,9 @@ class MemberController extends AbstractAdminController
     #[Override]
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'Members',
-            route: 'app_admin_member',
-            active: 'member',
-            linkRole: 'ROLE_ORGANIZER',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'Members', route: 'app_admin_member', active: 'member', role: 'ROLE_ORGANIZER'),
+        ]);
     }
 
     #[Route('/admin/member', name: 'app_admin_member')]

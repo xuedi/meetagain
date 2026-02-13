@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
 use App\Form\EmailTemplateType;
@@ -22,13 +23,9 @@ class EmailController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_email',
-            route: 'app_admin_email',
-            active: 'email',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'menu_admin_email', route: 'app_admin_email', active: 'email', role: 'ROLE_FOUNDER'),
+        ]);
     }
 
     private const string DEFAULT_LANGUAGE = 'en';

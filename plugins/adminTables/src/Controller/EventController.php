@@ -4,6 +4,7 @@ namespace Plugin\AdminTables\Controller;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Entity\AdminLink;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
@@ -27,13 +28,9 @@ class EventController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_event',
-            route: 'app_admin_event',
-            active: 'event',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'menu_admin_event', route: 'app_admin_event', active: 'event', role: 'ROLE_FOUNDER'),
+        ]);
     }
 
     public function __construct(

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\ValueObjects\LogEntry;
 use App\Repository\NotFoundLogRepository;
 use App\Service\ActivityService;
@@ -14,13 +15,14 @@ class LogsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'menu_admin_activity_log',
-            route: 'app_admin_activity_log',
-            active: 'activity_log',
-            linkRole: 'ROLE_ADMIN',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(
+                label: 'menu_admin_activity_log',
+                route: 'app_admin_activity_log',
+                active: 'activity_log',
+                role: 'ROLE_ADMIN',
+            ),
+        ]);
     }
 
     public function __construct(
