@@ -10,6 +10,10 @@ use App\Entity\AdminLink;
  * Defines where and how a controller appears in the admin sidebar navigation.
  * Sections and links are sorted alphabetically.
  *
+ * Role Filtering:
+ * - sectionRole: Hides entire section if user lacks this role
+ * - AdminLink role: Filters individual links within the section
+ *
  * Link Modification Feature:
  * The optional $modifies parameter allows controllers to modify existing navigation
  * links by route name. This is useful for plugins that want to override navigation
@@ -19,7 +23,10 @@ use App\Entity\AdminLink;
  * ```php
  * return new AdminNavigationConfig(
  *     section: 'My Section',
- *     links: [...],
+ *     links: [
+ *         new AdminLink(label: 'menu_label', route: 'app_route', active: 'state', role: 'ROLE_ADMIN'),
+ *     ],
+ *     sectionRole: 'ROLE_USER',
  *     modifies: [
  *         'app_admin_cms' => [  // Route to modify
  *             'section' => 'GROUP NAME',  // Change section
@@ -40,28 +47,5 @@ readonly class AdminNavigationConfig
         public array $links, // Array of AdminLink objects
         public ?array $modifies = null, // Route modifications
         public ?string $sectionRole = null, // Required role for entire section
-        public ?string $linkRole = null,
     ) {}
-
-    /**
-     * Convenience factory for the common single-link case.
-     *
-     * @param array<string, array<string, string>>|null $modifies Route modifications
-     */
-    public static function single(
-        string $section,
-        string $label,
-        string $route,
-        ?string $active = null,
-        ?string $linkRole = null,
-        ?string $sectionRole = null,
-        ?array $modifies = null,
-    ): self {
-        return new self(
-            section: $section,
-            links: [new AdminLink(label: $label, route: $route, active: $active, role: $linkRole)],
-            modifies: $modifies,
-            sectionRole: $sectionRole,
-        );
-    }
 }

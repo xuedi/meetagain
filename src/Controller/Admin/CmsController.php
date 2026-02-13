@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
@@ -31,13 +32,9 @@ class CmsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'System',
-            label: 'CMS',
-            route: 'app_admin_cms',
-            active: 'cms',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'CMS', route: 'app_admin_cms', active: 'cms', role: 'ROLE_FOUNDER'),
+        ]);
     }
 
     public function __construct(

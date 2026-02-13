@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\AdminLink;
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;

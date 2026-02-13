@@ -32,7 +32,7 @@ class TranslationController extends AbstractAdminController
                     active: 'publish',
                 ),
             ],
-            linkRole: 'ROLE_ADMIN',
+            sectionRole: 'ROLE_ADMIN',
         );
     }
 

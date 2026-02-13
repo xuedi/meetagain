@@ -4,6 +4,7 @@ namespace Plugin\AdminTables\Controller;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Entity\AdminLink;
 use App\Entity\Host;
 use App\Repository\HostRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,13 +19,9 @@ class HostController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'Tables',
-            label: 'menu_admin_host',
-            route: 'app_admin_host',
-            active: 'host',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'Tables', links: [
+            new AdminLink(label: 'menu_admin_host', route: 'app_admin_host', active: 'host', role: 'ROLE_FOUNDER'),
+        ]);
     }
 
     public function __construct(

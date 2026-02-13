@@ -4,6 +4,7 @@ namespace Plugin\AdminTables\Controller;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Entity\AdminLink;
 use App\Entity\Location;
 use App\Repository\LocationRepository;
 use DateTimeImmutable;
@@ -19,13 +20,14 @@ class LocationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return AdminNavigationConfig::single(
-            section: 'Tables',
-            label: 'menu_admin_location',
-            route: 'app_admin_location',
-            active: 'location',
-            linkRole: 'ROLE_FOUNDER',
-        );
+        return new AdminNavigationConfig(section: 'Tables', links: [
+            new AdminLink(
+                label: 'menu_admin_location',
+                route: 'app_admin_location',
+                active: 'location',
+                role: 'ROLE_FOUNDER',
+            ),
+        ]);
     }
 
     public function __construct(
