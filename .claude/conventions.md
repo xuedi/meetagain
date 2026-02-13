@@ -63,29 +63,119 @@ class UserDTO
 
 ---
 
-### Docblocks
+### Docblocks - Avoid Over-Documentation
 
-**Omit when types are clear:**
+**Principle: Let the code speak. Only document when types are ambiguous.**
+
+#### When NOT to document:
+
+❌ **Self-explanatory method names:**
 ```php
-// ❌ Don't add redundant docblocks
+// BAD - Redundant
 /**
- * @param string $email
- * @return User
+ * Get user by ID.
+ *
+ * @param int $id User ID
+ * @return User|null The user or null
  */
-public function findByEmail(string $email): User
+public function getUserById(int $id): ?User
 
-// ✅ Types are sufficient
-public function findByEmail(string $email): User
+// GOOD - Type hints are sufficient
+public function getUserById(int $id): ?User
 ```
 
-**Add for collections:**
+❌ **Obvious constructors:**
 ```php
-// ✅ Generic types need documentation
+// BAD - Repeats what the code says
+/**
+ * Constructor.
+ *
+ * @param UserRepository $userRepo User repository
+ * @param EntityManagerInterface $em Entity manager
+ */
+public function __construct(
+    private readonly UserRepository $userRepo,
+    private readonly EntityManagerInterface $em,
+) {}
+
+// GOOD - No docblock needed
+public function __construct(
+    private readonly UserRepository $userRepo,
+    private readonly EntityManagerInterface $em,
+) {}
+```
+
+❌ **Simple getters/setters:**
+```php
+// BAD
+/** @return string */
+public function getName(): string { return $this->name; }
+
+// GOOD
+public function getName(): string { return $this->name; }
+```
+
+❌ **Route descriptions that repeat method names:**
+```php
+// BAD
+/**
+ * Switch group context via form submission.
+ */
+#[Route('/context/switch', name: 'app_multisite_context_switch')]
+public function switchContext(Request $request): Response
+
+// GOOD - Route and method name are clear
+#[Route('/context/switch', name: 'app_multisite_context_switch')]
+public function switchContext(Request $request): Response
+```
+
+#### When TO document:
+
+✅ **Array structures (or use value objects instead):**
+```php
+/**
+ * @return array{id: int, name: string, count: int}
+ */
+public function getStatistics(): array
+
+// Or better - use a value object:
+public function getStatistics(): Statistics
+```
+
+✅ **Collection generics:**
+```php
 /**
  * @var Collection<int, Event>
  */
 #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organizer')]
 private Collection $events;
+```
+
+✅ **Non-obvious business logic ("why", not "what"):**
+```php
+public function calculatePrice(): float
+{
+    // Apply 10% discount for bulk orders to match competitor pricing
+    if ($this->quantity > 100) {
+        return $this->basePrice * 0.9;
+    }
+    return $this->basePrice;
+}
+```
+
+✅ **Single-line comments for test blocks (AAA pattern):**
+```php
+public function testUserCanLogin(): void
+{
+    // Arrange
+    $user = $this->createUser('test@example.com');
+
+    // Act
+    $response = $this->client->post('/login', ['email' => $user->getEmail()]);
+
+    // Assert
+    $this->assertTrue($response->isSuccessful());
+}
 ```
 
 ---
