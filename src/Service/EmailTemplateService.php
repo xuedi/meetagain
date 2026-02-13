@@ -14,9 +14,6 @@ readonly class EmailTemplateService
     private const string TEMPLATE_PATH = '/templates/email/defaults/';
     private const string DEFAULT_LANGUAGE = 'en';
 
-    /**
-     * Translated subjects for each email type per language.
-     */
     private const array SUBJECTS = [
         'en' => [
             EmailType::VerificationRequest->value => 'Please Confirm your Email',
@@ -47,9 +44,6 @@ readonly class EmailTemplateService
         ],
     ];
 
-    /**
-     * Variables available for each template type.
-     */
     private const array VARIABLES = [
         EmailType::VerificationRequest->value => ['username', 'token', 'host', 'url', 'lang'],
         EmailType::Welcome->value => ['host', 'url', 'lang'],
@@ -89,8 +83,6 @@ readonly class EmailTemplateService
     }
 
     /**
-     * Get template content for a specific language with fallback to English.
-     *
      * @return array{subject: string, body: string}
      */
     public function getTemplateContent(EmailType $identifier, string $language): array
@@ -125,8 +117,6 @@ readonly class EmailTemplateService
     }
 
     /**
-     * Get default templates for a specific language.
-     *
      * @return array<string, array{subject: string, body: string, variables: string[]}>
      */
     public function getDefaultTemplates(string $language = self::DEFAULT_LANGUAGE): array
@@ -172,9 +162,6 @@ readonly class EmailTemplateService
         ];
     }
 
-    /**
-     * Load template body for a specific language, falling back to default if not found.
-     */
     private function loadTemplateBody(EmailType $type, string $language = self::DEFAULT_LANGUAGE): string
     {
         // Try language-specific file first
