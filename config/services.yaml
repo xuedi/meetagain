@@ -42,3 +42,11 @@ services:
         class: App\Service\SymfonyFixturesLoaderAdapter
         arguments:
             - '@doctrine.fixtures.loader'
+
+    App\Authorization\Action\ActionAuthorizationService:
+        arguments:
+            $providers: !tagged_iterator app.action_authorization
+
+    App\Authorization\Action\ActionAuthorizationMessageService:
+        arguments:
+            $providers: !tagged_iterator app.action_authorization_message
