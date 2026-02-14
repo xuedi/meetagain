@@ -73,4 +73,10 @@ class EventFilterType extends AbstractType
             'method' => 'GET',
         ]);
     }
+
+    #[Override]
+    public function getBlockPrefix(): string
+    {
+        return '';
+    }
 }
