@@ -3,14 +3,6 @@
 {% block content %}
 
     <div class="container">
-        {# Group-specific messaging (multisite mode) #}
-        {% if group is defined and group.startPage is null %}
-            <p class="has-text-grey-light mb-4">
-                No home page selected. Visitors will see a default landing page.
-                <a href="{{ path('app_admin_group_settings') }}">Configure in Settings</a>
-            </p>
-        {% endif %}
-
         <article class="message is-success is-hidden" id="cms-add">
             {{ form_start(form) }}
             <div class="message-header">
@@ -49,12 +41,17 @@
             </thead>
             <tbody>
             {% for page in cms %}
-                <tr>
+                <tr {% if page.slug == 'index' %}class="has-text-grey"{% endif %}>
                     <td>
-                        {{ page.slug }}
-                        {# Show home indicator in multisite mode #}
-                        {% if group is defined and group.startPage and group.startPage.id == page.id %}
-                            <span class="has-text-info"> (Home)</span>
+                        {% if page.slug == 'index' %}
+                            <span class="icon-text">
+                                <span class="icon has-text-grey-light">
+                                    <i class="fa fa-home"></i>
+                                </span>
+                                <span>{{ page.slug }}</span>
+                            </span>
+                        {% else %}
+                            {{ page.slug }}
                         {% endif %}
                     </td>
                     <td>{{ page.createdBy.name }}</td>
