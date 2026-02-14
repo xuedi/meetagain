@@ -6,9 +6,11 @@ use App\Entity\AdminLink;
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;
+use App\Enum\EntityAction;
 use App\Form\AnnouncementType;
 use App\Repository\AnnouncementRepository;
 use App\Service\AnnouncementService;
+use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +37,7 @@ class AnnouncementController extends AbstractAdminController
         private readonly AnnouncementRepository $repo,
         private readonly AnnouncementService $announcementService,
         private readonly EntityManagerInterface $em,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     #[Route('/admin/system/announcements', name: 'app_admin_announcement')]
@@ -61,6 +64,8 @@ class AnnouncementController extends AbstractAdminController
             $this->em->persist($announcement);
             $this->em->flush();
 
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateAnnouncement, $announcement->getId());
+
             return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
         }
 
@@ -81,6 +86,8 @@ class AnnouncementController extends AbstractAdminController
 
         $this->em->persist($announcement);
         $this->em->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::CreateAnnouncement, $announcement->getId());
 
         return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
     }
@@ -127,8 +134,11 @@ class AnnouncementController extends AbstractAdminController
             return $this->redirectToRoute('app_admin_announcement');
         }
 
+        $announcementId = $announcement->getId();
         $this->em->remove($announcement);
         $this->em->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::DeleteAnnouncement, $announcementId);
 
         return $this->redirectToRoute('app_admin_announcement');
     }
