@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    {% if notifications.totalCount == 0 %}
+        <p class="has-text-grey">No new notifications</p>
+    {% else %}
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Notification</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in notifications.items %}
+                    <tr>
+                        <td style="width: 50px;">
+                            <span class="icon">
+                                <i class="fa {{ item.icon }}"></i>
+                            </span>
+                        </td>
+                        <td>{{ item.label|raw }}</td>
+                        <td style="width: 50px;">
+                            {% if item.route %}
+                                <a href="{{ path(item.route, item.routeParams) }}">
+                                    <span class="icon"><i class="fa fa-arrow-right"></i></span>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
