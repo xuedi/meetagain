@@ -108,9 +108,9 @@ readonly class RecurringEventService
             'dtstart' => $this->getLastRecurringEventDate($event),
             'until' => (match ($recurringRule) {
                 EventIntervals::Daily => (clone $today)->modify('+2 weeks'),
-                EventIntervals::Weekly => (clone $today)->modify('+3 weeks'),
-                EventIntervals::BiMonthly => (clone $today)->modify('+5 weeks'),
-                EventIntervals::Monthly => (clone $today)->modify('+3 months'),
+                EventIntervals::Weekly => (clone $today)->modify('+3 months'),
+                EventIntervals::BiMonthly => (clone $today)->modify('+6 months'),
+                EventIntervals::Monthly => (clone $today)->modify('+6 months'),
                 EventIntervals::Yearly => (clone $today)->modify('+3 years'),
             })->format('Y-m-d'),
         ]);

@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Comment;
+use App\Entity\User;
 use App\Plugin;
 use App\Repository\UserRepository;
 use App\Service\PluginService;
@@ -157,9 +158,9 @@ class EventAddFixtureCommand extends Command
     }
 
     /**
-     * @param array<int, \App\Entity\User> $users
+     * @param array<int, User> $users
      *
-     * @return array<int, \App\Entity\User>
+     * @return array<int, User>
      */
     private function getRandomUsers(array $users, int $count): array
     {
