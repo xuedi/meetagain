@@ -28,11 +28,7 @@ readonly class NavigationPlugin implements Plugin
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';
 
         $links = [
-            new Link(
-                slug: $this->router->generate('app_event', ['_locale' => $locale]),
-                name: 'events',
-                priority: 100,
-            ),
+            new Link(slug: $this->router->generate('app_event', ['_locale' => $locale]), name: 'events', priority: 100),
             new Link(
                 slug: $this->router->generate('app_member', ['_locale' => $locale, 'page' => 1]),
                 name: 'members',

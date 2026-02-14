@@ -9,10 +9,12 @@ use App\Entity\Host;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\Location;
+use App\Enum\EntityAction;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
+use App\Service\EntityActionDispatcher;
 use App\Service\EventService;
 use App\Service\ImageService;
 use App\Service\TranslationService;
@@ -42,6 +44,7 @@ class EventController extends AbstractAdminController
         private readonly EventService $eventService,
         private readonly EventRepository $repo,
         private readonly EventFilterService $eventFilterService,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     #[Route('/admin/events', name: 'app_admin_event')]
@@ -118,6 +121,8 @@ class EventController extends AbstractAdminController
 
             $this->entityManager->persist($event);
             $this->entityManager->flush();
+
+            $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
 
             // create thumbnail
             if ($image instanceof Image) {
@@ -204,6 +209,8 @@ class EventController extends AbstractAdminController
 
             $entityManager->persist($event);
             $entityManager->flush();
+
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateEvent, $event->getId());
 
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
         }
