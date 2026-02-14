@@ -244,3 +244,91 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// Tag input: interactive add/remove tags for group profile
+document.addEventListener('DOMContentLoaded', function () {
+    const tagInput = document.getElementById('tag-input');
+    const tagAddBtn = document.getElementById('tag-add-btn');
+    const tagList = document.getElementById('tag-list');
+    const hiddenField = document.querySelector('textarea[data-tag-field="true"]');
+
+    // Debug: log what we found
+    if (!tagInput) console.warn('Tag input: tag-input not found');
+    if (!tagAddBtn) console.warn('Tag input: tag-add-btn not found');
+    if (!tagList) console.warn('Tag input: tag-list not found');
+    if (!hiddenField) console.warn('Tag input: tags hidden field not found');
+
+    if (!tagInput || !tagAddBtn || !tagList || !hiddenField) {
+        return;
+    }
+
+    console.log('Tag input initialized. Existing tags:', hiddenField.value);
+
+    const tags = new Set();
+
+    // Parse existing tags from hidden field
+    if (hiddenField.value) {
+        const existingTags = hiddenField.value.split(',').map(t => t.trim()).filter(t => t);
+        existingTags.forEach(tag => tags.add(tag));
+    }
+
+    function renderTags() {
+        tagList.innerHTML = '';
+
+        if (tags.size === 0) {
+            tagList.innerHTML = '<span class="has-text-grey-light">No tags yet</span>';
+            hiddenField.value = '';
+            return;
+        }
+
+        tags.forEach(tag => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag is-medium is-light';
+
+            const tagText = document.createTextNode(tag + ' ');
+            tagElement.appendChild(tagText);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'delete is-small';
+            deleteBtn.setAttribute('data-tag', tag);
+            deleteBtn.addEventListener('click', function() {
+                tags.delete(this.getAttribute('data-tag'));
+                renderTags();
+            });
+
+            tagElement.appendChild(deleteBtn);
+            tagList.appendChild(tagElement);
+        });
+
+        // Update hidden field
+        hiddenField.value = Array.from(tags).join(', ');
+    }
+
+    function addTag() {
+        const newTag = tagInput.value.trim().toLowerCase();
+        if (newTag && !tags.has(newTag)) {
+            tags.add(newTag);
+            tagInput.value = '';
+            renderTags();
+        } else if (newTag && tags.has(newTag)) {
+            // Tag already exists - just clear input
+            tagInput.value = '';
+        }
+    }
+
+    tagAddBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        addTag();
+    });
+
+    tagInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag();
+        }
+    });
+
+    // Initial render
+    renderTags();
+});
