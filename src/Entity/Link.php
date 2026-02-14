@@ -7,6 +7,7 @@ readonly class Link
     public function __construct(
         private string $slug,
         private string $name,
+        private int $priority = 0,
     ) {}
 
     public function getSlug(): string
@@ -17,5 +18,10 @@ readonly class Link
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getPriority(): int
+    {
+        return $this->priority;
     }
 }
