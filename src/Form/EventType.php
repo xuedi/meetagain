@@ -84,6 +84,7 @@ class EventType extends AbstractType
                 'class' => Location::class,
                 'choice_label' => 'name',
                 'required' => true,
+                'mapped' => false,
             ])
             ->add('host', EntityType::class, [
                 'class' => Host::class,
@@ -91,7 +92,7 @@ class EventType extends AbstractType
                 'label' => 'Hosts',
                 'expanded' => true,
                 'multiple' => true,
-                'by_reference' => false,
+                'mapped' => false,
             ])
             ->add('image', FileType::class, [
                 'mapped' => false,
@@ -136,25 +137,6 @@ class EventType extends AbstractType
                 ]);
             }
         }
-
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            $data = $event->getData();
-
-            $entityFields = ['location', 'host', 'type'];
-
-            foreach ($entityFields as $field) {
-                if (isset($data[$field]) && $this->isEmpty($data[$field])) {
-                    unset($data[$field]);
-                }
-            }
-
-            $event->setData($data);
-        });
-    }
-
-    private function isEmpty(mixed $value): bool
-    {
-        return $value === null || $value === '' || is_array($value) && count($value) === 0;
     }
 
     #[Override]
