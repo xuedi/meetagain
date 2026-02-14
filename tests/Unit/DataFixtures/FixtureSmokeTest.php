@@ -11,7 +11,6 @@ use App\DataFixtures\EventFixture;
 use App\DataFixtures\HostFixture;
 use App\DataFixtures\LanguageFixture;
 use App\DataFixtures\LocationFixture;
-use App\DataFixtures\MenuFixture;
 use App\DataFixtures\MessageFixture;
 use App\DataFixtures\SystemUserFixture;
 use App\DataFixtures\UserFixture;
@@ -31,9 +30,7 @@ use Plugin\MultiSite\DataFixtures\GroupEventFixture;
 use Plugin\MultiSite\DataFixtures\GroupFixture;
 use Plugin\MultiSite\DataFixtures\GroupInvitationFixture;
 use Plugin\MultiSite\DataFixtures\GroupMemberFixture;
-use Plugin\MultiSite\DataFixtures\GroupMenuFixture;
 use Plugin\MultiSite\DataFixtures\MessageFixture as MultiSiteMessageFixture;
-use Plugin\MultiSite\Repository\GroupMenuMappingRepository;
 use Plugin\MultiSite\Service\GroupCmsService;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -145,15 +142,6 @@ class FixtureSmokeTest extends TestCase
         $this->assertInstanceOf(CmsBlockFixture::class, $fixture);
     }
 
-    public function testMenuFixtureCanInstantiate(): void
-    {
-        // Act
-        $fixture = new MenuFixture();
-
-        // Assert
-        $this->assertInstanceOf(MenuFixture::class, $fixture);
-    }
-
     public function testEventFixtureCanInstantiate(): void
     {
         // Arrange
@@ -235,18 +223,6 @@ class FixtureSmokeTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(GroupCmsBlockFixture::class, $fixture);
-    }
-
-    public function testGroupMenuFixtureCanInstantiate(): void
-    {
-        // Arrange
-        $menuMappingRepository = $this->createStub(GroupMenuMappingRepository::class);
-
-        // Act
-        $fixture = new GroupMenuFixture($menuMappingRepository);
-
-        // Assert
-        $this->assertInstanceOf(GroupMenuFixture::class, $fixture);
     }
 
     public function testGroupEventFixtureCanInstantiate(): void

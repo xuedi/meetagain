@@ -63,14 +63,36 @@ public function getPluginKey(): string
 
 **Returns:** `array<Link>` - List of navigation links.
 
-**Example (Dishes Plugin):**
+**Link Parameters:**
+- `slug` - URL for the link
+- `name` - Translation key (prefixed with `menu_` when rendering)
+- `priority` - Optional integer for ordering (default: 0)
+  - **Lower values appear on the left**
+  - **Higher values appear on the right**
+  - Core navigation uses: Events (100), Members (200), Groups (250), Admin (300)
+
+**Example (Simple Link without Priority):**
 ```php
 public function getMenuLinks(): array
 {
     return [
         new Link(
             slug: $this->urlGenerator->generate('app_plugin_dishes'),
-            name: 'Dishes'
+            name: 'dishes'
+        ),
+    ];
+}
+```
+
+**Example (Link with Priority):**
+```php
+public function getMenuLinks(): array
+{
+    return [
+        new Link(
+            slug: $this->urlGenerator->generate('app_plugin_dishes'),
+            name: 'dishes',
+            priority: 150  // Appears between Members (200) and Events (100)
         ),
     ];
 }
@@ -81,8 +103,16 @@ public function getMenuLinks(): array
 public function getMenuLinks(): array
 {
     return [
-        new Link(slug: $this->urlGenerator->generate('app_filmclub_filmlist'), name: 'Filme'),
-        new Link(slug: $this->urlGenerator->generate('app_filmclub_vote'), name: 'Vote'),
+        new Link(
+            slug: $this->urlGenerator->generate('app_filmclub_filmlist'),
+            name: 'films',
+            priority: 120
+        ),
+        new Link(
+            slug: $this->urlGenerator->generate('app_filmclub_vote'),
+            name: 'vote',
+            priority: 130
+        ),
     ];
 }
 ```
@@ -94,6 +124,13 @@ public function getMenuLinks(): array
     return [];
 }
 ```
+
+**Priority Recommendations:**
+- **0-99:** Plugin links that should appear before Events
+- **100-199:** Between Events and Members
+- **200-249:** Between Members and Groups
+- **250-299:** Between Groups and Admin
+- **300+:** After Admin (rarely used)
 
 ---
 
