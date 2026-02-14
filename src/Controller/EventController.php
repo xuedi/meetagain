@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Authorization\Action\ActionAuthorizationMessageService;
+use App\Authorization\Action\ActionAuthorizationService;
 use App\Entity\ActivityType;
 use App\Entity\Comment;
 use App\Entity\Event;
@@ -39,6 +41,8 @@ class EventController extends AbstractController
         private readonly CommentRepository $comments,
         private readonly ImageService $imageService,
         private readonly EventFilterService $eventFilterService,
+        private readonly ActionAuthorizationService $actionAuthService,
+        private readonly ActionAuthorizationMessageService $authMessageService,
     ) {}
 
     #[Route('/events', name: self::ROUTE_EVENT)]
@@ -91,6 +95,16 @@ class EventController extends AbstractController
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->actionAuthService->isActionAllowed('event.comment', $id, $this->getUser())) {
+                $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage(
+                    'event.comment',
+                    $id,
+                    $this->getUser(),
+                );
+                $this->addFlash($unauthorizedMsg->type, $unauthorizedMsg->message);
+
+                return $this->redirectToRoute('app_event_details', ['id' => $id]);
+            }
             $comment = new Comment();
             $comment->setUser($this->getAuthedUser());
             $comment->setEvent($this->repo->find($id));
@@ -127,6 +141,17 @@ class EventController extends AbstractController
         $user = $em->find(User::class, $this->getAuthedUser()->getId());
         if ($user === null) {
             throw new RuntimeException('User not found');
+        }
+
+        if (!$this->actionAuthService->isActionAllowed('event.upload', $event->getId(), $user)) {
+            $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage(
+                'event.upload',
+                $event->getId(),
+                $user,
+            );
+            $this->addFlash($unauthorizedMsg->type, $unauthorizedMsg->message);
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
 
         $form = $this->createForm(EventUploadType::class);
@@ -175,6 +200,12 @@ class EventController extends AbstractController
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
         $user = $this->getAuthedUser();
+        if (!$this->actionAuthService->isActionAllowed('event.rsvp', $event->getId(), $user)) {
+            $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage('event.rsvp', $event->getId(), $user);
+            $this->addFlash($unauthorizedMsg->type, $unauthorizedMsg->message);
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
         $event->toggleRsvp($this->getAuthedUser());
         $em->persist($event);
         $em->flush();
