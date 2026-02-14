@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Event;
 use App\Entity\EventIntervals;
 use App\Entity\EventTranslation;
+use App\Enum\EntityAction;
 use App\Repository\EventRepository;
 use DateTime;
 use DateTimeImmutable;
@@ -17,6 +18,7 @@ readonly class RecurringEventService
     public function __construct(
         private EventRepository $repo,
         private EntityManagerInterface $em,
+        private EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     public function extentRecurringEvents(): void
@@ -79,6 +81,7 @@ readonly class RecurringEventService
         }
 
         $rrule = $this->createRRule($event, $event->getRecurringRule());
+        $createdEvents = [];
 
         $skipFirst = true;
         foreach ($rrule as $occurrence) {
@@ -90,10 +93,17 @@ readonly class RecurringEventService
                 continue;
             }
 
-            $this->em->persist($this->createRecurringEvent($event, $occurrence));
+            $newEvent = $this->createRecurringEvent($event, $occurrence);
+            $this->em->persist($newEvent);
+            $createdEvents[] = $newEvent;
         }
 
         $this->em->flush();
+
+        // Dispatch CreateEvent for each created recurring event (now they have IDs)
+        foreach ($createdEvents as $createdEvent) {
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateEvent, $createdEvent->getId());
+        }
     }
 
     private function createRRule(Event $event, EventIntervals $recurringRule): RRule

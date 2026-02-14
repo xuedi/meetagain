@@ -12,12 +12,14 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
+use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\CmsType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\CmsBlockService;
+use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -44,6 +46,7 @@ class CmsController extends AbstractAdminController
         private readonly CmsBlockService $blockService,
         private readonly AnnouncementRepository $announcementRepo,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     #[Route('/admin/cms', name: 'app_admin_cms')]
@@ -84,6 +87,8 @@ class CmsController extends AbstractAdminController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->em->flush();
 
+            $this->entityActionDispatcher->dispatch(EntityAction::UpdateCms, $cms->getId());
+
             return $this->redirectToRoute('app_admin_cms');
         }
 
@@ -120,8 +125,11 @@ class CmsController extends AbstractAdminController
                 throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
             }
 
+            $cmsId = $cmsPage->getId();
             $this->em->remove($cmsPage);
             $this->em->flush();
+
+            $this->entityActionDispatcher->dispatch(EntityAction::DeleteCms, $cmsId);
         }
 
         return $this->redirectToRoute('app_admin_cms');
@@ -140,6 +148,8 @@ class CmsController extends AbstractAdminController
 
         $this->em->persist($newPage);
         $this->em->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::CreateCms, $newPage->getId());
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $newPage->getId(),

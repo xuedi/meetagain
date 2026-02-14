@@ -4,8 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 use App\Entity\Location;
+use App\Enum\EntityAction;
 use App\Form\LocationType;
 use App\Repository\LocationRepository;
+use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +27,7 @@ class LocationController extends AbstractAdminController
 
     public function __construct(
         private readonly LocationRepository $repo,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     #[Route('/admin/locations', name: 'app_admin_location')]
@@ -44,6 +47,8 @@ class LocationController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
+            $this->entityActionDispatcher->dispatch(EntityAction::UpdateLocation, $location->getId());
 
             $this->addFlash('success', 'Location updated successfully');
 
@@ -74,6 +79,8 @@ class LocationController extends AbstractAdminController
 
             $entityManager->persist($location);
             $entityManager->flush();
+
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateLocation, $location->getId());
 
             $this->addFlash('success', 'Location created successfully');
 
