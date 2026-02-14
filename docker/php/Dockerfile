@@ -34,4 +34,6 @@ RUN chown -R ${UID}:${GID} /data/caddy && chown -R ${UID}:${GID} /config/caddy
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 ENV PATH="$PATH:/usr/local/bin"
 
+COPY php.ini /usr/local/etc/php/conf.d/99-custom.ini
+
 USER ${UNAME}
