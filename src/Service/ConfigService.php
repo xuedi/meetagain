@@ -187,7 +187,7 @@ readonly class ConfigService
         return $setting->getValue() === 'true';
     }
 
-    private function getString(string $name, string $default): string
+    public function getString(string $name, string $default): string
     {
         $setting = $this->repo->findOneBy(['name' => $name]);
         if ($setting === null) {
@@ -197,7 +197,7 @@ readonly class ConfigService
         return $setting->getValue();
     }
 
-    private function setString(string $name, string $value): void
+    public function setString(string $name, string $value): void
     {
         $setting = $this->repo->findOneBy(['name' => $name]);
         if ($setting === null) {
@@ -211,7 +211,7 @@ readonly class ConfigService
         $this->em->flush();
     }
 
-    private function getInt(string $name, int $default): int
+    public function getInt(string $name, int $default): int
     {
         $setting = $this->repo->findOneBy(['name' => $name]);
         if ($setting === null) {
@@ -221,7 +221,7 @@ readonly class ConfigService
         return (int) $setting->getValue();
     }
 
-    private function setInt(string $name, int $value): void
+    public function setInt(string $name, int $value): void
     {
         $setting = $this->repo->findOneBy(['name' => $name]);
         if ($setting === null) {
