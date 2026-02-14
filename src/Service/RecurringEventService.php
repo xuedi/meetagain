@@ -21,9 +21,14 @@ readonly class RecurringEventService
 
     public function extentRecurringEvents(): void
     {
-        $events = $this->repo->findAllRecurring();
-        foreach ($events as $event) {
-            $this->fillRecurringEvents($event);
+        $eventIds = array_map(static fn(Event $e) => $e->getId(), $this->repo->findAllRecurring());
+
+        foreach ($eventIds as $eventId) {
+            $this->em->clear();
+            $event = $this->repo->find($eventId);
+            if ($event !== null) {
+                $this->fillRecurringEvents($event);
+            }
         }
     }
 
@@ -130,7 +135,14 @@ readonly class RecurringEventService
         $recurringEvent->setRecurringOf($parent->getId());
         $recurringEvent->setRecurringRule(null);
         $recurringEvent->setCreatedAt(new DateTimeImmutable());
-        $recurringEvent->setHost($parent->getHost());
+
+        // Reload host collection from managed parent to avoid detached state issues
+        if ($parent->getHost()->count() > 0) {
+            foreach ($parent->getHost() as $host) {
+                $recurringEvent->addHost($host);
+            }
+        }
+
         $recurringEvent->setType($parent->getType());
 
         foreach ($parent->getTranslation() as $eventTranslation) {
