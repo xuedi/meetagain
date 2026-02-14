@@ -126,7 +126,7 @@ class MemberController extends AbstractAdminController
         $this->em->persist($user);
         $this->em->flush();
 
-        return $this->redirectToRoute('app_admin');
+        return $this->redirectToRoute('app_admin_member');
     }
 
     #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['POST'])]
@@ -142,7 +142,7 @@ class MemberController extends AbstractAdminController
         $this->em->persist($user);
         $this->em->flush();
 
-        return $this->redirectToRoute('app_admin');
+        return $this->redirectToRoute('app_admin_member');
     }
 
     #[Route('/admin/member/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]

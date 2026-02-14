@@ -2,33 +2,32 @@
 
 namespace App\Twig;
 
+use App\Notification\NotificationService;
+use App\Notification\NotificationSummary;
 use Override;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Bundle\SecurityBundle\Security;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class NotificationExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
+        private readonly NotificationService $notificationService,
+        private readonly Security $security,
     ) {}
 
     #[Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('has_new_messages', $this->hasNewMessages(...)),
+            new TwigFunction('get_notifications', $this->getNotifications(...)),
         ];
     }
 
-    public function hasNewMessages(): bool
+    public function getNotifications(): NotificationSummary
     {
-        $request = $this->requestStack->getCurrentRequest();
-        if ($request instanceof Request) {
-            return $request->getSession()->get('hasNewMessage', false);
-        }
+        $user = $this->security->getUser();
 
-        return false;
+        return $user ? $this->notificationService->getNotifications($user) : new NotificationSummary([], 0);
     }
 }
