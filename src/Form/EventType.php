@@ -21,6 +21,8 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -89,6 +91,7 @@ class EventType extends AbstractType
                 'label' => 'Hosts',
                 'expanded' => true,
                 'multiple' => true,
+                'by_reference' => false,
             ])
             ->add('image', FileType::class, [
                 'mapped' => false,
@@ -133,6 +136,25 @@ class EventType extends AbstractType
                 ]);
             }
         }
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+
+            $entityFields = ['location', 'host', 'type'];
+
+            foreach ($entityFields as $field) {
+                if (isset($data[$field]) && $this->isEmpty($data[$field])) {
+                    unset($data[$field]);
+                }
+            }
+
+            $event->setData($data);
+        });
+    }
+
+    private function isEmpty(mixed $value): bool
+    {
+        return $value === null || $value === '' || is_array($value) && count($value) === 0;
     }
 
     #[Override]
