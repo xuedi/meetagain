@@ -51,17 +51,12 @@ class EventController extends AbstractController
         $response = $this->getResponse();
         $form = $this->createForm(EventFilterType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $time = $form->getData()['time'];
-            $sort = $form->getData()['sort'];
-            $type = $form->getData()['type'];
-            $rsvp = $form->getData()['rsvp'];
-        } else {
-            $time = EventFilterTime::Future;
-            $sort = EventFilterSort::OldToNew;
-            $type = EventTypes::All;
-            $rsvp = EventFilterRsvp::All;
-        }
+
+        $data = $form->getData() ?? [];
+        $time = $data['time'] ?? EventFilterTime::Future;
+        $sort = $data['sort'] ?? EventFilterSort::OldToNew;
+        $type = $data['type'] ?? EventTypes::All;
+        $rsvp = $data['rsvp'] ?? EventFilterRsvp::All;
 
         // Apply content filtering from all registered filters
         $filterResult = $this->eventFilterService->getEventIdFilter();
