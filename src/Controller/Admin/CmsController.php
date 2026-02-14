@@ -69,7 +69,7 @@ class CmsController extends AbstractAdminController
     #[Route(
         '/admin/cms/{id}/edit/{locale}/{blockId}',
         name: 'app_admin_cms_edit',
-        requirements: ['locale' => '.+', 'blockId' => '\d+'],
+        requirements: ['locale' => '[^/]+', 'blockId' => '\d+'],
         defaults: ['locale' => null, 'blockId' => null],
         methods: ['GET', 'POST'],
     )]
