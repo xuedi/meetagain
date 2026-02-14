@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Authorization\Action;
 
 use App\Entity\User;
+use App\Enum\FlashMessageType;
 
 readonly class ActionAuthorizationMessageService
 {
@@ -35,7 +36,7 @@ readonly class ActionAuthorizationMessageService
 
         return new UnauthorizedMessage(
             message: sprintf('This event is for group members only. Please join the group to %s.', $actionLabel),
-            type: 'error',
+            type: FlashMessageType::Error,
         );
     }
 }
