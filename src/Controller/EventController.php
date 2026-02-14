@@ -101,7 +101,7 @@ class EventController extends AbstractController
                     $id,
                     $this->getUser(),
                 );
-                $this->addFlash($unauthorizedMsg->type, $unauthorizedMsg->message);
+                $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
 
                 return $this->redirectToRoute('app_event_details', ['id' => $id]);
             }
@@ -149,7 +149,7 @@ class EventController extends AbstractController
                 $event->getId(),
                 $user,
             );
-            $this->addFlash($unauthorizedMsg->type, $unauthorizedMsg->message);
+            $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
@@ -202,7 +202,7 @@ class EventController extends AbstractController
         $user = $this->getAuthedUser();
         if (!$this->actionAuthService->isActionAllowed('event.rsvp', $event->getId(), $user)) {
             $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage('event.rsvp', $event->getId(), $user);
-            $this->addFlash($unauthorizedMsg->type, $unauthorizedMsg->message);
+            $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
