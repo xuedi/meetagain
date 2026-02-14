@@ -56,7 +56,12 @@ readonly class PluginService
     {
         $config = $this->getPluginConfig();
 
-        return array_keys(array_filter($config, fn($enabled) => $enabled === true));
+        $activePlugins = array_keys(array_filter($config, fn($enabled) => $enabled === true));
+
+        // Core plugins are always active
+        $activePlugins[] = 'core_navigation';
+
+        return $activePlugins;
     }
 
     public function install(string $pluginKey): void

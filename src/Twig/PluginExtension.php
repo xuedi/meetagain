@@ -44,7 +44,11 @@ final class PluginExtension extends AbstractExtension
 
     public function getPluginsLinks(): array
     {
-        return $this->collectFromPlugins(fn(Plugin $p) => $p->getMenuLinks());
+        $links = $this->collectFromPlugins(fn(Plugin $p) => $p->getMenuLinks());
+
+        usort($links, fn($a, $b) => $a->getPriority() <=> $b->getPriority());
+
+        return $links;
     }
 
     public function isPluginEnabled(string $pluginKey): bool

@@ -31,6 +31,12 @@ class Cms
     private ?bool $published = null;
 
     /**
+     * @var array<int>|null
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $menuLocations = null;
+
+    /**
      * @var Collection<int, CmsBlock>
      */
     #[ORM\OneToMany(targetEntity: CmsBlock::class, mappedBy: 'page', orphanRemoval: true)]
@@ -90,6 +96,24 @@ class Cms
     public function setPublished(bool $published): static
     {
         $this->published = $published;
+
+        return $this;
+    }
+
+    /**
+     * @return array<int>|null
+     */
+    public function getMenuLocations(): ?array
+    {
+        return $this->menuLocations;
+    }
+
+    /**
+     * @param array<int>|null $menuLocations
+     */
+    public function setMenuLocations(?array $menuLocations): static
+    {
+        $this->menuLocations = $menuLocations;
 
         return $this;
     }

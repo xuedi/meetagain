@@ -9,16 +9,11 @@
         <div id="navBarTop" class="navbar-menu">
             <div class="navbar-start">
                 {% for menu in get_menu('top') %}
-                    <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name(app.locale) }}</a>
+                    <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name }}</a>
                 {% endfor %}
                 {% for pluginLink in get_plugins_links() %}
                     <a class="navbar-item" href="{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
                 {% endfor %}
-                {% if is_granted('ROLE_ORGANIZER') %}
-                    <a class="navbar-item" href="{{ path('app_admin') }}">
-                        {{ "menu_admin" | trans }}
-                    </a>
-                {% endif %}
             </div>
             <div class="navbar-end">
                 {% if is_granted('ROLE_USER') %}

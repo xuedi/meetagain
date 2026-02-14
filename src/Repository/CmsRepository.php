@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Cms;
+use App\Entity\MenuLocation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -82,6 +83,20 @@ class CmsRepository extends ServiceEntityRepository
             ->where('c.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return array<Cms>
+     */
+    public function findByMenuLocation(MenuLocation $location): array
+    {
+        return $this
+            ->createQueryBuilder('c')
+            ->where('JSON_CONTAINS(c.menuLocations, :location) = 1')
+            ->andWhere('c.published = true')
+            ->setParameter('location', json_encode($location->value))
             ->getQuery()
             ->getResult();
     }
