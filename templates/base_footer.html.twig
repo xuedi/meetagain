@@ -13,9 +13,11 @@
                 <p>{{ 'footer_col1' | trans }}</p>
                 <ul>
                     {% for menu in get_menu('col1') %}
-                        <li>
-                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
-                        </li>
+                        {% if menu.slug != 'index' %}
+                            <li>
+                                <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
@@ -23,9 +25,11 @@
                 <p>{{ 'footer_col2' | trans }}</p>
                 <ul>
                     {% for menu in get_menu('col2') %}
-                        <li>
-                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
-                        </li>
+                        {% if menu.slug != 'index' %}
+                            <li>
+                                <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
@@ -33,9 +37,11 @@
                 <p>{{ 'footer_col3' | trans }}</p>
                 <ul>
                     {% for menu in get_menu('col3') %}
-                        <li>
-                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
-                        </li>
+                        {% if menu.slug != 'index' %}
+                            <li>
+                                <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
@@ -43,9 +49,11 @@
                 <p>{{ 'footer_col4' | trans }}</p>
                 <ul>
                     {% for menu in get_menu('col4') %}
-                        <li>
-                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
-                        </li>
+                        {% if menu.slug != 'index' %}
+                            <li>
+                                <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
