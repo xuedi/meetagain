@@ -5,8 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\AdminLink;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
+use App\Entity\Host;
 use App\Entity\Image;
 use App\Entity\ImageType;
+use App\Entity\Location;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
@@ -60,6 +62,13 @@ class EventController extends AbstractAdminController
     public function edit(Request $request, Event $event): Response
     {
         $form = $this->createForm(EventType::class, $event);
+
+        // Only set form data on GET request (initial load)
+        if ($request->isMethod('GET')) {
+            $form->get('location')->setData($event->getLocation());
+            $form->get('host')->setData($event->getHost());
+        }
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
@@ -67,6 +76,23 @@ class EventController extends AbstractAdminController
             // overwrite basic data
             $event->setInitial(true);
             $event->setUser($user);
+
+            // manually hydrate location (unmapped field)
+            $locationData = $form->get('location')->getData();
+            if ($locationData instanceof Location) {
+                $event->setLocation($locationData);
+            }
+
+            // manually hydrate hosts (unmapped field)
+            $event->getHost()->clear();
+            $hostsData = $form->get('host')->getData();
+            if (is_iterable($hostsData)) {
+                foreach ($hostsData as $host) {
+                    if ($host instanceof Host) {
+                        $event->addHost($host);
+                    }
+                }
+            }
 
             // event image
             $image = null;
@@ -90,7 +116,6 @@ class EventController extends AbstractAdminController
                 $this->entityManager->persist($translation);
             }
 
-            // persist
             $this->entityManager->persist($event);
             $this->entityManager->flush();
 
@@ -106,6 +131,8 @@ class EventController extends AbstractAdminController
             }
 
             $this->addFlash('success', 'Event saved' . $followUp);
+
+            return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
         }
 
         return $this->render('admin/event/edit.html.twig', [
