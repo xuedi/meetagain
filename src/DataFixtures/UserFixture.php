@@ -344,7 +344,7 @@ class UserFixture extends AbstractFixture
                 'password' => null,
                 'roles' => [UserRole::User->toRoleString(), UserRole::Organizer->toRoleString()],
                 'verified' => false,
-                'status' => UserStatus::Active,
+                'status' => UserStatus::EmailVerified,
                 'following' => [
                     self::ADEM_LANE,
                     self::ADIL_FLOYD,
