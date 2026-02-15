@@ -101,7 +101,10 @@ class CmsController extends AbstractAdminController
 
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateCms, $cms->getId());
 
-            return $this->redirectToRoute('app_admin_cms');
+            return $this->redirectToRoute('app_admin_cms_edit', [
+                'id' => $cms->getId(),
+                'locale' => $locale,
+            ]);
         }
 
         $newBlocks = [
@@ -157,6 +160,7 @@ class CmsController extends AbstractAdminController
         $newPage = new Cms();
         $newPage->setSlug($request->request->all('cms')['slug']);
         $newPage->setPublished(false);
+        $newPage->setLocked(false);
         $newPage->setCreatedBy($user);
         $newPage->setCreatedAt(new DateTimeImmutable());
 
