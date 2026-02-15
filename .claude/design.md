@@ -114,30 +114,21 @@
 
 ### Delete Warning Boxes
 
+**Reusable Block:** `templates/_block/warning_box.html.twig`
 **Reference Implementation:** `templates/admin/cms/cms_edit.html.twig`
 
 **Prefer warning boxes over JavaScript `onclick="confirm()"` dialogs** for better UX and consistency.
 
 ```twig
-{# Warning box - hidden by default, shown when trigger is clicked #}
-<article class="message is-danger is-hidden" id="entity-delete-warning">
-    <div class="message-header">
-        <p>Delete [Entity Name]</p>
-        <button class="delete toggleTrigger" data-id="entity-delete-warning" aria-label="delete"></button>
-    </div>
-    <div class="message-body has-text-black has-background-white">
-        <p>
-            Warning text explaining consequences of deletion.
-            Be specific about what will be deleted.
-        </p>
-        <div class="has-text-right mt-3">
-            <a class="button" href="{{ path('app_admin_entity_delete', {'id': entity.id}) }}">
-                <span class="icon"><i class="fa fa-trash"></i></span>
-                <span>Yes, Delete</span>
-            </a>
-        </div>
-    </div>
-</article>
+{# Use the reusable warning box block #}
+{% include '_block/warning_box.html.twig' with {
+    'id': 'entity-delete-warning',
+    'title': 'Delete [Entity Name]',
+    'content': '<p>Warning text explaining consequences of deletion. Be specific about what will be deleted.</p>',
+    'buttonLabel': 'Yes, Delete',
+    'buttonUrl': path('app_admin_entity_delete', {'id': entity.id}),
+    'type': 'danger'
+} %}
 
 {# Danger Zone - trigger button in right sidebar #}
 <fieldset class="mt-5 p-4" style="border: 2px solid #f14668; border-radius: 4px;">
@@ -151,11 +142,19 @@
 </fieldset>
 ```
 
+**Parameters:**
+- `id` - Unique ID for the warning box (required)
+- `title` - Header title (required)
+- `content` - Warning message HTML (required)
+- `buttonLabel` - Confirmation button label (optional)
+- `buttonUrl` - Delete action URL (optional)
+- `type` - 'danger' (red, default) or 'warning' (orange)
+- `showButton` - Whether to show confirmation button (default: true if buttonUrl set)
+
 **Styling:**
-- `message is-danger is-hidden` - Red header, white body (via custom CSS), initially hidden
-- `message-body has-text-black has-background-white` - White background for readability
-- Confirmation button uses plain `button` class (no `is-danger` - context already clear)
+- Red (`danger`) or orange (`warning`) header, white body with black text
 - Grey borders applied automatically via global CSS (`custom.css`)
+- Confirmation button uses plain `button` class (no color - context already clear)
 - Trigger button uses `is-light` for subtle appearance
 
 ### Row Color Coding
