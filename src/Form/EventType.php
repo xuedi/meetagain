@@ -121,11 +121,13 @@ class EventType extends AbstractType
                     'label' => "title ($languageCode)",
                     'data' => $translation?->getTitle() ?? '',
                     'mapped' => false,
+                    'required' => false,
                 ]);
                 $builder->add("description-$languageCode", TextareaType::class, [
                     'label' => "description ($languageCode)",
                     'data' => $translation?->getDescription() ?? '',
                     'mapped' => false,
+                    'required' => false,
                     'attr' => ['rows' => 15],
                 ]);
                 $builder->add("teaser-$languageCode", TextareaType::class, [
