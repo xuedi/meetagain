@@ -29,18 +29,12 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.createdAt|date('Y-m-d H:i') }}</td>
                         <td>
-                            <form method="post" action="{{ path('app_admin_member_approve', {id: user.id}) }}" style="display:inline;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ user.id) }}">
-                                <button type="submit" style="border:none;background:none;padding:0;cursor:pointer;" title="Approve">
-                                    <span class="icon has-text-success"><i class="fa fa-check"></i></span>
-                                </button>
-                            </form>
-                            <form method="post" action="{{ path('app_admin_member_deny', {id: user.id}) }}" style="display:inline;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('deny' ~ user.id) }}">
-                                <button type="submit" style="border:none;background:none;padding:0;cursor:pointer;" title="Deny" onclick="return confirm('Deny this user?');">
-                                    <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
-                                </button>
-                            </form>
+                            <a href="{{ path('app_admin_member_approve', {id: user.id}) }}" title="Approve">
+                                <span class="icon has-text-success"><i class="fa fa-check"></i></span>
+                            </a>
+                            <a href="{{ path('app_admin_member_deny', {id: user.id}) }}" title="Deny" onclick="return confirm('Deny this user?');">
+                                <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
