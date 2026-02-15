@@ -94,9 +94,10 @@ class CmsRepository extends ServiceEntityRepository
     {
         return $this
             ->createQueryBuilder('c')
-            ->where('JSON_CONTAINS(c.menuLocations, :location) = 1')
+            ->join('c.menuLocations', 'ml')
+            ->where('ml.location = :location')
             ->andWhere('c.published = true')
-            ->setParameter('location', json_encode($location->value))
+            ->setParameter('location', $location)
             ->getQuery()
             ->getResult();
     }

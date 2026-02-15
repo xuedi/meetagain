@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Cms;
+use App\Entity\CmsMenuLocation;
 use App\Entity\MenuLocation;
 use DateTimeImmutable;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -27,7 +28,15 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             $cms->setCreatedBy($this->getRefUser(UserFixture::ADMIN));
             $cms->setPublished(true);
             $cms->setLocked(in_array($slug, [self::PRIVACY, self::IMPRINT], true));
-            $cms->setMenuLocations($menuLocations);
+            if ($menuLocations !== null) {
+                foreach ($menuLocations as $value) {
+                    $location = MenuLocation::from($value);
+                    $menuLocation = new CmsMenuLocation();
+                    $menuLocation->setCms($cms);
+                    $menuLocation->setLocation($location);
+                    $cms->addMenuLocation($menuLocation);
+                }
+            }
 
             $manager->persist($cms);
             $this->addRefCms($slug, $cms);

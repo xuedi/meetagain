@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Cms;
+use App\Entity\CmsMenuLocation;
 use App\Entity\MenuLocation;
 use Override;
 use Symfony\Component\Form\AbstractType;
@@ -50,12 +51,47 @@ class CmsType extends AbstractType
             'multiple' => true,
             'expanded' => true,
             'required' => false,
+            'mapped' => false,
         ]);
+
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event): void {
+            $cms = $event->getData();
+            if ($cms instanceof Cms) {
+                $values = [];
+                foreach ($cms->getMenuLocations() as $ml) {
+                    $values[] = $ml->getLocation()->value;
+                }
+
+                $event->getForm()->get('menuLocations')->setData($values);
+            }
+        });
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+            $cms = $event->getData();
+            $form = $event->getForm();
+            if ($cms instanceof Cms && $form->get('menuLocations')->isSubmitted()) {
+                $values = $form->get('menuLocations')->getData() ?? [];
+
+                // Clear existing locations
+                foreach ($cms->getMenuLocations() as $ml) {
+                    $cms->removeMenuLocation($ml);
+                }
+
+                // Add new locations
+                foreach ($values as $value) {
+                    $location = MenuLocation::from($value);
+                    $menuLocation = new CmsMenuLocation();
+                    $menuLocation->setCms($cms);
+                    $menuLocation->setLocation($location);
+                    $cms->addMenuLocation($menuLocation);
+                }
+            }
+        });
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $data = $event->getData();
 
-            $optionalFields = ['menuLocations', 'locked'];
+            $optionalFields = ['locked'];
             foreach ($optionalFields as $field) {
                 if (isset($data[$field]) && $this->isEmpty($data[$field])) {
                     unset($data[$field]);
