@@ -145,7 +145,7 @@ class SecurityController extends AbstractController
             $this->emailService->sendQueue();
 
             // Redirect to events page
-            return $this->redirectToRoute('app_event');
+            return $this->redirectToRoute('app_login');
         }
 
         // Manual approval required
