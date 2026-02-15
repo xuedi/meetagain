@@ -41,4 +41,12 @@ interface AdminCmsListFilterInterface
      *         - false: Explicitly deny this CMS page
      */
     public function isCmsAccessible(int $cmsId): ?bool;
+
+    /**
+     * Get debug context information for logging when access is denied.
+     *
+     * @param int $cmsId The CMS page ID being checked
+     * @return array<string, mixed> Context information for logging (e.g., current group, domain)
+     */
+    public function getDebugContext(int $cmsId): array;
 }

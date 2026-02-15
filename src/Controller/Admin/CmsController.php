@@ -22,6 +22,7 @@ use App\Service\CmsBlockService;
 use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,6 +48,7 @@ class CmsController extends AbstractAdminController
         private readonly AnnouncementRepository $announcementRepo,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly LoggerInterface $logger,
     ) {}
 
     #[Route('/admin/cms', name: 'app_admin_cms')]
@@ -77,6 +79,7 @@ class CmsController extends AbstractAdminController
     {
         // Validate CMS is accessible in current admin context
         if (!$this->adminCmsListFilterService->isCmsAccessible($cms->getId())) {
+            $this->logAccessDenied($cms, $request, 'edit');
             throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
         }
 
@@ -122,6 +125,7 @@ class CmsController extends AbstractAdminController
         if ($cmsPage !== null) {
             // Validate CMS is accessible in current admin context
             if (!$this->adminCmsListFilterService->isCmsAccessible($cmsPage->getId())) {
+                $this->logAccessDenied($cmsPage, $request, 'delete');
                 throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
             }
 
@@ -167,6 +171,7 @@ class CmsController extends AbstractAdminController
 
         // Validate CMS is accessible in current admin context
         if (!$this->adminCmsListFilterService->isCmsAccessible($cmsPage->getId())) {
+            $this->logAccessDenied($cmsPage, $request, 'add_block');
             throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
         }
 
@@ -245,5 +250,30 @@ class CmsController extends AbstractAdminController
         $session->set($lastEditLocaleKey, $locale);
 
         return $locale;
+    }
+
+    private function logAccessDenied(Cms $cms, Request $request, string $action): void
+    {
+        $filterResult = $this->adminCmsListFilterService->getCmsIdFilter();
+        $allowedIds = $filterResult->hasActiveFilter() ? $filterResult->getCmsIds() : null;
+
+        $context = [
+            'action' => $action,
+            'cms_id' => $cms->getId(),
+            'cms_slug' => $cms->getSlug(),
+            'request_uri' => $request->getUri(),
+            'request_host' => $request->getHost(),
+            'user_id' => $this->getUser()?->getId(),
+            'allowed_cms_ids' => $allowedIds !== null ? array_slice($allowedIds, 0, 20) : 'all',
+            'total_allowed' => $allowedIds !== null ? count($allowedIds) : null,
+        ];
+
+        // Add filter context for debugging (provided by filters like GroupContextFilter)
+        $filterContext = $this->adminCmsListFilterService->getDebugContext($cms->getId());
+        if ($filterContext !== []) {
+            $context['filter_context'] = $filterContext;
+        }
+
+        $this->logger->warning('CMS page access denied', $context);
     }
 }
