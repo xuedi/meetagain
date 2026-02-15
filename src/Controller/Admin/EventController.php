@@ -10,7 +10,7 @@ use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\Location;
 use App\Enum\EntityAction;
-use App\Filter\Event\EventFilterService;
+use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
@@ -43,7 +43,7 @@ class EventController extends AbstractAdminController
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly EventService $eventService,
         private readonly EventRepository $repo,
-        private readonly EventFilterService $eventFilterService,
+        private readonly AdminEventListFilterService $eventFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
@@ -64,6 +64,11 @@ class EventController extends AbstractAdminController
     #[Route('/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event): Response
     {
+        // Validate event is accessible in current context
+        if (!$this->eventFilterService->isEventAccessible($event->getId())) {
+            throw $this->createNotFoundException('Event not found in current context.');
+        }
+
         $form = $this->createForm(EventType::class, $event);
 
         // Only set form data on GET request (initial load)
