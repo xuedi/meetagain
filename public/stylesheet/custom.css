@@ -124,3 +124,10 @@ input[type="color"] {
     bottom: 0;
     z-index: 1000;
 }
+
+/* Message body borders for better visual separation TODO: move the adjustments later to a clean sass precompile modification */
+.message-body {
+    border-left: 2px solid #b5b5b5 !important;
+    border-right: 2px solid #b5b5b5 !important;
+    border-bottom: 2px solid #b5b5b5 !important;
+}
