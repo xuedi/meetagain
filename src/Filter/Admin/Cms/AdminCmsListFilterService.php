@@ -74,6 +74,24 @@ readonly class AdminCmsListFilterService
     }
 
     /**
+     * Get combined debug context from all registered filters.
+     * @return array<string, mixed>
+     */
+    public function getDebugContext(int $cmsId): array
+    {
+        $context = [];
+
+        foreach ($this->getSortedFilters() as $filter) {
+            $filterContext = $filter->getDebugContext($cmsId);
+            if ($filterContext !== []) {
+                $context[get_class($filter)] = $filterContext;
+            }
+        }
+
+        return $context;
+    }
+
+    /**
      * @return array<AdminCmsListFilterInterface>
      */
     private function getSortedFilters(): array
