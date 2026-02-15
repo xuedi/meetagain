@@ -251,6 +251,17 @@ class Cms
         return null;
     }
 
+    public function getLinkName(string $language): ?string
+    {
+        foreach ($this->linkNames as $linkName) {
+            if ($linkName->getLanguage() === $language) {
+                return $linkName->getName();
+            }
+        }
+
+        return null;
+    }
+
     public function getPageContent(string $language): ?string
     {
         $content = [];

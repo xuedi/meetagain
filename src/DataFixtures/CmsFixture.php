@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Cms;
+use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
 use App\Entity\MenuLocation;
@@ -45,6 +46,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
         $manager->flush();
 
         $this->createTitles($manager);
+        $this->createLinkNames($manager);
 
         $this->stop();
     }
@@ -78,6 +80,40 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             $title->setLanguage($language);
             $title->setTitle($titleText);
             $manager->persist($title);
+        }
+
+        $manager->flush();
+    }
+
+    private function createLinkNames(ObjectManager $manager): void
+    {
+        $linkNames = [
+            [self::INDEX, 'en', 'Home'],
+            [self::INDEX, 'de', 'Startseite'],
+            [self::INDEX, 'zh', '首页'],
+            [self::PRIVACY, 'en', 'Privacy'],
+            [self::PRIVACY, 'de', 'Datenschutz'],
+            [self::PRIVACY, 'zh', '隐私'],
+            [self::ABOUT, 'en', 'About'],
+            [self::ABOUT, 'de', 'Über uns'],
+            [self::ABOUT, 'zh', '关于'],
+            [self::RULES, 'en', 'Rules'],
+            [self::RULES, 'de', 'Regeln'],
+            [self::RULES, 'zh', '规则'],
+            [self::IMPRINT, 'en', 'Imprint'],
+            [self::IMPRINT, 'de', 'Impressum'],
+            [self::IMPRINT, 'zh', '版本说明'],
+            [self::ANNOUNCEMENT, 'en', 'News'],
+            [self::ANNOUNCEMENT, 'de', 'Neuigkeiten'],
+            [self::ANNOUNCEMENT, 'zh', '新闻'],
+        ];
+
+        foreach ($linkNames as [$slug, $language, $nameText]) {
+            $linkName = new CmsLinkName();
+            $linkName->setCms($this->getRefCms($slug));
+            $linkName->setLanguage($language);
+            $linkName->setName($nameText);
+            $manager->persist($linkName);
         }
 
         $manager->flush();

@@ -16,7 +16,7 @@ readonly class MenuItem
     {
         return new self(
             slug: '/' . $locale . '/' . $cms->getSlug(),
-            name: $cms->getPageTitle($locale) ?? $cms->getSlug() ?? '',
+            name: $cms->getLinkName($locale) ?? $cms->getSlug() ?? '',
             priority: 0.0,
         );
     }
