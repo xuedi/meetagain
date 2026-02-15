@@ -10,6 +10,44 @@
             {{ memberPageTop | raw }}
         {% endif %}
 
+        {# Core pending user approvals (EmailVerified status) #}
+        {% if pendingUsers is defined and pendingUsers|length > 0 %}
+            <p class="subtitle">Pending User Approvals ({{ pendingUsers|length }})</p>
+            <table class="table is-fullwidth mb-5">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Registered At</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in pendingUsers %}
+                    <tr>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.createdAt|date('Y-m-d H:i') }}</td>
+                        <td>
+                            <form method="post" action="{{ path('app_admin_member_approve', {id: user.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ user.id) }}">
+                                <button type="submit" style="border:none;background:none;padding:0;cursor:pointer;" title="Approve">
+                                    <span class="icon has-text-success"><i class="fa fa-check"></i></span>
+                                </button>
+                            </form>
+                            <form method="post" action="{{ path('app_admin_member_deny', {id: user.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('deny' ~ user.id) }}">
+                                <button type="submit" style="border:none;background:none;padding:0;cursor:pointer;" title="Deny" onclick="return confirm('Deny this user?');">
+                                    <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
         <p class="subtitle">Members ({{ users|length }})</p>
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
@@ -36,25 +74,7 @@
                 {% endif %}
                 <tr class="{{ rowClass }}">
                     <td>{{ user.name }}</td>
-                    <td>
-                        {{ user.email }}
-                        {% if user.status.value == 1 and is_granted('ROLE_FOUNDER') %}
-                            <span class="ml-2">
-                                <form method="post" action="{{ path('app_admin_member_approve', {id: user.id}) }}" style="display:inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ user.id) }}">
-                                    <button type="submit" style="border:none;background:none;padding:0;cursor:pointer;" title="Approve">
-                                        <span class="icon has-text-success"><i class="fa fa-check"></i></span>
-                                    </button>
-                                </form>
-                                <form method="post" action="{{ path('app_admin_member_deny', {id: user.id}) }}" style="display:inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('deny' ~ user.id) }}">
-                                    <button type="submit" style="border:none;background:none;padding:0;cursor:pointer;" title="Deny" onclick="return confirm('Deny this user?');">
-                                        <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
-                                    </button>
-                                </form>
-                            </span>
-                        {% endif %}
-                    </td>
+                    <td>{{ user.email }}</td>
                     <td>{{ user.locale }}</td>
                     <td>
                         <div class="hidden">{{ user.roles|join }}</div>
