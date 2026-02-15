@@ -62,12 +62,12 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
             ],
             [
                 'website_url',
-                'localhost',
+                'meetagain.local',
                 ConfigType::String,
             ],
             [
                 'website_host',
-                'https://localhost',
+                'https://meetagain.local',
                 ConfigType::String,
             ],
             [
