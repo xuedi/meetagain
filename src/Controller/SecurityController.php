@@ -8,6 +8,7 @@ use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
 use App\Entity\User;
 use App\Entity\UserStatus;
+use App\Enum\EntityAction;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
@@ -15,6 +16,7 @@ use App\Service\ActivityService;
 use App\Service\CaptchaService;
 use App\Service\ConsentService;
 use App\Service\EmailService;
+use App\Service\EntityActionDispatcher;
 use App\Service\PasswordResetService;
 use DateTime;
 use DateTimeImmutable;
@@ -40,6 +42,7 @@ class SecurityController extends AbstractController
         private readonly ConsentService $consentService,
         private readonly CaptchaService $captchaService,
         private readonly PasswordResetService $passwordResetService,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
@@ -101,6 +104,8 @@ class SecurityController extends AbstractController
 
             $em->persist($user);
             $em->flush();
+
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
 
             $this->activityService->log(ActivityType::Registered, $user, []);
             $this->emailService->prepareVerificationRequest($user);
