@@ -1,0 +1,50 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
+
+        <div class="content">
+            <p>
+                Configure email templates sent by the website. Use <code>{{ '{{' }}variable{{ '}}' }}</code> placeholders
+                in subject and body fields. Click edit to customize a template.
+            </p>
+        </div>
+
+        {% for name,email in emails %}
+            <div class="content has-background-grey-lighter p-3 mt-6 is-large is-flex is-justify-content-space-between is-align-items-center">
+                <span>{{ name | lower | trans }}</span>
+                {% if email.template %}
+                    <a href="{{ path('app_admin_email_templates_edit', {id: email.template.id}) }}" class="button is-small is-info">
+                        Edit
+                    </a>
+                {% endif %}
+            </div>
+            <div class="columns">
+                <div class="column is-7">
+                    <div class="box">
+                        <p>Subject: <b>{{ email.subject }}</b></p>
+                        <br>
+                        <div>
+                            {{ email.renderedBody|raw }}
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <table class="table is-narrow is-fullwidth">
+                        {% for key,value in email.context %}
+                            <tr>
+                                <th>{{ key }}</th>
+                                <td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

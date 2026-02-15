@@ -1,0 +1,18 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'debugging'} %}
+
+        <div class="content">
+            <p class="has-text-grey">
+                <span class="icon"><i class="fa fa-wrench"></i></span>
+                Coming soon - email debugging and diagnostic tools will be available here.
+            </p>
+        </div>
+
+    </div>
+
+{% endblock %}
