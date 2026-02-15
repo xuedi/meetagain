@@ -6,6 +6,7 @@ use App\Entity\AdminLink;
 use App\Entity\Location;
 use App\Enum\EntityAction;
 use App\Form\LocationType;
+use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
 use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
@@ -27,6 +28,7 @@ class LocationController extends AbstractAdminController
 
     public function __construct(
         private readonly LocationRepository $repo,
+        private readonly EventRepository $eventRepo,
         private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
@@ -55,11 +57,40 @@ class LocationController extends AbstractAdminController
             return $this->redirectToRoute('app_admin_location');
         }
 
+        // Get events using this location
+        $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
+
         return $this->render('admin/location/edit.html.twig', [
             'active' => 'location',
             'location' => $location,
             'form' => $form,
+            'events_using_location' => $eventsUsingLocation,
         ]);
+    }
+
+    #[Route('/admin/locations/{id}/delete', name: 'app_admin_location_delete', methods: ['GET'])]
+    public function delete(Location $location, EntityManagerInterface $entityManager): Response
+    {
+        // Check if location is used in any events
+        $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
+        if (count($eventsUsingLocation) > 0) {
+            $this->addFlash(
+                'error',
+                'Cannot delete location. It is currently used in ' . count($eventsUsingLocation) . ' event(s).',
+            );
+
+            return $this->redirectToRoute('app_admin_location_edit', ['id' => $location->getId()]);
+        }
+
+        $locationId = $location->getId();
+        $entityManager->remove($location);
+        $entityManager->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::DeleteLocation, $locationId);
+
+        $this->addFlash('success', 'Location deleted successfully');
+
+        return $this->redirectToRoute('app_admin_location');
     }
 
     #[Route('/admin/locations/add', name: 'app_admin_location_add', methods: ['GET', 'POST'])]

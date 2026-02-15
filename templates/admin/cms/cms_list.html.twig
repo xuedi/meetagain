@@ -42,7 +42,7 @@
             </thead>
             <tbody>
             {% for page in cms %}
-                <tr {% if page.slug == 'index' %}class="has-text-grey"{% endif %}>
+                <tr>
                     <td>{{ page.slug }}</td>
                     <td>{{ page.createdBy.name }}</td>
                     <td>{{ page.createdAt|date('Y-m-d') }}</td>
