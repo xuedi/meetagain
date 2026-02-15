@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_FOUNDER')]
+#[IsGranted('ROLE_FOUNDER'), Route('/admin/locations')]
 class LocationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -32,7 +32,7 @@ class LocationController extends AbstractAdminController
         private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
-    #[Route('/admin/locations', name: 'app_admin_location')]
+    #[Route('', name: 'app_admin_location')]
     public function list(): Response
     {
         return $this->render('admin/location/list.html.twig', [
@@ -41,7 +41,7 @@ class LocationController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/locations/{id}/edit', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(LocationType::class, $location);
@@ -68,7 +68,7 @@ class LocationController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/locations/{id}/delete', name: 'app_admin_location_delete', methods: ['GET'])]
+    #[Route('/{id}/delete', name: 'app_admin_location_delete', methods: ['GET'])]
     public function delete(Location $location, EntityManagerInterface $entityManager): Response
     {
         // Check if location is used in any events
@@ -93,7 +93,7 @@ class LocationController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_location');
     }
 
-    #[Route('/admin/locations/add', name: 'app_admin_location_add', methods: ['GET', 'POST'])]
+    #[Route('/add', name: 'app_admin_location_add', methods: ['GET', 'POST'])]
     public function add(Request $request, EntityManagerInterface $entityManager): Response
     {
         $location = new Location();

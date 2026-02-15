@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_ADMIN'), Route('/admin/language')]
 class LanguageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -41,7 +41,7 @@ class LanguageController extends AbstractAdminController
         private readonly ImageService $imageService,
     ) {}
 
-    #[Route('/admin/language', name: 'app_admin_language')]
+    #[Route('', name: 'app_admin_language')]
     public function list(): Response
     {
         return $this->render('admin/system/language_list.html.twig', [
@@ -50,7 +50,7 @@ class LanguageController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/language/add', name: 'app_admin_language_add', methods: ['GET', 'POST'])]
+    #[Route('/add', name: 'app_admin_language_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
         $language = new Language();
@@ -78,7 +78,7 @@ class LanguageController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/language/{id}/edit', name: 'app_admin_language_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_admin_language_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Language $language): Response
     {
         $form = $this->createForm(LanguageType::class, $language, ['is_edit' => true]);
@@ -104,7 +104,7 @@ class LanguageController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/language/{id}/toggle', name: 'app_admin_language_toggle', methods: ['POST'])]
+    #[Route('/{id}/toggle', name: 'app_admin_language_toggle', methods: ['POST'])]
     public function toggle(Language $language): Response
     {
         $language->setEnabled(!$language->isEnabled());
