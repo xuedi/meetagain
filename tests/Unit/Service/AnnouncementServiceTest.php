@@ -72,12 +72,6 @@ class AnnouncementServiceTest extends TestCase
     public function testSendSuccessfullyProcessesSubscribers(): void
     {
         // Arrange: create CMS blocks
-        $titleBlock = $this->createStub(CmsBlock::class);
-        $titleBlock->method('getLanguage')->willReturn('en');
-        $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
-        $titleBlock->method('getJson')->willReturn(['title' => 'Test Title']);
-        $titleBlock->method('getImage')->willReturn(null);
-
         $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
         $textBlock->method('getType')->willReturn(CmsBlockTypes::Text);
@@ -86,7 +80,8 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: create CMS page with blocks
         $cmsPage = $this->createStub(Cms::class);
-        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock, $textBlock]));
+        $cmsPage->method('getPageTitle')->willReturn('Test Title');
+        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$textBlock]));
 
         // Arrange: create draft announcement with CMS page
         $announcement = $this->createMock(Announcement::class);
@@ -147,16 +142,10 @@ class AnnouncementServiceTest extends TestCase
 
     public function testSendFiltersOutUsersWithDisabledNotifications(): void
     {
-        // Arrange: create CMS blocks
-        $titleBlock = $this->createStub(CmsBlock::class);
-        $titleBlock->method('getLanguage')->willReturn('en');
-        $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
-        $titleBlock->method('getJson')->willReturn(['title' => 'Test Title']);
-        $titleBlock->method('getImage')->willReturn(null);
-
-        // Arrange: create CMS page with blocks
+        // Arrange: create CMS page with title
         $cmsPage = $this->createStub(Cms::class);
-        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock]));
+        $cmsPage->method('getPageTitle')->willReturn('Test Title');
+        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([]));
 
         // Arrange: create draft announcement
         $announcement = $this->createMock(Announcement::class);
@@ -211,12 +200,6 @@ class AnnouncementServiceTest extends TestCase
     public function testGetPreviewContextReturnsCorrectData(): void
     {
         // Arrange: create CMS blocks
-        $titleBlock = $this->createStub(CmsBlock::class);
-        $titleBlock->method('getLanguage')->willReturn('en');
-        $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
-        $titleBlock->method('getJson')->willReturn(['title' => 'Preview Title']);
-        $titleBlock->method('getImage')->willReturn(null);
-
         $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
         $textBlock->method('getType')->willReturn(CmsBlockTypes::Text);
@@ -225,7 +208,8 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: create CMS page
         $cmsPage = $this->createStub(Cms::class);
-        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock, $textBlock]));
+        $cmsPage->method('getPageTitle')->willReturn('Preview Title');
+        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$textBlock]));
 
         // Arrange: create announcement
         $announcement = $this->createStub(Announcement::class);
@@ -343,16 +327,10 @@ class AnnouncementServiceTest extends TestCase
 
     public function testRenderPreviewReturnsRenderedSubjectAndBody(): void
     {
-        // Arrange: create CMS blocks
-        $titleBlock = $this->createStub(CmsBlock::class);
-        $titleBlock->method('getLanguage')->willReturn('en');
-        $titleBlock->method('getType')->willReturn(CmsBlockTypes::Title);
-        $titleBlock->method('getJson')->willReturn(['title' => 'My Title']);
-        $titleBlock->method('getImage')->willReturn(null);
-
         // Arrange: create CMS page
         $cmsPage = $this->createStub(Cms::class);
-        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$titleBlock]));
+        $cmsPage->method('getPageTitle')->willReturn('My Title');
+        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([]));
 
         // Arrange: create announcement
         $announcement = $this->createStub(Announcement::class);

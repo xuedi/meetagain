@@ -345,15 +345,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Title,
-                [
-                    'title' => 'New Website Version Released!',
-                ],
-                null,
-            ],
-            [
-                CmsFixture::ANNOUNCEMENT,
-                LanguageFixture::ENGLISH,
                 CmsBlockTypes::Text,
                 [
                     'content' => 'We are excited to announce the launch of our new website version. Enjoy a better experience and new features!',
@@ -372,15 +363,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Title,
-                [
-                    'title' => 'Neue Website-Version veröffentlicht!',
-                ],
-                null,
-            ],
-            [
-                CmsFixture::ANNOUNCEMENT,
-                LanguageFixture::GERMAN,
                 CmsBlockTypes::Text,
                 [
                     'content' => 'Wir freuen uns, den Start unserer neuen Website-Version bekannt zu geben. Genießen Sie eine bessere Benutzererfahrung und neue Funktionen!',
@@ -395,15 +377,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                     'id' => 'announcement-de',
                 ],
                 'screenshot-de.png',
-            ],
-            [
-                CmsFixture::ANNOUNCEMENT,
-                LanguageFixture::CHINESE,
-                CmsBlockTypes::Title,
-                [
-                    'title' => '新版本网站发布！',
-                ],
-                null,
             ],
             [
                 CmsFixture::ANNOUNCEMENT,

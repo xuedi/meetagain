@@ -125,7 +125,6 @@ class CmsController extends AbstractAdminController
             Image::getType(),
             Hero::getType(),
             EventTeaser::getType(),
-            Title::getType(),
         ];
 
         return $this->render('admin/cms/cms_edit.html.twig', [
