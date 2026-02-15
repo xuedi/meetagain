@@ -34,10 +34,10 @@ class Cms
     private ?bool $locked = null;
 
     /**
-     * @var array<int>|null
+     * @var Collection<int, CmsMenuLocation>
      */
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $menuLocations = null;
+    #[ORM\OneToMany(targetEntity: CmsMenuLocation::class, mappedBy: 'cms', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $menuLocations;
 
     /**
      * @var Collection<int, CmsBlock>
@@ -47,6 +47,7 @@ class Cms
 
     public function __construct()
     {
+        $this->menuLocations = new ArrayCollection();
         $this->blocks = new ArrayCollection();
     }
 
@@ -116,19 +117,28 @@ class Cms
     }
 
     /**
-     * @return array<int>|null
+     * @return Collection<int, CmsMenuLocation>
      */
-    public function getMenuLocations(): ?array
+    public function getMenuLocations(): Collection
     {
         return $this->menuLocations;
     }
 
-    /**
-     * @param array<int>|null $menuLocations
-     */
-    public function setMenuLocations(?array $menuLocations): static
+    public function addMenuLocation(CmsMenuLocation $menuLocation): static
     {
-        $this->menuLocations = $menuLocations;
+        if (!$this->menuLocations->contains($menuLocation)) {
+            $this->menuLocations->add($menuLocation);
+            $menuLocation->setCms($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenuLocation(CmsMenuLocation $menuLocation): static
+    {
+        if ($this->menuLocations->removeElement($menuLocation) && $menuLocation->getCms() === $this) {
+            $menuLocation->setCms(null);
+        }
 
         return $this;
     }
