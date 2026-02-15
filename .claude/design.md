@@ -59,7 +59,7 @@
 **✅ DO:**
 - Use simple `<a>` tags with icon spans for actions
 - Put "create" icon in table header (last column)
-- Use `onclick="return confirm(...)"` for destructive actions
+- Use warning boxes for destructive actions (see "Delete Warning Boxes" section)
 - Use row background colors for state (canceled, recurring, featured)
 - Keep action icons inline, no button wrapping
 - Use plain text for status instead of tags
@@ -111,6 +111,52 @@
 - **`has-text-danger`**: Destructive/negative actions (cancel, ban)
 - **`has-text-success`**: Positive actions (uncancel, approve)
 - **`has-text-warning`**: Featured/important indicators
+
+### Delete Warning Boxes
+
+**Reference Implementation:** `templates/admin/cms/cms_edit.html.twig`
+
+**Prefer warning boxes over JavaScript `onclick="confirm()"` dialogs** for better UX and consistency.
+
+```twig
+{# Warning box - hidden by default, shown when trigger is clicked #}
+<article class="message is-danger is-hidden" id="entity-delete-warning">
+    <div class="message-header">
+        <p>Delete [Entity Name]</p>
+        <button class="delete toggleTrigger" data-id="entity-delete-warning" aria-label="delete"></button>
+    </div>
+    <div class="message-body has-text-black has-background-white">
+        <p>
+            Warning text explaining consequences of deletion.
+            Be specific about what will be deleted.
+        </p>
+        <div class="has-text-right mt-3">
+            <a class="button" href="{{ path('app_admin_entity_delete', {'id': entity.id}) }}">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>Yes, Delete</span>
+            </a>
+        </div>
+    </div>
+</article>
+
+{# Danger Zone - trigger button in right sidebar #}
+<fieldset class="mt-5 p-4" style="border: 2px solid #f14668; border-radius: 4px;">
+    <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">Danger Zone</legend>
+
+    <a class="button is-light is-fullwidth toggleTrigger" data-id="entity-delete-warning"
+       href="{{ path('app_admin_entity_delete', {'id': entity.id}) }}">
+        <span class="icon"><i class="fa fa-trash"></i></span>
+        <span>Delete [Entity]</span>
+    </a>
+</fieldset>
+```
+
+**Styling:**
+- `message is-danger is-hidden` - Red header, white body (via custom CSS), initially hidden
+- `message-body has-text-black has-background-white` - White background for readability
+- Confirmation button uses plain `button` class (no `is-danger` - context already clear)
+- Grey borders applied automatically via global CSS (`custom.css`)
+- Trigger button uses `is-light` for subtle appearance
 
 ### Row Color Coding
 
@@ -521,7 +567,7 @@ When creating admin interfaces:
 - [ ] Keep forms minimal (no unnecessary wrappers)
 - [ ] No boxes/cards unless absolutely necessary
 - [ ] Minimize color usage (only for meaningful distinctions)
-- [ ] Use `onclick="return confirm(...)"` for destructive actions
+- [ ] Use warning boxes for destructive actions (prefer over `onclick="confirm()"`)
 - [ ] Keep pagination simple and centered
 - [ ] Only show legends if colors aren't obvious
 - [ ] **Use very simple Bulma elements** (table, input, select, field, control)
