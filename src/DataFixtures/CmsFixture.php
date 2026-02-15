@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Cms;
 use App\Entity\CmsMenuLocation;
+use App\Entity\CmsTitle;
 use App\Entity\MenuLocation;
 use DateTimeImmutable;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -42,7 +43,44 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             $this->addRefCms($slug, $cms);
         }
         $manager->flush();
+
+        $this->createTitles($manager);
+
         $this->stop();
+    }
+
+    private function createTitles(ObjectManager $manager): void
+    {
+        $titles = [
+            [self::INDEX, 'en', 'MeetAgain - Event Management'],
+            [self::INDEX, 'de', 'MeetAgain - Event-Management'],
+            [self::INDEX, 'zh', 'MeetAgain - 活动管理'],
+            [self::PRIVACY, 'en', 'Privacy Policy'],
+            [self::PRIVACY, 'de', 'Datenschutzerklärung'],
+            [self::PRIVACY, 'zh', '隐私政策'],
+            [self::ABOUT, 'en', 'About Us'],
+            [self::ABOUT, 'de', 'Über uns'],
+            [self::ABOUT, 'zh', '关于我们'],
+            [self::RULES, 'en', 'Community Rules'],
+            [self::RULES, 'de', 'Community-Regeln'],
+            [self::RULES, 'zh', '社区规则'],
+            [self::IMPRINT, 'en', 'Imprint'],
+            [self::IMPRINT, 'de', 'Impressum'],
+            [self::IMPRINT, 'zh', '版本说明'],
+            [self::ANNOUNCEMENT, 'en', 'New Website Version Released!'],
+            [self::ANNOUNCEMENT, 'de', 'Neue Website-Version veröffentlicht!'],
+            [self::ANNOUNCEMENT, 'zh', '新版本网站发布！'],
+        ];
+
+        foreach ($titles as [$slug, $language, $titleText]) {
+            $title = new CmsTitle();
+            $title->setCms($this->getRefCms($slug));
+            $title->setLanguage($language);
+            $title->setTitle($titleText);
+            $manager->persist($title);
+        }
+
+        $manager->flush();
     }
 
     public function getDependencies(): array

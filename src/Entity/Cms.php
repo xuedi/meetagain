@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\BlockType\Text as TextType;
-use App\Entity\BlockType\Title as TitleType;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -243,9 +242,9 @@ class Cms
 
     public function getPageTitle(string $language): ?string
     {
-        foreach ($this->blocks as $block) {
-            if ($block->getLanguage() === $language && $block->getType() === CmsBlockTypes::Title) {
-                return TitleType::fromJson($block->getJson())->title;
+        foreach ($this->titles as $title) {
+            if ($title->getLanguage() === $language) {
+                return $title->getTitle();
             }
         }
 

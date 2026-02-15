@@ -9,7 +9,6 @@ use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Image;
 use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
-use App\Entity\BlockType\Title;
 use App\Entity\Image as ImageEntity;
 use RuntimeException;
 
@@ -24,7 +23,6 @@ enum CmsBlockTypes: int
     case Gallery = 7;
     case Hero = 8;
     case EventTeaser = 9;
-    case Title = 10;
 
     public static function buildObject(self $type, array $data, ?ImageEntity $image = null): BlockType
     {
@@ -34,7 +32,6 @@ enum CmsBlockTypes: int
             CmsBlockTypes::Image => Image::fromJson($data, $image),
             CmsBlockTypes::Hero => Hero::fromJson($data, $image),
             CmsBlockTypes::Paragraph => Paragraph::fromJson($data, $image),
-            CmsBlockTypes::Title => Title::fromJson($data, $image),
             CmsBlockTypes::EventTeaser => EventTeaser::fromJson($data, $image),
             default => throw new RuntimeException('Unknown block type: ' . $type->name),
         };
