@@ -93,6 +93,7 @@ class CmsController extends AbstractAdminController
 
         $form = $this->createForm(CmsType::class, $cms, [
             'is_admin' => $isAdmin,
+            'edit_locale' => $locale,
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
