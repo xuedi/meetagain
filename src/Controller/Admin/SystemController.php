@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
 class SystemController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -28,7 +28,7 @@ class SystemController extends AbstractAdminController
         private readonly ConfigService $configService,
     ) {}
 
-    #[Route('/admin/system', name: 'app_admin_system', methods: ['GET', 'POST'])]
+    #[Route('', name: 'app_admin_system', methods: ['GET', 'POST'])]
     public function index(Request $request): Response
     {
         $form = $this->createForm(SettingsType::class);
@@ -56,7 +56,7 @@ class SystemController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/system/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails', methods: ['POST'])]
+    #[Route('/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails', methods: ['POST'])]
     public function regenerateThumbnails(): Response
     {
         $startTime = microtime(true);
@@ -68,7 +68,7 @@ class SystemController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_system');
     }
 
-    #[Route('/admin/system/cleanup_thumbnails', name: 'app_admin_cleanup_thumbnails', methods: ['POST'])]
+    #[Route('/cleanup_thumbnails', name: 'app_admin_cleanup_thumbnails', methods: ['POST'])]
     public function cleanupThumbnails(): Response
     {
         $startTime = microtime(true);
@@ -80,7 +80,7 @@ class SystemController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_system');
     }
 
-    #[Route('/admin/system/boolean/{name}', name: 'app_admin_system_boolean', methods: ['POST'])]
+    #[Route('/boolean/{name}', name: 'app_admin_system_boolean', methods: ['POST'])]
     public function boolean(Request $request, string $name): Response
     {
         $value = $this->configService->toggleBoolean($name);

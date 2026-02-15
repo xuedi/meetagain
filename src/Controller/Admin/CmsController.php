@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_FOUNDER')]
+#[IsGranted('ROLE_FOUNDER'), Route('/admin/cms')]
 class CmsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -51,7 +51,7 @@ class CmsController extends AbstractAdminController
         private readonly LoggerInterface $logger,
     ) {}
 
-    #[Route('/admin/cms', name: 'app_admin_cms')]
+    #[Route('', name: 'app_admin_cms')]
     public function cmsList(): Response
     {
         $isAdmin = $this->isGranted('ROLE_ADMIN');
@@ -84,7 +84,7 @@ class CmsController extends AbstractAdminController
     }
 
     #[Route(
-        '/admin/cms/{id}/edit/{locale}/{blockId}',
+        '/{id}/edit/{locale}/{blockId}',
         name: 'app_admin_cms_edit',
         requirements: ['locale' => '[^/]+', 'blockId' => '\d+'],
         defaults: ['locale' => null, 'blockId' => null],
@@ -140,7 +140,7 @@ class CmsController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/cms/delete', name: 'app_admin_cms_delete', methods: ['GET'])]
+    #[Route('/delete', name: 'app_admin_cms_delete', methods: ['GET'])]
     public function cmsDelete(Request $request): Response
     {
         $id = $request->query->get('id');
@@ -162,7 +162,7 @@ class CmsController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_cms');
     }
 
-    #[Route('/admin/cms/add', name: 'app_admin_cms_add', methods: ['POST'])]
+    #[Route('/add', name: 'app_admin_cms_add', methods: ['POST'])]
     public function cmsAdd(Request $request): Response
     {
         $user = $this->getUser();
@@ -185,7 +185,7 @@ class CmsController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/cms/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
+    #[Route('/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
     public function cmsBlockAdd(Request $request, int $id): Response
     {
         $cmsPage = $this->repo->find($id);
@@ -210,7 +210,7 @@ class CmsController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/cms/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
+    #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
     public function cmsBlockMoveDown(Request $request): Response
     {
         $pageId = (int) $request->query->get('id');
@@ -225,7 +225,7 @@ class CmsController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/cms/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
+    #[Route('/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
     public function cmsBlockMoveUp(Request $request): Response
     {
         $pageId = (int) $request->query->get('id');
@@ -240,7 +240,7 @@ class CmsController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/cms/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
+    #[Route('/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
     public function cmsBlockSave(Request $request): Response
     {
         $blockId = (int) $request->request->get('blockId');
@@ -254,7 +254,7 @@ class CmsController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/cms/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
+    #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
     public function cmsBlockDelete(Request $request): Response
     {
         $this->blockService->deleteBlock((int) $request->query->get('blockId'));

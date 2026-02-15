@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_FOUNDER')]
+#[IsGranted('ROLE_FOUNDER'), Route('/admin/events')]
 class EventController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -47,7 +47,7 @@ class EventController extends AbstractAdminController
         private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
-    #[Route('/admin/events', name: 'app_admin_event')]
+    #[Route('', name: 'app_admin_event')]
     public function list(): Response
     {
         // Apply multisite filtering if enabled
@@ -61,7 +61,7 @@ class EventController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/events/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event): Response
     {
         $form = $this->createForm(EventType::class, $event);
@@ -147,14 +147,14 @@ class EventController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/events/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
     public function delete(): Response
     {
         dump('delete');
         exit();
     }
 
-    #[Route('/admin/events/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
+    #[Route('/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
     public function cancel(Event $event): Response
     {
         $rsvpCount = $event->getRsvp()->count();
@@ -166,7 +166,7 @@ class EventController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
 
-    #[Route('/admin/events/{id}/uncancel', name: 'app_admin_event_uncancel', methods: ['POST'])]
+    #[Route('/{id}/uncancel', name: 'app_admin_event_uncancel', methods: ['POST'])]
     public function uncancel(Event $event): Response
     {
         $this->eventService->uncancelEvent($event);
@@ -184,7 +184,7 @@ class EventController extends AbstractAdminController
         return new EventTranslation();
     }
 
-    #[Route('/admin/events/new', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();
