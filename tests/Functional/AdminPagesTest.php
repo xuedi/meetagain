@@ -26,24 +26,22 @@ class AdminPagesTest extends WebTestCase
         $client->request('GET', '/en/admin/cms');
         $this->assertResponseIsSuccessful('CMS route should load for admin');
 
-        // Test System route
+        // Test System route (redirects to /admin/system/config)
         $client->request('GET', '/en/admin/system');
-        $this->assertResponseIsSuccessful('System route should load for admin');
+        $this->assertResponseRedirects('/en/admin/system/config', 302);
+        $client->followRedirect();
+        $this->assertResponseIsSuccessful('System config route should load for admin');
 
         // Test Email route
-        $client->request('GET', '/en/admin/email');
+        $client->request('GET', '/en/admin/email/templates');
         $this->assertResponseIsSuccessful('Email route should load for admin');
 
         // Test Translation route
         $client->request('GET', '/en/admin/translation');
         $this->assertResponseIsSuccessful('Translation route should load for admin');
 
-        // Test Menu route
-        $client->request('GET', '/en/admin/menu');
-        $this->assertResponseIsSuccessful('Menu route should load for admin');
-
         // Test Announcements route
-        $client->request('GET', '/en/admin/system/announcements');
+        $client->request('GET', '/en/admin/email/announcements');
         $this->assertResponseIsSuccessful('Announcements route should load for admin');
     }
 
@@ -61,19 +59,15 @@ class AdminPagesTest extends WebTestCase
         $this->assertResponseRedirects();
 
         // Test Email route
-        $client->request('GET', '/en/admin/email');
+        $client->request('GET', '/en/admin/email/templates');
         $this->assertResponseRedirects();
 
         // Test Translation route
         $client->request('GET', '/en/admin/translation');
         $this->assertResponseRedirects();
 
-        // Test Menu route
-        $client->request('GET', '/en/admin/menu');
-        $this->assertResponseRedirects();
-
         // Test Announcements route
-        $client->request('GET', '/en/admin/system/announcements');
+        $client->request('GET', '/en/admin/email/announcements');
         $this->assertResponseRedirects();
     }
 

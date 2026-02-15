@@ -1,0 +1,22 @@
+<div class="tabs is-boxed">
+    <ul>
+        <li class="{% if activeSection == 'config' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_system_config') }}">
+                <span class="icon is-small"><i class="fa fa-cog" aria-hidden="true"></i></span>
+                <span>{{ 'system_tab_config'|trans }}</span>
+            </a>
+        </li>
+        <li class="{% if activeSection == 'theme' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_system_theme') }}">
+                <span class="icon is-small"><i class="fa fa-palette" aria-hidden="true"></i></span>
+                <span>{{ 'system_tab_theme'|trans }}</span>
+            </a>
+        </li>
+        <li class="{% if activeSection == 'images' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_system_images') }}">
+                <span class="icon is-small"><i class="fa fa-image" aria-hidden="true"></i></span>
+                <span>{{ 'system_tab_images'|trans }}</span>
+            </a>
+        </li>
+    </ul>
+</div>
