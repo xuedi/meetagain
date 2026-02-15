@@ -145,7 +145,7 @@ class SecurityController extends AbstractController
             $this->emailService->sendQueue();
 
             // Redirect to events page
-            return $this->redirectToRoute('app_login');
+            return $this->render('security/approved.html.twig');
         }
 
         // Manual approval required
