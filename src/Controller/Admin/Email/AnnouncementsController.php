@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\Email;
 
-use App\Entity\AdminLink;
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;
@@ -18,39 +19,32 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ORGANIZER')]
-class AnnouncementController extends AbstractAdminController
+#[IsGranted('ROLE_ADMIN'), Route('/admin/email/announcements')]
+class AnnouncementsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(
-                label: 'menu_admin_announcement',
-                route: 'app_admin_announcement',
-                active: 'announcement',
-                role: 'ROLE_ORGANIZER',
-            ),
-        ]);
+        return null;
     }
 
     public function __construct(
-        private readonly AnnouncementRepository $repo,
+        private readonly AnnouncementRepository $announcementRepo,
         private readonly AnnouncementService $announcementService,
         private readonly EntityManagerInterface $em,
         private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
-    #[Route('/admin/system/announcements', name: 'app_admin_announcement')]
-    public function list(): Response
+    #[Route('', name: 'app_admin_email_announcements')]
+    public function announcements(): Response
     {
-        return $this->render('admin/system/announcement_list.html.twig', [
-            'active' => 'announcement',
-            'announcements' => $this->repo->findAllOrderedByDate(),
+        return $this->render('admin/email/announcements/list.html.twig', [
+            'active' => 'email',
+            'announcements' => $this->announcementRepo->findAllOrderedByDate(),
         ]);
     }
 
-    #[Route('/admin/system/announcements/new', name: 'app_admin_announcement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    #[Route('/new', name: 'app_admin_email_announcements_new', methods: ['GET', 'POST'])]
+    public function announcementsNew(Request $request): Response
     {
         $announcement = new Announcement();
         $form = $this->createForm(AnnouncementType::class, $announcement);
@@ -66,17 +60,17 @@ class AnnouncementController extends AbstractAdminController
 
             $this->entityActionDispatcher->dispatch(EntityAction::CreateAnnouncement, $announcement->getId());
 
-            return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
+            return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
         }
 
-        return $this->render('admin/system/announcement_new.html.twig', [
-            'active' => 'announcement',
+        return $this->render('admin/email/announcements/new.html.twig', [
+            'active' => 'email',
             'form' => $form,
         ]);
     }
 
-    #[Route('/admin/system/announcements/from-cms/{id}', name: 'app_admin_announcement_from_cms')]
-    public function createFromCms(Cms $cmsPage): Response
+    #[Route('/from-cms/{id}', name: 'app_admin_email_announcements_from_cms')]
+    public function announcementsFromCms(Cms $cmsPage): Response
     {
         $announcement = new Announcement();
         $announcement->setCmsPage($cmsPage);
@@ -89,11 +83,11 @@ class AnnouncementController extends AbstractAdminController
 
         $this->entityActionDispatcher->dispatch(EntityAction::CreateAnnouncement, $announcement->getId());
 
-        return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
+        return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
     }
 
-    #[Route('/admin/system/announcements/{id}', name: 'app_admin_announcement_view')]
-    public function view(Announcement $announcement, Request $request): Response
+    #[Route('/{id}', name: 'app_admin_email_announcements_view')]
+    public function announcementsView(Announcement $announcement, Request $request): Response
     {
         $locale = $request->query->get('locale', 'en');
         $preview = null;
@@ -101,37 +95,37 @@ class AnnouncementController extends AbstractAdminController
             $preview = $this->announcementService->renderPreview($announcement, $locale);
         }
 
-        return $this->render('admin/system/announcement_view.html.twig', [
-            'active' => 'announcement',
+        return $this->render('admin/email/announcements/view.html.twig', [
+            'active' => 'email',
             'announcement' => $announcement,
             'preview' => $preview,
             'previewLocale' => $locale,
         ]);
     }
 
-    #[Route('/admin/system/announcements/{id}/send', name: 'app_admin_announcement_send', methods: ['POST'])]
-    public function send(Announcement $announcement): Response
+    #[Route('/{id}/send', name: 'app_admin_email_announcements_send', methods: ['POST'])]
+    public function announcementsSend(Announcement $announcement): Response
     {
         if (!$announcement->isDraft()) {
             $this->addFlash('error', 'announcement_already_sent');
 
-            return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
+            return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
         }
 
         $recipientCount = $this->announcementService->send($announcement);
 
         $this->addFlash('success', sprintf('announcement_sent_success: %d', $recipientCount));
 
-        return $this->redirectToRoute('app_admin_announcement_view', ['id' => $announcement->getId()]);
+        return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
     }
 
-    #[Route('/admin/system/announcements/{id}/delete', name: 'app_admin_announcement_delete', methods: ['POST'])]
-    public function delete(Announcement $announcement): Response
+    #[Route('/{id}/delete', name: 'app_admin_email_announcements_delete', methods: ['POST'])]
+    public function announcementsDelete(Announcement $announcement): Response
     {
         if (!$announcement->isDraft()) {
             $this->addFlash('error', 'announcement_cannot_delete_sent');
 
-            return $this->redirectToRoute('app_admin_announcement');
+            return $this->redirectToRoute('app_admin_email_announcements');
         }
 
         $announcementId = $announcement->getId();
@@ -140,6 +134,6 @@ class AnnouncementController extends AbstractAdminController
 
         $this->entityActionDispatcher->dispatch(EntityAction::DeleteAnnouncement, $announcementId);
 
-        return $this->redirectToRoute('app_admin_announcement');
+        return $this->redirectToRoute('app_admin_email_announcements');
     }
 }
