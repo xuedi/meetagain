@@ -27,8 +27,6 @@ doctrine:
                 dql:
                     datetime_functions:
                         DATE_FORMAT: DoctrineExtensions\Query\Mysql\DateFormat
-                    string_functions:
-                        JSON_CONTAINS: App\Doctrine\Query\Mysql\JsonContains
 
 when@test:
     doctrine:
