@@ -100,4 +100,17 @@ class CmsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return array<int>
+     */
+    public function getLockedCmsIds(): array
+    {
+        return $this
+            ->createQueryBuilder('c')
+            ->select('c.id')
+            ->where('c.locked = true')
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
 }

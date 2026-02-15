@@ -54,8 +54,11 @@ class CmsController extends AbstractAdminController
     #[Route('/admin/cms', name: 'app_admin_cms')]
     public function cmsList(): Response
     {
+        $isAdmin = $this->isGranted('ROLE_ADMIN');
+
         $newForm = $this->createForm(CmsType::class, null, [
             'action' => $this->generateUrl('app_admin_cms_add'),
+            'is_admin' => $isAdmin,
         ]);
 
         // Apply admin-specific CMS list filtering
@@ -65,6 +68,7 @@ class CmsController extends AbstractAdminController
             'active' => 'cms',
             'form' => $newForm,
             'cms' => $this->repo->findByIds($filterResult->getCmsIds()),
+            'is_admin' => $isAdmin,
         ]);
     }
 
@@ -85,7 +89,11 @@ class CmsController extends AbstractAdminController
 
         $locale = $this->getLastEditLocale($locale, $request->getSession());
 
-        $form = $this->createForm(CmsType::class, $cms);
+        $isAdmin = $this->isGranted('ROLE_ADMIN');
+
+        $form = $this->createForm(CmsType::class, $cms, [
+            'is_admin' => $isAdmin,
+        ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->em->flush();
@@ -114,6 +122,7 @@ class CmsController extends AbstractAdminController
             'form' => $form,
             'cms' => $cms,
             'linkedAnnouncement' => $this->announcementRepo->findByCmsPage($cms->getId()),
+            'is_admin' => $isAdmin,
         ]);
     }
 

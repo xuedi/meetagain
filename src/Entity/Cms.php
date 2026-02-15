@@ -30,6 +30,9 @@ class Cms
     #[ORM\Column]
     private ?bool $published = null;
 
+    #[ORM\Column]
+    private ?bool $locked = null;
+
     /**
      * @var array<int>|null
      */
@@ -96,6 +99,18 @@ class Cms
     public function setPublished(bool $published): static
     {
         $this->published = $published;
+
+        return $this;
+    }
+
+    public function isLocked(): ?bool
+    {
+        return $this->locked;
+    }
+
+    public function setLocked(bool $locked): static
+    {
+        $this->locked = $locked;
 
         return $this;
     }

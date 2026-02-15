@@ -34,6 +34,7 @@
                 <th>CreatedBy</th>
                 <th>CreatedAt</th>
                 <th>Status</th>
+                <th></th>
                 <th>Blocks</th>
                 <th>Translations</th>
                 <th><a class="toggleTrigger" data-id="cms-add" href="#"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
@@ -42,18 +43,7 @@
             <tbody>
             {% for page in cms %}
                 <tr {% if page.slug == 'index' %}class="has-text-grey"{% endif %}>
-                    <td>
-                        {% if page.slug == 'index' %}
-                            <span class="icon-text">
-                                <span class="icon has-text-grey-light">
-                                    <i class="fa fa-home"></i>
-                                </span>
-                                <span>{{ page.slug }}</span>
-                            </span>
-                        {% else %}
-                            {{ page.slug }}
-                        {% endif %}
-                    </td>
+                    <td>{{ page.slug }}</td>
                     <td>{{ page.createdBy.name }}</td>
                     <td>{{ page.createdAt|date('Y-m-d') }}</td>
                     <td>
@@ -63,9 +53,27 @@
                             <span class="has-text-grey-light">{{ 'draft' | trans }}</span>
                         {% endif %}
                     </td>
+                    <td>
+                        <span class="icon-text">
+                            {% if page.slug == 'index' %}
+                                <span class="icon has-text-grey-light" title="{{ 'Home page' | trans }}">
+                                    <i class="fa fa-home"></i>
+                                </span>
+                            {% endif %}
+                            {% if page.locked %}
+                                <span class="icon has-text-warning" title="{{ 'Locked (visible on all groups)' | trans }}">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                            {% endif %}
+                        </span>
+                    </td>
                     <td>{{ page.blocks|length }}</td>
                     <td>{{ page.languages|length }}</td>
-                    <td><a href="{{ path('app_admin_cms_edit', {'id': page.id, 'locale': app.request.locale}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a></td>
+                    <td>
+                        {% if not (page.locked and not is_admin) %}
+                            <a href="{{ path('app_admin_cms_edit', {'id': page.id, 'locale': app.request.locale}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
