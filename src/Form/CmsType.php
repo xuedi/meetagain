@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Cms;
+use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
+use App\Entity\CmsTitle;
 use App\Entity\MenuLocation;
 use Override;
 use Symfony\Component\Form\AbstractType;
@@ -45,6 +47,18 @@ class CmsType extends AbstractType
             ]);
         }
 
+        $builder->add('pageTitle', TextType::class, [
+            'label' => 'Page Title',
+            'required' => false,
+            'mapped' => false,
+            'help' => 'Title shown in browser and page content',
+        ])->add('linkName', TextType::class, [
+            'label' => 'Menu Link Name',
+            'required' => false,
+            'mapped' => false,
+            'help' => 'Name shown in menus (defaults to page title if empty)',
+        ]);
+
         $builder->add('menuLocations', ChoiceType::class, [
             'label' => 'Menu Locations',
             'choices' => MenuLocation::getChoices($this->translator),
@@ -54,37 +68,123 @@ class CmsType extends AbstractType
             'mapped' => false,
         ]);
 
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event): void {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($options): void {
             $cms = $event->getData();
-            if ($cms instanceof Cms) {
-                $values = [];
-                foreach ($cms->getMenuLocations() as $ml) {
-                    $values[] = $ml->getLocation()->value;
-                }
+            if (!$cms instanceof Cms) {
+                return;
+            }
 
-                $event->getForm()->get('menuLocations')->setData($values);
+            $locale = $options['edit_locale'];
+            $form = $event->getForm();
+
+            // Populate menuLocations
+            $values = [];
+            foreach ($cms->getMenuLocations() as $ml) {
+                $values[] = $ml->getLocation()->value;
+            }
+            $form->get('menuLocations')->setData($values);
+
+            // Populate pageTitle
+            foreach ($cms->getTitles() as $title) {
+                if ($title->getLanguage() === $locale) {
+                    $form->get('pageTitle')->setData($title->getTitle());
+                    break;
+                }
+            }
+
+            // Populate linkName
+            foreach ($cms->getLinkNames() as $linkName) {
+                if ($linkName->getLanguage() === $locale) {
+                    $form->get('linkName')->setData($linkName->getName());
+                    break;
+                }
             }
         });
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($options): void {
             $cms = $event->getData();
             $form = $event->getForm();
-            if ($cms instanceof Cms && $form->get('menuLocations')->isSubmitted()) {
+            if (!$cms instanceof Cms) {
+                return;
+            }
+
+            $locale = $options['edit_locale'];
+
+            // Handle menuLocations
+            if ($form->get('menuLocations')->isSubmitted()) {
                 $values = $form->get('menuLocations')->getData() ?? [];
 
-                // Clear existing locations
+                // Get current location values
+                $existingValues = [];
                 foreach ($cms->getMenuLocations() as $ml) {
-                    $cms->removeMenuLocation($ml);
+                    $existingValues[$ml->getLocation()->value] = $ml;
                 }
 
-                // Add new locations
-                foreach ($values as $value) {
-                    $location = MenuLocation::from($value);
-                    $menuLocation = new CmsMenuLocation();
-                    $menuLocation->setCms($cms);
-                    $menuLocation->setLocation($location);
-                    $cms->addMenuLocation($menuLocation);
+                // Remove locations that are no longer selected
+                foreach ($existingValues as $value => $ml) {
+                    if (!in_array($value, $values, strict: true)) {
+                        $cms->removeMenuLocation($ml);
+                    }
                 }
+
+                // Add new locations that don't exist yet
+                foreach ($values as $value) {
+                    if (!isset($existingValues[$value])) {
+                        $location = MenuLocation::from($value);
+                        $menuLocation = new CmsMenuLocation();
+                        $menuLocation->setCms($cms);
+                        $menuLocation->setLocation($location);
+                        $cms->addMenuLocation($menuLocation);
+                    }
+                }
+            }
+
+            // Handle pageTitle
+            $titleText = $form->get('pageTitle')->getData();
+            $existingTitle = null;
+            foreach ($cms->getTitles() as $title) {
+                if ($title->getLanguage() === $locale) {
+                    $existingTitle = $title;
+                    break;
+                }
+            }
+
+            if ($titleText !== null && $titleText !== '') {
+                if ($existingTitle) {
+                    $existingTitle->setTitle($titleText);
+                } else {
+                    $newTitle = new CmsTitle();
+                    $newTitle->setCms($cms);
+                    $newTitle->setLanguage($locale);
+                    $newTitle->setTitle($titleText);
+                    $cms->addTitle($newTitle);
+                }
+            } elseif ($existingTitle) {
+                $cms->removeTitle($existingTitle);
+            }
+
+            // Handle linkName
+            $linkNameText = $form->get('linkName')->getData();
+            $existingLinkName = null;
+            foreach ($cms->getLinkNames() as $linkName) {
+                if ($linkName->getLanguage() === $locale) {
+                    $existingLinkName = $linkName;
+                    break;
+                }
+            }
+
+            if ($linkNameText !== null && $linkNameText !== '') {
+                if ($existingLinkName) {
+                    $existingLinkName->setName($linkNameText);
+                } else {
+                    $newLinkName = new CmsLinkName();
+                    $newLinkName->setCms($cms);
+                    $newLinkName->setLanguage($locale);
+                    $newLinkName->setName($linkNameText);
+                    $cms->addLinkName($newLinkName);
+                }
+            } elseif ($existingLinkName) {
+                $cms->removeLinkName($existingLinkName);
             }
         });
 
@@ -113,6 +213,7 @@ class CmsType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Cms::class,
             'is_admin' => false,
+            'edit_locale' => 'en',
         ]);
     }
 }
