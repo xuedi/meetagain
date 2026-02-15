@@ -63,12 +63,23 @@ class CmsController extends AbstractAdminController
 
         // Apply admin-specific CMS list filtering
         $filterResult = $this->adminCmsListFilterService->getCmsIdFilter();
+        $cmsPages = $this->repo->findByIds($filterResult->getCmsIds());
+
+        // Get CMS IDs that have linked announcements
+        $cmsIdsWithAnnouncements = [];
+        foreach ($cmsPages as $page) {
+            $announcement = $this->announcementRepo->findByCmsPage($page->getId());
+            if ($announcement !== null) {
+                $cmsIdsWithAnnouncements[] = $page->getId();
+            }
+        }
 
         return $this->render('admin/cms/cms_list.html.twig', [
             'active' => 'cms',
             'form' => $newForm,
-            'cms' => $this->repo->findByIds($filterResult->getCmsIds()),
+            'cms' => $cmsPages,
             'is_admin' => $isAdmin,
+            'cms_with_announcements' => $cmsIdsWithAnnouncements,
         ]);
     }
 
