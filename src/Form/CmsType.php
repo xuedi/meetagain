@@ -56,7 +56,7 @@ class CmsType extends AbstractType
             'label' => 'Menu Link Name',
             'required' => false,
             'mapped' => false,
-            'help' => 'Name shown in menus (defaults to page title if empty)',
+            'help' => 'Name shown in menus (no need if no menu like index)',
         ]);
 
         $builder->add('menuLocations', ChoiceType::class, [
