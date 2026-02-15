@@ -8,8 +8,8 @@
             <thead>
             <tr>
                 <th>Title</th>
-                <th>Start date</th>
-                <th>Stop date</th>
+                <th>Created at</th>
+                <th>Event time</th>
                 <th>Recurring</th>
                 <th>Location</th>
                 <th>Rsvp</th>
@@ -29,8 +29,8 @@
                 {% endif %}
                 <tr class="{{ textColor }} {% if event.id == nextEvent and not event.canceled %}has-background-warning-light{% endif %}">
                     <td>{{ event.title(app.locale) }}</td>
+                    <td>{{ event.createdAt|date('Y-m-d') }}</td>
                     <td>{{ event.start|date('Y-m-d') }}</td>
-                    <td>{{ event.stop|date('Y-m-d') }}</td>
                     <td>
                         {% if event.recurringOf is not null %}
                             auto
