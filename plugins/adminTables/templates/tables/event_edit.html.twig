@@ -11,6 +11,24 @@
         'type': 'danger'
     } %}
 
+    {% include '_block/warning_box.html.twig' with {
+        'id': 'event-cancel-warning',
+        'title': 'Cancel Event',
+        'content': '<p>Are you sure you want to cancel this event? All RSVPd users will be notified.</p>',
+        'buttonLabel': 'Yes, Cancel Event',
+        'buttonUrl': path('app_admin_event_cancel', {'id': event.id}),
+        'type': 'warning'
+    } %}
+
+    {% include '_block/warning_box.html.twig' with {
+        'id': 'event-uncancel-warning',
+        'title': 'Uncancel Event',
+        'content': '<p>Are you sure you want to uncancel this event?</p>',
+        'buttonLabel': 'Yes, Uncancel Event',
+        'buttonUrl': path('app_admin_event_uncancel', {'id': event.id}),
+        'type': 'warning'
+    } %}
+
     <div class="container">
 
         {{ form_start(form) }}
@@ -100,15 +118,14 @@
 
                 <div class="mt-2">
                     {% if event.canceled %}
-                        <a href="{{ path('app_admin_event_uncancel', {'id': event.id}) }}"
-                           class="button is-warning is-light">
+                        <a class="button is-warning is-light toggleTrigger" data-id="event-uncancel-warning"
+                           href="{{ path('app_admin_event_uncancel', {'id': event.id}) }}">
                             <span class="icon"><i class="fa fa-check"></i></span>
                             <span>Uncancel</span>
                         </a>
                     {% else %}
-                        <a href="{{ path('app_admin_event_cancel', {'id': event.id}) }}"
-                           class="button is-danger is-light"
-                           onclick="return confirm('Are you sure you want to cancel this event? All RSVPd users will be notified.')">
+                        <a class="button is-danger is-light toggleTrigger" data-id="event-cancel-warning"
+                           href="{{ path('app_admin_event_cancel', {'id': event.id}) }}">
                             <span class="icon"><i class="fa fa-ban"></i></span>
                             <span>Cancel Event</span>
                         </a>
