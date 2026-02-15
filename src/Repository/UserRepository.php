@@ -324,6 +324,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * Find users by status.
+     * @return list<User>
+     */
+    public function findByStatus(UserStatus $status): array
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->where('u.status = :status')
+            ->setParameter('status', $status)
+            ->orderBy('u.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return array{total: int}
      */
     public function getSocialNetworkStats(DateTimeImmutable $weekStart): array

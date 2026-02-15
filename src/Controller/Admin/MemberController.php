@@ -42,9 +42,16 @@ class MemberController extends AbstractAdminController
         $filterResult = $this->filterService->getUserIdFilter();
         $users = $this->repo->findAllForAdmin($filterResult->getUserIds());
 
+        // Get pending users (EmailVerified status) for approval section
+        $pendingUsers = [];
+        if ($this->isGranted('ROLE_FOUNDER')) {
+            $pendingUsers = $this->repo->findByStatus(UserStatus::EmailVerified);
+        }
+
         return $this->render('admin/member/list.html.twig', [
             'active' => 'member',
             'users' => $users,
+            'pendingUsers' => $pendingUsers,
         ]);
     }
 
