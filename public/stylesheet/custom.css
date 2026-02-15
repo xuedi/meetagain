@@ -131,3 +131,9 @@ input[type="color"] {
     border-right: 2px solid #b5b5b5 !important;
     border-bottom: 2px solid #b5b5b5 !important;
 }
+
+/* Flatpickr time picker fix - v4.6+ uses .hasTime instead of .showTimeInput */
+.flatpickr-calendar.hasTime .flatpickr-time {
+    border-top: 1px solid rgba(10,10,10,.1);
+    height: calc(2.25rem + 1px);
+}
