@@ -9,7 +9,7 @@
                 <p>Delete the member</p>
                 <button class="delete toggleTrigger" data-id="user-delete-warning" aria-label="delete"></button>
             </div>
-            <div class="message-body">
+            <div class="message-body has-text-black has-background-white">
                 <p>
                     If a member is deleted they will be marked as deleted and can be reactivated later.
                     This is a soft-delete that preserves all related data until permanent cleanup runs.
@@ -17,7 +17,7 @@
                 <div class="has-text-right">
                     <form method="post" action="{{ path('app_admin_member_delete', {'id': user.id}) }}" style="display:inline;">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                        <button type="submit" class="button is-danger">
+                        <button type="submit" class="button">
                             <span class="icon"><i class="fa fa-trash"></i></span>
                             <span>Yes, Delete</span>
                         </button>
