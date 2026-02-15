@@ -1,0 +1,34 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'images'} %}
+
+        <h1 class="title is-5">Thumbnail Management</h1>
+        <p class="subtitle is-6 has-text-grey mb-4">Regenerate or cleanup image thumbnails</p>
+
+        <div class="columns">
+            <div class="column is-6">
+
+                <form action="{{ path('app_admin_regenerate_thumbnails') }}" method="post" class="mb-3">
+                    <button type="submit" class="button is-info" onclick="return confirm('Regenerate all thumbnails? This may take a while.');">
+                        <span class="icon"><i class="fa fa-sync"></i></span>
+                        <span>Regenerate Thumbnails</span>
+                    </button>
+                </form>
+
+                <form action="{{ path('app_admin_cleanup_thumbnails') }}" method="post">
+                    <button type="submit" class="button is-warning" onclick="return confirm('Delete obsolete thumbnails?');">
+                        <span class="icon"><i class="fa fa-trash"></i></span>
+                        <span>Cleanup Thumbnails</span>
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

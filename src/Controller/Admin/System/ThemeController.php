@@ -1,0 +1,43 @@
+<?php declare(strict_types=1);
+
+namespace App\Controller\Admin\System;
+
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
+use App\Form\ThemeColorsType;
+use App\Service\ConfigService;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted('ROLE_ADMIN'), Route('/admin/system/theme')]
+class ThemeController extends AbstractAdminController
+{
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return null;
+    }
+
+    public function __construct(
+        private readonly ConfigService $configService,
+    ) {}
+
+    #[Route('', name: 'app_admin_system_theme', methods: ['GET', 'POST'])]
+    public function theme(Request $request): Response
+    {
+        $colorsForm = $this->createForm(ThemeColorsType::class);
+        $colorsForm->handleRequest($request);
+
+        if ($colorsForm->isSubmitted() && $colorsForm->isValid()) {
+            $this->configService->saveColors($colorsForm->getData());
+            $this->addFlash('success', 'Theme colors saved');
+        }
+
+        return $this->render('admin/system/theme/index.html.twig', [
+            'active' => 'system',
+            'colorsForm' => $colorsForm,
+            'colorDefaults' => $this->configService->getThemeColorDefaults(),
+        ]);
+    }
+}
