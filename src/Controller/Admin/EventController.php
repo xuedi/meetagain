@@ -72,6 +72,7 @@ class EventController extends AbstractAdminController
             $form->get('host')->setData($event->getHost());
         }
 
+        // TODO: simplify with vanilla symfony components now the cascading flush effect is fixed
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
