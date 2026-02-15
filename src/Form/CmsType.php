@@ -31,7 +31,20 @@ class CmsType extends AbstractType
                 $this->translator->trans('Published') => 1,
                 $this->translator->trans('Draft') => 0,
             ],
-        ])->add('menuLocations', ChoiceType::class, [
+        ]);
+
+        if ($options['is_admin']) {
+            $builder->add('locked', ChoiceType::class, [
+                'label' => false,
+                'choices' => [
+                    $this->translator->trans('Locked (visible on all groups)') => 1,
+                    $this->translator->trans('Normal') => 0,
+                ],
+                'help' => 'Locked pages are visible on all multisite groups (e.g., imprint, privacy)',
+            ]);
+        }
+
+        $builder->add('menuLocations', ChoiceType::class, [
             'label' => 'Menu Locations',
             'choices' => MenuLocation::getChoices($this->translator),
             'multiple' => true,
@@ -42,8 +55,11 @@ class CmsType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $data = $event->getData();
 
-            if (isset($data['menuLocations']) && $this->isEmpty($data['menuLocations'])) {
-                unset($data['menuLocations']);
+            $optionalFields = ['menuLocations', 'locked'];
+            foreach ($optionalFields as $field) {
+                if (isset($data[$field]) && $this->isEmpty($data[$field])) {
+                    unset($data[$field]);
+                }
             }
 
             $event->setData($data);
@@ -60,6 +76,7 @@ class CmsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Cms::class,
+            'is_admin' => false,
         ]);
     }
 }
