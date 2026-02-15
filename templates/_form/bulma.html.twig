@@ -148,7 +148,7 @@
 
 {%- block datetime_widget -%}
     {% if widget == 'single_text' %}
-        <div class="field has-addons flatpickr-field">
+        <div class="field has-addons flatpickr-field" data-enable-time="true">
             <div class="control is-expanded">
                 {%- set attr = attr|merge({'data-input': ''}) -%}
                 {{- block('form_widget_simple') -}}
