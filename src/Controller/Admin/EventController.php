@@ -207,6 +207,22 @@ class EventController extends AbstractAdminController
             $event->setFeatured(false);
             $event->setUser($user);
 
+            // manually hydrate location (unmapped field)
+            $locationData = $form->get('location')->getData();
+            if ($locationData instanceof Location) {
+                $event->setLocation($locationData);
+            }
+
+            // manually hydrate hosts (unmapped field)
+            $hostsData = $form->get('host')->getData();
+            if (is_iterable($hostsData)) {
+                foreach ($hostsData as $host) {
+                    if ($host instanceof Host) {
+                        $event->addHost($host);
+                    }
+                }
+            }
+
             $entityManager->persist($event);
             $entityManager->flush();
 
