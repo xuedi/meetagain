@@ -117,12 +117,12 @@ class MemberController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['POST'])]
+    #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['GET'])]
     #[IsGranted('ROLE_FOUNDER')]
     public function approve(User $user): Response
     {
-        if (!$this->filterService->isMemberAccessible($user->getId())) {
-            throw $this->createNotFoundException('Member not found in current context.');
+        if ($user->getStatus() !== UserStatus::EmailVerified) {
+            throw $this->createNotFoundException('Only pending users can be approved.');
         }
 
         $user->setStatus(UserStatus::Active);
@@ -136,12 +136,12 @@ class MemberController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_member');
     }
 
-    #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['POST'])]
+    #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['GET'])]
     #[IsGranted('ROLE_FOUNDER')]
     public function deny(User $user): Response
     {
-        if (!$this->filterService->isMemberAccessible($user->getId())) {
-            throw $this->createNotFoundException('Member not found in current context.');
+        if ($user->getStatus() !== UserStatus::EmailVerified) {
+            throw $this->createNotFoundException('Only pending users can be denied.');
         }
 
         $user->setStatus(UserStatus::Denied);
