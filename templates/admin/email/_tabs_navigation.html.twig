@@ -1,0 +1,24 @@
+<div class="tabs is-boxed">
+    <ul>
+        <li class="{% if activeSection == 'templates' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_email_templates') }}">
+                <span>{{ 'email_tab_templates'|trans }}</span>
+            </a>
+        </li>
+        <li class="{% if activeSection == 'sendlog' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_email_sendlog') }}">
+                <span>{{ 'email_tab_sendlog'|trans }}</span>
+            </a>
+        </li>
+        <li class="{% if activeSection == 'announcements' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_email_announcements') }}">
+                <span>{{ 'email_tab_announcements'|trans }}</span>
+            </a>
+        </li>
+        <li class="{% if activeSection == 'debugging' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_email_debugging') }}">
+                <span>{{ 'email_tab_debugging'|trans }}</span>
+            </a>
+        </li>
+    </ul>
+</div>

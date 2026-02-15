@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\Email;
 
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\AdminLink;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
@@ -18,14 +20,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_FOUNDER'), Route('/admin/email')]
-class EmailController extends AbstractAdminController
+#[IsGranted('ROLE_ADMIN'), Route('/admin/email/templates')]
+class TemplatesController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(label: 'menu_admin_email', route: 'app_admin_email', active: 'email', role: 'ROLE_FOUNDER'),
-        ]);
+        return null;
     }
 
     private const string DEFAULT_LANGUAGE = 'en';
@@ -39,8 +39,8 @@ class EmailController extends AbstractAdminController
         private readonly EmailTemplateTranslationRepository $translationRepo,
     ) {}
 
-    #[Route('', name: 'app_admin_email')]
-    public function list(): Response
+    #[Route('', name: 'app_admin_email_templates')]
+    public function templates(): Response
     {
         $templates = $this->templateRepo->findAll();
         $templatesByIdentifier = $this->buildTemplatesByMockKey($templates);
@@ -62,7 +62,7 @@ class EmailController extends AbstractAdminController
             ];
         }
 
-        return $this->render('admin/system/email_list.html.twig', [
+        return $this->render('admin/email/templates/list.html.twig', [
             'active' => 'email',
             'emails' => $emails,
         ]);
@@ -83,8 +83,8 @@ class EmailController extends AbstractAdminController
         return $result;
     }
 
-    #[Route('/{id}/edit', name: 'app_admin_email_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, EmailTemplate $template): Response
+    #[Route('/{id}/edit', name: 'app_admin_email_templates_edit', methods: ['GET', 'POST'])]
+    public function templatesEdit(Request $request, EmailTemplate $template): Response
     {
         $form = $this->createForm(EmailTemplateType::class, $template);
         $form->handleRequest($request);
@@ -107,10 +107,10 @@ class EmailController extends AbstractAdminController
 
             $this->addFlash('success', 'Email template updated successfully.');
 
-            return $this->redirectToRoute('app_admin_email');
+            return $this->redirectToRoute('app_admin_email_templates');
         }
 
-        return $this->render('admin/system/email_edit.html.twig', [
+        return $this->render('admin/email/templates/edit.html.twig', [
             'active' => 'email',
             'form' => $form,
             'template' => $template,
@@ -118,8 +118,8 @@ class EmailController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/{id}/preview', name: 'app_admin_email_preview')]
-    public function preview(Request $request, EmailTemplate $template): Response
+    #[Route('/{id}/preview', name: 'app_admin_email_templates_preview')]
+    public function templatesPreview(Request $request, EmailTemplate $template): Response
     {
         $language = $request->query->getString('lang', self::DEFAULT_LANGUAGE);
         $mockList = $this->emailService->getMockEmailList();
@@ -128,7 +128,7 @@ class EmailController extends AbstractAdminController
         $renderedSubject = $this->templateService->renderContent($template->getSubject($language), $mockContext);
         $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
 
-        return $this->render('admin/system/email_preview.html.twig', [
+        return $this->render('admin/email/templates/preview.html.twig', [
             'active' => 'email',
             'template' => $template,
             'renderedSubject' => $renderedSubject,
@@ -139,8 +139,8 @@ class EmailController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/{id}/reset', name: 'app_admin_email_reset', methods: ['POST'])]
-    public function reset(EmailTemplate $template): Response
+    #[Route('/{id}/reset', name: 'app_admin_email_templates_reset', methods: ['POST'])]
+    public function templatesReset(EmailTemplate $template): Response
     {
         $identifier = $template->getIdentifier();
 
@@ -167,7 +167,7 @@ class EmailController extends AbstractAdminController
 
         $this->addFlash('success', 'Email template reset to default for all languages.');
 
-        return $this->redirectToRoute('app_admin_email_edit', ['id' => $template->getId()]);
+        return $this->redirectToRoute('app_admin_email_templates_edit', ['id' => $template->getId()]);
     }
 
     private function getMockContextForTemplate(string $identifier, array $mockList): array

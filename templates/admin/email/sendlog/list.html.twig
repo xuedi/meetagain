@@ -1,0 +1,71 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'sendlog'} %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Created</th>
+                <th>Recipient</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Template</th>
+                <th>Sent At</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for email in emails %}
+                <tr>
+                    <td>
+                        {{ email.createdAt|date('Y-m-d') }}<br>
+                        <small class="has-text-grey">{{ email.createdAt|date('H:i:s') }}</small>
+                    </td>
+                    <td>{{ email.recipient }}</td>
+                    <td>{{ email.subject }}</td>
+                    <td>
+                        {% if email.isFailed() %}
+                            <span class="icon-text has-text-danger">
+                                <span class="icon"><i class="fa fa-exclamation-triangle"></i></span>
+                                <span>failed</span>
+                            </span>
+                            {% if email.errorMessage %}
+                                <br><small class="has-text-grey">{{ email.errorMessage|u.truncate(50) }}</small>
+                            {% endif %}
+                        {% elseif email.isSent() %}
+                            <span class="has-text-success">sent</span>
+                        {% else %}
+                            <span>pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if email.template %}
+                            <span class="tag is-light">{{ email.template.value }}</span>
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if email.sendAt %}
+                            {{ email.sendAt|date('Y-m-d H:i:s') }}
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="has-text-centered has-text-grey">
+                        No email entries found.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

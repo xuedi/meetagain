@@ -17,7 +17,7 @@ class AdminEmailTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/en/admin/email');
+        $client->request('GET', '/en/admin/email/templates');
 
         // Assert
         $this->assertResponseRedirects();
@@ -30,7 +30,7 @@ class AdminEmailTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/email');
+        $crawler = $client->request('GET', '/en/admin/email/templates');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -45,7 +45,7 @@ class AdminEmailTest extends WebTestCase
         $template = $this->getFirstTemplate($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/edit');
+        $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/edit');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -63,7 +63,7 @@ class AdminEmailTest extends WebTestCase
         $template = $this->getFirstTemplate($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/preview');
+        $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/preview');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -77,7 +77,7 @@ class AdminEmailTest extends WebTestCase
         $this->loginAsAdmin($client);
         $template = $this->getFirstTemplate($client);
 
-        $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/edit');
+        $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/edit');
 
         // Act - form fields are now language-specific
         $form = $crawler
@@ -89,7 +89,7 @@ class AdminEmailTest extends WebTestCase
         $client->submit($form);
 
         // Assert
-        $this->assertResponseRedirects('/en/admin/email');
+        $this->assertResponseRedirects('/en/admin/email/templates');
 
         // Verify changes persisted
         $client->followRedirect();
@@ -108,7 +108,7 @@ class AdminEmailTest extends WebTestCase
         $originalSubject = $template->getSubject('en');
 
         // First change the template
-        $crawler = $client->request('GET', '/en/admin/email/' . $template->getId() . '/edit');
+        $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/edit');
         $form = $crawler
             ->filter('button[type="submit"]')
             ->form([
@@ -119,7 +119,7 @@ class AdminEmailTest extends WebTestCase
         $client->followRedirect();
 
         // Act: reset to default
-        $client->request('POST', '/en/admin/email/' . $template->getId() . '/reset');
+        $client->request('POST', '/en/admin/email/templates/' . $template->getId() . '/reset');
 
         // Assert
         $this->assertResponseRedirects();
