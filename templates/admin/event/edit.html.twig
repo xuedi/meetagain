@@ -2,24 +2,14 @@
 
 {% block content %}
 
-    <article class="message is-danger is-hidden" id="event-delete-warning">
-        <div class="message-header">
-            <p>Delete the Page</p>
-            <button class="delete toggleTrigger" data-id="event-delete-warning" aria-label="delete"></button>
-        </div>
-        <div class="message-body has-text-black has-background-white">
-            <p>
-                If you delete this event, all recurring events are deleted as well, also all related data
-                like rsvp's, comments, event images and so on. Please consider deactivating the event instead.
-            </p>
-            <div class="has-text-right">
-                <a class="button" href="{{ path('app_admin_event_delete', {'id': event.id}) }}">
-                    <span class="icon"><i class="fa fa-trash"></i></span>
-                    <span>Yes, Delete</span>
-                </a>
-            </div>
-        </div>
-    </article>
+    {% include '_block/warning_box.html.twig' with {
+        'id': 'event-delete-warning',
+        'title': 'Delete the Event',
+        'content': '<p>If you delete this event, all recurring events are deleted as well, also all related data like rsvp\'s, comments, event images and so on. Please consider deactivating the event instead.</p>',
+        'buttonLabel': 'Yes, Delete',
+        'buttonUrl': path('app_admin_event_delete', {'id': event.id}),
+        'type': 'danger'
+    } %}
 
     <div class="container">
 

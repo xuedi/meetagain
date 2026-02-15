@@ -2,24 +2,14 @@
 
 {% block content %}
 
-    <article class="message is-danger is-hidden" id="cms-delete-warning">
-        <div class="message-header">
-            <p>Delete the Page</p>
-            <button class="delete toggleTrigger" data-id="cms-delete-warning" aria-label="delete"></button>
-        </div>
-        <div class="message-body has-text-black has-background-white">
-            <p>
-                If you delete this page, all of its connected blocks and images and so on will be also removed. Also,
-                all language variation! Please consider to set this Page just offline.
-            </p>
-            <div class="has-text-right">
-                <a class="button" href="{{ path('app_admin_cms_delete', {'id': cms.id}) }}">
-                    <span class="icon"><i class="fa fa-trash"></i></span>
-                    <span>Yes, Delete</span>
-                </a>
-            </div>
-        </div>
-    </article>
+    {% include '_block/warning_box.html.twig' with {
+        'id': 'cms-delete-warning',
+        'title': 'Delete the Page',
+        'content': '<p>If you delete this page, all of its connected blocks and images and so on will be also removed. Also, all language variation! Please consider to set this Page just offline.</p>',
+        'buttonLabel': 'Yes, Delete',
+        'buttonUrl': path('app_admin_cms_delete', {'id': cms.id}),
+        'type': 'danger'
+    } %}
 
     <div class="box">
         {{ form_start(form) }}
