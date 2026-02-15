@@ -88,6 +88,11 @@ readonly class ConfigService
         return $this->getBoolean('show_frontpage', false);
     }
 
+    public function isAutomaticRegistration(): bool
+    {
+        return $this->getBoolean('automatic_registration', false);
+    }
+
     public function getDateFormat(): string
     {
         return $this->getString('date_format', 'Y-m-d H:i');

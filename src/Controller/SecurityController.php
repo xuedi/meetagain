@@ -14,6 +14,7 @@ use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
 use App\Service\ActivityService;
 use App\Service\CaptchaService;
+use App\Service\ConfigService;
 use App\Service\ConsentService;
 use App\Service\EmailService;
 use App\Service\EntityActionDispatcher;
@@ -43,6 +44,7 @@ class SecurityController extends AbstractController
         private readonly CaptchaService $captchaService,
         private readonly PasswordResetService $passwordResetService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly ConfigService $configService,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
@@ -126,26 +128,30 @@ class SecurityController extends AbstractController
         if ($user === null) {
             return $this->render('security/register_error.html.twig');
         }
-        $user->setStatus(UserStatus::EmailVerified);
-        $user->setRegcode(null);
 
+        // clean up and write activity
+        $user->setRegcode(null);
+        $this->activityService->log(ActivityType::RegistrationEmailConfirmed, $user, []);
+        
+        // Check if automatic registration is enabled
+        if ($this->configService->isAutomaticRegistration()) {
+            // Auto-approve user
+            $user->setStatus(UserStatus::Active);
+            $em->persist($user);
+            $em->flush();
+
+            // Send welcome email
+            $this->emailService->prepareWelcome($user);
+            $this->emailService->sendQueue();
+
+            // Redirect to events page
+            return $this->redirectToRoute('app_event');
+        }
+
+        // Manual approval required
+        $user->setStatus(UserStatus::EmailVerified);
         $em->persist($user);
         $em->flush();
-
-        $xuedi = $em->getRepository(User::class)->findOneBy(['email' => 'admin@beijingcode.org']);
-        if ($xuedi !== null) {
-            $msg = new Message();
-            $msg->setDeleted(false);
-            $msg->setWasRead(false);
-            $msg->setSender($xuedi);
-            $msg->setReceiver($user);
-            $msg->setCreatedAt(new DateTimeImmutable());
-            $msg->setContent('Welcome to the community! Feel free to ask me anything. Or suggest a new features.');
-
-            $em->persist($msg);
-            $em->flush();
-        }
-        $this->activityService->log(ActivityType::RegistrationEmailConfirmed, $user, []);
 
         return $this->render('security/register_success.html.twig');
     }
