@@ -1,0 +1,29 @@
+{#
+    Reusable warning/confirmation box for destructive actions
+
+    Parameters:
+    - id: Unique ID for the warning box (required)
+    - title: Header title (required)
+    - content: Warning message content (required, can be HTML)
+    - buttonLabel: Confirmation button label (optional)
+    - buttonUrl: Delete/action URL (optional)
+    - type: 'danger' (red, default) or 'warning' (orange)
+    - showButton: Whether to show the confirmation button (default: true if buttonUrl is set)
+#}
+<article class="message is-{{ type|default('danger') }} is-hidden" id="{{ id }}">
+    <div class="message-header">
+        <p>{{ title }}</p>
+        <button class="delete toggleTrigger" data-id="{{ id }}" aria-label="delete"></button>
+    </div>
+    <div class="message-body has-text-black has-background-white">
+        {{ content|raw }}
+        {% if (showButton is not defined and buttonUrl is defined) or showButton %}
+            <div class="has-text-right mt-3">
+                <a class="button" href="{{ buttonUrl }}">
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                    <span>{{ buttonLabel }}</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</article>
