@@ -40,6 +40,18 @@ class Cms
     private Collection $menuLocations;
 
     /**
+     * @var Collection<int, CmsTitle>
+     */
+    #[ORM\OneToMany(targetEntity: CmsTitle::class, mappedBy: 'cms', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $titles;
+
+    /**
+     * @var Collection<int, CmsLinkName>
+     */
+    #[ORM\OneToMany(targetEntity: CmsLinkName::class, mappedBy: 'cms', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $linkNames;
+
+    /**
      * @var Collection<int, CmsBlock>
      */
     #[ORM\OneToMany(targetEntity: CmsBlock::class, mappedBy: 'page', orphanRemoval: true)]
@@ -48,6 +60,8 @@ class Cms
     public function __construct()
     {
         $this->menuLocations = new ArrayCollection();
+        $this->titles = new ArrayCollection();
+        $this->linkNames = new ArrayCollection();
         $this->blocks = new ArrayCollection();
     }
 
@@ -138,6 +152,60 @@ class Cms
     {
         if ($this->menuLocations->removeElement($menuLocation) && $menuLocation->getCms() === $this) {
             $menuLocation->setCms(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CmsTitle>
+     */
+    public function getTitles(): Collection
+    {
+        return $this->titles;
+    }
+
+    public function addTitle(CmsTitle $title): static
+    {
+        if (!$this->titles->contains($title)) {
+            $this->titles->add($title);
+            $title->setCms($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTitle(CmsTitle $title): static
+    {
+        if ($this->titles->removeElement($title) && $title->getCms() === $this) {
+            $title->setCms(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CmsLinkName>
+     */
+    public function getLinkNames(): Collection
+    {
+        return $this->linkNames;
+    }
+
+    public function addLinkName(CmsLinkName $linkName): static
+    {
+        if (!$this->linkNames->contains($linkName)) {
+            $this->linkNames->add($linkName);
+            $linkName->setCms($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLinkName(CmsLinkName $linkName): static
+    {
+        if ($this->linkNames->removeElement($linkName) && $linkName->getCms() === $this) {
+            $linkName->setCms(null);
         }
 
         return $this;
