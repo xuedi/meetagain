@@ -40,14 +40,18 @@ MeetAgain is a **Symfony 8.0 / PHP 8.4** event management system with a plugin a
 
 The application implements a **composite filter pattern** for content scoping. This allows plugins to restrict which content is visible without core code having any knowledge of plugins.
 
-### Four Filter Domains
+### Filter Domains
 
 ```
 src/Filter/
-├── Event/       # Event filtering
-├── Cms/         # CMS page filtering
+├── Event/       # Event filtering (frontend)
+├── Cms/         # CMS page filtering (frontend)
 ├── Menu/        # Navigation menu filtering
-└── Member/      # User/member filtering
+├── Member/      # User/member filtering (frontend)
+└── Admin/       # Admin-specific filters
+    ├── Event/   # Admin event list filtering
+    ├── Member/  # Admin member list filtering
+    └── Cms/     # Admin CMS list filtering
 ```
 
 ### Filter Pattern
@@ -629,10 +633,19 @@ public function index(): Response
 - Testable in isolation
 
 **Available Filter Interfaces:**
-- `EventFilterInterface` - Filter events
-- `CmsFilterInterface` - Filter CMS pages
+
+**Frontend Filters:**
+- `EventFilterInterface` - Filter events (frontend discovery)
+- `CmsFilterInterface` - Filter CMS pages (frontend)
 - `MenuFilterInterface` - Filter navigation menus
-- `MemberFilterInterface` - Filter user/member lists
+- `MemberFilterInterface` - Filter user/member lists (frontend)
+
+**Admin Filters:**
+- `AdminEventListFilterInterface` - Filter events (admin management)
+- `AdminMemberListFilterInterface` - Filter members (admin management)
+- `AdminCmsListFilterInterface` - Filter CMS pages (admin management)
+
+Admin filters extend frontend behavior with `getDebugContext()` for logging access denied scenarios.
 
 ---
 

@@ -6,7 +6,7 @@ use App\Entity\AdminLink;
 use App\Entity\User;
 use App\Entity\UserRole;
 use App\Entity\UserStatus;
-use App\Filter\Member\MemberFilterService;
+use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Service\EmailService;
@@ -23,7 +23,7 @@ class MemberController extends AbstractAdminController
     public function __construct(
         private readonly UserRepository $repo,
         private readonly EmailService $emailService,
-        private readonly MemberFilterService $filterService,
+        private readonly AdminMemberListFilterService $filterService,
         private readonly EntityManagerInterface $em,
     ) {}
 
