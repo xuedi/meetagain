@@ -6,7 +6,6 @@ use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\BlockType\Image as ImageType;
 use App\Entity\BlockType\Text as TextType;
-use App\Entity\BlockType\Title as TitleType;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
 use App\Entity\EmailTemplate;
@@ -88,7 +87,7 @@ readonly class AnnouncementService
      */
     private function renderContent(Cms $cmsPage, string $locale): array
     {
-        $title = "ERROR: The CMS page has no title for the language [$locale]";
+        $title = $cmsPage->getPageTitle($locale) ?? "ERROR: The CMS page has no title for the language [$locale]";
         $contentParts = [];
 
         foreach ($cmsPage->getBlocks() as $block) {
@@ -97,7 +96,6 @@ readonly class AnnouncementService
             }
 
             match ($block->getType()) {
-                CmsBlockTypes::Title => $title = TitleType::fromJson($block->getJson())->title,
                 CmsBlockTypes::Text => $contentParts[] =
                     '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
                 CmsBlockTypes::Image => $contentParts[] = $this->renderImageBlock(ImageType::fromJson(
