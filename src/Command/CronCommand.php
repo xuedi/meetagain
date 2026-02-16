@@ -46,6 +46,7 @@ class CronCommand extends LoggedCommand
         //$count = $this->rsvpNotificationService->processUpcomingEvents(7);
         //$output->writeln(sprintf('%d sent', $count));
 
+        /*
         $output->write('Validating activity payloads ... ');
         $invalidActivities = $this->activityService->validateAllActivities();
         if ($invalidActivities === []) {
@@ -83,6 +84,7 @@ class CronCommand extends LoggedCommand
                 ]);
             }
         }
+        */
 
         $this->release();
 
