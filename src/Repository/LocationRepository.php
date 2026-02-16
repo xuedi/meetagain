@@ -36,4 +36,24 @@ class LocationRepository extends ServiceEntityRepository
 
         return $qb->orderBy('l.name', 'ASC')->getQuery()->getResult();
     }
+
+    /**
+     * Create query builder for admin forms with optional filtering.
+     * Used in form dropdowns to limit location choices based on admin context.
+     *
+     * @param array<int>|null $restrictToLocationIds Optional location ID filter
+     */
+    public function createQueryBuilderForAdmin(?array $restrictToLocationIds = null)
+    {
+        $qb = $this->createQueryBuilder('l');
+
+        if ($restrictToLocationIds === []) {
+            // Empty filter means no locations should be shown
+            $qb->where('1 = 0');
+        } elseif ($restrictToLocationIds !== null) {
+            $qb->where('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);
+        }
+
+        return $qb->orderBy('l.name', 'ASC');
+    }
 }
