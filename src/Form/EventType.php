@@ -7,7 +7,9 @@ use App\Entity\EventIntervals;
 use App\Entity\EventTypes;
 use App\Entity\Host;
 use App\Entity\Location;
+use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Repository\EventTranslationRepository;
+use App\Repository\LocationRepository;
 use App\Service\TranslationService;
 use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -33,6 +35,8 @@ class EventType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly TranslationService $translationService,
         private readonly EventTranslationRepository $eventTransRepo,
+        private readonly AdminLocationListFilterService $locationFilterService,
+        private readonly LocationRepository $locationRepository,
     ) {}
 
     #[Override]
@@ -85,6 +89,12 @@ class EventType extends AbstractType
                 'choice_label' => 'name',
                 'required' => true,
                 'mapped' => false,
+                'query_builder' => function () {
+                    $filterResult = $this->locationFilterService->getLocationIdFilter();
+                    $locationIds = $filterResult->getLocationIds();
+
+                    return $this->locationRepository->createQueryBuilderForAdmin($locationIds);
+                },
             ])
             ->add('host', EntityType::class, [
                 'class' => Host::class,
