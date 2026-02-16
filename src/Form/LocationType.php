@@ -3,9 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Location;
-use App\Entity\User;
 use Override;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -25,15 +23,7 @@ class LocationType extends AbstractType
             ->add('city')
             ->add('postcode')
             ->add('longitude')
-            ->add('latitude')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-                'label' => 'Created By',
-                'choice_label' => 'name',
-            ]);
+            ->add('latitude');
     }
 
     #[Override]
