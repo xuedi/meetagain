@@ -51,6 +51,11 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 ConfigType::Boolean,
             ],
             [
+                'send_rsvp_notifications',
+                'true',
+                ConfigType::Boolean,
+            ],
+            [
                 'email_sender_mail',
                 'email@localhost',
                 ConfigType::String,
