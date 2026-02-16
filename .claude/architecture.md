@@ -188,6 +188,19 @@ class ManageController extends AbstractController
 }
 ```
 
+**Admin Controller Organization:**
+
+Subdirectories under `src/Controller/Admin/` indicate controllers grouped by a shared submenu:
+
+- `Admin/Email/` - Email management (templates, sendlog, announcements, debugging) with shared tabs navigation
+- `Admin/Translation/` - Translation management (edit, actions) with shared tabs navigation
+- `Admin/Settings/` - Settings pages (config, theme, language, images) with shared tabs navigation
+
+Each group has:
+- `LinkController.php` - Provides single main navigation link (e.g., "Email" → System section)
+- Other controllers return `null` for `getAdminNavigation()`
+- `_tabs_navigation.html.twig` template - Shared submenu included by all pages in the group
+
 **Note:** Controllers should delegate to services, not repositories directly (TODO: refactor existing direct repository usage).
 
 ---

@@ -229,11 +229,7 @@ final class AdminNavigationServiceTest extends TestCase
         $this->assertCount(2, $links, 'Should have two links from the same controller');
 
         $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $links);
-        $this->assertSame(
-            ['menu_admin_email', 'menu_admin_translation'],
-            $linkLabels,
-            'Both links should be present',
-        );
+        $this->assertSame(['menu_admin_email', 'menu_admin_translation'], $linkLabels, 'Both links should be present');
     }
 
     public function testMultiLinkControllerLinksSortedAlphabeticallyWithOtherControllers(): void

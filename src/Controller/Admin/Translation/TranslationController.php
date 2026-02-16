@@ -58,14 +58,12 @@ class TranslationController extends AbstractAdminController
     public function translationsExtract(): Response
     {
         $result = $this->translationImportService->extract();
-        $this->addFlash(
-            'success',
-            sprintf('Extracted %d translations (%d new, %d orphans removed)',
-                $result->count,
-                $result->new,
-                $result->deleted
-            )
-        );
+        $this->addFlash('success', sprintf(
+            'Extracted %d translations (%d new, %d orphans removed)',
+            $result->count,
+            $result->new,
+            $result->deleted,
+        ));
 
         return $this->redirectToRoute('app_admin_translation_actions');
     }
@@ -74,13 +72,11 @@ class TranslationController extends AbstractAdminController
     public function translationsPublish(): Response
     {
         $result = $this->translationService->publish();
-        $this->addFlash(
-            'success',
-            sprintf('Published %d translations to %s',
-                $result->published,
-                implode(', ', $result->languages)
-            )
-        );
+        $this->addFlash('success', sprintf(
+            'Published %d translations to %s',
+            $result->published,
+            implode(', ', $result->languages),
+        ));
 
         return $this->redirectToRoute('app_admin_translation_actions');
     }
