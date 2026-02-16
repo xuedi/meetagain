@@ -42,9 +42,9 @@ class CronCommand extends LoggedCommand
         $this->mailService->sendQueue();
         $output->writeln('OK');
 
-        $output->write('Send RSVP notifications ... ');
-        $count = $this->rsvpNotificationService->processUpcomingEvents(7);
-        $output->writeln(sprintf('%d sent', $count));
+        //$output->write('Send RSVP notifications ... ');
+        //$count = $this->rsvpNotificationService->processUpcomingEvents(7);
+        //$output->writeln(sprintf('%d sent', $count));
 
         $output->write('Validating activity payloads ... ');
         $invalidActivities = $this->activityService->validateAllActivities();
