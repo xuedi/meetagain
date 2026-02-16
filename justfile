@@ -238,3 +238,18 @@ fixCoverageBadge:
 	{{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --no-progress
 	{{PHP}} php bin/console app:badge:generate
 	git add tests/badge/coverage.svg
+
+# Fill missing translations automatically (with AI-generated translations)
+[group('translations')]
+translationFill:
+    @echo "📥 Syncing latest translations from production..."
+    @{{JUST}} devModeFixtures multisite
+    @echo ""
+    @echo "🔍 Checking for missing translations..."
+    @{{PHP}} php bin/console app:translation:missing | head -1
+    @echo ""
+    @echo "🤖 Generating SQL statements with auto-translation..."
+    @{{PHP}} php bin/console app:translation:fill-missing --auto-translate
+    @echo ""
+    @echo "✅ Done! Review translationUpdates.sql and upload to production."
+    @echo "   Then run: just translationFill again to verify"
