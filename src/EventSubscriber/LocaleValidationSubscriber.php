@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use App\Service\LanguageService;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -27,6 +28,10 @@ readonly class LocaleValidationSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(RequestEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         // Check for locale in route attributes
@@ -36,9 +41,17 @@ readonly class LocaleValidationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Validate that the locale is enabled
+        // Globally disabled language -> 404
         if (!$this->languageService->isValidCode($locale)) {
             throw new NotFoundHttpException(sprintf('Locale "%s" is not available', $locale));
+        }
+
+        // Context-filtered language -> redirect to default filtered locale
+        if (!$this->languageService->isFilteredValidCode($locale)) {
+            $defaultLocale = $this->languageService->getFilteredDefaultLocale();
+            $uri = $request->getRequestUri();
+            $newUri = preg_replace('#^/' . preg_quote($locale, '#') . '(/|$)#', '/' . $defaultLocale . '$1', $uri);
+            $event->setResponse(new RedirectResponse($newUri, 302));
         }
     }
 }
