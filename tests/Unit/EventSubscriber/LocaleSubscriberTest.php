@@ -3,6 +3,7 @@
 namespace Tests\Unit\EventSubscriber;
 
 use App\EventSubscriber\LocaleSubscriber;
+use App\Service\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -12,6 +13,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class LocaleSubscriberTest extends TestCase
 {
+    private function createLanguageServiceStub(string $filteredDefaultLocale = 'en'): LanguageService
+    {
+        $languageService = $this->createStub(LanguageService::class);
+        $languageService->method('getFilteredDefaultLocale')->willReturn($filteredDefaultLocale);
+
+        return $languageService;
+    }
+
     /**
      * @param SessionInterface&\PHPUnit\Framework\MockObject\Stub $session
      */
@@ -35,7 +44,8 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestReturnsEarlyWhenNoPreviousSession(): void
     {
-        $subscriber = new LocaleSubscriber('en');
+        $languageService = $this->createLanguageServiceStub('en');
+        $subscriber = new LocaleSubscriber($languageService, 'en');
 
         $request = new Request();
         // No session set, so hasPreviousSession() returns false
@@ -51,7 +61,8 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestSavesLocaleToSessionWhenAttributePresent(): void
     {
-        $subscriber = new LocaleSubscriber('en');
+        $languageService = $this->createLanguageServiceStub('en');
+        $subscriber = new LocaleSubscriber($languageService, 'en');
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())->method('set')->with('_locale', 'de');
@@ -67,7 +78,8 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestRestoresLocaleFromSessionWhenNoAttribute(): void
     {
-        $subscriber = new LocaleSubscriber('en');
+        $languageService = $this->createLanguageServiceStub('en');
+        $subscriber = new LocaleSubscriber($languageService, 'en');
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')->with('_locale', 'en')->willReturn('fr');
@@ -85,7 +97,8 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestUsesDefaultLocaleWhenSessionEmpty(): void
     {
-        $subscriber = new LocaleSubscriber('es');
+        $languageService = $this->createLanguageServiceStub('es');
+        $subscriber = new LocaleSubscriber($languageService, 'es');
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')->with('_locale', 'es')->willReturn('es'); // Returns the default

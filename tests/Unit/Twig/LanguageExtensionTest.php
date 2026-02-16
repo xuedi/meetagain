@@ -32,7 +32,7 @@ class LanguageExtensionTest extends TestCase
 
     public function testGetGlobalsReturnsEnabledLocales(): void
     {
-        $this->languageServiceStub->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
+        $this->languageServiceStub->method('getFilteredEnabledCodes')->willReturn(['en', 'de', 'zh']);
 
         $globals = $this->subject->getGlobals();
 

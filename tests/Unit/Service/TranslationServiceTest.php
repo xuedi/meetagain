@@ -159,8 +159,8 @@ class TranslationServiceTest extends TestCase
 
     public function testGetLanguageCodesReturnsEnabledLocales(): void
     {
-        // Arrange: mock language service to return enabled codes
-        $this->languageService->method('getEnabledCodes')->willReturn(['en', 'de', 'fr']);
+        // Arrange: mock language service to return filtered enabled codes
+        $this->languageService->method('getFilteredEnabledCodes')->willReturn(['en', 'de', 'fr']);
 
         // Act: get language codes
         $result = $this->subject->getLanguageCodes();
@@ -197,7 +197,8 @@ class TranslationServiceTest extends TestCase
 
     public function testGetAltLangListReturnsAlternativeLanguageLinks(): void
     {
-        // Arrange: mock language service to return enabled codes
+        // Arrange: mock language service to return filtered and all enabled codes
+        $this->languageService->method('getFilteredEnabledCodes')->willReturn(['en', 'de', 'fr']);
         $this->languageService->method('getEnabledCodes')->willReturn(['en', 'de', 'fr']);
 
         // Act: get alternative language list for current locale 'en' and URI '/en/events'
