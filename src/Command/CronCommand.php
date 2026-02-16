@@ -74,9 +74,7 @@ class CronCommand extends LoggedCommand
         foreach ($this->plugins as $plugin) {
             $pluginKey = $plugin->getPluginKey();
             try {
-                $output->write(sprintf('Running plugin cron: %s', $pluginKey));
                 $plugin->runCronTasks($output);
-                $output->writeln('');
             } catch (Exception $e) {
                 $this->logger->error('Plugin cron task failed', [
                     'plugin' => $pluginKey,
