@@ -288,4 +288,27 @@ class EventRepository extends ServiceEntityRepository
 
         return $qb->orderBy('e.start', 'ASC')->getQuery()->getResult();
     }
+
+    /**
+     * Find events by their IDs with translations eagerly loaded.
+     *
+     * @param array<int> $eventIds
+     * @return array<Event>
+     */
+    public function findByIds(array $eventIds, string $orderBy = 'start', string $direction = 'DESC'): array
+    {
+        if ($eventIds === []) {
+            return [];
+        }
+
+        return $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.id IN (:eventIds)')
+            ->setParameter('eventIds', $eventIds)
+            ->orderBy('e.' . $orderBy, $direction)
+            ->getQuery()
+            ->getResult();
+    }
 }
