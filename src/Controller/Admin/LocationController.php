@@ -111,8 +111,6 @@ class LocationController extends AbstractAdminController
     {
         $location = new Location();
         $form = $this->createForm(LocationType::class, $location);
-        $form->remove('createdAt');
-        $form->remove('user');
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
