@@ -1,6 +1,7 @@
 # Claude Code Guidelines
 
-**Quick Links:** [Architecture](architecture.md) | [Conventions](conventions.md) | [Design](design.md) | [Testing](testing.md)
+**Quick Links:
+** [Architecture](architecture.md) | [Conventions](conventions.md) | [Design](design.md) | [Testing](testing.md)
 
 ---
 
@@ -196,18 +197,40 @@ Skills automatically use the Haiku model for efficiency and follow project conve
 
 ### Translation Skills
 
-| Skill                                                   | Purpose                                   |
-|---------------------------------------------------------|-------------------------------------------|
-| `/add-translation key="..." de="..." en="..." cn="..."` | Add translation SQL to translationUpdates.sql |
+| Skill                                                   | Purpose                                          |
+|---------------------------------------------------------|--------------------------------------------------|
+| `/fill-translations`                                    | Auto-fill all missing translations (recommended) |
+| `/add-translation key="..." de="..." en="..." cn="..."` | Add single translation SQL statement             |
 
-**Examples:**
+**Recommended Workflow:**
+
+```bash
+# 1. Fill missing translations (auto-syncs from production first)
+just translationFill
+# OR use skill: /fill-translations
+
+# 2. Review translationUpdates.sql
+
+# 3. Upload SQL to production
+
+# 4. Run again to verify: just translationFill
+```
+
+**Manual single translation:**
 
 ```bash
 /add-translation key="event_list_title" de="Veranstaltungsliste" en="Event List" cn="活动列表"
-/add-translation key="save_button" de="Speichern" en="Save" cn="保存"
 ```
 
-**Note:** Translation files (`translations/*.php`) are gitignored and managed externally. This skill generates SQL statements for manual integration into production.
+**Direct command (alternative to skill):**
+
+```bash
+just translationFill   # Same as /fill-translations, auto-translate enabled
+```
+
+**Note:** Translation files (`translations/*.php`) are gitignored and managed externally. Skills generate SQL statements
+in `translationUpdates.sql` for manual integration into production. All SQL uses `ON DUPLICATE KEY UPDATE` for safe
+re-execution.
 
 ---
 

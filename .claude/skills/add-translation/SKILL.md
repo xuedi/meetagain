@@ -33,7 +33,8 @@ Task(
     2. Generate SQL INSERT statements for all 3 languages:
        - Use user_id = 1
        - Use NOW() for created_at
-       - Format: INSERT INTO translation (created_at, language, placeholder, translation, user_id) VALUES (NOW(), 'LANG', 'KEY', 'TEXT', 1);
+       - Format: INSERT INTO translation (created_at, language, placeholder, translation, user_id) VALUES (NOW(), 'LANG', 'KEY', 'TEXT', 1) ON DUPLICATE KEY UPDATE translation = 'TEXT', created_at = NOW();
+       - The ON DUPLICATE KEY UPDATE ensures safe re-execution (updates existing, inserts new)
 
     3. Append to translationUpdates.sql in project root:
        - Add a comment line: -- Translation key: KEY
