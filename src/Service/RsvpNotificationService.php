@@ -37,7 +37,7 @@ readonly class RsvpNotificationService
             $totalNotifications += $this->notifyFollowersForEvent($event);
         }
 
-        return $totalNotifications. ' send';
+        return $totalNotifications . ' send';
     }
 
     public function notifyFollowersForEvent(Event $event): int
