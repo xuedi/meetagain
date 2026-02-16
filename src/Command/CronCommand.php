@@ -47,28 +47,28 @@ class CronCommand extends LoggedCommand
         //$output->writeln(sprintf('%d sent', $count));
 
         /*
-        $output->write('Validating activity payloads ... ');
-        $invalidActivities = $this->activityService->validateAllActivities();
-        if ($invalidActivities === []) {
-            $output->writeln('OK');
-        } else {
-            $output->writeln(sprintf('<error>%d invalid activities found</error>', count($invalidActivities)));
-            foreach ($invalidActivities as $invalid) {
-                $this->logger->warning('Invalid activity payload', [
-                    'activity_id' => $invalid['id'],
-                    'type' => $invalid['type'],
-                    'error' => $invalid['error'],
-                ]);
-                $output->writeln(sprintf(
-                    '  - Activity #%d (%s): %s',
-                    $invalid['id'],
-                    $invalid['type'],
-                    $invalid['error'],
-                ));
-            }
-        }
-
-        */
+         * $output->write('Validating activity payloads ... ');
+         * $invalidActivities = $this->activityService->validateAllActivities();
+         * if ($invalidActivities === []) {
+         * $output->writeln('OK');
+         * } else {
+         * $output->writeln(sprintf('<error>%d invalid activities found</error>', count($invalidActivities)));
+         * foreach ($invalidActivities as $invalid) {
+         * $this->logger->warning('Invalid activity payload', [
+         * 'activity_id' => $invalid['id'],
+         * 'type' => $invalid['type'],
+         * 'error' => $invalid['error'],
+         * ]);
+         * $output->writeln(sprintf(
+         * '  - Activity #%d (%s): %s',
+         * $invalid['id'],
+         * $invalid['type'],
+         * $invalid['error'],
+         * ));
+         * }
+         * }
+         *
+         */
 
         // Run plugin cron tasks
         foreach ($this->plugins as $plugin) {
