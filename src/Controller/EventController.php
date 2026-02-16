@@ -20,10 +20,12 @@ use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\ActivityService;
 use App\Service\EventService;
+use App\Service\FeaturedEventProviderInterface;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -43,6 +45,8 @@ class EventController extends AbstractController
         private readonly EventFilterService $eventFilterService,
         private readonly ActionAuthorizationService $actionAuthService,
         private readonly ActionAuthorizationMessageService $authMessageService,
+        #[AutowireIterator(FeaturedEventProviderInterface::class)]
+        private readonly iterable $featuredEventProviders = [],
     ) {}
 
     #[Route('/events', name: self::ROUTE_EVENT)]
@@ -171,14 +175,68 @@ class EventController extends AbstractController
     {
         $response = $this->getResponse();
 
+        // Check if any plugin provides custom featured events list
+        $featuredEvents = $this->getProvidedFeaturedEvents();
+
+        if ($featuredEvents === null) {
+            // No custom provider, use default logic with filtering
+            $filterResult = $this->eventFilterService->getEventIdFilter();
+            $allowedEventIds = $filterResult->getEventIds();
+
+            $featuredEvents = $this->repo->findBy(['featured' => true], ['start' => 'DESC']);
+
+            // Filter featured events if needed
+            if ($allowedEventIds !== null) {
+                $featuredEvents = array_filter($featuredEvents, fn($event) => in_array(
+                    $event->getId(),
+                    $allowedEventIds,
+                    true,
+                ));
+            }
+
+            $lastEvents = $this->repo->getPastEvents(3, $allowedEventIds);
+        } else {
+            // Provider handles filtering, just get past events with same filter
+            $filterResult = $this->eventFilterService->getEventIdFilter();
+            $allowedEventIds = $filterResult->getEventIds();
+            $lastEvents = $this->repo->getPastEvents(3, $allowedEventIds);
+        }
+
         return $this->render(
             'events/featured.html.twig',
             [
-                'featured' => $this->repo->findBy(['featured' => true], ['start' => 'ASC']),
-                'last' => $this->repo->getPastEvents(),
+                'featured' => $featuredEvents,
+                'last' => $lastEvents,
             ],
             $response,
         );
+    }
+
+    /**
+     * Get featured events from a provider plugin if one should handle it.
+     *
+     * @return array<Event>|null
+     */
+    private function getProvidedFeaturedEvents(): ?array
+    {
+        $providers = iterator_to_array($this->featuredEventProviders);
+
+        // Sort by priority (highest first)
+        usort(
+            $providers,
+            static fn(
+                FeaturedEventProviderInterface $a,
+                FeaturedEventProviderInterface $b,
+            ): int => $b->getPriority() <=> $a->getPriority(),
+        );
+
+        foreach ($providers as $provider) {
+            if ($provider->shouldProvide()) {
+                return $provider->getFeaturedEvents();
+            }
+        }
+
+        return null;
     }
 
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]
