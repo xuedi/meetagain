@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Service\LanguageService;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 readonly class LocaleSubscriber implements EventSubscriberInterface
 {
     public function __construct(
+        private LanguageService $languageService,
         private string $defaultLocale = 'en',
     ) {}
 
@@ -34,7 +36,8 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            $locale = $request->getSession()->get('_locale', $this->defaultLocale);
+            $filteredDefault = $this->languageService->getFilteredDefaultLocale();
+            $locale = $request->getSession()->get('_locale', $filteredDefault);
             $request->setLocale($locale);
         }
     }

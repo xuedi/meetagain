@@ -24,7 +24,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
     public function getGlobals(): array
     {
         return [
-            'enabled_locales' => $this->languageService->getEnabledCodes(),
+            'enabled_locales' => $this->languageService->getFilteredEnabledCodes(),
         ];
     }
 
@@ -32,7 +32,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_enabled_locales', $this->languageService->getEnabledCodes(...)),
+            new TwigFunction('get_enabled_locales', $this->languageService->getFilteredEnabledCodes(...)),
             new TwigFunction('get_all_languages', $this->languageService->getAllLanguages(...)),
             new TwigFunction('current_locale', $this->getCurrentLocale(...)),
             new TwigFunction('get_alternative_languages', $this->getAlternativeLanguageCodes(...)),

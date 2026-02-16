@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Language;
+use App\Filter\Language\LanguageFilterService;
 use App\Repository\LanguageRepository;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -17,6 +18,7 @@ readonly class LanguageService
     public function __construct(
         private LanguageRepository $languageRepo,
         private TagAwareCacheInterface $appCache,
+        private LanguageFilterService $languageFilterService,
     ) {}
 
     /**
@@ -76,5 +78,52 @@ readonly class LanguageService
     public function findByCode(string $code): ?Language
     {
         return $this->languageRepo->findByCode($code);
+    }
+
+    /**
+     * Get enabled language codes filtered by current context.
+     * This applies any registered language filters (e.g., from plugins).
+     *
+     * @return string[] Array of filtered language codes
+     */
+    public function getFilteredEnabledCodes(): array
+    {
+        $enabledCodes = $this->getEnabledCodes();
+        $filterResult = $this->languageFilterService->getLanguageCodeFilter();
+
+        if (!$filterResult->hasActiveFilter()) {
+            return $enabledCodes;
+        }
+
+        $filteredCodes = $filterResult->getLanguageCodes();
+        if ($filteredCodes === null || $filteredCodes === []) {
+            return $enabledCodes; // Fallback: if filter produces empty, show all rather than nothing
+        }
+
+        $result = array_values(array_intersect($enabledCodes, $filteredCodes));
+
+        return $result === [] ? $enabledCodes : $result; // Safety: never return empty
+    }
+
+    /**
+     * Check if a language code is valid in the filtered context.
+     */
+    public function isFilteredValidCode(string $code): bool
+    {
+        return in_array($code, $this->getFilteredEnabledCodes(), true);
+    }
+
+    /**
+     * Get the default locale for the current filtered context.
+     * Prefers 'en' if available, otherwise returns the first filtered code.
+     */
+    public function getFilteredDefaultLocale(): string
+    {
+        $filteredCodes = $this->getFilteredEnabledCodes();
+        if (in_array('en', $filteredCodes, true)) {
+            return 'en';
+        }
+
+        return $filteredCodes[0] ?? 'en'; // First by sort order, or 'en' as absolute fallback
     }
 }

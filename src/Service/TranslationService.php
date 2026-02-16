@@ -77,7 +77,7 @@ readonly class TranslationService
 
     public function getLanguageCodes(): array
     {
-        return $this->languageService->getEnabledCodes();
+        return $this->languageService->getFilteredEnabledCodes();
     }
 
     public function isValidLanguageCodes(string $code): bool
@@ -87,7 +87,7 @@ readonly class TranslationService
 
     public function getAltLangList(string $currentLocale, string $currentUri): array
     {
-        $altLangList = array_fill_keys($this->getLanguageCodes(), $currentUri);
+        $altLangList = array_fill_keys($this->languageService->getFilteredEnabledCodes(), $currentUri);
         unset($altLangList[$currentLocale]); // remove current
         foreach ($altLangList as $languageCode => $link) {
             $altLangList[$languageCode] = $this->replaceUriLanguageCode($link, $languageCode);
@@ -98,7 +98,7 @@ readonly class TranslationService
 
     public function replaceUriLanguageCode(string $link, string $newCode): string
     {
-        $languages = $this->getLanguageCodes();
+        $languages = $this->languageService->getEnabledCodes(); // All enabled, not filtered
         $trimmedLink = trim($link, '/');
 
         // Just language
