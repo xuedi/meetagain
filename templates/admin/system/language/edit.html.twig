@@ -4,6 +4,8 @@
 
     <div class="container">
 
+        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'language'} %}
+
         <h1 class="title">{{ isEdit ? 'Edit Language'|trans : 'Add Language'|trans }}</h1>
 
         {{ form_start(form) }}
