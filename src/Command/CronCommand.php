@@ -7,6 +7,7 @@ use App\Service\ActivityService;
 use App\Service\CommandExecutionService;
 use App\Service\EmailService;
 use App\Service\RsvpNotificationService;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -38,9 +39,8 @@ class CronCommand extends LoggedCommand
             return Command::SUCCESS;
         }
 
-        $output->write('Send out queued emails ... ');
-        $this->mailService->sendQueue();
-        $output->writeln('OK');
+        $count = $this->mailService->sendQueue();
+        $output->writeln('EmailService: ' . $count);
 
         //$output->write('Send RSVP notifications ... ');
         //$count = $this->rsvpNotificationService->processUpcomingEvents(7);
@@ -68,15 +68,16 @@ class CronCommand extends LoggedCommand
             }
         }
 
+        */
+
         // Run plugin cron tasks
         foreach ($this->plugins as $plugin) {
             $pluginKey = $plugin->getPluginKey();
-            $output->write(sprintf('Running %s plugin cron ... ', $pluginKey));
             try {
+                $output->write(sprintf('Running plugin cron: %s', $pluginKey));
                 $plugin->runCronTasks($output);
-                $output->writeln('OK');
-            } catch (\Exception $e) {
-                $output->writeln(sprintf('<error>FAILED: %s</error>', $e->getMessage()));
+                $output->writeln('');
+            } catch (Exception $e) {
                 $this->logger->error('Plugin cron task failed', [
                     'plugin' => $pluginKey,
                     'error' => $e->getMessage(),
@@ -84,7 +85,6 @@ class CronCommand extends LoggedCommand
                 ]);
             }
         }
-        */
 
         $this->release();
 
