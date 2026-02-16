@@ -194,6 +194,21 @@ Skills automatically use the Haiku model for efficiency and follow project conve
 
 **Note:** Check `plugins/` directory for available plugins. Each plugin has its own `CLAUDE.md` for documentation.
 
+### Translation Skills
+
+| Skill                                                   | Purpose                                   |
+|---------------------------------------------------------|-------------------------------------------|
+| `/add-translation key="..." de="..." en="..." cn="..."` | Add translation SQL to translationUpdates.sql |
+
+**Examples:**
+
+```bash
+/add-translation key="event_list_title" de="Veranstaltungsliste" en="Event List" cn="活动列表"
+/add-translation key="save_button" de="Speichern" en="Save" cn="保存"
+```
+
+**Note:** Translation files (`translations/*.php`) are gitignored and managed externally. This skill generates SQL statements for manual integration into production.
+
 ---
 
 ## Token Efficiency
