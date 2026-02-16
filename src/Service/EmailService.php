@@ -239,21 +239,27 @@ readonly class EmailService
         ];
     }
 
-    public function sendQueue(): void
+    public function sendQueue(): string
     {
+        $send = 0;
+        $failed = 0;
         $mails = $this->mailRepo->findBy(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000);
         foreach ($mails as $mail) {
             try {
                 $this->mailer->send($this->queueToTemplate($mail));
                 $mail->setSendAt(new DateTime());
                 $mail->setStatus(EmailQueueStatus::Sent);
+                $send++;
             } catch (TransportExceptionInterface $e) {
                 $mail->setStatus(EmailQueueStatus::Failed);
                 $mail->setErrorMessage($e->getMessage());
+                $failed++;
             }
             $this->em->persist($mail);
         }
         $this->em->flush();
+
+        return sprintf('Send: %d, Failed: %d', $send, $failed);
     }
 
     private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier, bool $flush = true): bool
