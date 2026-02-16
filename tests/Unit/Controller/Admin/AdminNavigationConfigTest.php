@@ -32,11 +32,7 @@ final class AdminNavigationConfigTest extends TestCase
         // Arrange
         $links = [
             new AdminLink(label: 'menu_admin_email', route: 'app_admin_email_templates', active: 'email'),
-            new AdminLink(
-                label: 'menu_admin_translation',
-                route: 'app_admin_translation',
-                active: 'translation',
-            ),
+            new AdminLink(label: 'menu_admin_translation', route: 'app_admin_translation', active: 'translation'),
         ];
 
         // Act
