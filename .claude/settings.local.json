@@ -54,7 +54,14 @@
       "Bash(git log:*)",
       "Bash(just checkMagoAnalyze:*)",
       "Bash(just checkVersions:*)",
-      "Bash(/home/xuedi/Projects/meetAgain/translationUpdates.sql:*)"
+      "Bash(just translationFill:*)",
+      "Write(/home/xuedi/Projects/meetAgain/translationUpdates.sql)",
+      "Edit(/home/xuedi/Projects/meetAgain/translationUpdates.sql)",
+      "Read(/home/xuedi/Projects/meetAgain/translationUpdates.sql)",
+      "Write(/tmp/*)",
+      "Read(/tmp/*)",
+      "Bash(echo * >> /home/xuedi/Projects/meetAgain/translationUpdates.sql)",
+      "Bash(cat * >> /home/xuedi/Projects/meetAgain/translationUpdates.sql)"
     ]
   }
 }
