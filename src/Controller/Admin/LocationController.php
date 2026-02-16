@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\AdminLink;
 use App\Entity\Location;
 use App\Enum\EntityAction;
+use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\LocationType;
 use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
@@ -30,20 +31,28 @@ class LocationController extends AbstractAdminController
         private readonly LocationRepository $repo,
         private readonly EventRepository $eventRepo,
         private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly AdminLocationListFilterService $locationFilterService,
     ) {}
 
     #[Route('', name: 'app_admin_location')]
     public function list(): Response
     {
+        $filterResult = $this->locationFilterService->getLocationIdFilter();
+        $locationIds = $filterResult->getLocationIds();
+
         return $this->render('admin/location/list.html.twig', [
             'active' => 'location',
-            'locations' => $this->repo->findAll(),
+            'locations' => $this->repo->findAllForAdmin($locationIds),
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->locationFilterService->isLocationAccessible($location->getId())) {
+            throw $this->createNotFoundException('Location not found in current context.');
+        }
+
         $form = $this->createForm(LocationType::class, $location);
         $form->handleRequest($request);
 
@@ -71,6 +80,10 @@ class LocationController extends AbstractAdminController
     #[Route('/{id}/delete', name: 'app_admin_location_delete', methods: ['GET'])]
     public function delete(Location $location, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->locationFilterService->isLocationAccessible($location->getId())) {
+            throw $this->createNotFoundException('Location not found in current context.');
+        }
+
         // Check if location is used in any events
         $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
         if (count($eventsUsingLocation) > 0) {

@@ -15,4 +15,25 @@ class LocationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Location::class);
     }
+
+    /**
+     * Find all locations for admin interface with optional filtering.
+     *
+     * @param array<int>|null $restrictToLocationIds Optional location ID filter
+     * @return array<Location>
+     */
+    public function findAllForAdmin(?array $restrictToLocationIds = null): array
+    {
+        if ($restrictToLocationIds === []) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('l');
+
+        if ($restrictToLocationIds !== null) {
+            $qb->andWhere('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);
+        }
+
+        return $qb->orderBy('l.name', 'ASC')->getQuery()->getResult();
+    }
 }
