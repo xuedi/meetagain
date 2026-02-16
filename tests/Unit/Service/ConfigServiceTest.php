@@ -197,6 +197,27 @@ class ConfigServiceTest extends TestCase
         $this->assertFalse($this->subject->isShowFrontpage());
     }
 
+    public function testIsSendRsvpNotificationsReturnsTrueByDefault(): void
+    {
+        $this->configRepoStub->method('findOneBy')->willReturn(null);
+
+        $this->assertTrue($this->subject->isSendRsvpNotifications());
+    }
+
+    public function testIsSendRsvpNotificationsReturnsTrueWhenEnabled(): void
+    {
+        $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('true'));
+
+        $this->assertTrue($this->subject->isSendRsvpNotifications());
+    }
+
+    public function testIsSendRsvpNotificationsReturnsFalseWhenDisabled(): void
+    {
+        $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('false'));
+
+        $this->assertFalse($this->subject->isSendRsvpNotifications());
+    }
+
     public function testSaveFormCreatesNewSettings(): void
     {
         $configRepoStub = $this->createStub(ConfigRepository::class);

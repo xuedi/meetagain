@@ -6,9 +6,11 @@ use App\Entity\Event;
 use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Repository\EventRepository;
+use App\Service\ConfigService;
 use App\Service\EmailService;
 use App\Service\RsvpNotificationService;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +22,7 @@ class RsvpNotificationServiceTest extends TestCase
     private EventRepository&Stub $eventRepo;
     private EmailService&MockObject $emailService;
     private TagAwareCacheInterface&Stub $appCache;
+    private ConfigService&Stub $configService;
     private RsvpNotificationService $service;
 
     protected function setUp(): void
@@ -27,7 +30,14 @@ class RsvpNotificationServiceTest extends TestCase
         $this->eventRepo = $this->createStub(EventRepository::class);
         $this->emailService = $this->createMock(EmailService::class);
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->service = new RsvpNotificationService($this->eventRepo, $this->emailService, $this->appCache);
+        $this->configService = $this->createStub(ConfigService::class);
+        $this->configService->method('isSendRsvpNotifications')->willReturn(true);
+        $this->service = new RsvpNotificationService(
+            $this->eventRepo,
+            $this->emailService,
+            $this->appCache,
+            $this->configService,
+        );
     }
 
     public function testNotifyFollowersForEventSendsEmail(): void
@@ -243,7 +253,12 @@ class RsvpNotificationServiceTest extends TestCase
                 return $value;
             });
 
-        $this->service = new RsvpNotificationService($this->eventRepo, $this->emailService, $this->appCache);
+        $this->service = new RsvpNotificationService(
+            $this->eventRepo,
+            $this->emailService,
+            $this->appCache,
+            $this->configService,
+        );
 
         // Email should be sent exactly once across both calls
         $this->emailService
@@ -258,5 +273,54 @@ class RsvpNotificationServiceTest extends TestCase
         // Second call - should NOT send notification (already cached)
         $count2 = $this->service->notifyFollowersForEvent($event);
         $this->assertEquals(0, $count2);
+    }
+
+    public function testNotifyFollowersForEventSkipsWhenGlobalSettingDisabled(): void
+    {
+        // Arrange - Global setting is disabled
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('isSendRsvpNotifications')->willReturn(false);
+
+        $service = new RsvpNotificationService($this->eventRepo, $this->emailService, $this->appCache, $configService);
+
+        $event = $this->createStub(Event::class);
+        $attendee = $this->createStub(User::class);
+        $follower = $this->createStub(User::class);
+        $follower->method('isNotification')->willReturn(true);
+        $settings = new NotificationSettings(['followingUpdates' => true]);
+        $follower->method('getNotificationSettings')->willReturn($settings);
+
+        $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
+        $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
+        $event->method('hasRsvp')->with($follower)->willReturn(false);
+
+        // Assert - No email should be sent when global setting is disabled
+        $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
+
+        // Act
+        $count = $service->notifyFollowersForEvent($event);
+
+        // Assert
+        $this->assertEquals(0, $count);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testProcessUpcomingEventsSkipsWhenGlobalSettingDisabled(): void
+    {
+        // Arrange - Global setting is disabled
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('isSendRsvpNotifications')->willReturn(false);
+
+        $eventRepo = $this->createMock(EventRepository::class);
+        $service = new RsvpNotificationService($eventRepo, $this->emailService, $this->appCache, $configService);
+
+        // Assert - No events should be fetched when global setting is disabled
+        $eventRepo->expects($this->never())->method('findUpcomingEventsWithinRange');
+
+        // Act
+        $count = $service->processUpcomingEvents(7);
+
+        // Assert
+        $this->assertEquals(0, $count);
     }
 }

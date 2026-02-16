@@ -93,6 +93,11 @@ readonly class ConfigService
         return $this->getBoolean('automatic_registration', false);
     }
 
+    public function isSendRsvpNotifications(): bool
+    {
+        return $this->getBoolean('send_rsvp_notifications', true);
+    }
+
     public function getDateFormat(): string
     {
         return $this->getString('date_format', 'Y-m-d H:i');
