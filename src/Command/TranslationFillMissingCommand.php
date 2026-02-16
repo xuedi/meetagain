@@ -25,7 +25,7 @@ class TranslationFillMissingCommand extends Command
         private readonly TranslationFileManager $fileManager,
         private readonly LanguageService $languageService,
         private readonly CommandService $commandService,
-        private readonly string $projectDir,
+        private readonly string $kernelProjectDir,
     ) {
         parent::__construct();
     }
@@ -109,7 +109,7 @@ class TranslationFillMissingCommand extends Command
             $io->writeln(implode("\n", $sqlStatements));
             $io->info(sprintf('Would add %d translation keys', count($sqlStatements)));
         } else {
-            $sqlFile = $this->projectDir . '/' . self::SQL_FILE;
+            $sqlFile = $this->kernelProjectDir . '/' . self::SQL_FILE;
             $content = implode("\n", $sqlStatements) . "\n";
 
             file_put_contents($sqlFile, $content, FILE_APPEND);

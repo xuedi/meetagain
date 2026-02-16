@@ -100,7 +100,7 @@ devModeFixtures plugins='':
     {{PHP}} php bin/console app:plugin:pre-fixtures
     {{PHP}} php bin/console app:fixtures:load -q --append --group=plugin
     {{PHP}} php bin/console app:plugin:post-fixtures
-    {{PHP}} php bin/console app:translation:import 'https://dragon-descendants.de/api/translations'
+    {{PHP}} php bin/console app:translation:import 'https://meetagain.org/api/translations'
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console app:event:add-fixture
 
