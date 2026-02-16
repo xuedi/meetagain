@@ -18,10 +18,15 @@ readonly class RsvpNotificationService
         private EventRepository $eventRepo,
         private EmailService $emailService,
         private TagAwareCacheInterface $appCache,
+        private ConfigService $configService,
     ) {}
 
-    public function processUpcomingEvents(int $daysAhead = 7): int
+    public function processUpcomingEvents(int $daysAhead = 7): string
     {
+        if (!$this->configService->isSendRsvpNotifications()) {
+            return 'disabled';
+        }
+
         $start = new DateTime();
         $end = new DateTime()->modify(sprintf('+%d days', $daysAhead));
 
@@ -32,11 +37,15 @@ readonly class RsvpNotificationService
             $totalNotifications += $this->notifyFollowersForEvent($event);
         }
 
-        return $totalNotifications;
+        return $totalNotifications. ' send';
     }
 
     public function notifyFollowersForEvent(Event $event): int
     {
+        if (!$this->configService->isSendRsvpNotifications()) {
+            return 0;
+        }
+
         $attendees = $event->getRsvp();
         if ($attendees->isEmpty()) {
             return 0;
