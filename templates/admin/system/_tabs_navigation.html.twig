@@ -18,5 +18,11 @@
                 <span>{{ 'system_tab_images'|trans }}</span>
             </a>
         </li>
+        <li class="{% if activeSection == 'language' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_language') }}">
+                <span class="icon is-small"><i class="fa fa-language" aria-hidden="true"></i></span>
+                <span>{{ 'system_tab_language'|trans }}</span>
+            </a>
+        </li>
     </ul>
 </div>

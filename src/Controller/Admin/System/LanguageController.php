@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\System;
 
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\AdminLink;
 use App\Entity\Image;
 use App\Entity\ImageType;
@@ -23,14 +25,7 @@ class LanguageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(
-                label: 'menu_admin_language',
-                route: 'app_admin_language',
-                active: 'language',
-                role: 'ROLE_ADMIN',
-            ),
-        ]);
+        return null;
     }
 
     public function __construct(
@@ -44,8 +39,8 @@ class LanguageController extends AbstractAdminController
     #[Route('', name: 'app_admin_language')]
     public function list(): Response
     {
-        return $this->render('admin/system/language_list.html.twig', [
-            'active' => 'language',
+        return $this->render('admin/system/language/list.html.twig', [
+            'active' => 'system',
             'languages' => $this->repo->findAllOrdered(),
         ]);
     }
@@ -70,8 +65,8 @@ class LanguageController extends AbstractAdminController
             return $this->redirectToRoute('app_admin_language');
         }
 
-        return $this->render('admin/system/language_edit.html.twig', [
-            'active' => 'language',
+        return $this->render('admin/system/language/edit.html.twig', [
+            'active' => 'system',
             'form' => $form,
             'language' => $language,
             'isEdit' => false,
@@ -96,8 +91,8 @@ class LanguageController extends AbstractAdminController
             return $this->redirectToRoute('app_admin_language');
         }
 
-        return $this->render('admin/system/language_edit.html.twig', [
-            'active' => 'language',
+        return $this->render('admin/system/language/edit.html.twig', [
+            'active' => 'system',
             'form' => $form,
             'language' => $language,
             'isEdit' => true,
