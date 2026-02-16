@@ -31,25 +31,20 @@ final class AdminNavigationConfigTest extends TestCase
     {
         // Arrange
         $links = [
-            new AdminLink(label: 'menu_admin_translation', route: 'app_admin_translation', active: 'edit'),
+            new AdminLink(label: 'menu_admin_email', route: 'app_admin_email_templates', active: 'email'),
             new AdminLink(
-                label: 'menu_admin_translation_extract',
-                route: 'app_admin_translation_extract',
-                active: 'extract',
-            ),
-            new AdminLink(
-                label: 'menu_admin_translation_publish',
-                route: 'app_admin_translation_publish',
-                active: 'publish',
+                label: 'menu_admin_translation',
+                route: 'app_admin_translation',
+                active: 'translation',
             ),
         ];
 
         // Act
-        $config = new AdminNavigationConfig(section: 'Translation', links: $links);
+        $config = new AdminNavigationConfig(section: 'System', links: $links);
 
         // Assert
-        $this->assertSame('Translation', $config->section);
-        $this->assertCount(3, $config->links);
+        $this->assertSame('System', $config->section);
+        $this->assertCount(2, $config->links);
         $this->assertSame($links, $config->links);
         $this->assertNull($config->sectionRole);
     }

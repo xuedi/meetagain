@@ -4,6 +4,8 @@
 
     <div class="container">
 
+        {% include 'admin/translation/_tabs_navigation.html.twig' with {'activeSection': 'edit'} %}
+
         <form method="post" action="{{ path('app_admin_translation_save') }}">
             <table class="table is-fullwidth">
                 <thead>

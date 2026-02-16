@@ -1,0 +1,48 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/translation/_tabs_navigation.html.twig' with {'activeSection': 'actions'} %}
+
+        <h1 class="title is-4">{{ 'menu_admin_translation_actions'|trans }}</h1>
+
+        <div class="columns">
+            <div class="column is-half">
+                <div class="box">
+                    <h2 class="subtitle is-5">{{ 'menu_admin_translation_extract'|trans }}</h2>
+                    <p class="mb-4">
+                        {{ 'translation_extract_description'|trans }}
+                    </p>
+                    <form method="post" action="{{ path('app_admin_translation_extract') }}">
+                        <button class="button is-primary" type="submit">
+                            <span class="icon">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <span>{{ 'menu_admin_translation_extract'|trans }}</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="column is-half">
+                <div class="box">
+                    <h2 class="subtitle is-5">{{ 'menu_admin_translation_publish'|trans }}</h2>
+                    <p class="mb-4">
+                        {{ 'translation_publish_description'|trans }}
+                    </p>
+                    <form method="post" action="{{ path('app_admin_translation_publish') }}">
+                        <button class="button is-success" type="submit">
+                            <span class="icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span>{{ 'menu_admin_translation_publish'|trans }}</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

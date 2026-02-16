@@ -198,21 +198,16 @@ final class AdminNavigationServiceTest extends TestCase
 
     public function testGetSidebarSectionsHandlesMultipleLinksPerController(): void
     {
-        // Arrange - controller with multiple links (like TranslationController)
+        // Arrange - controller with multiple links (Email and Translation in System section)
         $mockController = new class implements AdminNavigationInterface {
             public function getAdminNavigation(): ?AdminNavigationConfig
             {
-                return new AdminNavigationConfig(section: 'Translation', links: [
-                    new AdminLink(label: 'menu_admin_translation', route: 'app_admin_translation', active: 'edit'),
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'menu_admin_email', route: 'app_admin_email_templates', active: 'email'),
                     new AdminLink(
-                        label: 'menu_admin_translation_extract',
-                        route: 'app_admin_translation_extract',
-                        active: 'extract',
-                    ),
-                    new AdminLink(
-                        label: 'menu_admin_translation_publish',
-                        route: 'app_admin_translation_publish',
-                        active: 'publish',
+                        label: 'menu_admin_translation',
+                        route: 'app_admin_translation',
+                        active: 'translation',
                     ),
                 ]);
             }
@@ -227,17 +222,17 @@ final class AdminNavigationServiceTest extends TestCase
 
         // Assert
         $this->assertCount(1, $sections, 'Should have one section');
-        $translationSection = $sections[0];
-        $this->assertSame('Translation', $translationSection->getSection());
+        $systemSection = $sections[0];
+        $this->assertSame('System', $systemSection->getSection());
 
-        $links = $translationSection->getLinks();
-        $this->assertCount(3, $links, 'Should have three links from the same controller');
+        $links = $systemSection->getLinks();
+        $this->assertCount(2, $links, 'Should have two links from the same controller');
 
         $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $links);
         $this->assertSame(
-            ['menu_admin_translation', 'menu_admin_translation_extract', 'menu_admin_translation_publish'],
+            ['menu_admin_email', 'menu_admin_translation'],
             $linkLabels,
-            'All three links should be present',
+            'Both links should be present',
         );
     }
 

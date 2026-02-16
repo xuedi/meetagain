@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\Translation;
 
-use App\Entity\AdminLink;
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\TranslationSuggestionStatus;
 use App\Repository\TranslationSuggestionRepository;
 use App\Service\TranslationImportService;
@@ -17,23 +18,7 @@ class TranslationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
-            section: 'Translation',
-            links: [
-                new AdminLink(label: 'menu_admin_translation_edit', route: 'app_admin_translation', active: 'edit'),
-                new AdminLink(
-                    label: 'menu_admin_translation_extract',
-                    route: 'app_admin_translation_extract',
-                    active: 'extract',
-                ),
-                new AdminLink(
-                    label: 'menu_admin_translation_publish',
-                    route: 'app_admin_translation_publish',
-                    active: 'publish',
-                ),
-            ],
-            sectionRole: 'ROLE_ADMIN',
-        );
+        return null;
     }
 
     public function __construct(
@@ -61,22 +46,43 @@ class TranslationController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_translation');
     }
 
-    #[Route('/extract', name: 'app_admin_translation_extract')]
-    public function translationsExtract(): Response
+    #[Route('/actions', name: 'app_admin_translation_actions')]
+    public function translationsActions(): Response
     {
-        return $this->render('admin/translation/translation_extract.html.twig', [
-            'active' => 'extract',
-            'result' => $this->translationImportService->extract(),
+        return $this->render('admin/translation/translation_actions.html.twig', [
+            'active' => 'actions',
         ]);
     }
 
-    #[Route('/publish', name: 'app_admin_translation_publish')]
+    #[Route('/extract', name: 'app_admin_translation_extract', methods: ['POST'])]
+    public function translationsExtract(): Response
+    {
+        $result = $this->translationImportService->extract();
+        $this->addFlash(
+            'success',
+            sprintf('Extracted %d translations (%d new, %d orphans removed)',
+                $result->count,
+                $result->new,
+                $result->deleted
+            )
+        );
+
+        return $this->redirectToRoute('app_admin_translation_actions');
+    }
+
+    #[Route('/publish', name: 'app_admin_translation_publish', methods: ['POST'])]
     public function translationsPublish(): Response
     {
-        return $this->render('admin/translation/translation_publish.html.twig', [
-            'active' => 'publish',
-            'result' => $this->translationService->publish(),
-        ]);
+        $result = $this->translationService->publish();
+        $this->addFlash(
+            'success',
+            sprintf('Published %d translations to %s',
+                $result->published,
+                implode(', ', $result->languages)
+            )
+        );
+
+        return $this->redirectToRoute('app_admin_translation_actions');
     }
 
     #[Route('/suggestions', name: 'app_admin_translation_suggestion')]
