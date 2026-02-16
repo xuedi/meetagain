@@ -132,7 +132,7 @@ class SecurityController extends AbstractController
         // clean up and write activity
         $user->setRegcode(null);
         $this->activityService->log(ActivityType::RegistrationEmailConfirmed, $user, []);
-        
+
         // Check if automatic registration is enabled
         if ($this->configService->isAutomaticRegistration()) {
             // Auto-approve user
