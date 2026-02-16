@@ -176,8 +176,8 @@ class RsvpNotificationServiceTest extends TestCase
 
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
-        $count = $this->service->processUpcomingEvents(5);
-        $this->assertEquals(0, $count);
+        $result = $this->service->processUpcomingEvents(5);
+        $this->assertEquals('0 send', $result);
     }
 
     public function testNotifyFollowersForEventEmptyAttendees(): void
@@ -318,9 +318,9 @@ class RsvpNotificationServiceTest extends TestCase
         $eventRepo->expects($this->never())->method('findUpcomingEventsWithinRange');
 
         // Act
-        $count = $service->processUpcomingEvents(7);
+        $result = $service->processUpcomingEvents(7);
 
         // Assert
-        $this->assertEquals(0, $count);
+        $this->assertEquals('disabled', $result);
     }
 }
