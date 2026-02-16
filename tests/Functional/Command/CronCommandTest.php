@@ -40,7 +40,7 @@ class CronCommandTest extends KernelTestCase
         $commandTester->execute([]);
 
         $commandTester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('Send out queued emails ... OK', $commandTester->getDisplay());
+        $this->assertStringContainsString('EmailService: Send: 1, Failed: 0', $commandTester->getDisplay());
 
         // 3. Assert: Check if email is marked as sent
         $em->clear();
