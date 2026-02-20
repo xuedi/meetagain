@@ -37,6 +37,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('current_locale', $this->getCurrentLocale(...)),
             new TwigFunction('get_alternative_languages', $this->getAlternativeLanguageCodes(...)),
             new TwigFunction('get_language_codes', $this->translationService->getLanguageCodes(...)),
+            new TwigFunction('get_admin_language_codes', $this->translationService->getAdminLanguageCodes(...)),
         ];
     }
 

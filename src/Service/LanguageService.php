@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Language;
+use App\Filter\Admin\Language\AdminLanguageFilterService;
 use App\Filter\Language\LanguageFilterService;
 use App\Repository\LanguageRepository;
 use Psr\Cache\InvalidArgumentException;
@@ -19,6 +20,7 @@ readonly class LanguageService
         private LanguageRepository $languageRepo,
         private TagAwareCacheInterface $appCache,
         private LanguageFilterService $languageFilterService,
+        private AdminLanguageFilterService $adminLanguageFilterService,
     ) {}
 
     /**
@@ -111,6 +113,39 @@ readonly class LanguageService
     public function isFilteredValidCode(string $code): bool
     {
         return in_array($code, $this->getFilteredEnabledCodes(), true);
+    }
+
+    /**
+     * Get enabled language codes filtered for admin context.
+     * This applies admin-specific language filters (e.g., group language restrictions in admin forms).
+     *
+     * @return string[] Array of filtered language codes
+     */
+    public function getAdminFilteredEnabledCodes(): array
+    {
+        $enabledCodes = $this->getEnabledCodes();
+        $filterResult = $this->adminLanguageFilterService->getLanguageCodeFilter();
+
+        if (!$filterResult->hasActiveFilter()) {
+            return $enabledCodes;
+        }
+
+        $filteredCodes = $filterResult->getLanguageCodes();
+        if ($filteredCodes === null || $filteredCodes === []) {
+            return $enabledCodes; // Fallback: if filter produces empty, show all rather than nothing
+        }
+
+        $result = array_values(array_intersect($enabledCodes, $filteredCodes));
+
+        return $result === [] ? $enabledCodes : $result; // Safety: never return empty
+    }
+
+    /**
+     * Check if a language code is valid in the admin filtered context.
+     */
+    public function isAdminFilteredValidCode(string $code): bool
+    {
+        return in_array($code, $this->getAdminFilteredEnabledCodes(), true);
     }
 
     /**

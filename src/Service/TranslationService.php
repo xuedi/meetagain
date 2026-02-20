@@ -80,6 +80,11 @@ readonly class TranslationService
         return $this->languageService->getFilteredEnabledCodes();
     }
 
+    public function getAdminLanguageCodes(): array
+    {
+        return $this->languageService->getAdminFilteredEnabledCodes();
+    }
+
     public function isValidLanguageCodes(string $code): bool
     {
         return $this->languageService->isValidCode($code);
