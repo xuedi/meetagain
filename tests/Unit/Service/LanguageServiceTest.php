@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Service;
 
 use App\Entity\Language;
+use App\Filter\Admin\Language\AdminLanguageFilterService;
 use App\Filter\Language\LanguageFilterResult;
 use App\Filter\Language\LanguageFilterService;
 use App\Repository\LanguageRepository;
@@ -19,6 +20,7 @@ class LanguageServiceTest extends TestCase
     private LanguageRepository|Stub $languageRepo;
     private TagAwareCacheInterface|Stub $appCache;
     private LanguageFilterService|Stub $languageFilterService;
+    private AdminLanguageFilterService|Stub $adminLanguageFilterService;
     private LanguageService $service;
 
     protected function setUp(): void
@@ -27,13 +29,15 @@ class LanguageServiceTest extends TestCase
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->languageFilterService = $this->createStub(LanguageFilterService::class);
         $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::noFilter());
-        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService);
+        $this->adminLanguageFilterService = $this->createStub(AdminLanguageFilterService::class);
+        $this->adminLanguageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::noFilter());
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
     }
 
     public function testGetEnabledCodesUsesCache(): void
     {
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
-        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
 
         $this->appCache
             ->expects($this->once())
@@ -53,7 +57,7 @@ class LanguageServiceTest extends TestCase
     public function testGetEnabledCodesFallbackOnCacheError(): void
     {
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
-        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
 
         $this->appCache
             ->expects($this->once())
@@ -76,7 +80,7 @@ class LanguageServiceTest extends TestCase
     public function testInvalidateCache(): void
     {
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
-        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
 
         $this->appCache
             ->expects($this->exactly(2))
@@ -105,7 +109,7 @@ class LanguageServiceTest extends TestCase
         $this->assertEquals('en|de', $this->service->getLocaleRegexPattern());
 
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
         $this->appCache->method('get')->willReturn([]);
         $this->assertEquals('en', $this->service->getLocaleRegexPattern());
     }
@@ -113,7 +117,7 @@ class LanguageServiceTest extends TestCase
     public function testGetAllLanguagesUsesCache(): void
     {
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
-        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
 
         $langEn = new Language();
         $this->appCache
@@ -134,7 +138,7 @@ class LanguageServiceTest extends TestCase
     public function testGetAllLanguagesFallbackOnCacheError(): void
     {
         $this->appCache = $this->createMock(TagAwareCacheInterface::class);
-        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
 
         $this->appCache
             ->expects($this->once())

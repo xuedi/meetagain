@@ -44,7 +44,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        $this->assertCount(5, $functions);
+        $this->assertCount(6, $functions);
 
         $functionNames = array_map(fn($f) => $f->getName(), $functions);
         $this->assertContains('get_enabled_locales', $functionNames);
@@ -52,6 +52,7 @@ class LanguageExtensionTest extends TestCase
         $this->assertContains('current_locale', $functionNames);
         $this->assertContains('get_alternative_languages', $functionNames);
         $this->assertContains('get_language_codes', $functionNames);
+        $this->assertContains('get_admin_language_codes', $functionNames);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
