@@ -22,7 +22,7 @@
             </div>
             <div class="column is-2">
                 <div class="buttons has-addons">
-                    {% for locale in enabled_locales %}
+                    {% for locale in get_admin_language_codes() %}
                         {% set link = path('app_admin_cms_edit', {'id': cms.id, 'locale': locale}) %}
                         <a class="button {% if locale == editLocale %}is-active{% endif %}" href="{{ link }}">{{ locale }}</a>
                     {% endfor %}
