@@ -12,6 +12,7 @@
                 <th>Event time</th>
                 <th>Recurring</th>
                 <th>Location</th>
+                <th>Status</th>
                 <th>Rsvp</th>
                 <th>Type</th>
                 <th><a href="{{ path('app_admin_event_add') }}"><span class="icon"><i class="fa fa-add"></i></span></a></th>
@@ -39,6 +40,15 @@
                         {% endif %}
                     </td>
                     <td>{{ event.location ? event.location.name : '-' }}</td>
+                    <td>
+                        {% if event.status.value == 'locked' %}
+                            <span class="tag is-warning is-light">locked</span>
+                        {% elseif event.status.value == 'published' %}
+                            <span class="tag is-success is-light">published</span>
+                        {% else %}
+                            <span class="tag is-light">draft</span>
+                        {% endif %}
+                    </td>
                     <td>{{ event.rsvp|length }}</td>
                     <td>{{ event.type ? event.type.name : '-' }}</td>
                     <td>
