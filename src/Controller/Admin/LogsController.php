@@ -15,23 +15,11 @@ class LogsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'Logs', links: [
+        return new AdminNavigationConfig(section: 'System', links: [
             new AdminLink(
-                label: 'menu_admin_logs_activity',
+                label: 'menu_admin_logs',
                 route: 'app_admin_activity_log',
-                active: 'activity',
-                role: 'ROLE_ADMIN',
-            ),
-            new AdminLink(
-                label: 'menu_admin_logs_system',
-                route: 'app_admin_system_log',
                 active: 'logs',
-                role: 'ROLE_ADMIN',
-            ),
-            new AdminLink(
-                label: 'menu_admin_logs_404',
-                route: 'app_admin_not_found_log',
-                active: '404',
                 role: 'ROLE_ADMIN',
             ),
         ]);
@@ -42,11 +30,18 @@ class LogsController extends AbstractAdminController
         private readonly NotFoundLogRepository $foundLogRepo,
     ) {}
 
+    #[Route('', name: 'app_admin_logs')]
+    public function index(): Response
+    {
+        return $this->redirectToRoute('app_admin_activity_log');
+    }
+
     #[Route('/activity', name: 'app_admin_activity_log')]
     public function activityList(): Response
     {
         return $this->render('admin/logs/logs_activity_list.html.twig', [
-            'active' => 'activity',
+            'active' => 'logs',
+            'activeLog' => 'activity',
             'activities' => $this->activityService->getAdminList(),
         ]);
     }
@@ -56,6 +51,7 @@ class LogsController extends AbstractAdminController
     {
         return $this->render('admin/logs/logs_system_list.html.twig', [
             'active' => 'logs',
+            'activeLog' => 'logs',
             'logs' => $this->getLogs(),
         ]);
     }
@@ -64,7 +60,8 @@ class LogsController extends AbstractAdminController
     public function notFoundLogs(): Response
     {
         return $this->render('admin/logs/logs_notFound_list.html.twig', [
-            'active' => '404',
+            'active' => 'logs',
+            'activeLog' => '404',
             'list' => $this->foundLogRepo->getTop100(),
         ]);
     }
@@ -72,7 +69,7 @@ class LogsController extends AbstractAdminController
     private function getLogList(): array
     {
         $list = [];
-        $logPath = dirname(__DIR__, 3) . '/var/log/';
+        $logPath = dirname(__DIR__, 4) . '/var/log/';
         $logFiles = glob($logPath . '/*.log');
 
         foreach ($logFiles as $logFile) {
