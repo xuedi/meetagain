@@ -125,7 +125,7 @@ class EventType extends AbstractType
 
         $eventId = $event?->getId();
         if (null !== $eventId) { // not for new events
-            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+            foreach ($this->translationService->getAdminLanguageCodes() as $languageCode) {
                 $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
                 $builder->add("title-$languageCode", TextType::class, [
                     'label' => "title ($languageCode)",
