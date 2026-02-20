@@ -12,6 +12,7 @@ use App\Form\AnnouncementType;
 use App\Repository\AnnouncementRepository;
 use App\Service\AnnouncementService;
 use App\Service\EntityActionDispatcher;
+use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +33,7 @@ class AnnouncementsController extends AbstractAdminController
         private readonly AnnouncementService $announcementService,
         private readonly EntityManagerInterface $em,
         private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly TranslationService $translationService,
     ) {}
 
     #[Route('', name: 'app_admin_email_announcements')]
@@ -89,7 +91,7 @@ class AnnouncementsController extends AbstractAdminController
     #[Route('/{id}', name: 'app_admin_email_announcements_view')]
     public function announcementsView(Announcement $announcement, Request $request): Response
     {
-        $locale = $request->query->get('locale', 'en');
+        $locale = $request->query->get('locale', $this->translationService->getAdminLanguageCodes()[0]);
         $preview = null;
         if ($announcement->isDraft()) {
             $preview = $this->announcementService->renderPreview($announcement, $locale);
