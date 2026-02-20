@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\EventFilterRsvp;
 use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
+use App\Entity\EventStatus;
 use App\Entity\EventTypes;
 use DateTime;
 use DateTimeInterface;
@@ -37,8 +38,8 @@ class EventRepository extends ServiceEntityRepository
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
-            ->andWhere('e.published = :published')
-            ->setParameter('published', true);
+            ->andWhere('e.status IN (:statuses)')
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
 
         match ($time) {
             EventFilterTime::Past => $qb->andWhere('e.start <= :now')->setParameter('now', new DateTime()),
@@ -85,10 +86,10 @@ class EventRepository extends ServiceEntityRepository
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->where('e.start BETWEEN :start AND :end')
-            ->andWhere('e.published = :published')
+            ->andWhere('e.status IN (:statuses)')
             ->setParameter('start', $start)
             ->setParameter('end', $end)
-            ->setParameter('published', true);
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
 
         if ($restrictToEventIds !== null) {
             if ($restrictToEventIds === []) {

@@ -198,7 +198,7 @@ class EventController extends AbstractAdminController
         $form->remove('createdAt');
         $form->remove('image');
         $form->remove('user');
-        $form->remove('published');
+        $form->remove('status');
         $form->remove('allFollowing');
         $form->remove('featured');
         $form->handleRequest($request);
@@ -209,7 +209,6 @@ class EventController extends AbstractAdminController
             $event->setCreatedAt(new DateTimeImmutable());
             $event->setPreviewImage(null);
             $event->setInitial(true);
-            $event->setPublished(false);
             $event->setFeatured(false);
             $event->setUser($user);
 

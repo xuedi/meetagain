@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\EventIntervals;
+use App\Entity\EventStatus;
 use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
 use App\Entity\ImageType;
@@ -44,7 +45,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
         foreach ($this->getData() as $data) {
             $event = new Event();
             $event->setInitial(true);
-            $event->setPublished(true);
+            $event->setStatus(EventStatus::Published);
             $event->setFeatured($data['featured'] ?? false);
             $event->setStart($data['start']);
             $event->setStop($data['stop']);

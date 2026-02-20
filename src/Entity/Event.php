@@ -75,8 +75,8 @@ class Event
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'event')]
     private Collection $images;
 
-    #[ORM\Column]
-    private ?bool $published = null;
+    #[ORM\Column(type: 'string', enumType: EventStatus::class)]
+    private EventStatus $status = EventStatus::Draft;
 
     #[ORM\Column]
     private ?bool $featured = null;
@@ -374,14 +374,14 @@ class Event
         return null;
     }
 
-    public function isPublished(): ?bool
+    public function getStatus(): EventStatus
     {
-        return $this->published;
+        return $this->status;
     }
 
-    public function setPublished(bool $published): static
+    public function setStatus(EventStatus $status): static
     {
-        $this->published = $published;
+        $this->status = $status;
 
         return $this;
     }

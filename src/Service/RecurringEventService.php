@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Event;
 use App\Entity\EventIntervals;
+use App\Entity\EventStatus;
 use App\Entity\EventTranslation;
 use App\Enum\EntityAction;
 use App\Repository\EventRepository;
@@ -52,10 +53,13 @@ readonly class RecurringEventService
 
         $children = $this->repo->findFollowUpEvents(parentEventId: $parent->getId(), greaterThan: $event->getStart());
 
+        $updatedCount = 0;
         foreach ($children as $child) {
+            if ($child->getStatus() === EventStatus::Locked) {
+                continue; // skip manually-customized events
+            }
             $child->setLocation($event->getLocation());
             $child->setPreviewImage($event->getPreviewImage());
-            $child->setPublished($event->isPublished());
             foreach ($event->getTranslation() as $eventTranslation) {
                 $childTranslation = $child->findTranslation($eventTranslation->getLanguage());
                 if ($childTranslation === null) {
@@ -71,10 +75,11 @@ readonly class RecurringEventService
                 $this->em->persist($childTranslation);
             }
             $this->em->persist($child);
+            ++$updatedCount;
         }
         $this->em->flush();
 
-        return count($children);
+        return $updatedCount;
     }
 
     private function fillRecurringEvents(Event $event): void
@@ -138,7 +143,7 @@ readonly class RecurringEventService
     {
         $recurringEvent = new Event();
         $recurringEvent->setUser($parent->getUser());
-        $recurringEvent->setPublished($parent->isPublished());
+        $recurringEvent->setStatus(EventStatus::Published);
         $recurringEvent->setFeatured(false);
         $recurringEvent->setLocation($parent->getLocation());
         $recurringEvent->setPreviewImage($parent->getPreviewImage());
