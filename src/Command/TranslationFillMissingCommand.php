@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:translation:fill-missing',
-    description: 'Generates SQL statements for missing translations and appends to translationUpdates.sql'
+    description: 'Generates SQL statements for missing translations and appends to translationUpdates.sql',
 )]
 class TranslationFillMissingCommand extends Command
 {
@@ -37,13 +37,13 @@ class TranslationFillMissingCommand extends Command
             'dry-run',
             null,
             InputOption::VALUE_NONE,
-            'Show what would be added without actually writing to file'
+            'Show what would be added without actually writing to file',
         );
         $this->addOption(
             'auto-translate',
             null,
             InputOption::VALUE_NONE,
-            'Automatically generate basic translations for missing entries'
+            'Automatically generate basic translations for missing entries',
         );
     }
 
@@ -94,7 +94,7 @@ class TranslationFillMissingCommand extends Command
             $io->warning(sprintf(
                 'Skipped %d keys that need manual translation: %s',
                 count($skippedKeys),
-                implode(', ', array_slice($skippedKeys, 0, 5)) . (count($skippedKeys) > 5 ? '...' : '')
+                implode(', ', array_slice($skippedKeys, 0, 5)) . (count($skippedKeys) > 5 ? '...' : ''),
             ));
         }
 

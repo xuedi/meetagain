@@ -114,7 +114,7 @@ class EventController extends AbstractAdminController
             }
 
             // save translations
-            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+            foreach ($this->translationService->getAdminLanguageCodes() as $languageCode) {
                 $translation = $this->getTranslation($languageCode, $event->getId());
                 $translation->setEvent($event);
                 $translation->setLanguage($languageCode);

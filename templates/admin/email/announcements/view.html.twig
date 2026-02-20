@@ -71,7 +71,7 @@
                         </div>
                         <div class="level-right">
                             <div class="buttons has-addons">
-                                {% for locale in enabled_locales %}
+                                {% for locale in get_admin_language_codes() %}
                                     <a href="{{ path('app_admin_email_announcements_view', {'id': announcement.id, 'locale': locale}) }}"
                                        class="button is-small {% if locale == previewLocale %}is-active is-info{% endif %}">
                                         {{ locale }}
