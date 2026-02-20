@@ -27,7 +27,7 @@ class EmailTemplateType extends AbstractType
         $templateId = $template?->getId();
 
         if ($templateId !== null) {
-            foreach ($this->translationService->getAdminLanguageCodes() as $languageCode) {
+            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
                 $translation = $this->translationRepo->findOneBy([
                     'emailTemplate' => $templateId,
                     'language' => $languageCode,
