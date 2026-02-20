@@ -76,7 +76,7 @@
                     <td>{{ page.languages|length }}</td>
                     <td>
                         {% if not (page.locked and not is_admin) %}
-                            <a href="{{ path('app_admin_cms_edit', {'id': page.id, 'locale': app.request.locale}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
+                            <a href="{{ path('app_admin_cms_edit', {'id': page.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
                         {% endif %}
                     </td>
                 </tr>
