@@ -49,8 +49,8 @@ class EventType extends AbstractType
                 'data' => true,
             ])
             ->add('status', EnumType::class, [
-                'class'   => EventStatus::class,
-                'label'   => 'Status',
+                'class' => EventStatus::class,
+                'label' => 'Status',
                 'choices' => EventStatus::getChoices($this->translator),
             ])
             ->add('featured', ChoiceType::class, [
