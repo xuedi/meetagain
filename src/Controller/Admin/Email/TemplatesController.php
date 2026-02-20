@@ -28,7 +28,6 @@ class TemplatesController extends AbstractAdminController
         return null;
     }
 
-
     public function __construct(
         private readonly EmailService $emailService,
         private readonly EmailTemplateRepository $templateRepo,
