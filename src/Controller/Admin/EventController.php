@@ -66,7 +66,7 @@ class EventController extends AbstractAdminController
     {
         // Validate event is accessible in current context
         if (!$this->eventFilterService->isEventAccessible($event->getId())) {
-            throw $this->createNotFoundException('Event not found in current context.');
+            throw $this->createAccessDeniedException('This event is not accessible in the current context');
         }
 
         $form = $this->createForm(EventType::class, $event);
