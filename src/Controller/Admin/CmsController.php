@@ -20,6 +20,7 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\CmsBlockService;
 use App\Service\EntityActionDispatcher;
+use App\Service\TranslationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -49,6 +50,7 @@ class CmsController extends AbstractAdminController
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly LoggerInterface $logger,
+        private readonly TranslationService $translationService,
     ) {}
 
     #[Route('', name: 'app_admin_cms')]
@@ -269,7 +271,7 @@ class CmsController extends AbstractAdminController
     {
         $lastEditLocaleKey = 'lastEditLocale';
         if ($locale === null) {
-            $locale = $session->get($lastEditLocaleKey, 'en');
+            $locale = $session->get($lastEditLocaleKey, $this->translationService->getAdminLanguageCodes()[0]);
         }
         $session->set($lastEditLocaleKey, $locale);
 

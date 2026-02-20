@@ -28,7 +28,6 @@ class TemplatesController extends AbstractAdminController
         return null;
     }
 
-    private const string DEFAULT_LANGUAGE = 'en';
 
     public function __construct(
         private readonly EmailService $emailService,
@@ -54,7 +53,7 @@ class TemplatesController extends AbstractAdminController
                 'context' => $mockData['context'],
                 'renderedBody' => $dbTemplate
                     ? $this->templateService->renderContent(
-                        $dbTemplate->getBody(self::DEFAULT_LANGUAGE),
+                        $dbTemplate->getBody($this->translationService->getLanguageCodes()[0]),
                         $mockData['context'],
                     )
                     : '<p>Template not found. Run app:email-templates:seed</p>',
@@ -121,7 +120,7 @@ class TemplatesController extends AbstractAdminController
     #[Route('/{id}/preview', name: 'app_admin_email_templates_preview')]
     public function templatesPreview(Request $request, EmailTemplate $template): Response
     {
-        $language = $request->query->getString('lang', self::DEFAULT_LANGUAGE);
+        $language = $request->query->getString('lang', $this->translationService->getLanguageCodes()[0]);
         $mockList = $this->emailService->getMockEmailList();
         $mockContext = $this->getMockContextForTemplate($template->getIdentifier(), $mockList);
 
