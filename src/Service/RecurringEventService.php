@@ -55,6 +55,7 @@ readonly class RecurringEventService
         foreach ($children as $child) {
             $child->setLocation($event->getLocation());
             $child->setPreviewImage($event->getPreviewImage());
+            $child->setPublished($event->isPublished());
             foreach ($event->getTranslation() as $eventTranslation) {
                 $childTranslation = $child->findTranslation($eventTranslation->getLanguage());
                 if ($childTranslation === null) {
