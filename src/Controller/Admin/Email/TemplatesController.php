@@ -91,7 +91,7 @@ class TemplatesController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Save translations for each language
-            foreach ($this->translationService->getAdminLanguageCodes() as $languageCode) {
+            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
                 $translation = $this->getOrCreateTranslation($languageCode, $template->getId());
                 $translation->setEmailTemplate($template);
                 $translation->setLanguage($languageCode);
@@ -114,7 +114,7 @@ class TemplatesController extends AbstractAdminController
             'active' => 'email',
             'form' => $form,
             'template' => $template,
-            'languages' => $this->translationService->getAdminLanguageCodes(),
+            'languages' => $this->translationService->getLanguageCodes(),
         ]);
     }
 
@@ -135,7 +135,7 @@ class TemplatesController extends AbstractAdminController
             'renderedBody' => $renderedBody,
             'context' => $mockContext,
             'currentLanguage' => $language,
-            'languages' => $this->translationService->getAdminLanguageCodes(),
+            'languages' => $this->translationService->getLanguageCodes(),
         ]);
     }
 
@@ -145,7 +145,7 @@ class TemplatesController extends AbstractAdminController
         $identifier = $template->getIdentifier();
 
         // Reset translations for all enabled languages with language-specific defaults
-        foreach ($this->translationService->getAdminLanguageCodes() as $languageCode) {
+        foreach ($this->translationService->getLanguageCodes() as $languageCode) {
             $langDefaults = $this->templateService->getDefaultTemplates($languageCode);
 
             if (!isset($langDefaults[$identifier])) {
