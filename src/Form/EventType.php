@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Event;
 use App\Entity\EventIntervals;
+use App\Entity\EventStatus;
 use App\Entity\EventTypes;
 use App\Entity\Host;
 use App\Entity\Location;
@@ -47,12 +48,10 @@ class EventType extends AbstractType
             ->add('initial', HiddenType::class, [
                 'data' => true,
             ])
-            ->add('published', ChoiceType::class, [
-                'label' => 'Status',
-                'choices' => [
-                    $this->translator->trans('published') => true,
-                    $this->translator->trans('draft') => false,
-                ],
+            ->add('status', EnumType::class, [
+                'class'   => EventStatus::class,
+                'label'   => 'Status',
+                'choices' => EventStatus::getChoices($this->translator),
             ])
             ->add('featured', ChoiceType::class, [
                 'label' => 'Featured',
