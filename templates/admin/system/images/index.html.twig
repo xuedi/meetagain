@@ -6,27 +6,61 @@
 
         {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'images'} %}
 
-        <h1 class="title is-5">Thumbnail Management</h1>
-        <p class="subtitle is-6 has-text-grey mb-4">Regenerate or cleanup image thumbnails</p>
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>CreatedAt</th>
+                <th>Uploader</th>
+                <th></th>
+                <th>Size</th>
+                <th>Type</th>
+                <th>MimeType</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for image in images %}
+                <tr>
+                    <td>{{ image.createdAt | date('Y-m-d') }}</td>
+                    <td>{{ image.uploader.email }}</td>
+                    <td>
+                        <div class="dropdown is-hoverable">
+                            <div class="dropdown-trigger">
+                                <span aria-haspopup="true" aria-controls="dropdown-image">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-image" aria-hidden="true"></i>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-image" role="menu">
+                                <div class="dropdown-content">
+                                    <div class="dropdown-item is-hovered">
+                                        {% include '_block/image.html.twig' with {'image': image} %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ image.size | format_bytes }}</td>
+                    <td>{{ image.type.name }}</td>
+                    <td>{{ image.mimeType }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-        <div class="columns">
-            <div class="column is-6">
-
-                <form action="{{ path('app_admin_regenerate_thumbnails') }}" method="post" class="mb-3">
-                    <button type="submit" class="button is-info" onclick="return confirm('Regenerate all thumbnails? This may take a while.');">
-                        <span class="icon"><i class="fa fa-sync"></i></span>
-                        <span>Regenerate Thumbnails</span>
-                    </button>
-                </form>
-
-                <form action="{{ path('app_admin_cleanup_thumbnails') }}" method="post">
-                    <button type="submit" class="button is-warning" onclick="return confirm('Delete obsolete thumbnails?');">
-                        <span class="icon"><i class="fa fa-trash"></i></span>
-                        <span>Cleanup Thumbnails</span>
-                    </button>
-                </form>
-
-            </div>
+        <div class="buttons mt-4">
+            <form action="{{ path('app_admin_regenerate_thumbnails') }}" method="post">
+                <button type="submit" class="button is-info" onclick="return confirm('Regenerate all thumbnails? This may take a while.');">
+                    <span class="icon"><i class="fa fa-sync"></i></span>
+                    <span>Regenerate Thumbnails</span>
+                </button>
+            </form>
+            <form action="{{ path('app_admin_cleanup_thumbnails') }}" method="post">
+                <button type="submit" class="button is-warning" onclick="return confirm('Delete obsolete thumbnails?');">
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                    <span>Cleanup Thumbnails</span>
+                </button>
+            </form>
         </div>
 
     </div>
