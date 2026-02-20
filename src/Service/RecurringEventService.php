@@ -58,8 +58,10 @@ readonly class RecurringEventService
             foreach ($event->getTranslation() as $eventTranslation) {
                 $childTranslation = $child->findTranslation($eventTranslation->getLanguage());
                 if ($childTranslation === null) {
-                    // Child doesn't have this language, skip
-                    continue;
+                    $childTranslation = new EventTranslation();
+                    $childTranslation->setEvent($child);
+                    $childTranslation->setLanguage($eventTranslation->getLanguage());
+                    $child->addTranslation($childTranslation);
                 }
                 $childTranslation->setTitle($eventTranslation->getTitle());
                 $childTranslation->setTeaser($eventTranslation->getTeaser());
