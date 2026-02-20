@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Settings;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Repository\ImageRepository;
 use App\Service\ImageService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,6 +20,7 @@ class ImagesController extends AbstractAdminController
 
     public function __construct(
         private readonly ImageService $imageService,
+        private readonly ImageRepository $imageRepository,
     ) {}
 
     #[Route('', name: 'app_admin_system_images', methods: ['GET'])]
@@ -26,6 +28,7 @@ class ImagesController extends AbstractAdminController
     {
         return $this->render('admin/system/images/index.html.twig', [
             'active' => 'system',
+            'images' => $this->imageRepository->findAll(),
         ]);
     }
 
