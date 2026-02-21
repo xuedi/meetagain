@@ -6,13 +6,114 @@
 
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'debugging'} %}
 
-        <div class="content">
-            <p class="has-text-grey">
-                <span class="icon"><i class="fa fa-wrench"></i></span>
-                Coming soon - email debugging and diagnostic tools will be available here.
-            </p>
-        </div>
+        <form method="post" action="{{ path('app_admin_email_debugging_send') }}">
+
+            <div class="columns">
+                <div class="column is-4">
+                    <div class="field">
+                        <label class="label">Email Type</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select id="emailType" name="emailType">
+                                    {% for emailType in emailTypes %}
+                                        <option value="{{ emailType.value }}"
+                                                data-context="{{ mockData[emailType.value].context|json_encode }}">
+                                            {{ emailType.value }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column is-2">
+                    <div class="field">
+                        <label class="label">Language</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="language">
+                                    {% for lang in languages %}
+                                        <option value="{{ lang }}">{{ lang }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Recipient Email</label>
+                        <div class="control">
+                            <input class="input" type="email" name="recipient" placeholder="test@example.com" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box">
+                <h3 class="subtitle">Context Variables</h3>
+                <div id="contextFields"></div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <button type="submit" class="button is-primary">
+                        <span class="icon"><i class="fa fa-paper-plane"></i></span>
+                        <span>Send Test Email</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
 
     </div>
+
+    <script>
+        const emailTypeSelect = document.getElementById('emailType');
+        const contextFieldsContainer = document.getElementById('contextFields');
+
+        function updateContextFields() {
+            const selectedOption = emailTypeSelect.options[emailTypeSelect.selectedIndex];
+            const context = JSON.parse(selectedOption.dataset.context || '{}');
+
+            contextFieldsContainer.innerHTML = '';
+
+            for (const [key, value] of Object.entries(context)) {
+                const field = document.createElement('div');
+                field.className = 'field is-horizontal';
+
+                const fieldLabel = document.createElement('div');
+                fieldLabel.className = 'field-label is-normal';
+                fieldLabel.innerHTML = '<label class="label">' + key + '</label>';
+
+                const fieldBody = document.createElement('div');
+                fieldBody.className = 'field-body';
+
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'field';
+
+                const control = document.createElement('div');
+                control.className = 'control';
+
+                const input = document.createElement('input');
+                input.className = 'input';
+                input.type = 'text';
+                input.name = 'context[' + key + ']';
+                input.value = value;
+
+                control.appendChild(input);
+                fieldDiv.appendChild(control);
+                fieldBody.appendChild(fieldDiv);
+                field.appendChild(fieldLabel);
+                field.appendChild(fieldBody);
+                contextFieldsContainer.appendChild(field);
+            }
+        }
+
+        emailTypeSelect.addEventListener('change', updateContextFields);
+        updateContextFields();
+    </script>
 
 {% endblock %}
