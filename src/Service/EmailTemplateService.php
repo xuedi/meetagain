@@ -45,10 +45,10 @@ readonly class EmailTemplateService
     ];
 
     private const array VARIABLES = [
-        EmailType::VerificationRequest->value => ['username', 'token', 'host', 'url', 'lang'],
-        EmailType::Welcome->value => ['host', 'url', 'lang'],
-        EmailType::PasswordResetRequest->value => ['username', 'token', 'host', 'lang'],
-        EmailType::NotificationMessage->value => ['username', 'sender', 'senderId', 'host', 'lang'],
+        EmailType::VerificationRequest->value => ['username', 'token', 'host', 'url', 'lang', 'greeting'],
+        EmailType::Welcome->value => ['host', 'url', 'lang', 'greeting'],
+        EmailType::PasswordResetRequest->value => ['username', 'token', 'host', 'lang', 'greeting'],
+        EmailType::NotificationMessage->value => ['username', 'sender', 'senderId', 'host', 'lang', 'greeting'],
         EmailType::NotificationRsvpAggregated->value => [
             'username',
             'attendeeNames',
@@ -58,6 +58,7 @@ readonly class EmailTemplateService
             'eventTitle',
             'host',
             'lang',
+            'greeting',
         ],
         EmailType::NotificationEventCanceled->value => [
             'username',
@@ -67,8 +68,17 @@ readonly class EmailTemplateService
             'eventTitle',
             'host',
             'lang',
+            'greeting',
         ],
-        EmailType::Announcement->value => ['title', 'content', 'announcementUrl', 'username', 'host', 'lang'],
+        EmailType::Announcement->value => [
+            'title',
+            'content',
+            'announcementUrl',
+            'username',
+            'host',
+            'lang',
+            'greeting',
+        ],
     ];
 
     public function __construct(
