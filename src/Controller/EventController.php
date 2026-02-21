@@ -183,16 +183,7 @@ class EventController extends AbstractController
             $filterResult = $this->eventFilterService->getEventIdFilter();
             $allowedEventIds = $filterResult->getEventIds();
 
-            $featuredEvents = $this->repo->findBy(['featured' => true], ['start' => 'DESC']);
-
-            // Filter featured events if needed
-            if ($allowedEventIds !== null) {
-                $featuredEvents = array_filter($featuredEvents, fn($event) => in_array(
-                    $event->getId(),
-                    $allowedEventIds,
-                    true,
-                ));
-            }
+            $featuredEvents = $this->repo->findFeatured($allowedEventIds);
 
             $lastEvents = $this->repo->getPastEvents(3, $allowedEventIds);
         } else {

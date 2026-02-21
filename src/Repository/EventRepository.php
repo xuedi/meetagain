@@ -38,6 +38,10 @@ class EventRepository extends ServiceEntityRepository
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
+            ->leftJoin('e.rsvp', 'r')
+            ->addSelect('r')
+            ->leftJoin('e.previewImage', 'pi')
+            ->addSelect('pi')
             ->andWhere('e.status IN (:statuses)')
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
 
@@ -128,6 +132,12 @@ class EventRepository extends ServiceEntityRepository
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l')
+            ->leftJoin('e.rsvp', 'r')
+            ->addSelect('r')
+            ->leftJoin('e.previewImage', 'pi')
+            ->addSelect('pi')
             ->where('e.start > :date')
             ->setParameter('date', new DateTime());
 
@@ -152,6 +162,12 @@ class EventRepository extends ServiceEntityRepository
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l')
+            ->leftJoin('e.rsvp', 'r')
+            ->addSelect('r')
+            ->leftJoin('e.previewImage', 'pi')
+            ->addSelect('pi')
             ->where('e.start < :date')
             ->setParameter('date', new DateTime());
 
@@ -277,7 +293,12 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findAllForAdmin(?array $restrictToEventIds = null): array
     {
-        $qb = $this->createQueryBuilder('e')->leftJoin('e.translations', 't')->addSelect('t');
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l');
 
         // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
@@ -288,6 +309,60 @@ class EventRepository extends ServiceEntityRepository
         }
 
         return $qb->orderBy('e.start', 'ASC')->getQuery()->getResult();
+    }
+
+    /**
+     * Get RSVP counts per event in a single aggregate query.
+     *
+     * @param array<int>|null $eventIds Optional event ID filter
+     * @return array<int, int> Map of event ID to RSVP count
+     */
+    public function getRsvpCounts(?array $eventIds = null): array
+    {
+        $qb = $this
+            ->getEntityManager()
+            ->createQueryBuilder()
+            ->select('e.id', 'COUNT(r.id) as cnt')
+            ->from(Event::class, 'e')
+            ->leftJoin('e.rsvp', 'r')
+            ->groupBy('e.id');
+
+        if ($eventIds !== null && $eventIds !== []) {
+            $qb->andWhere('e.id IN (:ids)')->setParameter('ids', $eventIds);
+        }
+
+        return array_column($qb->getQuery()->getArrayResult(), 'cnt', 'id');
+    }
+
+    /**
+     * Find featured events with location and preview image eagerly loaded.
+     *
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
+     * @return array<Event>
+     */
+    public function findFeatured(?array $restrictToEventIds = null): array
+    {
+        if ($restrictToEventIds === []) {
+            return [];
+        }
+
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l')
+            ->leftJoin('e.previewImage', 'pi')
+            ->addSelect('pi')
+            ->where('e.featured = :featured')
+            ->setParameter('featured', true)
+            ->orderBy('e.start', 'DESC');
+
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:ids)')->setParameter('ids', $restrictToEventIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**

@@ -66,6 +66,7 @@ class EventController extends AbstractAdminController
         return $this->render('admin/event/list.html.twig', [
             'nextEvent' => $this->repo->getNextEventId($eventIds),
             'events' => $this->repo->findAllForAdmin($eventIds),
+            'rsvpCounts' => $this->repo->getRsvpCounts($eventIds),
             'active' => 'event',
         ]);
     }
