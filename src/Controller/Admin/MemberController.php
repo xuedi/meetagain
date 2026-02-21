@@ -30,9 +30,13 @@ class MemberController extends AbstractAdminController
     #[Override]
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(label: 'Members', route: 'app_admin_member', active: 'member', role: 'ROLE_ORGANIZER'),
-        ]);
+        return new AdminNavigationConfig(
+            section: 'System',
+            links: [
+                new AdminLink(label: 'Members', route: 'app_admin_member', active: 'member', role: 'ROLE_ORGANIZER'),
+            ],
+            sectionPriority: 100,
+        );
     }
 
     #[Route('/admin/member', name: 'app_admin_member')]

@@ -10,13 +10,17 @@ class LinkController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(
-                label: 'menu_admin_system',
-                route: 'app_admin_system_config',
-                active: 'system',
-                role: 'ROLE_ADMIN',
-            ),
-        ]);
+        return new AdminNavigationConfig(
+            section: 'System',
+            links: [
+                new AdminLink(
+                    label: 'menu_admin_system',
+                    route: 'app_admin_system_config',
+                    active: 'system',
+                    role: 'ROLE_ADMIN',
+                ),
+            ],
+            sectionPriority: 100,
+        );
     }
 }
