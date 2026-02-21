@@ -11,7 +11,7 @@
     <div class="dropdown-menu" role="menu" style="min-width: 300px;">
         <div class="dropdown-content">
             {% for item in notifications.items %}
-                {% if item.route %}
+                {% if item.route and route_exists(item.route) %}
                     <a href="{{ path(item.route, item.routeParams) }}" class="dropdown-item">
                         <span class="icon is-small"><i class="fa {{ item.icon }}"></i></span>
                         <span>{{ item.label|raw }}</span>

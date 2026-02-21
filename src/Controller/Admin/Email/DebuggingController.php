@@ -8,7 +8,7 @@ use App\Enum\EmailType;
 use App\Service\ConfigService;
 use App\Service\EmailService;
 use App\Service\EmailTemplateService;
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -26,7 +26,7 @@ class DebuggingController extends AbstractAdminController
         private readonly EmailTemplateService $templateService,
         private readonly MailerInterface $mailer,
         private readonly ConfigService $config,
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
     ) {}
 
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -49,7 +49,7 @@ class DebuggingController extends AbstractAdminController
             'active' => 'email',
             'emailTypes' => EmailType::cases(),
             'mockData' => $mockData,
-            'languages' => $this->translationService->getLanguageCodes(),
+            'languages' => $this->languageService->getFilteredEnabledCodes(),
             'defaultType' => EmailType::cases()[0]->value,
         ]);
     }

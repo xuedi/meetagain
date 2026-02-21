@@ -18,5 +18,3 @@ installed.lock
 /plugins/multisite/
 /.claude/plans/*.md
 
-# Translation updates - staging area for production integration
-/translationUpdates.sql

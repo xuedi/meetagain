@@ -7,7 +7,6 @@ namespace App\Notification;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Repository\ImageRepository;
-use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -15,7 +14,6 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
 {
     public function __construct(
         private ImageRepository $imageRepo,
-        private TranslationSuggestionRepository $translationRepo,
         private EmailQueueRepository $emailRepo,
         private UserRepository $userRepo,
         private Security $security,
@@ -43,15 +41,6 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         }
 
         if ($this->security->isGranted('ROLE_ADMIN')) {
-            $pendingTranslations = $this->translationRepo->getPendingCount();
-            if ($pendingTranslations > 0) {
-                $items[] = new NotificationItem(
-                    label: $pendingTranslations . ' Pending Translation' . ($pendingTranslations > 1 ? 's' : ''),
-                    icon: 'fa-language',
-                    route: 'app_admin_translation',
-                );
-            }
-
             $staleEmails = $this->emailRepo->getStaleCount(60);
             if ($staleEmails > 0) {
                 $items[] = new NotificationItem(

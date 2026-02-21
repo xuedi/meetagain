@@ -100,7 +100,6 @@ devModeFixtures plugins='':
     {{PHP}} php bin/console app:plugin:pre-fixtures
     {{PHP}} php bin/console app:fixtures:load -q --append --group=plugin
     {{PHP}} php bin/console app:plugin:post-fixtures
-    {{PHP}} php bin/console app:translation:import 'https://meetagain.org/api/translations'
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console app:event:add-fixture
 
@@ -234,17 +233,9 @@ fixCoverageBadge:
 	{{PHP}} php bin/console app:badge:generate
 	git add tests/badge/coverage.svg
 
-# Fill missing translations automatically (with AI-generated translations)
+# Extract translation keys from templates into YAML files (run after adding new trans keys)
 [group('translations')]
-translationFill:
-    @echo "📥 Syncing latest translations from production..."
-    @{{JUST}} devModeFixtures
-    @echo ""
-    @echo "🔍 Checking for missing translations..."
-    @{{PHP}} php bin/console app:translation:missing | head -1
-    @echo ""
-    @echo "🤖 Generating SQL statements with auto-translation..."
-    @{{PHP}} php bin/console app:translation:fill-missing --auto-translate
-    @echo ""
-    @echo "✅ Done! Review translationUpdates.sql and upload to production."
-    @echo "   Then run: just translationFill again to verify"
+translationExtract:
+    @{{PHP}} php bin/console translation:extract --force de --format yaml
+    @{{PHP}} php bin/console translation:extract --force en --format yaml
+    @{{PHP}} php bin/console translation:extract --force cn --format yaml

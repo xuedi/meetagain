@@ -161,4 +161,39 @@ readonly class LanguageService
 
         return $filteredCodes[0] ?? 'en'; // First by sort order, or 'en' as absolute fallback
     }
+
+    /**
+     * Build an hreflang alternate-language list for the given URI.
+     *
+     * @return array<string, string> locale => URL
+     */
+    public function getAltLangList(string $currentLocale, string $currentUri): array
+    {
+        $altLangList = array_fill_keys($this->getFilteredEnabledCodes(), $currentUri);
+        unset($altLangList[$currentLocale]);
+        foreach ($altLangList as $languageCode => $link) {
+            $altLangList[$languageCode] = $this->replaceUriLanguageCode($link, $languageCode);
+        }
+
+        return $altLangList;
+    }
+
+    public function replaceUriLanguageCode(string $link, string $newCode): string
+    {
+        $languages = $this->getEnabledCodes();
+        $trimmedLink = trim($link, '/');
+
+        if (in_array($trimmedLink, $languages, true)) {
+            return sprintf('/%s/', $newCode);
+        }
+
+        $chunks = explode('/', $trimmedLink);
+        if (in_array($chunks[0], $languages, true)) {
+            $chunks[0] = $newCode;
+
+            return sprintf('/%s', implode('/', $chunks));
+        }
+
+        return $link;
+    }
 }

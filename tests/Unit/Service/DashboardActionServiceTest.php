@@ -9,7 +9,6 @@ use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
-use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use App\Service\DashboardActionService;
 use DateTimeImmutable;
@@ -22,7 +21,6 @@ class DashboardActionServiceTest extends TestCase
     private Stub&UserRepository $userRepoStub;
     private Stub&EmailQueueRepository $mailRepoStub;
     private Stub&ImageRepository $imageRepoStub;
-    private Stub&TranslationSuggestionRepository $translationRepoStub;
     private Stub&MessageRepository $messageRepoStub;
     private Stub&CommandExecutionLogRepository $commandLogRepoStub;
     private DashboardActionService $subject;
@@ -33,7 +31,6 @@ class DashboardActionServiceTest extends TestCase
         $this->userRepoStub = $this->createStub(UserRepository::class);
         $this->mailRepoStub = $this->createStub(EmailQueueRepository::class);
         $this->imageRepoStub = $this->createStub(ImageRepository::class);
-        $this->translationRepoStub = $this->createStub(TranslationSuggestionRepository::class);
         $this->messageRepoStub = $this->createStub(MessageRepository::class);
         $this->commandLogRepoStub = $this->createStub(CommandExecutionLogRepository::class);
 
@@ -42,7 +39,6 @@ class DashboardActionServiceTest extends TestCase
             $this->userRepoStub,
             $this->mailRepoStub,
             $this->imageRepoStub,
-            $this->translationRepoStub,
             $this->messageRepoStub,
             $this->commandLogRepoStub,
         );
@@ -61,14 +57,12 @@ class DashboardActionServiceTest extends TestCase
     public function testGetActionItemsReturnsExpectedCounts(): void
     {
         $this->imageRepoStub->method('getReportedCount')->willReturn(3);
-        $this->translationRepoStub->method('getPendingCount')->willReturn(5);
         $this->mailRepoStub->method('getStaleCount')->willReturn(2);
         $this->mailRepoStub->method('getPendingCount')->willReturn(10);
 
         $result = $this->subject->getActionItems();
 
         $this->assertSame(3, $result['reportedImages']);
-        $this->assertSame(5, $result['pendingTranslations']);
         $this->assertSame(2, $result['staleEmails']);
         $this->assertSame(10, $result['pendingEmails']);
     }
@@ -132,15 +126,6 @@ class DashboardActionServiceTest extends TestCase
         $result = $this->subject->getRecurringEventsCount();
 
         $this->assertSame(7, $result);
-    }
-
-    public function testGetPendingSuggestionsCountReturnsCount(): void
-    {
-        $this->translationRepoStub->method('getPendingCount')->willReturn(15);
-
-        $result = $this->subject->getPendingSuggestionsCount();
-
-        $this->assertSame(15, $result);
     }
 
     public function testGetUnverifiedCountReturnsCount(): void

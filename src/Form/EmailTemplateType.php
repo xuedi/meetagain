@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\EmailTemplate;
 use App\Repository\EmailTemplateTranslationRepository;
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class EmailTemplateType extends AbstractType
 {
     public function __construct(
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
         private readonly EmailTemplateTranslationRepository $translationRepo,
     ) {}
 
@@ -27,7 +27,7 @@ class EmailTemplateType extends AbstractType
         $templateId = $template?->getId();
 
         if ($templateId !== null) {
-            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+            foreach ($this->languageService->getFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->translationRepo->findOneBy([
                     'emailTemplate' => $templateId,
                     'language' => $languageCode,

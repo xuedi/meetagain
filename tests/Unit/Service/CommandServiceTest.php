@@ -4,7 +4,6 @@ namespace Tests\Unit\Service;
 
 use App\Service\Command\EchoCommand;
 use App\Service\CommandService;
-use App\Service\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -12,7 +11,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CommandServiceTest extends TestCase
 {
-    private function createService(?LanguageService $languageService = null): CommandService
+    private function createService(): CommandService
     {
         // Arrange: stub event dispatcher and container
         $eventDispatcherStub = $this->createStub(EventDispatcher::class);
@@ -25,7 +24,6 @@ class CommandServiceTest extends TestCase
 
         return new CommandService(
             kernel: $kernelStub,
-            languageService: $languageService ?? $this->createStub(LanguageService::class),
         );
     }
 
@@ -55,19 +53,6 @@ class CommandServiceTest extends TestCase
 
         // Act & Assert: execute migrations runs without throwing
         $service->executeMigrations();
-        $this->assertTrue(true);
-    }
-
-    public function testExtractTranslationsUsesConfiguredLocales(): void
-    {
-        // Arrange: mock language service to return enabled codes
-        $languageMock = $this->createMock(LanguageService::class);
-        $languageMock->expects($this->atLeastOnce())->method('getEnabledCodes')->willReturn(['de', 'en']);
-
-        $service = $this->createService(languageService: $languageMock);
-
-        // Act & Assert: extract translations runs without throwing
-        $service->extractTranslations();
         $this->assertTrue(true);
     }
 }
