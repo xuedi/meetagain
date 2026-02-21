@@ -243,7 +243,7 @@ fixCoverageBadge:
 [group('translations')]
 translationFill:
     @echo "📥 Syncing latest translations from production..."
-    @{{JUST}} devModeFixtures multisite
+    @{{JUST}} devModeFixtures
     @echo ""
     @echo "🔍 Checking for missing translations..."
     @{{PHP}} php bin/console app:translation:missing | head -1
