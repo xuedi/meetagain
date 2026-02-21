@@ -15,5 +15,6 @@ readonly class AdminNavigationConfig
         public array $links, // Array of AdminLink objects
         public ?array $modifies = null, // Route modifications
         public ?string $sectionRole = null, // Required role for entire section
+        public int $sectionPriority = 0, // Sort order: lower = first; use 100 for "System"
     ) {}
 }

@@ -14,9 +14,18 @@ class PluginController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(label: 'menu_admin_plugin', route: 'app_admin_plugin', active: 'plugin', role: 'ROLE_ADMIN'),
-        ]);
+        return new AdminNavigationConfig(
+            section: 'System',
+            links: [
+                new AdminLink(
+                    label: 'menu_admin_plugin',
+                    route: 'app_admin_plugin',
+                    active: 'plugin',
+                    role: 'ROLE_ADMIN',
+                ),
+            ],
+            sectionPriority: 100,
+        );
     }
 
     public function __construct(

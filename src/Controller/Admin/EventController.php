@@ -31,9 +31,18 @@ class EventController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(label: 'menu_admin_event', route: 'app_admin_event', active: 'event', role: 'ROLE_FOUNDER'),
-        ]);
+        return new AdminNavigationConfig(
+            section: 'System',
+            links: [
+                new AdminLink(
+                    label: 'menu_admin_event',
+                    route: 'app_admin_event',
+                    active: 'event',
+                    role: 'ROLE_FOUNDER',
+                ),
+            ],
+            sectionPriority: 100,
+        );
     }
 
     public function __construct(
