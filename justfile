@@ -181,11 +181,6 @@ testCoverage +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml
     {{PHP}} php bin/console app:test:coverage-report {{parameter}}
 
-# Analyze route performance
-[group('testing')]
-testSymfony +parameter='':
-    {{PHP}} php bin/console app:test:metrics {{parameter}}
-
 # Analyze Page speed in various browsers
 [group('testing')]
 testPerformance:
