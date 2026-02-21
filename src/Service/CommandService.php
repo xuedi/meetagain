@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Service\Command\ClearCacheCommand;
 use App\Service\Command\CommandInterface;
 use App\Service\Command\ExecuteMigrationsCommand;
-use App\Service\Command\ExtractTranslationsCommand;
 use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -19,7 +18,6 @@ readonly class CommandService
 
     public function __construct(
         private KernelInterface $kernel,
-        private LanguageService $languageService,
     ) {
         $this->application = new Application($this->kernel);
         $this->application->setAutoExit(false);
@@ -55,15 +53,5 @@ readonly class CommandService
     public function executeMigrations(): string
     {
         return $this->execute(new ExecuteMigrationsCommand()) . PHP_EOL;
-    }
-
-    public function extractTranslations(): string
-    {
-        $output = '';
-        foreach ($this->languageService->getEnabledCodes() as $locale) {
-            $output .= $this->execute(new ExtractTranslationsCommand($locale)) . PHP_EOL;
-        }
-
-        return $output;
     }
 }

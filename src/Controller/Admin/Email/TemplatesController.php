@@ -12,7 +12,7 @@ use App\Repository\EmailTemplateRepository;
 use App\Repository\EmailTemplateTranslationRepository;
 use App\Service\EmailService;
 use App\Service\EmailTemplateService;
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +33,7 @@ class TemplatesController extends AbstractAdminController
         private readonly EmailTemplateRepository $templateRepo,
         private readonly EmailTemplateService $templateService,
         private readonly EntityManagerInterface $em,
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
         private readonly EmailTemplateTranslationRepository $translationRepo,
     ) {}
 
@@ -52,7 +52,7 @@ class TemplatesController extends AbstractAdminController
                 'context' => $mockData['context'],
                 'renderedBody' => $dbTemplate
                     ? $this->templateService->renderContent(
-                        $dbTemplate->getBody($this->translationService->getLanguageCodes()[0]),
+                        $dbTemplate->getBody($this->languageService->getFilteredEnabledCodes()[0]),
                         $mockData['context'],
                     )
                     : '<p>Template not found. Run app:email-templates:seed</p>',
@@ -89,7 +89,7 @@ class TemplatesController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Save translations for each language
-            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+            foreach ($this->languageService->getFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->getOrCreateTranslation($languageCode, $template->getId());
                 $translation->setEmailTemplate($template);
                 $translation->setLanguage($languageCode);
@@ -112,14 +112,14 @@ class TemplatesController extends AbstractAdminController
             'active' => 'email',
             'form' => $form,
             'template' => $template,
-            'languages' => $this->translationService->getLanguageCodes(),
+            'languages' => $this->languageService->getFilteredEnabledCodes(),
         ]);
     }
 
     #[Route('/{id}/preview', name: 'app_admin_email_templates_preview')]
     public function templatesPreview(Request $request, EmailTemplate $template): Response
     {
-        $language = $request->query->getString('lang', $this->translationService->getLanguageCodes()[0]);
+        $language = $request->query->getString('lang', $this->languageService->getFilteredEnabledCodes()[0]);
         $mockList = $this->emailService->getMockEmailList();
         $mockContext = $this->getMockContextForTemplate($template->getIdentifier(), $mockList);
 
@@ -133,7 +133,7 @@ class TemplatesController extends AbstractAdminController
             'renderedBody' => $renderedBody,
             'context' => $mockContext,
             'currentLanguage' => $language,
-            'languages' => $this->translationService->getLanguageCodes(),
+            'languages' => $this->languageService->getFilteredEnabledCodes(),
         ]);
     }
 
@@ -143,7 +143,7 @@ class TemplatesController extends AbstractAdminController
         $identifier = $template->getIdentifier();
 
         // Reset translations for all enabled languages with language-specific defaults
-        foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+        foreach ($this->languageService->getFilteredEnabledCodes() as $languageCode) {
             $langDefaults = $this->templateService->getDefaultTemplates($languageCode);
 
             if (!isset($langDefaults[$identifier])) {

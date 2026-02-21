@@ -11,7 +11,7 @@ use App\Entity\Location;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Repository\EventTranslationRepository;
 use App\Repository\LocationRepository;
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -34,7 +34,7 @@ class EventType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly AdminLocationListFilterService $locationFilterService,
         private readonly LocationRepository $locationRepository,
@@ -124,7 +124,7 @@ class EventType extends AbstractType
 
         $eventId = $event?->getId();
         if (null !== $eventId) { // not for new events
-            foreach ($this->translationService->getAdminLanguageCodes() as $languageCode) {
+            foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
                 $builder->add("title-$languageCode", TextType::class, [
                     'label' => "title ($languageCode)",

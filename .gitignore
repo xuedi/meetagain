@@ -18,5 +18,3 @@ installed.lock
 /plugins/multisite/
 /.ai/plans/*.md
 
-# Translation updates - staging area for production integration
-/translationUpdates.sql
