@@ -265,6 +265,7 @@ final class EmailServiceTest extends TestCase
         ?EmailQueueRepository $mailRepo = null,
         ?EntityManagerInterface $em = null,
         ?EmailTemplateService $templateService = null,
+        iterable $enrichers = [],
     ): EmailService {
         if ($config === null) {
             $config = $this->createStub(ConfigService::class);
@@ -292,6 +293,7 @@ final class EmailServiceTest extends TestCase
             mailRepo: $mailRepo ?? $this->createStub(EmailQueueRepository::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             templateService: $templateService,
+            enrichers: $enrichers,
         );
     }
 
