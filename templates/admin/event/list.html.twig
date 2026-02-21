@@ -49,7 +49,7 @@
                             <span class="icon has-text-grey-light" title="draft"><i class="fa fa-eye-slash"></i></span>
                         {% endif %}
                     </td>
-                    <td>{{ event.rsvp|length }}</td>
+                    <td>{{ rsvpCounts[event.id] ?? 0 }}</td>
                     <td>{{ event.type ? event.type.name : '-' }}</td>
                     <td>
                         <a href="{{ path('app_admin_event_edit', {'id': event.id}) }}">
