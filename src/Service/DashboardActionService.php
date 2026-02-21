@@ -7,7 +7,6 @@ use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
-use App\Repository\TranslationSuggestionRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 
@@ -18,7 +17,6 @@ readonly class DashboardActionService
         private UserRepository $userRepo,
         private EmailQueueRepository $mailRepo,
         private ImageRepository $imageRepo,
-        private TranslationSuggestionRepository $translationSuggestionRepo,
         private MessageRepository $messageRepo,
         private CommandExecutionLogRepository $commandLogRepo,
     ) {}
@@ -32,7 +30,6 @@ readonly class DashboardActionService
     {
         return [
             'reportedImages' => $this->imageRepo->getReportedCount(),
-            'pendingTranslations' => $this->translationSuggestionRepo->getPendingCount(),
             'staleEmails' => $this->mailRepo->getStaleCount(60),
             'pendingEmails' => $this->mailRepo->getPendingCount(),
         ];
@@ -69,11 +66,6 @@ readonly class DashboardActionService
     public function getRecurringEventsCount(): int
     {
         return $this->eventRepo->getRecurringCount();
-    }
-
-    public function getPendingSuggestionsCount(): int
-    {
-        return $this->translationSuggestionRepo->getPendingCount();
     }
 
     public function getUnverifiedCount(): int

@@ -17,7 +17,7 @@ use App\Repository\EventTranslationRepository;
 use App\Service\EntityActionDispatcher;
 use App\Service\EventService;
 use App\Service\ImageService;
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -48,7 +48,7 @@ class EventController extends AbstractAdminController
     public function __construct(
         private readonly ImageService $imageService,
         private readonly EntityManagerInterface $entityManager,
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly EventService $eventService,
         private readonly EventRepository $repo,
@@ -124,7 +124,7 @@ class EventController extends AbstractAdminController
             }
 
             // save translations
-            foreach ($this->translationService->getAdminLanguageCodes() as $languageCode) {
+            foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->getTranslation($languageCode, $event->getId());
                 $translation->setEvent($event);
                 $translation->setLanguage($languageCode);

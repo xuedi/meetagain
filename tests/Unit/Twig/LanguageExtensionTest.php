@@ -3,30 +3,32 @@
 namespace Tests\Unit\Twig;
 
 use App\Service\LanguageService;
-use App\Service\TranslationService;
 use App\Twig\LanguageExtension;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 class LanguageExtensionTest extends TestCase
 {
     private Stub&LanguageService $languageServiceStub;
-    private Stub&TranslationService $translationServiceStub;
     private Stub&RequestStack $requestStackStub;
+    private Stub&RouterInterface $routerStub;
     private LanguageExtension $subject;
 
     protected function setUp(): void
     {
         $this->languageServiceStub = $this->createStub(LanguageService::class);
-        $this->translationServiceStub = $this->createStub(TranslationService::class);
         $this->requestStackStub = $this->createStub(RequestStack::class);
+        $this->routerStub = $this->createStub(RouterInterface::class);
+        $this->routerStub->method('getRouteCollection')->willReturn(new RouteCollection());
         $this->subject = new LanguageExtension(
             $this->languageServiceStub,
-            $this->translationServiceStub,
             $this->requestStackStub,
+            $this->routerStub,
         );
     }
 
@@ -44,7 +46,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        $this->assertCount(6, $functions);
+        $this->assertCount(7, $functions);
 
         $functionNames = array_map(fn($f) => $f->getName(), $functions);
         $this->assertContains('get_enabled_locales', $functionNames);
@@ -53,6 +55,7 @@ class LanguageExtensionTest extends TestCase
         $this->assertContains('get_alternative_languages', $functionNames);
         $this->assertContains('get_language_codes', $functionNames);
         $this->assertContains('get_admin_language_codes', $functionNames);
+        $this->assertContains('route_exists', $functionNames);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
@@ -81,7 +84,7 @@ class LanguageExtensionTest extends TestCase
         $request->method('getLocale')->willReturn('en');
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
 
-        $this->translationServiceStub
+        $this->languageServiceStub
             ->method('getAltLangList')
             ->with('en', '/en/events')
             ->willReturn(['de' => '/de/events', 'zh' => '/zh/events']);

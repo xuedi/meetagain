@@ -12,7 +12,6 @@ use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
 use App\Service\ImageService;
 use App\Service\LanguageService;
-use App\Service\TranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +31,6 @@ class LanguageController extends AbstractAdminController
         private readonly LanguageRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
-        private readonly TranslationService $translationService,
         private readonly ImageService $imageService,
     ) {}
 
@@ -58,7 +56,6 @@ class LanguageController extends AbstractAdminController
             $this->em->persist($language);
             $this->em->flush();
             $this->languageService->invalidateCache();
-            $this->translationService->publish();
 
             $this->addFlash('success', 'Language added successfully');
 
@@ -84,7 +81,6 @@ class LanguageController extends AbstractAdminController
 
             $this->em->flush();
             $this->languageService->invalidateCache();
-            $this->translationService->publish();
 
             $this->addFlash('success', 'Language updated successfully');
 

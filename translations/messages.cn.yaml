@@ -1,0 +1,209 @@
+page_title_default: 欢迎
+menu_about: 关于
+menu_events: 活动
+menu_members: 成员
+menu_manage: 管理
+menu_admin: 管理员
+menu_profile_events: 我的活动
+menu_profile_messages: 我的留言
+menu_profile_view_profile: 查看简介
+menu_profile_config: 设置和隐私
+menu_profile_logout: 注销
+language_de: 德语
+language_en: 英语
+language_cn: 中文
+button_save: 节省
+menu_admin_cms: 页面
+menu_admin_config: 配置
+menu_admin_event: 活动
+menu_admin_host: 主机
+menu_admin_location: 会场
+menu_admin_user: 成员
+page_title_about: 关于
+page_title_admin: 管理
+page_title_event: 活动
+page_title_login: 登录
+page_title_manage: 管理
+page_title_member: 成员
+page_title_profile: 概况
+role_admin: 管理
+role_manager: 经理
+role_system: 系统
+role_user: 用户
+menu_default: 主页
+menu_login: 登录
+'p: please sign in': 请登录
+'p: please register': 请注册
+page_title_register: 注册
+button_register: 注册
+no: 没有
+yes: 是
+published: 已出版
+draft: 草案
+button_add: 添加
+button_cancel: 取消
+menu_imprint: 印象深刻
+menu_privacy: 数据保护
+page_title_error: 错误
+page_title_cmd: CMS
+button_change_password: 更改密码
+terms: 条件
+event_filter_time_all: 所有活动
+event_filter_time_past: 刚老
+event_filter_time_future: 在即
+event_filter_sort_past: 旧事重提
+event_filter_sort_future: 新事件优先
+event_filter_type_all: 各类
+event_filter_type_regular: 普通
+event_filter_type_outdoor: 户外
+event_filter_type_dinner: 只是晚餐
+event_filter_who_all: 所有活动
+event_filter_who_myevents: 我的活动
+event_filter_who_myfriendsevents: 我的朋友们
+changedusername: 更改了用户名
+login: 登录
+registered: 注册
+emailverified: 电子邮件已验证
+active: 活动
+blocked: 受阻
+deleted: 删除
+denied: 拒绝
+menu_admin_images: 图像
+menu_admin_logs_system: 系统
+menu_admin_logs_activity: 活动
+button_filter: 过滤
+event_filter_who_my: 我的活动
+event_filter_who_my_friends: 我的朋友们
+menu_profile_social: 我的活动
+images: 图片
+comments: 评论
+menu_profile_images: 我的照片
+menu_cookie_consent_button: (饼干)同意
+menu_cookie_consent_headline: 本网站使用(饼干)
+menu_cookie_consent_text: "本网站本身不使用任何跟踪功能，仅使用符合 GDPR 的非个性化会话。"
+menu_cookie_consent_option_osm: 开放式街道地图
+menu_cookie_consent_option_osm_text: "该(饼干)不是由我们设置的，而是通过集成(OpenStreetMaps)设置的，如果未设置，则活动详情页上没有地图。"
+event: 活动
+block_headline: 标题
+block_paragraph: 段落
+block_text: 文本
+block_image: 图片
+block_hero: 英雄
+block_eventteaser: 活动预告
+menu_glossary: 术语表
+rsvpyes: 是
+rsvpno: 不
+menu_cookie_consent_button_accept: 接受
+menu_cookie_consent_options: 可选饼干
+page_register_headline: 请注册
+menu_cookie_consent_button_deny: 拒绝
+page_login_headline: 请登录
+button_send: 发送
+menu_admin_redo_thumbnails: 重新生成缩略图
+page_reset_headline: 重置密码
+page_login_reset: "如果您忘记了密码，只要您还记得自己的电子邮件地址，就可以重新设置密码。"
+page_reset_password_headline: 新密码
+button_send_reset_link: 重置密码
+menu_admin_logs_404: 404 错误
+button_upload: 上传
+toggle_yes: 在
+toggle_no: 关掉
+image_report_reason_privacy: 隐私
+image_report_reason_copyright: 版权
+image_report_reason_inappropriate: 不恰当
+report_image_reason: 报告原因
+button_report: 报告
+page_title_events_featured: 推荐会议
+events_featured_button: 精选
+page_plugin_glossary_new_title: 新条目
+page_plugin_glossary_delete_title: 删除条目
+page_plugin_glossary_title: 术语表
+page_image_title: 图片
+menu_admin_plugin: 插件
+menu_admin_command: 命令
+page_reset_success_title: 重置成功
+page_reset_success_headline: 重置成功
+menu_admin_system: 设置
+admin_menu_add: 添加
+admin_menu_edit: 编辑
+menu_admin_menu: 菜单
+menu_location_topbar: 顶部菜单
+menu_location_bottomcol1: 页脚 1
+menu_location_bottomcol2: 页脚 2
+menu_location_bottomcol3: 页脚 3
+menu_location_bottomcol4: 页脚 4
+menu_type_url: 网址
+menu_type_cms: CMS页面
+menu_type_event: 活动页面
+menu_type_route: 网站路线
+menu_visibility_everyone: 游客
+menu_visibility_user: 成员
+menu_visibility_manager: 经理
+menu_visibility_admin: 管理员
+page_plugin_dishes_title_index: 菜肴
+email: 电子邮件
+password: 密码
+link_here: 这里
+footer_col1: 静态
+footer_col2: 动态
+footer_col3: 社交
+footer_col4: 法律
+member_pageview_information: "显示第 %pageCurrent% 页，共 %pageTotal% 页（总计 %userTotal% 名成员）"
+page_plugin_dishes_title_details: 菜肴
+page_plugin_dishes_title_new: 新菜品
+menu_dishes: 法院
+menu_admin_email: 电子邮件
+code: 代码
+name: 名称
+'has tile': 包含图片
+status: 状态
+'sort order': 排序顺序
+enabled: 启用
+disabled: 停用
+disable: 禁用
+enable: 启用
+'edit language': 编辑语言
+'add language': 添加语言
+menu_admin_language: 语言
+canceled: 取消
+'this event has been canceled.': 本次活动已取消。
+'event canceled': 活动取消
+page_title_cookie: 网站Cookie
+cookie_consent_cookies_text: "我们仅存储您是否接受Cookie的信息。这将避免您下次访问时出现Cookie弹窗。"
+cookie_consent_current_status: 当前状态
+cookie_consent_cookies: 允许Cookies
+cookie_consent_status_granted: 接受
+cookie_consent_status_denied: 被拒绝
+cookie_consent_status_unknown: 未设置
+actions: 操作
+announcement_cms_page: CMS 页面
+announcement_content: 内容
+announcement_content_help: 内容将从所选的 CMS 页面中提取。
+announcement_created: 已创建
+announcement_created_by: 创建者
+announcement_details: 公告详情
+announcement_edit: 编辑公告
+announcement_email_preview: 邮件预览
+announcement_new: 新公告
+announcement_preview: 预览
+announcement_recipients: 收件人
+announcement_sent_at: 发送于
+announcement_status: 状态
+announcement_title: 标题
+button_back: 返回
+button_change_cms_page: 更改 CMS 页面
+button_create: 创建
+button_delete: 删除
+button_edit_cms_page: 编辑 CMS 页面
+button_preview: 预览
+button_send_announcement: 发送公告
+confirm_delete_announcement: 您确定要删除此公告吗？
+confirm_send_announcement: 您确定要向所有收件人发送此公告吗？
+email_subject: 主题
+menu_admin_announcement: 公告
+no_announcements: 未找到公告。
+no_cms_page: 未选择 CMS 页面。
+sent: 已发送
+unpublished: 未发布
+menu_cookie_consent_button_status: 状态
+event_filter_group_all: 所有组
