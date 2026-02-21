@@ -74,6 +74,7 @@ readonly class AdminNavigationService
                 if (!isset($sectionsMap[$section])) {
                     $sectionsMap[$section] = [
                         'role' => $config->sectionRole,
+                        'priority' => $config->sectionPriority,
                         'links' => [],
                     ];
                 }
@@ -85,8 +86,11 @@ readonly class AdminNavigationService
             }
         }
 
-        // Sort sections alphabetically by section name
-        ksort($sectionsMap);
+        // Sort sections by priority ASC, then alphabetically within same priority
+        uksort($sectionsMap, function (string $a, string $b) use ($sectionsMap): int {
+            $diff = $sectionsMap[$a]['priority'] <=> $sectionsMap[$b]['priority'];
+            return $diff !== 0 ? $diff : strcmp($a, $b);
+        });
 
         // Sort links within each section alphabetically by label
         foreach ($sectionsMap as &$sectionData) {

@@ -97,6 +97,60 @@ final class AdminNavigationServiceTest extends TestCase
         $this->assertSame(['Apple', 'Mango', 'Zebra'], $sectionNames, 'Sections should be sorted alphabetically');
     }
 
+    public function testGetSidebarSectionsSortsByPriorityThenAlphabetically(): void
+    {
+        // Arrange - "System" section at priority 100 should appear after priority-0 sections,
+        // even if alphabetically it would come before (e.g., "Zebra" > "System" but priority wins)
+        $pluginController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(section: 'Zebra Group', links: [new AdminLink(
+                    label: 'menu_zebra',
+                    route: 'app_zebra',
+                )]);
+            }
+        };
+
+        $systemController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    links: [new AdminLink(label: 'menu_system', route: 'app_system')],
+                    sectionPriority: 100,
+                );
+            }
+        };
+
+        $anotherPluginController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(section: 'Apple Group', links: [new AdminLink(
+                    label: 'menu_apple',
+                    route: 'app_apple',
+                )]);
+            }
+        };
+
+        $service = new AdminNavigationService(
+            $this->security,
+            [$systemController, $pluginController, $anotherPluginController],
+        );
+
+        $this->security->method('isGranted')->willReturn(true);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert - priority-0 sections appear first (alphabetically), then priority-100
+        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
+        $this->assertSame(
+            ['Apple Group', 'Zebra Group', 'System'],
+            $sectionNames,
+            'Priority-0 sections appear before priority-100, alphabetically within same priority',
+        );
+    }
+
     public function testGetSidebarSectionsSortsLinksAlphabetically(): void
     {
         // Arrange - create multiple controllers contributing to same section
