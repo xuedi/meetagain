@@ -12,17 +12,23 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
 readonly class EmailService
 {
+    /**
+     * @param iterable<EmailContextEnricherInterface> $enrichers
+     */
     public function __construct(
         private MailerInterface $mailer,
         private ConfigService $config,
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
         private EmailTemplateService $templateService,
+        #[AutowireIterator(EmailContextEnricherInterface::class)]
+        private iterable $enrichers,
     ) {}
 
     public function prepareVerificationRequest(User $user): bool
@@ -267,7 +273,11 @@ readonly class EmailService
         $locale = $email->getLocale() ?? 'en';
         $templateContent = $this->templateService->getTemplateContent($identifier, $locale);
 
-        $context = $email->getContext();
+        $context = array_merge(['greeting' => ''], $email->getContext());
+
+        foreach ($this->enrichers as $enricher) {
+            $context = $enricher->enrich($context, $locale);
+        }
 
         $emailQueue = new EmailQueue();
         $emailQueue->setSender($email->getFrom()[0]->toString());
