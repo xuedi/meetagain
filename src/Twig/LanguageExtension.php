@@ -3,10 +3,12 @@
 namespace App\Twig;
 
 use App\Service\LanguageService;
+use Exception;
 use Override;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
@@ -67,6 +69,14 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
     public function routeExists(string $name): bool
     {
-        return $this->router->getRouteCollection()->get($name) !== null;
+        try {
+            $this->router->generate($name);
+
+            return true;
+        } catch (RouteNotFoundException) {
+            return false;
+        } catch (Exception) {
+            return true;
+        }
     }
 }

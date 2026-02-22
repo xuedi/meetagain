@@ -9,7 +9,8 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
 class LanguageExtensionTest extends TestCase
@@ -24,7 +25,6 @@ class LanguageExtensionTest extends TestCase
         $this->languageServiceStub = $this->createStub(LanguageService::class);
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->routerStub = $this->createStub(RouterInterface::class);
-        $this->routerStub->method('getRouteCollection')->willReturn(new RouteCollection());
         $this->subject = new LanguageExtension(
             $this->languageServiceStub,
             $this->requestStackStub,
@@ -113,5 +113,41 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->getAlternativeLanguageCodes();
 
         $this->assertSame([], $result);
+    }
+
+    public function testRouteExistsReturnsTrueWhenRouteCanBeGenerated(): void
+    {
+        // Arrange
+        $this->routerStub->method('generate')->with('some_route')->willReturn('/some/path');
+
+        // Act
+        $result = $this->subject->routeExists('some_route');
+
+        // Assert
+        $this->assertTrue($result);
+    }
+
+    public function testRouteExistsReturnsFalseWhenRouteNotFound(): void
+    {
+        // Arrange
+        $this->routerStub->method('generate')->willThrowException(new RouteNotFoundException());
+
+        // Act
+        $result = $this->subject->routeExists('nonexistent_route');
+
+        // Assert
+        $this->assertFalse($result);
+    }
+
+    public function testRouteExistsReturnsTrueWhenRouteExistsButRequiresParams(): void
+    {
+        // Arrange
+        $this->routerStub->method('generate')->willThrowException(new MissingMandatoryParametersException('id'));
+
+        // Act
+        $result = $this->subject->routeExists('parameterized_route');
+
+        // Assert
+        $this->assertTrue($result);
     }
 }
