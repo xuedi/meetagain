@@ -36,8 +36,8 @@ menu_login: 登录
 'p: please register': 请注册
 page_title_register: 注册
 button_register: 注册
-no: 没有
-yes: 是
+'no': 没有
+'yes': 是
 published: 已出版
 draft: 草案
 button_add: 添加
@@ -80,9 +80,9 @@ comments: 评论
 menu_profile_images: 我的照片
 menu_cookie_consent_button: (饼干)同意
 menu_cookie_consent_headline: 本网站使用(饼干)
-menu_cookie_consent_text: "本网站本身不使用任何跟踪功能，仅使用符合 GDPR 的非个性化会话。"
+menu_cookie_consent_text: '本网站本身不使用任何跟踪功能，仅使用符合 GDPR 的非个性化会话。'
 menu_cookie_consent_option_osm: 开放式街道地图
-menu_cookie_consent_option_osm_text: "该(饼干)不是由我们设置的，而是通过集成(OpenStreetMaps)设置的，如果未设置，则活动详情页上没有地图。"
+menu_cookie_consent_option_osm_text: 该(饼干)不是由我们设置的，而是通过集成(OpenStreetMaps)设置的，如果未设置，则活动详情页上没有地图。
 event: 活动
 block_headline: 标题
 block_paragraph: 段落
@@ -101,10 +101,10 @@ page_login_headline: 请登录
 button_send: 发送
 menu_admin_redo_thumbnails: 重新生成缩略图
 page_reset_headline: 重置密码
-page_login_reset: "如果您忘记了密码，只要您还记得自己的电子邮件地址，就可以重新设置密码。"
+page_login_reset: 如果您忘记了密码，只要您还记得自己的电子邮件地址，就可以重新设置密码。
 page_reset_password_headline: 新密码
 button_send_reset_link: 重置密码
-menu_admin_logs_404: 404 错误
+menu_admin_logs_404: '404 错误'
 button_upload: 上传
 toggle_yes: 在
 toggle_no: 关掉
@@ -128,10 +128,10 @@ admin_menu_add: 添加
 admin_menu_edit: 编辑
 menu_admin_menu: 菜单
 menu_location_topbar: 顶部菜单
-menu_location_bottomcol1: 页脚 1
-menu_location_bottomcol2: 页脚 2
-menu_location_bottomcol3: 页脚 3
-menu_location_bottomcol4: 页脚 4
+menu_location_bottomcol1: '页脚 1'
+menu_location_bottomcol2: '页脚 2'
+menu_location_bottomcol3: '页脚 3'
+menu_location_bottomcol4: '页脚 4'
 menu_type_url: 网址
 menu_type_cms: CMS页面
 menu_type_event: 活动页面
@@ -148,7 +148,7 @@ footer_col1: 静态
 footer_col2: 动态
 footer_col3: 社交
 footer_col4: 法律
-member_pageview_information: "显示第 %pageCurrent% 页，共 %pageTotal% 页（总计 %userTotal% 名成员）"
+member_pageview_information: '显示第 %pageCurrent% 页，共 %pageTotal% 页（总计 %userTotal% 名成员）'
 page_plugin_dishes_title_details: 菜肴
 page_plugin_dishes_title_new: 新菜品
 menu_dishes: 法院
@@ -169,16 +169,16 @@ canceled: 取消
 'this event has been canceled.': 本次活动已取消。
 'event canceled': 活动取消
 page_title_cookie: 网站Cookie
-cookie_consent_cookies_text: "我们仅存储您是否接受Cookie的信息。这将避免您下次访问时出现Cookie弹窗。"
+cookie_consent_cookies_text: 我们仅存储您是否接受Cookie的信息。这将避免您下次访问时出现Cookie弹窗。
 cookie_consent_current_status: 当前状态
 cookie_consent_cookies: 允许Cookies
 cookie_consent_status_granted: 接受
 cookie_consent_status_denied: 被拒绝
 cookie_consent_status_unknown: 未设置
 actions: 操作
-announcement_cms_page: CMS 页面
+announcement_cms_page: 'CMS 页面'
 announcement_content: 内容
-announcement_content_help: 内容将从所选的 CMS 页面中提取。
+announcement_content_help: '内容将从所选的 CMS 页面中提取。'
 announcement_created: 已创建
 announcement_created_by: 创建者
 announcement_details: 公告详情
@@ -191,10 +191,10 @@ announcement_sent_at: 发送于
 announcement_status: 状态
 announcement_title: 标题
 button_back: 返回
-button_change_cms_page: 更改 CMS 页面
+button_change_cms_page: '更改 CMS 页面'
 button_create: 创建
 button_delete: 删除
-button_edit_cms_page: 编辑 CMS 页面
+button_edit_cms_page: '编辑 CMS 页面'
 button_preview: 预览
 button_send_announcement: 发送公告
 confirm_delete_announcement: 您确定要删除此公告吗？
@@ -202,8 +202,77 @@ confirm_send_announcement: 您确定要向所有收件人发送此公告吗？
 email_subject: 主题
 menu_admin_announcement: 公告
 no_announcements: 未找到公告。
-no_cms_page: 未选择 CMS 页面。
+no_cms_page: '未选择 CMS 页面。'
 sent: 已发送
 unpublished: 未发布
 menu_cookie_consent_button_status: 状态
 event_filter_group_all: 所有组
+group_tab_profile: 个人资料
+group_tab_languages: 语言
+group_languages_current_settings: 当前设置
+group_languages_enabled_count: 已启用语言
+group_languages_all: 全部
+group_languages_list: 语言列表
+group_languages_default_tag: 默认
+Registered: 已注册
+EmailVerified: 邮箱已验证
+Active: 活跃
+Blocked: 已封禁
+Deleted: 已删除
+Denied: 已拒绝
+locked: 已锁定
+ChangedUsername: 更改了用户名
+Login: 登录
+RsvpYes: 是
+RsvpNo: 否
+Published: 已发布
+Draft: 草稿
+'Locked (visible on all groups)': 已锁定（在所有组中可见）
+Normal: 正常
+role_founder: 创始人
+role_organizer: 组织者
+'Yes': 是
+'No': 否
+registration_approved_title: 注册已通过
+registration_approved_subtitle: 欢迎加入社区！
+registration_next_steps: 下一步
+registration_tip_profile: 完善个人资料
+registration_tip_profile_desc: 添加照片并填写您的详细信息
+registration_tip_events: 探索活动
+registration_tip_events_desc: 浏览并参加即将举行的活动
+registration_tip_community: 融入社区
+registration_tip_community_desc: 结识其他成员
+registration_tip_settings: 自定义设置
+registration_tip_settings_desc: 调整您的偏好和隐私设置
+login_now: 立即登录
+button_Register: 注册
+Canceled: 已取消
+'Event canceled': 活动已取消
+Comments: 评论
+Images: 图片
+'This event has been canceled.': 本次活动已取消。
+email_tab_templates: 模板
+email_tab_sendlog: 发送日志
+email_tab_announcements: 公告
+email_tab_debugging: 调试
+logs_tab_activity: 活动日志
+logs_tab_system: 系统日志
+logs_tab_404: 404错误
+system_tab_config: 配置
+system_tab_theme: 主题
+system_tab_images: 图片
+system_tab_language: 语言
+Code: 代码
+Name: 名称
+'Has Tile': 有图块
+Status: 状态
+'Sort Order': 排序
+Enabled: 已启用
+Disabled: 已禁用
+Disable: 禁用
+Enable: 启用
+'Edit Language': 编辑语言
+'Add Language': 添加语言
+'Home page': 主页
+'Has linked announcement': 有关联公告
+page_title_CMD: CMS
