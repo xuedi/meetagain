@@ -2,7 +2,7 @@
 
 namespace Plugin\Dishes\Form;
 
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Repository\DishTranslationRepository;
 use Symfony\Component\Form\AbstractType;
@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class DishType extends AbstractType
 {
     public function __construct(
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
         private readonly DishTranslationRepository $dishTransRepo,
     ) {}
 
@@ -23,7 +23,7 @@ class DishType extends AbstractType
     {
         $dish = $options['data'] ?? null;
         $dishId = $dish?->getId();
-        foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+        foreach ($this->languageService->getEnabledCodes() as $languageCode) {
             $translation = $dishId !== null
                 ? $this->dishTransRepo->findOneBy(['dish' => $dishId, 'language' => $languageCode])
                 : null;
