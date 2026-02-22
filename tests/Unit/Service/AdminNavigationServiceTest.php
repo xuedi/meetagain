@@ -10,6 +10,8 @@ use App\Service\AdminNavigationService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @covers \App\Service\AdminNavigationService
@@ -18,10 +20,13 @@ use Symfony\Bundle\SecurityBundle\Security;
 final class AdminNavigationServiceTest extends TestCase
 {
     private Security $security;
+    private RouterInterface $router;
 
     protected function setUp(): void
     {
         $this->security = $this->createMock(Security::class);
+        $this->router = $this->createStub(RouterInterface::class);
+        $this->router->method('generate')->willReturn('/some/path');
     }
 
     public function testGetSidebarSectionsWithControllers(): void
@@ -36,7 +41,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -84,7 +89,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$controllerZ, $controllerA, $controllerM]);
+        $service = new AdminNavigationService($this->security, $this->router, [$controllerZ, $controllerA, $controllerM]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -134,6 +139,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService(
             $this->security,
+            $this->router,
             [$systemController, $pluginController, $anotherPluginController],
         );
 
@@ -181,7 +187,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$controllerZ, $controllerA, $controllerM]);
+        $service = new AdminNavigationService($this->security, $this->router, [$controllerZ, $controllerA, $controllerM]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -217,7 +223,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
         // Deny ROLE_ADMIN
         $this->security->method('isGranted')->willReturn(false);
@@ -239,7 +245,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -267,7 +273,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -308,7 +314,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$singleLinkController, $multiLinkController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$singleLinkController, $multiLinkController]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -344,7 +350,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
         // Only grant base admin role, not ROLE_SUPER_ADMIN
         $this->security->method('isGranted')->willReturnCallback(fn(string $role) => $role !== 'ROLE_SUPER_ADMIN');
@@ -391,7 +397,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -446,6 +452,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService(
             $this->security,
+            $this->router,
             [$cmsController, $systemController, $modifierController],
         );
 
@@ -502,7 +509,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$cmsController, $modifier1, $modifier2]);
+        $service = new AdminNavigationService($this->security, $this->router, [$cmsController, $modifier1, $modifier2]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -546,7 +553,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -561,5 +568,40 @@ final class AdminNavigationServiceTest extends TestCase
         $this->assertEquals('New Label', $link->getLabel());
         $this->assertEquals('new_active', $link->getActive());
         $this->assertEquals('app_admin_test', $link->getRoute());
+    }
+
+    public function testLinksWithNonExistentRoutesAreFiltered(): void
+    {
+        // Arrange
+        $mockController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'Valid Link', route: 'app_existing_route'),
+                    new AdminLink(label: 'Missing Link', route: 'app_missing_route'),
+                ]);
+            }
+        };
+
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('generate')->willReturnCallback(function (string $name): string {
+            if ($name === 'app_missing_route') {
+                throw new RouteNotFoundException();
+            }
+
+            return '/some/path';
+        });
+
+        $service = new AdminNavigationService($this->security, $router, [$mockController]);
+        $this->security->method('isGranted')->willReturn(true);
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert
+        $this->assertCount(1, $sections);
+        $links = $sections[0]->getLinks();
+        $this->assertCount(1, $links, 'Link with non-existent route should be filtered out');
+        $this->assertSame('Valid Link', $links[0]->getLabel());
     }
 }
