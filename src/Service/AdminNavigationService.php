@@ -7,6 +7,8 @@ use App\Entity\AdminLink;
 use App\Entity\AdminSection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Builds admin sidebar navigation from controllers.
@@ -21,6 +23,7 @@ readonly class AdminNavigationService
      */
     public function __construct(
         private Security $security,
+        private RouterInterface $router,
         #[AutowireIterator(AdminNavigationInterface::class)]
         private iterable $controllers,
     ) {}
@@ -79,6 +82,10 @@ readonly class AdminNavigationService
                     ];
                 }
 
+                if (!$this->routeExists($route)) {
+                    continue;
+                }
+
                 // Create modified link
                 $modifiedLink = new AdminLink(label: $label, route: $route, active: $active, role: $role);
 
@@ -124,5 +131,18 @@ readonly class AdminNavigationService
         }
 
         return $sections;
+    }
+
+    private function routeExists(string $name): bool
+    {
+        try {
+            $this->router->generate($name);
+
+            return true;
+        } catch (RouteNotFoundException) {
+            return false;
+        } catch (\Exception) {
+            return true;
+        }
     }
 }
