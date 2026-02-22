@@ -1,12 +1,12 @@
 page_title_default: Willkommen
-menu_about: "Über Uns"
+menu_about: 'Über Uns'
 menu_events: Events
 menu_members: Mitglieder
 menu_manage: Verwaltung
 menu_admin: Admin
-menu_profile_events: Meine Events
-menu_profile_messages: Meine Nachrichten
-menu_profile_view_profile: Mein Profil
+menu_profile_events: 'Meine Events'
+menu_profile_messages: 'Meine Nachrichten'
+menu_profile_view_profile: 'Mein Profil'
 menu_profile_config: Einstellungen
 menu_profile_logout: Abmelden
 language_de: Deutsch
@@ -17,9 +17,9 @@ menu_admin_cms: Seiten
 menu_admin_config: Konfiguration
 menu_admin_event: Events
 menu_admin_host: Gastgeber
-menu_admin_location: "Veranstaltungsort"
+menu_admin_location: Veranstaltungsort
 menu_admin_user: Mitglieder
-page_title_about: "Über uns"
+page_title_about: 'Über uns'
 page_title_admin: Admin
 page_title_event: Events
 page_title_login: Login
@@ -36,55 +36,55 @@ menu_login: Anmelden
 'p: please register': Registrierung
 page_title_register: Registrierung
 button_register: Registrierung
-no: Nein
-yes: Ja
-published: "Veröffentlicht"
+'no': Nein
+'yes': Ja
+published: Veröffentlicht
 draft: Entwurf
-button_add: "Hinzufügen"
+button_add: Hinzufügen
 button_cancel: Abbrechen
 menu_imprint: Impressum
 menu_privacy: Datenschutz
 page_title_error: Fehler
 page_title_cmd: CMS
-button_change_password: "Passwort ändern"
+button_change_password: 'Passwort ändern'
 terms: Bedingungen
-event_filter_time_all: Alle Events
-event_filter_time_past: Nur Alte
-event_filter_time_future: Nur zukünftige
-event_filter_sort_past: Alte zuerst
-event_filter_sort_future: Neue zuerst
-event_filter_type_all: Alle Typen
-event_filter_type_regular: "Nur Reguläre"
-event_filter_type_outdoor: Nur Outdoor
-event_filter_type_dinner: Nur Dinner
-event_filter_who_all: Alle Events
+event_filter_time_all: 'Alle Events'
+event_filter_time_past: 'Nur Alte'
+event_filter_time_future: 'Nur zukünftige'
+event_filter_sort_past: 'Alte zuerst'
+event_filter_sort_future: 'Neue zuerst'
+event_filter_type_all: 'Alle Typen'
+event_filter_type_regular: 'Nur Reguläre'
+event_filter_type_outdoor: 'Nur Outdoor'
+event_filter_type_dinner: 'Nur Dinner'
+event_filter_who_all: 'Alle Events'
 event_filter_who_myevents: Meine
-event_filter_who_myfriendsevents: Mit meinen Freunden
-changedusername: "Usernamen geändert"
+event_filter_who_myfriendsevents: 'Mit meinen Freunden'
+changedusername: 'Usernamen geändert'
 login: Einloggen
 registered: Registriert
-emailverified: "E-Mail geprüft"
+emailverified: 'E-Mail geprüft'
 active: Aktiv
 blocked: Gesterrt
 deleted: gelöscht
 denied: Abgelehnt
 menu_admin_images: Bilder
 menu_admin_logs_system: System
-menu_admin_logs_activity: "Aktivität"
+menu_admin_logs_activity: Aktivität
 button_filter: Filtern
 event_filter_who_my: Meine
-event_filter_who_my_friends: Mit meinen Freunden
-menu_profile_social: Meine Aktivitäten
+event_filter_who_my_friends: 'Mit meinen Freunden'
+menu_profile_social: 'Meine Aktivitäten'
 images: Bilder
 comments: Kommentare
-menu_profile_images: Meine Bilder
-menu_cookie_consent_button: Cookie Zustimmung
-menu_cookie_consent_headline: Diese Webseite benutzt Cookies
-menu_cookie_consent_text: "Diese Webseite selber benutzt keinerlei Tracking oder cookies, nur die GDPR-konforme und nicht personenbezogene Session."
-menu_cookie_consent_option_osm: Open Street maps
-menu_cookie_consent_option_osm_text: "Dieser Cookie wird nicht von uns gesetzt aber durch die Einbindung von OpenStreetMaps, wenn nicht gesetzt gibt es keine Karte auf der Event detail Seite."
+menu_profile_images: 'Meine Bilder'
+menu_cookie_consent_button: 'Cookie Zustimmung'
+menu_cookie_consent_headline: 'Diese Webseite benutzt Cookies'
+menu_cookie_consent_text: 'Diese Webseite selber benutzt keinerlei Tracking oder cookies, nur die GDPR-konforme und nicht personenbezogene Session.'
+menu_cookie_consent_option_osm: 'Open Street maps'
+menu_cookie_consent_option_osm_text: 'Dieser Cookie wird nicht von uns gesetzt aber durch die Einbindung von OpenStreetMaps, wenn nicht gesetzt gibt es keine Karte auf der Event detail Seite.'
 event: Event
-block_headline: "Überschrift"
+block_headline: Überschrift
 block_paragraph: Absatz
 block_text: Text
 block_image: Bild
@@ -94,48 +94,48 @@ menu_glossary: Glossar
 rsvpyes: Ja
 rsvpno: Nein
 menu_cookie_consent_button_accept: Akzeptieren
-menu_cookie_consent_options: Optionale cookies
+menu_cookie_consent_options: 'Optionale cookies'
 page_register_headline: Registrierung
 menu_cookie_consent_button_deny: Ablehnen
 page_login_headline: Anmeldung
 button_send: Senden
 menu_admin_redo_thumbnails: reThumbnail
-page_reset_headline: "Passwort zurücksetzen"
-page_login_reset: "Wenn Sie Ihr Passwort vergessen haben, können Sie es zurücksetzen, wenn Sie sich an Ihre E-Mail-Adresse erinnern"
-page_reset_password_headline: Neues Passwort
-button_send_reset_link: "Passwort zurücksetzen"
-menu_admin_logs_404: 404 Fehler
+page_reset_headline: 'Passwort zurücksetzen'
+page_login_reset: 'Wenn Sie Ihr Passwort vergessen haben, können Sie es zurücksetzen, wenn Sie sich an Ihre E-Mail-Adresse erinnern'
+page_reset_password_headline: 'Neues Passwort'
+button_send_reset_link: 'Passwort zurücksetzen'
+menu_admin_logs_404: '404 Fehler'
 button_upload: Hochladen
 toggle_yes: Ja
 toggle_no: Nein
 image_report_reason_privacy: Datenschutz
 image_report_reason_copyright: Copyright
 image_report_reason_inappropriate: Unangemessen
-report_image_reason: Grund des Reports
+report_image_reason: 'Grund des Reports'
 button_report: Melden
-page_title_events_featured: Besondere Treffen
-events_featured_button: Besondere Events
-page_plugin_glossary_new_title: Neuer Eintrag
-page_plugin_glossary_delete_title: "Eintrag löschen"
+page_title_events_featured: 'Besondere Treffen'
+events_featured_button: 'Besondere Events'
+page_plugin_glossary_new_title: 'Neuer Eintrag'
+page_plugin_glossary_delete_title: 'Eintrag löschen'
 page_plugin_glossary_title: Glossar
 page_image_title: Bilder
 menu_admin_plugin: Erwiterungen
 menu_admin_command: Befehle
-page_reset_success_title: "Erfolgreich zurückgesetzt"
-page_reset_success_headline: "Erfolgreich zurückgesetzt"
+page_reset_success_title: 'Erfolgreich zurückgesetzt'
+page_reset_success_headline: 'Erfolgreich zurückgesetzt'
 menu_admin_system: Einstellungen
-admin_menu_add: "Hinzufügen"
+admin_menu_add: Hinzufügen
 admin_menu_edit: Bearbeiten
 menu_admin_menu: Menus
-menu_location_topbar: Top Menu
-menu_location_bottomcol1: Fusszeile 1
-menu_location_bottomcol2: Fusszeile 2
-menu_location_bottomcol3: Fusszeile 3
-menu_location_bottomcol4: Fusszeile 4
+menu_location_topbar: 'Top Menu'
+menu_location_bottomcol1: 'Fusszeile 1'
+menu_location_bottomcol2: 'Fusszeile 2'
+menu_location_bottomcol3: 'Fusszeile 3'
+menu_location_bottomcol4: 'Fusszeile 4'
 menu_type_url: Url
 menu_type_cms: CMS-Seite
 menu_type_event: Event-Seite
-menu_type_route: Website route
+menu_type_route: 'Website route'
 menu_visibility_everyone: Besucher
 menu_visibility_user: Mitglieder
 menu_visibility_manager: Manager
@@ -147,63 +147,132 @@ link_here: hier
 footer_col1: Static
 footer_col2: Dynamic
 footer_col3: Social
-footer_col4: "Gesetzliches"
-member_pageview_information: "Anzeige von Seite %pageCurrent% von %pageTotal% (%userTotal% Mitglieder insgesamt)"
+footer_col4: Gesetzliches
+member_pageview_information: 'Anzeige von Seite %pageCurrent% von %pageTotal% (%userTotal% Mitglieder insgesamt)'
 page_plugin_dishes_title_details: Gericht
-page_plugin_dishes_title_new: Neues Gericht
+page_plugin_dishes_title_new: 'Neues Gericht'
 menu_dishes: Gerichte
 menu_admin_email: Emails
 code: code
 name: Name
-'has tile': "Hat intro Bild"
+'has tile': 'Hat intro Bild'
 status: Status
 'sort order': Sortierung
 enabled: aktiviert
 disabled: deaktiviert
 disable: deaktivieren
 enable: aktivieren
-'edit language': Sprache bearbeiten
-'add language': Sprache hinzufügen
+'edit language': 'Sprache bearbeiten'
+'add language': 'Sprache hinzufügen'
 menu_admin_language: Sprachen
 canceled: abgesagt
-'this event has been canceled.': "Diese Veranstaltung wurde abgesagt."
-'event canceled': Veranstaltung abgesagt
+'this event has been canceled.': 'Diese Veranstaltung wurde abgesagt.'
+'event canceled': 'Veranstaltung abgesagt'
 page_title_cookie: Cookies
-cookie_consent_cookies_text: "Wir speichern lediglich die Information, ob Sie Cookies akzeptiert haben oder nicht. Dadurch wird das Cookie-Popup-Fenster bei Ihrem nächsten Besuch unnoetig."
-cookie_consent_current_status: Jetziger Status
-cookie_consent_cookies: Cookies erlauben
+cookie_consent_cookies_text: 'Wir speichern lediglich die Information, ob Sie Cookies akzeptiert haben oder nicht. Dadurch wird das Cookie-Popup-Fenster bei Ihrem nächsten Besuch unnoetig.'
+cookie_consent_current_status: 'Jetziger Status'
+cookie_consent_cookies: 'Cookies erlauben'
 cookie_consent_status_granted: Akzeptiert
 cookie_consent_status_denied: Abgelehnt
-cookie_consent_status_unknown: Nicht gesetzt
+cookie_consent_status_unknown: 'Nicht gesetzt'
 actions: Aktionen
 announcement_cms_page: CMS-Seite
 announcement_content: Inhalt
-announcement_content_help: "Der Inhalt wird von der ausgewählten CMS-Seite übernommen."
+announcement_content_help: 'Der Inhalt wird von der ausgewählten CMS-Seite übernommen.'
 announcement_created: Erstellt
-announcement_created_by: Erstellt von
+announcement_created_by: 'Erstellt von'
 announcement_details: Details
-announcement_edit: "Ankündigung bearbeiten"
+announcement_edit: 'Ankündigung bearbeiten'
 announcement_email_preview: Vorschau
-announcement_new: "Neue Ankündigung"
+announcement_new: 'Neue Ankündigung'
 announcement_preview: Vorschau
-announcement_recipients: "Empfänger"
-announcement_sent_at: Gesendet am
+announcement_recipients: Empfänger
+announcement_sent_at: 'Gesendet am'
 announcement_status: Status
 announcement_title: Titel
-button_back: "Zurück"
-button_change_cms_page: "CMS-Seite ändern"
+button_back: Zurück
+button_change_cms_page: 'CMS-Seite ändern'
 button_create: Erstellen
-button_delete: "Löschen"
-button_edit_cms_page: "CMS-Seite bearbeiten"
+button_delete: Löschen
+button_edit_cms_page: 'CMS-Seite bearbeiten'
 button_preview: Vorschau
-button_send_announcement: "Ankündigung senden"
-confirm_delete_announcement: "Sind Sie sicher, dass Sie diese Ankündigung löschen möchten?"
-confirm_send_announcement: "Sind Sie sicher, dass Sie diese Ankündigung an alle Empfänger senden möchten?"
+button_send_announcement: 'Ankündigung senden'
+confirm_delete_announcement: 'Sind Sie sicher, dass Sie diese Ankündigung löschen möchten?'
+confirm_send_announcement: 'Sind Sie sicher, dass Sie diese Ankündigung an alle Empfänger senden möchten?'
 email_subject: Betreff
-menu_admin_announcement: "Ankündigungen"
-no_announcements: "Keine Ankündigungen gefunden."
-no_cms_page: "Keine CMS-Seite ausgewählt."
+menu_admin_announcement: Ankündigungen
+no_announcements: 'Keine Ankündigungen gefunden.'
+no_cms_page: 'Keine CMS-Seite ausgewählt.'
 sent: Gesendet
-unpublished: "Unveröffentlicht"
+unpublished: Unveröffentlicht
 menu_cookie_consent_button_status: Status
-event_filter_group_all: Alle Gruppen
+event_filter_group_all: 'Alle Gruppen'
+group_tab_profile: Profil
+group_tab_languages: Sprachen
+group_languages_current_settings: 'Aktuelle Einstellungen'
+group_languages_enabled_count: 'Aktivierte Sprachen'
+group_languages_all: Alle
+group_languages_list: Sprachenliste
+group_languages_default_tag: Standard
+Registered: Registriert
+EmailVerified: 'E-Mail bestätigt'
+Active: Aktiv
+Blocked: Gesperrt
+Deleted: Gelöscht
+Denied: Abgelehnt
+locked: Gesperrt
+ChangedUsername: 'Benutzername geändert'
+Login: Einloggen
+RsvpYes: Ja
+RsvpNo: Nein
+Published: Veröffentlicht
+Draft: Entwurf
+'Locked (visible on all groups)': 'Gesperrt (auf allen Gruppen sichtbar)'
+Normal: Normal
+role_founder: Gründer
+role_organizer: Organisator
+'Yes': Ja
+'No': Nein
+registration_approved_title: 'Registrierung bestätigt'
+registration_approved_subtitle: 'Willkommen in der Gemeinschaft!'
+registration_next_steps: 'Nächste Schritte'
+registration_tip_profile: 'Profil vervollständigen'
+registration_tip_profile_desc: 'Fügen Sie ein Foto hinzu und füllen Sie Ihre Daten aus'
+registration_tip_events: 'Events entdecken'
+registration_tip_events_desc: 'Durchsuchen Sie kommende Events und melden Sie sich an'
+registration_tip_community: 'Mit der Gemeinschaft verbinden'
+registration_tip_community_desc: 'Lernen Sie andere Mitglieder kennen'
+registration_tip_settings: 'Einstellungen anpassen'
+registration_tip_settings_desc: 'Passen Sie Ihre Vorlieben und Datenschutzeinstellungen an'
+login_now: 'Jetzt einloggen'
+button_Register: Registrieren
+Canceled: Abgesagt
+'Event canceled': 'Veranstaltung abgesagt'
+Comments: Kommentare
+Images: Bilder
+'This event has been canceled.': 'Diese Veranstaltung wurde abgesagt.'
+email_tab_templates: Vorlagen
+email_tab_sendlog: Sendeprotokoll
+email_tab_announcements: Ankündigungen
+email_tab_debugging: Debugging
+logs_tab_activity: Aktivität
+logs_tab_system: System
+logs_tab_404: '404 Fehler'
+system_tab_config: Konfiguration
+system_tab_theme: Design
+system_tab_images: Bilder
+system_tab_language: Sprache
+Code: Code
+Name: Name
+'Has Tile': 'Hat Kachel'
+Status: Status
+'Sort Order': Sortierung
+Enabled: Aktiviert
+Disabled: Deaktiviert
+Disable: Deaktivieren
+Enable: Aktivieren
+'Edit Language': 'Sprache bearbeiten'
+'Add Language': 'Sprache hinzufügen'
+'Home page': Startseite
+'Has linked announcement': 'Hat verknüpfte Ankündigung'
+page_title_CMD: CMS
