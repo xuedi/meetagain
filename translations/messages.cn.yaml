@@ -69,8 +69,9 @@ blocked: 受阻
 deleted: 删除
 denied: 拒绝
 menu_admin_images: 图像
-menu_admin_logs_system: 系统
-menu_admin_logs_activity: 活动
+menu_admin_logs: 日志
+menu_admin_logs_system: 系统日志
+menu_admin_logs_activity: 活动日志
 button_filter: 过滤
 event_filter_who_my: 我的活动
 event_filter_who_my_friends: 我的朋友们

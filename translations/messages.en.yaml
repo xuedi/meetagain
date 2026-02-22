@@ -69,6 +69,7 @@ blocked: Blocked
 deleted: Deleted
 denied: Denied
 menu_admin_images: Images
+menu_admin_logs: Logs
 menu_admin_logs_system: System
 menu_admin_logs_activity: Activity
 button_filter: Filter
