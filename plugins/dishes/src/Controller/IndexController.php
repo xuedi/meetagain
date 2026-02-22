@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Controller;
 
 use App\Controller\AbstractController;
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dishes\Entity\Dish;
@@ -23,7 +23,7 @@ class IndexController extends AbstractController
 {
     public function __construct(
         private readonly DishRepository $repo,
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
         private readonly EntityManagerInterface $em,
         private readonly DishService $dishService,
         private readonly DishListService $listService,
@@ -67,7 +67,7 @@ class IndexController extends AbstractController
 
         return $this->render('@Dishes/details.html.twig', [
             'dish' => $dish,
-            'languages' => $this->translationService->getLanguageCodes(),
+            'languages' => $this->languageService->getEnabledCodes(),
             'userLists' => $userLists,
         ]);
     }
@@ -115,7 +115,7 @@ class IndexController extends AbstractController
             $this->em->persist($dish);
 
             // save translations
-            foreach ($this->translationService->getLanguageCodes() as $languageCode) {
+            foreach ($this->languageService->getEnabledCodes() as $languageCode) {
                 $translation = $dish->findTranslation($languageCode);
                 if ($translation === null) {
                     $translation = new DishTranslation();
@@ -134,7 +134,7 @@ class IndexController extends AbstractController
 
         return $this->render('@Dishes/edit.html.twig', [
             'form' => $form,
-            'languages' => $this->translationService->getLanguageCodes(),
+            'languages' => $this->languageService->getEnabledCodes(),
         ]);
     }
 }

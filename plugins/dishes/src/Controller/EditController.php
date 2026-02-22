@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Controller;
 
 use App\Controller\AbstractController;
-use App\Service\TranslationService;
+use App\Service\LanguageService;
 use Plugin\Dishes\Form\DishTranslationType;
 use Plugin\Dishes\Service\DishService;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +16,7 @@ class EditController extends AbstractController
 {
     public function __construct(
         private readonly DishService $dishService,
-        private readonly TranslationService $translationService,
+        private readonly LanguageService $languageService,
     ) {}
 
     #[Route('/translate/{id}/{lang}', name: 'plugin_dishes_translate', methods: ['GET', 'POST'])]
@@ -69,7 +69,7 @@ class EditController extends AbstractController
             'dish' => $dish,
             'form' => $form,
             'targetLanguage' => $lang,
-            'availableLanguages' => $this->translationService->getLanguageCodes(),
+            'availableLanguages' => $this->languageService->getEnabledCodes(),
             'existingTranslation' => $existingTranslation,
         ]);
     }
