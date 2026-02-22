@@ -69,6 +69,7 @@ blocked: Gesterrt
 deleted: gelöscht
 denied: Abgelehnt
 menu_admin_images: Bilder
+menu_admin_logs: Protokolle
 menu_admin_logs_system: System
 menu_admin_logs_activity: Aktivität
 button_filter: Filtern
