@@ -102,6 +102,7 @@ devModeFixtures plugins='':
     {{PHP}} php bin/console app:plugin:post-fixtures
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console app:event:add-fixture
+    {{JUST}} appClearCache
 
 # Switch to installer mode
 [group('development')]
