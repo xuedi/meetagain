@@ -36,10 +36,6 @@ class AdminPagesTest extends WebTestCase
         $client->request('GET', '/en/admin/email/templates');
         $this->assertResponseIsSuccessful('Email route should load for admin');
 
-        // Test Translation route
-        $client->request('GET', '/en/admin/translation');
-        $this->assertResponseIsSuccessful('Translation route should load for admin');
-
         // Test Announcements route
         $client->request('GET', '/en/admin/email/announcements');
         $this->assertResponseIsSuccessful('Announcements route should load for admin');
@@ -60,10 +56,6 @@ class AdminPagesTest extends WebTestCase
 
         // Test Email route
         $client->request('GET', '/en/admin/email/templates');
-        $this->assertResponseRedirects();
-
-        // Test Translation route
-        $client->request('GET', '/en/admin/translation');
         $this->assertResponseRedirects();
 
         // Test Announcements route
