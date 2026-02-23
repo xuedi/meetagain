@@ -29,12 +29,18 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.createdAt|date('Y-m-d H:i') }}</td>
                         <td>
-                            <a href="{{ path('app_admin_member_approve', {id: user.id}) }}" title="Approve">
-                                <span class="icon has-text-success"><i class="fa fa-check"></i></span>
-                            </a>
-                            <a href="{{ path('app_admin_member_deny', {id: user.id}) }}" title="Deny" onclick="return confirm('Deny this user?');">
-                                <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
-                            </a>
+                            <form action="{{ path('app_admin_member_approve', {id: user.id}) }}" method="post" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('approve_user') }}">
+                                <button type="submit" class="button is-ghost p-0" title="Approve">
+                                    <span class="icon has-text-success"><i class="fa fa-check"></i></span>
+                                </button>
+                            </form>
+                            <form action="{{ path('app_admin_member_deny', {id: user.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('Deny this user?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('deny_user') }}">
+                                <button type="submit" class="button is-ghost p-0" title="Deny">
+                                    <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
