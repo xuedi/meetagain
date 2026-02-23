@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -26,6 +27,7 @@ readonly class PasswordResetService
         }
 
         $user->setRegcode($this->generateResetToken());
+        $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
         $this->em->persist($user);
         $this->em->flush();
 
@@ -38,13 +40,20 @@ readonly class PasswordResetService
 
     public function findUserByResetCode(string $code): ?User
     {
-        return $this->userRepository->findOneBy(['regcode' => $code]);
+        $user = $this->userRepository->findOneBy(['regcode' => $code]);
+
+        if ($user === null || $user->isRegcodeExpired()) {
+            return null;
+        }
+
+        return $user;
     }
 
     public function resetPassword(User $user, string $newPassword): void
     {
         $user->setPassword($this->hasher->hashPassword($user, $newPassword));
         $user->setRegcode(null);
+        $user->setRegcodeExpiresAt(null);
 
         $this->em->persist($user);
         $this->em->flush();

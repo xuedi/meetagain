@@ -57,6 +57,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 40, nullable: true)]
     private ?string $regcode = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $regcodeExpiresAt = null;
+
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Image $image = null;
 
@@ -308,6 +311,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->regcode = $regcode;
 
         return $this;
+    }
+
+    public function getRegcodeExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->regcodeExpiresAt;
+    }
+
+    public function setRegcodeExpiresAt(?DateTimeImmutable $regcodeExpiresAt): static
+    {
+        $this->regcodeExpiresAt = $regcodeExpiresAt;
+
+        return $this;
+    }
+
+    public function isRegcodeExpired(): bool
+    {
+        if ($this->regcodeExpiresAt === null) {
+            return false;
+        }
+
+        return $this->regcodeExpiresAt < new DateTimeImmutable();
     }
 
     public function getImage(): ?Image
