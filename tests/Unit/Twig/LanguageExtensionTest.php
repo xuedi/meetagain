@@ -25,11 +25,7 @@ class LanguageExtensionTest extends TestCase
         $this->languageServiceStub = $this->createStub(LanguageService::class);
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->routerStub = $this->createStub(RouterInterface::class);
-        $this->subject = new LanguageExtension(
-            $this->languageServiceStub,
-            $this->requestStackStub,
-            $this->routerStub,
-        );
+        $this->subject = new LanguageExtension($this->languageServiceStub, $this->requestStackStub, $this->routerStub);
     }
 
     public function testGetGlobalsReturnsEnabledLocales(): void
@@ -118,7 +114,10 @@ class LanguageExtensionTest extends TestCase
     public function testRouteExistsReturnsTrueWhenRouteCanBeGenerated(): void
     {
         // Arrange
-        $this->routerStub->method('generate')->with('some_route')->willReturn('/some/path');
+        $this->routerStub
+            ->method('generate')
+            ->with('some_route')
+            ->willReturn('/some/path');
 
         // Act
         $result = $this->subject->routeExists('some_route');
