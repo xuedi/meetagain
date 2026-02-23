@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\CronTaskInterface;
 use App\Entity\EmailQueue;
 use App\Entity\EmailQueueStatus;
 use App\Entity\Event;
@@ -12,11 +13,12 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
-readonly class EmailService
+readonly class EmailService implements CronTaskInterface
 {
     /**
      * @param iterable<EmailContextEnricherInterface> $enrichers
@@ -243,6 +245,12 @@ readonly class EmailService
                 ],
             ],
         ];
+    }
+
+    public function runCronTask(OutputInterface $output): void
+    {
+        $count = $this->sendQueue();
+        $output->writeln('EmailService: ' . $count);
     }
 
     public function sendQueue(): string

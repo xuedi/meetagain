@@ -55,11 +55,6 @@ readonly class Kernel implements Plugin
         return null;
     }
 
-    public function runCronTasks(OutputInterface $output): void
-    {
-        // No cron tasks for this plugin
-    }
-
     public function getEventListItemTags(int $eventId): array
     {
         return [];
