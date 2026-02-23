@@ -89,7 +89,11 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$controllerZ, $controllerA, $controllerM]);
+        $service = new AdminNavigationService(
+            $this->security,
+            $this->router,
+            [$controllerZ, $controllerA, $controllerM],
+        );
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -187,7 +191,11 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$controllerZ, $controllerA, $controllerM]);
+        $service = new AdminNavigationService(
+            $this->security,
+            $this->router,
+            [$controllerZ, $controllerA, $controllerM],
+        );
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -314,7 +322,11 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$singleLinkController, $multiLinkController]);
+        $service = new AdminNavigationService(
+            $this->security,
+            $this->router,
+            [$singleLinkController, $multiLinkController],
+        );
 
         $this->security->method('isGranted')->willReturn(true);
 
@@ -584,13 +596,15 @@ final class AdminNavigationServiceTest extends TestCase
         };
 
         $router = $this->createStub(RouterInterface::class);
-        $router->method('generate')->willReturnCallback(function (string $name): string {
-            if ($name === 'app_missing_route') {
-                throw new RouteNotFoundException();
-            }
+        $router
+            ->method('generate')
+            ->willReturnCallback(function (string $name): string {
+                if ($name === 'app_missing_route') {
+                    throw new RouteNotFoundException();
+                }
 
-            return '/some/path';
-        });
+                return '/some/path';
+            });
 
         $service = new AdminNavigationService($this->security, $router, [$mockController]);
         $this->security->method('isGranted')->willReturn(true);

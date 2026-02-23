@@ -33,6 +33,6 @@ class FollowedUser extends MessageAbstract
         $userId = $this->meta['user_id'];
         $userName = $this->userNames[$userId] ?? '[deleted]';
 
-        return sprintf('Started following: %s', $userName);
+        return sprintf('Started following: %s', $this->e($userName));
     }
 }

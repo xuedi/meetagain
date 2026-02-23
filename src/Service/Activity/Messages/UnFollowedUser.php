@@ -33,6 +33,6 @@ class UnFollowedUser extends MessageAbstract
         $userId = $this->meta['user_id'];
         $userName = $this->userNames[$userId] ?? '[deleted]';
 
-        return sprintf('Stopped following: %s', $userName);
+        return sprintf('Stopped following: %s', $this->e($userName));
     }
 }

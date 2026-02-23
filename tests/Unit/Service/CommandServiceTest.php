@@ -22,9 +22,7 @@ class CommandServiceTest extends TestCase
         $kernelStub = $this->createStub(KernelInterface::class);
         $kernelStub->method('getContainer')->willReturn($containerStub);
 
-        return new CommandService(
-            kernel: $kernelStub,
-        );
+        return new CommandService(kernel: $kernelStub);
     }
 
     public function testExecuteCommandReturnsOutput(): void
