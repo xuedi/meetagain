@@ -7,6 +7,7 @@ use App\Entity\Message;
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
 use App\Entity\User;
+use App\Entity\UserRole;
 use App\Entity\UserStatus;
 use App\Enum\EntityAction;
 use App\Form\NewPasswordType;
@@ -107,7 +108,7 @@ class SecurityController extends AbstractController
             $plainPassword = $form->get('plainPassword')->getData();
 
             $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
-            $user->setRoles(['ROLE_USER']);
+            $user->setRole(UserRole::User);
             $user->setNotification(true);
             $user->setStatus(UserStatus::Registered);
             $user->setPublic(true);

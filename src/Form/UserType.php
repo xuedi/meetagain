@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Entity\UserRole;
 use App\Entity\UserStatus;
 use App\Service\LanguageService;
 use Override;
@@ -50,16 +51,10 @@ class UserType extends AbstractType
             ->add('bio', TextareaType::class, [
                 'label' => 'Bio',
             ])
-            ->add('roles', ChoiceType::class, [
-                'choices' => [
-                    $this->translator->trans('role_system') => 'ROLE_SYSTEM',
-                    $this->translator->trans('role_admin') => 'ROLE_ADMIN',
-                    $this->translator->trans('role_founder') => 'ROLE_FOUNDER',
-                    $this->translator->trans('role_organizer') => 'ROLE_ORGANIZER',
-                    $this->translator->trans('role_user') => 'ROLE_USER',
-                ],
+            ->add('role', ChoiceType::class, [
+                'choices' => UserRole::getChoices(),
                 'expanded' => true,
-                'multiple' => true,
+                'multiple' => false,
             ])
             ->add('verified', ChoiceType::class, [
                 'data' => $user->isVerified(),
