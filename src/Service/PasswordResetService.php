@@ -63,6 +63,6 @@ readonly class PasswordResetService
 
     private function generateResetToken(): string
     {
-        return sha1(random_bytes(128));
+        return bin2hex(random_bytes(32));
     }
 }

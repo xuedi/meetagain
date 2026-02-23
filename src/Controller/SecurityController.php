@@ -113,7 +113,7 @@ class SecurityController extends AbstractController
             $user->setPublic(true);
             $user->setVerified(false);
             $user->setLocale($request->getLocale());
-            $user->setRegcode(sha1(random_bytes(128)));
+            $user->setRegcode(bin2hex(random_bytes(32)));
             $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
             $user->setLastLogin(new DateTime());
             $user->setCreatedAt(new DateTimeImmutable());
