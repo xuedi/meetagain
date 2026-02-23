@@ -99,6 +99,7 @@ class SecurityController extends AbstractController
             $user->setVerified(false);
             $user->setLocale($request->getLocale());
             $user->setRegcode(sha1(random_bytes(128)));
+            $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
             $user->setLastLogin(new DateTime());
             $user->setCreatedAt(new DateTimeImmutable());
             $user->setBio(null);
@@ -125,12 +126,13 @@ class SecurityController extends AbstractController
     public function verifyUserEmail(EntityManagerInterface $em, string $code): Response
     {
         $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
-        if ($user === null) {
+        if ($user === null || $user->isRegcodeExpired()) {
             return $this->render('security/register_error.html.twig');
         }
 
         // clean up and write activity
         $user->setRegcode(null);
+        $user->setRegcodeExpiresAt(null);
         $this->activityService->log(ActivityType::RegistrationEmailConfirmed, $user, []);
 
         // Check if automatic registration is enabled
