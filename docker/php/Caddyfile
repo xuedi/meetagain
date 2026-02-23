@@ -16,9 +16,22 @@
 	}
 }
 
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-XSS-Protection "1; mode=block"
+		-Server
+	}
+}
+
 # HTTPS with custom certificate for *.meetagain.local
 *.meetagain.local, meetagain.local {
 	tls /certs/meetagain.local.crt /certs/meetagain.local.key
+
+	import security_headers
 
 	root * /var/www/html/public
 	encode zstd br gzip
@@ -38,6 +51,8 @@
 
 # Localhost (HTTP only, no certificate needed)
 http://localhost {
+	import security_headers
+
 	root * /var/www/html/public
 	encode zstd br gzip
 
