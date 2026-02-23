@@ -200,11 +200,8 @@ class MemberController extends AbstractAdminController
             throw $this->createAccessDeniedException('Cannot modify system users.');
         }
 
-        // Add ROLE_ORGANIZER if not already present
-        if (!in_array('ROLE_ORGANIZER', $user->getRoles(), true)) {
-            $roles = $user->getRoles();
-            $roles[] = 'ROLE_ORGANIZER';
-            $user->setRoles($roles);
+        if ($user->getRole() !== UserRole::Organizer) {
+            $user->setRole(UserRole::Organizer);
             $this->em->flush();
             $this->addFlash('success', 'Member promoted to organizer.');
         }
