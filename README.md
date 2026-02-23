@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Version-v1.0.0-31c754.svg)](https://codeberg.org/xuedi/meetAgain/releases)
 [![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
-[![Code Coverage](https://codeberg.org/xuedi/meetAgain/raw/branch/main/tests/badge/coverage.svg)](https://codeberg.org/xuedi/meetAgain/src/branch/main/tests/badgeGenerator.php)
+[![Code Coverage](https://codeberg.org/xuedi/meetAgain/raw/branch/main/tests/badge/coverage.svg)](https://codeberg.org/xuedi/meetAgain/src/branch/main/src/Command/BadgeGenerateCommand.php)
 
 A self-hosted, open-source alternative to Meetup.com for organizing groups and scheduling events. Single group installation like WordPress
 
