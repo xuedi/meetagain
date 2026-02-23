@@ -170,49 +170,27 @@ class EventServiceTest extends TestCase
 
 ### Testing Services
 
-**Example: CleanupService**
-
 ```php
-readonly class CleanupServiceTest extends TestCase
+class CleanupServiceTest extends TestCase
 {
-    private MockObject|EventRepository $eventRepo;
-    private MockObject|ImageRepository $imageRepo;
-    private MockObject|EntityManagerInterface $em;
-    private CleanupService $subject;
-
     protected function setUp(): void
     {
-        $this->eventRepo = $this->createStub(EventRepository::class);
         $this->imageRepo = $this->createStub(ImageRepository::class);
         $this->em = $this->createStub(EntityManagerInterface::class);
-
-        $this->subject = new CleanupService(
-            $this->eventRepo,
-            $this->imageRepo,
-            $this->em
-        );
+        $this->subject = new CleanupService($this->imageRepo, $this->em);
     }
 
     public function testRemoveOrphanedImagesDeletesOrphanedImages(): void
     {
-        // Arrange: orphaned images
-        $image1 = new Image();
-        $image2 = new Image();
-        $this->imageRepo->method('findOrphaned')->willReturn([$image1, $image2]);
-
-        // Arrange: expect remove calls
+        // Arrange: stub returns 2 orphaned images; mock expects 2 removes + 1 flush
+        $this->imageRepo->method('findOrphaned')->willReturn([new Image(), new Image()]);
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->em->expects($this->exactly(2))->method('remove');
         $this->em->expects($this->once())->method('flush');
+        $this->subject = new CleanupService($this->imageRepo, $this->em);
 
-        // Recreate subject with mock
-        $this->subject = new CleanupService($this->eventRepo, $this->imageRepo, $this->em);
-
-        // Act
-        $count = $this->subject->removeOrphanedImages();
-
-        // Assert
-        $this->assertSame(2, $count);
+        // Act + Assert
+        $this->assertSame(2, $this->subject->removeOrphanedImages());
     }
 }
 ```
@@ -334,15 +312,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
 }
 ```
 
-**For comprehensive fixture system documentation, see:**
-- [Architecture - Fixture System](architecture.md#fixture-system-architecture)
-  - Reference system internals (`__call()` implementation)
-  - Plugin fixture extension (AbstractPluginFixture)
-  - Fixture groups & loading order
-  - Dependency trees for base and plugin fixtures
-  - Migration script integration
-  - Best practices and known issues
-
 **Quick Reference - Available Methods:**
 ```php
 // Magic methods (via __call):
@@ -356,65 +325,6 @@ $this->stop();                       // Progress: " OK\n"
 $text = $this->getText('filename');  // Read DataFixtures/FixtureName/filename.txt
 ```
 
----
-
-### Fixture Dependencies
-
-```php
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-
-class CommentFixture extends AbstractFixture implements DependentFixtureInterface
-{
-    public function load(ObjectManager $manager): void
-    {
-        $this->start();
-
-        // ✅ Use custom reference system
-        $event = $this->getRefEvent('Regular Wednesday meetup');
-        $user = $this->getRefUser('john_doe');
-
-        $comment = new Comment();
-        $comment->setEvent($event);
-        $comment->setUser($user);
-        $comment->setContent('Looking forward to it!');
-
-        $manager->persist($comment);
-        $manager->flush();
-        $this->stop();
-    }
-
-    public function getDependencies(): array
-    {
-        return [
-            EventFixture::class,
-            UserFixture::class,
-        ];
-    }
-}
-```
-
----
-
-### Plugin Fixtures
-
-Plugins can load additional fixtures after main fixtures:
-
-```php
-class DishesPlugin implements Plugin
-{
-    public function loadPostExtendFixtures(ObjectManager $manager): void
-    {
-        $event = $manager->getRepository(Event::class)->findOneBy(['title' => 'Team Lunch']);
-
-        $dish = new Dish();
-        $dish->setEvent($event);
-        $dish->setName('Vegetarian Pizza');
-
-        $manager->persist($dish);
-        $manager->flush();
-    }
-}
-```
 
 ---
 
@@ -424,14 +334,8 @@ class DishesPlugin implements Plugin
 
 ```bash
 just testCoverage              # Generate coverage and show report
-just showCoverage              # Show files below 80% coverage
+just testCoverage --threshold=80  # Show files below 80% coverage
 ```
-
-**AI-readable coverage report:**
-```bash
-php tests/AiReadableCoverage.php --threshold=80
-```
-
 Output:
 ```
 COVERAGE: 85% (1234/1450)
@@ -466,59 +370,17 @@ From `phpunit.xml`:
 
 ---
 
-## Test Execution via Haiku Agent
+## Test Execution
 
-When running tests via Claude, always use Haiku agent:
-
-```
-Task(
-  subagent_type: "Bash",
-  model: "haiku",
-  prompt: "Run: just testUnit Tests\\Unit\\Service\\TranslationServiceTest && just testPrintResults"
-)
-```
-
-**AI-readable test results:**
-```bash
-just testPrintResults
-```
-
-Output:
-```
-STATUS: FAILED
-SUMMARY: 10 tests, 31 assertions, 1 failures (0.23s)
----
-FAILURES:
-  1. TranslationServiceTest::testGetMatrixReturnsTranslations
-     File: tests/Unit/Service/TranslationServiceTest.php:76
-     Type: AssertionFailure
-     Message: Failed asserting that two strings are identical.
-     Expected: 'bar' | Actual: 'baz'
-```
+Use the `/test-unit` or `/test-functional` skills, or `Task(model: "haiku")` for custom commands. Results via `just testPrintResults` or `just testPrintResults --failures-only`.
 
 ---
 
 ## Best Practices
 
-### Do's
+**Do:** AAA pattern with comments, `createStub()` for dependencies, `createMock()` only when verifying interactions, data providers for parameterized tests, one behavior per test, descriptive method names.
 
-- ✅ Use AAA pattern with comments
-- ✅ Use `createStub()` for dependencies
-- ✅ Use `createMock()` only when verifying interactions
-- ✅ Use data providers for parameterized tests
-- ✅ Test one behavior per test method
-- ✅ Use descriptive test method names
-- ✅ Arrange realistic test data with fixtures
-- ✅ Run tests before committing
-
-### Don'ts
-
-- ❌ Don't test framework functionality (Doctrine, Symfony)
-- ❌ Don't mock what you don't own (external libraries)
-- ❌ Don't test private methods directly (test through public API)
-- ❌ Don't use real database in unit tests
-- ❌ Don't share state between tests
-- ❌ Don't use sleep() for async operations (use proper mocking)
+**Don't:** Test framework code (Doctrine/Symfony), mock what you don't own, test private methods directly, use real database in unit tests, share state between tests.
 
 ---
 

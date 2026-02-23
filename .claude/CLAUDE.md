@@ -1,7 +1,6 @@
 # Claude Code Guidelines
 
-**Quick Links:
-** [Architecture](architecture.md) | [Conventions](conventions.md) | [Design](design.md) | [Testing](testing.md)
+**Quick Links:** [Architecture](architecture.md) | [Conventions](conventions.md) | [Design](design.md) | [Testing](testing.md)
 
 ---
 
@@ -42,6 +41,7 @@ just test               # Run all tests + checks
 - **Code Quality Workflow**: Always run `just fixMago` before `just test`
 - Avoid `just test` to save tokens, ask user to run it after coding is complete
 - If you must run a test, use `just testUnit <specific test>` only on the test to be run
+- **Token Efficiency:** Use skills for `just` commands (see [SKILLS-CHEATSHEET.md](SKILLS-CHEATSHEET.md)); for unlisted commands use `Task(model: "haiku")`.
 
 ---
 
@@ -89,204 +89,16 @@ just test               # Run all tests + checks
 
 ### Testing
 
-| Command               | Purpose                           |
-|-----------------------|-----------------------------------|
-| `just test`           | Run all tests and checks          |
-| `just testUnit`       | Run unit tests (generates JUnit)  |
-| `just testFunctional` | Run functional tests              |
-| `just testPrintResults` | Print AI-readable test results  |
-| `just testCoverage`   | Generate and show coverage report |
-| `just testSymfony`    | Analyze route performance         |
+| Command                 | Purpose                           |
+|-------------------------|-----------------------------------|
+| `just test`             | Run all tests and checks          |
+| `just testUnit`         | Run unit tests (generates JUnit)  |
+| `just testFunctional`   | Run functional tests              |
+| `just testPrintResults` | Print AI-readable test results    |
+| `just testCoverage`     | Generate and show coverage report |
+| `just testSymfony`      | Analyze route performance         |
 
-### Code Quality Checks
-
-| Command                 | Purpose                  |
-|-------------------------|--------------------------|
-| `just checkMago`        | Run Mago linter          |
-| `just checkMagoAnalyze` | Mago static analysis     |
-| `just checkMagoGuard`   | Mago architectural rules |
-| `just checkMagoAll`     | Run all 3 Mago checks    |
-
-### Fixes
-
-| Command        | Purpose                                             |
-|----------------|-----------------------------------------------------|
-| `just fixMago` | Format code with Mago (run this before `just test`) |
-
-**Note:** Always run `just fixMago` after making code changes and before running `just test` to ensure code style
-consistency.
-
-### Database
-
-| Command                       | Purpose                   |
-|-------------------------------|---------------------------|
-| `just dockerDatabase "query"` | Run SQL query on database |
-
----
-
-## Available Skills
-
-**Use skills instead of manually invoking Task with Haiku model for common workflows.**
-
-Skills automatically use the Haiku model for efficiency and follow project conventions.
-
-### Testing Skills
-
-| Skill                       | Purpose                                    |
-|-----------------------------|--------------------------------------------|
-| `/test-unit [filter]`       | Run unit tests (optionally filtered)       |
-| `/test-functional [filter]` | Run functional tests (optionally filtered) |
-| `/test-all`                 | Run complete test suite with coverage      |
-
-**Examples:**
-
-```bash
-/test-unit                    # Run all unit tests
-/test-unit EventServiceTest   # Run specific test class
-/test-functional LoginTest    # Run functional login tests
-/test-all                     # Full test suite + coverage
-```
-
-### Code Quality Skills
-
-| Skill            | Purpose                                              |
-|------------------|------------------------------------------------------|
-| `/check-quality` | Format code and run quality checks                   |
-| `/quality-fix`   | Complete pre-commit workflow (format + test + check) |
-
-**Examples:**
-
-```bash
-/check-quality   # Auto-format + check for issues
-/quality-fix     # Full pre-commit workflow
-```
-
-### Database & Environment Skills
-
-| Skill                 | Purpose                             |
-|-----------------------|-------------------------------------|
-| `/reset-dev [plugin]` | Reset dev environment with fixtures |
-| `/cache-clear [env]`  | Clear Symfony cache (dev/test/prod) |
-| `/db-query "query"`   | Execute SQL query on database       |
-
-**Examples:**
-
-```bash
-/reset-dev                # Reset with all enabled plugins
-/reset-dev <plugin-name>  # Reset with specific plugin
-/cache-clear              # Clear dev cache
-/cache-clear test         # Clear test cache
-/db-query "SELECT COUNT(*) FROM users"
-```
-
-### Plugin Management Skills
-
-| Skill                    | Purpose                    |
-|--------------------------|----------------------------|
-| `/plugin-enable <name>`  | Enable plugin + migrations |
-| `/plugin-disable <name>` | Disable plugin             |
-
-**Examples:**
-
-```bash
-/plugin-enable <plugin-name>   # Enable a plugin
-/plugin-disable <plugin-name>  # Disable a plugin
-```
-
-**Note:** Check `plugins/` directory for available plugins. Each plugin has its own `CLAUDE.md` for documentation.
-
-### Translation Skills
-
-| Skill                                                   | Purpose                                          |
-|---------------------------------------------------------|--------------------------------------------------|
-| `/fill-translations`                                    | Auto-fill all missing translations (recommended) |
-| `/add-translation key="..." de="..." en="..." cn="..."` | Add single translation SQL statement             |
-
-**Recommended Workflow:**
-
-```bash
-# 1. Fill missing translations (auto-syncs from production first)
-just translationFill
-# OR use skill: /fill-translations
-
-# 2. Review translationUpdates.sql
-
-# 3. Upload SQL to production
-
-# 4. Run again to verify: just translationFill
-```
-
-**Manual single translation:**
-
-```bash
-/add-translation key="event_list_title" de="Veranstaltungsliste" en="Event List" cn="活动列表"
-```
-
-**Direct command (alternative to skill):**
-
-```bash
-just translationFill   # Same as /fill-translations, auto-translate enabled
-```
-
-**Note:** Translation files (`translations/*.php`) are gitignored and managed externally. Skills generate SQL statements
-in `translationUpdates.sql` for manual integration into production. All SQL uses `ON DUPLICATE KEY UPDATE` for safe
-re-execution.
-
----
-
-## Token Efficiency
-
-- Default to `model: "sonnet"` for subagents
-- **Use skills for `just` commands** (skills automatically use Haiku model)
-- For custom just commands not covered by skills, use `Task(model: "haiku")`
-- Prefer asking user to run tests locally over AI execution
-- For codebase exploration, use `subagent_type: "Explore"` over multiple greps
-- Only read files that are directly relevant to the task
-- Use offset/limit when reading large files
-
----
-
-## Haiku Agent for `just` Commands
-
-**IMPORTANT: Use skills (e.g., `/test-unit`) instead of manual Haiku agent invocation.**
-
-Skills are pre-configured shortcuts that automatically use Haiku model and follow best practices.
-
-### When Skills Don't Cover Your Use Case
-
-For custom `just` commands not covered by skills, use the Haiku model via Task tool:
-
-```
-Task(
-  subagent_type: "Bash",
-  model: "haiku",
-  prompt: "Run: just <custom-command> && just testPrintResults"
-)
-```
-
-**Pattern for running tests manually:**
-
-1. Run test command: `just testUnit [TestClass]` (generates JUnit XML)
-2. Get results: `just testPrintResults` (AI-readable format)
-3. Return structured summary to parent agent
-
-**AI-readable output format:**
-
-```
-STATUS: PASSED|FAILED
-SUMMARY: X tests, Y assertions, Z failures
----
-FAILURES:
-  1. ClassName::methodName
-     File: path/to/file.php:123
-     Message: Failed asserting...
-     Expected: 'foo' | Actual: 'bar'
-```
-
-**Available test result commands:**
-
-- `just testPrintResults` - Print all test results
-- `just testPrintResults --failures-only` - Print only failures
+**Skills:** See [SKILLS-CHEATSHEET.md](SKILLS-CHEATSHEET.md) for all available skills (testing, quality, database, plugins, translations).
 
 ---
 

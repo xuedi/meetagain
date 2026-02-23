@@ -65,118 +65,18 @@ class UserDTO
 
 ### Docblocks - Avoid Over-Documentation
 
-**Principle: Let the code speak. Only document when types are ambiguous.**
+**Only document when types are ambiguous or logic is non-obvious.**
 
-#### When NOT to document:
+**Document:**
+- `@var Collection<int, Event>` generics on Doctrine collections
+- `@return array{id: int, name: string}` for complex array shapes (or better: use a value object)
+- Non-obvious business logic — the "why", not the "what"
+- AAA section comments in tests: `// Arrange`, `// Act`, `// Assert`
 
-❌ **Self-explanatory method names:**
-```php
-// BAD - Redundant
-/**
- * Get user by ID.
- *
- * @param int $id User ID
- * @return User|null The user or null
- */
-public function getUserById(int $id): ?User
-
-// GOOD - Type hints are sufficient
-public function getUserById(int $id): ?User
-```
-
-❌ **Obvious constructors:**
-```php
-// BAD - Repeats what the code says
-/**
- * Constructor.
- *
- * @param UserRepository $userRepo User repository
- * @param EntityManagerInterface $em Entity manager
- */
-public function __construct(
-    private readonly UserRepository $userRepo,
-    private readonly EntityManagerInterface $em,
-) {}
-
-// GOOD - No docblock needed
-public function __construct(
-    private readonly UserRepository $userRepo,
-    private readonly EntityManagerInterface $em,
-) {}
-```
-
-❌ **Simple getters/setters:**
-```php
-// BAD
-/** @return string */
-public function getName(): string { return $this->name; }
-
-// GOOD
-public function getName(): string { return $this->name; }
-```
-
-❌ **Route descriptions that repeat method names:**
-```php
-// BAD
-/**
- * Switch group context via form submission.
- */
-#[Route('/context/switch', name: 'app_multisite_context_switch')]
-public function switchContext(Request $request): Response
-
-// GOOD - Route and method name are clear
-#[Route('/context/switch', name: 'app_multisite_context_switch')]
-public function switchContext(Request $request): Response
-```
-
-#### When TO document:
-
-✅ **Array structures (or use value objects instead):**
-```php
-/**
- * @return array{id: int, name: string, count: int}
- */
-public function getStatistics(): array
-
-// Or better - use a value object:
-public function getStatistics(): Statistics
-```
-
-✅ **Collection generics:**
-```php
-/**
- * @var Collection<int, Event>
- */
-#[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organizer')]
-private Collection $events;
-```
-
-✅ **Non-obvious business logic ("why", not "what"):**
-```php
-public function calculatePrice(): float
-{
-    // Apply 10% discount for bulk orders to match competitor pricing
-    if ($this->quantity > 100) {
-        return $this->basePrice * 0.9;
-    }
-    return $this->basePrice;
-}
-```
-
-✅ **Single-line comments for test blocks (AAA pattern):**
-```php
-public function testUserCanLogin(): void
-{
-    // Arrange
-    $user = $this->createUser('test@example.com');
-
-    // Act
-    $response = $this->client->post('/login', ['email' => $user->getEmail()]);
-
-    // Assert
-    $this->assertTrue($response->isSuccessful());
-}
-```
+**Don't document:**
+- Self-explanatory method names with complete type hints
+- Obvious constructors or simple getters/setters
+- Route descriptions that repeat the method name
 
 ---
 
@@ -185,67 +85,14 @@ public function testUserCanLogin(): void
 Prefer value objects instead of complex arrays to avoid verbose type annotations:
 
 ```php
-// ❌ Avoid - Requires complex annotations
-/**
- * @return array{section: string, links: array<int, array{label: string, route: string, active?: string}>}
- */
+// ❌ Avoid - Requires complex @return annotation
 public function getAdminSystemLinks(): array
 
-// ✅ Better - Self-documenting with value objects
+// ✅ Better - Self-documenting
 public function getAdminSystemLinks(): ?AdminSection
 ```
 
-```php
-readonly class AdminSection
-{
-    /**
-     * @param list<AdminLink> $links
-     */
-    public function __construct(
-        private string $section,
-        private array $links,
-    ) {
-    }
-
-    public function getSection(): string
-    {
-        return $this->section;
-    }
-
-    /**
-     * @return list<AdminLink>
-     */
-    public function getLinks(): array
-    {
-        return $this->links;
-    }
-}
-
-readonly class AdminLink
-{
-    public function __construct(
-        private string $label,
-        private string $route,
-        private ?string $active = null,
-    ) {
-    }
-
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    public function getRoute(): string
-    {
-        return $this->route;
-    }
-
-    public function getActive(): ?string
-    {
-        return $this->active;
-    }
-}
-```
+See `src/Controller/Admin/SystemController.php` for the `AdminSection` + `AdminLink` value object pattern.
 
 ---
 
@@ -567,63 +414,13 @@ Use lowercase with underscores:
 
 ## Plugins
 
-### Plugin Interface Implementation
-
-```php
-#[AutoconfigureTag(Plugin::class)]
-class DishesPlugin implements Plugin
-{
-    public function getPluginKey(): string
-    {
-        return 'dishes';
-    }
-
-    public function getMenuLinks(): array
-    {
-        return [
-            new MenuLink(
-                'dishes.menu.title',
-                MenuRoutes::Dishes,
-                'fa-utensils'
-            ),
-        ];
-    }
-
-    public function getEventTile(Event $event): ?PluginTile
-    {
-        // Return custom tile for event detail page
-    }
-
-    public function loadPostExtendFixtures(ObjectManager $manager): void
-    {
-        // Load plugin-specific test data
-    }
-}
-```
+Plugin conventions follow the core Plugin interface. See [Plugin Architecture](architecture.md#plugin-architecture) and the [Plugin Development Guide](../../docs/plugin-development.md) for full details.
 
 **Key rules:**
+- Use `#[AutoconfigureTag(Plugin::class)]` for auto-registration
 - Main code MUST NOT depend on plugin code
 - Plugin tables have NO foreign keys to main tables
-- Main application must work when plugins are disabled
-- Integration points check if plugin is enabled before calling it
-- Use `AutoconfigureTag` attribute for auto-registration
-
-**Example: Checking if plugin is enabled:**
-```php
-// Always check enabled status before calling plugin methods
-public function getPluginEventTiles(int $id): array
-{
-    $enabledPlugins = $this->pluginService->getActiveList();
-
-    foreach ($this->plugins as $plugin) {
-        if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-            continue;  // Skip disabled plugins
-        }
-        // Only call plugin if enabled
-        $tile = $plugin->getEventTile($id);
-    }
-}
-```
+- Always check plugin enabled status: `$this->pluginService->getActiveList()`
 
 ---
 

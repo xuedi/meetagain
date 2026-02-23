@@ -2,8 +2,6 @@
 
 This document describes the architectural patterns and layer dependencies of the MeetAgain application.
 
-**Last Updated:** 2026-01-26
-
 ---
 
 ## Overview
@@ -17,117 +15,6 @@ MeetAgain is a **Symfony 8.0 / PHP 8.4** event management system with a plugin a
 - **Cache:** Valkey/Redis (Symfony Cache)
 - **Testing:** PHPUnit 12, DAMA DoctrineTestBundle
 - **Quality:** Mago (linter, analyzer, guard, formatter)
-
-**Codebase Statistics** (as of 2026-01-26):
-
-### Core Repository
-- 260+ PHP files in src/
-- 36 readonly service classes
-- 24 repository classes
-- 50+ entity classes
-- 30+ controller classes
-- 18 form types
-- 11 Twig extensions
-- 10 CLI commands
-- 5 event subscribers
-- 4 content filter systems
-- 20+ unit test suites
-
-
-## Content Filter System Architecture ⭐
-
-**Location:** `src/Filter/` (Reorganized 2026-01-26 from `src/Service/*Filter/`)
-
-The application implements a **composite filter pattern** for content scoping. This allows plugins to restrict which content is visible without core code having any knowledge of plugins.
-
-### Filter Domains
-
-```
-src/Filter/
-├── Event/       # Event filtering (frontend)
-├── Cms/         # CMS page filtering (frontend)
-├── Menu/        # Navigation menu filtering
-├── Member/      # User/member filtering (frontend)
-└── Admin/       # Admin-specific filters
-    ├── Event/   # Admin event list filtering
-    ├── Member/  # Admin member list filtering
-    └── Cms/     # Admin CMS list filtering
-```
-
-### Filter Pattern
-
-Each filter domain has three components:
-
-1. **Interface** - Defines filtering contract (`#[AutoconfigureTag]` for auto-registration)
-2. **Service** - Composite service collecting all filters (`#[AutowireIterator]`)
-3. **Result** - Value object wrapping filter results
-
-**Benefits:**
-- ✅ Zero plugin knowledge in core
-- ✅ Multiple plugins can provide filters (composable)
-- ✅ Auto-registration via Symfony tags
-- ✅ Priority-based ordering
-- ✅ AND logic composition (intersection)
-- ✅ Testable in isolation
-
-See [Plugin Content Filtering Pattern](#plugin-content-filtering-pattern) for detailed implementation.
-
----
-
-## Recent Architectural Changes
-
-### 1. Filter System Reorganization (2026-01-26)
-
-**Previous Location:** `src/Service/EventFilter/`, `src/Service/CmsFilter/`, etc.
-**New Location:** `src/Filter/Event/`, `src/Filter/Cms/`, etc.
-
-**Rationale:**
-- Groups all filtering logic together
-- Separates filtering infrastructure from business services
-- Makes the pattern more discoverable
-- Prepares for future filter abstractions
-
-**Impact:** 14 files updated (9 core, 5 plugin imports), no behavioral changes.
-
-### 2. CMS & Menu Platform Pages (2026-01-26)
-
-**Enhancement:** Content can now be "platform-level" (visible everywhere).
-
-**Pattern:**
-- CMS pages/menus NOT mapped to any filter context are "platform content"
-- Platform content visible on ALL domains (including whitelabel domains)
-- Used for legal pages (imprint, privacy) that should appear everywhere
-- Filters automatically merge group content + platform content
-
-**Example:**
-```php
-// MultiSite WhitelabelCmsFilter
-public function getCmsIdFilter(): ?array {
-    $platformIds = $this->mappingRepository->getPlatformCmsIds();
-
-    if (!$context->isActive()) {
-        return $platformIds;  // Main domain: only platform pages
-    }
-
-    $groupIds = $this->mappingRepository->getCmsIdsForGroup($context->group);
-    return array_merge($groupIds, $platformIds);  // Group domain: both
-}
-```
-
-### 3. Menu Filtering System (2026-01-26)
-
-**New Feature:** Navigation menus can now be filtered per context.
-
-**Changes:**
-- New entity: `GroupMenuMapping` (junction table)
-- New filter: `WhitelabelMenuFilter implements MenuFilterInterface`
-- Migration: `Version20260126120000` creates `multisite_group_menu` table
-- MenuRepository integrated with `MenuFilterService`
-
-**Impact:**
-- Menus can be customized per whitelabel domain
-- Platform menus visible everywhere
-- Consistent with CMS page filtering pattern
 
 ---
 
@@ -164,7 +51,7 @@ The application is organized into distinct layers with clear responsibilities an
 
 ## Layer Dependency Rules
 
-Enforced by `tests/deptrac.yaml`:
+Enforced by Mago Guard (`just checkMagoGuard`, config: `tests/config/mago.toml`):
 
 ### Controller Layer
 **Can depend on:** Service, Entity, Form, Security, Repository
@@ -337,7 +224,6 @@ class Event
 **Can depend on:** Entity, Repository, Service
 **Purpose:** Test data (allowed more flexibility)
 
-**Custom AbstractFixture:**
 This project uses a custom `AbstractFixture` base class with type-safe reference methods:
 
 ```php
@@ -364,155 +250,7 @@ class EventFixture extends AbstractFixture
 - PHPDoc hints for PHPStan
 - Helper methods: `start()`, `stop()`, `getText()`
 
-See [Fixture System Architecture](#fixture-system-architecture) below for comprehensive details.
-
----
-
-## Fixture System Architecture
-
-### Overview
-
-The application uses a sophisticated fixture system for development and testing data. It features:
-- **Custom reference system** with type-safe magic methods
-- **Fixture groups** for staged loading (install → base → plugin)
-- **Plugin fixture inheritance** for extended entity support
-- **Pre/post-fixture hooks** for plugin setup and data transformation
-
-### Inheritance Hierarchy
-
-```
-Doctrine\Common\DataFixtures\AbstractFixture (vendor)
-       ↓ extends
-Doctrine\Bundle\FixturesBundle\Fixture (vendor)
-       ↓ extends
-App\DataFixtures\AbstractFixture (project)
-       ↓ extends (for plugins)
-Plugin\MultiSite\DataFixtures\AbstractPluginFixture (plugin)
-```
-
-**Key Files:**
-- `/src/DataFixtures/AbstractFixture.php` - Base class for core fixtures
-- `/plugins/multisite/src/DataFixtures/AbstractPluginFixture.php` - Extended for plugin entities
-
----
-
-### Custom Reference System
-
-The project implements a type-safe reference system using PHP's `__call()` magic method. Instead of manually managing reference keys, fixtures use magic methods like `getRefUser('name')` and `addRefEvent('name', $entity)`.
-
-**Benefits:**
-- Type-safe calls with PHPStan support via `@method` annotations
-- No manual key management
-- Cross-fixture references work automatically
-- Works for both core entities (`App\Entity\*`) and plugin entities (`Plugin\*\Entity\*`)
-
----
-
-### Plugin Fixture Extension
-
-Plugin fixtures extend `AbstractPluginFixture` which overrides `__call()` to check both plugin and core entity namespaces. This allows plugin fixtures to reference both their own entities (e.g., `getRefGroup()`) and core entities (e.g., `getRefUser()`, `getRefEvent()`).
-
----
-
-### Fixture Groups & Loading Order
-
-Fixtures are organized into groups for staged loading:
-
-| Group | Purpose | Loaded By |
-|-------|---------|-----------|
-| `install` | System users, config, languages, email templates | `--group=install` |
-| `base` | Core dev data (users, events, locations, CMS, etc.) | `--group=base` |
-| `plugin` | Plugin-specific dev data (groups, members, etc.) | `--group=plugin --append` |
-
-**Loading Sequence (`just devModeFixtures`):**
-
-```bash
-# 1. Reset database
-doctrine:database:drop --force
-doctrine:database:create
-doctrine:migrations:migrate --no-interaction
-
-# 2. Load base fixtures
-doctrine:fixtures:load --group=install        # System users first
-doctrine:fixtures:load --append --group=base   # Core dev data
-
-# 3. Run plugin pre-fixture hooks
-app:plugin:pre-fixtures  # Plugins can run setup commands before plugin fixtures
-
-# 4. Load plugin fixtures
-doctrine:fixtures:load --append --group=plugin
-app:plugin:post-fixtures
-```
-
-**Key Points:**
-- `--append` flag preserves references from previous groups
-- Migration runs BETWEEN base and plugin fixtures
-- Plugin fixtures can access all base fixture references
-
----
-
-### Base Fixture Dependency Tree
-
-**Install Group (System Foundation):**
-```
-SystemUserFixture (provides: import, cron users)
-    ↓
-├─ LanguageFixture (depends: SystemUserFixture)
-├─ ConfigFixture (depends: SystemUserFixture)
-└─ EmailTemplateFixture (depends: LanguageFixture)
-```
-
-**Base Group (Development Data):**
-```
-UserFixture (provides: 150+ users)
-    ↓
-├─ LocationFixture ─┐
-├─ HostFixture ─────┼─→ EventFixture (provides: events)
-├─ CmsFixture ──────┤
-│                   │
-├─ ActivityFixture  │
-├─ MessageFixture   │
-│                   │
-└─ CmsBlockFixture ─┴─→ MenuFixture
-```
-
-**Execution Order (topologically sorted):**
-```
-1. SystemUserFixture        (install)
-2. LanguageFixture          (install)
-3. ConfigFixture            (install)
-4. EmailTemplateFixture     (install)
-5. UserFixture              (base)
-6. LocationFixture          (base)
-7. HostFixture              (base)
-8. CmsFixture               (base)
-9. ActivityFixture          (base)
-10. MessageFixture          (base)
-11. EventFixture            (base)
-12. CmsBlockFixture         (base)
-13. MenuFixture             (base)
-```
-
----
-
-### Helper Methods
-
-```php
-$this->start();                      // Prints "Creating FixtureName ..."
-$this->stop();                       // Prints " OK\n"
-$content = $this->getText('file');   // Reads from DataFixtures/FixtureName/file.txt
-```
-
----
-
-### Best Practices
-
-- Use `getDependencies()` to declare fixture dependencies
-- Use constants for reference names: `const ADMIN = 'admin';`
-- Call `start()` / `stop()` for progress output
-- Don't hardcode entity IDs (auto-generated)
-- Don't create circular dependencies
-- See `testing.md` for detailed fixture examples
+See [testing.md](testing.md) for fixture usage patterns and practical examples.
 
 ---
 
@@ -567,9 +305,19 @@ interface Plugin
 
 **Problem:** Plugins need to filter content (events, CMS pages, etc.) without core code knowing about them.
 
-**✅ CORRECT - Tagged Service Pattern:**
+**Filter Domains** (`src/Filter/`):
+```
+src/Filter/
+├── Event/       # Event filtering (frontend + admin)
+├── Cms/         # CMS page filtering (frontend + admin)
+├── Menu/        # Navigation menu filtering
+├── Member/      # User/member filtering (frontend + admin)
+└── Admin/       # Admin-specific sub-filters
+```
 
-Core defines interfaces with auto-tagging:
+Each domain has three components: **Interface** (`#[AutoconfigureTag]`), **Service** (`#[AutowireIterator]`), **Result** (value object).
+
+**Core defines interfaces with auto-tagging:**
 ```php
 // src/Filter/Event/EventFilterInterface.php
 #[AutoconfigureTag]
@@ -577,11 +325,11 @@ interface EventFilterInterface
 {
     public function getPriority(): int;
     public function getEventIdFilter(): ?array;  // null = no filter, [] = block all, [...] = whitelist
-    public function isEventAccessible(int $eventId): ?bool;  // null = no opinion
+    public function isEventAccessible(int $eventId): ?bool;
 }
 ```
 
-Core provides composite services using `#[AutowireIterator]`:
+**Core provides composite services using `#[AutowireIterator]`:**
 ```php
 // src/Filter/Event/EventFilterService.php
 readonly class EventFilterService
@@ -590,75 +338,20 @@ readonly class EventFilterService
         #[AutowireIterator(EventFilterInterface::class)]
         private iterable $filters,
     ) {}
-
-    public function getEventIdFilter(): EventFilterResult
-    {
-        // Compose all filters using AND logic (intersection)
-        foreach ($this->getSortedFilters() as $filter) {
-            $filterResult = $filter->getEventIdFilter();
-            if ($filterResult === null) continue;         // No opinion
-            if ($filterResult === []) return emptyResult; // Block all
-            // Intersect - event must pass ALL filters
-            $resultSet = array_intersect($resultSet, $filterResult);
-        }
-        return new EventFilterResult($resultSet, $hasActiveFilter);
-    }
 }
 ```
 
-Plugins implement the interface:
-```php
-// plugins/multisite/src/Service/WhitelabelEventFilter.php
-readonly class WhitelabelEventFilter implements EventFilterInterface
-{
-    public function getPriority(): int { return 100; }
+Plugins implement the interface and auto-register via `#[AutoconfigureTag]`. Controllers use only the core service — zero plugin knowledge in core.
 
-    public function getEventIdFilter(): ?array
-    {
-        if (!$this->contextService->getCurrentContext()->isActive()) {
-            return null; // No filtering
-        }
-        return $this->mappingRepository->getEventIdsForGroup($group);
-    }
-}
-```
-
-Controllers use the core service (no plugin knowledge):
-```php
-// EventController.php - Clean separation
-public function __construct(
-    private readonly EventFilterService $eventFilterService, // ✅ Core service
-) {}
-
-public function index(): Response
-{
-    $filterResult = $this->eventFilterService->getEventIdFilter();
-    $events = $this->repo->findByFilters(..., $filterResult->getEventIds());
-}
-```
-
-**Benefits:**
-- Zero plugin-specific code in core
-- Multiple plugins can provide filters (composable)
-- Plugins auto-register via `#[AutoconfigureTag]`
-- Priority-based ordering
-- AND logic (intersection) - all filters must pass
-- Testable in isolation
+**Benefits:** Zero plugin knowledge in core, composable (AND intersection logic), auto-registration, priority ordering, testable in isolation.
 
 **Available Filter Interfaces:**
 
-**Frontend Filters:**
-- `EventFilterInterface` - Filter events (frontend discovery)
-- `CmsFilterInterface` - Filter CMS pages (frontend)
-- `MenuFilterInterface` - Filter navigation menus
-- `MemberFilterInterface` - Filter user/member lists (frontend)
+Frontend: `EventFilterInterface`, `CmsFilterInterface`, `MenuFilterInterface`, `MemberFilterInterface`
 
-**Admin Filters:**
-- `AdminEventListFilterInterface` - Filter events (admin management)
-- `AdminMemberListFilterInterface` - Filter members (admin management)
-- `AdminCmsListFilterInterface` - Filter CMS pages (admin management)
+Admin: `AdminEventListFilterInterface`, `AdminMemberListFilterInterface`, `AdminCmsListFilterInterface`
 
-Admin filters extend frontend behavior with `getDebugContext()` for logging access denied scenarios.
+Admin filters extend frontend behavior with `getDebugContext()` for access denied logging.
 
 ---
 
@@ -672,7 +365,6 @@ Admin filters extend frontend behavior with `getDebugContext()` for logging acce
 - Legal pages (imprint, privacy policy) required on all domains
 - Shared footer menus
 - Global announcements
-- Company-wide events
 
 **Implementation:**
 ```php
@@ -693,10 +385,9 @@ return array_merge($groupIds, $platformIds);
 - Single source of truth (no duplication)
 - Automatic visibility across all domains
 - Easy content management (just don't map it)
-- Consistent behavior across filter types
 
 **Implementation Note:**
-See plugin documentation for specific implementations (e.g., `plugins/multisite/CLAUDE.md`).
+See the relevant plugin's `CLAUDE.md` for specific filter implementations.
 
 ---
 
@@ -721,18 +412,6 @@ class PluginEntityMapping {
     #[ORM\Column(name: 'core_entity_id', type: 'integer')]  // NOT a FK!
     private ?int $coreEntityId = null;
 }
-```
-
-**Example Use Case:**
-Plugins that need to associate their entities with core entities can use junction tables to maintain clean separation. See plugin documentation for specific implementations.
-
-**Query Pattern:**
-```php
-// Get IDs from junction table
-$eventIds = $mappingRepo->getEventIdsForGroup($group);
-
-// Query core entities
-return $eventRepo->findById($eventIds);
 ```
 
 **Benefits:**
@@ -767,8 +446,8 @@ foreach ($this->plugins as $plugin) {
 **❌ WRONG:**
 ```php
 // Core depends on specific plugin (architectural violation)
-#[Autowire(service: 'Plugin\MultiSite\Service\WhitelabelEventFilterService')]
-private readonly ?object $whitelabelFilter = null;
+#[Autowire(service: 'Plugin\MyPlugin\Service\MyPluginFilterService')]
+private readonly ?object $pluginFilter = null;
 ```
 
 ---
@@ -785,17 +464,6 @@ private readonly ?object $whitelabelFilter = null;
 6. **RateLimiter Improvements** - Better rate limiting strategies
 
 ### Symfony Features in Active Use
-
-**Example: Early Hints**
-```php
-// Controllers use early hints for asset preloading
-#[Route('/event/{id}', name: 'app_event_details')]
-public function details(int $id): Response
-{
-    $response = $this->getResponse(); // Early hints support
-    return $this->render('events/details.html.twig', [...], $response);
-}
-```
 
 **Example: AssetMapper**
 ```php
@@ -876,11 +544,6 @@ $cache->invalidateTags(['menu']);
 - Mock/stub for isolated testing
 - DAMA DoctrineTestBundle for transactional tests
 
-**MultiSite Plugin:**
-- 11 unit test suites covering all filter implementations
-- Junction table repository tests
-- Integration tests for group context handling
-
 ### Performance Optimizations
 
 - **Readonly Services** - Zero state, thread-safe, no side effects
@@ -922,48 +585,6 @@ This enforces architectural rules and fails if violations are introduced.
 
 ---
 
-## Quick Reference
-
-### Content Filtering in Controllers
-
-```php
-// Apply filter to repository query
-public function index(): Response
-{
-    $filterResult = $this->eventFilterService->getEventIdFilter();
-    $events = $this->eventRepo->findByFilters(..., $filterResult->getEventIds());
-
-    return $this->render('event/index.html.twig', ['events' => $events]);
-}
-```
-
-### Implementing a Plugin Filter
-
-```php
-// In plugin
-readonly class MyEventFilter implements EventFilterInterface
-{
-    public function getPriority(): int {
-        return 100; // Higher = earlier in chain
-    }
-
-    public function getEventIdFilter(): ?array {
-        return [1, 2, 3]; // Whitelist
-        // return null;    // No opinion
-        // return [];      // Block all
-    }
-
-    public function isEventAccessible(int $eventId): ?bool {
-        return in_array($eventId, $this->getAllowedIds());
-    }
-}
-```
-
-
----
-
 **Related Documentation:**
 - [Conventions](conventions.md) - Coding standards
-- [Testing](testing.md) - Testing strategies
-- [MultiSite Plugin](../plugins/multisite/ARCHITECTURE.md) - Plugin architecture details
-- [Filter Refactoring](refactoring/2026-01-26-filter-reorganization.md) - Filter reorganization details
+- [Testing](testing.md) - Testing strategies and fixture patterns

@@ -324,72 +324,12 @@ public function getAdminNavigation(): ?AdminNavigationConfig
 
 ### Info Boxes - When NOT to Use Them
 
-**Don't use info boxes for:**
+**Don't use for:** row counts ("Showing 10 events"), obvious instructions ("click edit to edit"), self-explanatory page descriptions, or success messages for expected behavior.
 
-❌ **Obvious information:**
-```twig
-{# DON'T #}
-<div class="notification is-info is-light">
-    Showing 10 events
-</div>
-```
-*Users can count the rows themselves.*
-
-❌ **Instructions that should be obvious:**
-```twig
-{# DON'T #}
-<div class="notification is-info">
-    Click the edit icon to edit an event.
-</div>
-```
-*Users know how to use icons.*
-
-❌ **Help text that clutters the UI:**
-```twig
-{# DON'T #}
-<div class="message is-info">
-    <div class="message-body">
-        This page shows all events in the system. You can filter by status, type, and location.
-        Use the search box to find specific events.
-    </div>
-</div>
-```
-*The interface is self-explanatory.*
-
-❌ **Success messages for expected behavior:**
-```twig
-{# DON'T #}
-<div class="notification is-success">
-    The page loaded successfully!
-</div>
-```
-*Of course it did - the user is looking at it.*
-
-**Only use info boxes for:**
-
-✅ **Critical errors:**
-```twig
-{# DO - Something went wrong #}
-<div class="notification is-danger">
-    Could not save event: Database connection failed.
-</div>
-```
-
-✅ **Unexpected states:**
-```twig
-{# DO - User needs to take action #}
-<div class="notification is-warning">
-    Your account has no permissions. Contact an administrator.
-</div>
-```
-
-✅ **Temporary feedback (flash messages):**
-```twig
-{# DO - Confirms action was taken #}
-{% for message in app.flashes('success') %}
-    <div class="notification is-success">{{ message }}</div>
-{% endfor %}
-```
+**Only use for:**
+- ✅ Critical errors (database failures, save errors)
+- ✅ Unexpected states requiring action (no permissions, misconfiguration)
+- ✅ Flash messages confirming user-initiated actions
 
 **Guideline:** If the user can see it on the page, don't explain it with a box.
 
@@ -472,84 +412,35 @@ Only include legend if row colors aren't obvious:
 
 ## Examples
 
-### Good Example (adminTables style)
+### Good vs Bad
 
 ```twig
-<div class="container">
-    <table id="filteredTable" class="table is-fullwidth">
-        <thead>
+{# ✅ GOOD - adminTables style #}
+<table id="filteredTable" class="table is-fullwidth">
+    <thead><tr>
+        <th>Name</th><th>Status</th>
+        <th><a href="{{ path('app_admin_user_add') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
+    </tr></thead>
+    <tbody>{% for user in users %}
         <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th><a href="{{ path('app_admin_user_add') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
+            <td>{{ user.name }}</td>
+            <td>{{ user.active ? 'Active' : 'Inactive' }}</td>  {# plain text, not tags #}
+            <td>
+                <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
+                <a href="{{ path('app_admin_user_delete', {'id': user.id}) }}"><span class="icon"><i class="fa fa-trash"></i></span></a>
+            </td>
         </tr>
-        </thead>
-        <tbody>
-        {% for user in users %}
-            <tr>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.active ? 'Active' : 'Inactive' }}</td>
-                <td>
-                    <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}">
-                        <span class="icon"><i class="fa fa-edit"></i></span>
-                    </a>
-                    <a href="{{ path('app_admin_user_delete', {'id': user.id}) }}">
-                        <span class="icon"><i class="fa fa-trash"></i></span>
-                    </a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-```
+    {% endfor %}</tbody>
+</table>
 
-### Bad Example (over-styled)
-
-```twig
-<div class="container">
-    <div class="level">
-        <div class="level-left">
-            <h1 class="title">Users</h1>
-        </div>
-        <div class="level-right">
-            <a href="..." class="button is-primary is-large">
-                <span class="icon"><i class="fa fa-plus"></i></span>
-                <span>Create User</span>
-            </a>
-        </div>
-    </div>
-
-    <div class="box">
-        <div class="notification is-info">
-            Showing 10 users
-        </div>
-
-        <table class="table">
-            <tbody>
-            {% for user in users %}
-                <tr>
-                    <td>{{ user.name }}</td>
-                    <td>
-                        {% if user.active %}
-                            <span class="tag is-success">Active</span>
-                        {% else %}
-                            <span class="tag is-danger">Inactive</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="buttons">
-                            <button class="button is-info is-small">Edit</button>
-                            <button class="button is-danger is-small">Delete</button>
-                        </div>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+{# ❌ BAD - over-styled: box wrapper, notification, level header, tag status, button elements #}
+<div class="box">
+    <div class="notification is-info">Showing 10 users</div>
+    <table class="table"><tbody>{% for user in users %}<tr>
+        <td>{{ user.name }}</td>
+        <td><span class="tag is-{{ user.active ? 'success' : 'danger' }}">{{ user.active ? 'Active' : 'Inactive' }}</span></td>
+        <td><div class="buttons"><button class="button is-info is-small">Edit</button></div></td>
+    </tr>{% endfor %}</tbody></table>
 </div>
 ```
 
