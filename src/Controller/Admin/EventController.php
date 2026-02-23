@@ -164,10 +164,11 @@ class EventController extends AbstractAdminController
     }
 
     #[Route('/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
-    public function delete(): Response
+    public function delete(Event $event): Response
     {
-        dump('delete');
-        exit();
+        $this->addFlash('error', 'Event deletion is not yet implemented.');
+
+        return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
 
     #[Route('/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
