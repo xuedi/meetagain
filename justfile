@@ -113,7 +113,7 @@ devModeInstaller:
     {{JUST}} devResetDatabase
     rm -f .env installed.lock
     @echo ""
-    @echo "Access: http://localhost/install/"
+    @echo "Access: https://meetagain.local/install/"
 
 # Clean generated files
 [group('development')]
@@ -213,7 +213,7 @@ checkMagoAll: checkMago checkMagoAnalyze checkMagoGuard
 
 # Check accessibility (Pa11y)
 [group('checks')]
-checkA11y url='http://localhost/':
+checkA11y url='http://meetagain.local/':
     {{DOCKER}} build pa11y -q
     {{DOCKER}} run --rm pa11y {{url}} --reporter cli --standard WCAG2AA
 
