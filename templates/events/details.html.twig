@@ -38,7 +38,7 @@
             <div class="columns">
                 <div class="column is-9">
                     <div class="content">
-                        {{ event.description(app.locale)|raw|nl2br }}
+                        {{ event.description(app.locale)|nl2br }}
                     </div>
                     {% if is_granted('ROLE_USER') %}
                         <div class="mt-5 box">

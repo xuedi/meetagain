@@ -42,7 +42,7 @@ class EventImageUploaded extends MessageAbstract
             'uploaded <b>%d</b> images to the event <a href="%s">%s</a>',
             $this->meta['images'],
             $this->router->generate('app_event_details', ['id' => $eventId]),
-            $eventName,
+            $this->e($eventName),
         );
     }
 }
