@@ -8,3 +8,11 @@ framework:
             policy: 'fixed_window'
             limit: 10
             interval: '1 hour'
+
+when@test:
+    framework:
+        rate_limiter:
+            password_reset:
+                limit: 999999
+            registration:
+                limit: 999999
