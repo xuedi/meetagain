@@ -33,6 +33,6 @@ class RsvpYes extends MessageAbstract
         $eventId = $this->meta['event_id'];
         $eventName = $this->eventNames[$eventId] ?? '[deleted]';
 
-        return sprintf('Going to event: %s', $eventName);
+        return sprintf('Going to event: %s', $this->e($eventName));
     }
 }

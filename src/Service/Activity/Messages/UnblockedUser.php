@@ -30,6 +30,9 @@ class UnblockedUser extends MessageAbstract
 
     protected function renderHtml(): string
     {
-        return $this->renderText();
+        $userId = $this->meta['user_id'];
+        $userName = $this->userNames[$userId] ?? '[deleted]';
+
+        return sprintf('Unblocked user: %s', $this->e($userName));
     }
 }
