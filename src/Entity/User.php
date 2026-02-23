@@ -54,7 +54,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $public = true;
 
-    #[ORM\Column(length: 40, nullable: true)]
+    #[ORM\Column(length: 64, nullable: true)]
     private ?string $regcode = null;
 
     #[ORM\Column(nullable: true)]

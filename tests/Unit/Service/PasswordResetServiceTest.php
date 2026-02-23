@@ -60,7 +60,7 @@ class PasswordResetServiceTest extends TestCase
 
         $this->assertSame($user, $result);
         $this->assertNotNull($user->getRegcode());
-        $this->assertEquals(40, strlen($user->getRegcode())); // SHA1 hash is 40 chars
+        $this->assertEquals(64, strlen($user->getRegcode())); // bin2hex(random_bytes(32)) is 64 chars
     }
 
     public function testRequestResetLogsActivityAndSendsEmail(): void

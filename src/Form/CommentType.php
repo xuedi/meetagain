@@ -18,7 +18,6 @@ class CommentType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // TODO: Extra secure for all kinds of input
         $builder->add('comment', TextareaType::class);
     }
 
