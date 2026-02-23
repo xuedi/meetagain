@@ -137,3 +137,13 @@ input[type="color"] {
     border-top: 1px solid rgba(10,10,10,.1);
     height: calc(2.25rem + 1px);
 }
+
+.LinkLikeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: .5rem .75rem;
+    font-size: 1em;
+    text-align: left;
+    line-height: 1.5;
+}

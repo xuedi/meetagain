@@ -17,9 +17,9 @@
             <hr class="dropdown-divider"/>
             <a class="navbar-item" href="{{ path('app_profile_config') }}">{{ "menu_profile_config" | trans }}</a>
             <hr class="dropdown-divider"/>
-            <form action="{{ path('app_security_logout') }}" method="post">
+            <form action="{{ path('app_security_logout') }}" method="post" style="display:contents;">
                 <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
-                <button type="submit" class="navbar-item" style="background:none;border:none;cursor:pointer;width:100%;text-align:left;">{{ "menu_profile_logout" | trans }}</button>
+                <button type="submit" class="navbar-item LinkLikeButton">{{ "menu_profile_logout" | trans }}</button>
             </form>
         </div>
     </div>
