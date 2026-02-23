@@ -3,10 +3,7 @@
 namespace Tests\Unit\Command;
 
 use App\Command\CronCommand;
-use App\Service\ActivityService;
 use App\Service\CommandExecutionService;
-use App\Service\EmailService;
-use App\Service\RsvpNotificationService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -14,37 +11,27 @@ class CronCommandTest extends TestCase
 {
     public function testCommandHasCorrectName(): void
     {
-        $emailServiceStub = $this->createStub(EmailService::class);
-        $activityServiceStub = $this->createStub(ActivityService::class);
-        $rsvpNotificationServiceStub = $this->createStub(RsvpNotificationService::class);
+        // Arrange
         $loggerStub = $this->createStub(LoggerInterface::class);
         $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
-        $command = new CronCommand(
-            $emailServiceStub,
-            $activityServiceStub,
-            $rsvpNotificationServiceStub,
-            $loggerStub,
-            $commandExecServiceStub,
-        );
 
+        // Act
+        $command = new CronCommand($loggerStub, $commandExecServiceStub);
+
+        // Assert
         $this->assertSame('app:cron', $command->getName());
     }
 
     public function testCommandHasCorrectDescription(): void
     {
-        $emailServiceStub = $this->createStub(EmailService::class);
-        $activityServiceStub = $this->createStub(ActivityService::class);
-        $rsvpNotificationServiceStub = $this->createStub(RsvpNotificationService::class);
+        // Arrange
         $loggerStub = $this->createStub(LoggerInterface::class);
         $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
-        $command = new CronCommand(
-            $emailServiceStub,
-            $activityServiceStub,
-            $rsvpNotificationServiceStub,
-            $loggerStub,
-            $commandExecServiceStub,
-        );
 
+        // Act
+        $command = new CronCommand($loggerStub, $commandExecServiceStub);
+
+        // Assert
         $this->assertSame('cron manager to be called often, maybe every 5 min or so', $command->getDescription());
     }
 }

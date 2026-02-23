@@ -2,11 +2,8 @@
 
 namespace App\Command;
 
-use App\Plugin;
-use App\Service\ActivityService;
+use App\CronTaskInterface;
 use App\Service\CommandExecutionService;
-use App\Service\EmailService;
-use App\Service\RsvpNotificationService;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,13 +19,10 @@ class CronCommand extends LoggedCommand
     use LockableTrait;
 
     public function __construct(
-        private readonly EmailService $mailService,
-        private readonly ActivityService $activityService,
-        private readonly RsvpNotificationService $rsvpNotificationService,
         private readonly LoggerInterface $logger,
         CommandExecutionService $commandExecutionService,
-        #[AutowireIterator(Plugin::class)]
-        private readonly iterable $plugins = [],
+        #[AutowireIterator(CronTaskInterface::class)]
+        private readonly iterable $cronTasks = [],
     ) {
         parent::__construct($commandExecutionService);
     }
@@ -39,44 +33,12 @@ class CronCommand extends LoggedCommand
             return Command::SUCCESS;
         }
 
-        $count = $this->mailService->sendQueue();
-        $output->writeln('EmailService: ' . $count);
-
-        $count = $this->rsvpNotificationService->processUpcomingEvents(7);
-        $output->writeln('Send RSVP notifications: ' . $count);
-
-        /*
-         * $output->write('Validating activity payloads ... ');
-         * $invalidActivities = $this->activityService->validateAllActivities();
-         * if ($invalidActivities === []) {
-         * $output->writeln('OK');
-         * } else {
-         * $output->writeln(sprintf('<error>%d invalid activities found</error>', count($invalidActivities)));
-         * foreach ($invalidActivities as $invalid) {
-         * $this->logger->warning('Invalid activity payload', [
-         * 'activity_id' => $invalid['id'],
-         * 'type' => $invalid['type'],
-         * 'error' => $invalid['error'],
-         * ]);
-         * $output->writeln(sprintf(
-         * '  - Activity #%d (%s): %s',
-         * $invalid['id'],
-         * $invalid['type'],
-         * $invalid['error'],
-         * ));
-         * }
-         * }
-         *
-         */
-
-        // Run plugin cron tasks
-        foreach ($this->plugins as $plugin) {
-            $pluginKey = $plugin->getPluginKey();
+        foreach ($this->cronTasks as $task) {
             try {
-                $plugin->runCronTasks($output);
+                $task->runCronTask($output);
             } catch (Exception $e) {
-                $this->logger->error('Plugin cron task failed', [
-                    'plugin' => $pluginKey,
+                $this->logger->error('Cron task failed', [
+                    'task' => $task::class,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
