@@ -15,6 +15,16 @@ enum UserRole: string
     public const ROLE_ORGANIZER = 'ROLE_ORGANIZER';
     public const ROLE_USER = 'ROLE_USER';
 
+    public static function getChoices(): array
+    {
+        return [
+            'Administrator' => self::Admin,
+            'Founder' => self::Founder,
+            'Organizer' => self::Organizer,
+            'User' => self::User,
+        ];
+    }
+
     public function toRoleString(): string
     {
         return 'ROLE_' . $this->value;
