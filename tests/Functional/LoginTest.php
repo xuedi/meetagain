@@ -156,8 +156,9 @@ class LoginTest extends WebTestCase
         $client->submit($form);
         $client->followRedirect();
 
-        // Logout
-        $client->request('GET', '/en/logout');
+        // Logout via POST with CSRF token (logout is POST-only for CSRF protection)
+        $csrfToken = $client->getContainer()->get('security.csrf.token_manager')->getToken('logout')->getValue();
+        $client->request('POST', '/en/logout', ['_token' => $csrfToken]);
         $this->assertResponseRedirects();
 
         // Profile should now redirect to login

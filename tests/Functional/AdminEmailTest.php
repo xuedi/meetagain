@@ -79,9 +79,9 @@ class AdminEmailTest extends WebTestCase
 
         $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/edit');
 
-        // Act - form fields are now language-specific
+        // Act - select by form name to avoid the navbar logout button (also a submit button)
         $form = $crawler
-            ->filter('button[type="submit"]')
+            ->filter('form[name="email_template"]')
             ->form([
                 'email_template[subject-en]' => 'Updated Subject',
                 'email_template[body-en]' => '<h1>Updated Body</h1>',
@@ -107,10 +107,10 @@ class AdminEmailTest extends WebTestCase
         $template = $this->getFirstTemplate($client);
         $originalSubject = $template->getSubject('en');
 
-        // First change the template
+        // First change the template — select by form name to avoid the navbar logout button
         $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/edit');
         $form = $crawler
-            ->filter('button[type="submit"]')
+            ->filter('form[name="email_template"]')
             ->form([
                 'email_template[subject-en]' => 'Modified Subject',
                 'email_template[body-en]' => '<p>Modified</p>',
