@@ -170,9 +170,9 @@ testUnit +parameter='':
 testFunctional +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-progress --log-junit tests/reports/junit.xml {{parameter}}
 
-# Show AI-readable test results (for Haiku agent)
+# Print AI-readable test results (for Haiku agent)
 [group('testing')]
-testResults +parameter='':
+testPrintResults +parameter='':
     {{PHP}} php bin/console app:test:results {{parameter}}
 
 # Show coverage report

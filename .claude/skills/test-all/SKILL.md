@@ -21,7 +21,7 @@ Task(
     Execute complete test suite:
 
     1. Run: just test
-    2. Run: just testResults
+    2. Run: just testPrintResults
 
     Return comprehensive summary:
     - Unit tests: count, status

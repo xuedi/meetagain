@@ -94,7 +94,7 @@ just test               # Run all tests + checks
 | `just test`           | Run all tests and checks          |
 | `just testUnit`       | Run unit tests (generates JUnit)  |
 | `just testFunctional` | Run functional tests              |
-| `just testResults`    | AI-readable test results          |
+| `just testPrintResults` | Print AI-readable test results  |
 | `just testCoverage`   | Generate and show coverage report |
 | `just testSymfony`    | Analyze route performance         |
 
@@ -260,14 +260,14 @@ For custom `just` commands not covered by skills, use the Haiku model via Task t
 Task(
   subagent_type: "Bash",
   model: "haiku",
-  prompt: "Run: just <custom-command> && just testResults"
+  prompt: "Run: just <custom-command> && just testPrintResults"
 )
 ```
 
 **Pattern for running tests manually:**
 
 1. Run test command: `just testUnit [TestClass]` (generates JUnit XML)
-2. Get results: `just testResults` (AI-readable format)
+2. Get results: `just testPrintResults` (AI-readable format)
 3. Return structured summary to parent agent
 
 **AI-readable output format:**
@@ -285,8 +285,8 @@ FAILURES:
 
 **Available test result commands:**
 
-- `just testResults` - Show all test results
-- `just testResults --failures-only` - Show only failures
+- `just testPrintResults` - Print all test results
+- `just testPrintResults --failures-only` - Print only failures
 
 ---
 

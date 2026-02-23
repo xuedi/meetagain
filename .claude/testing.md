@@ -474,13 +474,13 @@ When running tests via Claude, always use Haiku agent:
 Task(
   subagent_type: "Bash",
   model: "haiku",
-  prompt: "Run: just testUnit Tests\\Unit\\Service\\TranslationServiceTest && just testResults"
+  prompt: "Run: just testUnit Tests\\Unit\\Service\\TranslationServiceTest && just testPrintResults"
 )
 ```
 
 **AI-readable test results:**
 ```bash
-just testResults
+just testPrintResults
 ```
 
 Output:

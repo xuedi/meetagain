@@ -25,7 +25,7 @@ Task(
     Execute PHPUnit unit tests and return results:
 
     1. Run: just testUnit $ARGUMENTS
-    2. Run: just testResults
+    2. Run: just testPrintResults
 
     Return a concise summary including:
     - Total tests run
