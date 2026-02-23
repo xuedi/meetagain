@@ -60,12 +60,6 @@ interface Plugin
     public function getFooterAbout(): ?string;
 
     /**
-     * Runs periodic maintenance/cron tasks for the plugin.
-     * Called by app:cron command (typically every 5 minutes).
-     */
-    public function runCronTasks(OutputInterface $output): void;
-
-    /**
      * Returns tags/badges to display for an event in list views.
      * @return list<EventListItemTag>
      */

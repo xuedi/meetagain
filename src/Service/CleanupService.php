@@ -2,17 +2,30 @@
 
 namespace App\Service;
 
+use App\CronTaskInterface;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-readonly class CleanupService
+readonly class CleanupService implements CronTaskInterface
 {
     public function __construct(
         private ImageRepository $imageRepo,
         private UserRepository $userRepo,
         private EntityManagerInterface $entityManager,
     ) {}
+
+    public function runCronTask(OutputInterface $output): void
+    {
+        $output->write('Clean image cache ... ');
+        $this->removeImageCache();
+        $output->writeln('OK');
+
+        $output->write('Clean registrations ... ');
+        $this->removeGhostedRegistrations();
+        $output->writeln('OK');
+    }
 
     public function removeImageCache(): void
     {
