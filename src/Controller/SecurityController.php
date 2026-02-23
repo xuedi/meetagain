@@ -23,10 +23,12 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -45,6 +47,10 @@ class SecurityController extends AbstractController
         private readonly PasswordResetService $passwordResetService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ConfigService $configService,
+        #[Target('passwordReset')]
+        private readonly RateLimiterFactory $passwordResetLimiter,
+        #[Target('registration')]
+        private readonly RateLimiterFactory $registrationLimiter,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
@@ -65,9 +71,13 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/logout', name: 'app_security_logout')]
+    #[Route(path: '/logout', name: 'app_security_logout', methods: ['POST'])]
     public function logout(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('logout', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $user = $this->getAuthedUser();
         $osm = $user->isOsmConsent() ? ConsentType::Granted : ConsentType::Denied;
 
@@ -84,6 +94,11 @@ class SecurityController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, EntityManagerInterface $em): Response
     {
+        $limiter = $this->registrationLimiter->create($request->getClientIp());
+        if (!$limiter->consume()->isAccepted()) {
+            return new Response('Too many registration attempts. Please try again later.', 429);
+        }
+
         $user = new User();
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
@@ -161,6 +176,11 @@ class SecurityController extends AbstractController
     #[Route(path: '/reset', name: 'app_reset')]
     public function reset(Request $request): Response
     {
+        $limiter = $this->passwordResetLimiter->create($request->getClientIp());
+        if (!$limiter->consume()->isAccepted()) {
+            return new Response('Too many password reset attempts. Please try again later.', 429);
+        }
+
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
 
@@ -174,12 +194,9 @@ class SecurityController extends AbstractController
             $email = $form->get('email')->getData();
 
             if ($form->getErrors(true)->count() === 0) {
-                $user = $this->passwordResetService->requestReset($email);
-                if (!$user instanceof User) {
-                    $form->get('email')->addError(new FormError('No valid user found'));
-                } else {
-                    return $this->render('security/reset_email_send.html.twig');
-                }
+                $this->passwordResetService->requestReset($email);
+
+                return $this->render('security/reset_email_send.html.twig');
             }
 
             $this->captchaService->reset();

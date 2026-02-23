@@ -50,3 +50,8 @@ services:
     App\Authorization\Action\ActionAuthorizationMessageService:
         arguments:
             $providers: !tagged_iterator app.action_authorization_message
+
+    App\Controller\SecurityController:
+        arguments:
+            $passwordResetLimiter: '@limiter.password_reset'
+            $registrationLimiter: '@limiter.registration'
