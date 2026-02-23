@@ -121,10 +121,14 @@ class MemberController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['GET'])]
+    #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['POST'])]
     #[IsGranted('ROLE_FOUNDER')]
-    public function approve(User $user): Response
+    public function approve(Request $request, User $user): Response
     {
+        if (!$this->isCsrfTokenValid('approve_user', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         if ($user->getStatus() !== UserStatus::EmailVerified) {
             throw $this->createNotFoundException('Only pending users can be approved.');
         }
@@ -140,10 +144,14 @@ class MemberController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_member');
     }
 
-    #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['GET'])]
+    #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['POST'])]
     #[IsGranted('ROLE_FOUNDER')]
-    public function deny(User $user): Response
+    public function deny(Request $request, User $user): Response
     {
+        if (!$this->isCsrfTokenValid('deny_user', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         if ($user->getStatus() !== UserStatus::EmailVerified) {
             throw $this->createNotFoundException('Only pending users can be denied.');
         }
