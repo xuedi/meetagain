@@ -49,10 +49,10 @@ class EventImageUploadTest extends WebTestCase
             'type' => ImageType::EventUpload,
         ]);
 
-        // Step 3: Navigate to event upload page
-        $crawler = $client->request('GET', '/en/event/upload/' . $eventId);
+        // Step 3: Fetch the modal content to get the CSRF token
+        $crawler = $client->request('GET', '/en/image/event/' . $eventId . '/modal');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('form', 'Upload form should exist');
+        $this->assertSelectorExists('form', 'Upload form should exist in modal content');
 
         // Step 4: Upload an image - create a small test image
         $tempFile = sys_get_temp_dir() . '/test_upload_' . uniqid() . '.jpg';
@@ -69,7 +69,7 @@ class EventImageUploadTest extends WebTestCase
         // Submit form with file upload using multipart
         $client->request(
             'POST',
-            '/en/event/upload/' . $eventId,
+            '/en/image/event/' . $eventId . '/upload',
             ['event_upload' => ['_token' => $csrfToken]],
             ['event_upload' => ['files' => [new UploadedFile($tempFile, 'test_image.jpg', 'image/jpeg', null, true)]]],
         );
