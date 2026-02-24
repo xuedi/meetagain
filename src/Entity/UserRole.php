@@ -8,12 +8,14 @@ enum UserRole: string
     case Founder = 'FOUNDER';
     case Organizer = 'ORGANIZER';
     case User = 'USER';
+    case System = 'SYSTEM';
 
     // Constants for use in attributes like #[IsGranted()]
     public const ROLE_ADMIN = 'ROLE_ADMIN';
     public const ROLE_FOUNDER = 'ROLE_FOUNDER';
     public const ROLE_ORGANIZER = 'ROLE_ORGANIZER';
     public const ROLE_USER = 'ROLE_USER';
+    public const ROLE_SYSTEM = 'ROLE_SYSTEM';
 
     public static function getChoices(): array
     {
@@ -36,8 +38,7 @@ enum UserRole: string
             'ROLE_ADMIN' => self::Admin,
             'ROLE_FOUNDER' => self::Founder,
             'ROLE_ORGANIZER' => self::Organizer,
-            'ROLE_MANAGER' => self::Organizer, // Backwards compatibility
-            'ROLE_USER' => self::User,
+            'ROLE_SYSTEM' => self::System,
             default => self::User,
         };
     }

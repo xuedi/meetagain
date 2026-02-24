@@ -194,7 +194,7 @@ class MemberController extends AbstractAdminController
         }
 
         // Prevent promoting system users
-        if ($user->hasUserRole(UserRole::System)) {
+        if ($user->getRole() === UserRole::System) {
             throw $this->createAccessDeniedException('Cannot modify system users.');
         }
 
@@ -216,7 +216,7 @@ class MemberController extends AbstractAdminController
         }
 
         // Prevent modifying system users
-        if ($user->hasUserRole(UserRole::System)) {
+        if ($user->getRole() === UserRole::System) {
             throw $this->createAccessDeniedException('Cannot modify system users.');
         }
 

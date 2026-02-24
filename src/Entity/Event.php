@@ -75,7 +75,7 @@ class Event
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'event')]
     private Collection $images;
 
-    #[ORM\Column(type: 'string', enumType: EventStatus::class)]
+    #[ORM\Column(type: 'string', length: 20, enumType: EventStatus::class)]
     private EventStatus $status = EventStatus::Draft;
 
     #[ORM\Column]
