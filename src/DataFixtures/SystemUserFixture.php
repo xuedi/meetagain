@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Entity\UserRole;
 use App\Entity\UserStatus;
 use DateTime;
 use DateTimeImmutable;
@@ -36,7 +37,7 @@ class SystemUserFixture extends AbstractFixture implements FixtureGroupInterface
             $user->setBio(null);
             $user->setOsmConsent(false);
             $user->setLocale(LanguageFixture::ENGLISH);
-            $user->setRoles(['ROLE_SYSTEM']);
+            $user->setRole(UserRole::System);
             $user->setCreatedAt(new DateTimeImmutable());
             $user->setLastLogin(new DateTime());
 
