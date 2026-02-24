@@ -33,6 +33,6 @@ class BlockedUser extends MessageAbstract
         $userId = $this->meta['user_id'];
         $userName = $this->userNames[$userId] ?? '[deleted]';
 
-        return sprintf('Blocked user: %s', $this->e($userName));
+        return sprintf('Blocked user: %s', $this->escapeHtml($userName));
     }
 }

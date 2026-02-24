@@ -40,7 +40,7 @@ abstract class MessageAbstract implements MessageInterface
         return $asHtml ? $this->renderHtml() : $this->renderText();
     }
 
-    protected function e(string $value): string
+    protected function escapeHtml(string $value): string
     {
         return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }

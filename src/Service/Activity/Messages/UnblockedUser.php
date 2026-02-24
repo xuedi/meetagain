@@ -33,6 +33,6 @@ class UnblockedUser extends MessageAbstract
         $userId = $this->meta['user_id'];
         $userName = $this->userNames[$userId] ?? '[deleted]';
 
-        return sprintf('Unblocked user: %s', $this->e($userName));
+        return sprintf('Unblocked user: %s', $this->escapeHtml($userName));
     }
 }

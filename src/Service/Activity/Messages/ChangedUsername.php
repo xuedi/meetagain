@@ -31,6 +31,6 @@ class ChangedUsername extends MessageAbstract
     {
         $msgTemplate = 'Changed username from <b>%s</b> to <b>%s</b>';
 
-        return sprintf($msgTemplate, $this->e($this->meta['old']), $this->e($this->meta['new']));
+        return sprintf($msgTemplate, $this->escapeHtml($this->meta['old']), $this->escapeHtml($this->meta['new']));
     }
 }
