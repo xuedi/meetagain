@@ -15,16 +15,13 @@ use App\Entity\User;
 use App\Filter\Event\EventFilterService;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
-use App\Form\EventUploadType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\ActivityService;
 use App\Service\EventService;
 use App\Service\FeaturedEventProviderInterface;
-use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +38,6 @@ class EventController extends AbstractController
         private readonly EventService $eventService,
         private readonly EventRepository $repo,
         private readonly CommentRepository $comments,
-        private readonly ImageService $imageService,
         private readonly EventFilterService $eventFilterService,
         private readonly ActionAuthorizationService $actionAuthService,
         private readonly ActionAuthorizationMessageService $authMessageService,
@@ -134,42 +130,6 @@ class EventController extends AbstractController
             ],
             $response,
         );
-    }
-
-    #[Route('/event/upload/{event}', name: 'app_event_upload', methods: ['GET', 'POST'])]
-    public function upload(Event $event, Request $request, EntityManagerInterface $em): Response
-    {
-        $user = $em->find(User::class, $this->getAuthedUser()->getId());
-        if ($user === null) {
-            throw new RuntimeException('User not found');
-        }
-
-        if (!$this->actionAuthService->isActionAllowed('event.upload', $event->getId(), $user)) {
-            $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage(
-                'event.upload',
-                $event->getId(),
-                $user,
-            );
-            $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
-
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-
-        $form = $this->createForm(EventUploadType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $files = $form->get('files')->getData();
-            $count = $this->imageService->uploadForEvent($event, $files, $user);
-
-            $this->activityService->log(ActivityType::EventImageUploaded, $user, [
-                'event_id' => $event->getId(),
-                'images' => $count,
-            ]);
-
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-
-        return $this->render('events/upload.html.twig', ['form' => $form], $this->getResponse());
     }
 
     #[Route('/event/featured/', name: self::ROUTE_FEATURED)]

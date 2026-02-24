@@ -6,7 +6,9 @@
     </div>
     <div class="level-right">
         {% if is_granted('ROLE_USER') %}
-            <a href="{{ path('app_event_upload', {'event': event.id}) }}" class="button is-success is-small ml-4">
+            <a href="#"
+               class="button is-success is-small ml-4 modalTrigger"
+               data-modal-url="{{ path('app_image_modal', {'entity': 'event', 'id': event.id}) }}">
                 <span class="icon"><i class="fa fa-plus"></i></span><span>Upload photo</span>
             </a>
         {% endif %}

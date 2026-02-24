@@ -14,7 +14,12 @@
                     <div class="box">
                         <div class="columns">
                             <div class="column is-6">
-                                {{ modal|raw }}
+                                {% include 'components/image_upload.html.twig' with {
+                                'entity': 'user',
+                                'id': user.id,
+                                'image': user.image,
+                                'rotate': true
+                            } %}
                             </div>
                             <div class="column is-6">
                                 {{ form_row(form.name) }}

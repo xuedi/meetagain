@@ -111,57 +111,70 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Modal: open by trigger and close via .modal-close
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.modalTrigger').forEach((trigger) => {
-        trigger.addEventListener('click', event => {
-            event.preventDefault();
-
-            const modalSelector = event.currentTarget.dataset.target;
-            const modal = document.getElementById(modalSelector);
-            if (!modal) return;
-            const modalClose = modal.querySelector('.modal-close');
-
-            if (modalClose) {
-                modalClose.addEventListener('click', () => {
-                    modal.classList.remove('is-active');
-                });
-            }
-
-            modal.classList.add('is-active');
-        });
-    });
-});
-
-// File upload: send selected file via ajax and reload on success
+// Modal: lazy-load content from data-modal-url into global modal (binds at DOMContentLoaded)
 document.addEventListener('DOMContentLoaded', function () {
-    (document.querySelectorAll('.fileUploadTrigger') || []).forEach((trigger) => {
-        trigger.addEventListener('change', (event) => {
+    document.querySelectorAll('.modalTrigger').forEach(function (trigger) {
+        trigger.addEventListener('click', function (event) {
             event.preventDefault();
-            const url = event.currentTarget.getAttribute('data-url');
-            const file = event.currentTarget.files && event.currentTarget.files[0];
-            if (!url || !file) return;
 
-            const formData = new FormData();
-            formData.append('image_upload[newImage]', file);
-
-            maFetch(url, false, formData)
-                .then(() => location.reload())
-                .catch(() => location.reload());
-        });
-    });
-});
-
-// File actions: select/rotate via ajax and then reload
-document.addEventListener('DOMContentLoaded', function () {
-    (document.querySelectorAll('.fileSelectTrigger, .fileRotateTrigger') || []).forEach((trigger) => {
-        trigger.addEventListener('click', (event) => {
-            event.preventDefault();
-            const url = event.currentTarget.getAttribute('href');
+            const url = event.currentTarget.dataset.modalUrl;
             if (!url) return;
-            maFetch(url).then(() => location.reload());
+
+            const modal = document.getElementById('globalImageModal');
+            const content = document.getElementById('globalImageModalContent');
+            if (!modal || !content) return;
+
+            maFetch(url)
+                .then(function (html) {
+                    content.innerHTML = html;
+                    modal.classList.add('is-active');
+                })
+                .catch(function (err) {
+                    console.error('Modal load failed:', err);
+                });
         });
     });
+});
+
+// Modal: close global modal via .modal-close or .modal-background
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('globalImageModal');
+    if (!modal) return;
+
+    const closeModal = () => modal.classList.remove('is-active');
+
+    const closeBtn = modal.querySelector('.modal-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    const bg = modal.querySelector('.modal-background');
+    if (bg) bg.addEventListener('click', closeModal);
+});
+
+// File upload: delegated — send selected file via ajax and reload (works on dynamically injected modal content)
+document.addEventListener('change', function (event) {
+    const trigger = event.target.closest('.fileUploadTrigger');
+    if (!trigger) return;
+
+    const url = trigger.getAttribute('data-url');
+    const file = trigger.files && trigger.files[0];
+    if (!url || !file) return;
+
+    const formData = new FormData();
+    formData.append('image_upload[newImage]', file);
+
+    maFetch(url, false, formData)
+        .then(() => location.reload())
+        .catch(() => location.reload());
+});
+
+// File actions: delegated — select/rotate via ajax and reload (works on dynamically injected modal content)
+document.addEventListener('click', function (event) {
+    const trigger = event.target.closest('.fileSelectTrigger, .fileRotateTrigger');
+    if (!trigger) return;
+    event.preventDefault();
+    const url = trigger.getAttribute('href');
+    if (!url) return;
+    maFetch(url).then(() => location.reload());
 });
 
 // Show-all: toggle all siblings with .showAllToggle within container

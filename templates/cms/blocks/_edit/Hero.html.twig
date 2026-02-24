@@ -58,7 +58,11 @@
         </div>
         <div class="column is-1"></div>
         <div class="column is-4">
-            {{ renderImageModal('cmsBlock', blockId )|raw }}
+            {% include 'components/image_upload.html.twig' with {
+                'entity': 'cmsBlock',
+                'id': blockId,
+                'image': blockImage
+            } %}
         </div>
     </div>
 
