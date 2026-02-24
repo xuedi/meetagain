@@ -195,7 +195,7 @@ class ImageUploadController extends AbstractController
                     ]);
                 break;
             case 'cmsBlock':
-                $this->denyAccessUnlessGranted('ROLE_ADMIN');
+                $this->denyAccessUnlessGranted('ROLE_FOUNDER');
                 $imageType = ImageType::CmsBlock;
                 $entity = $this->em->getRepository(CmsBlock::class)->findOneBy(['id' => $id]);
                 $gallery = $this->em->getRepository(Image::class)->findBy(['type' => ImageType::CmsBlock]);
