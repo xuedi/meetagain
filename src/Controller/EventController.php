@@ -112,6 +112,8 @@ class EventController extends AbstractController
             $em->persist($comment);
             $em->flush();
 
+            $this->activityService->log(ActivityType::CommentedOnEvent, $this->getAuthedUser(), ['event_id' => $id]);
+
             $form = $this->createForm(CommentType::class);
         }
 
