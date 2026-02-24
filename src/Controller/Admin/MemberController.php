@@ -83,11 +83,9 @@ class MemberController extends AbstractAdminController
         if ($form->isSubmitted() && $form->isValid()) {
             // Restrict role assignment for FOUNDERs
             if ($this->isGranted('ROLE_FOUNDER') && !$this->isGranted('ROLE_ADMIN')) {
-                $requestedRoles = $form->get('roles')->getData();
-                $restrictedRoles = ['ROLE_ADMIN', 'ROLE_FOUNDER'];
-                $hasRestricted = !empty(array_intersect($requestedRoles, $restrictedRoles));
+                $requestedRole = $form->get('role')->getData();
 
-                if ($hasRestricted) {
+                if (in_array($requestedRole, [UserRole::Admin, UserRole::Founder], true)) {
                     $this->addFlash('error', 'You cannot assign FOUNDER or ADMIN roles');
 
                     return $this->redirectToRoute('app_admin_member');
