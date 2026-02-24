@@ -277,3 +277,6 @@ Enable: Enable
 'Home page': 'Home page'
 'Has linked announcement': 'Has linked announcement'
 page_title_CMD: CMS
+config_option_show_frontpage: 'Show on frontpage'
+config_option_automatic_registration: 'Automatic registration'
+config_option_send_rsvp_notifications: 'Send RSVP notifications'

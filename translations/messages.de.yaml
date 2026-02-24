@@ -277,3 +277,6 @@ Enable: Aktivieren
 'Home page': Startseite
 'Has linked announcement': 'Hat verknüpfte Ankündigung'
 page_title_CMD: CMS
+config_option_show_frontpage: 'Auf der Startseite anzeigen'
+config_option_automatic_registration: 'Automatische Registrierung'
+config_option_send_rsvp_notifications: 'RSVP-Benachrichtigungen senden'
