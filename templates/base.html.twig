@@ -19,7 +19,7 @@
     {% for stylesheet in get_plugin_stylesheets() %}
         <link rel="stylesheet" href="{{ stylesheet }}"/>
     {% endfor %}
-    <script src="/javascript/custom.js" defer></script>
+    <script src="/javascript/custom.js?v=2" defer></script>
     {% for javascript in get_plugin_javascripts() %}
         <script src="{{ javascript }}" defer></script>
     {% endfor %}
@@ -63,5 +63,10 @@
     </div>
 {% endfor %}
 {% include 'base_footer.html.twig' %}
+<div id="globalImageModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content"><div class="box" id="globalImageModalContent"></div></div>
+    <div class="modal-close is-large" aria-label="close"></div>
+</div>
 </body>
 </html>

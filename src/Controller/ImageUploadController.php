@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use App\Authorization\Action\ActionAuthorizationMessageService;
+use App\Authorization\Action\ActionAuthorizationService;
 use App\Entity\ActivityType;
 use App\Entity\CmsBlock;
+use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Service\ActivityService;
@@ -20,9 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * TODO: refactor logic from here into the ImageService, so this controller is not called at other services anymore.
- */
 class ImageUploadController extends AbstractController
 {
     public function __construct(
@@ -30,54 +31,36 @@ class ImageUploadController extends AbstractController
         private readonly ImageService $imageService,
         private readonly CmsBlockRepository $cmsBlockRepo,
         private readonly ActivityService $activityService,
+        private readonly ActionAuthorizationService $actionAuthService,
+        private readonly ActionAuthorizationMessageService $authMessageService,
     ) {}
 
-    #[Route('/replace_image/{entity}/{id}', name: 'app_image_replace', requirements: [
-        'entity' => 'user|cmsBlock',
+    #[Route('/image/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
+        'entity' => 'user|cmsBlock|event',
         'id' => '\d+',
     ])]
-    public function imageReplace(string $entity, int $id): Response
+    public function imageModal(string $entity, int $id): Response
     {
-        $response = $this->getResponse();
         $data = $this->prepare($entity, $id);
-        $image = $data['image'];
-        $gallery = $data['gallery'];
+        $templateVars = [
+            'imageUploadGallery' => $data['gallery'],
+            'image' => $data['image'],
+            'entity' => $entity,
+            'id' => $id,
+        ];
 
-        return $this->render(
-            'image/index.html.twig',
-            [
-                'imageUploadGallery' => $gallery,
-                'image' => $image,
+        if ($entity === 'event') {
+            $uploadUrl = $this->generateUrl('app_event_image_upload', ['id' => $id]);
+            $form = $this->createForm(EventUploadType::class, null, ['action' => $uploadUrl]);
+            $templateVars['uploadForm'] = $form->createView();
+        } else {
+            $templateVars['uploadUrl'] = $this->generateUrl('app_replace_image_upload', [
                 'entity' => $entity,
                 'id' => $id,
-            ],
-            $response,
-        );
-    }
+            ]);
+        }
 
-    #[Route('/replace_image/modal/{entity}/{id}', name: 'app_image_replace_modal', requirements: [
-        'entity' => 'user|cmsBlock',
-        'id' => '\d+',
-    ])]
-    public function imageReplaceModal(string $entity, int $id, bool $rotate = false): Response
-    {
-        $response = $this->getResponse();
-        $data = $this->prepare($entity, $id);
-        $image = $data['image'];
-        $gallery = $data['gallery'];
-
-        return $this->render(
-            'image/image_with_modal.html.twig',
-            [
-                'imageUploadGallery' => $gallery,
-                'modal' => true,
-                'rotate' => $image === null ? false : $rotate,
-                'image' => $image,
-                'entity' => $entity,
-                'id' => $id,
-            ],
-            $response,
-        );
+        return new Response($this->renderView('image/modal_content.html.twig', $templateVars));
     }
 
     #[Route('/image/{entity}/{id}/select/{newImage}', name: 'app_replace_image_select', requirements: [
@@ -142,18 +125,46 @@ class ImageUploadController extends AbstractController
         return $this->returnBackToImage($entityName, $id);
     }
 
-    #[Route('/add_image/{entity}/{id}', name: 'app_image_add', requirements: [
-        'entity' => 'user|cmsBlock',
-        'id' => '\d+',
-    ])]
-    public function imageAdd(string $entity, int $id): Response
+    #[Route(
+        '/image/event/{id}/upload',
+        name: 'app_event_image_upload',
+        requirements: ['id' => '\d+'],
+        methods: ['POST'],
+    )]
+    public function uploadEventImages(Request $request, int $id): Response
     {
-        // Upload multiple images and return
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        $user = $this->getAuthedUser();
+        $event = $this->em->getRepository(Event::class)->findOneBy(['id' => $id]);
 
-        return $this->render('image/index.html.twig', [
-            'entity' => $entity,
-            'id' => $id,
-        ]);
+        if ($event === null) {
+            throw $this->createNotFoundException();
+        }
+
+        if (!$this->actionAuthService->isActionAllowed('event.upload', $event->getId(), $user)) {
+            $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage(
+                'event.upload',
+                $event->getId(),
+                $user,
+            );
+            $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
+
+        $form = $this->createForm(EventUploadType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $files = $form->get('files')->getData();
+            $count = $this->imageService->uploadForEvent($event, $files, $user);
+
+            $this->activityService->log(ActivityType::EventImageUploaded, $user, [
+                'event_id' => $event->getId(),
+                'images' => $count,
+            ]);
+        }
+
+        return $this->redirectToRoute('app_event_details', ['id' => $id]);
     }
 
     #[Route(
@@ -169,12 +180,7 @@ class ImageUploadController extends AbstractController
             $this->imageService->rotateThumbNail($image);
         }
 
-        // TODO: add ajax returns
-
-        return $this->redirectToRoute('app_image_replace', [
-            'entity' => $entity,
-            'id' => $id,
-        ]);
+        return $this->returnBackToImage($entity, $id);
     }
 
     private function prepare(string $entityString, int $id): array
@@ -184,33 +190,64 @@ class ImageUploadController extends AbstractController
                 $this->denyAccessUnlessGranted('ROLE_USER');
                 $imageType = ImageType::ProfilePicture;
                 $entity = $this->em->getRepository(User::class)->findOneBy(['id' => $id]);
-                if ($entity !== $this->getAuthedUser()) {
+                if ($entity === null || $entity->getId() !== $this->getAuthedUser()->getId()) {
                     throw new Exception('You cant change other user profile picture');
                 }
-                $gallery = $this->em
+                $image = $entity->getImage();
+                $rawGallery = $this->em
                     ->getRepository(Image::class)
                     ->findBy([
                         'type' => ImageType::ProfilePicture,
                         'uploader' => $entity,
                     ]);
+                $extendedGallery = $this->buildSelectableGallery($rawGallery, $image, $entityString, $id);
                 break;
             case 'cmsBlock':
                 $this->denyAccessUnlessGranted('ROLE_FOUNDER');
                 $imageType = ImageType::CmsBlock;
                 $entity = $this->em->getRepository(CmsBlock::class)->findOneBy(['id' => $id]);
-                $gallery = $this->em->getRepository(Image::class)->findBy(['type' => ImageType::CmsBlock]);
+                $image = $entity->getImage();
+                $rawGallery = $this->em->getRepository(Image::class)->findBy(['type' => ImageType::CmsBlock]);
+                $extendedGallery = $this->buildSelectableGallery($rawGallery, $image, $entityString, $id);
+                break;
+            case 'event':
+                $this->denyAccessUnlessGranted('ROLE_USER');
+                $imageType = ImageType::EventUpload;
+                $entity = $this->em->getRepository(Event::class)->findOneBy(['id' => $id]);
+                $image = null;
+                $extendedGallery = array_map(fn(Image $item) => [
+                    'image' => $item,
+                    'link' => null,
+                ], $entity->getImages()->toArray());
                 break;
             default:
                 throw new Exception('Invalid entity');
         }
 
-        $extendedGallery = [];
-        $image = $entity->getImage();
-        foreach ($gallery as $item) {
-            if ($image === null || $item->getId() === $image->getId()) {
+        return [
+            'imageType' => $imageType,
+            'entity' => $entity,
+            'image' => $image,
+            'gallery' => $extendedGallery,
+        ];
+    }
+
+    private function buildSelectableGallery(
+        array $rawGallery,
+        ?Image $currentImage,
+        string $entityString,
+        int $id,
+    ): array {
+        if ($currentImage === null) {
+            return [];
+        }
+
+        $gallery = [];
+        foreach ($rawGallery as $item) {
+            if ($item->getId() === $currentImage->getId()) {
                 continue;
             }
-            $extendedGallery[] = [
+            $gallery[] = [
                 'image' => $item,
                 'link' => $this->generateUrl('app_replace_image_select', [
                     'entity' => $entityString,
@@ -220,12 +257,7 @@ class ImageUploadController extends AbstractController
             ];
         }
 
-        return [
-            'imageType' => $imageType,
-            'entity' => $entity,
-            'image' => $image,
-            'gallery' => $extendedGallery,
-        ];
+        return $gallery;
     }
 
     private function returnBackToImage(string $entity, int $id): Response

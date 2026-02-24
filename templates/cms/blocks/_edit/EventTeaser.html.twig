@@ -19,7 +19,11 @@
 
     <div class="columns is-vcentered">
         <div class="column is-4">
-            {{ renderImageModal('cmsBlock', blockId )|raw }}
+            {% include 'components/image_upload.html.twig' with {
+                'entity': 'cmsBlock',
+                'id': blockId,
+                'image': blockImage
+            } %}
         </div>
         <div class="column is-7">
             <h1 class="title is-4">{{ block.headline }}</h1>

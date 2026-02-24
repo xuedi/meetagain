@@ -24,7 +24,6 @@ class ProfileController extends AbstractController
 
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly ImageUploadController $imageUploadController,
         private readonly EventRepository $repo,
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
@@ -59,8 +58,6 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
-        $modal = $this->imageUploadController->imageReplaceModal('user', $user->getId(), true)->getContent();
-
         // Apply content filtering from all registered filters
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $eventIds = $filterResult->getEventIds();
@@ -68,7 +65,6 @@ class ProfileController extends AbstractController
         return $this->render(
             'profile/index.html.twig',
             [
-                'modal' => $modal,
                 'lastLogin' => $request->getSession()->get('lastLogin', '-'),
                 'messageCount' => $this->msgRepo->getMessageCount($user),
                 'socialCounts' => $this->userRepo->getSocialCounts($user),
