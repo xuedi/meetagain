@@ -10,10 +10,13 @@ use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\Enum\EntityAction;
+use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Service\ActivityService;
+use App\Service\EntityActionDispatcher;
 use App\Service\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +36,8 @@ class ImageUploadController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly ActionAuthorizationService $actionAuthService,
         private readonly ActionAuthorizationMessageService $authMessageService,
+        private readonly ImageGalleryFilterService $imageGalleryFilterService,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     #[Route('/image/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
@@ -107,6 +112,7 @@ class ImageUploadController extends AbstractController
                 $this->em->persist($image);
                 $this->imageService->createThumbnails($image, $imageType);
                 $this->em->flush();
+                $this->entityActionDispatcher->dispatch(EntityAction::CreateImage, $image->getId());
 
                 // associate image with the entity
                 $entity->setImage($image);
@@ -208,6 +214,16 @@ class ImageUploadController extends AbstractController
                 $entity = $this->em->getRepository(CmsBlock::class)->findOneBy(['id' => $id]);
                 $image = $entity->getImage();
                 $rawGallery = $this->em->getRepository(Image::class)->findBy(['type' => ImageType::CmsBlock]);
+                $allowedIds = $this->imageGalleryFilterService->getImageIdFilter($imageType);
+                if ($allowedIds !== null) {
+                    $rawGallery = $allowedIds === []
+                        ? []
+                        : array_values(array_filter($rawGallery, fn(Image $img) => in_array(
+                            $img->getId(),
+                            $allowedIds,
+                            true,
+                        )));
+                }
                 $extendedGallery = $this->buildSelectableGallery($rawGallery, $image, $entityString, $id);
                 break;
             case 'event':

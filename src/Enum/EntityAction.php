@@ -17,4 +17,5 @@ enum EntityAction: string
     case UpdateAnnouncement = 'update_announcement';
     case DeleteAnnouncement = 'delete_announcement';
     case CreateUser = 'create_user';
+    case CreateImage = 'create_image';
 }
