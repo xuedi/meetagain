@@ -96,9 +96,8 @@ class ProfileController extends AbstractController
         $em->persist($event);
         $em->flush();
 
-        // TODO: to slow, need to save event data first, generate log & notification async
-        // $type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
-        // $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
+        $type = $status ? ActivityType::RsvpYes : ActivityType::RsvpNo;
+        $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['newStatus' => $status]);
