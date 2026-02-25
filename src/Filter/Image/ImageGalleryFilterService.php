@@ -2,6 +2,7 @@
 
 namespace App\Filter\Image;
 
+use App\Entity\Image;
 use App\Entity\ImageType;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -51,6 +52,27 @@ readonly class ImageGalleryFilterService
         }
 
         return $resultSet;
+    }
+
+    /**
+     * Apply the combined filter to an array of images, returning only allowed ones.
+     *
+     * @param array<Image> $images
+     * @return array<Image>
+     */
+    public function applyFilter(array $images, ImageType $type): array
+    {
+        $allowedIds = $this->getImageIdFilter($type);
+
+        if ($allowedIds === null) {
+            return $images;
+        }
+
+        if ($allowedIds === []) {
+            return [];
+        }
+
+        return array_values(array_filter($images, fn(Image $img) => in_array($img->getId(), $allowedIds, true)));
     }
 
     /**

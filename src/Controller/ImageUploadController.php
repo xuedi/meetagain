@@ -214,16 +214,7 @@ class ImageUploadController extends AbstractController
                 $entity = $this->em->getRepository(CmsBlock::class)->findOneBy(['id' => $id]);
                 $image = $entity->getImage();
                 $rawGallery = $this->em->getRepository(Image::class)->findBy(['type' => ImageType::CmsBlock]);
-                $allowedIds = $this->imageGalleryFilterService->getImageIdFilter($imageType);
-                if ($allowedIds !== null) {
-                    $rawGallery = $allowedIds === []
-                        ? []
-                        : array_values(array_filter($rawGallery, fn(Image $img) => in_array(
-                            $img->getId(),
-                            $allowedIds,
-                            true,
-                        )));
-                }
+                $rawGallery = $this->imageGalleryFilterService->applyFilter($rawGallery, $imageType);
                 $extendedGallery = $this->buildSelectableGallery($rawGallery, $image, $entityString, $id);
                 break;
             case 'event':
