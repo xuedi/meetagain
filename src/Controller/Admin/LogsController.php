@@ -73,7 +73,7 @@ class LogsController extends AbstractAdminController
     private function getLogList(): array
     {
         $list = [];
-        $logPath = dirname(__DIR__, 4) . '/var/log/';
+        $logPath = dirname(__DIR__, 3) . '/var/log/';
         $logFiles = glob($logPath . '/*.log');
 
         foreach ($logFiles as $logFile) {
