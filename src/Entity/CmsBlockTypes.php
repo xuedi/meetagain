@@ -4,9 +4,9 @@ namespace App\Entity;
 
 use App\Entity\BlockType\BlockType;
 use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
-use App\Entity\BlockType\Image;
 use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
 use App\Entity\Image as ImageEntity;
@@ -16,7 +16,6 @@ enum CmsBlockTypes: int
 {
     case Headline = 1;
     case Text = 2;
-    case Image = 3;
     case Video = 4;
     case Paragraph = 5;
     case Events = 6;
@@ -29,7 +28,7 @@ enum CmsBlockTypes: int
         return match ($type) {
             CmsBlockTypes::Headline => Headline::fromJson($data, $image),
             CmsBlockTypes::Text => Text::fromJson($data, $image),
-            CmsBlockTypes::Image => Image::fromJson($data, $image),
+            CmsBlockTypes::Gallery => Gallery::fromJson($data, $image),
             CmsBlockTypes::Hero => Hero::fromJson($data, $image),
             CmsBlockTypes::Paragraph => Paragraph::fromJson($data, $image),
             CmsBlockTypes::EventTeaser => EventTeaser::fromJson($data, $image),

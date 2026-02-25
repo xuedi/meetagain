@@ -33,6 +33,7 @@ readonly class ConfigService
             ImageType::PluginDishGallery => [[1024, 768], [400, 400]],
             ImageType::LanguageTile => [[600, 400], [300, 200]],
             ImageType::PluginBookclubCover => [[400, 500], [200, 250]],
+            ImageType::CmsGallery => [[1024, 768], [210, 140]],
         };
     }
 

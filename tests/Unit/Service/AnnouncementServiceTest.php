@@ -8,7 +8,6 @@ use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
 use App\Entity\EmailTemplate;
-use App\Entity\Image;
 use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -381,17 +380,16 @@ class AnnouncementServiceTest extends TestCase
 
     public function testRenderContentIncludesImageBlock(): void
     {
-        // Arrange: create image
-        $image = $this->createStub(Image::class);
-        $image->method('getHash')->willReturn('imagehash123');
-        $image->method('getAlt')->willReturn('Test image');
-
-        // Arrange: create image block
+        // Arrange: create gallery block
         $imageBlock = $this->createStub(CmsBlock::class);
         $imageBlock->method('getLanguage')->willReturn('en');
-        $imageBlock->method('getType')->willReturn(CmsBlockTypes::Image);
-        $imageBlock->method('getJson')->willReturn(['id' => 'img-1']);
-        $imageBlock->method('getImage')->willReturn($image);
+        $imageBlock->method('getType')->willReturn(CmsBlockTypes::Gallery);
+        $imageBlock
+            ->method('getJson')
+            ->willReturn([
+                'title' => '',
+                'images' => [['id' => 1, 'hash' => 'imagehash123']],
+            ]);
 
         // Arrange: create CMS page
         $cmsPage = $this->createStub(Cms::class);
@@ -420,7 +418,6 @@ class AnnouncementServiceTest extends TestCase
 
         // Assert: content contains image HTML
         $this->assertStringContainsString('imagehash123', $result['content']);
-        $this->assertStringContainsString('Test image', $result['content']);
         $this->assertStringContainsString('<img', $result['content']);
     }
 

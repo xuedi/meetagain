@@ -14,6 +14,7 @@ enum ImageType: int
     case PluginDishGallery = 6;
     case LanguageTile = 7;
     case PluginBookclubCover = 8;
+    case CmsGallery = 9;
 
     public static function getChoices(TranslatorInterface $translator): array
     {
