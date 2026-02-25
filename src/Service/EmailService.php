@@ -273,7 +273,10 @@ readonly class EmailService implements CronTaskInterface
         }
         $this->em->flush();
 
-        return sprintf('Send: %d, Failed: %d', $send, $failed);
+        if ($failed > 0) {
+            return sprintf('%d (Failed: %d)', $send, $failed);
+        }
+        return sprintf('%d', $send);
     }
 
     private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier, bool $flush = true): bool

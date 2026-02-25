@@ -18,27 +18,30 @@ readonly class CleanupService implements CronTaskInterface
 
     public function runCronTask(OutputInterface $output): void
     {
-        $output->write('Clean image cache ... ');
-        $this->removeImageCache();
-        $output->writeln('OK');
+        $count = $this->removeImageCache();
+        $output->writeln('Clean image cache: ' . $count);
 
-        $output->write('Clean registrations ... ');
-        $this->removeGhostedRegistrations();
-        $output->writeln('OK');
+        $count = $this->removeGhostedRegistrations();
+        $output->writeln('Clean registrations: ' . $count);
     }
 
-    public function removeImageCache(): void
+    public function removeImageCache(): int
     {
+        $count = 0;
         $images = $this->imageRepo->getOldImageUpdates(30);
         foreach ($images as $image) {
             $image->setUpdatedAt(null);
             $this->entityManager->persist($image);
+            $count++;
         }
         $this->entityManager->flush();
+
+        return $count;
     }
 
-    public function removeGhostedRegistrations(): void
+    public function removeGhostedRegistrations(): int
     {
+        $count = 0;
         $users = $this->userRepo->getOldRegistrations(10);
         foreach ($users as $user) {
             $activities = $user->getActivities();
@@ -46,7 +49,10 @@ readonly class CleanupService implements CronTaskInterface
                 $this->entityManager->remove($activity);
             }
             $this->entityManager->remove($user);
+            $count++;
         }
         $this->entityManager->flush();
+
+        return $count;
     }
 }
