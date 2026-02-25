@@ -15,5 +15,5 @@ duration.second: '{count}秒'
 duration.minute: '{count}分钟'
 duration.hour: '{count}小时'
 duration.day: '{count}天'
-duration.none: '不到1秒'
+duration.none: 不到1秒
 age: '{count}岁'
