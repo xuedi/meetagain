@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\CronTaskInterface;
+use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,6 +15,7 @@ readonly class CleanupService implements CronTaskInterface
         private ImageRepository $imageRepo,
         private UserRepository $userRepo,
         private EntityManagerInterface $entityManager,
+        private EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     public function runCronTask(OutputInterface $output): void
@@ -44,6 +46,7 @@ readonly class CleanupService implements CronTaskInterface
         $count = 0;
         $users = $this->userRepo->getOldRegistrations(10);
         foreach ($users as $user) {
+            $this->entityActionDispatcher->dispatch(EntityAction::DeleteUser, $user->getId());
             $activities = $user->getActivities();
             foreach ($activities as $activity) {
                 $this->entityManager->remove($activity);
