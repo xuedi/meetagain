@@ -31,15 +31,26 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
 
             $manager->persist($block);
             if ($imageName !== null) {
-                // upload file and create thumbnails
                 $imageFile = __DIR__ . "/CmsBlock/$imageName";
                 $uploadedImage = new UploadedFile($imageFile, $block->getId() . '.jpg');
-                $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
-                $this->imageService->createThumbnails($image, ImageType::CmsBlock);
 
-                // associate image with a user
-                $block->setImage($image);
-                $manager->persist($block);
+                if ($type === CmsBlockTypes::Gallery) {
+                    // Gallery blocks store image refs in JSON; flush first to get image ID
+                    $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsGallery);
+                    $manager->persist($image);
+                    $manager->flush();
+                    $this->imageService->createThumbnails($image, ImageType::CmsGallery);
+
+                    $json['images'][] = ['id' => $image->getId(), 'hash' => $image->getHash()];
+                    $block->setJson($json);
+                    $manager->persist($block);
+                } else {
+                    // Other block types use the associated Image entity field
+                    $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
+                    $this->imageService->createThumbnails($image, ImageType::CmsBlock);
+                    $block->setImage($image);
+                    $manager->persist($block);
+                }
             }
 
             ++$priority;
@@ -354,10 +365,8 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Image,
-                [
-                    'id' => 'announcement-en',
-                ],
+                CmsBlockTypes::Gallery,
+                ['title' => '', 'images' => []],
                 'screenshot-en.png',
             ],
             [
@@ -372,10 +381,8 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Image,
-                [
-                    'id' => 'announcement-de',
-                ],
+                CmsBlockTypes::Gallery,
+                ['title' => '', 'images' => []],
                 'screenshot-de.png',
             ],
             [
@@ -390,10 +397,8 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Image,
-                [
-                    'id' => 'announcement-cn',
-                ],
+                CmsBlockTypes::Gallery,
+                ['title' => '', 'images' => []],
                 'screenshot-cn.png',
             ],
         ];

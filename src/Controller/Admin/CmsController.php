@@ -4,32 +4,39 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
-use App\Entity\BlockType\Image;
 use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
 use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
+use App\Entity\ImageType;
+use App\Entity\User;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\CmsType;
+use App\Form\EventUploadType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\CmsBlockService;
 use App\Service\EntityActionDispatcher;
+use App\Service\ImageService;
 use App\Service\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_FOUNDER'), Route('/admin/cms')]
 class CmsController extends AbstractAdminController
@@ -55,6 +62,8 @@ class CmsController extends AbstractAdminController
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly LoggerInterface $logger,
         private readonly LanguageService $languageService,
+        private readonly ImageService $imageService,
+        private readonly ValidatorInterface $validator,
     ) {}
 
     #[Route('', name: 'app_admin_cms')]
@@ -128,7 +137,7 @@ class CmsController extends AbstractAdminController
             Headline::getType(),
             Paragraph::getType(),
             Text::getType(),
-            Image::getType(),
+            Gallery::getType(),
             Hero::getType(),
             EventTeaser::getType(),
         ];
@@ -268,6 +277,88 @@ class CmsController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $request->query->get('id'),
             'locale' => $request->query->get('locale'),
+        ]);
+    }
+
+    #[Route('/block/{blockId}/gallery/modal', name: 'app_admin_cms_gallery_modal', methods: ['GET'])]
+    public function cmsGalleryModal(int $blockId): Response
+    {
+        $form = $this->createForm(EventUploadType::class, null, [
+            'action' => $this->generateUrl('app_admin_cms_gallery_add', ['blockId' => $blockId]),
+        ]);
+
+        return new Response($this->renderView('admin/cms/gallery_upload_modal.html.twig', [
+            'form' => $form,
+        ]));
+    }
+
+    #[Route('/block/{blockId}/gallery/add', name: 'app_admin_cms_gallery_add', methods: ['POST'])]
+    public function cmsGalleryAdd(Request $request, int $blockId): Response
+    {
+        $block = $this->blockRepo->find($blockId);
+        if ($block === null) {
+            throw new RuntimeException('Could not find block');
+        }
+
+        $form = $this->createForm(EventUploadType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $user = $this->getUser();
+            assert($user instanceof User);
+            $fileConstraint = new File(maxSize: '10M', mimeTypes: ['image/*']);
+            foreach ($form->get('files')->getData() ?? [] as $file) {
+                if (!$file instanceof UploadedFile) {
+                    continue;
+                }
+                $violations = $this->validator->validate($file, $fileConstraint);
+                if (count($violations) > 0) {
+                    $this->logger->warning('Skipping invalid file during gallery upload', [
+                        'error' => $violations->get(0)->getMessage(),
+                        'file' => $file->getClientOriginalName(),
+                    ]);
+                    continue;
+                }
+                $image = $this->imageService->upload($file, $user, ImageType::CmsGallery);
+                $image->setUploader($user);
+                $image->setUpdatedAt(new DateTimeImmutable());
+                $this->em->persist($image);
+                $this->em->flush();
+                $this->imageService->createThumbnails($image, ImageType::CmsGallery);
+
+                $json = $block->getJson();
+                $json['images'][] = ['id' => $image->getId(), 'hash' => $image->getHash()];
+                $block->setJson($json);
+                $this->em->persist($block);
+                $this->em->flush();
+            }
+        }
+
+        return $this->redirectToRoute('app_admin_cms_edit', [
+            'id' => $block->getPage()->getId(),
+            'locale' => $block->getLanguage(),
+        ]);
+    }
+
+    #[Route('/block/{blockId}/gallery/remove/{imageId}', name: 'app_admin_cms_gallery_remove', methods: ['GET'])]
+    public function cmsGalleryRemove(int $blockId, int $imageId): Response
+    {
+        $block = $this->blockRepo->find($blockId);
+        if ($block === null) {
+            throw new RuntimeException('Could not find block');
+        }
+
+        $json = $block->getJson();
+        $json['images'] = array_values(array_filter(
+            $json['images'] ?? [],
+            fn(array $item) => $item['id'] !== $imageId,
+        ));
+        $block->setJson($json);
+        $this->em->persist($block);
+        $this->em->flush();
+
+        return $this->redirectToRoute('app_admin_cms_edit', [
+            'id' => $block->getPage()->getId(),
+            'locale' => $block->getLanguage(),
         ]);
     }
 

@@ -4,12 +4,11 @@ namespace App\Service;
 
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
-use App\Entity\BlockType\Image as ImageType;
+use App\Entity\BlockType\Gallery as GalleryType;
 use App\Entity\BlockType\Text as TextType;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
 use App\Entity\EmailTemplate;
-use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\UserRepository;
@@ -98,10 +97,8 @@ readonly class AnnouncementService
             match ($block->getType()) {
                 CmsBlockTypes::Text => $contentParts[] =
                     '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
-                CmsBlockTypes::Image => $contentParts[] = $this->renderImageBlock(ImageType::fromJson(
-                    $block->getJson(),
-                    $block->getImage(),
-                )),
+                CmsBlockTypes::Gallery
+                    => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson())),
                 default => null,
             };
         }
@@ -116,17 +113,15 @@ readonly class AnnouncementService
         ];
     }
 
-    private function renderImageBlock(ImageType $imageBlock): string
+    private function renderGalleryBlock(GalleryType $galleryBlock): string
     {
-        $image = $imageBlock->image;
-        if (!$image instanceof Image) {
-            return '';
+        $parts = [];
+        foreach ($galleryBlock->images as $item) {
+            $url = $this->configService->getHost() . '/images/thumbnails/' . $item['hash'] . '_600x400.webp';
+            $parts[] = sprintf('<p><img src="%s" alt="" style="max-width: 100%%; height: auto;"></p>', $url);
         }
 
-        $url = $this->configService->getHost() . '/images/thumbnails/' . $image->getHash() . '_600x400.webp';
-        $alt = htmlspecialchars($image->getAlt() ?? '', ENT_QUOTES, 'UTF-8');
-
-        return sprintf('<p><img src="%s" alt="%s" style="max-width: 100%%; height: auto;"></p>', $url, $alt);
+        return implode("\n", $parts);
     }
 
     public function getPreviewContext(Announcement $announcement, string $locale = 'en'): array
