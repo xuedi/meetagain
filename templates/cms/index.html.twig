@@ -1,5 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ '/stylesheet/fancybox.css' }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ '/javascript/fancybox.umd.js' }}"></script>
+{% endblock %}
+
 {% block title %}
     {% if title is defined  %}
         {{ title }}
