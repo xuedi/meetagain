@@ -14,6 +14,9 @@ when@dev:
                 type: console
                 process_psr_3_messages: false
                 channels: ["!event", "!doctrine", "!console", "!app"]
+            sentry_logs:
+                type: service
+                id: Sentry\SentryBundle\Monolog\LogsHandler
 
 when@test:
     monolog:
@@ -33,8 +36,10 @@ when@prod:
     monolog:
         handlers:
             main:
-                type:  rotating_file
-                path:  '%kernel.logs_dir%/%kernel.environment%.log'
+                type: rotating_file
+                path: '%kernel.logs_dir%/%kernel.environment%.log'
                 handler: nested
                 level: error
-
+            sentry_logs:
+                type: service
+                id: Sentry\SentryBundle\Monolog\LogsHandler
