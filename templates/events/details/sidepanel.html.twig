@@ -4,6 +4,7 @@
     <div class="box mt-5">
         {{ tile|raw }}
     </div>
+{% endfor %}
 <div class="box mt-5">
     <strong>{{ event.start|date('d. F Y') }}</strong>
     <p>
@@ -13,7 +14,6 @@
         {% endif %}
     </p>
 </div>
-{% endfor %}
 <div class="box mt-5">
     <h2 class="title is-4">Hosts</h2>
     <div class="columns is-multiline">
