@@ -51,6 +51,8 @@ services:
         arguments:
             $providers: !tagged_iterator app.action_authorization_message
 
+    Sentry\SentryBundle\Monolog\LogsHandler: ~
+
     App\Controller\SecurityController:
         arguments:
             $passwordResetLimiter: '@limiter.password_reset'
