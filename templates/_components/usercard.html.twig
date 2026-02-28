@@ -1,14 +1,20 @@
+{#
+    User profile card with avatar and name link
+
+    Parameters:
+    - user: User entity with id, name, image, verified properties (required)
+#}
 {% if is_granted('ROLE_USER') %}
     <div class="card">
         <div class="card-image">
             <figure class="image">
                 <a href="{{ path('app_member_view', {'id': user.id}) }}">
-                    {% include '_block/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
+                    {% include '_components/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
                 </a>
             </figure>
         </div>
         <div class="card-content p-3 has-text-centered">
-            {% include '_block/username.html.twig' with {
+            {% include '_components/username.html.twig' with {
                 'link': path('app_member_view', {'id': user.id}),
                 'verified': user.verified,
                 'name': user.name
@@ -19,7 +25,7 @@
     <div class="card">
         <div class="card-image">
             <figure class="image">
-                {% include '_block/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
+                {% include '_components/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
             </figure>
         </div>
         <div class="card-content p-3 has-text-centered">

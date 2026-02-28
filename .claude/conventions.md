@@ -293,6 +293,15 @@ templates/
 │   └── _event_card.html.twig # Fragment (reusable)
 ```
 
+### Template Directory Conventions
+
+| Directory | Purpose |
+|---|---|
+| `templates/_components/` | Reusable UI snippets included across multiple pages via `{% include '_components/X.html.twig' with {…} %}` |
+| `templates/{page}/_partials/` | Sub-sections of a specific page, not reused elsewhere (e.g. `profile/_partials/`) |
+| `templates/cms/blocks/` | CMS content-block renderers (Hero, Gallery…), driven by `CmsBlockTypes` enum |
+| `templates/admin/{section}/` | Admin section templates; `_tabs_navigation.html.twig` stays section-specific |
+
 ---
 
 ### CSS Framework

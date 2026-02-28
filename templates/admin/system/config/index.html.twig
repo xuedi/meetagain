@@ -40,7 +40,7 @@
                             <td>
                                 {% if item.isBoolean %}
 
-                                    {% include '_block/toggle.html.twig' with {
+                                    {% include '_components/toggle.html.twig' with {
                                         'link': path('app_admin_system_boolean', {'name': item.name}),
                                         'status': item.getBoolean
                                     } %}

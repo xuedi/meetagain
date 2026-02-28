@@ -19,7 +19,7 @@
         <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
             <td>
                 <a href="{{ path('plugin_dishes_item_show', {'id': item.id}) }}">
-                    {% include '_block/image.html.twig' with {'image': item.previewImage, 'size': '50x50'} %}
+                    {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '50x50'} %}
                 </a>
             </td>
             <td>{{ item.getTranslatedName(app.locale) }}</td>

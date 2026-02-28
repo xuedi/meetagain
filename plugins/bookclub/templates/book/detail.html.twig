@@ -16,7 +16,7 @@
             <div class="column is-4">
                 {% if book.coverImage %}
                     <figure class="image">
-                        {% include '_block/image.html.twig' with {'image': book.coverImage, 'size': '400x500'} %}
+                        {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '400x500'} %}
                     </figure>
                 {% else %}
                     <div class="box has-background-light has-text-centered" style="height: 300px; display: flex; align-items: center; justify-content: center;">

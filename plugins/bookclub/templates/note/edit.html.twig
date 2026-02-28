@@ -53,7 +53,7 @@
                     <h3 class="title is-5">Book Info</h3>
                     {% if book.coverImage %}
                         <figure class="image mb-4">
-                            {% include '_block/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
+                            {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
                         </figure>
                     {% endif %}
                     {% if book.description %}

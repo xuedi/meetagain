@@ -114,14 +114,14 @@
 
 ### Delete Warning Boxes
 
-**Reusable Block:** `templates/_block/warning_box.html.twig`
+**Reusable Block:** `templates/_components/warning_box.html.twig`
 **Reference Implementation:** `templates/admin/cms/cms_edit.html.twig`
 
 **Prefer warning boxes over JavaScript `onclick="confirm()"` dialogs** for better UX and consistency.
 
 ```twig
-{# Use the reusable warning box block #}
-{% include '_block/warning_box.html.twig' with {
+{# Use the reusable warning box component #}
+{% include '_components/warning_box.html.twig' with {
     'id': 'entity-delete-warning',
     'title': 'Delete [Entity Name]',
     'content': '<p>Warning text explaining consequences of deletion. Be specific about what will be deleted.</p>',

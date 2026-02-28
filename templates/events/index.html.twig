@@ -114,7 +114,7 @@
                         <div class="column is-3">
                             <figure class="image is-3by2">
                                 <a href="{{ path('app_event_details', { 'id': event.id }) }}">
-                                    {% include '_block/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
+                                    {% include '_components/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
                                 </a>
                             </figure>
                         </div>
