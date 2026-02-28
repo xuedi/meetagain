@@ -80,7 +80,7 @@ class CmsBlock
 
     public function getBlockObject(): BlockType
     {
-        return CmsBlockTypes::buildObject($this->getType(), $this->getJson());
+        return CmsBlockTypes::buildObject($this->getType(), $this->getJson(), $this->getImage());
     }
 
     public function setJson(array $json): static

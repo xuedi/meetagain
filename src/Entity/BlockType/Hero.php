@@ -15,6 +15,7 @@ class Hero implements BlockType
         public string $buttonLink,
         public string $buttonText,
         public string $color,
+        public bool $imageRight,
         public ?ImageEntity $image,
     ) {}
 
@@ -28,6 +29,7 @@ class Hero implements BlockType
             $json['buttonLink'],
             $json['buttonText'],
             $json['color'] ?? '#f14668',
+            (bool) ($json['imageRight'] ?? false),
             $image,
         );
     }
@@ -48,6 +50,7 @@ class Hero implements BlockType
             'buttonLink' => $this->buttonLink,
             'buttonText' => $this->buttonText,
             'color' => $this->color,
+            'imageRight' => $this->imageRight,
             'image' => $this->image,
         ];
     }
