@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    {% include '_block/warning_box.html.twig' with {
+    {% include '_components/warning_box.html.twig' with {
         'id': 'event-delete-warning',
         'title': 'Delete the Event',
         'content': '<p>If you delete this event, all recurring events are deleted as well, also all related data like rsvp\'s, comments, event images and so on. Please consider deactivating the event instead.</p>',
@@ -11,7 +11,7 @@
         'type': 'danger'
     } %}
 
-    {% include '_block/warning_box.html.twig' with {
+    {% include '_components/warning_box.html.twig' with {
         'id': 'event-cancel-warning',
         'title': 'Cancel Event',
         'content': '<p>Are you sure you want to cancel this event? All RSVPd users will be notified.</p>',
@@ -20,7 +20,7 @@
         'type': 'warning'
     } %}
 
-    {% include '_block/warning_box.html.twig' with {
+    {% include '_components/warning_box.html.twig' with {
         'id': 'event-uncancel-warning',
         'title': 'Uncancel Event',
         'content': '<p>Are you sure you want to uncancel this event?</p>',
@@ -95,7 +95,7 @@
 
                 <div class="mt-3">
                     {{ form_row(form.image) }}
-                    {% include '_block/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
+                    {% include '_components/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
                 </div>
 
                 <div class="columns">

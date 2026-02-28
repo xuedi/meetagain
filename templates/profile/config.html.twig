@@ -17,7 +17,7 @@
                                 Enable eMail notification
                             </div>
                             <div class="control">
-                                {% include '_block/toggle.html.twig' with {
+                                {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'notification'}),
                                     'status': user.isNotification,
                                     'noAjax': true
@@ -29,7 +29,7 @@
                                 <div class="field is-grouped">
                                     <div class="control is-expanded">{{ notification.label }}</div>
                                     <div class="control">
-                                        {% include '_block/toggle.html.twig' with {
+                                        {% include '_components/toggle.html.twig' with {
                                             'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
                                             'status': notification.value,
                                         } %}
@@ -44,7 +44,7 @@
                         <div class="field is-grouped">
                             <div class="control is-expanded">Show me on the members page for website guests</div>
                             <div class="control">
-                                {% include '_block/toggle.html.twig' with {
+                                {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'public'}),
                                     'status': user.isPublic
                                 } %}
@@ -53,7 +53,7 @@
                         <div class="field is-grouped">
                             <div class="control is-expanded">Can be tagged by others in photos</div>
                             <div class="control">
-                                {% include '_block/toggle.html.twig' with {
+                                {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'tagging'}),
                                     'status': user.isTagging
                                 } %}
@@ -62,7 +62,7 @@
                         <div class="field is-grouped">
                             <div class="control is-expanded">Enable osm maps on the event page</div>
                             <div class="control">
-                                {% include '_block/toggle.html.twig' with {
+                                {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'osm'}),
                                     'status': user.isOsmConsent
                                 } %}
@@ -107,7 +107,7 @@
                                 {% for block in blockedUsers %}
                                     <tr id="block-{{ block.blocked.id }}">
                                         <td style="width: 60px;">
-                                            {% include '_block/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
+                                            {% include '_components/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
                                         </td>
                                         <td>
                                             {{ block.blocked.name }}

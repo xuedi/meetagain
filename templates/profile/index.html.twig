@@ -14,7 +14,7 @@
                     <div class="box">
                         <div class="columns">
                             <div class="column is-6">
-                                {% include 'components/image_upload.html.twig' with {
+                                {% include '_components/image_upload.html.twig' with {
                                 'entity': 'user',
                                 'id': user.id,
                                 'image': user.image,
@@ -55,7 +55,7 @@
 
                     <div class="box">
                         <h2 class="title is-5">Upcoming events</h2>
-                        {% include 'profile/block/rsvp_list.html.twig' with {'user': user, 'list': upcoming, 'isPast': false} %}
+                        {% include 'profile/_partials/rsvp_list.html.twig' with {'user': user, 'list': upcoming, 'isPast': false} %}
                     </div>
 
                     <div class="card is-fullwidth">
@@ -66,7 +66,7 @@
                             </a>
                         </header>
                         <div class="card-content is-hidden">
-                            {% include 'profile/block/rsvp_list.html.twig' with {'user': user, 'list': past, 'isPast': true} %}
+                            {% include 'profile/_partials/rsvp_list.html.twig' with {'user': user, 'list': past, 'isPast': true} %}
                         </div>
                     </div>
 

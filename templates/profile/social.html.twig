@@ -16,7 +16,7 @@
                     </p>
                     <div class="mt-5">
                         {% for activity in activities %}
-                            {% include 'profile/block/activity.html.twig' with { 'activity': activity} %}
+                            {% include 'profile/_partials/activity.html.twig' with { 'activity': activity} %}
                         {% endfor %}
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                 <div class="column is-4">
 
                     {%
-                        include 'profile/block/social_list.html.twig'
+                        include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': friends,
                         'title': 'We follow each other',
@@ -36,7 +36,7 @@
                     %}
 
                     {%
-                        include 'profile/block/social_list.html.twig'
+                        include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': following,
                             'title': 'People i follow',
@@ -46,7 +46,7 @@
                     %}
 
                     {%
-                        include 'profile/block/social_list.html.twig'
+                        include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': followers,
                             'title': 'People who follow me',

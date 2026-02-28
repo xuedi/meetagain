@@ -1,8 +1,16 @@
+{#
+    Single comment box with avatar, author name, timestamp, and action links
+
+    Parameters:
+    - comment: Comment entity with id, content, createdAt, user properties (required)
+    - user:    currently logged-in User entity (used to show delete/reply buttons) (required)
+    - event:   Event entity (used to build the delete-comment URL) (required)
+#}
 <div class="box">
     <article class="media">
         <div class="media-left">
             <figure class="image is-64x64">
-                {% include '_block/image.html.twig' with {'image': comment.user.image, 'size': '400x400'} %}
+                {% include '_components/image.html.twig' with {'image': comment.user.image, 'size': '400x400'} %}
             </figure>
         </div>
         <div class="media-content">

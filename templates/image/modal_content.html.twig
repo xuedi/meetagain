@@ -4,7 +4,7 @@
     <div class="mb-5">
         {% for galleryItem in selectableGallery %}
             <a href="{{ galleryItem.link }}" class="image-item fileSelectTrigger">
-                {% include '_block/image.html.twig' with {'image': galleryItem.image, 'size': '80x80'} %}
+                {% include '_components/image.html.twig' with {'image': galleryItem.image, 'size': '80x80'} %}
             </a>
         {% endfor %}
     </div>

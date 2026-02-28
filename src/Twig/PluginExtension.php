@@ -201,7 +201,7 @@ final class PluginExtension extends AbstractExtension
             return '';
         }
 
-        return $this->twig->render('_block/event_list_item_tags.html.twig', [
+        return $this->twig->render('_components/event_list_item_tags.html.twig', [
             'tags' => $tags,
         ]);
     }

@@ -1,4 +1,13 @@
-{# Render event list item tags from plugins #}
+{#
+    Render event list item plugin tags
+
+    Parameters:
+    - tags: array of tag objects, each with:
+        - url:   link URL (optional — renders <a> if set, <span> otherwise)
+        - color: Bulma tag colour class e.g. 'is-primary' (required)
+        - icon:  FontAwesome class string e.g. 'fas fa-star' (optional)
+        - text:  visible tag label (required)
+#}
 {% for tag in tags %}
     {% if tag.url %}
         <a href="{{ tag.url }}" class="tag {{ tag.color }} ml-2">
