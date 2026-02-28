@@ -51,7 +51,9 @@ services:
         arguments:
             $providers: !tagged_iterator app.action_authorization_message
 
-    Sentry\SentryBundle\Monolog\LogsHandler: ~
+    Sentry\SentryBundle\Monolog\LogsHandler:
+        arguments:
+            - !php/const Monolog\Logger::INFO
 
     App\Controller\SecurityController:
         arguments:
