@@ -9,7 +9,7 @@ when@prod:
                 - 'Symfony\Component\ErrorHandler\Error\FatalError'
                 - 'Symfony\Component\Debug\Exception\FatalErrorException'
                 - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
-            traces_sample_rate: 1
+            traces_sample_rate: 1.0
         register_error_listener: false
         register_error_handler: false
         tracing:
