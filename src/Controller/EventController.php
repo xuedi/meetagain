@@ -87,6 +87,7 @@ class EventController extends AbstractController
         }
 
         $response = $this->getResponse();
+        $event = $this->repo->findOneForDetails($id);
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -102,7 +103,7 @@ class EventController extends AbstractController
             }
             $comment = new Comment();
             $comment->setUser($this->getAuthedUser());
-            $comment->setEvent($this->repo->find($id));
+            $comment->setEvent($event);
             $comment->setContent($form->getData()['comment']);
             $comment->setCreatedAt(new DateTimeImmutable());
             $em->persist($comment);
@@ -116,8 +117,6 @@ class EventController extends AbstractController
         if (!$this->getUser() instanceof UserInterface) {
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
         }
-
-        $event = $this->repo->findOneBy(['id' => $id]);
 
         return $this->render(
             'events/details.html.twig',
