@@ -40,7 +40,7 @@ readonly class CmsBlockService
             throw new RuntimeException('Could not load block');
         }
 
-        $block->setJson(CmsBlockTypes::buildObject($type, $payload)->toArray());
+        $block->setJson(CmsBlockTypes::buildObject($type, $payload, $block->getImage())->toArray());
         $this->em->persist($block);
         $this->em->flush();
 

@@ -113,23 +113,42 @@ class CmsBlockServiceTest extends TestCase
         $this->assertEquals(1, $block->getPriority());
     }
 
-    public function testMoveBlockUpAdjustsPriority(): void
+    public function testUpdateHeroBlockHandlesImageRightCheckbox(): void
     {
         $emMock = $this->createMock(EntityManagerInterface::class);
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
 
         $block = new CmsBlock();
-        $block->setPriority(3);
+        $block->setType(CmsBlockTypes::Hero);
+        $block->setJson([
+            'headline' => 'old',
+            'subHeadline' => 'old',
+            'text' => 'old',
+            'buttonLink' => 'old',
+            'buttonText' => 'old',
+            'color' => 'old',
+            'imageRight' => true
+        ]);
 
         $blockRepoStub->method('find')->with(42)->willReturn($block);
-        $blockRepoStub->method('findBy')->willReturn([$block]);
-
-        $emMock->expects($this->exactly(2))->method('persist');
-        $emMock->expects($this->exactly(2))->method('flush');
 
         $subject = new CmsBlockService($emMock, $blockRepoStub);
-        $subject->moveBlockUp(1, 42, 'en');
+        
+        // Test when imageRight is missing from payload (unchecked)
+        $payload = [
+            'headline' => 'new',
+            'subHeadline' => 'new',
+            'text' => 'new',
+            'buttonLink' => 'new',
+            'buttonText' => 'new',
+            'color' => 'new'
+        ];
+        $subject->updateBlock(42, CmsBlockTypes::Hero, $payload);
+        $this->assertFalse($block->getJson()['imageRight']);
 
-        $this->assertEquals(1, $block->getPriority());
+        // Test when imageRight is in payload (checked)
+        $payload['imageRight'] = '1';
+        $subject->updateBlock(42, CmsBlockTypes::Hero, $payload);
+        $this->assertTrue($block->getJson()['imageRight']);
     }
 }

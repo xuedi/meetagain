@@ -3,6 +3,12 @@
     <div class="hero-body">
         <div class="container">
             <div class="columns is-vcentered">
+                {% if not block.imageRight %}
+                    <div class="column is-4">
+                        {% include '_components/image.html.twig' with {'image': block.image} %}
+                    </div>
+                    <div class="column is-2"></div>
+                {% endif %}
                 <div class="column is-6 has-text-white">
                     <h1 class="title has-text-white">{{ block.headline }}</h1>
                     <p class="subtitle has-text-white">{{ block.subHeadline }}</p>
@@ -11,10 +17,12 @@
                         <a class="button" href="\{{ app.request.locale }}{{ block.buttonLink }}">{{ block.buttonText }}</a>
                     </p>
                 </div>
-                <div class="column is-2"></div>
-                <div class="column is-4">
-                    {% include '_components/image.html.twig' with {'image': block.image} %}
-                </div>
+                {% if block.imageRight %}
+                    <div class="column is-2"></div>
+                    <div class="column is-4">
+                        {% include '_components/image.html.twig' with {'image': block.image} %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
