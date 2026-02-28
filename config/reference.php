@@ -1556,6 +1556,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
  *         symfonycasts_verify_email?: SymfonycastsVerifyEmailConfig,
+ *         sentry?: SentryConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
