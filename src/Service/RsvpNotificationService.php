@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\EventRepository;
 use DateTime;
 use Psr\Cache\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -21,12 +22,14 @@ readonly class RsvpNotificationService implements CronTaskInterface
         private EmailService $emailService,
         private TagAwareCacheInterface $appCache,
         private ConfigService $configService,
+        private LoggerInterface $logger,
     ) {}
 
     public function runCronTask(OutputInterface $output): void
     {
         $count = $this->processUpcomingEvents(7);
         $output->writeln('Send RSVP notifications: ' . $count);
+        $this->logger->info('RSVP notifications processed', ['result' => $count]);
     }
 
     public function processUpcomingEvents(int $daysAhead = 7): string
