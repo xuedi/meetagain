@@ -1,29 +1,28 @@
-when@prod:
-    sentry:
-        dsn: '%env(SENTRY_DSN)%'
-        options:
-            # Add request headers, cookies, IP address and the authenticated user
-            # see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
-            # send_default_pii: true
-            ignore_exceptions:
-                - 'Symfony\Component\ErrorHandler\Error\FatalError'
-                - 'Symfony\Component\Debug\Exception\FatalErrorException'
-                - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
-            traces_sample_rate: 1.0
-        register_error_listener: true
-        register_error_handler: false
-        tracing:
-            dbal:
-                enabled: true
-            twig:
-                enabled: true
-            cache:
-                enabled: true
-            http_client:
-                enabled: true
+sentry:
+    dsn: '%env(SENTRY_DSN)%'
+    options:
+        # Add request headers, cookies, IP address and the authenticated user
+        # see https://docs.sentry.io/platforms/php/data-management/data-collected/ for more info
+        # send_default_pii: true
+        ignore_exceptions:
+            - 'Symfony\Component\ErrorHandler\Error\FatalError'
+            - 'Symfony\Component\Debug\Exception\FatalErrorException'
+            - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
+        traces_sample_rate: 1.0
+    register_error_listener: true
+    register_error_handler: false
+    tracing:
+        dbal:
+            enabled: true
+        twig:
+            enabled: true
+        cache:
+            enabled: true
+        http_client:
+            enabled: true
 
-    monolog:
-        handlers:
-            sentry_logs:
-                type: service
-                id: Sentry\SentryBundle\Monolog\LogsHandler
+monolog:
+    handlers:
+        sentry_logs:
+            type: service
+            id: Sentry\SentryBundle\Monolog\LogsHandler
