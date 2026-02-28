@@ -286,18 +286,25 @@ public function getPluginEventTiles(int $id): array
 }
 ```
 
-**Plugin Interface:**
+**Plugin Interface** (`src/Plugin.php`):
 ```php
 interface Plugin
 {
     public function getPluginKey(): string;
     public function getMenuLinks(): array;
-    public function getEventTile(Event $event): ?PluginTile;
-    public function loadPostExtendFixtures(ObjectManager $manager): void;
+    public function getEventTile(int $eventId): ?string;
+    public function getEventListItemTags(int $eventId): array;
+    public function warmCache(WarmCacheType $type, array $ids): void; // batch pre-warm, see Caching Strategy
+    public function getFooterAbout(): ?string;
+    public function getMemberPageTop(): ?string;
+    public function getAdminSystemLinks(): ?AdminSection;
+    public function loadPostExtendFixtures(OutputInterface $output): void;
+    public function preFixtures(OutputInterface $output): void;
+    public function postFixtures(OutputInterface $output): void;
 }
 ```
 
-**Example:** `src/Plugin/Dishes/DishesPlugin.php`
+**Example:** `plugins/dishes/src/Kernel.php`
 
 ---
 
@@ -510,20 +517,147 @@ Translation system uses `Translation` entity:
 
 ## Caching Strategy
 
-**Symfony Cache (Valkey/Redis):**
-- Used for translations, menu items, plugin configuration
-- Tagged cache invalidation (e.g., `translations` tag)
-- Early hints caching for HTTP/2 performance
+### Decision Hierarchy
 
-**Example:**
+**Prefer Valkey over per-request PHP memos wherever safe.** Apply in this order:
+
+| Strategy | When to use |
+|---|---|
+| **Valkey (`CacheInterface`)** | Data stable across requests — config values, menu IDs, CMS filter ID sets. Cross-request sharing multiplies the savings. |
+| **Per-request PHP property** | Session- or user-scoped data that must not be shared across requests (e.g. current group context, resolved Doctrine entities). |
+| **No cache** | Called once per request, or trivially cheap. |
+
+**Never put Doctrine entity objects in Valkey** — they contain proxy state that is not safely serializable. Cache IDs only, then fetch entities fresh on the way out.
+
+---
+
+### Valkey / Symfony `CacheInterface`
+
+Inject `CacheInterface` and use the callback form. Write invalidation must call `$cache->delete(key)` after every flush.
+
 ```php
-$cache->get('menu_items', function() {
-    return $this->buildMenuItems();
-});
+// Reading — callback only runs on cache miss
+private function getCachedValue(string $name): ?string
+{
+    return $this->cache->get(
+        'config_' . $name,
+        function (ItemInterface $item) use ($name): ?string {
+            $item->expiresAfter(3600);
+            return $this->repo->findOneBy(['name' => $name])?->getValue();
+        },
+    );
+}
 
-// Invalidation
-$cache->invalidateTags(['menu']);
+// Writing — always invalidate after flush
+public function setString(string $name, string $value): void
+{
+    // ... persist & flush ...
+    $this->cache->delete('config_' . $name);
+}
 ```
+
+**Cache key conventions:**
+
+| Prefix | Data | TTL |
+|---|---|---|
+| `config_{name}` | Single config value | 24 h |
+| `cms_locked_ids` | Locked CMS page IDs | 1 h |
+| `cms_menu_location_{n}` | CMS IDs for a menu location | 1 h |
+| `menu_{type}_{locale}_{hash}` | Rendered `MenuItem[]` per context | 1 h |
+
+---
+
+### Per-Request PHP Property Memos
+
+Use a nullable private property (not `readonly` class) when the data is user/session scoped and must not leak across requests. Symfony creates a fresh service container per HTTP request, so per-request memos are safe.
+
+**Pattern** — remove `readonly` from the class declaration, keep `readonly` on each injected property:
+
+```php
+// ✅ Correct: class-level readonly removed, property-level readonly kept
+class GroupContextService
+{
+    private ?GroupContext $contextMemo = null;
+
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        // ...
+    ) {}
+
+    public function getCurrentContext(): GroupContext
+    {
+        if ($this->contextMemo !== null) {
+            return $this->contextMemo;
+        }
+        // ... compute ...
+        return $this->contextMemo = $result;
+    }
+}
+
+// ❌ Wrong: readonly class cannot hold mutable memo fields
+readonly class GroupContextService { ... }
+```
+
+---
+
+### N+1 Avoidance: Plugin `warmCache` Pattern
+
+When a list page calls a plugin method once per row (e.g. `event_list_item_tags`), the naive per-call DB query becomes O(N). Solve this with a single pre-warm call before the render loop.
+
+**`WarmCacheType` enum** (`src/Entity/WarmCacheType.php`):
+
+```php
+enum WarmCacheType
+{
+    case EventListItemTags;
+    // Add a new case here when the next list needs warming
+}
+```
+
+**`Plugin` interface** — one universal method covers all warmable types:
+
+```php
+public function warmCache(WarmCacheType $type, array $ids): void;
+```
+
+Plugins that don't cache anything leave the body empty. Plugins that do switch on `$type`:
+
+```php
+// multisite Kernel.php
+public function warmCache(WarmCacheType $type, array $ids): void
+{
+    if ($type !== WarmCacheType::EventListItemTags) {
+        return;
+    }
+    // One batch query replaces N individual queries
+    $groups = $this->groupEventMappingRepository->getGroupsForEventIds($ids);
+    foreach ($ids as $id) {
+        $this->eventGroupCache[$id] = $groups[$id] ?? null; // null = no group, skip re-query
+    }
+}
+```
+
+**Twig integration** — collect all IDs before the loop, warm once:
+
+```twig
+{# Collect IDs #}
+{% set allEventIds = [] %}
+{% for item in structuredList %}
+    {% for event in item.events %}
+        {% set allEventIds = allEventIds|merge([event.id]) %}
+    {% endfor %}
+{% endfor %}
+{# One batch warm call, then the render loop fires zero extra queries #}
+{% if allEventIds is not empty %}{{ warm_event_list_item_tags(allEventIds) }}{% endif %}
+
+{% for item in structuredList %}...{% endfor %}
+```
+
+**Adding a new warmable type:**
+
+1. Add a case to `WarmCacheType`
+2. Add a new Twig function in `PluginExtension` (e.g. `warm_member_tags`) that calls `warmCache(WarmCacheType::NewCase, $ids)`
+3. Implement in whichever plugin caches that data; all other plugins leave `warmCache` empty
 
 ---
 
@@ -546,8 +680,10 @@ $cache->invalidateTags(['menu']);
 
 ### Performance Optimizations
 
-- **Readonly Services** - Zero state, thread-safe, no side effects
+- **Readonly Services** - Zero state, thread-safe, no side effects (exception: per-request memo services — see Caching Strategy)
+- **Valkey-first caching** - Config values, menu IDs, CMS filter sets cached in Valkey; per-request memos only for user/session-scoped data
 - **QueryBuilder** - Eager loading with `addSelect()` to avoid N+1
+- **Batch `warmCache`** - Pre-populate per-request plugin caches before list render loops (one query replaces N)
 - **Array Hydration** - For list views where entities aren't needed
 - **Indexed Junction Tables** - Optimized queries for group mappings
 - **Early Hints** - HTTP/2 asset preloading for faster page loads
@@ -568,8 +704,9 @@ $cache->invalidateTags(['menu']);
 3. **Static Methods** - Use dependency injection
 4. **Direct DB queries** - Use Doctrine QueryBuilder
 5. **Tight coupling** - Respect layer boundaries
-6. **Missing readonly** - All services must be readonly
-7. **Mutable services** - No state in services
+6. **Missing readonly** - All services must be `readonly` unless they hold a per-request memo property (see Caching Strategy)
+7. **Mutable services with shared state** - No state that persists across requests; per-request memo fields are the only allowed exception
+8. **Caching entities in Valkey** - Only cache scalar IDs; fetch entities fresh to avoid serialization issues
 8. **God objects** - Classes with too many responsibilities
 
 ---

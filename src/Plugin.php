@@ -5,6 +5,7 @@ namespace App;
 use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
 use App\Entity\Link;
+use App\Entity\WarmCacheType;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -64,6 +65,14 @@ interface Plugin
      * @return list<EventListItemTag>
      */
     public function getEventListItemTags(int $eventId): array;
+
+    /**
+     * Pre-warms any per-request caches before a list render loop.
+     * Called once with all visible IDs of the given type to avoid N individual queries.
+     *
+     * @param array<int> $ids
+     */
+    public function warmCache(WarmCacheType $type, array $ids): void;
 
     /**
      * Returns rendered HTML to display at the top of the admin member list page.

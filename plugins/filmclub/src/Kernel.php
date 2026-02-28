@@ -4,6 +4,7 @@ namespace Plugin\Filmclub;
 
 use App\Entity\AdminSection;
 use App\Entity\Link;
+use App\Entity\WarmCacheType;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
@@ -181,6 +182,10 @@ class Kernel implements Plugin
     public function getEventListItemTags(int $eventId): array
     {
         return [];
+    }
+
+    public function warmCache(WarmCacheType $type, array $ids): void
+    {
     }
 
     public function getMemberPageTop(): ?string
