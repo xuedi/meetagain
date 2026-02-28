@@ -22,6 +22,7 @@ use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\CmsBlockService;
+use App\Service\CmsPageCacheService;
 use App\Service\EntityActionDispatcher;
 use App\Service\ImageService;
 use App\Service\LanguageService;
@@ -60,6 +61,7 @@ class CmsController extends AbstractAdminController
         private readonly AnnouncementRepository $announcementRepo,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly CmsPageCacheService $cmsPageCacheService,
         private readonly LoggerInterface $logger,
         private readonly LanguageService $languageService,
         private readonly ImageService $imageService,
@@ -218,6 +220,7 @@ class CmsController extends AbstractAdminController
         $blockType = CmsBlockTypes::from((int) $request->request->get('blockType'));
 
         $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
+        $this->cmsPageCacheService->invalidatePage($id);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $id,
@@ -233,6 +236,7 @@ class CmsController extends AbstractAdminController
         $locale = $request->query->get('locale');
 
         $this->blockService->moveBlockDown($pageId, $blockId, $locale);
+        $this->cmsPageCacheService->invalidatePage($pageId);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $pageId,
@@ -248,6 +252,7 @@ class CmsController extends AbstractAdminController
         $locale = $request->query->get('locale');
 
         $this->blockService->moveBlockUp($pageId, $blockId, $locale);
+        $this->cmsPageCacheService->invalidatePage($pageId);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $pageId,
@@ -262,6 +267,7 @@ class CmsController extends AbstractAdminController
         $type = CmsBlockTypes::from((int) $request->request->get('blockType'));
 
         $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
+        $this->cmsPageCacheService->invalidatePage((int) $request->request->get('id'));
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $request->request->get('id'),
@@ -273,6 +279,7 @@ class CmsController extends AbstractAdminController
     public function cmsBlockDelete(Request $request): Response
     {
         $this->blockService->deleteBlock((int) $request->query->get('blockId'));
+        $this->cmsPageCacheService->invalidatePage((int) $request->query->get('id'));
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $request->query->get('id'),
@@ -333,6 +340,8 @@ class CmsController extends AbstractAdminController
             }
         }
 
+        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $block->getPage()->getId(),
             'locale' => $block->getLanguage(),
@@ -355,6 +364,8 @@ class CmsController extends AbstractAdminController
         $block->setJson($json);
         $this->em->persist($block);
         $this->em->flush();
+
+        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $block->getPage()->getId(),
