@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class ConfigServiceTest extends TestCase
 {
@@ -25,6 +26,12 @@ class ConfigServiceTest extends TestCase
         $this->configRepoStub = $this->createStub(ConfigRepository::class);
         $this->entityManagerStub = $this->createStub(EntityManagerInterface::class);
         $this->cacheStub = $this->createStub(CacheInterface::class);
+        // Always simulate a cache miss so the callback (and thus the repo) is exercised
+        $this->cacheStub->method('get')->willReturnCallback(
+            function (string $key, callable $callback): mixed {
+                return $callback($this->createStub(ItemInterface::class));
+            },
+        );
         $this->subject = new ConfigService(
             repo: $this->configRepoStub,
             em: $this->entityManagerStub,

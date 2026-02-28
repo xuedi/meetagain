@@ -15,6 +15,8 @@ use Symfony\Contracts\Cache\ItemInterface;
 readonly class ConfigService
 {
     private const string CACHE_KEY_THEME_COLORS = 'theme_colors';
+    private const string CACHE_KEY_PREFIX = 'config_';
+    private const int CACHE_TTL = 60 * 60 * 24;
 
     public function __construct(
         private ConfigRepository $repo,
@@ -127,6 +129,7 @@ readonly class ConfigService
 
         $this->em->persist($setting);
         $this->em->flush();
+        $this->cache->delete(self::CACHE_KEY_PREFIX . $name);
 
         return $value;
     }
@@ -158,7 +161,7 @@ readonly class ConfigService
     public function getThemeColors(): array
     {
         return $this->cache->get(self::CACHE_KEY_THEME_COLORS, function (ItemInterface $item): array {
-            $item->expiresAfter(3600);
+            $item->expiresAfter(self::CACHE_TTL);
 
             $defaults = $this->getThemeColorDefaults();
             $colorNames = array_keys($defaults);
@@ -188,24 +191,26 @@ readonly class ConfigService
         $this->cache->delete(self::CACHE_KEY_THEME_COLORS);
     }
 
+    private function getCachedValue(string $name): ?string
+    {
+        return $this->cache->get(
+            self::CACHE_KEY_PREFIX . $name,
+            function (ItemInterface $item) use ($name): ?string {
+                $item->expiresAfter(self::CACHE_TTL);
+
+                return $this->repo->findOneBy(['name' => $name])?->getValue();
+            },
+        );
+    }
+
     private function getBoolean(string $name, bool $default = false): bool
     {
-        $setting = $this->repo->findOneBy(['name' => $name]);
-        if ($setting === null) {
-            return $default;
-        }
-
-        return $setting->getValue() === 'true';
+        return ($this->getCachedValue($name) ?? ($default ? 'true' : 'false')) === 'true';
     }
 
     public function getString(string $name, string $default): string
     {
-        $setting = $this->repo->findOneBy(['name' => $name]);
-        if ($setting === null) {
-            return $default;
-        }
-
-        return $setting->getValue();
+        return $this->getCachedValue($name) ?? $default;
     }
 
     public function setString(string $name, string $value): void
@@ -220,16 +225,14 @@ readonly class ConfigService
 
         $this->em->persist($setting);
         $this->em->flush();
+        $this->cache->delete(self::CACHE_KEY_PREFIX . $name);
     }
 
     public function getInt(string $name, int $default): int
     {
-        $setting = $this->repo->findOneBy(['name' => $name]);
-        if ($setting === null) {
-            return $default;
-        }
+        $value = $this->getCachedValue($name);
 
-        return (int) $setting->getValue();
+        return $value === null ? $default : (int) $value;
     }
 
     public function setInt(string $name, int $value): void
@@ -244,5 +247,6 @@ readonly class ConfigService
 
         $this->em->persist($setting);
         $this->em->flush();
+        $this->cache->delete(self::CACHE_KEY_PREFIX . $name);
     }
 }
