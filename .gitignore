@@ -17,4 +17,5 @@ installed.lock
 /.deptrac.cache
 /plugins/multisite/
 /.ai/plans/*.md
+/.ai/*.local
 
