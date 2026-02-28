@@ -17,7 +17,7 @@ class CmsBlock
     private ?string $language = null;
 
     #[ORM\Column(enumType: CmsBlockTypes::class)]
-    private ?CmsBlockTypes $Type = null;
+    private ?CmsBlockTypes $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'blocks')]
     #[ORM\JoinColumn(nullable: false)]
@@ -51,12 +51,12 @@ class CmsBlock
 
     public function getType(): ?CmsBlockTypes
     {
-        return $this->Type;
+        return $this->type;
     }
 
-    public function setType(CmsBlockTypes $Type): static
+    public function setType(CmsBlockTypes $type): static
     {
-        $this->Type = $Type;
+        $this->type = $type;
 
         return $this;
     }
