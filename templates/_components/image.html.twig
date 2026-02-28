@@ -1,3 +1,12 @@
+{#
+    Render a thumbnail image or placeholder
+
+    Parameters:
+    - image: Image entity with hash, alt, updatedAt, type properties (optional — shows placeholder if null)
+    - size:  thumbnail dimensions as 'WxH' string e.g. '400x400' (optional)
+             auto-selected from image.type when omitted:
+               type 1 → 400x400, type 2 → 600x400, type 3 → 210x140, type 4 → 432x432, default → 50x50
+#}
 {% if size is not defined  %}
     {% set size = '50x50' %}
     {% if image is defined and image.type is defined %}

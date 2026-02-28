@@ -1,0 +1,14 @@
+{#
+    User display name with optional verified badge
+
+    Parameters:
+    - link: URL to the user's profile page (required)
+    - name: display name of the user (required)
+    - verified: boolean — shows a checkmark icon if true (required)
+#}
+<a href="{{ link }}">{{ name }}</a>
+{% if verified %}
+    <span class="icon has-text-success">
+        <i class="fa-regular fa-user-check"></i>
+    </span>
+{% endif %}

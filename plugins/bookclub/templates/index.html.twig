@@ -44,7 +44,7 @@
                             {% if book.coverImage %}
                                 <div class="card-image">
                                     <figure class="image is-4by5">
-                                        {% include '_block/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
+                                        {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
                                     </figure>
                                 </div>
                             {% endif %}

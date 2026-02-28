@@ -2,7 +2,7 @@
 <div class="columns">
     <div class="column is-four-fifths">
         {% for comment in comments %}
-            {% include '_block/comment.html.twig' with {'comment': comment, 'user': user, 'event': event} %}
+            {% include '_components/comment.html.twig' with {'comment': comment, 'user': user, 'event': event} %}
         {% endfor %}
         {% if is_granted('ROLE_USER') %}
             {{ form_start(commentForm) }}

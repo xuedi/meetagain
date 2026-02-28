@@ -22,7 +22,7 @@
             {% set Caption = 'You can <a href=' ~ path('app_report_image', {'id': image.id}) ~ '>report</a> an image if there is something wrong.' %}
             <div class="column is-2">
                 <a data-fancybox="gallery" data-caption="{{ Caption }}" href="{{ href }}">
-                    {% include '_block/image.html.twig' with {'image': image, 'size': '210x140'} %}
+                    {% include '_components/image.html.twig' with {'image': image, 'size': '210x140'} %}
                 </a>
             </div>
         {% endif %}

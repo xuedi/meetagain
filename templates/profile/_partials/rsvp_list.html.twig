@@ -15,7 +15,7 @@
                     <span class="tag is-small is-danger is-light">{{ "toggle_no"|trans }}</span>
                 {% endif %}
             {% else %}
-                {% include '_block/toggle.html.twig' with {
+                {% include '_components/toggle.html.twig' with {
                     'link': path('app_profile_toggle_rsvp', {event: event.id}),
                     'status': event.rsvp.contains(user)
                 } %}

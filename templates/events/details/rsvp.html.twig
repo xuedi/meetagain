@@ -24,7 +24,7 @@
 <div class="columns is-multiline mt-2">
     {% for rsvp in event.rsvp %}
         <div class="column is-2">
-            {% include '_block/usercard.html.twig' with {'user': rsvp} %}
+            {% include '_components/usercard.html.twig' with {'user': rsvp} %}
         </div>
     {% endfor %}
 </div>

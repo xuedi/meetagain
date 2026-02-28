@@ -10,7 +10,7 @@
             <div class="columns is-multiline">
                 {% for user in users %}
                     <div class="column is-2">
-                        {% include '_block/usercard.html.twig' with {'user': user} %}
+                        {% include '_components/usercard.html.twig' with {'user': user} %}
                     </div>
                 {% endfor %}
             </div>

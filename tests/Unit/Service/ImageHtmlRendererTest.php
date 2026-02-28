@@ -34,7 +34,7 @@ class ImageHtmlRendererTest extends TestCase
         $this->twig
             ->expects($this->once())
             ->method('render')
-            ->with('_block/image.html.twig', [
+            ->with('_components/image.html.twig', [
                 'image' => $image,
                 'size' => '100x100',
             ])
@@ -56,7 +56,7 @@ class ImageHtmlRendererTest extends TestCase
         $this->twig
             ->expects($this->once())
             ->method('render')
-            ->with('_block/image.html.twig', [
+            ->with('_components/image.html.twig', [
                 'image' => $image,
                 'size' => '50x50',
             ])

@@ -16,7 +16,7 @@ readonly class ImageHtmlRenderer
     {
         $image = $this->imageRepo->findOneBy(['id' => $id]);
 
-        return $this->twig->render('_block/image.html.twig', [
+        return $this->twig->render('_components/image.html.twig', [
             'image' => $image,
             'size' => $size,
         ]);

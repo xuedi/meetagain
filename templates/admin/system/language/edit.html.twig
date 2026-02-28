@@ -22,7 +22,7 @@
                     <h4 class="subtitle is-5">Tile Image (Frontpage)</h4>
                     {% if language.tileImage %}
                         <div class="mb-3">
-                            {% include '_block/image.html.twig' with {'image': language.tileImage, 'size': '300x200'} %}
+                            {% include '_components/image.html.twig' with {'image': language.tileImage, 'size': '300x200'} %}
                         </div>
                     {% else %}
                         <div class="mb-3 has-text-grey">
