@@ -17,6 +17,7 @@ readonly class CmsService
         private EventRepository $eventRepo,
         private EventFilterService $eventFilterService,
         private CmsFilterService $cmsFilterService,
+        private CmsPageCacheService $cmsPageCacheService,
     ) {}
 
     public function getSites(): array
@@ -26,7 +27,7 @@ readonly class CmsService
 
     public function handle(string $locale, string $slug, Response $response): Response
     {
-        // Apply CMS filtering based on current context
+        // Apply CMS filtering based on current context (determines access, not content)
         $cmsFilterResult = $this->cmsFilterService->getCmsIdFilter();
 
         $cms = $this->repo->findPublishedBySlug($slug, $cmsFilterResult->getCmsIds());
@@ -42,15 +43,25 @@ readonly class CmsService
             ]), Response::HTTP_NO_CONTENT);
         }
 
-        // actual CMS content
-        // Apply content filtering from all registered filters
+        // Apply event filter — affects which events are embedded in the page content
         $filterResult = $this->eventFilterService->getEventIdFilter();
+        $eventIds = $filterResult->getEventIds();
+
+        $cached = $this->cmsPageCacheService->get($slug, $locale, $eventIds);
+        if ($cached !== null) {
+            $response->setContent($cached);
+            $response->setStatusCode(Response::HTTP_OK);
+
+            return $response;
+        }
 
         $content = $this->twig->render('cms/index.html.twig', [
             'title' => $cms->getPageTitle($locale) ?? 'No Title set',
             'blocks' => $blocks,
-            'events' => $this->eventRepo->getUpcomingEvents(3, $filterResult->getEventIds()),
+            'events' => $this->eventRepo->getUpcomingEvents(3, $eventIds),
         ]);
+
+        $this->cmsPageCacheService->store($slug, $locale, $eventIds, $content, $cms->getId());
 
         $response->setContent($content);
         $response->setStatusCode(Response::HTTP_OK);

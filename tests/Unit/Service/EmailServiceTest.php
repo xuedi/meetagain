@@ -13,6 +13,7 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
@@ -265,6 +266,7 @@ final class EmailServiceTest extends TestCase
         ?EmailQueueRepository $mailRepo = null,
         ?EntityManagerInterface $em = null,
         ?EmailTemplateService $templateService = null,
+        ?LoggerInterface $logger = null,
         iterable $enrichers = [],
     ): EmailService {
         if ($config === null) {
@@ -293,6 +295,7 @@ final class EmailServiceTest extends TestCase
             mailRepo: $mailRepo ?? $this->createStub(EmailQueueRepository::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             templateService: $templateService,
+            logger: $logger ?? $this->createStub(LoggerInterface::class),
             enrichers: $enrichers,
         );
     }
