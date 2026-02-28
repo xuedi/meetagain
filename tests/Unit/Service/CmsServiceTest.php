@@ -9,6 +9,7 @@ use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use App\Service\CmsPageCacheService;
 use App\Service\CmsService;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
@@ -35,6 +36,7 @@ class CmsServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
+            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
         );
 
         // Act: create not found page
@@ -62,6 +64,7 @@ class CmsServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
+            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
         );
 
         // Act: get all sites
@@ -100,6 +103,7 @@ class CmsServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $cmsFilterServiceMock,
+            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
         );
 
         // Act: handle request for non-existent page
@@ -146,6 +150,7 @@ class CmsServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $cmsFilterServiceMock,
+            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
         );
 
         // Act: handle request for page without content in requested language
@@ -173,6 +178,7 @@ class CmsServiceTest extends TestCase
             ->with($locale)
             ->willReturn($blocks);
         $cmsMock->expects($this->once())->method('getPageTitle')->with($locale)->willReturn($pageTitle);
+        $cmsMock->method('getId')->willReturn(123);
 
         $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
         $cmsFilterServiceMock
@@ -209,6 +215,7 @@ class CmsServiceTest extends TestCase
             eventRepo: $eventRepoMock,
             eventFilterService: $eventFilterServiceMock,
             cmsFilterService: $cmsFilterServiceMock,
+            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
         );
 
         // Act: handle request for page with content
@@ -231,6 +238,7 @@ class CmsServiceTest extends TestCase
         $cmsStub = $this->createStub(Cms::class);
         $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn($blocks);
         $cmsStub->method('getPageTitle')->willReturn(null);
+        $cmsStub->method('getId')->willReturn(456);
 
         // Arrange: stub repository to return the CMS entity
         $cmsRepoStub = $this->createStub(CmsRepository::class);
@@ -265,6 +273,7 @@ class CmsServiceTest extends TestCase
             eventRepo: $eventRepoStub,
             eventFilterService: $eventFilterServiceStub,
             cmsFilterService: $cmsFilterServiceStub,
+            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
         );
 
         // Act: handle request for page without title

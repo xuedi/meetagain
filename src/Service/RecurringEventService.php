@@ -20,17 +20,25 @@ readonly class RecurringEventService
         private EventRepository $repo,
         private EntityManagerInterface $em,
         private EntityActionDispatcher $entityActionDispatcher,
+        private CmsPageCacheService $cmsPageCacheService,
     ) {}
 
     public function extentRecurringEvents(): void
     {
         $eventIds = array_map(static fn(Event $e) => $e->getId(), $this->repo->findAllRecurring());
 
+        $totalCreated = 0;
         foreach ($eventIds as $eventId) {
             $this->em->clear();
             $event = $this->repo->find($eventId);
             if ($event !== null) {
-                $this->fillRecurringEvents($event);
+                $totalCreated += $this->fillRecurringEvents($event);
+            }
+        }
+
+        if ($totalCreated > 0) {
+            foreach ($this->cmsPageCacheService->findEventTeaserPageIds() as $pageId) {
+                $this->cmsPageCacheService->invalidatePage($pageId);
             }
         }
     }
@@ -82,10 +90,10 @@ readonly class RecurringEventService
         return $updatedCount;
     }
 
-    private function fillRecurringEvents(Event $event): void
+    private function fillRecurringEvents(Event $event): int
     {
         if (!$event->getRecurringRule() instanceof EventIntervals) {
-            return;
+            return 0;
         }
 
         $rrule = $this->createRRule($event, $event->getRecurringRule());
@@ -112,6 +120,8 @@ readonly class RecurringEventService
         foreach ($createdEvents as $createdEvent) {
             $this->entityActionDispatcher->dispatch(EntityAction::CreateEvent, $createdEvent->getId());
         }
+
+        return count($createdEvents);
     }
 
     private function createRRule(Event $event, EventIntervals $recurringRule): RRule

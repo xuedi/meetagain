@@ -8,9 +8,11 @@ use App\Entity\User;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use App\Service\CleanupService;
+use App\Service\EntityActionDispatcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class CleanupServiceTest extends TestCase
 {
@@ -18,11 +20,15 @@ class CleanupServiceTest extends TestCase
         ?ImageRepository $imageRepo = null,
         ?UserRepository $userRepo = null,
         ?EntityManagerInterface $entityManager = null,
+        ?EntityActionDispatcher $entityActionDispatcher = null,
+        ?LoggerInterface $logger = null,
     ): CleanupService {
         return new CleanupService(
             imageRepo: $imageRepo ?? $this->createStub(ImageRepository::class),
             userRepo: $userRepo ?? $this->createStub(UserRepository::class),
             entityManager: $entityManager ?? $this->createStub(EntityManagerInterface::class),
+            entityActionDispatcher: $entityActionDispatcher ?? $this->createStub(EntityActionDispatcher::class),
+            logger: $logger ?? $this->createStub(LoggerInterface::class),
         );
     }
 
@@ -55,8 +61,9 @@ class CleanupServiceTest extends TestCase
         // Arrange: stub activity for the user
         $activityStub = $this->createStub(Activity::class);
 
-        // Arrange: mock user to return activities collection
+        // Arrange: mock user to return activities collection and ID
         $userMock = $this->createMock(User::class);
+        $userMock->method('getId')->willReturn(42);
         $userMock->expects($this->once())->method('getActivities')->willReturn(new ArrayCollection([$activityStub]));
 
         // Arrange: mock user repository to return old registrations

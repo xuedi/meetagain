@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -37,6 +38,7 @@ class RsvpNotificationServiceTest extends TestCase
             $this->emailService,
             $this->appCache,
             $this->configService,
+            $this->createStub(LoggerInterface::class),
         );
     }
 
@@ -258,6 +260,7 @@ class RsvpNotificationServiceTest extends TestCase
             $this->emailService,
             $this->appCache,
             $this->configService,
+            $this->createStub(LoggerInterface::class),
         );
 
         // Email should be sent exactly once across both calls
@@ -281,7 +284,13 @@ class RsvpNotificationServiceTest extends TestCase
         $configService = $this->createStub(ConfigService::class);
         $configService->method('isSendRsvpNotifications')->willReturn(false);
 
-        $service = new RsvpNotificationService($this->eventRepo, $this->emailService, $this->appCache, $configService);
+        $service = new RsvpNotificationService(
+            $this->eventRepo,
+            $this->emailService,
+            $this->appCache,
+            $configService,
+            $this->createStub(LoggerInterface::class),
+        );
 
         $event = $this->createStub(Event::class);
         $attendee = $this->createStub(User::class);
@@ -312,7 +321,13 @@ class RsvpNotificationServiceTest extends TestCase
         $configService->method('isSendRsvpNotifications')->willReturn(false);
 
         $eventRepo = $this->createMock(EventRepository::class);
-        $service = new RsvpNotificationService($eventRepo, $this->emailService, $this->appCache, $configService);
+        $service = new RsvpNotificationService(
+            $eventRepo,
+            $this->emailService,
+            $this->appCache,
+            $configService,
+            $this->createStub(LoggerInterface::class),
+        );
 
         // Assert - No events should be fetched when global setting is disabled
         $eventRepo->expects($this->never())->method('findUpcomingEventsWithinRange');
