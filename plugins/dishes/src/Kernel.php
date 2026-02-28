@@ -4,6 +4,7 @@ namespace Plugin\Dishes;
 
 use App\Entity\AdminSection;
 use App\Entity\Link;
+use App\Entity\WarmCacheType;
 use App\Plugin;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -58,6 +59,10 @@ readonly class Kernel implements Plugin
     public function getEventListItemTags(int $eventId): array
     {
         return [];
+    }
+
+    public function warmCache(WarmCacheType $type, array $ids): void
+    {
     }
 
     public function getMemberPageTop(): ?string

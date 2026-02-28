@@ -3,6 +3,7 @@
 namespace Plugin\Karaoke;
 
 use App\Entity\AdminSection;
+use App\Entity\WarmCacheType;
 use App\Plugin;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -50,6 +51,10 @@ class Kernel implements Plugin
     public function getEventListItemTags(int $eventId): array
     {
         return [];
+    }
+
+    public function warmCache(WarmCacheType $type, array $ids): void
+    {
     }
 
     public function getMemberPageTop(): ?string

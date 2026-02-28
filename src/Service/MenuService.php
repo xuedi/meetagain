@@ -7,12 +7,17 @@ use App\Filter\Cms\CmsFilterService;
 use App\Repository\CmsRepository;
 use App\ValueObject\MenuItem;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 readonly class MenuService
 {
+    private const int CACHE_TTL = 3600;
+
     public function __construct(
         private CmsRepository $cmsRepo,
         private CmsFilterService $cmsFilterService,
+        private CacheInterface $cache,
     ) {}
 
     /**
@@ -34,23 +39,32 @@ readonly class MenuService
             return [];
         }
 
-        // Get CMS pages with this menu location
-        $cmsPages = $this->cmsRepo->findByMenuLocation($menuLocation);
-
-        // Apply CMS filter (multisite filtering)
+        // Apply CMS filter (multisite filtering) — memoized per request
         $filterResult = $this->cmsFilterService->getCmsIdFilter();
         $allowedCmsIds = $filterResult->getCmsIds();
 
-        $items = [];
-        foreach ($cmsPages as $cms) {
-            // Apply multisite filtering
-            if ($allowedCmsIds !== null && !in_array($cms->getId(), $allowedCmsIds, true)) {
-                continue;
-            }
+        // Build cache key from type, locale and the set of allowed IDs
+        $idHash = $allowedCmsIds !== null ? md5(implode(',', $allowedCmsIds)) : 'all';
+        $cacheKey = sprintf('menu_%s_%s_%s', $type, $locale, $idHash);
 
-            $items[] = MenuItem::fromCms($cms, $locale);
-        }
+        return $this->cache->get(
+            $cacheKey,
+            function (ItemInterface $item) use ($menuLocation, $allowedCmsIds, $locale): array {
+                $item->expiresAfter(self::CACHE_TTL);
 
-        return $items;
+                $cmsPages = $this->cmsRepo->findByMenuLocation($menuLocation);
+
+                $items = [];
+                foreach ($cmsPages as $cms) {
+                    if ($allowedCmsIds !== null && !in_array($cms->getId(), $allowedCmsIds, true)) {
+                        continue;
+                    }
+
+                    $items[] = MenuItem::fromCms($cms, $locale);
+                }
+
+                return $items;
+            },
+        );
     }
 }

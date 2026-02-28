@@ -4,6 +4,7 @@ namespace App\CorePlugins\Navigation;
 
 use App\Entity\AdminSection;
 use App\Entity\Link;
+use App\Entity\WarmCacheType;
 use App\Plugin;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -77,6 +78,10 @@ readonly class NavigationPlugin implements Plugin
     public function getEventListItemTags(int $eventId): array
     {
         return [];
+    }
+
+    public function warmCache(WarmCacheType $type, array $ids): void
+    {
     }
 
     public function getMemberPageTop(): ?string
