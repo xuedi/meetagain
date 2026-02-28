@@ -366,6 +366,27 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find a single event with all detail-page associations eagerly loaded to avoid N+1 queries.
+     * Fetches: location, previewImage, images, host, host.user, rsvp, rsvp.image, translations.
+     */
+    public function findOneForDetails(int $id): ?Event
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')->addSelect('t')
+            ->leftJoin('e.location', 'l')->addSelect('l')
+            ->leftJoin('e.previewImage', 'pi')->addSelect('pi')
+            ->leftJoin('e.images', 'img')->addSelect('img')
+            ->leftJoin('e.host', 'h')->addSelect('h')
+            ->leftJoin('h.user', 'hu')->addSelect('hu')
+            ->leftJoin('e.rsvp', 'r')->addSelect('r')
+            ->leftJoin('r.image', 'ri')->addSelect('ri')
+            ->where('e.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Find events by their IDs with translations eagerly loaded.
      *
      * @param array<int> $eventIds

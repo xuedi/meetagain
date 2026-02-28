@@ -6,13 +6,17 @@ use App\Entity\Cms;
 use App\Entity\MenuLocation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @extends ServiceEntityRepository<Cms>
  */
 class CmsRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private const int CACHE_TTL = 3600;
+
+    public function __construct(ManagerRegistry $registry, private readonly CacheInterface $cache)
     {
         parent::__construct($registry, Cms::class);
     }
@@ -88,18 +92,35 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
+     * IDs are cached in Valkey; entities are fetched fresh on each request to avoid
+     * serializing Doctrine proxy objects into the cache.
+     *
      * @return array<Cms>
      */
     public function findByMenuLocation(MenuLocation $location): array
     {
-        return $this
-            ->createQueryBuilder('c')
-            ->join('c.menuLocations', 'ml')
-            ->where('ml.location = :location')
-            ->andWhere('c.published = true')
-            ->setParameter('location', $location)
-            ->getQuery()
-            ->getResult();
+        $ids = $this->cache->get(
+            'cms_menu_location_' . $location->value,
+            function (ItemInterface $item) use ($location): array {
+                $item->expiresAfter(self::CACHE_TTL);
+
+                return $this
+                    ->createQueryBuilder('c')
+                    ->select('c.id')
+                    ->join('c.menuLocations', 'ml')
+                    ->where('ml.location = :location')
+                    ->andWhere('c.published = true')
+                    ->setParameter('location', $location)
+                    ->getQuery()
+                    ->getSingleColumnResult();
+            },
+        );
+
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this->findBy(['id' => $ids]);
     }
 
     /**
@@ -107,11 +128,18 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function getLockedCmsIds(): array
     {
-        return $this
-            ->createQueryBuilder('c')
-            ->select('c.id')
-            ->where('c.locked = true')
-            ->getQuery()
-            ->getSingleColumnResult();
+        return $this->cache->get(
+            'cms_locked_ids',
+            function (ItemInterface $item): array {
+                $item->expiresAfter(self::CACHE_TTL);
+
+                return $this
+                    ->createQueryBuilder('c')
+                    ->select('c.id')
+                    ->where('c.locked = true')
+                    ->getQuery()
+                    ->getSingleColumnResult();
+            },
+        );
     }
 }
