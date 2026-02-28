@@ -7,6 +7,7 @@ use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 readonly class CleanupService implements CronTaskInterface
@@ -16,15 +17,18 @@ readonly class CleanupService implements CronTaskInterface
         private UserRepository $userRepo,
         private EntityManagerInterface $entityManager,
         private EntityActionDispatcher $entityActionDispatcher,
+        private LoggerInterface $logger,
     ) {}
 
     public function runCronTask(OutputInterface $output): void
     {
         $count = $this->removeImageCache();
         $output->writeln('Clean image cache: ' . $count);
+        $this->logger->info('Image cache cleaned', ['count' => $count]);
 
         $count = $this->removeGhostedRegistrations();
         $output->writeln('Clean registrations: ' . $count);
+        $this->logger->info('Ghosted registrations removed', ['count' => $count]);
     }
 
     public function removeImageCache(): int

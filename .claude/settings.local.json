@@ -62,7 +62,8 @@
       "Read(/tmp/*)",
       "Bash(echo * >> /home/xuedi/Projects/meetAgain/translationUpdates.sql)",
       "Bash(cat * >> /home/xuedi/Projects/meetAgain/translationUpdates.sql)",
-      "Bash(just translationExtract:*)"
+      "Bash(just translationExtract:*)",
+      "Bash(just appCron:*)"
     ]
   }
 }

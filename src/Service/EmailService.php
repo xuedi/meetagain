@@ -14,6 +14,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Output\OutputInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -29,6 +30,7 @@ readonly class EmailService implements CronTaskInterface
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
         private EmailTemplateService $templateService,
+        private LoggerInterface $logger,
         #[AutowireIterator(EmailContextEnricherInterface::class)]
         private iterable $enrichers,
     ) {}
@@ -274,8 +276,11 @@ readonly class EmailService implements CronTaskInterface
         $this->em->flush();
 
         if ($failed > 0) {
+            $this->logger->warning('Email queue processed with failures', ['sent' => $send, 'failed' => $failed]);
             return sprintf('%d (Failed: %d)', $send, $failed);
         }
+
+        $this->logger->info('Email queue processed', ['sent' => $send]);
         return sprintf('%d', $send);
     }
 
