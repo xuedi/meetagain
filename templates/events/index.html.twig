@@ -52,6 +52,15 @@
 
 
 
+    {# Collect all event IDs upfront to batch-warm plugin caches in a single query #}
+    {% set allEventIds = [] %}
+    {% for item in structuredList %}
+        {% for event in item.events %}
+            {% set allEventIds = allEventIds|merge([event.id]) %}
+        {% endfor %}
+    {% endfor %}
+    {% if allEventIds is not empty %}{{ warm_event_list_item_tags(allEventIds) }}{% endif %}
+
     {% for item in structuredList %}
         <section class="section py-3 is-hidden-mobile">
             <div class="container">

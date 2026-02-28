@@ -4,6 +4,7 @@ namespace App\Twig;
 
 use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
+use App\Entity\WarmCacheType;
 use App\Plugin;
 use App\Service\PluginService;
 use Override;
@@ -38,6 +39,7 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
             new TwigFunction('get_member_page_top', $this->getMemberPageTop(...), ['is_safe' => ['html']]),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
+            new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
             new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),
         ];
     }
@@ -106,6 +108,28 @@ final class PluginExtension extends AbstractExtension
     public function getMemberPageTop(): ?string
     {
         return $this->findFirstFromPlugins(fn(Plugin $p) => $p->getMemberPageTop());
+    }
+
+    /**
+     * Pre-warms per-request caches for all visible event IDs before the list render loop.
+     *
+     * @param array<int> $eventIds
+     */
+    public function warmEventListItemTags(array $eventIds): void
+    {
+        $enabledPlugins = $this->pluginService->getActiveList();
+
+        foreach ($this->plugins as $plugin) {
+            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+
+            try {
+                $plugin->warmCache(WarmCacheType::EventListItemTags, $eventIds);
+            } catch (Throwable) {
+                continue;
+            }
+        }
     }
 
     public function getEventListItemTags(int $eventId): string
