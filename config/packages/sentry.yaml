@@ -1,6 +1,7 @@
 sentry:
     dsn: '%env(SENTRY_DSN)%'
     options:
+        enable_logs: true
         ignore_exceptions:
             - 'Symfony\Component\ErrorHandler\Error\FatalError'
             - 'Symfony\Component\Debug\Exception\FatalErrorException'
@@ -18,8 +19,3 @@ sentry:
         http_client:
             enabled: true
 
-monolog:
-    handlers:
-        sentry_logs:
-            type: service
-            id: Sentry\SentryBundle\Monolog\LogsHandler
