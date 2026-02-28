@@ -6,6 +6,7 @@ use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -18,6 +19,7 @@ readonly class CmsService
         private EventFilterService $eventFilterService,
         private CmsFilterService $cmsFilterService,
         private CmsPageCacheService $cmsPageCacheService,
+        private Security $security,
     ) {}
 
     public function getSites(): array
@@ -47,12 +49,18 @@ readonly class CmsService
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $eventIds = $filterResult->getEventIds();
 
-        $cached = $this->cmsPageCacheService->get($slug, $locale, $eventIds);
-        if ($cached !== null) {
-            $response->setContent($cached);
-            $response->setStatusCode(Response::HTTP_OK);
+        // Only cache for anonymous visitors. Authenticated users get a fresh render
+        // because the full HTML includes user-specific content (navigation, user menu).
+        $anonymous = !$this->security->isGranted('IS_AUTHENTICATED');
 
-            return $response;
+        if ($anonymous) {
+            $cached = $this->cmsPageCacheService->get($slug, $locale, $eventIds);
+            if ($cached !== null) {
+                $response->setContent($cached);
+                $response->setStatusCode(Response::HTTP_OK);
+
+                return $response;
+            }
         }
 
         $content = $this->twig->render('cms/index.html.twig', [
@@ -61,7 +69,9 @@ readonly class CmsService
             'events' => $this->eventRepo->getUpcomingEvents(3, $eventIds),
         ]);
 
-        $this->cmsPageCacheService->store($slug, $locale, $eventIds, $content, $cms->getId());
+        if ($anonymous) {
+            $this->cmsPageCacheService->store($slug, $locale, $eventIds, $content, $cms->getId());
+        }
 
         $response->setContent($content);
         $response->setStatusCode(Response::HTTP_OK);

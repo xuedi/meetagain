@@ -13,6 +13,7 @@ use App\Service\CmsPageCacheService;
 use App\Service\CmsService;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -37,6 +38,7 @@ class CmsServiceTest extends TestCase
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
+            security: $this->createStub(Security::class),
         );
 
         // Act: create not found page
@@ -65,6 +67,7 @@ class CmsServiceTest extends TestCase
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
+            security: $this->createStub(Security::class),
         );
 
         // Act: get all sites
@@ -104,6 +107,7 @@ class CmsServiceTest extends TestCase
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
+            security: $this->createStub(Security::class),
         );
 
         // Act: handle request for non-existent page
@@ -151,6 +155,7 @@ class CmsServiceTest extends TestCase
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
+            security: $this->createStub(Security::class),
         );
 
         // Act: handle request for page without content in requested language
@@ -216,6 +221,7 @@ class CmsServiceTest extends TestCase
             eventFilterService: $eventFilterServiceMock,
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
+            security: $this->createStub(Security::class),
         );
 
         // Act: handle request for page with content
@@ -274,6 +280,7 @@ class CmsServiceTest extends TestCase
             eventFilterService: $eventFilterServiceStub,
             cmsFilterService: $cmsFilterServiceStub,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
+            security: $this->createStub(Security::class),
         );
 
         // Act: handle request for page without title
