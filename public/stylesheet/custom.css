@@ -118,10 +118,11 @@ input[type="color"] {
 }
 
 .flashNotification {
-    position: absolute;
+    position: fixed;
     width: max-content;
     left: 50%;
-    bottom: 0;
+    transform: translateX(-50%);
+    bottom: 1rem;
     z-index: 1000;
 }
 

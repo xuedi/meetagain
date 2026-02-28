@@ -65,7 +65,8 @@
       "Bash(just translationExtract:*)",
       "Bash(just appCron:*)",
       "Bash(bash:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(just do:*)"
     ]
   }
 }
