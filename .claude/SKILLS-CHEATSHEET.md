@@ -45,6 +45,15 @@
 
 ---
 
+## Sentry
+
+```bash
+/sentry-errors                  # List 10 most recent unresolved issues
+/sentry-errors 12345            # Full details + stack trace for issue ID
+```
+
+---
+
 ## Plugin Management
 
 ```bash
