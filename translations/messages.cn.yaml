@@ -146,7 +146,7 @@ email: 电子邮件
 password: 密码
 link_here: 这里
 footer_col1: 帮助
-footer_col2: 动态
+footer_col2: 平台
 footer_col3: 社交
 footer_col4: 法律
 member_pageview_information: '显示第 %pageCurrent% 页，共 %pageTotal% 页（总计 %userTotal% 名成员）'
