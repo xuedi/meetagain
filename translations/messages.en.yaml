@@ -146,7 +146,7 @@ email: Email
 password: Password
 link_here: here
 footer_col1: Help
-footer_col2: Dynamic
+footer_col2: Platform
 footer_col3: Social
 footer_col4: Legal
 member_pageview_information: 'Showing page %pageCurrent% of %pageTotal% (%userTotal% total members)'
