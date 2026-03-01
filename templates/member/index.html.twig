@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ "page_title_member"|trans }}{% endblock %}
+{% block meta_description %}{{ get_meta_description('members') }}{% endblock %}
 
 {% block body %}
     <section class="section">
