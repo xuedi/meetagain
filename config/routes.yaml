@@ -12,6 +12,10 @@ frontpage:
     type: attribute
     resource: ../src/Controller/NonLocale/FrontpageController.php
 
+sitemap:
+    type: attribute
+    resource: ../src/Controller/NonLocale/SitemapController.php
+
 api:
     type: attribute
     resource: ../src/Controller/NonLocale/ApiController.php

@@ -5,7 +5,6 @@ namespace Tests\Unit\EventSubscriber;
 use App\Entity\NotFoundLog;
 use App\EventSubscriber\NotFoundSubscriber;
 use App\Service\CmsService;
-use App\Service\SitemapService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -21,13 +20,11 @@ class NotFoundSubscriberTest extends TestCase
 {
     private function createSubscriber(
         ?CmsService $cms = null,
-        ?SitemapService $sitemap = null,
         ?RouterInterface $router = null,
         ?EntityManagerInterface $em = null,
     ): NotFoundSubscriber {
         return new NotFoundSubscriber(
             $cms ?? $this->createStub(CmsService::class),
-            $sitemap ?? $this->createStub(SitemapService::class),
             $router ?? $this->createStub(RouterInterface::class),
             $em ?? $this->createStub(EntityManagerInterface::class),
         );
@@ -57,37 +54,6 @@ class NotFoundSubscriberTest extends TestCase
         $subscriber->onKernelException($event);
 
         $this->assertNull($event->getResponse());
-    }
-
-    public function testOnKernelExceptionHandlesSitemapXml(): void
-    {
-        $sitemapContent = '<?xml version="1.0"?><urlset></urlset>';
-        $sitemapResponse = new Response($sitemapContent, Response::HTTP_OK);
-
-        $sitemap = $this->createMock(SitemapService::class);
-        $sitemap
-            ->expects($this->once())
-            ->method('getContent')
-            ->with('localhost')
-            ->willReturn($sitemapResponse);
-
-        $cms = $this->createMock(CmsService::class);
-        $cms->expects($this->never())->method('createNotFoundPage');
-
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->never())->method('persist');
-
-        $subscriber = $this->createSubscriber(cms: $cms, sitemap: $sitemap, em: $em);
-
-        $request = Request::create('/sitemap.xml');
-        $kernel = $this->createStub(HttpKernelInterface::class);
-        $exception = new NotFoundHttpException('Not found');
-
-        $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $exception);
-
-        $subscriber->onKernelException($event);
-
-        $this->assertSame($sitemapResponse, $event->getResponse());
     }
 
     public function testOnKernelExceptionCreatesNotFoundPageAndLogsTo404Log(): void
