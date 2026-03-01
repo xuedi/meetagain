@@ -2,10 +2,12 @@
 
 namespace App\Twig;
 
+use App\Service\ConfigService;
 use App\Service\LanguageService;
 use Exception;
 use Override;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -20,6 +22,9 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly LanguageService $languageService,
         private readonly RequestStack $requestStack,
         private readonly RouterInterface $router,
+        private readonly ConfigService $configService,
+        #[AutowireIterator(MetaDescriptionProviderInterface::class)]
+        private readonly iterable $metaDescriptionProviders = [],
     ) {}
 
     #[Override]
@@ -41,6 +46,8 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('get_language_codes', $this->languageService->getFilteredEnabledCodes(...)),
             new TwigFunction('get_admin_language_codes', $this->languageService->getAdminFilteredEnabledCodes(...)),
             new TwigFunction('route_exists', $this->routeExists(...)),
+            new TwigFunction('get_canonical_url', $this->getCanonicalUrl(...)),
+            new TwigFunction('get_meta_description', $this->getMetaDescription(...)),
         ];
     }
 
@@ -65,6 +72,38 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         }
 
         return [];
+    }
+
+    public function getMetaDescription(string $context = 'default'): string
+    {
+        // 1. Plugin-provided value (e.g. per-group override from multisite)
+        foreach ($this->metaDescriptionProviders as $provider) {
+            $value = $provider->getMetaDescription($context);
+            if ($value !== null && $value !== '') {
+                return $value;
+            }
+        }
+
+        // 2. System-wide admin config
+        $systemValue = $this->configService->getSeoDescription($context);
+        if ($systemValue !== '') {
+            return $systemValue;
+        }
+
+        // 3. Hardcoded fallback
+        return match ($context) {
+            'events'  => 'Browse upcoming events and meetups.',
+            'members' => 'Meet the members of this community.',
+            default   => 'A community platform for local events and meetups.',
+        };
+    }
+
+    public function getCanonicalUrl(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $path = $request instanceof Request ? $request->getRequestUri() : '/';
+
+        return rtrim($this->configService->getHost(), '/') . $path;
     }
 
     public function routeExists(string $name): bool

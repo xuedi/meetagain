@@ -29,13 +29,12 @@ readonly class ConfigService
         return match ($type) {
             ImageType::ProfilePicture => [[400, 400], [80, 80], [50, 50]],
             ImageType::EventTeaser => [[1024, 768], [600, 400], [210, 140]], // included EventUpload
-            ImageType::EventUpload => [[1024, 768], [210, 140]],
+            ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [210, 140]],
             ImageType::CmsBlock => [[432, 432], [80, 80]],
             ImageType::PluginDishPreview => [[1024, 768], [400, 400], [100, 100], [50, 50]], // is also part of gallery
             ImageType::PluginDishGallery => [[1024, 768], [400, 400]],
             ImageType::LanguageTile => [[600, 400], [300, 200]],
             ImageType::PluginBookclubCover => [[400, 500], [200, 250]],
-            ImageType::CmsGallery => [[1024, 768], [210, 140]],
         };
     }
 
@@ -71,6 +70,15 @@ readonly class ConfigService
     public function getUrl(): string
     {
         return $this->getString('website_url', 'localhost');
+    }
+
+    public function getSeoDescription(string $context): string
+    {
+        return match ($context) {
+            'events'  => $this->getString('seo_description_events', ''),
+            'members' => $this->getString('seo_description_members', ''),
+            default   => $this->getString('seo_description_default', ''),
+        };
     }
 
     public function getSystemUserId(): int
@@ -142,6 +150,13 @@ readonly class ConfigService
         $this->setString('email_sender_mail', $formData['senderEmail']);
         $this->setInt('system_user_id', $formData['systemUser']);
         $this->setString('date_format', $formData['dateFormat']);
+    }
+
+    public function saveSeoForm(array $formData): void
+    {
+        $this->setString('seo_description_default', $formData['seoDescriptionDefault'] ?? '');
+        $this->setString('seo_description_events', $formData['seoDescriptionEvents'] ?? '');
+        $this->setString('seo_description_members', $formData['seoDescriptionMembers'] ?? '');
     }
 
     public function getThemeColorDefaults(): array

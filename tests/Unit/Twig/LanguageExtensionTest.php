@@ -2,8 +2,10 @@
 
 namespace Tests\Unit\Twig;
 
+use App\Service\ConfigService;
 use App\Service\LanguageService;
 use App\Twig\LanguageExtension;
+use App\Twig\MetaDescriptionProviderInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -18,6 +20,7 @@ class LanguageExtensionTest extends TestCase
     private Stub&LanguageService $languageServiceStub;
     private Stub&RequestStack $requestStackStub;
     private Stub&RouterInterface $routerStub;
+    private Stub&ConfigService $configServiceStub;
     private LanguageExtension $subject;
 
     protected function setUp(): void
@@ -25,7 +28,13 @@ class LanguageExtensionTest extends TestCase
         $this->languageServiceStub = $this->createStub(LanguageService::class);
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->routerStub = $this->createStub(RouterInterface::class);
-        $this->subject = new LanguageExtension($this->languageServiceStub, $this->requestStackStub, $this->routerStub);
+        $this->configServiceStub = $this->createStub(ConfigService::class);
+        $this->subject = new LanguageExtension(
+            $this->languageServiceStub,
+            $this->requestStackStub,
+            $this->routerStub,
+            $this->configServiceStub,
+        );
     }
 
     public function testGetGlobalsReturnsEnabledLocales(): void
@@ -42,7 +51,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        $this->assertCount(7, $functions);
+        $this->assertCount(9, $functions);
 
         $functionNames = array_map(fn($f) => $f->getName(), $functions);
         $this->assertContains('get_enabled_locales', $functionNames);
@@ -52,6 +61,8 @@ class LanguageExtensionTest extends TestCase
         $this->assertContains('get_language_codes', $functionNames);
         $this->assertContains('get_admin_language_codes', $functionNames);
         $this->assertContains('route_exists', $functionNames);
+        $this->assertContains('get_canonical_url', $functionNames);
+        $this->assertContains('get_meta_description', $functionNames);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
@@ -148,5 +159,80 @@ class LanguageExtensionTest extends TestCase
 
         // Assert
         $this->assertTrue($result);
+    }
+
+    public function testGetCanonicalUrlCombinesConfigHostWithRequestUri(): void
+    {
+        // Arrange
+        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local');
+        $request = $this->createStub(Request::class);
+        $request->method('getRequestUri')->willReturn('/en/events');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        // Act
+        $result = $this->subject->getCanonicalUrl();
+
+        // Assert
+        $this->assertSame('https://meetagain.local/en/events', $result);
+    }
+
+    public function testGetMetaDescriptionReturnsProviderValueWhenAvailable(): void
+    {
+        // Arrange
+        $provider = $this->createStub(MetaDescriptionProviderInterface::class);
+        $provider->method('getMetaDescription')->with('events')->willReturn('Weiqi club upcoming events');
+
+        $subject = new LanguageExtension(
+            $this->languageServiceStub,
+            $this->requestStackStub,
+            $this->routerStub,
+            $this->configServiceStub,
+            [$provider],
+        );
+
+        // Act
+        $result = $subject->getMetaDescription('events');
+
+        // Assert
+        $this->assertSame('Weiqi club upcoming events', $result);
+    }
+
+    public function testGetMetaDescriptionFallsBackToSystemConfigWhenNoProviderValue(): void
+    {
+        // Arrange
+        $this->configServiceStub->method('getSeoDescription')->with('events')->willReturn('System events description');
+
+        // Act
+        $result = $this->subject->getMetaDescription('events');
+
+        // Assert
+        $this->assertSame('System events description', $result);
+    }
+
+    public function testGetMetaDescriptionFallsBackToHardcodedWhenNothingConfigured(): void
+    {
+        // Arrange
+        $this->configServiceStub->method('getSeoDescription')->willReturn('');
+
+        // Act
+        $result = $this->subject->getMetaDescription('members');
+
+        // Assert
+        $this->assertSame('Meet the members of this community.', $result);
+    }
+
+    public function testGetCanonicalUrlStripsTrailingSlashFromHost(): void
+    {
+        // Arrange
+        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local/');
+        $request = $this->createStub(Request::class);
+        $request->method('getRequestUri')->willReturn('/en/members');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        // Act
+        $result = $this->subject->getCanonicalUrl();
+
+        // Assert
+        $this->assertSame('https://meetagain.local/en/members', $result);
     }
 }

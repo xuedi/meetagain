@@ -210,6 +210,7 @@ menu_cookie_consent_button_status: Status
 event_filter_group_all: 'Alle Gruppen'
 group_tab_profile: Profil
 group_tab_languages: Sprachen
+group_tab_seo: SEO
 group_languages_current_settings: 'Aktuelle Einstellungen'
 group_languages_enabled_count: 'Aktivierte Sprachen'
 group_languages_all: Alle
@@ -263,6 +264,7 @@ system_tab_config: Konfiguration
 system_tab_theme: Design
 system_tab_images: Bilder
 system_tab_language: Sprache
+system_tab_seo: SEO
 Code: Code
 Name: Name
 'Has Tile': 'Hat Kachel'

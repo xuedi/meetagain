@@ -210,6 +210,7 @@ menu_cookie_consent_button_status: Status
 event_filter_group_all: 'All groups'
 group_tab_profile: Profile
 group_tab_languages: Languages
+group_tab_seo: SEO
 group_languages_current_settings: 'Current settings'
 group_languages_enabled_count: 'Enabled languages'
 group_languages_all: All
@@ -263,6 +264,7 @@ system_tab_config: Config
 system_tab_theme: Theme
 system_tab_images: Images
 system_tab_language: Language
+system_tab_seo: SEO
 Code: Code
 Name: Name
 'Has Tile': 'Has tile'

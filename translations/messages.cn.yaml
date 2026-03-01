@@ -210,6 +210,7 @@ menu_cookie_consent_button_status: 状态
 event_filter_group_all: 所有组
 group_tab_profile: 个人资料
 group_tab_languages: 语言
+group_tab_seo: SEO
 group_languages_current_settings: 当前设置
 group_languages_enabled_count: 已启用语言
 group_languages_all: 全部
@@ -263,6 +264,7 @@ system_tab_config: 配置
 system_tab_theme: 主题
 system_tab_images: 图片
 system_tab_language: 语言
+system_tab_seo: SEO
 Code: 代码
 Name: 名称
 'Has Tile': 有图块

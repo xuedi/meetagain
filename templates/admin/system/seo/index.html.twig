@@ -1,0 +1,30 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'seo'} %}
+
+        <div class="columns">
+            <div class="column is-6">
+
+                <h1 class="title is-5">SEO Meta Descriptions</h1>
+                <p class="content">
+                    These descriptions appear in search engine results. Leave a field empty to use the built-in fallback text.
+                    Maximum 160 characters each.
+                </p>
+
+                {{ form_start(form) }}
+                {{ form_row(form.seoDescriptionDefault) }}
+                {{ form_row(form.seoDescriptionEvents) }}
+                {{ form_row(form.seoDescriptionMembers) }}
+                <button class="button is-link">{{ "button_save" | trans }}</button>
+                {{ form_end(form) }}
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
