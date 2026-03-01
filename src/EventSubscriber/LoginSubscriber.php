@@ -34,6 +34,10 @@ class LoginSubscriber implements EventSubscriberInterface
         $consent->save($request->getSession());
 
         $response = $event->getResponse();
+        if ($response === null) {
+            return;
+        }
+
         foreach ($consent->getHtmlCookies() as $cookie) {
             $response->headers->setCookie($cookie);
         }
