@@ -54,6 +54,20 @@
 
 ---
 
+## Production API
+
+```bash
+/api-query                                      # Health check (GET /api/status)
+/api-query GET /api/cms/                        # List all CMS pages
+/api-query GET /api/cms/1                       # Get CMS page ID 1 with blocks
+/api-query POST /api/cms/ '{"slug":"x",...}'    # Create a CMS page
+/api-query DELETE /api/cms/1                    # Delete CMS page
+```
+
+**Note:** Credentials live in `.claude/api.local` (not committed). Fill in the production URL, admin email, and password before use. For local dev data, use `/db-query` instead.
+
+---
+
 ## Plugin Management
 
 ```bash
@@ -89,7 +103,9 @@ Skills are defined in SKILL.md files:
 ├── cache-clear/SKILL.md
 ├── db-query/SKILL.md
 ├── plugin-enable/SKILL.md
-└── plugin-disable/SKILL.md
+├── plugin-disable/SKILL.md
+├── sentry-errors/SKILL.md
+└── api-query/SKILL.md
 ```
 
 ---
