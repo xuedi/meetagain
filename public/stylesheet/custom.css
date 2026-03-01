@@ -50,6 +50,7 @@ a:hover { color: color-mix(in srgb, var(--theme-link) 80%, black); }
 .has-text-danger { color: var(--theme-danger) !important; }
 .has-background-danger { background-color: var(--theme-danger) !important; }
 .notification.is-danger { background-color: var(--theme-danger) !important; }
+.help.is-danger { background-color: transparent !important; color: var(--theme-danger) !important; }
 
 /* Text Grey (accessibility - contrast fix) */
 .has-text-grey { color: var(--theme-text-grey) !important; }
