@@ -71,6 +71,15 @@ readonly class CmsPageCacheService
     }
 
     /**
+     * Invalidates all menu location caches (CmsRepository + MenuService).
+     * Must be called whenever menu location assignments change.
+     */
+    public function invalidateMenuCaches(): void
+    {
+        $this->cache->invalidateTags(['cms_menu']);
+    }
+
+    /**
      * Returns the IDs of all CMS pages that contain at least one EventTeaser block.
      *
      * @return array<int>

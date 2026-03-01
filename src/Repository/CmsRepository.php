@@ -6,8 +6,9 @@ use App\Entity\Cms;
 use App\Entity\MenuLocation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * @extends ServiceEntityRepository<Cms>
@@ -18,7 +19,8 @@ class CmsRepository extends ServiceEntityRepository
 
     public function __construct(
         ManagerRegistry $registry,
-        private readonly CacheInterface $cache,
+        #[Autowire(service: 'cache.cms_page_cache')]
+        private readonly TagAwareCacheInterface $cache,
     ) {
         parent::__construct($registry, Cms::class);
     }
@@ -105,6 +107,7 @@ class CmsRepository extends ServiceEntityRepository
             $location,
         ): array {
             $item->expiresAfter(self::CACHE_TTL);
+            $item->tag(['cms_menu']);
 
             return $this
                 ->createQueryBuilder('c')
