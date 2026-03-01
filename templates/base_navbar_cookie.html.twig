@@ -1,13 +1,11 @@
-<div class="navbar-item dropdown is-hoverable {% if show_cookie_consent() %}is-active{% endif %}" role="region" aria-label="{{ "menu_cookie_consent_headline" | trans }}">
+<div class="navbar-item dropdown is-hoverable" id="cookie-consent-dropdown" role="region" aria-label="{{ "menu_cookie_consent_headline" | trans }}">
     <div class="dropdown-trigger">
         <button
             class="button cookie-button"
             aria-haspopup="dialog"
-            aria-expanded="{% if show_cookie_consent() %}true{% else %}false{% endif %}"
+            aria-expanded="false"
         >
-            {% if show_cookie_consent() %}
-            <span>{{ "menu_cookie_consent_button" | trans }}</span>
-            {% endif %}
+            <span class="cookie-consent-label" style="display:none">{{ "menu_cookie_consent_button" | trans }}</span>
             <span class="icon is-small">
                 <i class="fas fa-angle-down" aria-hidden="true"></i>
             </span>
@@ -45,22 +43,18 @@
                     </div>
                 </div>
                 <div class="navbar-item">
-                    <input
-                        type="submit"
+                    <button
+                        type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_accept') }}"
-                        value="{{ "menu_cookie_consent_button_accept" | trans }}"
                         aria-label="{{ "menu_cookie_consent_button_accept" | trans }}"
-                        role="button"
-                    >
-                    <input
-                        type="submit"
+                    >{{ "menu_cookie_consent_button_accept" | trans }}</button>
+                    <button
+                        type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_deny') }}"
-                        value="{{ "menu_cookie_consent_button_deny" | trans }}"
                         aria-label="{{ "menu_cookie_consent_button_deny" | trans }}"
-                        role="button"
-                    >
+                    >{{ "menu_cookie_consent_button_deny" | trans }}</button>
                     <a
                         href="{{ path('app_cookie') }}"
                         class="button"

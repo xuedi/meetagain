@@ -76,6 +76,7 @@ appCron:
 [group('app')]
 appClearCache:
     {{PHP}} composer dump-autoload
+    {{JUST}} app cache:pool:clear --all
     {{PHP}} php bin/console cache:clear -q
 
 # Run migrations
