@@ -15,8 +15,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/api/auth')]
 class AuthApiController extends AbstractController
 {
     public function __construct(
@@ -27,7 +29,7 @@ class AuthApiController extends AbstractController
         private readonly RateLimiterFactory $apiTokenLimiter,
     ) {}
 
-    #[Route('/api/auth/token', name: 'app_api_auth_token', methods: ['POST'])]
+    #[Route('/token', name: 'app_api_auth_token', methods: ['POST'])]
     public function generateToken(Request $request): JsonResponse
     {
         $limiter = $this->apiTokenLimiter->create($request->getClientIp());
@@ -41,25 +43,14 @@ class AuthApiController extends AbstractController
         $email = (string) ($data['email'] ?? '');
         $password = (string) ($data['password'] ?? '');
 
-        $user = $this->userRepository->findOneBy(['email' => $email]);
-
-        if (
-            !$user instanceof User
-            || $user->getStatus() !== UserStatus::Active
-            || !$this->passwordHasher->isPasswordValid($user, $password)
-        ) {
-            return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
+        try {
+            return new JsonResponse(['token' => $this->authenticateWithToken($email, $password)]);
+        } catch (AuthenticationException $error) {
+            return new JsonResponse(['error' => $error->getMessage()], Response::HTTP_UNAUTHORIZED);
         }
-
-        $plainToken = bin2hex(random_bytes(32));
-        $user->setApiTokenHash(hash('sha256', $plainToken));
-        $user->setApiTokenCreatedAt(new DateTimeImmutable());
-        $this->em->flush();
-
-        return new JsonResponse(['token' => $plainToken]);
     }
 
-    #[Route('/api/auth/token', name: 'app_api_auth_token_delete', methods: ['DELETE'])]
+    #[Route('/token', name: 'app_api_auth_token_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN')]
     public function revokeToken(): JsonResponse
     {
@@ -69,5 +60,25 @@ class AuthApiController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    private function authenticateWithToken(string $email, string $password): string
+    {
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+
+        if (
+            !$user instanceof User
+            || $user->getStatus() !== UserStatus::Active
+            || !$this->passwordHasher->isPasswordValid($user, $password)
+        ) {
+            throw new AuthenticationException('Invalid credentials');
+        }
+
+        $plainToken = bin2hex(random_bytes(32));
+        $user->setApiTokenHash(hash('sha256', $plainToken));
+        $user->setApiTokenCreatedAt(new DateTimeImmutable());
+        $this->em->flush();
+
+        return $plainToken;
     }
 }

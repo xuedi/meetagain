@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+#[Route('/api/cms'), IsGranted('ROLE_ADMIN')]
 class CmsCrudApiController extends AbstractController
 {
     public function __construct(
@@ -29,7 +29,7 @@ class CmsCrudApiController extends AbstractController
         private readonly CmsPageCacheService $cmsPageCacheService,
     ) {}
 
-    #[Route('/api/cms/', name: 'app_api_cms_list', methods: ['GET'])]
+    #[Route('/', name: 'app_api_cms_list', methods: ['GET'])]
     public function list(): JsonResponse
     {
         $pages = $this->cmsRepository->findAll();
@@ -52,7 +52,7 @@ class CmsCrudApiController extends AbstractController
         return new JsonResponse($result);
     }
 
-    #[Route('/api/cms/{id}', name: 'app_api_cms_get', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_api_cms_get', methods: ['GET'])]
     public function get(int $id): JsonResponse
     {
         $cms = $this->cmsRepository->find($id);
@@ -63,7 +63,7 @@ class CmsCrudApiController extends AbstractController
         return new JsonResponse($this->serializePage($cms));
     }
 
-    #[Route('/api/cms/', name: 'app_api_cms_create', methods: ['POST'])]
+    #[Route('/', name: 'app_api_cms_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
         $data = json_decode((string) $request->getContent(), true);
@@ -102,7 +102,7 @@ class CmsCrudApiController extends AbstractController
         return new JsonResponse($this->serializePage($cms), Response::HTTP_CREATED);
     }
 
-    #[Route('/api/cms/{id}', name: 'app_api_cms_update', methods: ['PUT'])]
+    #[Route('/{id}', name: 'app_api_cms_update', methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
     {
         $cms = $this->cmsRepository->find($id);
@@ -137,7 +137,7 @@ class CmsCrudApiController extends AbstractController
         return new JsonResponse($this->serializePage($cms));
     }
 
-    #[Route('/api/cms/{id}', name: 'app_api_cms_delete', methods: ['DELETE'])]
+    #[Route('/{id}', name: 'app_api_cms_delete', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
         $cms = $this->cmsRepository->find($id);
@@ -160,7 +160,7 @@ class CmsCrudApiController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/cms/{id}/blocks', name: 'app_api_cms_block_add', methods: ['POST'])]
+    #[Route('/{id}/blocks', name: 'app_api_cms_block_add', methods: ['POST'])]
     public function addBlock(int $id, Request $request): JsonResponse
     {
         $cms = $this->cmsRepository->find($id);
@@ -200,7 +200,7 @@ class CmsCrudApiController extends AbstractController
         return new JsonResponse($this->serializeBlock($block), Response::HTTP_CREATED);
     }
 
-    #[Route('/api/cms/{id}/blocks/{blockId}', name: 'app_api_cms_block_update', methods: ['PUT'])]
+    #[Route('/{id}/blocks/{blockId}', name: 'app_api_cms_block_update', methods: ['PUT'])]
     public function updateBlock(int $id, int $blockId, Request $request): JsonResponse
     {
         $cms = $this->cmsRepository->find($id);
@@ -232,7 +232,7 @@ class CmsCrudApiController extends AbstractController
         return new JsonResponse($this->serializeBlock($block));
     }
 
-    #[Route('/api/cms/{id}/blocks/{blockId}', name: 'app_api_cms_block_delete', methods: ['DELETE'])]
+    #[Route('/{id}/blocks/{blockId}', name: 'app_api_cms_block_delete', methods: ['DELETE'])]
     public function deleteBlock(int $id, int $blockId): JsonResponse
     {
         $cms = $this->cmsRepository->find($id);
