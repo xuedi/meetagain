@@ -127,13 +127,13 @@ class CmsBlockServiceTest extends TestCase
             'buttonLink' => 'old',
             'buttonText' => 'old',
             'color' => 'old',
-            'imageRight' => true
+            'imageRight' => true,
         ]);
 
         $blockRepoStub->method('find')->with(42)->willReturn($block);
 
         $subject = new CmsBlockService($emMock, $blockRepoStub);
-        
+
         // Test when imageRight is missing from payload (unchecked)
         $payload = [
             'headline' => 'new',
@@ -141,7 +141,7 @@ class CmsBlockServiceTest extends TestCase
             'text' => 'new',
             'buttonLink' => 'new',
             'buttonText' => 'new',
-            'color' => 'new'
+            'color' => 'new',
         ];
         $subject->updateBlock(42, CmsBlockTypes::Hero, $payload);
         $this->assertFalse($block->getJson()['imageRight']);

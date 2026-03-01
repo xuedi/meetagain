@@ -47,24 +47,25 @@ readonly class MenuService
         $idHash = $allowedCmsIds !== null ? md5(implode(',', $allowedCmsIds)) : 'all';
         $cacheKey = sprintf('menu_%s_%s_%s', $type, $locale, $idHash);
 
-        return $this->cache->get(
-            $cacheKey,
-            function (ItemInterface $item) use ($menuLocation, $allowedCmsIds, $locale): array {
-                $item->expiresAfter(self::CACHE_TTL);
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use (
+            $menuLocation,
+            $allowedCmsIds,
+            $locale,
+        ): array {
+            $item->expiresAfter(self::CACHE_TTL);
 
-                $cmsPages = $this->cmsRepo->findByMenuLocation($menuLocation);
+            $cmsPages = $this->cmsRepo->findByMenuLocation($menuLocation);
 
-                $items = [];
-                foreach ($cmsPages as $cms) {
-                    if ($allowedCmsIds !== null && !in_array($cms->getId(), $allowedCmsIds, true)) {
-                        continue;
-                    }
-
-                    $items[] = MenuItem::fromCms($cms, $locale);
+            $items = [];
+            foreach ($cmsPages as $cms) {
+                if ($allowedCmsIds !== null && !in_array($cms->getId(), $allowedCmsIds, true)) {
+                    continue;
                 }
 
-                return $items;
-            },
-        );
+                $items[] = MenuItem::fromCms($cms, $locale);
+            }
+
+            return $items;
+        });
     }
 }

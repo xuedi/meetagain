@@ -17,11 +17,7 @@ class SitemapControllerTest extends TestCase
         $expectedResponse = new Response($sitemapXml, Response::HTTP_OK, ['Content-Type' => 'text/xml']);
 
         $service = $this->createMock(SitemapService::class);
-        $service
-            ->expects($this->once())
-            ->method('getContent')
-            ->with('meetagain.local')
-            ->willReturn($expectedResponse);
+        $service->expects($this->once())->method('getContent')->with('meetagain.local')->willReturn($expectedResponse);
 
         $controller = new SitemapController($service);
         $request = Request::create('https://meetagain.local/sitemap.xml');

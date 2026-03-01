@@ -75,9 +75,9 @@ readonly class ConfigService
     public function getSeoDescription(string $context): string
     {
         return match ($context) {
-            'events'  => $this->getString('seo_description_events', ''),
+            'events' => $this->getString('seo_description_events', ''),
             'members' => $this->getString('seo_description_members', ''),
-            default   => $this->getString('seo_description_default', ''),
+            default => $this->getString('seo_description_default', ''),
         };
     }
 
@@ -208,14 +208,11 @@ readonly class ConfigService
 
     private function getCachedValue(string $name): ?string
     {
-        return $this->cache->get(
-            self::CACHE_KEY_PREFIX . $name,
-            function (ItemInterface $item) use ($name): ?string {
-                $item->expiresAfter(self::CACHE_TTL);
+        return $this->cache->get(self::CACHE_KEY_PREFIX . $name, function (ItemInterface $item) use ($name): ?string {
+            $item->expiresAfter(self::CACHE_TTL);
 
-                return $this->repo->findOneBy(['name' => $name])?->getValue();
-            },
-        );
+            return $this->repo->findOneBy(['name' => $name])?->getValue();
+        });
     }
 
     private function getBoolean(string $name, bool $default = false): bool
