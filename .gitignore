@@ -16,6 +16,3 @@ installed.lock
 /.idea/
 /.deptrac.cache
 /plugins/multisite/
-/.claude/plans/*.md
-/.claude/*.local
-/.claude/*.prod

@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'app:test:coverage-report',
-    description: 'Parse coverage report and display statistics in AI-friendly format',
+    description: 'Parse coverage report and display statistics in machine-readable format',
 )]
 class TestCoverageReportCommand extends Command
 {

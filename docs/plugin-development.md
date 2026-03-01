@@ -1101,9 +1101,6 @@ Create `CLAUDE.md` in plugin root with:
 
 ## Additional Resources
 
-- **Core Architecture:** See `/.claude/architecture.md`
-- **Core Conventions:** See `/.claude/conventions.md`
-- **Testing Guide:** See `/.claude/testing.md`
 - **Example Plugins:** See `plugins/dishes/`, `plugins/filmclub/`
 
 ---
