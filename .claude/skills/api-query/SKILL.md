@@ -12,24 +12,29 @@ Use this when you need to inspect or manage data on the live site. For local dev
 
 ## Arguments
 
+- **ENV** (optional): `local` to target local dev (`api.local`). Omit for production (`api.prod`).
 - **METHOD** (optional): HTTP method — `GET`, `POST`, `PUT`, `DELETE`. Defaults to `GET`.
 - **PATH** (optional): API path, e.g. `/api/cms/`. Defaults to `/api/status`.
 - **BODY** (optional): JSON body string for POST/PUT requests.
 
-Credentials are read from `.claude/api.local` (not committed — fill in the production URL, email, and password).
+Credentials:
+- **Production:** `.claude/api.prod` — production URL, email, password (not committed)
+- **Local dev:** `.claude/api.local` — `http://meetagain.local`, `admin@example.org`, `1234`
 
 ## Workflow
 
 Use the Bash tool to run the script directly. Do NOT use an agent.
 
 ```
-bash .claude/skills/api-query/run.sh $ARGUMENTS
+bash .claude/skills/api-query/run.sh [$ENV] $ARGUMENTS
 ```
 
 ## Examples
 
-- `/api-query` — Health check (`GET /api/status`)
-- `/api-query GET /api/cms/` — List all CMS pages
+- `/api-query` — Production health check (`GET /api/status`)
+- `/api-query local` — Local dev health check
+- `/api-query GET /api/cms/` — List all CMS pages (production)
+- `/api-query local GET /api/cms/` — List all CMS pages (local dev)
 - `/api-query GET /api/cms/1` — Get CMS page with ID 1
 - `/api-query POST /api/cms/ '{"slug":"test","titles":{"en":"Test"},"linkNames":{"en":"Test"}}'` — Create page
 - `/api-query DELETE /api/cms/1` — Delete CMS page 1
