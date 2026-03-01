@@ -7,10 +7,11 @@ METHOD="${1:-GET}"
 API_PATH="${2:-/api/status}"
 BODY="${3:-}"
 
-# Obtain a fresh Bearer token
+# Obtain a fresh Bearer token (use python to build JSON safely — password may contain shell-special chars)
+AUTH_JSON=$(python3 -c "import json,sys; print(json.dumps({'email':sys.argv[1],'password':sys.argv[2]}))" "$API_EMAIL" "$API_PASSWORD")
 TOKEN=$(curl -s -X POST "$API_URL/api/auth/token" \
   -H 'Content-Type: application/json' \
-  -d "{\"email\":\"$API_EMAIL\",\"password\":\"$API_PASSWORD\"}" \
+  -d "$AUTH_JSON" \
   | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('token','') if 'token' in d else d.get('error','auth failed'))")
 
 if [ -z "$TOKEN" ] || [[ "$TOKEN" == *"error"* ]] || [[ "$TOKEN" == "auth failed" ]]; then

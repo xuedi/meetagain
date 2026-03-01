@@ -67,7 +67,8 @@
       "Bash(bash:*)",
       "Bash(source:*)",
       "Bash(just do:*)",
-      "Bash(just testSetup:*)"
+      "Bash(just testSetup:*)",
+      "WebFetch(domain:meetagain.org)"
     ]
   }
 }
