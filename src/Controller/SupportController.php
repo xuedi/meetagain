@@ -31,7 +31,9 @@ class SupportController extends AbstractController
     {
         $limiter = $this->supportLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
-            return new Response('Too many requests. Please try again later.', 429);
+            return $this->render('rate_limited.html.twig', [
+                'message' => 'Too many support requests. Please try again later.',
+            ], new Response('', 429));
         }
 
         $user = $this->getUser();
