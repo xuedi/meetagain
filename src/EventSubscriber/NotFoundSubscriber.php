@@ -4,7 +4,6 @@ namespace App\EventSubscriber;
 
 use App\Entity\NotFoundLog;
 use App\Service\CmsService;
-use App\Service\SitemapService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -20,7 +19,6 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CmsService $cms,
-        private SitemapService $sitemapService,
         private RouterInterface $router,
         private EntityManagerInterface $em,
     ) {}
@@ -46,11 +44,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             $context->setParameter('_locale', 'en');
             $this->router->setContext($context); // language isn't set on event subscriber yet
 
-            // try stuff and special cases before actual 404
-            $content = match (trim($path, '/')) {
-                'sitemap.xml' => $this->sitemapService->getContent($event->getRequest()->getHost()),
-                default => $this->cms->createNotFoundPage(),
-            };
+            $content = $this->cms->createNotFoundPage();
 
             if ($content->getStatusCode() !== Response::HTTP_OK) {
                 $notFoundLog = new NotFoundLog();
