@@ -6,6 +6,7 @@ use App\CronTaskInterface;
 use App\Entity\EmailQueue;
 use App\Entity\EmailQueueStatus;
 use App\Entity\Event;
+use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
@@ -168,6 +169,22 @@ readonly class EmailService implements CronTaskInterface
         ]);
 
         return $this->addToEmailQueue($email, EmailType::Announcement, $flush);
+    }
+
+    public function prepareSupportNotification(SupportRequest $request): bool
+    {
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to($this->config->getMailerAddress());
+        $email->locale('en');
+        $email->context([
+            'name' => $request->getName(),
+            'email' => $request->getEmail(),
+            'message' => $request->getMessage(),
+            'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
+        ]);
+
+        return $this->addToEmailQueue($email, EmailType::SupportNotification);
     }
 
     public function getMockEmailList(): array

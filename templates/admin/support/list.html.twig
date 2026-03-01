@@ -1,0 +1,60 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for request in requests %}
+                <tr{% if request.isNew() %} class="has-background-warning-light"{% endif %}>
+                    <td>
+                        {{ request.createdAt|date('Y-m-d') }}<br>
+                        <small class="has-text-grey">{{ request.createdAt|date('H:i:s') }}</small>
+                    </td>
+                    <td>
+                        {% if request.isNew() %}<strong>{% endif %}
+                        {{ request.name }}
+                        {% if request.isNew() %}</strong>{% endif %}
+                    </td>
+                    <td>{{ request.email }}</td>
+                    <td>{{ request.message|u.truncate(100) }}</td>
+                    <td>
+                        {% if request.isNew() %}
+                            <span class="tag is-warning">New</span>
+                        {% else %}
+                            <span class="tag is-light">Read</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if request.isNew() %}
+                            <form method="post" action="{{ path('app_admin_support_mark_read', {id: request.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('mark_read_' ~ request.id) }}">
+                                <button type="submit" class="button is-small is-light">Mark as read</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="has-text-centered has-text-grey">
+                        No support requests found.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

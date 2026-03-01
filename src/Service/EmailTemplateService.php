@@ -23,6 +23,7 @@ readonly class EmailTemplateService
             EmailType::NotificationRsvpAggregated->value => 'People you follow plan to attend an event',
             EmailType::NotificationEventCanceled->value => 'Event canceled: {{eventTitle}}',
             EmailType::Announcement->value => '{{title}}',
+            EmailType::SupportNotification->value => 'New Support Request from {{name}}',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -32,6 +33,7 @@ readonly class EmailTemplateService
             EmailType::NotificationRsvpAggregated->value => 'Personen, denen du folgst, planen eine Veranstaltung zu besuchen',
             EmailType::NotificationEventCanceled->value => 'Veranstaltung abgesagt: {{eventTitle}}',
             EmailType::Announcement->value => '{{title}}',
+            EmailType::SupportNotification->value => 'Neue Supportanfrage von {{name}}',
         ],
         'cn' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -41,6 +43,7 @@ readonly class EmailTemplateService
             EmailType::NotificationRsvpAggregated->value => '您关注的人计划参加一个活动',
             EmailType::NotificationEventCanceled->value => '活动已取消：{{eventTitle}}',
             EmailType::Announcement->value => '{{title}}',
+            EmailType::SupportNotification->value => '{{name}} 的新支持请求',
         ],
     ];
 
@@ -77,6 +80,13 @@ readonly class EmailTemplateService
             'username',
             'host',
             'lang',
+            'greeting',
+        ],
+        EmailType::SupportNotification->value => [
+            'name',
+            'email',
+            'message',
+            'createdAt',
             'greeting',
         ],
     ];
@@ -168,6 +178,11 @@ readonly class EmailTemplateService
                 'subject' => $subjects[EmailType::Announcement->value],
                 'body' => $this->loadTemplateBody(EmailType::Announcement, $language),
                 'variables' => self::VARIABLES[EmailType::Announcement->value],
+            ],
+            EmailType::SupportNotification->value => [
+                'subject' => $subjects[EmailType::SupportNotification->value],
+                'body' => $this->loadTemplateBody(EmailType::SupportNotification, $language),
+                'variables' => self::VARIABLES[EmailType::SupportNotification->value],
             ],
         ];
     }

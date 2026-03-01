@@ -145,7 +145,7 @@ page_plugin_dishes_title_index: Dishes
 email: Email
 password: Password
 link_here: here
-footer_col1: Static
+footer_col1: Help
 footer_col2: Dynamic
 footer_col3: Social
 footer_col4: Legal
@@ -287,3 +287,5 @@ menu_admin_translation_extract: Search
 menu_admin_translation_publish: Publish
 page_title_translation_edit: 'Edit translation'
 page_title_translation: Translation
+nav_support: Support
+nav_api: API

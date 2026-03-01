@@ -145,7 +145,7 @@ page_plugin_dishes_title_index: 菜肴
 email: 电子邮件
 password: 密码
 link_here: 这里
-footer_col1: 静态
+footer_col1: 帮助
 footer_col2: 动态
 footer_col3: 社交
 footer_col4: 法律
@@ -287,3 +287,5 @@ menu_admin_translation_extract: 搜索
 menu_admin_translation_publish: 发布
 page_title_translation_edit: 编辑翻译
 page_title_translation: 翻译
+nav_support: 支持
+nav_api: API
