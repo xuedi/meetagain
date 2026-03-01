@@ -26,4 +26,10 @@ class ApiController extends AbstractController
     {
         return new JsonResponse('OK');
     }
+
+    #[Route('/api/translations', name: 'app_api_translations', methods: ['GET'])]
+    public function translationsIndex(): Response
+    {
+        return new JsonResponse('translations');
+    }
 }
