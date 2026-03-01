@@ -12,6 +12,10 @@ framework:
             policy: 'fixed_window'
             limit: 10
             interval: '15 minutes'
+        support:
+            policy: 'fixed_window'
+            limit: 10
+            interval: '1 hour'
 
 when@test:
     framework:
@@ -28,3 +32,7 @@ when@test:
                 policy: 'fixed_window'
                 limit: 999999
                 interval: '15 minutes'
+            support:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 hour'
