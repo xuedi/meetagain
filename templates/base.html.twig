@@ -3,13 +3,22 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Self-hosted event management platform">
+    <meta name="description" content="{% block meta_description %}{{ get_meta_description('default') }}{% endblock %}">
+
+    <link rel="canonical" href="{{ get_canonical_url() }}" />
 
     {% for altLangCode, altLangLink in get_alternative_languages() %}
-        <link rel=”alternate” hreflang="{{ altLangCode }}" href="{{ altLangLink }}" />
+        <link rel="alternate" hreflang="{{ altLangCode }}" href="{{ altLangLink }}" />
     {% endfor %}
 
     <title>{% block title %}meetAgain{% endblock %}</title>
+    <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ block('meta_description') }}{% endblock %}">
+    <meta property="og:url" content="{{ get_canonical_url() }}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:site_name" content="meetAgain">
+
+    {% block json_ld %}{% endblock %}
 
     <link rel="stylesheet" href="/stylesheet/bulma.min.css"/>
     <link rel="stylesheet" href="/stylesheet/fontawesome.min.css"/>

@@ -16,7 +16,7 @@ class Config
     #[ORM\Column(length: 64)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 128)]
+    #[ORM\Column(length: 255)]
     private ?string $value = null;
 
     #[ORM\Column(enumType: ConfigType::class)]
