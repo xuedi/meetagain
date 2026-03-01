@@ -1,1 +1,1 @@
-<p>{{ block.content|nl2br }}</p>
+<div class="content">{{ block.content|sanitize_html('cms.content') }}</div>

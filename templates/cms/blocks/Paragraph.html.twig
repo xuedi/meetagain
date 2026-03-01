@@ -1,6 +1,6 @@
 <h2 class="title is-5">{{ block.title }}</h2>
-<p class="mb-5">
-    {{ block.content|nl2br }}
-</p>
+<div class="content mb-5">
+    {{ block.content|sanitize_html('cms.content') }}
+</div>
 
 <br/>
