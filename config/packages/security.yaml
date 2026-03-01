@@ -16,6 +16,12 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api:
+            pattern: ^/api/
+            stateless: true
+            provider: app_user_provider
+            custom_authenticators:
+                - App\Security\ApiTokenAuthenticator
         main:
             lazy: true
             provider: app_user_provider
@@ -29,6 +35,10 @@ security:
                 interval: '15 minutes'
 
     access_control:
+        - { path: "^/api/auth",   roles: PUBLIC_ACCESS }
+        - { path: "^/api/$",      roles: PUBLIC_ACCESS }
+        - { path: "^/api/status", roles: PUBLIC_ACCESS }
+        - { path: "^/api/cms",    roles: ROLE_ADMIN }
         - { path: "^/[a-z]{2}/profile", roles: ROLE_USER }
         - { path: "^/[a-z]{2}/translation", roles: ROLE_USER }
 

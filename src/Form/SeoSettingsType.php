@@ -18,25 +18,30 @@ class SeoSettingsType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('seoDescriptionDefault', TextareaType::class, [
-                'label' => 'SEO: Default description',
-                'required' => false,
-                'data' => $this->configService->getSeoDescription('default'),
-                'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => 'Site-wide meta description (max 160 chars)'],
-            ])
-            ->add('seoDescriptionEvents', TextareaType::class, [
-                'label' => 'SEO: Events page description',
-                'required' => false,
-                'data' => $this->configService->getSeoDescription('events'),
-                'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => 'Meta description for the events listing (max 160 chars)'],
-            ])
-            ->add('seoDescriptionMembers', TextareaType::class, [
-                'label' => 'SEO: Members page description',
-                'required' => false,
-                'data' => $this->configService->getSeoDescription('members'),
-                'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => 'Meta description for the members listing (max 160 chars)'],
-            ]);
+        $builder->add('seoDescriptionDefault', TextareaType::class, [
+            'label' => 'SEO: Default description',
+            'required' => false,
+            'data' => $this->configService->getSeoDescription('default'),
+            'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => 'Site-wide meta description (max 160 chars)'],
+        ])->add('seoDescriptionEvents', TextareaType::class, [
+            'label' => 'SEO: Events page description',
+            'required' => false,
+            'data' => $this->configService->getSeoDescription('events'),
+            'attr' => [
+                'rows' => 3,
+                'maxlength' => 160,
+                'placeholder' => 'Meta description for the events listing (max 160 chars)',
+            ],
+        ])->add('seoDescriptionMembers', TextareaType::class, [
+            'label' => 'SEO: Members page description',
+            'required' => false,
+            'data' => $this->configService->getSeoDescription('members'),
+            'attr' => [
+                'rows' => 3,
+                'maxlength' => 160,
+                'placeholder' => 'Meta description for the members listing (max 160 chars)',
+            ],
+        ]);
     }
 
     #[Override]

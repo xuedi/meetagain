@@ -6,17 +6,96 @@
 
     <section class="section">
         <div class="container">
-            <h1 class="title is-3">Public API</h1>
+            <h1 class="title is-3">API Documentation</h1>
             <p class="mb-5">
-                All the data you can have
+                All available endpoints. Admin endpoints require a Bearer token obtained via the auth endpoint.
             </p>
-            <div class="buttons has-addons">
-                <button class="button is-success is-selected">GET</button>
-                <a class="button" href="{{ path('app_api_translations') }}">/api/translations</a>
+
+            <h2 class="title is-5 mt-5">Public Endpoints</h2>
+
+            <div class="buttons has-addons mb-2">
+                <span class="button is-success is-static">GET</span>
+                <span class="button is-light">/api/status</span>
+                <span class="button is-white is-static">Service health check</span>
             </div>
-            <div class="buttons has-addons">
-                <button class="button is-success is-selected">GET</button>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-success is-static">GET</span>
+                <a class="button" href="{{ path('app_api_translations') }}">/api/translations</a>
+                <span class="button is-white is-static">Translation strings</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-success is-static">GET</span>
                 <a class="button" href="{{ path('app_api_glossary') }}">/api/glossary</a>
+                <span class="button is-white is-static">Glossary data</span>
+            </div>
+
+            <h2 class="title is-5 mt-5">Authentication</h2>
+
+            <div class="buttons has-addons mb-2">
+                <span class="button is-info is-static">POST</span>
+                <span class="button is-light">/api/auth/token</span>
+                <span class="button is-white is-static">Generate Bearer token (email + password)</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-danger is-static">DELETE</span>
+                <span class="button is-light">/api/auth/token</span>
+                <span class="button is-white is-static">Revoke current token (requires Bearer)</span>
+            </div>
+
+            <div class="box mt-3">
+                <p class="has-text-weight-semibold mb-2">Example: obtain a token</p>
+                <pre>curl -s -X POST {{ app.request.schemeAndHttpHost }}/api/auth/token \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin@example.com","password":"..."}' | jq -r .token</pre>
+                <p class="has-text-weight-semibold mt-3 mb-2">Example: use the token</p>
+                <pre>curl {{ app.request.schemeAndHttpHost }}/api/cms/ \
+  -H "Authorization: Bearer $TOKEN"</pre>
+            </div>
+
+            <h2 class="title is-5 mt-5">CMS Pages — Admin only (Bearer required)</h2>
+
+            <div class="buttons has-addons mb-2">
+                <span class="button is-success is-static">GET</span>
+                <span class="button is-light">/api/cms/</span>
+                <span class="button is-white is-static">List all CMS pages</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-success is-static">GET</span>
+                <span class="button is-light">/api/cms/{id}</span>
+                <span class="button is-white is-static">Get full page with blocks</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-info is-static">POST</span>
+                <span class="button is-light">/api/cms/</span>
+                <span class="button is-white is-static">Create page — body: {slug, titles, linkNames}</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-warning is-static">PUT</span>
+                <span class="button is-light">/api/cms/{id}</span>
+                <span class="button is-white is-static">Update metadata — slug, published, titles, linkNames</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-danger is-static">DELETE</span>
+                <span class="button is-light">/api/cms/{id}</span>
+                <span class="button is-white is-static">Delete page (not allowed if locked)</span>
+            </div>
+
+            <h2 class="title is-5 mt-5">CMS Blocks — Admin only (Bearer required)</h2>
+
+            <div class="buttons has-addons mb-2">
+                <span class="button is-info is-static">POST</span>
+                <span class="button is-light">/api/cms/{id}/blocks</span>
+                <span class="button is-white is-static">Add block — body: {language, type, priority, json}</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-warning is-static">PUT</span>
+                <span class="button is-light">/api/cms/{id}/blocks/{blockId}</span>
+                <span class="button is-white is-static">Update block json and/or priority</span>
+            </div>
+            <div class="buttons has-addons mb-2">
+                <span class="button is-danger is-static">DELETE</span>
+                <span class="button is-light">/api/cms/{id}/blocks/{blockId}</span>
+                <span class="button is-white is-static">Delete block</span>
             </div>
         </div>
     </section>

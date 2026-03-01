@@ -66,7 +66,8 @@
       "Bash(just appCron:*)",
       "Bash(bash:*)",
       "Bash(source:*)",
-      "Bash(just do:*)"
+      "Bash(just do:*)",
+      "Bash(just testSetup:*)"
     ]
   }
 }

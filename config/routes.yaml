@@ -23,3 +23,11 @@ api:
 ajax:
     type: attribute
     resource: ../src/Controller/NonLocale/AjaxController.php
+
+api_auth:
+    type: attribute
+    resource: ../src/Controller/NonLocale/AuthApiController.php
+
+api_cms:
+    type: attribute
+    resource: ../src/Controller/NonLocale/CmsCrudApiController.php

@@ -416,6 +416,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult();
     }
 
+    public function findByApiTokenHash(string $hash): ?User
+    {
+        return $this->findOneBy(['apiTokenHash' => $hash]);
+    }
+
     /**
      * Find all users for admin interface with optional ID filtering.
      * Orders pending approvals first, then by creation date.

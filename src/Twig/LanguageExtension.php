@@ -92,9 +92,9 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
         // 3. Hardcoded fallback
         return match ($context) {
-            'events'  => 'Browse upcoming events and meetups.',
+            'events' => 'Browse upcoming events and meetups.',
             'members' => 'Meet the members of this community.',
-            default   => 'A community platform for local events and meetups.',
+            default => 'A community platform for local events and meetups.',
         };
     }
 
