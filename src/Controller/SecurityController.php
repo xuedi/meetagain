@@ -97,7 +97,9 @@ class SecurityController extends AbstractController
     {
         $limiter = $this->registrationLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
-            return new Response('Too many registration attempts. Please try again later.', 429);
+            return $this->render('rate_limited.html.twig', [
+                'message' => 'Too many registration attempts. Please try again later.',
+            ], new Response('', 429));
         }
 
         $user = new User();
@@ -179,7 +181,9 @@ class SecurityController extends AbstractController
     {
         $limiter = $this->passwordResetLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
-            return new Response('Too many password reset attempts. Please try again later.', 429);
+            return $this->render('rate_limited.html.twig', [
+                'message' => 'Too many password reset attempts. Please try again later.',
+            ], new Response('', 429));
         }
 
         $form = $this->createForm(PasswordResetType::class);
