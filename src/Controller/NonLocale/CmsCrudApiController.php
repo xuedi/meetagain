@@ -7,7 +7,9 @@ use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
 use App\Entity\CmsLinkName;
+use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
+use App\Entity\MenuLocation;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\CmsPageCacheService;
@@ -96,6 +98,16 @@ class CmsCrudApiController extends AbstractController
             $this->em->persist($linkName);
         }
 
+        foreach ((array) ($data['menuLocations'] ?? []) as $locationValue) {
+            $location = MenuLocation::tryFrom((int) $locationValue);
+            if ($location !== null) {
+                $menuLocation = new CmsMenuLocation();
+                $menuLocation->setLocation($location);
+                $cms->addMenuLocation($menuLocation);
+                $this->em->persist($menuLocation);
+            }
+        }
+
         $this->em->persist($cms);
         $this->em->flush();
 
@@ -126,6 +138,10 @@ class CmsCrudApiController extends AbstractController
 
         if (isset($data['linkNames']) && is_array($data['linkNames'])) {
             $this->updateLinkNames($cms, $data['linkNames']);
+        }
+
+        if (isset($data['menuLocations']) && is_array($data['menuLocations'])) {
+            $this->updateMenuLocations($cms, $data['menuLocations']);
         }
 
         $this->em->flush();
@@ -267,6 +283,11 @@ class CmsCrudApiController extends AbstractController
             $linkNames[$linkName->getLanguage()] = $linkName->getName();
         }
 
+        $menuLocations = [];
+        foreach ($cms->getMenuLocations() as $menuLocation) {
+            $menuLocations[] = $menuLocation->getLocation()?->value;
+        }
+
         $blocks = [];
         foreach ($cms->getBlocks() as $block) {
             $blocks[] = $this->serializeBlock($block);
@@ -279,6 +300,7 @@ class CmsCrudApiController extends AbstractController
             'locked' => $cms->isLocked(),
             'titles' => $titles,
             'linkNames' => $linkNames,
+            'menuLocations' => $menuLocations,
             'blocks' => $blocks,
         ];
     }
@@ -332,6 +354,35 @@ class CmsCrudApiController extends AbstractController
                 $linkName->setName((string) $nameText);
                 $cms->addLinkName($linkName);
                 $this->em->persist($linkName);
+            }
+        }
+    }
+
+    private function updateMenuLocations(Cms $cms, array $locationValues): void
+    {
+        $existingByValue = [];
+        foreach ($cms->getMenuLocations() as $menuLocation) {
+            $existingByValue[$menuLocation->getLocation()?->value] = $menuLocation;
+        }
+
+        $newValues = array_map('intval', $locationValues);
+
+        foreach ($existingByValue as $value => $menuLocation) {
+            if (!in_array($value, $newValues, true)) {
+                $cms->removeMenuLocation($menuLocation);
+                $this->em->remove($menuLocation);
+            }
+        }
+
+        foreach ($newValues as $locationValue) {
+            if (!isset($existingByValue[$locationValue])) {
+                $location = MenuLocation::tryFrom($locationValue);
+                if ($location !== null) {
+                    $menuLocation = new CmsMenuLocation();
+                    $menuLocation->setLocation($location);
+                    $cms->addMenuLocation($menuLocation);
+                    $this->em->persist($menuLocation);
+                }
             }
         }
     }
