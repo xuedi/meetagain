@@ -50,7 +50,7 @@ class ApiController extends AbstractController
             ],
             [
                 'title' => 'CMS Pages',
-                'badge' => 'Admin — Bearer required',
+                'badge' => 'Token required',
                 'endpoints' => [
                     [
                         'method' => 'GET', 'apiPath' => '/api/cms/', 'route' => null,
@@ -81,7 +81,7 @@ class ApiController extends AbstractController
             ],
             [
                 'title' => 'CMS Blocks',
-                'badge' => 'Admin — Bearer required',
+                'badge' => 'Token required',
                 'endpoints' => [
                     [
                         'method' => 'POST', 'apiPath' => '/api/cms/{id}/blocks', 'route' => null,
