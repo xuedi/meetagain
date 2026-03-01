@@ -1,0 +1,19 @@
+{% set methodColors = {'GET': 'is-success', 'POST': 'is-info', 'PUT': 'is-warning', 'DELETE': 'is-danger'} %}
+
+<div class="api-endpoint">
+    <div class="buttons has-addons mb-1">
+        <span class="button {{ methodColors[method] }} is-light is-static api-method">{{ method }}</span>
+        {% if route %}
+            <a class="button is-light api-path" href="{{ path(route) }}">{{ apiPath }}</a>
+        {% else %}
+            <span class="button is-light is-static api-path">{{ apiPath }}</span>
+        {% endif %}
+        <button class="button api-toggle" aria-expanded="false" aria-label="Toggle example">
+            <span class="icon"><i class="fas fa-chevron-down"></i></span>
+        </button>
+    </div>
+    <div class="api-example box is-hidden mb-3">
+        <p class="has-text-weight-semibold mb-2">{{ description }}</p>
+        <pre>{{ example|replace({'HOST': app.request.schemeAndHttpHost}) }}</pre>
+    </div>
+</div>
