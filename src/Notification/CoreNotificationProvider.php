@@ -19,7 +19,8 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         private UserRepository $userRepo,
         private SupportRequestRepository $supportRequestRepo,
         private Security $security,
-    ) {}
+    ) {
+    }
 
     public function getPriority(): int
     {
@@ -28,11 +29,10 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
 
     public function getNotifications(User $user): array
     {
-        if (!$this->security->isGranted('ROLE_FOUNDER')) {
-            return [];
-        }
-
         $items = [];
+        if (!$this->security->isGranted('ROLE_FOUNDER')) {
+            return $items; // only FOUNDER from here on
+        }
 
         $reportedCount = $this->imageRepo->getReportedCount();
         if ($reportedCount > 0) {
@@ -42,33 +42,36 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
             );
         }
 
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            $staleEmails = $this->emailRepo->getStaleCount(60);
-            if ($staleEmails > 0) {
-                $items[] = new NotificationItem(
-                    label: $staleEmails . ' Stale Email' . ($staleEmails > 1 ? 's' : ''),
-                    icon: 'fa-envelope',
-                );
-            }
-
-            $pendingApproval = $this->userRepo->getUnverifiedCount();
-            if ($pendingApproval > 0) {
-                $items[] = new NotificationItem(
-                    label: $pendingApproval . ' Pending Approval',
-                    icon: 'fa-user-clock',
-                    route: 'app_admin_member',
-                );
-            }
-
-            $newSupportRequests = $this->supportRequestRepo->getNewCount();
-            if ($newSupportRequests > 0) {
-                $items[] = new NotificationItem(
-                    label: $newSupportRequests . ' New Support Request' . ($newSupportRequests > 1 ? 's' : ''),
-                    icon: 'fa-life-ring',
-                    route: 'app_admin_support_list',
-                );
-            }
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
+            return $items; // only ADMIN from here on
         }
+
+        $staleEmails = $this->emailRepo->getStaleCount(60);
+        if ($staleEmails > 0) {
+            $items[] = new NotificationItem(
+                label: $staleEmails . ' Stale Email' . ($staleEmails > 1 ? 's' : ''),
+                icon: 'fa-envelope',
+            );
+        }
+
+        $pendingApproval = $this->userRepo->getUnverifiedCount();
+        if ($pendingApproval > 0) {
+            $items[] = new NotificationItem(
+                label: $pendingApproval . ' Pending Approval',
+                icon: 'fa-user-clock',
+                route: 'app_admin_member',
+            );
+        }
+
+        $newSupportRequests = $this->supportRequestRepo->getNewCount();
+        if ($newSupportRequests > 0) {
+            $items[] = new NotificationItem(
+                label: $newSupportRequests . ' New Support Request' . ($newSupportRequests > 1 ? 's' : ''),
+                icon: 'fa-life-ring',
+                route: 'app_admin_support_list',
+            );
+        }
+
 
         return $items;
     }
