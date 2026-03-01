@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://dragon-descendants.de/sitemap.xml
+Sitemap: /sitemap.xml

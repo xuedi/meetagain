@@ -48,7 +48,7 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
 
             // try stuff and special cases before actual 404
             $content = match (trim($path, '/')) {
-                'sitemap.xml' => $this->sitemapService->getContent('dragon-descendants.de'),
+                'sitemap.xml' => $this->sitemapService->getContent($event->getRequest()->getHost()),
                 default => $this->cms->createNotFoundPage(),
             };
 
