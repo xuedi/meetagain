@@ -1,9 +1,12 @@
 controllers:
     type: attribute
     prefix: /{_locale}
+    requirements:
+        _locale: '[a-z]{2}'
     resource:
         path: ../src/Controller/
         namespace: App\Controller
+    exclude: ../src/Controller/NonLocale/
 
 frontpage:
     type: attribute
