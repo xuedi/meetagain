@@ -68,7 +68,7 @@ class NotFoundSubscriberTest extends TestCase
         $sitemap
             ->expects($this->once())
             ->method('getContent')
-            ->with('dragon-descendants.de')
+            ->with('localhost')
             ->willReturn($sitemapResponse);
 
         $cms = $this->createMock(CmsService::class);
