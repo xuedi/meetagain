@@ -7,8 +7,9 @@ use App\Filter\Cms\CmsFilterService;
 use App\Repository\CmsRepository;
 use App\ValueObject\MenuItem;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class MenuService
 {
@@ -17,7 +18,8 @@ readonly class MenuService
     public function __construct(
         private CmsRepository $cmsRepo,
         private CmsFilterService $cmsFilterService,
-        private CacheInterface $cache,
+        #[Autowire(service: 'cache.cms_page_cache')]
+        private TagAwareCacheInterface $cache,
     ) {}
 
     /**
@@ -53,6 +55,7 @@ readonly class MenuService
             $locale,
         ): array {
             $item->expiresAfter(self::CACHE_TTL);
+            $item->tag(['cms_menu']);
 
             $cmsPages = $this->cmsRepo->findByMenuLocation($menuLocation);
 

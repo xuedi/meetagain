@@ -13,8 +13,14 @@ readonly class CmsCacheInvalidationHandler implements EntityActionInterface
     public function onEntityAction(EntityAction $action, int $entityId): void
     {
         match ($action) {
-            EntityAction::UpdateCms, EntityAction::DeleteCms => $this->cmsPageCacheService->invalidatePage($entityId),
+            EntityAction::UpdateCms, EntityAction::DeleteCms => $this->invalidateCmsAndMenus($entityId),
             default => null,
         };
+    }
+
+    private function invalidateCmsAndMenus(int $entityId): void
+    {
+        $this->cmsPageCacheService->invalidatePage($entityId);
+        $this->cmsPageCacheService->invalidateMenuCaches();
     }
 }

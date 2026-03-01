@@ -111,6 +111,10 @@ class CmsCrudApiController extends AbstractController
         $this->em->persist($cms);
         $this->em->flush();
 
+        if (isset($data['menuLocations'])) {
+            $this->cmsPageCacheService->invalidateMenuCaches();
+        }
+
         return new JsonResponse($this->serializePage($cms), Response::HTTP_CREATED);
     }
 
@@ -140,7 +144,8 @@ class CmsCrudApiController extends AbstractController
             $this->updateLinkNames($cms, $data['linkNames']);
         }
 
-        if (isset($data['menuLocations']) && is_array($data['menuLocations'])) {
+        $menuLocationsChanged = isset($data['menuLocations']) && is_array($data['menuLocations']);
+        if ($menuLocationsChanged) {
             $this->updateMenuLocations($cms, $data['menuLocations']);
         }
 
@@ -148,6 +153,10 @@ class CmsCrudApiController extends AbstractController
 
         if ($cms->getId() !== null) {
             $this->cmsPageCacheService->invalidatePage($cms->getId());
+        }
+
+        if ($menuLocationsChanged) {
+            $this->cmsPageCacheService->invalidateMenuCaches();
         }
 
         return new JsonResponse($this->serializePage($cms));
@@ -172,6 +181,8 @@ class CmsCrudApiController extends AbstractController
         if ($pageId !== null) {
             $this->cmsPageCacheService->invalidatePage($pageId);
         }
+
+        $this->cmsPageCacheService->invalidateMenuCaches();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
