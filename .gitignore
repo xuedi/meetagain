@@ -18,4 +18,4 @@ installed.lock
 /plugins/multisite/
 /.ai/plans/*.md
 /.ai/*.local
-
+/.ai/*.prod
