@@ -7,6 +7,7 @@ namespace App\Notification;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Repository\ImageRepository;
+use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -16,6 +17,7 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         private ImageRepository $imageRepo,
         private EmailQueueRepository $emailRepo,
         private UserRepository $userRepo,
+        private SupportRequestRepository $supportRequestRepo,
         private Security $security,
     ) {}
 
@@ -55,6 +57,15 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
                     label: $pendingApproval . ' Pending Approval',
                     icon: 'fa-user-clock',
                     route: 'app_admin_member',
+                );
+            }
+
+            $newSupportRequests = $this->supportRequestRepo->getNewCount();
+            if ($newSupportRequests > 0) {
+                $items[] = new NotificationItem(
+                    label: $newSupportRequests . ' New Support Request' . ($newSupportRequests > 1 ? 's' : ''),
+                    icon: 'fa-life-ring',
+                    route: 'app_admin_support_list',
                 );
             }
         }

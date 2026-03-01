@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'nav_support' | trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <h1 class="title is-5">{{ 'nav_support' | trans }}</h1>
+
+            {{ form_start(form) }}
+            <div class="columns">
+                <div class="column is-5">
+                    {{ form_row(form.name, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
+                    {{ form_row(form.email, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
+                    {{ form_row(form.message) }}
+                </div>
+            </div>
+
+            {% if not app.user %}
+            <div class="columns">
+                <div class="column is-1">
+                    <strong>Captcha</strong><br>
+                    <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
+                </div>
+                <div class="column is-4">
+                    {{ form_row(form.captcha) }}
+                </div>
+            </div>
+            <p class="mt-4">
+                You cannot get more than <strong>7</strong> new captcha per minute.
+            </p>
+            <p class="mb-5">
+                You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free try in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
+            </p>
+            {% else %}
+                {{ form_widget(form.captcha, {'attr': {'style': 'display:none'}}) }}
+            {% endif %}
+
+            {{ form_widget(form) }}
+            <button class="button is-primary">Send</button>
+            {{ form_end(form) }}
+
+        </div>
+    </section>
+
+    {% if not app.user %}
+    <script type="text/javascript">
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const refreshCount = document.getElementById('refreshCount');
+            const refreshTime = document.getElementById('refreshTime');
+            const timeID = setInterval(timeAndDate, 1000);
+
+            function timeAndDate() {
+                let xhr = new XMLHttpRequest();
+                xhr.open("GET", '{{ path('app_ajax_get_captcha_count') }}', true);
+                xhr.responseType = 'json';
+
+                xhr.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        if (this.response && refreshCount && refreshTime) {
+                            refreshCount.textContent = this.response.count ?? '';
+                            refreshTime.textContent = this.response.next ?? '';
+                        }
+                    }
+                }
+                xhr.send();
+            }
+        });
+
+    </script>
+    {% endif %}
+
+{% endblock %}
