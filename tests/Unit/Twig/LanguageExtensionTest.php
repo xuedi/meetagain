@@ -200,7 +200,10 @@ class LanguageExtensionTest extends TestCase
     public function testGetMetaDescriptionFallsBackToSystemConfigWhenNoProviderValue(): void
     {
         // Arrange
-        $this->configServiceStub->method('getSeoDescription')->with('events')->willReturn('System events description');
+        $this->configServiceStub
+            ->method('getSeoDescription')
+            ->with('events')
+            ->willReturn('System events description');
 
         // Act
         $result = $this->subject->getMetaDescription('events');

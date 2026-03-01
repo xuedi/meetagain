@@ -16,8 +16,10 @@ class CmsRepository extends ServiceEntityRepository
 {
     private const int CACHE_TTL = 3600;
 
-    public function __construct(ManagerRegistry $registry, private readonly CacheInterface $cache)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly CacheInterface $cache,
+    ) {
         parent::__construct($registry, Cms::class);
     }
 
@@ -99,22 +101,21 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function findByMenuLocation(MenuLocation $location): array
     {
-        $ids = $this->cache->get(
-            'cms_menu_location_' . $location->value,
-            function (ItemInterface $item) use ($location): array {
-                $item->expiresAfter(self::CACHE_TTL);
+        $ids = $this->cache->get('cms_menu_location_' . $location->value, function (ItemInterface $item) use (
+            $location,
+        ): array {
+            $item->expiresAfter(self::CACHE_TTL);
 
-                return $this
-                    ->createQueryBuilder('c')
-                    ->select('c.id')
-                    ->join('c.menuLocations', 'ml')
-                    ->where('ml.location = :location')
-                    ->andWhere('c.published = true')
-                    ->setParameter('location', $location)
-                    ->getQuery()
-                    ->getSingleColumnResult();
-            },
-        );
+            return $this
+                ->createQueryBuilder('c')
+                ->select('c.id')
+                ->join('c.menuLocations', 'ml')
+                ->where('ml.location = :location')
+                ->andWhere('c.published = true')
+                ->setParameter('location', $location)
+                ->getQuery()
+                ->getSingleColumnResult();
+        });
 
         if ($ids === []) {
             return [];
@@ -128,18 +129,15 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function getLockedCmsIds(): array
     {
-        return $this->cache->get(
-            'cms_locked_ids',
-            function (ItemInterface $item): array {
-                $item->expiresAfter(self::CACHE_TTL);
+        return $this->cache->get('cms_locked_ids', function (ItemInterface $item): array {
+            $item->expiresAfter(self::CACHE_TTL);
 
-                return $this
-                    ->createQueryBuilder('c')
-                    ->select('c.id')
-                    ->where('c.locked = true')
-                    ->getQuery()
-                    ->getSingleColumnResult();
-            },
-        );
+            return $this
+                ->createQueryBuilder('c')
+                ->select('c.id')
+                ->where('c.locked = true')
+                ->getQuery()
+                ->getSingleColumnResult();
+        });
     }
 }

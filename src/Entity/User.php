@@ -105,6 +105,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?array $notificationSettings = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $apiTokenHash = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $apiTokenCreatedAt = null;
+
     public function __construct()
     {
         $this->rsvp = new ArrayCollection();
@@ -560,5 +566,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getBlockedByUsers(): Collection
     {
         return $this->blockedByUsers;
+    }
+
+    public function getApiTokenHash(): ?string
+    {
+        return $this->apiTokenHash;
+    }
+
+    public function setApiTokenHash(?string $apiTokenHash): static
+    {
+        $this->apiTokenHash = $apiTokenHash;
+
+        return $this;
+    }
+
+    public function getApiTokenCreatedAt(): ?DateTimeImmutable
+    {
+        return $this->apiTokenCreatedAt;
+    }
+
+    public function setApiTokenCreatedAt(?DateTimeImmutable $apiTokenCreatedAt): static
+    {
+        $this->apiTokenCreatedAt = $apiTokenCreatedAt;
+
+        return $this;
     }
 }
