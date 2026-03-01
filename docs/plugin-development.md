@@ -1101,9 +1101,6 @@ Create `AGENTS.md` in plugin root with:
 
 ## Additional Resources
 
-- **Core Architecture:** See `/.ai/architecture.md`
-- **Core Conventions:** See `/.ai/conventions.md`
-- **Testing Guide:** See `/.ai/testing.md`
 - **Example Plugins:** See `plugins/dishes/`, `plugins/filmclub/`
 
 ---

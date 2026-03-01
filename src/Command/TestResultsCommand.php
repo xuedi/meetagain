@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'app:test:results', description: 'Parse JUnit XML and display test results in AI-friendly format')]
+#[AsCommand(name: 'app:test:results', description: 'Parse JUnit XML and display test results in machine-readable format')]
 class TestResultsCommand extends Command
 {
     public function __construct(
