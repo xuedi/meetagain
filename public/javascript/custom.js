@@ -98,15 +98,30 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Cookie consent: open banner client-side if no consent cookie is set (avoids cached HTML issue)
+document.addEventListener('DOMContentLoaded', function () {
+    const hasConsent = document.cookie.split(';').some(function (c) {
+        return c.trim().startsWith('consent_cookies=');
+    });
+    if (!hasConsent) {
+        const dropdown = document.getElementById('cookie-consent-dropdown');
+        if (!dropdown) return;
+        dropdown.classList.add('is-active');
+        const trigger = dropdown.querySelector('.cookie-button');
+        if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        const label = dropdown.querySelector('.cookie-consent-label');
+        if (label) label.style.display = '';
+    }
+});
+
 // Cookie consent: confirm via ajax and reload (modern forEach)
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.cookieTrigger') || []).forEach((el) => {
         el.addEventListener('click', (event) => {
-            event.preventDefault();
             const osmConsent = document.getElementById('osm_consent_checkbox');
             const base = event.currentTarget.dataset.url;
             const url = base + '?osmConsent=' + (osmConsent && osmConsent.checked);
-            maFetch(url).then(() => location.reload());
+            maFetch(url).then(() => location.reload()).catch(() => location.reload());
         });
     });
 });
