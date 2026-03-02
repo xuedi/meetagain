@@ -1,0 +1,20 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    {% include 'admin/system/_tabs_navigation.html.twig' %}
+
+    <div class="box">
+        <h2 class="title is-5">Error Tracker</h2>
+        <p class="mb-4">Trigger a test exception to verify that Bugsink is capturing
+        errors and sending notification emails correctly.</p>
+
+        <button id="debugTriggerException"
+                class="button is-warning"
+                data-url="{{ path('app_admin_system_debug_trigger') }}">
+            <span class="icon"><i class="fas fa-bug"></i></span>
+            <span>Trigger Test Exception</span>
+        </button>
+
+        <p id="debugTriggerResult" class="mt-3 is-hidden"></p>
+    </div>
+{% endblock %}
