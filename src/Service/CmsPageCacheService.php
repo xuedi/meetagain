@@ -21,9 +21,9 @@ readonly class CmsPageCacheService
      *
      * @param array<int>|null $eventIds from EventFilterService
      */
-    public function get(string $slug, string $locale, ?array $eventIds): ?string
+    public function get(int $pageId, string $locale, ?array $eventIds): ?string
     {
-        $key = $this->buildKey($slug, $locale, $eventIds);
+        $key = $this->buildKey($pageId, $locale, $eventIds);
         $miss = false;
 
         // On a cache miss the callback is invoked; on a hit it is skipped.
@@ -44,9 +44,9 @@ readonly class CmsPageCacheService
      *
      * @param array<int>|null $eventIds from EventFilterService
      */
-    public function store(string $slug, string $locale, ?array $eventIds, string $html, int $pageId): void
+    public function store(int $pageId, string $locale, ?array $eventIds, string $html): void
     {
-        $key = $this->buildKey($slug, $locale, $eventIds);
+        $key = $this->buildKey($pageId, $locale, $eventIds);
         $tag = $this->buildTag($pageId);
 
         // beta=INF forces the callback to run even if a cached entry already exists,
@@ -107,20 +107,15 @@ readonly class CmsPageCacheService
         return md5(implode(',', $sorted));
     }
 
-    private function buildKey(string $slug, string $locale, ?array $eventIds): string
+    private function buildKey(int $pageId, string $locale, ?array $eventIds): string
     {
         $fingerprint = $this->computeEventFilterFingerprint($eventIds);
 
-        return 'cms_page.' . $this->sanitizeKey($slug) . '.' . $locale . '.' . $fingerprint;
+        return 'cms_page.' . $pageId . '.' . $locale . '.' . $fingerprint;
     }
 
     private function buildTag(int $pageId): string
     {
         return 'cms_page_' . $pageId;
-    }
-
-    private function sanitizeKey(string $slug): string
-    {
-        return preg_replace('/[^a-zA-Z0-9_.\-]/', '_', $slug) ?? $slug;
     }
 }
