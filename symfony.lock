@@ -233,15 +233,6 @@
             "tests/bootstrap.php"
         ]
     },
-    "symfony/postmark-mailer": {
-        "version": "8.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "4.4",
-            "ref": "631f81f2fbf58126ae699a04b1d0984442613a19"
-        }
-    },
     "symfony/property-info": {
         "version": "7.3",
         "recipe": {
@@ -279,6 +270,15 @@
             "config/packages/security.yaml",
             "config/routes/security.yaml"
         ]
+    },
+    "symfony/sweego-mailer": {
+        "version": "8.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "7.2",
+            "ref": "633f6d6e1ae3e0f7abd24ed3945e094d369aadde"
+        }
     },
     "symfony/translation": {
         "version": "7.1",
