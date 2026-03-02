@@ -53,8 +53,10 @@ readonly class CmsService
         // because the full HTML includes user-specific content (navigation, user menu).
         $anonymous = !$this->security->isGranted('IS_AUTHENTICATED');
 
+        $pageId = (int) $cms->getId();
+
         if ($anonymous) {
-            $cached = $this->cmsPageCacheService->get($slug, $locale, $eventIds);
+            $cached = $this->cmsPageCacheService->get($pageId, $locale, $eventIds);
             if ($cached !== null) {
                 $response->setContent($cached);
                 $response->setStatusCode(Response::HTTP_OK);
@@ -70,7 +72,7 @@ readonly class CmsService
         ]);
 
         if ($anonymous) {
-            $this->cmsPageCacheService->store($slug, $locale, $eventIds, $content, $cms->getId());
+            $this->cmsPageCacheService->store($pageId, $locale, $eventIds, $content);
         }
 
         $response->setContent($content);
