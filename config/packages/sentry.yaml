@@ -9,13 +9,4 @@ sentry:
         traces_sample_rate: 1.0
     register_error_listener: true
     register_error_handler: false
-    tracing:
-        dbal:
-            enabled: true
-        twig:
-            enabled: true
-        cache:
-            enabled: true
-        http_client:
-            enabled: true
 
