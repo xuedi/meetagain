@@ -1,0 +1,75 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'import'} %}
+
+    {% if summary is defined %}
+        <div class="notification is-success">
+            <h2 class="title is-5">Import complete</h2>
+            <table class="table is-narrow">
+                <tbody>
+                    <tr>
+                        <td>Users created</td>
+                        <td>{{ summary.usersCreated }}</td>
+                    </tr>
+                    <tr>
+                        <td>Users skipped (already exist)</td>
+                        <td>{{ summary.usersSkipped }}</td>
+                    </tr>
+                    <tr>
+                        <td>Locations created</td>
+                        <td>{{ summary.locationsCreated }}</td>
+                    </tr>
+                    <tr>
+                        <td>Events created</td>
+                        <td>{{ summary.eventsCreated }}</td>
+                    </tr>
+                    <tr>
+                        <td>CMS pages created</td>
+                        <td>{{ summary.cmsPagesCreated }}</td>
+                    </tr>
+                    <tr>
+                        <td>CMS pages skipped (slug already exists)</td>
+                        <td>{{ summary.cmsPagesSkipped }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="mt-3">
+                <strong>Note:</strong> Imported users have no password set and must use
+                <em>Forgot password</em> to activate their account.
+            </p>
+        </div>
+    {% endif %}
+
+    {% if error is defined %}
+        <div class="notification is-danger">
+            <strong>Import failed:</strong> {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="box">
+        <h2 class="title is-5">Import Group Data</h2>
+        <p class="content">
+            Upload a meetAgain export ZIP file to import group data into this instance.
+            Duplicate users (same email) and CMS pages (same slug) will be skipped.
+            Events are always imported.
+        </p>
+
+        <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
+            <div class="field">
+                <label class="label">Export ZIP file</label>
+                <div class="control">
+                    <input class="input" type="file" name="import_file" accept=".zip" required>
+                </div>
+            </div>
+            <div class="field">
+                <button type="submit" class="button is-link">
+                    <span class="icon"><i class="fas fa-file-import"></i></span>
+                    <span>Import</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

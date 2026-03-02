@@ -84,6 +84,7 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -n -q
 
+# Full dev environment with demo data (base + plugin fixtures) — complete sample content for testing
 [group('development')]
 devModeFixtures plugins='':
     {{JUST}} dockerStop
@@ -103,6 +104,22 @@ devModeFixtures plugins='':
     {{PHP}} php bin/console app:plugin:post-fixtures
     {{PHP}} php bin/console app:event:extent
     {{PHP}} php bin/console app:event:add-fixture
+    {{JUST}} appClearCache
+
+# Minimal dev environment with install fixtures only (no sample content) — ideal for testing imports
+[group('development')]
+devModeMinimal plugins='':
+    {{JUST}} dockerStop
+    {{JUST}} devResetConfigs
+    cp .env.dist .env
+    touch installed.lock
+    {{JUST}} dockerStart
+    {{JUST}} do "composer install"
+    {{PHP}} php bin/console app:plugin disable all
+    {{PHP}} php bin/console app:plugin enable {{plugins}}
+    {{JUST}} devResetDatabase
+    {{JUST}} appMigrate
+    {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
     {{JUST}} appClearCache
 
 # Switch to installer mode
