@@ -11,7 +11,7 @@ A self-hosted, open-source alternative to Meetup.com for organizing groups and s
 - Recurring events with flexible scheduling (daily, weekly, monthly)
 - Block-based CMS for custom pages
 - Multi-language support with community translations
-- Plugin system for extensibility (Film Club, Book Club, Karaoke, and more)
+- Plugin system for extensibility (Dishes, Film Club, Book Club, Karaoke, Glossary, and more)
 - User management with email verification
 - RSVP tracking and event notifications
 - Aggregated notifications for followers
@@ -24,6 +24,14 @@ A self-hosted, open-source alternative to Meetup.com for organizing groups and s
 - **Cache:** Valkey (Redis-compatible)
 - **Web Server:** Caddy/FrankenPHP (HTTP/2, HTTP/3)
 - **Frontend:** Twig templates with Bulma CSS
+
+## Hosted Version
+
+Not ready to self-host? **[meetagain.org](https://meetagain.org)** offers a managed
+version with no server setup required.
+
+Your data is always yours — you can export it at any time and migrate to a
+self-hosted instance whenever you want.
 
 ## Local Development
 
