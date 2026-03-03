@@ -120,6 +120,7 @@ devModeMinimal plugins='':
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
+    {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=minimal
     {{JUST}} appClearCache
 
 # Switch to installer mode
