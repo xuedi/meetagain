@@ -248,6 +248,11 @@ fixCoverageBadge:
 	{{PHP}} php bin/console app:badge:generate
 	git add tests/badge/coverage.svg
 
+# Build static developer docs to docs/site/
+[group('fixing')]
+fixDocumentation:
+    docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/docs zensical/zensical build --config-file docs/mkdocs.yml
+
 # Extract translation keys from templates into YAML files (run after adding new trans keys)
 [group('translations')]
 translationExtract:
