@@ -11,7 +11,7 @@ book clubs, film nights, board game groups, karaoke nights — without bloating 
 | Section | For |
 |---------|-----|
 | [Getting Started](getting-started.md) | Self-hosters who want to run their own instance |
-| [Plugin Development](plugin-development.md) | Developers building plugins for the platform |
+| [Plugin Development](plugin-development/index.md) | Developers building plugins for the platform |
 | [Contributing](contributing.md) | Contributors to the open-source core |
 
 ---
