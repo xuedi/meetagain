@@ -1,5 +1,5 @@
-site_name: MeetAgain — Developer Docs
-site_description: Documentation for developers building plugins on or contributing to MeetAgain
+site_name: MeetAgain — Documentation
+site_description: Documentation for self-hosters, plugin developers, and core contributors
 docs_dir: src
 site_dir: site
 
@@ -50,12 +50,15 @@ nav:
     - Hosting: hosting.md
   - Core Development:
     - core-development/index.md
-    - Architecture: core-development/architecture.md
-    - Patterns: core-development/patterns.md
-    - Frontend: core-development/frontend.md
-    - Data Fixtures: core-development/fixtures.md
-    - Testing: core-development/testing.md
-    - Best Practices: core-development/best-practices.md
+    - Quick Start: core-development/quick-start.md
+    - Reference:
+      - Architecture: core-development/architecture.md
+      - Patterns: core-development/patterns.md
+      - Frontend: core-development/frontend.md
+    - Guides:
+      - Data Fixtures: core-development/fixtures.md
+      - Testing: core-development/testing.md
+      - Best Practices: core-development/best-practices.md
     - Troubleshooting: core-development/troubleshooting.md
   - Plugin Development:
     - plugin-development/index.md
