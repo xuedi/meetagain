@@ -209,5 +209,5 @@ just testFunctional plugins/your-plugin/tests/Functional/
 
 ## Reference
 
-- [Core testing guide](../../core/testing.md) — PHPUnit patterns, AAA, mocks vs stubs, coverage
-- [Fixtures](fixtures.md) — how to load test data in functional tests
+- [Core testing guide](../core-development/testing.md) — PHPUnit patterns, AAA, mocks vs stubs, coverage
+- [Fixtures](../core-development/fixtures.md) — how to load test data in functional tests

@@ -1,6 +1,8 @@
 # Getting Started
 
-Self-hosting MeetAgain for a single group.
+Setting up a local development environment for contributing to MeetAgain.
+
+For production deployment, see [Hosting](hosting.md).
 
 ---
 
@@ -8,87 +10,7 @@ Self-hosting MeetAgain for a single group.
 
 - **Docker** and **Docker Compose** (v2)
 - **[just](https://github.com/casey/just)** command runner (`cargo install just` or via your package manager)
-- A domain or local hostname (for local dev: `meetagain.local`)
-
----
-
-## Quick Start
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/xuedi/meetAgain.git
-cd meetAgain
-```
-
-### 2. Start the installer
-
-```bash
-just devModeInstaller
-```
-
-This starts the Docker containers with a blank database and no `.env` file,
-putting the app into installer mode.
-
-### 3. Open the installer
-
-Navigate to `https://meetagain.local/install/` and follow the setup wizard.
-The installer creates your admin account, sets up the database, and writes
-the `.env` configuration file.
-
-### 4. Done
-
-After the installer completes you have a running single-group instance.
-Log in with the credentials you chose during setup.
-
----
-
-## Development Environment
-
-For a development environment with sample data:
-
-```bash
-# Full environment with fixture data (events, users, CMS pages)
-just devModeFixtures
-
-# Minimal environment (install fixtures only — useful for testing imports)
-just devModeMinimal
-
-# Enable a specific plugin
-just devModeFixtures multisite
-```
-
-Default admin credentials in dev mode: `admin@example.org` / `1234`
-
----
-
-## Available Commands
-
-```bash
-just                    # List all commands
-just start              # Start containers
-just stop               # Stop containers
-just app <cmd>          # Run a Symfony console command
-just appMigrate         # Run database migrations
-just appClearCache      # Clear caches
-```
-
----
-
-## Enabling Plugins
-
-```bash
-# List available plugins
-just plugin-list
-
-# Enable a plugin
-just plugin-enable dishes
-
-# Disable a plugin
-just plugin-disable dishes
-```
-
-After enabling a plugin, run `just appMigrate` to apply its database migrations.
+- A local hostname entry for `meetagain.local` (see [Local Hostname Setup](#local-hostname-setup))
 
 ---
 
@@ -101,4 +23,58 @@ Add the following to `/etc/hosts`:
 ```
 
 The development server runs on HTTPS with a self-signed certificate.
-You may need to accept the certificate warning in your browser on first visit.
+Accept the certificate warning in your browser on first visit.
+
+---
+
+## Start in 3 commands
+
+```bash
+git clone https://github.com/xuedi/meetAgain.git && cd meetAgain
+just devModeFixtures
+# Open https://meetagain.local
+```
+
+`just devModeFixtures` resets the database, loads sample fixtures (events, users, CMS pages),
+and starts all Docker containers. Default admin credentials: `admin@example.org` / `1234`
+
+---
+
+## Dev services
+
+Once started, the following services are available:
+
+| Service | Container | Address | Purpose |
+|---------|-----------|---------|---------|
+| Application | `ma-php` (FrankenPHP + Caddy) | https://meetagain.local | The app |
+| Database | `ma-db` (MariaDB 12) | localhost:3306 | Relational DB |
+| Email | `ma-mailhog` (MailHog) | http://localhost:8025 | Catches all outgoing email |
+| Cache | `ma-valkey` (Valkey) | internal | Redis-compatible cache |
+
+MailHog captures every outgoing email — no real mail is sent in dev mode.
+
+---
+
+## Reset variants
+
+```bash
+just devModeFixtures             # Full environment with fixture data
+just devModeMinimal              # Install fixtures only (useful for testing imports)
+just devModeFixtures multisite   # Full environment with the multisite plugin enabled
+```
+
+---
+
+## Essential commands
+
+```bash
+just                    # List all commands
+just start              # Start containers
+just stop               # Stop containers
+just app <cmd>          # Run a Symfony console command
+just appMigrate         # Run database migrations
+just appClearCache      # Clear caches
+just testUnit           # Run unit tests
+just test               # Run all tests and checks
+just fixMago            # Auto-format code (run before committing)
+```
