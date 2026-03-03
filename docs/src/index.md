@@ -1,8 +1,11 @@
-# MeetAgain — Developer Docs
+# MeetAgain — Documentation
 
 MeetAgain is an open-source event management platform built with **Symfony 8 / PHP 8.4**.
 It is designed around a plugin system that lets communities tailor their space to their needs —
 book clubs, film nights, board game groups, karaoke nights — without bloating the base install.
+
+This is the central documentation for everyone working with MeetAgain: self-hosters, plugin
+developers, and core contributors.
 
 ---
 
