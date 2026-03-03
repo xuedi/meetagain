@@ -61,6 +61,6 @@ event filters, authorization, notifications, and more.
 | [Optional Hooks](optional-hooks.md) | All optional interfaces with examples |
 | [Architecture](architecture.md) | Namespaces, services, routes, templates, DB conventions |
 | [Best Practices](best-practices.md) | Coding patterns that keep plugins safe and removable |
-| [Data Fixtures](fixtures.md) | Cross-fixture references, fixture groups, hook timing |
+| [Data Fixtures](../core-development/fixtures.md) | Cross-fixture references, fixture groups, hook timing |
 | [Testing](testing.md) | Unit and functional testing guide for plugin code |
 | [Troubleshooting](troubleshooting.md) | Common problems and solutions |
