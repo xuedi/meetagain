@@ -84,9 +84,9 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -n -q
 
-# Full dev environment with demo data (base + plugin fixtures) — complete sample content for testing
+# Shared reset sequence used by devModeFixtures and devModeMinimal
 [group('development')]
-devModeFixtures plugins='':
+devModeReset plugins='':
     {{JUST}} dockerStop
     {{JUST}} devResetConfigs
     cp .env.dist .env
@@ -98,6 +98,11 @@ devModeFixtures plugins='':
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
+
+# Full dev environment with demo data (base + plugin fixtures) — complete sample content for testing
+[group('development')]
+devModeFixtures plugins='':
+    {{JUST}} devModeReset {{plugins}}
     {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=base
     {{PHP}} php bin/console app:plugin:pre-fixtures
     {{PHP}} php bin/console app:fixtures:load -q --append --group=plugin
@@ -109,17 +114,7 @@ devModeFixtures plugins='':
 # Minimal dev environment with install fixtures only (no sample content) — ideal for testing imports
 [group('development')]
 devModeMinimal plugins='':
-    {{JUST}} dockerStop
-    {{JUST}} devResetConfigs
-    cp .env.dist .env
-    touch installed.lock
-    {{JUST}} dockerStart
-    {{JUST}} do "composer install"
-    {{PHP}} php bin/console app:plugin disable all
-    {{PHP}} php bin/console app:plugin enable {{plugins}}
-    {{JUST}} devResetDatabase
-    {{JUST}} appMigrate
-    {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
+    {{JUST}} devModeReset {{plugins}}
     {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=minimal
     {{JUST}} appClearCache
 
