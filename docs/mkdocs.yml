@@ -23,7 +23,11 @@ theme:
   features:
     - navigation.tabs
     - navigation.sections
+    - navigation.indexes
+    - navigation.path
+    - navigation.instant
     - navigation.top
+    - toc.follow
     - content.code.copy
     - search.highlight
 
@@ -42,5 +46,16 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - Plugin Development: plugin-development.md
+  - Plugin Development:
+    - plugin-development/index.md
+    - Quick Start: plugin-development/quick-start.md
+    - Reference:
+      - Required Hooks: plugin-development/required-hooks.md
+      - Optional Hooks: plugin-development/optional-hooks.md
+    - Guides:
+      - Architecture: plugin-development/architecture.md
+      - Best Practices: plugin-development/best-practices.md
+      - Data Fixtures: plugin-development/fixtures.md
+      - Testing: plugin-development/testing.md
+    - Troubleshooting: plugin-development/troubleshooting.md
   - Contributing: contributing.md
