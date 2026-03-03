@@ -808,7 +808,7 @@ plugins/
       Service/           # Business logic
       DataFixtures/      # Fixture data
     templates/           # Twig templates
-    CLAUDE.md            # Plugin documentation
+    README.md            # Plugin documentation
 ```
 
 ### Minimal Kernel.php
@@ -1031,7 +1031,7 @@ public function getPriority(): int
 
 ### 6. Document Your Plugin
 
-Create `CLAUDE.md` in plugin root with:
+Create `README.md` in plugin root with:
 - Plugin purpose
 - Quick start guide
 - Key features
@@ -1067,7 +1067,7 @@ Create `CLAUDE.md` in plugin root with:
 - Admin navigation
 - Multiple interfaces
 
-**See:** `plugins/multisite/CLAUDE.md`
+**See:** `plugins/multisite/src/` — the reference implementation for all plugin integration points
 
 ---
 

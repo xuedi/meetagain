@@ -17,3 +17,4 @@ installed.lock
 /.deptrac.cache
 /plugins/multisite/
 /.claude/
+/docs/site/
