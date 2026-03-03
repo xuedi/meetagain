@@ -44,8 +44,19 @@ markdown_extensions:
   - attr_list
 
 nav:
-  - Home: index.md
-  - Getting Started: getting-started.md
+  - Home:
+    - index.md
+    - Getting Started: getting-started.md
+    - Hosting: hosting.md
+  - Core Development:
+    - core-development/index.md
+    - Architecture: core-development/architecture.md
+    - Patterns: core-development/patterns.md
+    - Frontend: core-development/frontend.md
+    - Data Fixtures: core-development/fixtures.md
+    - Testing: core-development/testing.md
+    - Best Practices: core-development/best-practices.md
+    - Troubleshooting: core-development/troubleshooting.md
   - Plugin Development:
     - plugin-development/index.md
     - Quick Start: plugin-development/quick-start.md
@@ -55,7 +66,6 @@ nav:
     - Guides:
       - Architecture: plugin-development/architecture.md
       - Best Practices: plugin-development/best-practices.md
-      - Data Fixtures: plugin-development/fixtures.md
       - Testing: plugin-development/testing.md
     - Troubleshooting: plugin-development/troubleshooting.md
   - Contributing: contributing.md

@@ -212,7 +212,7 @@ public function getFooterAbout(): ?string
 
 ## Fixture hooks
 
-See [Data Fixtures](fixtures.md) for a full guide on timing, groups, and cross-fixture references.
+See [Data Fixtures](../core-development/fixtures.md) for a full guide on timing, groups, and cross-fixture references.
 
 ### `preFixtures(OutputInterface $output): void`
 

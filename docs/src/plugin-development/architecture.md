@@ -147,6 +147,39 @@ class EventLink
 }
 ```
 
+### Migrations
+
+Plugin migration namespaces are registered in `plugins/your-plugin/config/packages/doctrine.yaml`:
+
+```yaml
+doctrine_migrations:
+    migrations_paths:
+        PluginYourPluginMigrations: "%kernel.project_dir%/plugins/your-plugin/migrations"
+```
+
+After changing a plugin entity, run from the project root:
+
+```bash
+just app doctrine:migrations:diff
+```
+
+When prompted, select your **plugin's namespace** (not `AppMigrations`):
+
+```
+Which migrations configuration would you like to use?
+ [0] AppMigrations
+ [1] PluginYourPluginMigrations
+> 1
+```
+
+The migration file is placed in `plugins/your-plugin/migrations/VersionXXX.php`.
+
+!!! warning
+    Never put plugin DDL in `AppMigrations` and never put core DDL in a plugin namespace.
+    Wrong selection = migrations written to the wrong directory.
+
+`just appMigrate` applies all pending migrations (core + all active plugins) in timestamp order.
+
 ---
 
 ## Plugin discovery
