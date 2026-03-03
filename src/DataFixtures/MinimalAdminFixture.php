@@ -8,11 +8,10 @@ use App\Entity\UserStatus;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class MinimalAdminFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
+class MinimalAdminFixture extends AbstractFixture implements FixtureGroupInterface
 {
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
@@ -43,13 +42,6 @@ class MinimalAdminFixture extends AbstractFixture implements FixtureGroupInterfa
 
         $this->addRefUser(UserFixture::ADMIN, $user);
         $this->stop();
-    }
-
-    public function getDependencies(): array
-    {
-        return [
-            SystemUserFixture::class,
-        ];
     }
 
     public static function getGroups(): array
