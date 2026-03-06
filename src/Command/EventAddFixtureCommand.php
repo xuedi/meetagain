@@ -146,7 +146,7 @@ class EventAddFixtureCommand extends Command
         ));
 
         // Run plugin fixtures for enabled plugins only
-        $enabledPlugins = $this->pluginService->getActiveList();
+        $enabledPlugins = $this->pluginService->getGloballyActiveList();
         foreach ($this->plugins as $plugin) {
             if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
                 continue;

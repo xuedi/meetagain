@@ -26,7 +26,7 @@ class PluginPreFixturesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $enabledPlugins = $this->pluginService->getActiveList();
+        $enabledPlugins = $this->pluginService->getGloballyActiveList();
         $hasErrors = false;
 
         foreach ($this->plugins as $plugin) {
