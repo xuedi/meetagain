@@ -3,7 +3,9 @@
 namespace App\Service;
 
 use App\ExtendedFilesystem;
+use App\Filter\Plugin\PluginListFilterInterface;
 use JsonException;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;
 
 readonly class PluginService
@@ -16,6 +18,8 @@ readonly class PluginService
         private ExtendedFilesystem $filesystem,
         string $kernelProjectDir,
         private string $environment,
+        #[AutowireIterator(PluginListFilterInterface::class)]
+        private iterable $pluginListFilters = [],
     ) {
         $this->configDir = $kernelProjectDir . '/config';
         $this->pluginDir = $kernelProjectDir . '/plugins';
@@ -52,7 +56,13 @@ readonly class PluginService
         return $plugins;
     }
 
-    public function getActiveList(): array
+    /**
+     * Returns all globally active plugin keys from config/plugins.php.
+     * Does NOT apply any context filters — always reflects the platform admin's settings.
+     *
+     * @return array<string>
+     */
+    public function getGloballyActiveList(): array
     {
         $config = $this->getPluginConfig();
 
@@ -62,6 +72,75 @@ readonly class PluginService
         $activePlugins[] = 'core_navigation';
 
         return $activePlugins;
+    }
+
+    /**
+     * Returns active plugin keys for the current request context.
+     * Applies all registered PluginListFilterInterface implementations (AND logic).
+     *
+     * @return array<string>
+     */
+    public function getActiveList(): array
+    {
+        $activeKeys = $this->getGloballyActiveList();
+
+        foreach ($this->pluginListFilters as $filter) {
+            $filtered = $filter->filterActivePlugins($activeKeys);
+            if ($filtered !== null) {
+                $activeKeys = array_values(array_intersect($activeKeys, $filtered));
+            }
+        }
+
+        return $activeKeys;
+    }
+
+    /**
+     * Returns globally active plugins that group founders can activate for their group.
+     * Excludes plugins where manifest.json has "group_activatable": false.
+     *
+     * @return array<array{key: string, name: string, description: string}>
+     */
+    public function getActivatableByGroupList(): array
+    {
+        $globallyActive = $this->getGloballyActiveList();
+        $result = [];
+
+        foreach ($this->parsePluginDir() as $pluginPath) {
+            $pluginKey = basename((string) $pluginPath);
+
+            if (!in_array($pluginKey, $globallyActive, true)) {
+                continue;
+            }
+
+            $manifest = $pluginPath . '/manifest.json';
+            if (!$this->filesystem->fileExists($manifest)) {
+                continue;
+            }
+
+            $manifestContent = $this->filesystem->getFileContents($manifest);
+            if ($manifestContent === false) {
+                continue;
+            }
+
+            try {
+                $pluginData = json_decode($manifestContent, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                continue;
+            }
+
+            // Skip plugins that have opted out of group activation
+            if (isset($pluginData['group_activatable']) && $pluginData['group_activatable'] === false) {
+                continue;
+            }
+
+            $result[] = [
+                'key' => $pluginKey,
+                'name' => $pluginData['name'] ?? $pluginKey,
+                'description' => $pluginData['description'] ?? '',
+            ];
+        }
+
+        return $result;
     }
 
     public function install(string $pluginKey): void
