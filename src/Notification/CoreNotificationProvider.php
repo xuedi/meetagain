@@ -19,8 +19,7 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         private UserRepository $userRepo,
         private SupportRequestRepository $supportRequestRepo,
         private Security $security,
-    ) {
-    }
+    ) {}
 
     public function getPriority(): int
     {
@@ -71,7 +70,6 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
                 route: 'app_admin_support_list',
             );
         }
-
 
         return $items;
     }

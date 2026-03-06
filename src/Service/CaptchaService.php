@@ -157,12 +157,7 @@ readonly class CaptchaService
             $draw = new ImagickDraw();
             $draw->setFont(__DIR__ . '/../../public/fonts/captcha.ttf');
             $draw->setFontSize($size + random_int(-4, 6));
-            $draw->setFillColor(sprintf(
-                'rgb(%d,%d,%d)',
-                random_int(0, 80),
-                random_int(0, 80),
-                random_int(0, 80),
-            ));
+            $draw->setFillColor(sprintf('rgb(%d,%d,%d)', random_int(0, 80), random_int(0, 80), random_int(0, 80)));
             $image->annotateImage($draw, $x, $y, $angle, $char);
             $x += 20 + random_int(-4, 4);
         }
