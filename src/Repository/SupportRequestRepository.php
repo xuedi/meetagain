@@ -17,7 +17,8 @@ class SupportRequestRepository extends ServiceEntityRepository
 
     public function getNewCount(): int
     {
-        return (int) $this->createQueryBuilder('sr')
+        return (int) $this
+            ->createQueryBuilder('sr')
             ->select('COUNT(sr.id)')
             ->where('sr.status = :status')
             ->setParameter('status', SupportRequestStatus::New)

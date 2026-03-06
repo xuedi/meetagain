@@ -31,15 +31,17 @@ class SupportController extends AbstractController
     {
         $limiter = $this->supportLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
-            return $this->render('rate_limited.html.twig', [
-                'message' => 'Too many support requests. Please try again later.',
-            ], new Response('', 429));
+            return $this->render(
+                'rate_limited.html.twig',
+                [
+                    'message' => 'Too many support requests. Please try again later.',
+                ],
+                new Response('', 429),
+            );
         }
 
         $user = $this->getUser();
-        $defaultData = $user instanceof User
-            ? ['name' => $user->getName(), 'email' => $user->getEmail()]
-            : [];
+        $defaultData = $user instanceof User ? ['name' => $user->getName(), 'email' => $user->getEmail()] : [];
 
         $form = $this->createForm(SupportRequestType::class, $defaultData);
         $form->handleRequest($request);
@@ -58,8 +60,12 @@ class SupportController extends AbstractController
 
             if ($form->getErrors(true)->count() === 0) {
                 $supportRequest = new SupportRequest();
-                $supportRequest->setName($user instanceof User ? (string) $user->getName() : (string) $form->get('name')->getData());
-                $supportRequest->setEmail($user instanceof User ? (string) $user->getEmail() : (string) $form->get('email')->getData());
+                $supportRequest->setName(
+                    $user instanceof User ? (string) $user->getName() : (string) $form->get('name')->getData(),
+                );
+                $supportRequest->setEmail(
+                    $user instanceof User ? (string) $user->getEmail() : (string) $form->get('email')->getData(),
+                );
                 $supportRequest->setMessage((string) $form->get('message')->getData());
                 $supportRequest->setCreatedAt(new DateTimeImmutable());
                 $supportRequest->setStatus(SupportRequestStatus::New);
