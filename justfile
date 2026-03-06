@@ -111,6 +111,11 @@ devModeFixtures plugins='':
     {{PHP}} php bin/console app:event:add-fixture
     {{JUST}} appClearCache
 
+# Full dev environment with ALL plugins active — ideal for testing plugin interactions
+[group('development')]
+devModeMax:
+    {{JUST}} devModeFixtures all
+
 # Minimal dev environment with install fixtures only (no sample content) — ideal for testing imports
 [group('development')]
 devModeMinimal plugins='':

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\ExtendedFilesystem;
+use App\Filter\Plugin\PluginListFilterInterface;
 use App\Service\CommandService;
 use App\Service\PluginService;
 use PHPUnit\Framework\TestCase;
@@ -116,6 +117,115 @@ class PluginServiceTest extends TestCase
         // Assert: returns only enabled plugins (plugin1 is true, plugin2 is false)
         $this->assertContains('plugin1', $result);
         $this->assertNotContains('plugin2', $result);
+    }
+
+    public function testGetGloballyActiveListIgnoresFilters(): void
+    {
+        // Arrange: service with a filter that would restrict the list
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+
+        $filter = $this->createMock(PluginListFilterInterface::class);
+        $filter->method('filterActivePlugins')->willReturn([]);
+
+        $subject = new PluginService(
+            $this->createStub(CommandService::class),
+            $fsStub,
+            $this->tempDir,
+            'test',
+            [$filter],
+        );
+
+        // Act: get globally active list — filters must NOT be applied
+        $result = $subject->getGloballyActiveList();
+
+        // Assert: plugin1 still visible regardless of filter
+        $this->assertContains('plugin1', $result);
+    }
+
+    public function testGetActiveListAppliesFilterAndIntersects(): void
+    {
+        // Arrange: filter restricts to empty set
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+
+        $filter = $this->createMock(PluginListFilterInterface::class);
+        $filter->method('filterActivePlugins')->willReturn([]);
+
+        $subject = new PluginService(
+            $this->createStub(CommandService::class),
+            $fsStub,
+            $this->tempDir,
+            'test',
+            [$filter],
+        );
+
+        // Act
+        $result = $subject->getActiveList();
+
+        // Assert: filter restricts list to empty (no plugins active for this context)
+        $this->assertNotContains('plugin1', $result);
+    }
+
+    public function testGetActiveListReturnsGlobalListWhenFilterReturnsNull(): void
+    {
+        // Arrange: filter returns null (no opinion)
+        $fsStub = $this->createStub(ExtendedFilesystem::class);
+        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+
+        $filter = $this->createMock(PluginListFilterInterface::class);
+        $filter->method('filterActivePlugins')->willReturn(null);
+
+        $subject = new PluginService(
+            $this->createStub(CommandService::class),
+            $fsStub,
+            $this->tempDir,
+            'test',
+            [$filter],
+        );
+
+        // Act
+        $result = $subject->getActiveList();
+
+        // Assert: null filter means no restriction — globally active plugins returned
+        $this->assertContains('plugin1', $result);
+        $this->assertNotContains('plugin2', $result);
+    }
+
+    public function testGetActivatableByGroupListExcludesGroupActivatableFalsePlugins(): void
+    {
+        // Arrange: two plugins, one with group_activatable: false
+        $pluginDir = $this->tempDir . '/plugins';
+        mkdir($pluginDir, 0777, true);
+        mkdir($pluginDir . '/plugin1', 0777, true);
+        mkdir($pluginDir . '/hidden_plugin', 0777, true);
+
+        file_put_contents($pluginDir . '/plugin1/manifest.json', json_encode([
+            'name' => 'Plugin 1',
+            'description' => 'Regular plugin',
+        ]));
+        file_put_contents($pluginDir . '/hidden_plugin/manifest.json', json_encode([
+            'name' => 'Hidden Plugin',
+            'description' => 'Infrastructure only',
+            'group_activatable' => false,
+        ]));
+
+        $fsMock = $this->createMock(ExtendedFilesystem::class);
+        $fsMock->method('exists')->willReturn(true);
+        $fsMock->method('glob')->willReturn([$pluginDir . '/plugin1', $pluginDir . '/hidden_plugin']);
+        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
+
+        // plugin1 is globally active, hidden_plugin is not in test config
+        $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir, 'test');
+
+        // Act
+        $result = $subject->getActivatableByGroupList();
+
+        // Assert: only plugin1 appears (plugin1 active + no group_activatable restriction)
+        $keys = array_column($result, 'key');
+        $this->assertContains('plugin1', $keys);
+        $this->assertNotContains('hidden_plugin', $keys);
     }
 
     public function testInstallAddsPluginToConfigAsDisabled(): void
