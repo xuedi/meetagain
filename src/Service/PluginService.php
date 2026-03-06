@@ -77,21 +77,27 @@ readonly class PluginService
     /**
      * Returns active plugin keys for the current request context.
      * Applies all registered PluginListFilterInterface implementations (AND logic).
+     * Filters only operate on group-activatable plugins; core and infrastructure plugins
+     * (e.g. core_navigation, multisite) are always included regardless of group context.
      *
      * @return array<string>
      */
     public function getActiveList(): array
     {
-        $activeKeys = $this->getGloballyActiveList();
+        $allActive = $this->getGloballyActiveList();
+
+        $activatableKeys = array_column($this->getActivatableByGroupList(), 'key');
+        $alwaysOn = array_values(array_diff($allActive, $activatableKeys));
+        $groupManaged = array_values(array_intersect($allActive, $activatableKeys));
 
         foreach ($this->pluginListFilters as $filter) {
-            $filtered = $filter->filterActivePlugins($activeKeys);
+            $filtered = $filter->filterActivePlugins($groupManaged);
             if ($filtered !== null) {
-                $activeKeys = array_values(array_intersect($activeKeys, $filtered));
+                $groupManaged = array_values(array_intersect($groupManaged, $filtered));
             }
         }
 
-        return $activeKeys;
+        return array_merge($alwaysOn, $groupManaged);
     }
 
     /**

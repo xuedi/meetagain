@@ -76,10 +76,14 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
         $this->subject = new CaptchaService($this->requestStackMock);
 
-        $this->sessionMock->method('get')
+        $this->sessionMock
+            ->method('get')
             ->with('captcha_text')
             ->willReturn('hgfw');
-        $this->sessionMock->expects($this->once())->method('remove')->with('captcha_attempts');
+        $this->sessionMock
+            ->expects($this->once())
+            ->method('remove')
+            ->with('captcha_attempts');
 
         // Act
         $result = $this->subject->isValid('hgfw');
@@ -96,11 +100,16 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
         $this->subject = new CaptchaService($this->requestStackMock);
 
-        $this->sessionMock->method('get')->willReturnMap([
-            ['captcha_text', null, 'jrdf'],
-            ['captcha_attempts', 0, 0],
-        ]);
-        $this->sessionMock->expects($this->once())->method('set')->with('captcha_attempts', 1);
+        $this->sessionMock
+            ->method('get')
+            ->willReturnMap([
+                ['captcha_text',     null, 'jrdf'],
+                ['captcha_attempts', 0,    0],
+            ]);
+        $this->sessionMock
+            ->expects($this->once())
+            ->method('set')
+            ->with('captcha_attempts', 1);
 
         // Act
         $result = $this->subject->isValid('hgfw');
@@ -117,10 +126,12 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
         $this->subject = new CaptchaService($this->requestStackMock);
 
-        $this->sessionMock->method('get')->willReturnMap([
-            ['captcha_text', null, 'jrdf'],
-            ['captcha_attempts', 0, 2], // 3rd attempt → triggers forced reset
-        ]);
+        $this->sessionMock
+            ->method('get')
+            ->willReturnMap([
+                ['captcha_text',     null, 'jrdf'],
+                ['captcha_attempts', 0,    2], // 3rd attempt → triggers forced reset
+            ]);
 
         // Assert: captcha is fully cleared after MAX_ATTEMPTS failures
         $this->sessionMock->expects($this->exactly(3))->method('remove');

@@ -22,8 +22,8 @@ use App\Entity\UserRole;
 use App\Entity\UserStatus;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
-use DateTimeImmutable;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use ZipArchive;
@@ -212,7 +212,7 @@ readonly class ImportService
     ): void {
         foreach ($eventsData as $eventData) {
             $locationRef = $eventData['location_ref'] ?? null;
-            $location = $locationRef !== null ? ($locationRefMap[(int) $locationRef] ?? null) : null;
+            $location = $locationRef !== null ? $locationRefMap[(int) $locationRef] ?? null : null;
 
             if ($location === null) {
                 $location = $this->locationRepository->findOneBy([]) ?? $this->createFallbackLocation($systemUser);
@@ -242,9 +242,9 @@ readonly class ImportService
             }
 
             $creatorEmail = (string) ($eventData['creator_email'] ?? '');
-            $creator = $userEmailMap[$creatorEmail]
-                ?? $this->userRepository->findOneBy(['email' => $creatorEmail])
-                ?? $systemUser;
+            $creator =
+                $userEmailMap[$creatorEmail] ?? $this->userRepository->findOneBy(['email' => $creatorEmail])
+                    ?? $systemUser;
             $event->setUser($creator);
 
             foreach ($eventData['titles'] ?? [] as $lang => $title) {

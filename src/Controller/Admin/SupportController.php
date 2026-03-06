@@ -16,12 +16,9 @@ class SupportController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
-            section: 'System',
-            links: [
-                new AdminLink(label: 'Support', route: 'app_admin_support_list', active: 'support'),
-            ],
-        );
+        return new AdminNavigationConfig(section: 'System', links: [
+            new AdminLink(label: 'Support', route: 'app_admin_support_list', active: 'support'),
+        ]);
     }
 
     public function __construct(
