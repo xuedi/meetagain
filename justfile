@@ -95,6 +95,7 @@ devModeReset plugins='':
     {{JUST}} do "composer install"
     {{PHP}} php bin/console app:plugin disable all
     {{PHP}} php bin/console app:plugin enable {{plugins}}
+    {{PHP}} php bin/console cache:clear -q
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
