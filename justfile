@@ -210,7 +210,6 @@ testPerformance:
     {{DOCKER}} stop php-bench
     xdg-open "$(find tests/reports/performance/sitespeed-result -name 'index.html' -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2)"
 
-
 # Check Mago (linter)
 [group('checks')]
 checkMago:
