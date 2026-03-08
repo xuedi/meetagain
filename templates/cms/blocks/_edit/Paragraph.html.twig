@@ -15,9 +15,43 @@
         </div>
     </div>
 
+    <div class="field">
+        <div class="control">
+            <label class="checkbox">
+                <input type="hidden" name="imageRight" value="0">
+                <input type="checkbox" name="imageRight" value="1" {% if block is defined and block.imageRight %}checked{% endif %}>
+                Image Right
+            </label>
+        </div>
+    </div>
+
 {% else %}
 
-    <h1 class="title is-4">{{ block.title }}</h1>
-    <p>{{ block.content|nl2br }}</p>
+    <div class="columns is-vcentered">
+        {% if not block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image_upload.html.twig' with {
+                    'entity': 'cmsBlock',
+                    'id': blockId,
+                    'image': blockImage
+                } %}
+            </div>
+            <div class="column is-1"></div>
+        {% endif %}
+        <div class="column">
+            <h2 class="title is-5">{{ block.title }}</h2>
+            <p>{{ block.content|nl2br }}</p>
+        </div>
+        {% if block.imageRight %}
+            <div class="column is-1"></div>
+            <div class="column is-4">
+                {% include '_components/image_upload.html.twig' with {
+                    'entity': 'cmsBlock',
+                    'id': blockId,
+                    'image': blockImage
+                } %}
+            </div>
+        {% endif %}
+    </div>
 
 {% endif %}

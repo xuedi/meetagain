@@ -11,13 +11,14 @@ class Paragraph implements BlockType
     private function __construct(
         public string $title,
         public string $content,
+        public bool $imageRight,
         public ?ImageEntity $image,
     ) {}
 
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
-        return new self($json['title'], $json['content'], $image);
+        return new self($json['title'], $json['content'], (bool) ($json['imageRight'] ?? false), $image);
     }
 
     #[Override]
@@ -32,6 +33,7 @@ class Paragraph implements BlockType
         return [
             'title' => $this->title,
             'content' => $this->content,
+            'imageRight' => $this->imageRight,
             'image' => $this->image,
         ];
     }
