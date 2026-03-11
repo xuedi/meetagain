@@ -3,12 +3,22 @@
 namespace Plugin\Bookclub;
 
 use App\Entity\AdminSection;
+use App\Entity\Link;
 use App\Entity\WarmCacheType;
 use App\Plugin;
+use Plugin\Bookclub\Repository\BookSelectionRepository;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class Kernel implements Plugin
 {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly Environment $twig,
+        private readonly BookSelectionRepository $selectionRepository,
+    ) {}
+
     public function getPluginKey(): string
     {
         return 'bookclub';
@@ -16,12 +26,20 @@ class Kernel implements Plugin
 
     public function getMenuLinks(): array
     {
-        return [];
+        return [
+            new Link(slug: $this->urlGenerator->generate('app_plugin_bookclub'), name: 'books'),
+            new Link(slug: $this->urlGenerator->generate('app_plugin_bookclub_poll_list'), name: 'polls'),
+        ];
     }
 
     public function getEventTile(int $eventId): ?string
     {
-        return null;
+        $selection = $this->selectionRepository->findByEventId($eventId);
+
+        return $this->twig->render('@Bookclub/tile/event.html.twig', [
+            'selection' => $selection,
+            'eventId' => $eventId,
+        ]);
     }
 
     public function loadPostExtendFixtures(OutputInterface $output): void

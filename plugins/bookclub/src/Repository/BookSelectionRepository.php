@@ -23,6 +23,11 @@ class BookSelectionRepository extends ServiceEntityRepository
         return $this->findOneBy(['event' => $event]);
     }
 
+    public function findByEventId(int $eventId): ?BookSelection
+    {
+        return $this->findOneBy(['event' => $eventId]);
+    }
+
     /** @return BookSelection[] */
     public function findByBook(Book $book): array
     {

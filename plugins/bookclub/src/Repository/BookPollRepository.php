@@ -26,4 +26,9 @@ class BookPollRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['status' => PollStatus::Closed], ['createdAt' => 'DESC']);
     }
+
+    public function findByEventId(int $eventId): ?BookPoll
+    {
+        return $this->findOneBy(['eventId' => $eventId]);
+    }
 }

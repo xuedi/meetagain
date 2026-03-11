@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All Polls - Book Club{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li class="is-active"><a>All Polls</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">All Polls</h1>
+
+        {% if polls is empty %}
+            <p class="has-text-grey">No polls have been created yet.</p>
+        {% else %}
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Winner</th>
+                        <th>Event</th>
+                        <th>Options</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for poll in polls %}
+                        {% set winner = winners[poll.id] ?? null %}
+                        {% set event = events[poll.id] ?? null %}
+                        <tr>
+                            <td>
+                                {% if poll.status.value == 0 and is_granted('ROLE_ORGANIZER') %}
+                                    <a href="{{ path('app_plugin_bookclub_poll_manage', {id: poll.id}) }}">
+                                        {{ poll.title ?? 'Untitled Poll' }}
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('app_plugin_bookclub_poll_results', {id: poll.id}) }}">
+                                        {{ poll.title ?? 'Untitled Poll' }}
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if poll.status.value == 0 %}
+                                    <span class="tag is-light">Draft</span>
+                                {% elseif poll.status.value == 1 %}
+                                    <span class="tag is-info">Open</span>
+                                {% else %}
+                                    <span class="tag is-success">Closed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if winner %}
+                                    <a href="{{ path('app_plugin_bookclub_book_show', {id: winner.book.id}) }}">
+                                        {{ winner.book.title }}
+                                    </a>
+                                {% else %}
+                                    <span class="has-text-grey">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if event %}
+                                    <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.getTitle('en') }}</a>
+                                    <span class="has-text-grey is-size-7">{{ event.start|date('Y-m-d') }}</span>
+                                {% else %}
+                                    <span class="has-text-grey">—</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ poll.suggestions|length }}</td>
+                            <td>{{ poll.createdAt|date('Y-m-d') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
