@@ -21,9 +21,15 @@
 {% else %}
     <p class="has-text-grey">No book selected yet</p>
     {% if is_granted('ROLE_ORGANIZER') %}
-        <a href="{{ path('app_plugin_bookclub_select', {eventId: eventId}) }}" class="button is-small is-success mt-2">
-            <span class="icon"><i class="fas fa-plus"></i></span>
-            <span>Select book</span>
-        </a>
+        <div class="buttons mt-2">
+            <a href="{{ path('app_plugin_bookclub_select', {eventId: eventId}) }}" class="button is-small is-success">
+                <span class="icon"><i class="fas fa-plus"></i></span>
+                <span>Select book</span>
+            </a>
+            <a href="{{ path('app_plugin_bookclub_poll_create', {eventId: eventId}) }}" class="button is-small is-info">
+                <span class="icon"><i class="fas fa-poll"></i></span>
+                <span>Create poll</span>
+            </a>
+        </div>
     {% endif %}
 {% endif %}

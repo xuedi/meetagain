@@ -25,7 +25,12 @@
                         <th>Winner</th>
                         <th>Event</th>
                         <th>Options</th>
-                        <th>Created</th>
+                        <th>
+                            Created
+                            {% if is_granted('ROLE_ORGANIZER') %}
+                                <a href="{{ path('app_plugin_bookclub_poll_create') }}"><span class="icon"><i class="fa fa-plus"></i></span></a>
+                            {% endif %}
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
