@@ -12,12 +12,9 @@
             </ul>
         </nav>
 
-        <h1 class="title">{{ poll.title ?? 'Poll Results' }}</h1>
+        <h1 class="title">Poll Results: {{ event.getTitle('en') }}</h1>
         <p class="subtitle">
-            Total votes: {{ results.totalVotes }}
-            {% if event %}
-                | For Event: <strong>{{ event.getTitle('en') }}</strong> ({{ event.start|date('Y-m-d') }})
-            {% endif %}
+            Total votes: {{ results.totalVotes }} | {{ event.start|date('Y-m-d') }}
         </p>
 
         {% if results.winner %}
@@ -63,11 +60,6 @@
             </tbody>
         </table>
 
-        <div class="buttons mt-5">
-            <a href="{{ path('app_plugin_bookclub') }}" class="button is-primary">
-                Back to Book Club
-            </a>
-        </div>
     </div>
 </section>
 {% endblock %}

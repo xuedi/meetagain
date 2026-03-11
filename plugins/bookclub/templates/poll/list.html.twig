@@ -20,15 +20,16 @@
             <table class="table is-fullwidth is-striped is-hoverable">
                 <thead>
                     <tr>
-                        <th>Title</th>
                         <th>Status</th>
                         <th>Winner</th>
                         <th>Event</th>
                         <th>Options</th>
+                        <th>Created</th>
                         <th>
-                            Created
                             {% if is_granted('ROLE_ORGANIZER') %}
-                                <a href="{{ path('app_plugin_bookclub_poll_create') }}"><span class="icon"><i class="fa fa-plus"></i></span></a>
+                                <a href="{{ path('app_plugin_bookclub_poll_create') }}">
+                                    <span class="icon"><i class="fa fa-plus"></i></span>
+                                </a>
                             {% endif %}
                         </th>
                     </tr>
@@ -39,20 +40,7 @@
                         {% set event = events[poll.id] ?? null %}
                         <tr>
                             <td>
-                                {% if poll.status.value == 0 and is_granted('ROLE_ORGANIZER') %}
-                                    <a href="{{ path('app_plugin_bookclub_poll_manage', {id: poll.id}) }}">
-                                        {{ poll.title ?? 'Untitled Poll' }}
-                                    </a>
-                                {% else %}
-                                    <a href="{{ path('app_plugin_bookclub_poll_results', {id: poll.id}) }}">
-                                        {{ poll.title ?? 'Untitled Poll' }}
-                                    </a>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if poll.status.value == 0 %}
-                                    <span class="tag is-light">Draft</span>
-                                {% elseif poll.status.value == 1 %}
+                                {% if poll.status.value == 1 %}
                                     <span class="tag is-info">Open</span>
                                 {% else %}
                                     <span class="tag is-success">Closed</span>
@@ -77,6 +65,17 @@
                             </td>
                             <td>{{ poll.suggestions|length }}</td>
                             <td>{{ poll.createdAt|date('Y-m-d') }}</td>
+                            <td>
+                                {% if poll.status.value == 1 %}
+                                    <a href="{{ path('app_plugin_bookclub_poll') }}">
+                                        <span class="icon"><i class="fa fa-vote-yea"></i></span>
+                                    </a>
+                                {% elseif poll.status.value == 2 %}
+                                    <a href="{{ path('app_plugin_bookclub_poll_results', {id: poll.id}) }}">
+                                        <span class="icon"><i class="fa fa-chart-bar"></i></span>
+                                    </a>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
