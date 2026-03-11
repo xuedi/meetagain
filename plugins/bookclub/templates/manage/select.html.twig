@@ -13,42 +13,108 @@
         </nav>
 
         <h1 class="title">Select Book for Event</h1>
-        <p class="subtitle">Event: {{ event.title }}</p>
+        <p class="subtitle"><a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.getTitle(app.locale) }}</a>
+        </p>
 
-        {% if currentSelection %}
-            <div class="notification is-info">
-                <strong>Current selection:</strong> {{ currentSelection.book.title }}
-                <form action="{{ path('app_plugin_bookclub_unselect', {selectionId: currentSelection.id}) }}" method="post" style="display: inline; margin-left: 1rem;">
-                    <button type="submit" class="button is-small is-warning">Remove</button>
-                </form>
-            </div>
-        {% else %}
-            <form action="{{ path('app_plugin_bookclub_select_submit', {eventId: event.id}) }}" method="post">
-                <div class="field">
-                    <label class="label">Select a Book</label>
-                    <div class="control">
-                        <div class="select is-fullwidth">
-                            <select name="book_id" required>
-                                <option value="">-- Choose a book --</option>
-                                {% for book in books %}
-                                    <option value="{{ book.id }}">
-                                        {{ book.title }} - {{ book.author ?? 'Unknown' }}
-                                    </option>
-                                {% endfor %}
-                            </select>
+        <div class="columns">
+
+            {# Left column: current selection + manual pick #}
+            <div class="column is-5">
+                {% if currentSelection %}
+                    <h2 class="title is-5">Current Selection</h2>
+
+                    <div class="notification">
+                        <p class="has-text-weight-bold">
+                            <a href="{{ path('app_plugin_bookclub_book_show', {id: currentSelection.book.id}) }}">
+                                {{ currentSelection.book.title }}
+                            </a>
+                        </p>
+                        {% if currentSelection.book.author %}
+                            <p class="has-text-grey is-size-7">{{ currentSelection.book.author }}</p>
+                        {% endif %}
+                        <form action="{{ path('app_plugin_bookclub_unselect', {selectionId: currentSelection.id}) }}" method="post" class="mt-3">
+                            <button type="submit" class="button is-small is-warning">Remove selection</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <h2 class="title is-5">Choose a Book Manually</h2>
+                    <form action="{{ path('app_plugin_bookclub_select_submit', {eventId: event.id}) }}" method="post">
+                        <div class="field">
+                            <label class="label" for="book_id">Book</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="book_id" name="book_id" required>
+                                        <option value="">-- Choose a book --</option>
+                                        {% for book in books %}
+                                            <option value="{{ book.id }}">{{ book.title }}{% if book.author %} — {{ book.author }}{% endif %}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                        <div class="field">
+                            <div class="control">
+                                <button type="submit" class="button is-primary">Assign to event</button>
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
 
-                <div class="field">
-                    <div class="control">
-                        <button type="submit" class="button is-primary">
-                            Assign Book to Event
-                        </button>
-                    </div>
-                </div>
-            </form>
-        {% endif %}
+            </div>
+
+            {# Right column: poll results #}
+            <div class="column is-7">
+                <h2 class="title is-5">Poll Result</h2>
+
+                {% if poll %}
+
+                    {% if pollResults.winner %}
+                        <div class="notification mb-3">
+                            <span class="icon"><i class="fas fa-trophy"></i></span>
+                            <strong>Winner: {{ pollResults.winner.book.title }}</strong>
+                            {% if pollResults.winner.book.author %}
+                                <span class="has-text-grey"> — {{ pollResults.winner.book.author }}</span>
+                            {% endif %}
+
+                            {% if not currentSelection %}
+                                <form action="{{ path('app_plugin_bookclub_select_winner', {eventId: event.id}) }}" method="post" class="mt-2">
+                                    <button type="submit" class="button is-small is-success">
+                                        <span class="icon"><i class="fas fa-check"></i></span>
+                                        <span>Select poll winner</span>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <table class="table is-fullwidth is-striped is-size-7">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Votes</th>
+                                <th>Voted by</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for suggestion in poll.suggestions %}
+                                {% set voteCount = pollResults.votes[suggestion.id] ?? 0 %}
+                                {% set voters = votesByUser|filter(v => v.suggestionId == suggestion.id) %}
+                                <tr class="{% if pollResults.winner and suggestion.id == pollResults.winner.id %}has-background-success-light{% endif %}">
+                                    <td>{{ suggestion.book.title }}</td>
+                                    <td><span class="tag is-info">{{ voteCount }}</span></td>
+                                    <td class="has-text-grey">
+                                        {% for v in voters %}{{ v.userName }}{% if not loop.last %}, {% endif %}{% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="has-text-grey">No poll is linked to this event.</p>
+                {% endif %}
+            </div>
+
+        </div>
     </div>
 </section>
 {% endblock %}

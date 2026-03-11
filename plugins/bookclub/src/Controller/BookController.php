@@ -3,6 +3,7 @@
 namespace Plugin\Bookclub\Controller;
 
 use App\Controller\AbstractController;
+use App\Repository\UserRepository;
 use Plugin\Bookclub\Form\BookIsbnType;
 use Plugin\Bookclub\Service\BookService;
 use RuntimeException;
@@ -16,6 +17,7 @@ class BookController extends AbstractController
 {
     public function __construct(
         private readonly BookService $bookService,
+        private readonly UserRepository $userRepository,
     ) {}
 
     #[Route('', name: 'app_plugin_bookclub', methods: ['GET'])]
@@ -34,8 +36,13 @@ class BookController extends AbstractController
             throw $this->createNotFoundException('Book not found');
         }
 
+        $createdBy = $book->getCreatedBy() !== null
+            ? $this->userRepository->find($book->getCreatedBy())
+            : null;
+
         return $this->render('@Bookclub/book/detail.html.twig', [
             'book' => $book,
+            'createdBy' => $createdBy,
         ]);
     }
 

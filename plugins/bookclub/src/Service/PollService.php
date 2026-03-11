@@ -248,4 +248,10 @@ readonly class PollService
     {
         return $this->pollRepo->findBy(['status' => PollStatus::Draft], ['createdAt' => 'DESC']);
     }
+
+    /** @return BookPoll[] */
+    public function getAll(): array
+    {
+        return $this->pollRepo->findBy([], ['createdAt' => 'DESC']);
+    }
 }

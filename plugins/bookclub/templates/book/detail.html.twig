@@ -49,6 +49,12 @@
                                 <td>{{ book.pageCount }}</td>
                             </tr>
                             {% endif %}
+                            {% if createdBy %}
+                            <tr>
+                                <th>Added by</th>
+                                <td>{{ createdBy.name }}</td>
+                            </tr>
+                            {% endif %}
                             <tr>
                                 <th>Status</th>
                                 <td>
