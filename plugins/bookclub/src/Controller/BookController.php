@@ -4,6 +4,7 @@ namespace Plugin\Bookclub\Controller;
 
 use App\Controller\AbstractController;
 use App\Repository\UserRepository;
+use Plugin\Bookclub\Entity\ViewType;
 use Plugin\Bookclub\Form\BookIsbnType;
 use Plugin\Bookclub\Service\BookService;
 use RuntimeException;
@@ -21,11 +22,23 @@ class BookController extends AbstractController
     ) {}
 
     #[Route('', name: 'app_plugin_bookclub', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $session = $request->getSession();
+        $viewType = $session->get('bookclubViewType', ViewType::Tiles->value);
+
         return $this->render('@Bookclub/index.html.twig', [
             'books' => $this->bookService->getApprovedList(),
+            'viewType' => $viewType,
         ]);
+    }
+
+    #[Route('/set/view/{type}', name: 'app_plugin_bookclub_set_view', methods: ['GET'])]
+    public function setView(Request $request, ViewType $type): Response
+    {
+        $request->getSession()->set('bookclubViewType', $type->value);
+
+        return $this->redirectToRoute('app_plugin_bookclub');
     }
 
     #[Route('/book/{id}', name: 'app_plugin_bookclub_book_show', methods: ['GET'])]
