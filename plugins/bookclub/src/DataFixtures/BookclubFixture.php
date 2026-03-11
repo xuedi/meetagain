@@ -5,6 +5,7 @@ namespace Plugin\Bookclub\DataFixtures;
 use App\DataFixtures\AbstractFixture;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\ImageService;
 use DateTimeImmutable;
@@ -17,6 +18,7 @@ use Plugin\Bookclub\Entity\BookPollVote;
 use Plugin\Bookclub\Entity\BookSuggestion;
 use Plugin\Bookclub\Entity\PollStatus;
 use Plugin\Bookclub\Entity\SuggestionStatus;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
@@ -24,6 +26,7 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
     public function __construct(
         private readonly ImageService $imageService,
         private readonly UserRepository $userRepository,
+        private readonly EventRepository $eventRepository,
     ) {}
 
     #[\Override]
@@ -94,8 +97,12 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
     /** @param Book[] $books */
     private function createClosedPollWithVotes(ObjectManager $manager, array $books): void
     {
+        $event = $this->eventRepository->findOneBy([]);
+        if ($event === null) {
+            throw new RuntimeException('No events found in database for bookclub fixture');
+        }
         $poll = new BookPoll();
-        $poll->setTitle('December 2025 Book Selection');
+        $poll->setEventId($event->getId());
         $poll->setCreatedBy(1);
         $poll->setCreatedAt(new DateTimeImmutable('-60 days'));
         $poll->setStartDate(new DateTimeImmutable('-55 days'));

@@ -28,20 +28,19 @@ readonly class PollService
 
     /**
      * @param int[] $suggestionIds Existing suggestion IDs to include
-     * @param int[] $bookIds Book IDs to add directly (manager picks)
+     * @param int[] $bookIds       Book IDs to add directly (manager picks)
      */
     public function create(
-        string $title,
         array $suggestionIds,
         array $bookIds,
         int $userId,
-        ?int $eventId = null,
+        int $eventId,
     ): BookPoll {
         $poll = new BookPoll();
-        $poll->setTitle($title);
         $poll->setCreatedBy($userId);
         $poll->setCreatedAt(new DateTimeImmutable());
-        $poll->setStatus(PollStatus::Draft);
+        $poll->setStatus(PollStatus::Active);
+        $poll->setStartDate(new DateTimeImmutable());
         $poll->setEventId($eventId);
 
         $this->em->persist($poll);
@@ -71,56 +70,6 @@ readonly class PollService
         $this->em->flush();
 
         return $poll;
-    }
-
-    public function addBookToPoll(int $pollId, int $bookId, int $userId): void
-    {
-        $poll = $this->pollRepo->find($pollId);
-        if ($poll === null) {
-            throw new RuntimeException('Poll not found');
-        }
-
-        if ($poll->getStatus() !== PollStatus::Draft) {
-            throw new RuntimeException('Can only add books to draft polls');
-        }
-
-        $book = $this->bookRepo->find($bookId);
-        if ($book === null) {
-            throw new RuntimeException('Book not found');
-        }
-
-        $suggestion = new BookSuggestion();
-        $suggestion->setBook($book);
-        $suggestion->setSuggestedBy($userId);
-        $suggestion->setSuggestedAt(new DateTimeImmutable());
-        $suggestion->setStatus(SuggestionStatus::InPoll);
-        $suggestion->setPoll($poll);
-
-        $this->em->persist($suggestion);
-        $this->em->flush();
-    }
-
-    public function activate(int $pollId, ?DateTimeImmutable $endDate = null): void
-    {
-        $poll = $this->pollRepo->find($pollId);
-        if ($poll === null) {
-            throw new RuntimeException('Poll not found');
-        }
-
-        if ($poll->getStatus() !== PollStatus::Draft) {
-            throw new RuntimeException('Only draft polls can be activated');
-        }
-
-        if ($poll->getSuggestions()->count() < 2) {
-            throw new RuntimeException('Poll needs at least 2 options');
-        }
-
-        $poll->setStatus(PollStatus::Active);
-        $poll->setStartDate(new DateTimeImmutable());
-        $poll->setEndDate($endDate);
-
-        $this->em->persist($poll);
-        $this->em->flush();
     }
 
     public function vote(int $pollId, int $suggestionId, int $userId): void
@@ -241,12 +190,6 @@ readonly class PollService
     public function get(int $id): ?BookPoll
     {
         return $this->pollRepo->find($id);
-    }
-
-    /** @return BookPoll[] */
-    public function getDraftPolls(): array
-    {
-        return $this->pollRepo->findBy(['status' => PollStatus::Draft], ['createdAt' => 'DESC']);
     }
 
     /** @return BookPoll[] */

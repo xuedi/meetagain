@@ -7,7 +7,6 @@ use Plugin\Bookclub\Entity\Book;
 use Plugin\Bookclub\Entity\BookSuggestion;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -24,7 +23,7 @@ class PollCreateType extends AbstractType
         /** @var Event[] $events */
         $events = $options['events'];
 
-        $eventChoices = ['' => null];
+        $eventChoices = [];
         foreach ($events as $event) {
             $label = sprintf('%s - %s', $event->getStart()->format('Y-m-d'), $event->getTitle('en'));
             $eventChoices[$label] = $event->getId();
@@ -51,13 +50,8 @@ class PollCreateType extends AbstractType
         $builder->add('event_id', ChoiceType::class, [
             'label' => 'For Event',
             'choices' => $eventChoices,
-            'required' => false,
+            'required' => true,
             'placeholder' => '-- Select an event --',
-        ])->add('title', TextType::class, [
-            'label' => 'Poll Title',
-            'attr' => [
-                'placeholder' => 'e.g. January 2025 Book Selection',
-            ],
             'constraints' => [
                 new NotBlank(),
             ],
