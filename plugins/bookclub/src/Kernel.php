@@ -6,6 +6,8 @@ use App\Entity\AdminSection;
 use App\Entity\Link;
 use App\Entity\WarmCacheType;
 use App\Plugin;
+use Plugin\Bookclub\Entity\PollStatus;
+use Plugin\Bookclub\Repository\BookPollRepository;
 use Plugin\Bookclub\Repository\BookSelectionRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -17,6 +19,7 @@ class Kernel implements Plugin
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly Environment $twig,
         private readonly BookSelectionRepository $selectionRepository,
+        private readonly BookPollRepository $pollRepository,
     ) {}
 
     public function getPluginKey(): string
@@ -35,9 +38,12 @@ class Kernel implements Plugin
     public function getEventTile(int $eventId): ?string
     {
         $selection = $this->selectionRepository->findByEventId($eventId);
+        $poll = $this->pollRepository->findByEventId($eventId);
+        $activePoll = ($poll !== null && $poll->getStatus() === PollStatus::Active) ? $poll : null;
 
         return $this->twig->render('@Bookclub/tile/event.html.twig', [
             'selection' => $selection,
+            'activePoll' => $activePoll,
             'eventId' => $eventId,
         ]);
     }

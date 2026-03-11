@@ -20,18 +20,10 @@
             <div class="columns">
                 <div class="column is-4">
                     <div class="field">
-                        {{ form_label(form.title, null, {'label_attr': {'class': 'label'}}) }}
-                        <div class="control">
-                            {{ form_widget(form.title, {'attr': {'class': 'input'}}) }}
-                        </div>
-                        {{ form_errors(form.title) }}
-                    </div>
-
-                    <div class="field">
                         {{ form_label(form.event_id, null, {'label_attr': {'class': 'label'}}) }}
-                        <div class="control is-expanded">
+                        <div class="control">
                             <div class="select is-fullwidth">
-                                {{ form_widget(form.event_id, {'attr': {'style': 'width: 100%'}}) }}
+                                {{ form_widget(form.event_id) }}
                             </div>
                         </div>
                         {{ form_errors(form.event_id) }}
@@ -41,7 +33,7 @@
                         <div class="control">
                             <button type="submit" class="button is-primary">
                                 <span class="icon"><i class="fas fa-poll"></i></span>
-                                <span>Create Poll (Draft)</span>
+                                <span>Create Poll</span>
                             </button>
                         </div>
                     </div>

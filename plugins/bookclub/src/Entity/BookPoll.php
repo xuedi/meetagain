@@ -14,9 +14,6 @@ class BookPoll
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $title = null;
-
     #[ORM\Column]
     private ?int $createdBy = null;
 
@@ -30,10 +27,10 @@ class BookPoll
     private ?DateTimeImmutable $endDate = null;
 
     #[ORM\Column(enumType: PollStatus::class)]
-    private PollStatus $status = PollStatus::Draft;
+    private PollStatus $status = PollStatus::Active;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $eventId = null;
+    #[ORM\Column]
+    private int $eventId;
 
     /** @var Collection<int, BookSuggestion> */
     #[ORM\OneToMany(targetEntity: BookSuggestion::class, mappedBy: 'poll')]
@@ -52,18 +49,6 @@ class BookPoll
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(?string $title): static
-    {
-        $this->title = $title;
-
-        return $this;
     }
 
     public function getCreatedBy(): ?int
@@ -148,12 +133,12 @@ class BookPoll
         return $this->votes;
     }
 
-    public function getEventId(): ?int
+    public function getEventId(): int
     {
         return $this->eventId;
     }
 
-    public function setEventId(?int $eventId): static
+    public function setEventId(int $eventId): static
     {
         $this->eventId = $eventId;
 

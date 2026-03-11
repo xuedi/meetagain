@@ -12,12 +12,9 @@
             </ul>
         </nav>
 
-        <h1 class="title">{{ poll.title ?? 'Book Poll' }}</h1>
+        <h1 class="title">{{ event.getTitle('en') }}</h1>
         <p class="subtitle">
-            Vote for the next book to read!
-            {% if event %}
-                <br><span class="is-size-6">For: <strong>{{ event.getTitle('en') }}</strong> ({{ event.start|date('Y-m-d') }})</span>
-            {% endif %}
+            Vote for the next book to read! &mdash; {{ event.start|date('Y-m-d') }}
         </p>
 
         {% if userVote %}
