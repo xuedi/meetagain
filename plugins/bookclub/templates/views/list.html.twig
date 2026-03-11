@@ -1,0 +1,34 @@
+<table class="table is-fullwidth is-striped is-hoverable">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Year</th>
+            <th>Pages</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+            <tr>
+                <td style="width: 50px;">
+                    {% if book.coverImage %}
+                        {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('app_plugin_bookclub_book_show', {id: book.id}) }}">{{ book.title }}</a>
+                </td>
+                <td>{{ book.author ?? 'Unknown' }}</td>
+                <td>{{ book.publishedYear ?? '—' }}</td>
+                <td>{{ book.pageCount ?? '—' }}</td>
+                <td>
+                    {% if is_granted('ROLE_USER') %}
+                        <a href="{{ path('app_plugin_bookclub_note_edit', {bookId: book.id}) }}" class="button is-small is-light">Notes</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
