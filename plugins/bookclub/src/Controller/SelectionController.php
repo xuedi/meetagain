@@ -4,7 +4,10 @@ namespace Plugin\Bookclub\Controller;
 
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
+use App\Repository\UserRepository;
+use Plugin\Bookclub\Repository\BookPollRepository;
 use Plugin\Bookclub\Service\BookService;
+use Plugin\Bookclub\Service\PollService;
 use Plugin\Bookclub\Service\SelectionService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +23,9 @@ class SelectionController extends AbstractController
         private readonly SelectionService $selectionService,
         private readonly BookService $bookService,
         private readonly EventRepository $eventRepository,
+        private readonly BookPollRepository $pollRepository,
+        private readonly PollService $pollService,
+        private readonly UserRepository $userRepository,
     ) {}
 
     #[Route('/select/{eventId}', name: 'app_plugin_bookclub_select', methods: ['GET'])]
@@ -30,12 +36,30 @@ class SelectionController extends AbstractController
             throw $this->createNotFoundException('Event not found');
         }
 
-        $existingSelection = $this->selectionService->getByEvent($event);
+        $currentSelection = $this->selectionService->getByEvent($event);
+
+        $poll = $this->pollRepository->findByEventId($eventId);
+        $pollResults = null;
+        $votesByUser = [];
+        if ($poll !== null) {
+            $pollResults = $this->pollService->getResults($poll->getId());
+            foreach ($poll->getVotes() as $vote) {
+                $user = $this->userRepository->find($vote->getUserId());
+                $votesByUser[] = [
+                    'userName' => $user?->getName() ?? 'Unknown',
+                    'bookTitle' => $vote->getSuggestion()->getBook()->getTitle(),
+                    'suggestionId' => $vote->getSuggestion()->getId(),
+                ];
+            }
+        }
 
         return $this->render('@Bookclub/manage/select.html.twig', [
             'event' => $event,
             'books' => $this->bookService->getApprovedList(),
-            'currentSelection' => $existingSelection,
+            'currentSelection' => $currentSelection,
+            'poll' => $poll,
+            'pollResults' => $pollResults,
+            'votesByUser' => $votesByUser,
         ]);
     }
 
@@ -57,7 +81,38 @@ class SelectionController extends AbstractController
 
         try {
             $this->selectionService->select($book, $event, $user->getId());
-            $this->addFlash('success', 'Book assigned to event.');
+        } catch (RuntimeException $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
+    }
+
+    #[Route('/select-winner/{eventId}', name: 'app_plugin_bookclub_select_winner', methods: ['POST'])]
+    public function selectWinner(int $eventId): Response
+    {
+        $event = $this->eventRepository->find($eventId);
+        if ($event === null) {
+            throw $this->createNotFoundException('Event not found');
+        }
+
+        $poll = $this->pollRepository->findByEventId($eventId);
+        if ($poll === null) {
+            $this->addFlash('danger', 'No poll found for this event.');
+            return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
+        }
+
+        $results = $this->pollService->getResults($poll->getId());
+        $winner = $results['winner'];
+        if ($winner === null) {
+            $this->addFlash('danger', 'No winner found in the poll.');
+            return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
+        }
+
+        $user = $this->getAuthedUser();
+
+        try {
+            $this->selectionService->select($winner->getBook(), $event, $user->getId());
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
@@ -75,7 +130,6 @@ class SelectionController extends AbstractController
 
         $eventId = $selection->getEvent()->getId();
         $this->selectionService->remove($selectionId);
-        $this->addFlash('success', 'Book removed from event.');
 
         return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
     }

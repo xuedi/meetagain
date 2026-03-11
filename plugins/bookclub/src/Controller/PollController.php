@@ -4,6 +4,7 @@ namespace Plugin\Bookclub\Controller;
 
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
+use Plugin\Bookclub\Entity\SuggestionStatus;
 use Plugin\Bookclub\Form\PollCreateType;
 use Plugin\Bookclub\Service\BookService;
 use Plugin\Bookclub\Service\PollService;
@@ -23,6 +24,35 @@ class PollController extends AbstractController
         private readonly BookService $bookService,
         private readonly EventRepository $eventRepository,
     ) {}
+
+    #[Route('/list', name: 'app_plugin_bookclub_poll_list', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function list(): Response
+    {
+        $polls = $this->pollService->getAll();
+
+        $winners = [];
+        $events = [];
+        foreach ($polls as $poll) {
+            $winner = null;
+            foreach ($poll->getSuggestions() as $suggestion) {
+                if ($suggestion->getStatus() === SuggestionStatus::Selected) {
+                    $winner = $suggestion;
+                    break;
+                }
+            }
+            $winners[$poll->getId()] = $winner;
+            $events[$poll->getId()] = $poll->getEventId() !== null
+                ? $this->eventRepository->find($poll->getEventId())
+                : null;
+        }
+
+        return $this->render('@Bookclub/poll/list.html.twig', [
+            'polls' => $polls,
+            'winners' => $winners,
+            'events' => $events,
+        ]);
+    }
 
     #[Route('', name: 'app_plugin_bookclub_poll', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
@@ -141,6 +171,28 @@ class PollController extends AbstractController
 
         return $this->render('@Bookclub/poll/manage.html.twig', [
             'poll' => $poll,
+            'event' => $event,
+        ]);
+    }
+
+    #[Route('/{id}/results', name: 'app_plugin_bookclub_poll_results', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function results(int $id): Response
+    {
+        $poll = $this->pollService->get($id);
+        if ($poll === null) {
+            throw $this->createNotFoundException('Poll not found');
+        }
+
+        $results = $this->pollService->getResults($id);
+        $event = null;
+        if ($poll->getEventId() !== null) {
+            $event = $this->eventRepository->find($poll->getEventId());
+        }
+
+        return $this->render('@Bookclub/poll/results.html.twig', [
+            'poll' => $poll,
+            'results' => $results,
             'event' => $event,
         ]);
     }

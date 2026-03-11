@@ -1,0 +1,29 @@
+<h3 class="title is-5">
+    <span class="icon"><i class="fas fa-book"></i></span>
+    Book Club
+</h3>
+
+{% if selection %}
+    <p class="is-size-7 has-text-grey mb-2">We will be discussing:</p>
+    {% if selection.book.coverImage %}
+        <a href="{{ path('app_plugin_bookclub_book_show', {id: selection.book.id}) }}" style="display: inline-block; border: 1px solid #666;">
+            {% include '_components/image.html.twig' with {'image': selection.book.coverImage, 'size': '200x250'} %}
+        </a>
+    {% endif %}
+    <p class="has-text-weight-bold mt-2">
+        <a href="{{ path('app_plugin_bookclub_book_show', {id: selection.book.id}) }}">
+            {{ selection.book.title }}
+        </a>
+    </p>
+    {% if selection.book.author %}
+        <p class="has-text-grey is-size-7">{{ selection.book.author }}</p>
+    {% endif %}
+{% else %}
+    <p class="has-text-grey">No book selected yet</p>
+    {% if is_granted('ROLE_ORGANIZER') %}
+        <a href="{{ path('app_plugin_bookclub_select', {eventId: eventId}) }}" class="button is-small is-success mt-2">
+            <span class="icon"><i class="fas fa-plus"></i></span>
+            <span>Select book</span>
+        </a>
+    {% endif %}
+{% endif %}
