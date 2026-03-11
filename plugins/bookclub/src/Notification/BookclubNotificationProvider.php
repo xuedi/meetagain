@@ -6,12 +6,14 @@ use App\Entity\User;
 use App\Notification\NotificationItem;
 use App\Notification\NotificationProviderInterface;
 use Plugin\Bookclub\Repository\BookRepository;
+use Plugin\Bookclub\Service\PollService;
 use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class BookclubNotificationProvider implements NotificationProviderInterface
 {
     public function __construct(
         private BookRepository $bookRepository,
+        private PollService $pollService,
         private Security $security,
     ) {}
 
@@ -22,21 +24,31 @@ readonly class BookclubNotificationProvider implements NotificationProviderInter
 
     public function getNotifications(User $user): array
     {
-        if (!$this->security->isGranted('ROLE_ORGANIZER')) {
-            return [];
+        $notifications = [];
+
+        if ($this->security->isGranted('ROLE_ORGANIZER')) {
+            $pendingCount = count($this->bookRepository->findBy(['approved' => false]));
+            if ($pendingCount > 0) {
+                $notifications[] = new NotificationItem(
+                    label: $pendingCount . ' Book' . ($pendingCount > 1 ? 's' : '') . ' Pending Approval',
+                    icon: 'fa-book',
+                    route: 'app_plugin_bookclub_pending',
+                );
+            }
         }
 
-        $pendingCount = count($this->bookRepository->findBy(['approved' => false]));
-        if ($pendingCount === 0) {
-            return [];
+        $activePoll = $this->pollService->getActivePoll();
+        if ($activePoll !== null) {
+            $vote = $this->pollService->getUserVote($activePoll->getId(), $user->getId());
+            if ($vote === null) {
+                $notifications[] = new NotificationItem(
+                    label: 'Open book poll — cast your vote!',
+                    icon: 'fa-vote-yea',
+                    route: 'app_plugin_bookclub_poll',
+                );
+            }
         }
 
-        return [
-            new NotificationItem(
-                label: $pendingCount . ' Book' . ($pendingCount > 1 ? 's' : '') . ' Pending Approval',
-                icon: 'fa-book',
-                route: 'app_plugin_bookclub_pending',
-            ),
-        ];
+        return $notifications;
     }
 }
