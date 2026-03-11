@@ -123,7 +123,9 @@ class PollController extends AbstractController
         $approvedBooks = $this->bookService->getApprovedList();
         $upcomingEvents = $this->eventRepository->getUpcomingEvents(20);
 
-        $form = $this->createForm(PollCreateType::class, null, [
+        $preselectedEventId = $request->query->getInt('eventId') ?: null;
+
+        $form = $this->createForm(PollCreateType::class, ['event_id' => $preselectedEventId], [
             'suggestions' => $pendingSuggestions,
             'books' => $approvedBooks,
             'events' => $upcomingEvents,
