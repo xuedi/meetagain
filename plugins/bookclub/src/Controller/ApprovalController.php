@@ -30,7 +30,6 @@ class ApprovalController extends AbstractController
     {
         try {
             $this->bookService->approve($id);
-            $this->addFlash('success', 'Book approved.');
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
