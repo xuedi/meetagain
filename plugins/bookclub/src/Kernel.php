@@ -31,7 +31,6 @@ class Kernel implements Plugin
     {
         return [
             new Link(slug: $this->urlGenerator->generate('app_plugin_bookclub'), name: 'books'),
-            new Link(slug: $this->urlGenerator->generate('app_plugin_bookclub_poll_list'), name: 'polls'),
         ];
     }
 
