@@ -1,0 +1,35 @@
+<div class="columns is-multiline">
+    {% for suggestion in poll.suggestions %}
+        <div class="column is-4">
+            <div class="card {% if userVote and userVote.suggestion.id == suggestion.id %}has-background-success-light{% endif %}">
+                {% if suggestion.book.coverImage %}
+                    <div class="card-image">
+                        <figure class="image is-4by5">
+                            {% include '_components/image.html.twig' with {'image': suggestion.book.coverImage, 'size': '200x250'} %}
+                        </figure>
+                    </div>
+                {% endif %}
+                <div class="card-content">
+                    <p class="title is-5">{{ suggestion.book.title }}</p>
+                    <p class="subtitle is-6">{{ suggestion.book.author ?? 'Unknown' }}</p>
+                    <p class="is-size-7 has-text-grey">
+                        Suggested by {{ get_user_name(suggestion.suggestedBy) }}
+                    </p>
+                </div>
+                <footer class="card-footer">
+                    <form action="{{ path('app_plugin_bookclub_poll_vote', {suggestionId: suggestion.id}) }}" method="post" class="card-footer-item">
+                        <button type="submit" class="button is-primary is-fullwidth">
+                            {% if userVote and userVote.suggestion.id == suggestion.id %}
+                                <span class="icon"><i class="fas fa-check"></i></span>
+                                <span>Voted</span>
+                            {% else %}
+                                <span class="icon"><i class="fas fa-vote-yea"></i></span>
+                                <span>Vote</span>
+                            {% endif %}
+                        </button>
+                    </form>
+                </footer>
+            </div>
+        </div>
+    {% endfor %}
+</div>

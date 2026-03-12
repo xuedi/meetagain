@@ -5,6 +5,7 @@ namespace Plugin\Bookclub\Controller;
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
 use Plugin\Bookclub\Entity\SuggestionStatus;
+use Plugin\Bookclub\Entity\ViewType;
 use Plugin\Bookclub\Form\PollCreateType;
 use Plugin\Bookclub\Service\BookService;
 use Plugin\Bookclub\Service\PollService;
@@ -52,12 +53,22 @@ class PollController extends AbstractController
         ]);
     }
 
+    #[Route('/set/view/{type}', name: 'app_plugin_bookclub_poll_set_view', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function setView(Request $request, ViewType $type): Response
+    {
+        $request->getSession()->set('bookclubPollViewType', $type->value);
+
+        return $this->redirectToRoute('app_plugin_bookclub_poll');
+    }
+
     #[Route('', name: 'app_plugin_bookclub_poll', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $user = $this->getAuthedUser();
         $activePoll = $this->pollService->getActivePoll();
+        $viewType = $request->getSession()->get('bookclubPollViewType', ViewType::Tiles->value);
 
         if ($activePoll !== null) {
             $userVote = $this->pollService->getUserVote($activePoll->getId(), $user->getId());
@@ -67,6 +78,7 @@ class PollController extends AbstractController
                 'poll' => $activePoll,
                 'userVote' => $userVote,
                 'event' => $event,
+                'viewType' => $viewType,
             ]);
         }
 
@@ -99,7 +111,6 @@ class PollController extends AbstractController
 
         try {
             $this->pollService->vote($activePoll->getId(), $suggestionId, $user->getId());
-            $this->addFlash('success', 'Vote recorded.');
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
