@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Process;
 
 readonly class CommandService
 {
@@ -53,5 +54,24 @@ readonly class CommandService
     public function executeMigrations(): string
     {
         return $this->execute(new ExecuteMigrationsCommand()) . PHP_EOL;
+    }
+
+    public function executeSubprocessMigrations(): void
+    {
+        $projectDir = $this->kernel->getProjectDir();
+        $process = new Process([
+            'php',
+            $projectDir . '/bin/console',
+            'doctrine:migrations:migrate',
+            '--no-interaction',
+            '--env=' . $this->kernel->getEnvironment(),
+        ]);
+        $process->setWorkingDirectory($projectDir);
+        $process->setTimeout(120);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('Migration failed: ' . $process->getErrorOutput());
+        }
     }
 }
