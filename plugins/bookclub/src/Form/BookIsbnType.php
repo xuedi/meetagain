@@ -17,11 +17,11 @@ class BookIsbnType extends AbstractType
         $builder->add('isbn', TextType::class, [
             'label' => 'ISBN',
             'attr' => [
-                'placeholder' => 'e.g. 978-0-13-468599-1',
+                'placeholder' => 'e.g. 9783442772612 or 978-3-442-77261-2',
             ],
             'constraints' => [
                 new NotBlank(),
-                new Regex(pattern: '/^[\d\-X]+$/', message: 'Please enter a valid ISBN (digits, hyphens, and X only)'),
+                new Regex(pattern: '/^[\d\-\s X]+$/i', message: 'Please enter a valid ISBN (digits, hyphens, spaces, and X only)'),
             ],
         ]);
     }
