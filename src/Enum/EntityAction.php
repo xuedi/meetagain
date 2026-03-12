@@ -19,4 +19,8 @@ enum EntityAction: string
     case CreateUser = 'create_user';
     case DeleteUser = 'delete_user';
     case CreateImage = 'create_image';
+    case CreateBookSuggestion = 'create_book_suggestion';
+    case DeleteBookSuggestion = 'delete_book_suggestion';
+    case CreateBook = 'create_book';
+    case DeleteBook = 'delete_book';
 }

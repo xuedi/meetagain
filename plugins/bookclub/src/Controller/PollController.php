@@ -7,7 +7,6 @@ use App\Repository\EventRepository;
 use Plugin\Bookclub\Entity\SuggestionStatus;
 use Plugin\Bookclub\Entity\ViewType;
 use Plugin\Bookclub\Form\PollCreateType;
-use Plugin\Bookclub\Repository\BookPollRepository;
 use Plugin\Bookclub\Service\BookService;
 use Plugin\Bookclub\Service\PollService;
 use Plugin\Bookclub\Service\SuggestionService;
@@ -25,7 +24,6 @@ class PollController extends AbstractController
         private readonly SuggestionService $suggestionService,
         private readonly BookService $bookService,
         private readonly EventRepository $eventRepository,
-        private readonly BookPollRepository $pollRepository,
     ) {}
 
     #[Route('/list', name: 'app_plugin_bookclub_poll_list', methods: ['GET'])]
@@ -126,7 +124,7 @@ class PollController extends AbstractController
     {
         $pendingSuggestions = $this->suggestionService->getPendingSuggestionsWithPriority();
         $approvedBooks = $this->bookService->getApprovedList();
-        $usedEventIds = $this->pollRepository->findUsedEventIds();
+        $usedEventIds = $this->pollService->getUsedEventIds();
         $upcomingEvents = array_filter(
             $this->eventRepository->getUpcomingEvents(20),
             fn($event) => !in_array($event->getId(), $usedEventIds),

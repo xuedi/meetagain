@@ -20,4 +20,54 @@ class BookRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['isbn' => $isbn]);
     }
+
+    /** @return Book[] */
+    public function findApproved(?array $allowedBookIds = null): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->where('b.approved = true')
+            ->orderBy('b.title', 'ASC');
+
+        if ($allowedBookIds !== null) {
+            if ($allowedBookIds === []) {
+                return [];
+            }
+            $qb->andWhere('b.id IN (:ids)')->setParameter('ids', $allowedBookIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /** @return Book[] */
+    public function findPending(?array $allowedBookIds = null): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->where('b.approved = false')
+            ->orderBy('b.createdAt', 'DESC');
+
+        if ($allowedBookIds !== null) {
+            if ($allowedBookIds === []) {
+                return [];
+            }
+            $qb->andWhere('b.id IN (:ids)')->setParameter('ids', $allowedBookIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /** @return Book[] */
+    public function findAllBooks(?array $allowedBookIds = null): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->orderBy('b.title', 'ASC');
+
+        if ($allowedBookIds !== null) {
+            if ($allowedBookIds === []) {
+                return [];
+            }
+            $qb->where('b.id IN (:ids)')->setParameter('ids', $allowedBookIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
