@@ -4,6 +4,12 @@
 
     <div class="container">
 
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="notification is-{{ type }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+
         <table class="table is-fullwidth">
             <thead>
             <tr>
@@ -23,13 +29,21 @@
                         {% if plugin.installed %}
                             {% if plugin.enabled %}
                                 <button class="button is-danger is-light" disabled>Uninstall</button>
-                                <a class="button is-danger is-light" href="{{ path('admin_plugin_disable', {name: plugin.name|lower}) }}">Disable</a>
+                                <form method="post" action="{{ path('admin_plugin_disable', {key: plugin.key}) }}" style="display:inline">
+                                    <button type="submit" class="button is-danger is-light">Disable</button>
+                                </form>
                             {% else %}
-                                <a class="button is-danger is-light" href="{{ path('admin_plugin_uninstall', {name: plugin.name|lower}) }}">Uninstall</a>
-                                <a class="button is-success is-light" href="{{ path('admin_plugin_enable', {name: plugin.name|lower}) }}">Enable</a>
+                                <form method="post" action="{{ path('admin_plugin_uninstall', {key: plugin.key}) }}" style="display:inline">
+                                    <button type="submit" class="button is-danger is-light">Uninstall</button>
+                                </form>
+                                <form method="post" action="{{ path('admin_plugin_enable', {key: plugin.key}) }}" style="display:inline">
+                                    <button type="submit" class="button is-success is-light">Enable</button>
+                                </form>
                             {% endif %}
                         {% else %}
-                            <a class="button is-success is-light" href="{{ path('admin_plugin_install', {name: plugin.name|lower}) }}">Install</a>
+                            <form method="post" action="{{ path('admin_plugin_install', {key: plugin.key}) }}" style="display:inline">
+                                <button type="submit" class="button is-success is-light">Install</button>
+                            </form>
                             <button class="button is-success is-light" disabled>Enable</button>
                         {% endif %}
                     </td>
@@ -41,4 +55,3 @@
     </div>
 
 {% endblock %}
-
