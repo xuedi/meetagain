@@ -19,11 +19,10 @@ readonly class SuggestionService
 
     public function suggest(Book $book, int $userId): BookSuggestion
     {
-        $existingPending = $this->suggestionRepo->findUserPendingSuggestion($userId);
-        if ($existingPending !== null) {
-            throw new RuntimeException(
-                'You already have a pending suggestion. Withdraw it first to suggest another book.',
-            );
+        foreach ($this->suggestionRepo->findUserPendingSuggestions($userId) as $pending) {
+            if ($pending->getBook()->getId() === $book->getId()) {
+                throw new RuntimeException('You have already suggested this book.');
+            }
         }
 
         $suggestion = new BookSuggestion();
@@ -34,42 +33,6 @@ readonly class SuggestionService
         $suggestion->setResubmitCount(0);
 
         $this->em->persist($suggestion);
-        $this->em->flush();
-
-        return $suggestion;
-    }
-
-    public function resubmit(int $suggestionId, int $userId): BookSuggestion
-    {
-        $oldSuggestion = $this->suggestionRepo->find($suggestionId);
-        if ($oldSuggestion === null) {
-            throw new RuntimeException('Suggestion not found');
-        }
-
-        if ($oldSuggestion->getSuggestedBy() !== $userId) {
-            throw new RuntimeException('You can only resubmit your own suggestions');
-        }
-
-        if ($oldSuggestion->getStatus() !== SuggestionStatus::Rejected) {
-            throw new RuntimeException('Only rejected suggestions can be resubmitted');
-        }
-
-        $existingPending = $this->suggestionRepo->findUserPendingSuggestion($userId);
-        if ($existingPending !== null) {
-            throw new RuntimeException('You already have a pending suggestion');
-        }
-
-        $suggestion = new BookSuggestion();
-        $suggestion->setBook($oldSuggestion->getBook());
-        $suggestion->setSuggestedBy($userId);
-        $suggestion->setSuggestedAt(new DateTimeImmutable());
-        $suggestion->setStatus(SuggestionStatus::Pending);
-        $suggestion->setResubmitCount($oldSuggestion->getResubmitCount() + 1);
-
-        $oldSuggestion->setStatus(SuggestionStatus::Withdrawn);
-
-        $this->em->persist($suggestion);
-        $this->em->persist($oldSuggestion);
         $this->em->flush();
 
         return $suggestion;
@@ -95,9 +58,10 @@ readonly class SuggestionService
         $this->em->flush();
     }
 
-    public function getUserPendingSuggestion(int $userId): ?BookSuggestion
+    /** @return BookSuggestion[] */
+    public function getUserPendingSuggestions(int $userId): array
     {
-        return $this->suggestionRepo->findUserPendingSuggestion($userId);
+        return $this->suggestionRepo->findUserPendingSuggestions($userId);
     }
 
     /** @return BookSuggestion[] */
@@ -135,12 +99,4 @@ readonly class SuggestionService
         return $this->suggestionRepo->find($id);
     }
 
-    /** @return BookSuggestion[] */
-    public function getUserRejectedSuggestions(int $userId): array
-    {
-        return $this->suggestionRepo->findBy([
-            'suggestedBy' => $userId,
-            'status' => SuggestionStatus::Rejected,
-        ]);
-    }
 }

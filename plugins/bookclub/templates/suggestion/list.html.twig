@@ -14,18 +14,13 @@
 
         <h1 class="title">Book Suggestions</h1>
 
-        {% if userSuggestion %}
-            <div class="notification">
-                <strong>Your current suggestion:</strong> {{ userSuggestion.book.title }}
-                <form action="{{ path('app_plugin_bookclub_withdraw', {suggestionId: userSuggestion.id}) }}" method="post" style="display: inline; margin-left: 1rem;">
-                    <button type="submit" class="button is-small is-warning">Withdraw</button>
-                </form>
-            </div>
-        {% else %}
+        {% if userSuggestions|length == 0 %}
             <div class="notification is-light">
-                You haven't suggested a book yet. Choose one from below or from the <a href="{{ path('app_plugin_bookclub') }}">book catalog</a>.
+                You haven't suggested a book yet. Choose one below or from the <a href="{{ path('app_plugin_bookclub') }}">book catalog</a>.
             </div>
         {% endif %}
+
+        {% set userSuggestionIds = userSuggestions|map(s => s.id) %}
 
         <div class="columns">
             <div class="column is-8">
@@ -39,6 +34,7 @@
                                 <th>Author</th>
                                 <th>Suggested By</th>
                                 <th>Priority</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -52,9 +48,25 @@
                                     <td>{{ suggestion.book.author ?? 'Unknown' }}</td>
                                     <td>{{ get_user_name(suggestion.suggestedBy) }}</td>
                                     <td>
-                                        <span class="tag is-info">
-                                            {{ suggestion.resubmitCount > 0 ? 'Resubmit #' ~ suggestion.resubmitCount : 'New' }}
-                                        </span>
+                                        {% set r = suggestion.resubmitCount %}
+                                        {% if r == 0 %}
+                                            <span class="icon" title="New"><i class="fa fa-thermometer-empty"></i></span>
+                                        {% elseif r == 1 %}
+                                            <span class="icon" title="Skipped once"><i class="fa fa-thermometer-quarter"></i></span>
+                                        {% elseif r == 2 %}
+                                            <span class="icon" title="Skipped {{ r }} times"><i class="fa fa-thermometer-half"></i></span>
+                                        {% elseif r == 3 %}
+                                            <span class="icon" title="Skipped {{ r }} times"><i class="fa fa-thermometer-three-quarters"></i></span>
+                                        {% else %}
+                                            <span class="icon" title="Skipped {{ r }} times"><i class="fa fa-thermometer-full"></i></span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="has-text-right">
+                                        {% if suggestion.id in userSuggestionIds %}
+                                            <a href="{{ path('app_plugin_bookclub_withdraw', {suggestionId: suggestion.id}) }}">
+                                                <span class="icon"><i class="fa fa-trash"></i></span>
+                                            </a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -64,28 +76,23 @@
                     <p class="has-text-grey">No pending suggestions.</p>
                 {% endif %}
 
-                {% if userRejected|length > 0 %}
-                    <h3 class="subtitle mt-5">Your Rejected Suggestions (can resubmit)</h3>
-                    <table class="table is-fullwidth">
-                        <tbody>
-                            {% for suggestion in userRejected %}
-                                <tr>
-                                    <td>{{ suggestion.book.title }}</td>
-                                    <td>Resubmit count: {{ suggestion.resubmitCount }}</td>
-                                    <td>
-                                        <form action="{{ path('app_plugin_bookclub_resubmit', {suggestionId: suggestion.id}) }}" method="post">
-                                            <button type="submit" class="button is-small is-primary">Resubmit</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <p class="help has-text-grey mt-2">
+                    Priority is based on how often a book has been skipped in previous polls and how long it has been waiting. Books that were not elected in a poll automatically move up in priority for the next one.
+                </p>
+
+                {% if is_granted('ROLE_ORGANIZER') %}
+                    <div class="box mt-4">
+                        <h3 class="title is-5">Manager Actions</h3>
+                        <a href="{{ path('app_plugin_bookclub_poll_create') }}" class="button is-primary is-fullwidth">
+                            Create Poll from Suggestions
+                        </a>
+                    </div>
                 {% endif %}
+
             </div>
 
             <div class="column is-4">
-                {% if not userSuggestion %}
+                {% if books|length > 0 %}
                     <div class="box">
                         <h3 class="title is-5">Suggest a Book</h3>
                         <p class="mb-3">Select a book to suggest for the next poll:</p>
@@ -96,15 +103,6 @@
                                 </button>
                             </form>
                         {% endfor %}
-                    </div>
-                {% endif %}
-
-                {% if is_granted('ROLE_ORGANIZER') %}
-                    <div class="box">
-                        <h3 class="title is-5">Manager Actions</h3>
-                        <a href="{{ path('app_plugin_bookclub_poll_create') }}" class="button is-primary is-fullwidth">
-                            Create Poll from Suggestions
-                        </a>
                     </div>
                 {% endif %}
             </div>

@@ -6,6 +6,7 @@ use App\Controller\AbstractController;
 use Plugin\Bookclub\Service\BookService;
 use Plugin\Bookclub\Service\SuggestionService;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -24,16 +25,18 @@ class SuggestionController extends AbstractController
     {
         $user = $this->getAuthedUser();
 
+        $userSuggestions = $this->suggestionService->getUserPendingSuggestions($user->getId());
+        $suggestedBookIds = array_map(fn($s) => $s->getBook()->getId(), $userSuggestions);
+
         return $this->render('@Bookclub/suggestion/list.html.twig', [
             'suggestions' => $this->suggestionService->getPendingSuggestionsWithPriority(),
-            'userSuggestion' => $this->suggestionService->getUserPendingSuggestion($user->getId()),
-            'userRejected' => $this->suggestionService->getUserRejectedSuggestions($user->getId()),
-            'books' => $this->bookService->getApprovedList(),
+            'userSuggestions' => $userSuggestions,
+            'books' => array_filter($this->bookService->getApprovedList(), fn($b) => !in_array($b->getId(), $suggestedBookIds)),
         ]);
     }
 
     #[Route('/suggest/{bookId}', name: 'app_plugin_bookclub_suggest', methods: ['POST'])]
-    public function suggest(int $bookId): Response
+    public function suggest(int $bookId, Request $request): Response
     {
         $book = $this->bookService->get($bookId);
         if ($book === null || !$book->isApproved()) {
@@ -44,37 +47,24 @@ class SuggestionController extends AbstractController
 
         try {
             $this->suggestionService->suggest($book, $user->getId());
-            $this->addFlash('success', 'Book suggested for the next poll.');
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
+        }
+
+        if ($request->request->get('redirect') === 'book') {
+            return $this->redirectToRoute('app_plugin_bookclub_book_show', ['id' => $bookId]);
         }
 
         return $this->redirectToRoute('app_plugin_bookclub_suggestions');
     }
 
-    #[Route('/resubmit/{suggestionId}', name: 'app_plugin_bookclub_resubmit', methods: ['POST'])]
-    public function resubmit(int $suggestionId): Response
-    {
-        $user = $this->getAuthedUser();
-
-        try {
-            $this->suggestionService->resubmit($suggestionId, $user->getId());
-            $this->addFlash('success', 'Book resubmitted for the next poll.');
-        } catch (RuntimeException $e) {
-            $this->addFlash('danger', $e->getMessage());
-        }
-
-        return $this->redirectToRoute('app_plugin_bookclub_suggestions');
-    }
-
-    #[Route('/withdraw/{suggestionId}', name: 'app_plugin_bookclub_withdraw', methods: ['POST'])]
+    #[Route('/withdraw/{suggestionId}', name: 'app_plugin_bookclub_withdraw', methods: ['GET'])]
     public function withdraw(int $suggestionId): Response
     {
         $user = $this->getAuthedUser();
 
         try {
             $this->suggestionService->withdraw($suggestionId, $user->getId());
-            $this->addFlash('success', 'Suggestion withdrawn.');
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
