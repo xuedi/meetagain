@@ -15,7 +15,7 @@
         <h1 class="title">Book Suggestions</h1>
 
         {% if userSuggestion %}
-            <div class="notification is-info">
+            <div class="notification">
                 <strong>Your current suggestion:</strong> {{ userSuggestion.book.title }}
                 <form action="{{ path('app_plugin_bookclub_withdraw', {suggestionId: userSuggestion.id}) }}" method="post" style="display: inline; margin-left: 1rem;">
                     <button type="submit" class="button is-small is-warning">Withdraw</button>
