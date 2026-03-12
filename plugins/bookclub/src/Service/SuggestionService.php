@@ -2,11 +2,14 @@
 
 namespace Plugin\Bookclub\Service;
 
+use App\Enum\EntityAction;
+use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;
 use Plugin\Bookclub\Entity\BookSuggestion;
 use Plugin\Bookclub\Entity\SuggestionStatus;
+use Plugin\Bookclub\Filter\BookGroupFilterService;
 use Plugin\Bookclub\Repository\BookSuggestionRepository;
 use RuntimeException;
 
@@ -15,11 +18,13 @@ readonly class SuggestionService
     public function __construct(
         private EntityManagerInterface $em,
         private BookSuggestionRepository $suggestionRepo,
+        private BookGroupFilterService $groupFilter,
+        private EntityActionDispatcher $dispatcher,
     ) {}
 
     public function suggest(Book $book, int $userId): BookSuggestion
     {
-        foreach ($this->suggestionRepo->findUserPendingSuggestions($userId) as $pending) {
+        foreach ($this->suggestionRepo->findUserPendingSuggestions($userId, $this->groupFilter->getAllowedSuggestionIds()) as $pending) {
             if ($pending->getBook()->getId() === $book->getId()) {
                 throw new RuntimeException('You have already suggested this book.');
             }
@@ -34,6 +39,8 @@ readonly class SuggestionService
 
         $this->em->persist($suggestion);
         $this->em->flush();
+
+        $this->dispatcher->dispatch(EntityAction::CreateBookSuggestion, $suggestion->getId());
 
         return $suggestion;
     }
@@ -56,18 +63,20 @@ readonly class SuggestionService
         $suggestion->setStatus(SuggestionStatus::Withdrawn);
         $this->em->persist($suggestion);
         $this->em->flush();
+
+        $this->dispatcher->dispatch(EntityAction::DeleteBookSuggestion, $suggestionId);
     }
 
     /** @return BookSuggestion[] */
     public function getUserPendingSuggestions(int $userId): array
     {
-        return $this->suggestionRepo->findUserPendingSuggestions($userId);
+        return $this->suggestionRepo->findUserPendingSuggestions($userId, $this->groupFilter->getAllowedSuggestionIds());
     }
 
     /** @return BookSuggestion[] */
     public function getPendingSuggestions(): array
     {
-        return $this->suggestionRepo->findAllPending();
+        return $this->suggestionRepo->findAllPending($this->groupFilter->getAllowedSuggestionIds());
     }
 
     /** @return BookSuggestion[] */
@@ -98,5 +107,4 @@ readonly class SuggestionService
     {
         return $this->suggestionRepo->find($id);
     }
-
 }

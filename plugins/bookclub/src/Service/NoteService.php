@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;
 use Plugin\Bookclub\Entity\BookNote;
+use Plugin\Bookclub\Filter\BookGroupFilterService;
 use Plugin\Bookclub\Repository\BookNoteRepository;
 
 readonly class NoteService
@@ -13,6 +14,7 @@ readonly class NoteService
     public function __construct(
         private EntityManagerInterface $em,
         private BookNoteRepository $noteRepo,
+        private BookGroupFilterService $groupFilter,
     ) {}
 
     public function saveNote(Book $book, int $userId, string $content): BookNote
@@ -44,7 +46,7 @@ readonly class NoteService
     /** @return BookNote[] */
     public function getUserNotes(int $userId): array
     {
-        return $this->noteRepo->findUserNotes($userId);
+        return $this->noteRepo->findUserNotes($userId, $this->groupFilter->getAllowedBookIds());
     }
 
     public function delete(int $noteId, int $userId): void
