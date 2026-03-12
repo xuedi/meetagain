@@ -45,11 +45,12 @@ readonly class PluginService
 
             $pluginKey = basename((string) $pluginPath);
             $plugins[] = [
-                'name' => $pluginData['name'] ?? $pluginKey,
-                'version' => $pluginData['version'] ?? '0.0.0',
+                'key'         => $pluginKey,
+                'name'        => $pluginData['name'] ?? $pluginKey,
+                'version'     => $pluginData['version'] ?? '0.0.0',
                 'description' => $pluginData['description'] ?? '',
-                'installed' => $this->isInstalled($pluginKey),
-                'enabled' => $this->isEnabled($pluginKey),
+                'installed'   => $this->isInstalled($pluginKey),
+                'enabled'     => $this->isEnabled($pluginKey),
             ];
         }
 
