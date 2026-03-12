@@ -1,5 +1,5 @@
 {
   "name": "Bookclub",
-  "version": "0.1",
-  "description": "Book club management with ISBN lookup, suggestions, polls, and personal reading notes"
+  "version": "1.0",
+  "description": "Book club with polls, suggestions, and reading notes"
 }
