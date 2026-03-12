@@ -31,4 +31,16 @@ class BookPollRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['eventId' => $eventId]);
     }
+
+    /** @return int[] */
+    public function findUsedEventIds(): array
+    {
+        return array_column(
+            $this->createQueryBuilder('p')
+                ->select('p.eventId')
+                ->getQuery()
+                ->getArrayResult(),
+            'eventId'
+        );
+    }
 }

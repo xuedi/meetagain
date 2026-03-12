@@ -127,7 +127,9 @@ readonly class PollService
             if ($suggestion->getId() === $winner->getId()) {
                 $suggestion->setStatus(SuggestionStatus::Selected);
             } else {
-                $suggestion->setStatus(SuggestionStatus::Rejected);
+                $suggestion->setStatus(SuggestionStatus::Pending);
+                $suggestion->setPoll(null);
+                $suggestion->setResubmitCount($suggestion->getResubmitCount() + 1);
             }
             $this->em->persist($suggestion);
         }

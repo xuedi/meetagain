@@ -17,9 +17,10 @@ class BookSuggestionRepository extends ServiceEntityRepository
         parent::__construct($registry, BookSuggestion::class);
     }
 
-    public function findUserPendingSuggestion(int $userId): ?BookSuggestion
+    /** @return BookSuggestion[] */
+    public function findUserPendingSuggestions(int $userId): array
     {
-        return $this->findOneBy([
+        return $this->findBy([
             'suggestedBy' => $userId,
             'status' => SuggestionStatus::Pending,
         ]);
