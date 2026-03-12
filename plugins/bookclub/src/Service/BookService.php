@@ -2,9 +2,12 @@
 
 namespace Plugin\Bookclub\Service;
 
+use App\Enum\EntityAction;
+use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;
+use Plugin\Bookclub\Filter\BookGroupFilterService;
 use Plugin\Bookclub\Repository\BookRepository;
 use RuntimeException;
 
@@ -15,6 +18,8 @@ readonly class BookService
         private BookRepository $bookRepo,
         private IsbnLookupInterface $isbnLookup,
         private CoverImageService $coverImageService,
+        private EntityActionDispatcher $dispatcher,
+        private BookGroupFilterService $groupFilter,
     ) {}
 
     public function createFromIsbn(string $isbn, int $userId, bool $isManager): ?Book
@@ -50,6 +55,8 @@ readonly class BookService
         $this->em->persist($book);
         $this->em->flush();
 
+        $this->dispatcher->dispatch(EntityAction::CreateBook, $book->getId());
+
         return $book;
     }
 
@@ -79,6 +86,8 @@ readonly class BookService
 
         $this->em->persist($book);
         $this->em->flush();
+
+        $this->dispatcher->dispatch(EntityAction::CreateBook, $book->getId());
 
         return $book;
     }
@@ -113,19 +122,19 @@ readonly class BookService
     /** @return Book[] */
     public function getApprovedList(): array
     {
-        return $this->bookRepo->findBy(['approved' => true], ['title' => 'ASC']);
+        return $this->bookRepo->findApproved($this->groupFilter->getAllowedBookIds());
     }
 
     /** @return Book[] */
     public function getPendingList(): array
     {
-        return $this->bookRepo->findBy(['approved' => false], ['createdAt' => 'DESC']);
+        return $this->bookRepo->findPending($this->groupFilter->getAllowedBookIds());
     }
 
     /** @return Book[] */
     public function getAll(): array
     {
-        return $this->bookRepo->findBy([], ['title' => 'ASC']);
+        return $this->bookRepo->findAllBooks($this->groupFilter->getAllowedBookIds());
     }
 
     public function get(int $id): ?Book

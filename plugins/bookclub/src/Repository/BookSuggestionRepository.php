@@ -17,18 +17,46 @@ class BookSuggestionRepository extends ServiceEntityRepository
         parent::__construct($registry, BookSuggestion::class);
     }
 
-    /** @return BookSuggestion[] */
-    public function findUserPendingSuggestions(int $userId): array
+    /**
+     * @param int[]|null $allowedIds null = no restriction
+     * @return BookSuggestion[]
+     */
+    public function findUserPendingSuggestions(int $userId, ?array $allowedIds = null): array
     {
-        return $this->findBy([
-            'suggestedBy' => $userId,
-            'status' => SuggestionStatus::Pending,
-        ]);
+        $qb = $this->createQueryBuilder('s')
+            ->where('s.suggestedBy = :userId')
+            ->andWhere('s.status = :status')
+            ->setParameter('userId', $userId)
+            ->setParameter('status', SuggestionStatus::Pending);
+
+        if ($allowedIds !== null) {
+            if ($allowedIds === []) {
+                return [];
+            }
+            $qb->andWhere('s.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
-    /** @return BookSuggestion[] */
-    public function findAllPending(): array
+    /**
+     * @param int[]|null $allowedIds null = no restriction
+     * @return BookSuggestion[]
+     */
+    public function findAllPending(?array $allowedIds = null): array
     {
-        return $this->findBy(['status' => SuggestionStatus::Pending], ['suggestedAt' => 'ASC']);
+        $qb = $this->createQueryBuilder('s')
+            ->where('s.status = :status')
+            ->setParameter('status', SuggestionStatus::Pending)
+            ->orderBy('s.suggestedAt', 'ASC');
+
+        if ($allowedIds !== null) {
+            if ($allowedIds === []) {
+                return [];
+            }
+            $qb->andWhere('s.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

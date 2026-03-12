@@ -26,8 +26,21 @@ class BookNoteRepository extends ServiceEntityRepository
     }
 
     /** @return BookNote[] */
-    public function findUserNotes(int $userId): array
+    public function findUserNotes(int $userId, ?array $allowedBookIds = null): array
     {
-        return $this->findBy(['userId' => $userId], ['updatedAt' => 'DESC', 'createdAt' => 'DESC']);
+        if ($allowedBookIds === []) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('n')
+            ->where('n.userId = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('COALESCE(n.updatedAt, n.createdAt)', 'DESC');
+
+        if ($allowedBookIds !== null) {
+            $qb->andWhere('IDENTITY(n.book) IN (:bookIds)')->setParameter('bookIds', $allowedBookIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

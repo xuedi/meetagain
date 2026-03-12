@@ -5,7 +5,6 @@ namespace Plugin\Bookclub\DataFixtures;
 use App\DataFixtures\AbstractFixture;
 use App\Entity\ImageType;
 use App\Entity\User;
-use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\ImageService;
 use DateTimeImmutable;
@@ -13,12 +12,6 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Bookclub\Entity\Book;
 use Plugin\Bookclub\Entity\BookNote;
-use Plugin\Bookclub\Entity\BookPoll;
-use Plugin\Bookclub\Entity\BookPollVote;
-use Plugin\Bookclub\Entity\BookSuggestion;
-use Plugin\Bookclub\Entity\PollStatus;
-use Plugin\Bookclub\Entity\SuggestionStatus;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
@@ -26,7 +19,6 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
     public function __construct(
         private readonly ImageService $imageService,
         private readonly UserRepository $userRepository,
-        private readonly EventRepository $eventRepository,
     ) {}
 
     #[\Override]
@@ -41,8 +33,6 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
         }
 
         $books = $this->createBooks($manager, $importUser);
-        $this->createClosedPollWithVotes($manager, $books);
-        $this->createPendingSuggestions($manager, $books);
         $this->createUserNotes($manager, $books);
 
         $manager->flush();
@@ -92,81 +82,6 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
         }
 
         return $books;
-    }
-
-    /** @param Book[] $books */
-    private function createClosedPollWithVotes(ObjectManager $manager, array $books): void
-    {
-        $event = $this->eventRepository->findOneBy([]);
-        if ($event === null) {
-            throw new RuntimeException('No events found in database for bookclub fixture');
-        }
-        $poll = new BookPoll();
-        $poll->setEventId($event->getId());
-        $poll->setCreatedBy(1);
-        $poll->setCreatedAt(new DateTimeImmutable('-60 days'));
-        $poll->setStartDate(new DateTimeImmutable('-55 days'));
-        $poll->setEndDate(new DateTimeImmutable('-45 days'));
-        $poll->setStatus(PollStatus::Closed);
-        $manager->persist($poll);
-
-        // Pick 5 books for the poll (indices 0-4)
-        $pollBooks = array_slice($books, 0, 5);
-        $suggestions = [];
-        $winnerIndex = 2; // The 3rd book will be the winner
-
-        foreach ($pollBooks as $index => $book) {
-            $suggestion = new BookSuggestion();
-            $suggestion->setBook($book);
-            $suggestion->setSuggestedBy(($index % 10) + 1);
-            $suggestion->setSuggestedAt(new DateTimeImmutable('-65 days'));
-            $suggestion->setPoll($poll);
-
-            if ($index === $winnerIndex) {
-                $suggestion->setStatus(SuggestionStatus::Selected);
-            } else {
-                $suggestion->setStatus(SuggestionStatus::Rejected);
-            }
-
-            $manager->persist($suggestion);
-            $suggestions[] = $suggestion;
-        }
-
-        // Create votes - winner gets 5 votes, others get 1-2
-        $voteDistribution = [1, 2, 5, 1, 2]; // Index 2 (winner) gets most votes
-        $voterUserId = 1;
-
-        foreach ($suggestions as $index => $suggestion) {
-            $voteCount = $voteDistribution[$index];
-            for ($v = 0; $v < $voteCount; $v++) {
-                $vote = new BookPollVote();
-                $vote->setPoll($poll);
-                $vote->setUserId($voterUserId);
-                $vote->setSuggestion($suggestion);
-                $vote->setVotedAt(new DateTimeImmutable('-50 days'));
-                $manager->persist($vote);
-                $voterUserId++;
-            }
-        }
-    }
-
-    /** @param Book[] $books */
-    private function createPendingSuggestions(ObjectManager $manager, array $books): void
-    {
-        // Create pending suggestions from different users (6-10) for upcoming poll
-        // Books at indices 10-14 are suggested
-        $pendingBooks = array_slice($books, 10, 5);
-
-        foreach ($pendingBooks as $index => $book) {
-            $suggestion = new BookSuggestion();
-            $suggestion->setBook($book);
-            $suggestion->setSuggestedBy($index + 6); // Users 6-10
-            $suggestion->setSuggestedAt(new DateTimeImmutable('-' . (10 - $index) . ' days'));
-            $suggestion->setStatus(SuggestionStatus::Pending);
-            $suggestion->setResubmitCount($index > 2 ? $index - 2 : 0); // Some resubmits
-
-            $manager->persist($suggestion);
-        }
     }
 
     /** @param Book[] $books */
@@ -266,6 +181,17 @@ class BookclubFixture extends AbstractFixture implements FixtureGroupInterface
             ['isbn' => '978-0307949486', 'title' => 'Gone Girl', 'author' => 'Gillian Flynn', 'description' => 'A wife disappears and her husband becomes the prime suspect.', 'pageCount' => 415, 'publishedYear' => 2012, 'createdBy' => 'Elena Owens'],
             ['isbn' => '978-0316055437', 'title' => 'The Lovely Bones', 'author' => 'Alice Sebold', 'description' => 'A murdered girl watches from heaven as her family copes.', 'pageCount' => 328, 'publishedYear' => 2002, 'createdBy' => 'Fergus Gray'],
             ['isbn' => '978-0385504201', 'title' => 'The Da Vinci Code', 'author' => 'Dan Brown', 'description' => 'A symbologist uncovers a conspiracy about the Holy Grail.', 'pageCount' => 489, 'publishedYear' => 2003, 'createdBy' => 'Fleur Cook'],
+            // Tech / non-fiction books
+            ['isbn' => '978-0132350884', 'title' => 'Clean Code', 'author' => 'Robert C. Martin', 'description' => 'A handbook of agile software craftsmanship covering clean code principles, naming, functions, and refactoring.', 'pageCount' => 431, 'publishedYear' => 2008, 'createdBy' => 'Adem Lane'],
+            ['isbn' => '978-0135957059', 'title' => 'The Pragmatic Programmer', 'author' => 'Hunt & Thomas', 'description' => 'Your journey to mastery — timeless lessons on career development, coding practices, and software craftsmanship.', 'pageCount' => 352, 'publishedYear' => 2019, 'createdBy' => 'Orlando Diggs'],
+            ['isbn' => '978-1449373320', 'title' => 'Designing Data-Intensive Applications', 'author' => 'Martin Kleppmann', 'description' => 'The big ideas behind reliable, scalable, and maintainable systems.', 'pageCount' => 590, 'publishedYear' => 2017, 'createdBy' => 'Crystal Liu'],
+            ['isbn' => '978-0201835953', 'title' => 'The Mythical Man-Month', 'author' => 'Frederick P. Brooks', 'description' => 'Essays on software engineering exploring why adding manpower to a late software project makes it later.', 'pageCount' => 322, 'publishedYear' => 1995, 'createdBy' => 'Phoenix Baker'],
+            ['isbn' => '978-0262510875', 'title' => 'Structure and Interpretation of Computer Programs', 'author' => 'Abelson & Sussman', 'description' => 'A classic MIT text on computational thinking through the Scheme programming language.', 'pageCount' => 657, 'publishedYear' => 1996, 'createdBy' => 'Candice Wu'],
+            ['isbn' => '978-0735619678', 'title' => 'Code Complete', 'author' => 'Steve McConnell', 'description' => 'A comprehensive guide to software construction — the practical backbone of software engineering.', 'pageCount' => 914, 'publishedYear' => 2004, 'createdBy' => 'Drew Cano'],
+            ['isbn' => '978-0134757599', 'title' => 'Refactoring', 'author' => 'Martin Fowler', 'description' => 'Improving the design of existing code through disciplined technique and a catalog of refactorings.', 'pageCount' => 448, 'publishedYear' => 2018, 'createdBy' => 'Kate Morrison'],
+            ['isbn' => '978-0321125217', 'title' => 'Domain-Driven Design', 'author' => 'Eric Evans', 'description' => 'Tackling complexity in the heart of software through model-driven design and ubiquitous language.', 'pageCount' => 560, 'publishedYear' => 2003, 'createdBy' => 'Adem Lane'],
+            ['isbn' => '978-1680502398', 'title' => 'Release It!', 'author' => 'Michael T. Nygard', 'description' => 'Design and deploy production-ready software with patterns for stability, capacity, and resilience.', 'pageCount' => 376, 'publishedYear' => 2018, 'createdBy' => 'Orlando Diggs'],
+            ['isbn' => '978-1736417911', 'title' => 'Staff Engineer', 'author' => 'Will Larson', 'description' => 'Leadership beyond the management track — a guide for engineers operating at staff level and above.', 'pageCount' => 187, 'publishedYear' => 2021, 'createdBy' => 'Crystal Liu'],
             // The following 3 books are pending approval
             ['isbn' => '978-0439064873', 'title' => 'Harry Potter and the Chamber of Secrets', 'author' => 'J.K. Rowling', 'description' => "Harry's second year at Hogwarts reveals dark secrets.", 'pageCount' => 341, 'publishedYear' => 1998, 'createdBy' => 'Harriet Rojas'],
             ['isbn' => '978-0439136365', 'title' => 'Harry Potter and the Prisoner of Azkaban', 'author' => 'J.K. Rowling', 'description' => 'Harry learns about his godfather Sirius Black.', 'pageCount' => 435, 'publishedYear' => 1999, 'createdBy' => 'Harry Bender'],

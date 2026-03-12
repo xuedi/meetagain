@@ -2,6 +2,8 @@
 
 namespace Plugin\Bookclub\Service;
 
+use App\Enum\EntityAction;
+use App\Service\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;
@@ -10,6 +12,7 @@ use Plugin\Bookclub\Entity\BookPollVote;
 use Plugin\Bookclub\Entity\BookSuggestion;
 use Plugin\Bookclub\Entity\PollStatus;
 use Plugin\Bookclub\Entity\SuggestionStatus;
+use Plugin\Bookclub\Filter\BookGroupFilterService;
 use Plugin\Bookclub\Repository\BookPollRepository;
 use Plugin\Bookclub\Repository\BookPollVoteRepository;
 use Plugin\Bookclub\Repository\BookRepository;
@@ -24,6 +27,8 @@ readonly class PollService
         private BookPollVoteRepository $voteRepo,
         private BookSuggestionRepository $suggestionRepo,
         private BookRepository $bookRepo,
+        private BookGroupFilterService $groupFilter,
+        private EntityActionDispatcher $dispatcher,
     ) {}
 
     /**
@@ -54,6 +59,7 @@ readonly class PollService
             }
         }
 
+        $managerSuggestions = [];
         foreach ($bookIds as $bookId) {
             $book = $this->bookRepo->find($bookId);
             if ($book !== null) {
@@ -64,10 +70,15 @@ readonly class PollService
                 $suggestion->setStatus(SuggestionStatus::InPoll);
                 $suggestion->setPoll($poll);
                 $this->em->persist($suggestion);
+                $managerSuggestions[] = $suggestion;
             }
         }
 
         $this->em->flush();
+
+        foreach ($managerSuggestions as $suggestion) {
+            $this->dispatcher->dispatch(EntityAction::CreateBookSuggestion, $suggestion->getId());
+        }
 
         return $poll;
     }
@@ -171,12 +182,12 @@ readonly class PollService
 
     public function getActivePoll(): ?BookPoll
     {
-        return $this->pollRepo->findActivePoll();
+        return $this->pollRepo->findActivePoll($this->groupFilter->getAllowedEventIds());
     }
 
     public function getLatestClosedPoll(): ?BookPoll
     {
-        return $this->pollRepo->findLatestClosed();
+        return $this->pollRepo->findLatestClosed($this->groupFilter->getAllowedEventIds());
     }
 
     public function getUserVote(int $pollId, int $userId): ?BookPollVote
@@ -197,6 +208,12 @@ readonly class PollService
     /** @return BookPoll[] */
     public function getAll(): array
     {
-        return $this->pollRepo->findBy([], ['createdAt' => 'DESC']);
+        return $this->pollRepo->findAll($this->groupFilter->getAllowedEventIds());
+    }
+
+    /** @return int[] */
+    public function getUsedEventIds(): array
+    {
+        return $this->pollRepo->findUsedEventIds($this->groupFilter->getAllowedEventIds());
     }
 }
