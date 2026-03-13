@@ -110,4 +110,18 @@ class EmailQueueRepository extends ServiceEntityRepository
 
         return round(($stats['sent'] / $stats['total']) * 100, 1);
     }
+
+    /**
+     * @return \App\Entity\EmailQueue[]
+     */
+    public function findWithProviderMessageIdAndNoStatus(int $limit): array
+    {
+        return $this->createQueryBuilder('eq')
+            ->where('eq.providerMessageId IS NOT NULL')
+            ->andWhere('eq.providerStatus IS NULL')
+            ->orderBy('eq.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -59,3 +59,14 @@ services:
         arguments:
             $passwordResetLimiter: '@limiter.password_reset'
             $registrationLimiter: '@limiter.registration'
+
+    App\Service\Email\Provider\Sweego\SweegoEmailDeliveryProvider:
+        arguments:
+            $mailerDsn: '%env(MAILER_DSN)%'
+
+    App\Service\Email\Provider\EmailDeliveryProviderInterface:
+        alias: App\Service\Email\Provider\Sweego\SweegoEmailDeliveryProvider
+
+    App\Service\EmailService:
+        arguments:
+            $transport: '@mailer.transports'

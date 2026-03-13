@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Index(name: 'idx_email_queue_status', columns: ['status'])]
+#[ORM\Index(name: 'idx_email_queue_provider_message_id', columns: ['provider_message_id'])]
 class EmailQueue
 {
     #[ORM\Id]
@@ -49,6 +50,12 @@ class EmailQueue
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $renderedBody = null;
+
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $providerMessageId = null;
+
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $providerStatus = null;
 
     public function getId(): ?int
     {
@@ -200,5 +207,29 @@ class EmailQueue
     public function isFailed(): bool
     {
         return $this->status === EmailQueueStatus::Failed;
+    }
+
+    public function getProviderMessageId(): ?string
+    {
+        return $this->providerMessageId;
+    }
+
+    public function setProviderMessageId(?string $providerMessageId): static
+    {
+        $this->providerMessageId = $providerMessageId;
+
+        return $this;
+    }
+
+    public function getProviderStatus(): ?string
+    {
+        return $this->providerStatus;
+    }
+
+    public function setProviderStatus(?string $providerStatus): static
+    {
+        $this->providerStatus = $providerStatus;
+
+        return $this;
     }
 }
