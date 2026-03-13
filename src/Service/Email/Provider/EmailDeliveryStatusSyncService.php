@@ -5,6 +5,7 @@ namespace App\Service\Email\Provider;
 use App\CronTaskInterface;
 use App\Repository\EmailQueueRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class EmailDeliveryStatusSyncService implements CronTaskInterface
@@ -13,6 +14,7 @@ final readonly class EmailDeliveryStatusSyncService implements CronTaskInterface
         private EmailDeliveryProviderInterface $provider,
         private EmailQueueRepository $repo,
         private EntityManagerInterface $em,
+        private LoggerInterface $logger,
     ) {}
 
     public function syncPending(int $limit = 100): SyncResult
@@ -29,6 +31,11 @@ final readonly class EmailDeliveryStatusSyncService implements CronTaskInterface
             if ($log !== null) {
                 $email->setProviderStatus($log->status);
                 $updated++;
+            } else {
+                $this->logger->warning('EmailDeliveryStatusSync: no provider log found for message', [
+                    'email_queue_id' => $email->getId(),
+                    'provider_message_id' => $email->getProviderMessageId(),
+                ]);
             }
         }
 
