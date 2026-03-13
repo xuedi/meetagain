@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 readonly class EmailService implements CronTaskInterface
 {
@@ -27,6 +28,7 @@ readonly class EmailService implements CronTaskInterface
      */
     public function __construct(
         private MailerInterface $mailer,
+        private TransportInterface $transport,
         private ConfigService $config,
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
@@ -263,6 +265,15 @@ readonly class EmailService implements CronTaskInterface
                     'lang' => 'en',
                 ],
             ],
+            EmailType::SupportNotification->value => [
+                'subject' => 'New Support Request from John Doe',
+                'context' => [
+                    'name' => 'John Doe',
+                    'email' => 'john.doe@example.org',
+                    'message' => 'I need help with my account.',
+                    'createdAt' => '2025-01-01 12:00:00',
+                ],
+            ],
         ];
     }
 
@@ -279,9 +290,12 @@ readonly class EmailService implements CronTaskInterface
         $mails = $this->mailRepo->findBy(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000);
         foreach ($mails as $mail) {
             try {
-                $this->mailer->send($this->queueToTemplate($mail));
+                $sentMessage = $this->transport->send($this->queueToTemplate($mail));
                 $mail->setSendAt(new DateTime());
                 $mail->setStatus(EmailQueueStatus::Sent);
+                if ($sentMessage->getMessageId() !== '') {
+                    $mail->setProviderMessageId($sentMessage->getMessageId());
+                }
                 $send++;
             } catch (TransportExceptionInterface $e) {
                 $mail->setStatus(EmailQueueStatus::Failed);
