@@ -7,7 +7,9 @@ use App\Service\Email\Provider\EmailDeliveryLogCollection;
 use App\Service\Email\Provider\EmailDeliveryLogFilter;
 use App\Service\Email\Provider\EmailDeliveryProviderInterface;
 use DateTimeImmutable;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Throwable;
 
 final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProviderInterface
 {
@@ -17,6 +19,7 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
 
     public function __construct(
         private HttpClientInterface $httpClient,
+        private LoggerInterface $logger,
         string $mailerDsn,
     ) {
         $parsed = parse_url($mailerDsn);
@@ -67,7 +70,12 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
                 $filter->offset,
                 $filter->size,
             );
-        } catch (\Throwable) {
+        } catch (Throwable $e) {
+            $this->logger->error('Sweego API request failed', [
+                'message' => $e->getMessage(),
+                'filter' => (array) $filter,
+            ]);
+
             return new EmailDeliveryLogCollection([], 0, $filter->offset, $filter->size);
         }
     }
