@@ -6,6 +6,18 @@
 
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'sendlog'} %}
 
+        {% if providerAvailable %}
+            <div class="mb-4">
+                <form method="post" action="{{ path('app_admin_email_sendlog_sync') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('sync') }}">
+                    <button type="submit" class="button is-small is-info">
+                        <span class="icon"><i class="fa fa-refresh"></i></span>
+                        <span>Sync from Provider</span>
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
@@ -13,6 +25,7 @@
                 <th>Recipient</th>
                 <th>Subject</th>
                 <th>Status</th>
+                <th>Provider Status</th>
                 <th>Template</th>
                 <th>Sent At</th>
             </tr>
@@ -42,6 +55,22 @@
                         {% endif %}
                     </td>
                     <td>
+                        {% set ps = email.providerStatus %}
+                        {% if ps == 'delivered' %}
+                            <span class="tag is-success">delivered</span>
+                        {% elseif ps == 'undelivered' %}
+                            <span class="tag is-danger">undelivered</span>
+                        {% elseif ps == 'queued' %}
+                            <span class="tag is-warning">queued</span>
+                        {% elseif ps is not null %}
+                            <span class="tag is-light">{{ ps }}</span>
+                        {% elseif email.providerMessageId %}
+                            <span class="has-text-grey">pending sync</span>
+                        {% else %}
+                            <span class="has-text-grey">–</span>
+                        {% endif %}
+                    </td>
+                    <td>
                         {% if email.template %}
                             <span class="tag is-light">{{ email.template.value }}</span>
                         {% else %}
@@ -58,7 +87,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="has-text-centered has-text-grey">
+                    <td colspan="7" class="has-text-centered has-text-grey">
                         No email entries found.
                     </td>
                 </tr>
