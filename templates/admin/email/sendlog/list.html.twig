@@ -23,11 +23,10 @@
             <tr>
                 <th>Created</th>
                 <th>Recipient</th>
-                <th>Subject</th>
-                <th>Status</th>
                 <th>Provider Status</th>
                 <th>Template</th>
                 <th>Sent At</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -38,22 +37,6 @@
                         <small class="has-text-grey">{{ email.createdAt|date('H:i:s') }}</small>
                     </td>
                     <td>{{ email.recipient }}</td>
-                    <td>{{ email.subject }}</td>
-                    <td>
-                        {% if email.isFailed() %}
-                            <span class="icon-text has-text-danger">
-                                <span class="icon"><i class="fa fa-exclamation-triangle"></i></span>
-                                <span>failed</span>
-                            </span>
-                            {% if email.errorMessage %}
-                                <br><small class="has-text-grey">{{ email.errorMessage|u.truncate(50) }}</small>
-                            {% endif %}
-                        {% elseif email.isSent() %}
-                            <span class="has-text-success">sent</span>
-                        {% else %}
-                            <span>pending</span>
-                        {% endif %}
-                    </td>
                     <td>
                         {% set ps = email.providerStatus %}
                         {% if ps == 'delivered' %}
@@ -84,10 +67,15 @@
                             <span class="has-text-grey">-</span>
                         {% endif %}
                     </td>
+                    <td>
+                        <a href="{{ path('app_admin_email_sendlog_show', {'id': email.id}) }}">
+                            <span class="icon"><i class="fa fa-eye"></i></span>
+                        </a>
+                    </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="7" class="has-text-centered has-text-grey">
+                    <td colspan="6" class="has-text-centered has-text-grey">
                         No email entries found.
                     </td>
                 </tr>
