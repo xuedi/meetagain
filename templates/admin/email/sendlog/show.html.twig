@@ -1,0 +1,115 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'sendlog'} %}
+
+        <div class="mb-4">
+            <a href="{{ path('app_admin_email_sendlog') }}" class="button is-small">
+                <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                <span>Back</span>
+            </a>
+        </div>
+
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td>{{ email.id }}</td>
+                </tr>
+                <tr>
+                    <th>Template</th>
+                    <td>
+                        {% if email.template %}
+                            <span class="tag is-light">{{ email.template.value }}</span>
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Sender</th>
+                    <td>{{ email.sender }}</td>
+                </tr>
+                <tr>
+                    <th>Recipient</th>
+                    <td>{{ email.recipient }}</td>
+                </tr>
+                <tr>
+                    <th>Subject</th>
+                    <td>{{ email.subject }}</td>
+                </tr>
+                <tr>
+                    <th>Language</th>
+                    <td>{{ email.lang }}</td>
+                </tr>
+                <tr>
+                    <th>Created At</th>
+                    <td>{{ email.createdAt|date('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr>
+                    <th>Sent At</th>
+                    <td>
+                        {% if email.sendAt %}
+                            {{ email.sendAt|date('Y-m-d H:i:s') }}
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Provider Message ID</th>
+                    <td>
+                        {% if email.providerMessageId %}
+                            <code>{{ email.providerMessageId }}</code>
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Provider Status</th>
+                    <td>
+                        {% set ps = email.providerStatus %}
+                        {% if ps == 'delivered' %}
+                            <span class="tag is-success">delivered</span>
+                        {% elseif ps == 'undelivered' %}
+                            <span class="tag is-danger">undelivered</span>
+                        {% elseif ps == 'queued' %}
+                            <span class="tag is-warning">queued</span>
+                        {% elseif ps is not null %}
+                            <span class="tag is-light">{{ ps }}</span>
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if email.errorMessage %}
+                    <tr>
+                        <th>Error</th>
+                        <td class="has-text-danger">{{ email.errorMessage }}</td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <th>Context</th>
+                    <td>
+                        <table class="table is-narrow is-bordered">
+                            <tbody>
+                                {% for key, value in email.context %}
+                                    <tr>
+                                        <th>{{ key }}</th>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

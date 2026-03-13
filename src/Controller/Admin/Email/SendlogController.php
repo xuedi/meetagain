@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Email;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Entity\EmailQueue;
 use App\Repository\EmailQueueRepository;
 use App\Service\Email\Provider\EmailDeliveryProviderInterface;
 use App\Service\Email\Provider\EmailDeliveryStatusSyncService;
@@ -39,6 +40,15 @@ class SendlogController extends AbstractAdminController
             'active' => 'email',
             'emails' => $emails,
             'providerAvailable' => $this->provider->isAvailable(),
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_admin_email_sendlog_show', requirements: ['id' => '\d+'])]
+    public function show(EmailQueue $email): Response
+    {
+        return $this->render('admin/email/sendlog/show.html.twig', [
+            'active' => 'email',
+            'email' => $email,
         ]);
     }
 
