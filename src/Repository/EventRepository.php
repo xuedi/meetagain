@@ -105,6 +105,34 @@ class EventRepository extends ServiceEntityRepository
         return $qb->orderBy('e.start', 'ASC')->getQuery()->getResult();
     }
 
+    /**
+     * Find upcoming events that need RSVP follower notifications.
+     * Returns events where: start is between $from and $to, rsvpNotificationSentAt IS NULL,
+     * not canceled, and has at least one RSVP attendee.
+     *
+     * @return array<Event>
+     */
+    public function findUpcomingEventsNeedingRsvpNotification(
+        DateTimeInterface $from,
+        DateTimeInterface $to,
+    ): array {
+        return $this
+            ->createQueryBuilder('e')
+            ->innerJoin('e.rsvp', 'r')
+            ->where('e.start BETWEEN :from AND :to')
+            ->andWhere('e.rsvpNotificationSentAt IS NULL')
+            ->andWhere('e.canceled = :notCanceled')
+            ->andWhere('e.status IN (:statuses)')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setParameter('notCanceled', false)
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->groupBy('e.id')
+            ->orderBy('e.start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getEventNameList(string $language): array
     {
         $events = $this

@@ -6,9 +6,12 @@ use App\CronTaskInterface;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EventRepository;
-use DateTime;
+use DateInterval;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -23,32 +26,44 @@ readonly class RsvpNotificationService implements CronTaskInterface
         private TagAwareCacheInterface $appCache,
         private ConfigService $configService,
         private LoggerInterface $logger,
+        private EntityManagerInterface $entityManager,
+        private ClockInterface $clock,
     ) {}
 
     public function runCronTask(OutputInterface $output): void
     {
-        $count = $this->processUpcomingEvents(7);
-        $output->writeln('Send RSVP notifications: ' . $count);
-        $this->logger->info('RSVP notifications processed', ['result' => $count]);
+        $currentHour = (int) $this->clock->now()->format('H');
+        if ($currentHour < 7 || $currentHour >= 22) {
+            $output->writeln('RSVP notifications skipped: outside allowed hours (07:00-22:00)');
+
+            return;
+        }
+
+        $result = $this->processUpcomingEvents();
+        $output->writeln('Send RSVP notifications: ' . $result);
+        $this->logger->info('RSVP notifications processed', ['result' => $result]);
     }
 
-    public function processUpcomingEvents(int $daysAhead = 7): string
+    public function processUpcomingEvents(): string
     {
         if (!$this->configService->isSendRsvpNotifications()) {
             return 'disabled';
         }
 
-        $start = new DateTime();
-        $end = new DateTime()->modify(sprintf('+%d days', $daysAhead));
+        $now = $this->clock->now();
+        $end = $now->add(new DateInterval('PT48H'));
 
-        $events = $this->eventRepo->findUpcomingEventsWithinRange($start, $end);
+        $events = $this->eventRepo->findUpcomingEventsNeedingRsvpNotification($now, $end);
         $totalNotifications = 0;
 
         foreach ($events as $event) {
             $totalNotifications += $this->notifyFollowersForEvent($event);
+
+            $event->setRsvpNotificationSentAt(new DateTimeImmutable());
+            $this->entityManager->flush();
         }
 
-        return $totalNotifications . ' send';
+        return $totalNotifications . ' sent';
     }
 
     public function notifyFollowersForEvent(Event $event): int
