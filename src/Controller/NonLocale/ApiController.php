@@ -112,6 +112,19 @@ class ApiController extends AbstractController
                 ],
             ],
             [
+                'title' => 'System Logs',
+                'badge' => 'Token required',
+                'endpoints' => [
+                    [
+                        'method'      => 'GET',
+                        'apiPath'     => '/api/logs',
+                        'description' => 'Read recent application log entries',
+                        'example'     => "curl HOST/api/logs?limit=50&level=WARNING \\\n  -H \"Authorization: Bearer \$TOKEN\"",
+                        'route'       => 'app_api_logs',
+                    ],
+                ],
+            ],
+            [
                 'title' => 'CMS Blocks',
                 'badge' => 'Token required',
                 'endpoints' => [

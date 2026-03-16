@@ -60,4 +60,21 @@ class LogEntry
     {
         return $this->json;
     }
+
+    public function toArray(): array
+    {
+        $context = null;
+        if ($this->json !== null) {
+            $decoded = json_decode($this->json, true);
+            $context = $decoded !== null ? $decoded : $this->json;
+        }
+
+        return [
+            'date'    => $this->date->format('c'),
+            'channel' => $this->type,
+            'level'   => $this->level,
+            'message' => $this->message,
+            'context' => $context,
+        ];
+    }
 }
