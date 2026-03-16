@@ -38,7 +38,7 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
         }
 
         try {
-            $body = ['offset' => $filter->offset, 'size' => $filter->size];
+            $body = ['channel' => 'email', 'offset' => $filter->offset, 'size' => $filter->size];
 
             if ($filter->messageId !== null) {
                 $body['transaction_id'] = $filter->messageId;
@@ -50,10 +50,10 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
                 $body['status'] = $filter->statuses;
             }
             if ($filter->since !== null) {
-                $body['date_from'] = $filter->since->format('Y-m-d');
+                $body['start_date'] = $filter->since->format('Y-m-d');
             }
             if ($filter->until !== null) {
-                $body['date_to'] = $filter->until->format('Y-m-d');
+                $body['end_date'] = $filter->until->format('Y-m-d');
             }
 
             $response = $this->httpClient->request('POST', self::BASE_URL . '/logs/', [
