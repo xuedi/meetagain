@@ -39,7 +39,7 @@ when@prod:
                 type: rotating_file
                 path: '%kernel.logs_dir%/%kernel.environment%.log'
                 handler: nested
-                level: error
+                level: warning
             sentry_logs:
                 type: service
                 id: Sentry\SentryBundle\Monolog\LogsHandler
