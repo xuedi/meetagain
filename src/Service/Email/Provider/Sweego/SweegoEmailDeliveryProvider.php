@@ -62,7 +62,7 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
             ]);
 
             $data = $response->toArray();
-            $items = array_map($this->mapLog(...), $data['logs'] ?? []);
+            $items = array_map($this->mapLog(...), $data['result'] ?? []);
 
             if (count($items) === 0) {
                 $this->logger->warning('Sweego logs API returned empty result', [
@@ -74,7 +74,7 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
 
             return new EmailDeliveryLogCollection(
                 $items,
-                $data['total'] ?? count($items),
+                $data['nb_result_without_offset'] ?? count($items),
                 $filter->offset,
                 $filter->size,
             );

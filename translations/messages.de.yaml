@@ -283,6 +283,7 @@ page_title_CMD: CMS
 config_option_show_frontpage: 'Auf der Startseite anzeigen'
 config_option_automatic_registration: 'Automatische Registrierung'
 config_option_send_rsvp_notifications: 'RSVP-Benachrichtigungen senden'
+config_option_email_delivery_sync_enabled: 'E-Mail-Zustellstatus synchronisieren'
 menu_admin_translation_edit: Bearbeiten
 menu_admin_translation_extract: Suchen
 menu_admin_translation_publish: Veröffentlichen

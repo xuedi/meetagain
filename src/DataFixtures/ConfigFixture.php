@@ -56,6 +56,11 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 ConfigType::Boolean,
             ],
             [
+                'email_delivery_sync_enabled',
+                'false',
+                ConfigType::Boolean,
+            ],
+            [
                 'email_sender_mail',
                 'email@localhost',
                 ConfigType::String,
