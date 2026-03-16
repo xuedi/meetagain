@@ -9,12 +9,16 @@ use App\Repository\EventRepository;
 use App\Service\ConfigService;
 use App\Service\EmailService;
 use App\Service\RsvpNotificationService;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -24,6 +28,8 @@ class RsvpNotificationServiceTest extends TestCase
     private EmailService&MockObject $emailService;
     private TagAwareCacheInterface&Stub $appCache;
     private ConfigService&Stub $configService;
+    private EntityManagerInterface&Stub $entityManager;
+    private ClockInterface&Stub $clock;
     private RsvpNotificationService $service;
 
     protected function setUp(): void
@@ -33,12 +39,17 @@ class RsvpNotificationServiceTest extends TestCase
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->configService = $this->createStub(ConfigService::class);
         $this->configService->method('isSendRsvpNotifications')->willReturn(true);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->clock = $this->createStub(ClockInterface::class);
+        $this->clock->method('now')->willReturn(new DateTimeImmutable('2026-03-13 10:00:00'));
         $this->service = new RsvpNotificationService(
             $this->eventRepo,
             $this->emailService,
             $this->appCache,
             $this->configService,
             $this->createStub(LoggerInterface::class),
+            $this->entityManager,
+            $this->clock,
         );
     }
 
@@ -174,12 +185,12 @@ class RsvpNotificationServiceTest extends TestCase
         $event2 = $this->createStub(Event::class);
         $event2->method('getRsvp')->willReturn(new ArrayCollection([]));
 
-        $this->eventRepo->method('findUpcomingEventsWithinRange')->willReturn([$event1, $event2]);
+        $this->eventRepo->method('findUpcomingEventsNeedingRsvpNotification')->willReturn([$event1, $event2]);
 
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
-        $result = $this->service->processUpcomingEvents(5);
-        $this->assertEquals('0 send', $result);
+        $result = $this->service->processUpcomingEvents();
+        $this->assertEquals('0 sent', $result);
     }
 
     public function testNotifyFollowersForEventEmptyAttendees(): void
@@ -261,6 +272,8 @@ class RsvpNotificationServiceTest extends TestCase
             $this->appCache,
             $this->configService,
             $this->createStub(LoggerInterface::class),
+            $this->entityManager,
+            $this->clock,
         );
 
         // Email should be sent exactly once across both calls
@@ -290,6 +303,8 @@ class RsvpNotificationServiceTest extends TestCase
             $this->appCache,
             $configService,
             $this->createStub(LoggerInterface::class),
+            $this->entityManager,
+            $this->clock,
         );
 
         $event = $this->createStub(Event::class);
@@ -327,15 +342,95 @@ class RsvpNotificationServiceTest extends TestCase
             $this->appCache,
             $configService,
             $this->createStub(LoggerInterface::class),
+            $this->entityManager,
+            $this->clock,
         );
 
         // Assert - No events should be fetched when global setting is disabled
-        $eventRepo->expects($this->never())->method('findUpcomingEventsWithinRange');
+        $eventRepo->expects($this->never())->method('findUpcomingEventsNeedingRsvpNotification');
 
         // Act
-        $result = $service->processUpcomingEvents(7);
+        $result = $service->processUpcomingEvents();
 
         // Assert
         $this->assertEquals('disabled', $result);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testRunCronTaskSkipsBeforeAllowedHours(): void
+    {
+        $clock = $this->createStub(ClockInterface::class);
+        $clock->method('now')->willReturn(new DateTimeImmutable('2026-03-13 06:59:00'));
+
+        $eventRepo = $this->createMock(EventRepository::class);
+        $eventRepo->expects($this->never())->method('findUpcomingEventsNeedingRsvpNotification');
+
+        $emailService = $this->createStub(EmailService::class);
+        $service = new RsvpNotificationService(
+            $eventRepo,
+            $emailService,
+            $this->appCache,
+            $this->configService,
+            $this->createStub(LoggerInterface::class),
+            $this->entityManager,
+            $clock,
+        );
+
+        $output = new BufferedOutput();
+        $service->runCronTask($output);
+
+        $this->assertStringContainsString('outside allowed hours', $output->fetch());
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testRunCronTaskSkipsAfterAllowedHours(): void
+    {
+        $clock = $this->createStub(ClockInterface::class);
+        $clock->method('now')->willReturn(new DateTimeImmutable('2026-03-13 22:00:00'));
+
+        $eventRepo = $this->createMock(EventRepository::class);
+        $eventRepo->expects($this->never())->method('findUpcomingEventsNeedingRsvpNotification');
+
+        $emailService = $this->createStub(EmailService::class);
+        $service = new RsvpNotificationService(
+            $eventRepo,
+            $emailService,
+            $this->appCache,
+            $this->configService,
+            $this->createStub(LoggerInterface::class),
+            $this->entityManager,
+            $clock,
+        );
+
+        $output = new BufferedOutput();
+        $service->runCronTask($output);
+
+        $this->assertStringContainsString('outside allowed hours', $output->fetch());
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testProcessUpcomingEventsMarksEventAfterSending(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getRsvp')->willReturn(new ArrayCollection([]));
+        $event->expects($this->once())->method('setRsvpNotificationSentAt');
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->once())->method('flush');
+
+        $this->eventRepo->method('findUpcomingEventsNeedingRsvpNotification')->willReturn([$event]);
+
+        $emailService = $this->createStub(EmailService::class);
+        $service = new RsvpNotificationService(
+            $this->eventRepo,
+            $emailService,
+            $this->appCache,
+            $this->configService,
+            $this->createStub(LoggerInterface::class),
+            $entityManager,
+            $this->clock,
+        );
+
+        $service->processUpcomingEvents();
     }
 }
