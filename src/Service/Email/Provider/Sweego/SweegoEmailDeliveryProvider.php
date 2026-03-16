@@ -65,7 +65,7 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
             $items = array_map($this->mapLog(...), $data['logs'] ?? []);
 
             if (count($items) === 0) {
-                $this->logger->debug('Sweego logs API returned empty result', [
+                $this->logger->warning('Sweego logs API returned empty result', [
                     'filter' => (array) $filter,
                     'response_keys' => array_keys($data),
                     'response' => $data,
