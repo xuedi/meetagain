@@ -109,6 +109,11 @@ readonly class ConfigService
         return $this->getBoolean('send_rsvp_notifications', true);
     }
 
+    public function isEmailDeliverySyncEnabled(): bool
+    {
+        return $this->getBoolean('email_delivery_sync_enabled', false);
+    }
+
     public function getDateFormat(): string
     {
         return $this->getString('date_format', 'Y-m-d H:i');

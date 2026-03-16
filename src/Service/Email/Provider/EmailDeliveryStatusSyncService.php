@@ -4,6 +4,7 @@ namespace App\Service\Email\Provider;
 
 use App\CronTaskInterface;
 use App\Repository\EmailQueueRepository;
+use App\Service\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +16,7 @@ final readonly class EmailDeliveryStatusSyncService implements CronTaskInterface
         private EmailQueueRepository $repo,
         private EntityManagerInterface $em,
         private LoggerInterface $logger,
+        private ConfigService $configService,
     ) {}
 
     public function syncPending(int $limit = 100): SyncResult
@@ -46,6 +48,10 @@ final readonly class EmailDeliveryStatusSyncService implements CronTaskInterface
 
     public function runCronTask(OutputInterface $output): void
     {
+        if (!$this->configService->isEmailDeliverySyncEnabled()) {
+            return;
+        }
+
         $result = $this->syncPending(100);
 
         if (!$result->available) {
