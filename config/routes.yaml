@@ -31,3 +31,7 @@ api_auth:
 api_cms:
     type: attribute
     resource: ../src/Controller/NonLocale/CmsCrudApiController.php
+
+api_logs:
+    type: attribute
+    resource: ../src/Controller/NonLocale/LogsApiController.php
