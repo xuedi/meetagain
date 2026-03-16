@@ -39,6 +39,7 @@ security:
         - { path: "^/api/$",      roles: PUBLIC_ACCESS }
         - { path: "^/api/status", roles: PUBLIC_ACCESS }
         - { path: "^/api/cms",    roles: ROLE_ADMIN }
+        - { path: "^/api/logs",   roles: ROLE_ADMIN }
         - { path: "^/[a-z]{2}/profile", roles: ROLE_USER }
         - { path: "^/[a-z]{2}/translation", roles: ROLE_USER }
 
