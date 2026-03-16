@@ -84,6 +84,9 @@ class Event
     #[ORM\Column]
     private bool $canceled = false;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $rsvpNotificationSentAt = null;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
@@ -434,6 +437,18 @@ class Event
     public function setCanceled(bool $canceled): static
     {
         $this->canceled = $canceled;
+
+        return $this;
+    }
+
+    public function getRsvpNotificationSentAt(): ?DateTimeImmutable
+    {
+        return $this->rsvpNotificationSentAt;
+    }
+
+    public function setRsvpNotificationSentAt(?DateTimeImmutable $rsvpNotificationSentAt): static
+    {
+        $this->rsvpNotificationSentAt = $rsvpNotificationSentAt;
 
         return $this;
     }
