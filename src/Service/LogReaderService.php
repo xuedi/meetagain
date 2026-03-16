@@ -63,6 +63,14 @@ readonly class LogReaderService
 
     public function getLogFilePath(): string
     {
+        $pattern = $this->logsDir . '/' . $this->environment . '-*.log';
+        $files = glob($pattern);
+
+        if (!empty($files)) {
+            usort($files, static fn($a, $b) => filemtime($b) <=> filemtime($a));
+            return $files[0];
+        }
+
         return $this->logsDir . '/' . $this->environment . '.log';
     }
 
