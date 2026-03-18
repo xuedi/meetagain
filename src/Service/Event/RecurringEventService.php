@@ -9,7 +9,7 @@ use App\Entity\EventTranslation;
 use App\Enum\EntityAction;
 use App\Repository\EventRepository;
 use App\Service\Cms\CmsPageCacheService;
-use App\Service\EntityActionDispatcher;
+use App\EntityActionDispatcher;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;

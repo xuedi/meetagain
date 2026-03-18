@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\ActivityType;
 use App\Form\ReportImageType;
 use App\Repository\ImageRepository;
-use App\Service\ActivityService;
+use App\Service\Activity\ActivityService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

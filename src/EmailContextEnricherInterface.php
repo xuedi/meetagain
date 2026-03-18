@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service;
+namespace App;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

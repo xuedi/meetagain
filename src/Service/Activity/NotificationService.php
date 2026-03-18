@@ -7,7 +7,7 @@ use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use DateTime;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Cache\ItemInterface;

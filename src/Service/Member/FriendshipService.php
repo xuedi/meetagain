@@ -6,7 +6,7 @@ use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
-use App\Service\ActivityService;
+use App\Service\Activity\ActivityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;

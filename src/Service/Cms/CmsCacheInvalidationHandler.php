@@ -3,7 +3,7 @@
 namespace App\Service\Cms;
 
 use App\Enum\EntityAction;
-use App\Service\EntityActionInterface;
+use App\EntityActionInterface;
 
 readonly class CmsCacheInvalidationHandler implements EntityActionInterface
 {

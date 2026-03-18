@@ -6,7 +6,7 @@ use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
 use App\Enum\EmailType;
 use App\Repository\EmailTemplateRepository;
-use App\Service\EmailTemplateService;
+use App\Service\Email\EmailTemplateService;
 use DateTimeImmutable;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;

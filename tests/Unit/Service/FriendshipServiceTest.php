@@ -5,7 +5,7 @@ namespace Tests\Unit\Service;
 use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
-use App\Service\ActivityService;
+use App\Service\Activity\ActivityService;
 use App\Service\Member\FriendshipService;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;

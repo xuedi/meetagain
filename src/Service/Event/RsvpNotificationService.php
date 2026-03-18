@@ -7,7 +7,7 @@ use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

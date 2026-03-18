@@ -9,7 +9,7 @@ use App\Entity\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\HttpFoundation\Request;

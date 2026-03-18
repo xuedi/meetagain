@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Email;
 
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;

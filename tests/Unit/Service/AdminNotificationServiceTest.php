@@ -7,7 +7,7 @@ use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use App\Repository\UserRepository;
 use App\Service\Admin\AdminNotificationService;
 use App\Service\Config\ConfigService;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use App\Entity\User;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;

@@ -11,7 +11,7 @@ use App\Enum\EntityAction;
 use App\Form\AnnouncementType;
 use App\Repository\AnnouncementRepository;
 use App\Service\Cms\AnnouncementService;
-use App\Service\EntityActionDispatcher;
+use App\EntityActionDispatcher;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

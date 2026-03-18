@@ -6,7 +6,7 @@ use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTime;
 use PHPUnit\Framework\TestCase;
