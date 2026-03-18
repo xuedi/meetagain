@@ -17,7 +17,7 @@ class CommandServiceTest extends TestCase
         $eventDispatcherStub = $this->createStub(EventDispatcher::class);
 
         $containerStub = $this->createStub(ContainerInterface::class);
-        $containerStub->method('get')->with('event_dispatcher')->willReturn($eventDispatcherStub);
+        $containerStub->method('get')->willReturn($eventDispatcherStub);
 
         $kernelStub = $this->createStub(KernelInterface::class);
         $kernelStub->method('getContainer')->willReturn($containerStub);

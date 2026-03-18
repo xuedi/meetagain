@@ -80,7 +80,6 @@ class CaptchaServiceTest extends TestCase
 
         $this->sessionMock
             ->method('get')
-            ->with('captcha_text')
             ->willReturn('hgfw');
         $this->sessionMock
             ->expects($this->once())
