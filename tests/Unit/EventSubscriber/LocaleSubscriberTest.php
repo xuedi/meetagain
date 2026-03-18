@@ -82,7 +82,7 @@ class LocaleSubscriberTest extends TestCase
         $subscriber = new LocaleSubscriber($languageService, 'en');
 
         $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')->with('_locale', 'en')->willReturn('fr');
+        $sessionStub->method('get')->willReturn('fr');
 
         $request = $this->createRequestWithSession($sessionStub);
         // No _locale attribute set
@@ -101,7 +101,7 @@ class LocaleSubscriberTest extends TestCase
         $subscriber = new LocaleSubscriber($languageService, 'es');
 
         $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')->with('_locale', 'es')->willReturn('es'); // Returns the default
+        $sessionStub->method('get')->willReturn('es'); // Returns the default
 
         $request = $this->createRequestWithSession($sessionStub);
 

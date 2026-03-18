@@ -70,7 +70,7 @@ class RsvpNotificationServiceTest extends TestCase
 
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
-        $event->method('hasRsvp')->with($follower)->willReturn(false);
+        $event->method('hasRsvp')->willReturn(false);
 
         $this->appCache
             ->method('get')
@@ -114,7 +114,7 @@ class RsvpNotificationServiceTest extends TestCase
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee1, $attendee2]));
         $attendee1->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
         $attendee2->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
-        $event->method('hasRsvp')->with($follower)->willReturn(false);
+        $event->method('hasRsvp')->willReturn(false);
 
         $this->appCache
             ->method('get')
@@ -151,7 +151,7 @@ class RsvpNotificationServiceTest extends TestCase
 
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
-        $event->method('hasRsvp')->with($follower)->willReturn(false);
+        $event->method('hasRsvp')->willReturn(false);
 
         $this->appCache->method('get')->willReturn(true);
 
@@ -220,7 +220,7 @@ class RsvpNotificationServiceTest extends TestCase
 
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
-        $event->method('hasRsvp')->with($follower)->willReturn(true);
+        $event->method('hasRsvp')->willReturn(true);
 
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
@@ -245,7 +245,7 @@ class RsvpNotificationServiceTest extends TestCase
 
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
-        $event->method('hasRsvp')->with($follower)->willReturn(false);
+        $event->method('hasRsvp')->willReturn(false);
 
         // Simulate cache storage - tracks which keys have been marked as sent
         $cacheStorage = [];
@@ -316,7 +316,7 @@ class RsvpNotificationServiceTest extends TestCase
 
         $event->method('getRsvp')->willReturn(new ArrayCollection([$attendee]));
         $attendee->method('getFollowers')->willReturn(new ArrayCollection([$follower]));
-        $event->method('hasRsvp')->with($follower)->willReturn(false);
+        $event->method('hasRsvp')->willReturn(false);
 
         // Assert - No email should be sent when global setting is disabled
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');

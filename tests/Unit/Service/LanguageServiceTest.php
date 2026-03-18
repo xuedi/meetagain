@@ -192,7 +192,6 @@ class LanguageServiceTest extends TestCase
         $lang = new Language();
         $this->languageRepo
             ->method('findByCode')
-            ->with('en')
             ->willReturn($lang);
 
         static::assertSame($lang, $this->service->findByCode('en'));

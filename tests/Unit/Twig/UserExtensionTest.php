@@ -30,7 +30,6 @@ class UserExtensionTest extends TestCase
     {
         $this->userServiceStub
             ->method('resolveUserName')
-            ->with(42)
             ->willReturn('John Doe');
 
         $result = $this->subject->getUserName(42);
@@ -42,7 +41,6 @@ class UserExtensionTest extends TestCase
     {
         $this->userServiceStub
             ->method('resolveUserName')
-            ->with(999)
             ->willReturn('[deleted]');
 
         $result = $this->subject->getUserName(999);
