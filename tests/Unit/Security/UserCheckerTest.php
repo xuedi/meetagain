@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Repository\MessageRepository;
 use App\Security\UserChecker;
-use App\Service\ActivityService;
+use App\Service\Activity\ActivityService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

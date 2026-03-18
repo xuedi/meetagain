@@ -7,7 +7,7 @@ use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use App\Service\Event\RsvpNotificationService;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;

@@ -9,7 +9,7 @@ use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
 use App\Plugin;
 use App\Repository\EventRepository;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use App\Service\Config\PluginService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;

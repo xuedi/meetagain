@@ -1,13 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Activity;
 
 use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
-use App\Service\Activity\MessageFactory;
-use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -18,7 +16,7 @@ readonly class ActivityService
     public function __construct(
         private EntityManagerInterface $em,
         private ActivityRepository $repo,
-        private ActivityNotificationService $notificationService,
+        private NotificationService $notificationService,
         private MessageFactory $messageFactory,
         private LoggerInterface $logger,
     ) {}

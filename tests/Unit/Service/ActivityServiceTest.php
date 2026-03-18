@@ -8,7 +8,7 @@ use App\Entity\User;
 use App\Repository\ActivityRepository;
 use App\Service\Activity\MessageFactory;
 use App\Service\Activity\MessageInterface;
-use App\Service\ActivityService;
+use App\Service\Activity\ActivityService;
 use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

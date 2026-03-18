@@ -14,7 +14,7 @@ use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
-use App\Service\EntityActionDispatcher;
+use App\EntityActionDispatcher;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageService;
 use App\Service\Config\LanguageService;

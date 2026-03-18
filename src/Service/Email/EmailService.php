@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Email;
 
 use App\CronTaskInterface;
+use App\EmailContextEnricherInterface;
 use App\Entity\EmailQueue;
 use App\Service\Config\ConfigService;
 use App\Entity\EmailQueueStatus;

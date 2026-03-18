@@ -9,7 +9,7 @@ use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\LocationType;
 use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
-use App\Service\EntityActionDispatcher;
+use App\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;

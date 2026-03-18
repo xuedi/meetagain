@@ -6,7 +6,7 @@ use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Entity\UserBlock;
 use App\Repository\UserBlockRepository;
-use App\Service\ActivityService;
+use App\Service\Activity\ActivityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;

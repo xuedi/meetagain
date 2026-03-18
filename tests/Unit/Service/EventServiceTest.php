@@ -8,7 +8,7 @@ use App\Entity\EventFilterTime;
 use App\Entity\EventIntervals;
 use App\Entity\EventTypes;
 use App\Repository\EventRepository;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use App\Service\Event\EventService;
 use App\Service\Config\PluginService;
 use App\Service\Event\RecurringEventService;
