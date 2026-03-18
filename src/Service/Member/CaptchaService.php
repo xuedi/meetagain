@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Imagick;
 use ImagickDraw;
 use ImagickPixel;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -17,6 +18,8 @@ readonly class CaptchaService
 
     public function __construct(
         private RequestStack $requestStack,
+        #[Autowire('%kernel.project_dir%')]
+        private string $projectDir,
     ) {}
 
     private function getSession(): SessionInterface
@@ -155,7 +158,7 @@ readonly class CaptchaService
             $angle = random_int(-20, 20);
             $y = $baseY + random_int(-6, 6);
             $draw = new ImagickDraw();
-            $draw->setFont(__DIR__ . '/../../public/fonts/captcha.ttf');
+            $draw->setFont($this->projectDir . '/public/fonts/captcha.ttf');
             $draw->setFontSize($size + random_int(-4, 6));
             $draw->setFillColor(sprintf('rgb(%d,%d,%d)', random_int(0, 80), random_int(0, 80), random_int(0, 80)));
             $image->annotateImage($draw, $x, $y, $angle, $char);

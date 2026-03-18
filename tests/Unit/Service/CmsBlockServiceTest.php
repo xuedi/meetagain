@@ -115,7 +115,7 @@ class CmsBlockServiceTest extends TestCase
 
     public function testUpdateHeroBlockHandlesImageRightCheckbox(): void
     {
-        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock = $this->createStub(EntityManagerInterface::class);
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
 
         $block = new CmsBlock();

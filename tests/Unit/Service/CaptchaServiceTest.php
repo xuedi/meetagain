@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CaptchaServiceTest extends TestCase
 {
+    private const string PROJECT_DIR = '/var/www/html';
+
     private MockObject|SessionInterface $sessionMock;
     private MockObject|RequestStack $requestStackMock;
     private CaptchaService $subject;
@@ -24,7 +26,7 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
 
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
     }
 
     public function testGenerateReturnsExistingImageFromSession(): void
@@ -49,7 +51,7 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
 
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         // Assert: verify session stores refresh timestamps, captcha text, and image
         $this->sessionMock
@@ -74,7 +76,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $this->sessionMock
             ->method('get')
@@ -98,7 +100,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $this->sessionMock
             ->method('get')
@@ -124,7 +126,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $this->sessionMock
             ->method('get')
@@ -149,7 +151,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $this->sessionMock
             ->expects($this->once())
@@ -170,7 +172,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $this->sessionMock
             ->expects($this->once())
@@ -191,7 +193,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $refreshHistory = [
             new DateTimeImmutable('-10 seconds'),
@@ -219,7 +221,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $this->sessionMock
             ->expects($this->once())
@@ -270,7 +272,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $refreshHistory = array_fill(0, 7, new DateTimeImmutable());
 
@@ -289,7 +291,7 @@ class CaptchaServiceTest extends TestCase
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->requestStackMock = $this->createStub(RequestStack::class);
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
-        $this->subject = new CaptchaService($this->requestStackMock);
+        $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $refreshHistory = [new DateTimeImmutable()];
 
