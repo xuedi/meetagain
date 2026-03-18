@@ -383,7 +383,7 @@ readonly class CategoryFilterContributor implements EventFilterFormContributorIn
 ```php
 namespace Plugin\YourPlugin\Notification;
 
-use App\Notification\NotificationProviderInterface;
+use App\Service\Notification\User\NotificationProviderInterface;
 use App\ValueObject\NotificationCount;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

@@ -9,7 +9,7 @@ use App\Repository\ActivityRepository;
 use App\Service\Activity\MessageFactory;
 use App\Service\Activity\MessageInterface;
 use App\Service\ActivityService;
-use App\Service\NotificationService;
+use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +33,7 @@ class ActivityServiceTest extends TestCase
         $messageFactoryMock->expects($this->once())->method('build')->willReturn($messageMock);
 
         // Arrange: mock NotificationService to verify notification is sent
-        $notificationServiceMock = $this->createMock(NotificationService::class);
+        $notificationServiceMock = $this->createMock(ActivityNotificationService::class);
         $notificationServiceMock->expects($this->once())->method('notify');
 
         // Arrange: mock EntityManager to verify Activity is persisted with correct data
@@ -102,7 +102,7 @@ class ActivityServiceTest extends TestCase
         $subject = new ActivityService(
             em: $this->createStub(EntityManagerInterface::class),
             repo: $repoMock,
-            notificationService: $this->createStub(NotificationService::class),
+            notificationService: $this->createStub(ActivityNotificationService::class),
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
         );
@@ -151,7 +151,7 @@ class ActivityServiceTest extends TestCase
         $subject = new ActivityService(
             em: $this->createStub(EntityManagerInterface::class),
             repo: $repoMock,
-            notificationService: $this->createStub(NotificationService::class),
+            notificationService: $this->createStub(ActivityNotificationService::class),
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
         );

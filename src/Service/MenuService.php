@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\MenuLocation;
 use App\Filter\Cms\CmsFilterService;
 use App\Repository\CmsRepository;
-use App\ValueObject\MenuItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Cache\ItemInterface;

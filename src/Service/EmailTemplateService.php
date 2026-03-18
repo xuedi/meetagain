@@ -24,6 +24,7 @@ readonly class EmailTemplateService
             EmailType::NotificationEventCanceled->value => 'Event canceled: {{eventTitle}}',
             EmailType::Announcement->value => '{{title}}',
             EmailType::SupportNotification->value => 'New Support Request from {{name}}',
+            EmailType::AdminNotification->value => 'Admin: Items require your attention',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -34,6 +35,7 @@ readonly class EmailTemplateService
             EmailType::NotificationEventCanceled->value => 'Veranstaltung abgesagt: {{eventTitle}}',
             EmailType::Announcement->value => '{{title}}',
             EmailType::SupportNotification->value => 'Neue Supportanfrage von {{name}}',
+            EmailType::AdminNotification->value => 'Admin: Es gibt Punkte, die deine Aufmerksamkeit erfordern',
         ],
         'cn' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -44,6 +46,7 @@ readonly class EmailTemplateService
             EmailType::NotificationEventCanceled->value => '活动已取消：{{eventTitle}}',
             EmailType::Announcement->value => '{{title}}',
             EmailType::SupportNotification->value => '{{name}} 的新支持请求',
+            EmailType::AdminNotification->value => '管理员：有事项需要您处理',
         ],
     ];
 
@@ -87,6 +90,13 @@ readonly class EmailTemplateService
             'email',
             'message',
             'createdAt',
+            'greeting',
+        ],
+        EmailType::AdminNotification->value => [
+            'username',
+            'sections',
+            'host',
+            'lang',
             'greeting',
         ],
     ];
@@ -183,6 +193,11 @@ readonly class EmailTemplateService
                 'subject' => $subjects[EmailType::SupportNotification->value],
                 'body' => $this->loadTemplateBody(EmailType::SupportNotification, $language),
                 'variables' => self::VARIABLES[EmailType::SupportNotification->value],
+            ],
+            EmailType::AdminNotification->value => [
+                'subject' => $subjects[EmailType::AdminNotification->value],
+                'body' => $this->loadTemplateBody(EmailType::AdminNotification, $language),
+                'variables' => self::VARIABLES[EmailType::AdminNotification->value],
             ],
         ];
     }

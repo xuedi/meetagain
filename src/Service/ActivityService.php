@@ -7,6 +7,7 @@ use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
 use App\Service\Activity\MessageFactory;
+use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -17,7 +18,7 @@ readonly class ActivityService
     public function __construct(
         private EntityManagerInterface $em,
         private ActivityRepository $repo,
-        private NotificationService $notificationService,
+        private ActivityNotificationService $notificationService,
         private MessageFactory $messageFactory,
         private LoggerInterface $logger,
     ) {}

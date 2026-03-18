@@ -171,6 +171,24 @@ readonly class EmailService implements CronTaskInterface
         return $this->addToEmailQueue($email, EmailType::Announcement, $flush);
     }
 
+    public function prepareAdminNotification(User $recipient, string $sectionsHtml): bool
+    {
+        $language = $recipient->getLocale();
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $recipient->getEmail());
+        $email->locale($language);
+        $email->context([
+            'username' => $recipient->getName(),
+            'sections' => $sectionsHtml,
+            'host' => $this->config->getHost(),
+            'lang' => $language,
+        ]);
+
+        return $this->addToEmailQueue($email, EmailType::AdminNotification);
+    }
+
     public function prepareSupportNotification(SupportRequest $request): bool
     {
         $email = new TemplatedEmail();
@@ -270,6 +288,15 @@ readonly class EmailService implements CronTaskInterface
                     'email' => 'john.doe@example.org',
                     'message' => 'I need help with my account.',
                     'createdAt' => '2025-01-01 12:00:00',
+                ],
+            ],
+            EmailType::AdminNotification->value => [
+                'subject' => 'Admin: Items require your attention',
+                'context' => [
+                    'username' => 'Admin User',
+                    'sections' => '<h3>Users Pending Approval</h3><ul><li>Jane Smith (jane@example.org)</li></ul>',
+                    'host' => 'https://localhost',
+                    'lang' => 'en',
                 ],
             ],
         ];
