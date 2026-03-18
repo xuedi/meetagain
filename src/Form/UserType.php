@@ -3,8 +3,8 @@
 namespace App\Form;
 
 use App\Entity\User;
-use App\Entity\UserRole;
-use App\Entity\UserStatus;
+use App\Enum\UserRole;
+use App\Enum\UserStatus;
 use App\Service\Config\LanguageService;
 use Override;
 use Symfony\Component\Form\AbstractType;

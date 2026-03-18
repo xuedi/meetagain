@@ -3,7 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
-use App\Entity\UserStatus;
+use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use Override;
 use Symfony\Component\HttpFoundation\JsonResponse;

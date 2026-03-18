@@ -2,8 +2,8 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Entity\ActivityType;
-use App\Entity\ImageReported;
+use App\Enum\ActivityType;
+use App\Enum\ImageReportReason;
 use App\Service\Activity\MessageAbstract;
 
 class ReportedImage extends MessageAbstract
@@ -27,13 +27,13 @@ class ReportedImage extends MessageAbstract
     {
         $msgTemplate = 'Reported image for reason: %s';
 
-        return sprintf($msgTemplate, ImageReported::from($this->meta['reason'])->name);
+        return sprintf($msgTemplate, ImageReportReason::from($this->meta['reason'])->name);
     }
 
     protected function renderHtml(): string
     {
         $msgTemplate = 'Reported image for reason: <b>%s</b>';
 
-        return sprintf($msgTemplate, ImageReported::from($this->meta['reason'])->name);
+        return sprintf($msgTemplate, ImageReportReason::from($this->meta['reason'])->name);
     }
 }

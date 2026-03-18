@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use App\Enum\EventInterval;
+use App\Enum\EventStatus;
+use App\Enum\EventType;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -30,8 +33,8 @@ class Event
     #[ORM\Column(nullable: true)]
     private ?int $recurringOf = null;
 
-    #[ORM\Column(type: 'integer', nullable: true, enumType: EventIntervals::class)]
-    private ?EventIntervals $recurringRule = null;
+    #[ORM\Column(type: 'integer', nullable: true, enumType: EventInterval::class)]
+    private ?EventInterval $recurringRule = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -54,8 +57,8 @@ class Event
     #[ORM\ManyToOne]
     private ?Image $previewImage = null;
 
-    #[ORM\Column(nullable: true, enumType: EventTypes::class)]
-    private ?EventTypes $type = null;
+    #[ORM\Column(nullable: true, enumType: EventType::class)]
+    private ?EventType $type = null;
 
     /**
      * @var Collection<int, Comment>
@@ -149,12 +152,12 @@ class Event
         return $this;
     }
 
-    public function getRecurringRule(): ?EventIntervals
+    public function getRecurringRule(): ?EventInterval
     {
         return $this->recurringRule;
     }
 
-    public function setRecurringRule(?EventIntervals $recurringRule): static
+    public function setRecurringRule(?EventInterval $recurringRule): static
     {
         $this->recurringRule = $recurringRule;
 
@@ -275,12 +278,12 @@ class Event
         return $this;
     }
 
-    public function getType(): ?EventTypes
+    public function getType(): ?EventType
     {
         return $this->type;
     }
 
-    public function setType(?EventTypes $type): static
+    public function setType(?EventType $type): static
     {
         $this->type = $type;
 

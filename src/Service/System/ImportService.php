@@ -4,22 +4,22 @@ namespace App\Service\System;
 
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
 use App\Entity\Event;
-use App\Entity\EventIntervals;
-use App\Entity\EventStatus;
+use App\Enum\EventInterval;
+use App\Enum\EventStatus;
 use App\Entity\EventTranslation;
-use App\Entity\EventTypes;
+use App\Enum\EventType;
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\Location;
-use App\Entity\MenuLocation;
+use App\Enum\MenuLocation;
 use App\Entity\User;
-use App\Entity\UserRole;
-use App\Entity\UserStatus;
+use App\Enum\UserRole;
+use App\Enum\UserStatus;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use DateTime;
@@ -317,7 +317,7 @@ readonly class ImportService
             $this->em->persist($cms);
 
             foreach ($pageData['blocks'] ?? [] as $blockData) {
-                $blockType = CmsBlockTypes::tryFrom((int) ($blockData['type'] ?? 0));
+                $blockType = CmsBlockType::tryFrom((int) ($blockData['type'] ?? 0));
                 if ($blockType === null) {
                     continue;
                 }
@@ -403,9 +403,9 @@ readonly class ImportService
         return $location;
     }
 
-    private function findEventTypeByName(string $name): ?EventTypes
+    private function findEventTypeByName(string $name): ?EventType
     {
-        foreach (EventTypes::cases() as $case) {
+        foreach (EventType::cases() as $case) {
             if ($case->name !== $name) {
                 continue;
             }
@@ -416,9 +416,9 @@ readonly class ImportService
         return null;
     }
 
-    private function findEventIntervalByName(string $name): ?EventIntervals
+    private function findEventIntervalByName(string $name): ?EventInterval
     {
-        foreach (EventIntervals::cases() as $case) {
+        foreach (EventInterval::cases() as $case) {
             if ($case->name !== $name) {
                 continue;
             }

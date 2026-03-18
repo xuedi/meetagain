@@ -3,8 +3,8 @@
 namespace App\Service\Config;
 
 use App\Entity\Config;
-use App\Entity\ConfigType;
-use App\Entity\ImageType;
+use App\Enum\ConfigType;
+use App\Enum\ImageType;
 use App\Repository\ConfigRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;

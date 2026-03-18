@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\ConfigType;
 use Doctrine\ORM\Mapping as ORM;
 use LogicException;
 

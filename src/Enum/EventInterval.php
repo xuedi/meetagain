@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
-enum EventIntervals: int
+enum EventInterval: int
 {
     case Daily = 1;
     case Weekly = 2;

@@ -5,7 +5,7 @@ namespace App\Service\Email;
 use App\CronTaskInterface;
 use App\EmailContextEnricherInterface;
 use App\Entity\EmailQueue;
-use App\Entity\EmailQueueStatus;
+use App\Enum\EmailQueueStatus;
 use App\Entity\Event;
 use App\Entity\SupportRequest;
 use App\Entity\User;

@@ -3,11 +3,11 @@
 namespace App\Service\Cms;
 
 use App\Entity\Announcement;
-use App\Entity\AnnouncementStatus;
+use App\Enum\AnnouncementStatus;
 use App\Entity\BlockType\Gallery as GalleryType;
 use App\Entity\BlockType\Text as TextType;
 use App\Entity\Cms;
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -98,9 +98,9 @@ readonly class AnnouncementService
             }
 
             match ($block->getType()) {
-                CmsBlockTypes::Text => $contentParts[] =
+                CmsBlockType::Text => $contentParts[] =
                     '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
-                CmsBlockTypes::Gallery
+                CmsBlockType::Gallery
                     => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson())),
                 default => null,
             };

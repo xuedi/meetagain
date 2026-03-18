@@ -4,7 +4,7 @@ namespace Plugin\Bookclub;
 
 use App\Entity\AdminSection;
 use App\Entity\Link;
-use App\Entity\WarmCacheType;
+use App\Enum\WarmCacheType;
 use App\Plugin;
 use Plugin\Bookclub\Entity\PollStatus;
 use Plugin\Bookclub\Repository\BookPollRepository;

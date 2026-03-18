@@ -4,7 +4,7 @@ namespace Plugin\Filmclub;
 
 use App\Entity\AdminSection;
 use App\Entity\Link;
-use App\Entity\WarmCacheType;
+use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;

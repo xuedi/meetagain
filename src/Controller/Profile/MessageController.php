@@ -3,7 +3,7 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\Message;
 use App\Form\CommentType;
 use App\Repository\MessageRepository;

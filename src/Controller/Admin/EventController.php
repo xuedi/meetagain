@@ -7,7 +7,7 @@ use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Host;
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\Location;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;

@@ -3,7 +3,7 @@
 namespace App\Filter\Image;
 
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**

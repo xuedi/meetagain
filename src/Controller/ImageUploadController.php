@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use App\Filter\Action\ActionAuthorizationMessageService;
 use App\Filter\Action\ActionAuthorizationService;
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\CmsBlock;
 use App\Entity\Event;
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;

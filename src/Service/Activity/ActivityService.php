@@ -3,7 +3,7 @@
 namespace App\Service\Activity;
 
 use App\Entity\Activity;
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;

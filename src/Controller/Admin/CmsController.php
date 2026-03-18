@@ -10,8 +10,8 @@ use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
 use App\Entity\Cms;
-use App\Entity\CmsBlockTypes;
-use App\Entity\ImageType;
+use App\Enum\CmsBlockType;
+use App\Enum\ImageType;
 use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
@@ -216,7 +216,7 @@ final class CmsController extends AbstractAdminController
         }
 
         $locale = $request->request->get('editLocale');
-        $blockType = CmsBlockTypes::from((int) $request->request->get('blockType'));
+        $blockType = CmsBlockType::from((int) $request->request->get('blockType'));
 
         $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
         $this->cmsPageCacheService->invalidatePage($id);
@@ -263,7 +263,7 @@ final class CmsController extends AbstractAdminController
     public function cmsBlockSave(Request $request): Response
     {
         $blockId = (int) $request->request->get('blockId');
-        $type = CmsBlockTypes::from((int) $request->request->get('blockType'));
+        $type = CmsBlockType::from((int) $request->request->get('blockType'));
 
         $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
         $this->cmsPageCacheService->invalidatePage((int) $request->request->get('id'));

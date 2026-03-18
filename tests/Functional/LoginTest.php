@@ -3,7 +3,7 @@
 namespace Tests\Functional;
 
 use App\Entity\Activity;
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

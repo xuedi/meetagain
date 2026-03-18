@@ -4,7 +4,7 @@ namespace App\CorePlugins\Navigation;
 
 use App\Entity\AdminSection;
 use App\Entity\Link;
-use App\Entity\WarmCacheType;
+use App\Enum\WarmCacheType;
 use App\Plugin;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Console\Output\OutputInterface;

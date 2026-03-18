@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Image;
-use App\Entity\ImageReported;
+use App\Enum\ImageReportReason;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -22,7 +22,7 @@ class ReportImageType extends AbstractType
     {
         $builder->add('reported', ChoiceType::class, [
             'label' => $this->translator->trans('report_image_reason'),
-            'choices' => ImageReported::getChoices($this->translator),
+            'choices' => ImageReportReason::getChoices($this->translator),
         ]);
     }
 

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Session\Consent;
-use App\Entity\Session\ConsentType;
+use App\Enum\ConsentType;
 use App\Form\CookieConsentType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
