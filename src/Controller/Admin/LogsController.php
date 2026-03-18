@@ -67,6 +67,7 @@ class LogsController extends AbstractAdminController
             'active' => 'logs',
             'activeLog' => '404',
             'list' => $this->foundLogRepo->getTop100(),
+            'recent' => $this->foundLogRepo->getRecent200(),
         ]);
     }
 

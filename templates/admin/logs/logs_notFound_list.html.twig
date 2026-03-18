@@ -6,22 +6,46 @@
 
         {% include 'admin/logs/_tabs_navigation.html.twig' with {'activeSection': 'logs'} %}
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Number</th>
-                <th>Url</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in list %}
-                <tr>
-                    <td>{{ item.number }}</td>
-                    <td>{{ item.url }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="columns">
+            <div class="column is-4">
+                <table class="table is-fullwidth">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Url</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in list %}
+                        <tr>
+                            <td>{{ item.number }}</td>
+                            <td>{{ item.url|length > 60 ? item.url|slice(0, 57) ~ '...' : item.url }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column is-8">
+                <table class="table is-fullwidth">
+                    <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>IP</th>
+                        <th>Url</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for entry in recent %}
+                        <tr>
+                            <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
+                            <td class="is-nowrap">{{ entry.ip }}</td>
+                            <td>{{ entry.url|length > 80 ? entry.url|slice(0, 77) ~ '...' : entry.url }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
