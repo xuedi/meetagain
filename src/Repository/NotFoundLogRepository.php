@@ -56,4 +56,14 @@ class NotFoundLogRepository extends ServiceEntityRepository
             ->getQuery()
             ->getArrayResult();
     }
+
+    public function getRecent200(): array
+    {
+        return $this
+            ->createQueryBuilder('n')
+            ->orderBy('n.createdAt', 'DESC')
+            ->setMaxResults(200)
+            ->getQuery()
+            ->getResult();
+    }
 }

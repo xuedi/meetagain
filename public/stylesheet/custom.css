@@ -140,6 +140,10 @@ input[type="color"] {
     height: calc(2.25rem + 1px);
 }
 
+.is-nowrap {
+    white-space: nowrap;
+}
+
 .LinkLikeButton {
     background: none;
     border: none;
