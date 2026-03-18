@@ -45,10 +45,10 @@ class EventImageUploadedTest extends TestCase
         $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::EventImageUploaded, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::EventImageUploaded, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingEventId(): void

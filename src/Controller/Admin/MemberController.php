@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ORGANIZER')]
-class MemberController extends AbstractAdminController
+final class MemberController extends AbstractAdminController
 {
     public function __construct(
         private readonly UserRepository $repo,

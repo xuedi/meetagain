@@ -6,8 +6,8 @@ use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
-use App\Service\Member\CaptchaService;
 use App\Service\Email\EmailService;
+use App\Service\Member\CaptchaService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 
-class SupportController extends AbstractController
+final class SupportController extends AbstractController
 {
     public function __construct(
         private readonly EmailService $emailService,

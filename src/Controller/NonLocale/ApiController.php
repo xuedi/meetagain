@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ApiController extends AbstractController
+final class ApiController extends AbstractController
 {
     #[Route('/api/', name: 'app_api')]
     public function index(): Response
@@ -116,11 +116,11 @@ class ApiController extends AbstractController
                 'badge' => 'Token required',
                 'endpoints' => [
                     [
-                        'method'      => 'GET',
-                        'apiPath'     => '/api/logs',
+                        'method' => 'GET',
+                        'apiPath' => '/api/logs',
                         'description' => 'Read recent application log entries',
-                        'example'     => "curl HOST/api/logs?limit=50&level=WARNING \\\n  -H \"Authorization: Bearer \$TOKEN\"",
-                        'route'       => 'app_api_logs',
+                        'example' => "curl HOST/api/logs?limit=50&level=WARNING \\\n  -H \"Authorization: Bearer \$TOKEN\"",
+                        'route' => 'app_api_logs',
                     ],
                 ],
             ],

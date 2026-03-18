@@ -6,9 +6,9 @@ use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use App\Service\Config\LanguageService;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
-use App\Service\Config\LanguageService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Throwable;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/debugging')]
-class DebuggingController extends AbstractAdminController
+final class DebuggingController extends AbstractAdminController
 {
     public function __construct(
         private readonly EmailService $emailService,
@@ -40,9 +40,11 @@ class DebuggingController extends AbstractAdminController
         $mockData = $this->emailService->getMockEmailList();
 
         foreach ($mockData as $type => $data) {
-            if (!array_key_exists('greeting', $mockData[$type]['context'])) {
-                $mockData[$type]['context']['greeting'] = '';
+            if (array_key_exists('greeting', $mockData[$type]['context'])) {
+                continue;
             }
+
+            $mockData[$type]['context']['greeting'] = '';
         }
 
         return $this->render('admin/email/debugging/index.html.twig', [

@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system/images')]
-class ImagesController extends AbstractAdminController
+final class ImagesController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

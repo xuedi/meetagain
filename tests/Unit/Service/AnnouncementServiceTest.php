@@ -136,7 +136,7 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->send($announcement);
 
         // Assert: returns recipient count
-        $this->assertSame(2, $result);
+        static::assertSame(2, $result);
     }
 
     public function testSendFiltersOutUsersWithDisabledNotifications(): void
@@ -193,7 +193,7 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->send($announcement);
 
         // Assert: only one recipient
-        $this->assertSame(1, $result);
+        static::assertSame(1, $result);
     }
 
     public function testGetPreviewContextReturnsCorrectData(): void
@@ -232,12 +232,12 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->getPreviewContext($announcement, 'en');
 
         // Assert: context contains expected data
-        $this->assertSame('Preview Title', $result['title']);
-        $this->assertStringContainsString('Preview content', $result['content']);
-        $this->assertSame('https://example.com/announcement/abc123hash', $result['announcementUrl']);
-        $this->assertSame('User', $result['username']);
-        $this->assertSame('https://example.com', $result['host']);
-        $this->assertSame('en', $result['lang']);
+        static::assertSame('Preview Title', $result['title']);
+        static::assertStringContainsString('Preview content', $result['content']);
+        static::assertSame('https://example.com/announcement/abc123hash', $result['announcementUrl']);
+        static::assertSame('User', $result['username']);
+        static::assertSame('https://example.com', $result['host']);
+        static::assertSame('en', $result['lang']);
     }
 
     public function testGetPreviewContextUsesPreviewHashWhenLinkHashIsNull(): void
@@ -264,7 +264,7 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->getPreviewContext($announcement, 'en');
 
         // Assert: uses preview hash
-        $this->assertSame('https://example.com/announcement/preview-42', $result['announcementUrl']);
+        static::assertSame('https://example.com/announcement/preview-42', $result['announcementUrl']);
     }
 
     public function testGetPreviewContextHandlesMissingCmsPage(): void
@@ -291,8 +291,8 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->getPreviewContext($announcement, 'en');
 
         // Assert: returns null title and empty content
-        $this->assertNull($result['title']);
-        $this->assertSame('', $result['content']);
+        static::assertNull($result['title']);
+        static::assertSame('', $result['content']);
     }
 
     public function testRenderPreviewThrowsExceptionWhenTemplateNotFound(): void
@@ -352,7 +352,7 @@ class AnnouncementServiceTest extends TestCase
         $templateServiceMock
             ->expects($this->exactly(2))
             ->method('renderContent')
-            ->willReturnCallback(fn(string $content) => str_replace(
+            ->willReturnCallback(static fn(string $content) => str_replace(
                 ['{{title}}', '{{content}}'],
                 ['My Title', ''],
                 $content,
@@ -374,8 +374,8 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->renderPreview($announcement, 'en');
 
         // Assert: returns subject and body
-        $this->assertArrayHasKey('subject', $result);
-        $this->assertArrayHasKey('body', $result);
+        static::assertArrayHasKey('subject', $result);
+        static::assertArrayHasKey('body', $result);
     }
 
     public function testRenderContentIncludesImageBlock(): void
@@ -417,8 +417,8 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->getPreviewContext($announcement, 'en');
 
         // Assert: content contains image HTML
-        $this->assertStringContainsString('imagehash123', $result['content']);
-        $this->assertStringContainsString('<img', $result['content']);
+        static::assertStringContainsString('imagehash123', $result['content']);
+        static::assertStringContainsString('<img', $result['content']);
     }
 
     public function testRenderContentSkipsBlocksForDifferentLocale(): void
@@ -462,8 +462,8 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->getPreviewContext($announcement, 'en');
 
         // Assert: only English content is included
-        $this->assertStringContainsString('English content', $result['content']);
-        $this->assertStringNotContainsString('German content', $result['content']);
+        static::assertStringContainsString('English content', $result['content']);
+        static::assertStringNotContainsString('German content', $result['content']);
     }
 
     public function testRenderContentShowsErrorWhenNoContentForLocale(): void
@@ -501,7 +501,7 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->getPreviewContext($announcement, 'en');
 
         // Assert: error message is shown
-        $this->assertStringContainsString('ERROR', $result['content']);
-        $this->assertStringContainsString('[en]', $result['content']);
+        static::assertStringContainsString('ERROR', $result['content']);
+        static::assertStringContainsString('[en]', $result['content']);
     }
 }

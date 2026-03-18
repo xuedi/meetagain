@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Twig\Environment;
 
-class ErrorController extends AbstractController
+final class ErrorController extends AbstractController
 {
     public function __construct(
         private readonly Environment $twig,

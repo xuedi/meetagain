@@ -80,8 +80,8 @@ class FriendshipServiceTest extends TestCase
         $response = $subject->toggleFollow($userId, $returnRoute);
 
         // Assert: returns redirect to generated route
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame($generatedRoute, $response->getTargetUrl());
+        static::assertInstanceOf(RedirectResponse::class, $response);
+        static::assertSame($generatedRoute, $response->getTargetUrl());
     }
 
     public function testToggleFollowRemovesUserWhenAlreadyFollowing(): void
@@ -144,8 +144,8 @@ class FriendshipServiceTest extends TestCase
         $response = $subject->toggleFollow($userId, $returnRoute);
 
         // Assert: returns redirect to generated route
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame($generatedRoute, $response->getTargetUrl());
+        static::assertInstanceOf(RedirectResponse::class, $response);
+        static::assertSame($generatedRoute, $response->getTargetUrl());
     }
 
     public function testToggleFollowThrowsExceptionWhenNotAuthenticated(): void

@@ -18,10 +18,10 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: create temporary directory structure for testing
         $this->tempDir = sys_get_temp_dir() . '/plugin_service_test_' . uniqid();
-        mkdir($this->tempDir, 0777, true);
+        mkdir($this->tempDir, 0o777, true);
 
         $configDir = $this->tempDir . '/config';
-        mkdir($configDir, 0777, true);
+        mkdir($configDir, 0o777, true);
 
         $this->configFile = $configDir . '/plugins.php';
         $this->envConfigFile = $configDir . '/plugins_test.php';
@@ -41,9 +41,9 @@ class PluginServiceTest extends TestCase
     {
         // Arrange: create plugin directories with manifest files
         $pluginDir = $this->tempDir . '/plugins';
-        mkdir($pluginDir, 0777, true);
-        mkdir($pluginDir . '/plugin1', 0777, true);
-        mkdir($pluginDir . '/plugin2', 0777, true);
+        mkdir($pluginDir, 0o777, true);
+        mkdir($pluginDir . '/plugin1', 0o777, true);
+        mkdir($pluginDir . '/plugin2', 0o777, true);
 
         file_put_contents($pluginDir . '/plugin1/manifest.json', json_encode([
             'name' => 'Plugin 1',
@@ -69,9 +69,9 @@ class PluginServiceTest extends TestCase
             ->method('glob')
             ->with($pluginDir . '/*', GLOB_ONLYDIR)
             ->willReturn([$pluginDir . '/plugin1', $pluginDir . '/plugin2']);
-        $fsMock->method('exists')->willReturnCallback(fn($path) => is_dir($path) || file_exists($path));
-        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
-        $fsMock->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
+        $fsMock->method('exists')->willReturnCallback(static fn($path) => is_dir($path) || file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(file_exists(...));
+        $fsMock->method('getFileContents')->willReturnCallback(file_get_contents(...));
 
         $subject = new PluginService($this->createStub(CommandService::class), $fsMock, $this->tempDir, 'test');
 
@@ -79,12 +79,12 @@ class PluginServiceTest extends TestCase
         $result = $subject->getAdminList();
 
         // Assert: returns plugin manifest data
-        $this->assertCount(2, $result);
-        $this->assertSame('Plugin 1', $result[0]['name']);
-        $this->assertSame('1.0.0', $result[0]['version']);
-        $this->assertSame('Test plugin 1', $result[0]['description']);
-        $this->assertSame('Plugin 2', $result[1]['name']);
-        $this->assertSame('2.0.0', $result[1]['version']);
+        static::assertCount(2, $result);
+        static::assertSame('Plugin 1', $result[0]['name']);
+        static::assertSame('1.0.0', $result[0]['version']);
+        static::assertSame('Test plugin 1', $result[0]['description']);
+        static::assertSame('Plugin 2', $result[1]['name']);
+        static::assertSame('2.0.0', $result[1]['version']);
     }
 
     public function testGetAdminListReturnsEmptyArrayWhenPluginDirNotFound(): void
@@ -100,14 +100,14 @@ class PluginServiceTest extends TestCase
         $result = $subject->getAdminList();
 
         // Assert: returns empty array
-        $this->assertSame([], $result);
+        static::assertSame([], $result);
     }
 
     public function testGetActiveListReturnsOnlyEnabledPlugins(): void
     {
         // Arrange: mock filesystem to return config directory
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
 
         $subject = new PluginService($this->createStub(CommandService::class), $fsStub, $this->tempDir, 'test');
 
@@ -115,15 +115,15 @@ class PluginServiceTest extends TestCase
         $result = $subject->getActiveList();
 
         // Assert: returns only enabled plugins (plugin1 is true, plugin2 is false)
-        $this->assertContains('plugin1', $result);
-        $this->assertNotContains('plugin2', $result);
+        static::assertContains('plugin1', $result);
+        static::assertNotContains('plugin2', $result);
     }
 
     public function testGetGloballyActiveListIgnoresFilters(): void
     {
         // Arrange: service with a filter that would restrict the list
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
 
         $filterStub = $this->createStub(PluginListFilterInterface::class);
         $filterStub->method('filterActivePlugins')->willReturn([]);
@@ -140,24 +140,24 @@ class PluginServiceTest extends TestCase
         $result = $subject->getGloballyActiveList();
 
         // Assert: plugin1 still visible regardless of filter
-        $this->assertContains('plugin1', $result);
+        static::assertContains('plugin1', $result);
     }
 
     public function testGetActiveListAppliesFilterAndIntersects(): void
     {
         // Arrange: plugin1 must have a manifest.json to be group-activatable and thus filterable
         $pluginDir = $this->tempDir . '/plugins';
-        mkdir($pluginDir . '/plugin1', 0777, true);
+        mkdir($pluginDir . '/plugin1', 0o777, true);
         file_put_contents($pluginDir . '/plugin1/manifest.json', json_encode([
             'name' => 'Plugin 1',
             'description' => 'Group-activatable plugin',
         ]));
 
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
-        $fsStub->method('exists')->willReturnCallback(fn($path) => is_dir($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
+        $fsStub->method('exists')->willReturnCallback(is_dir(...));
         $fsStub->method('glob')->willReturn([$pluginDir . '/plugin1']);
-        $fsStub->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
+        $fsStub->method('getFileContents')->willReturnCallback(file_get_contents(...));
 
         $filter = $this->createMock(PluginListFilterInterface::class);
         $filter->expects($this->once())->method('filterActivePlugins')->with(['plugin1'])->willReturn([]);
@@ -174,15 +174,15 @@ class PluginServiceTest extends TestCase
         $result = $subject->getActiveList();
 
         // Assert: filter restricts group-activatable plugin1 out; core_navigation always remains
-        $this->assertNotContains('plugin1', $result);
-        $this->assertContains('core_navigation', $result);
+        static::assertNotContains('plugin1', $result);
+        static::assertContains('core_navigation', $result);
     }
 
     public function testGetActiveListReturnsGlobalListWhenFilterReturnsNull(): void
     {
         // Arrange: filter returns null (no opinion)
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
 
         $filterStub = $this->createStub(PluginListFilterInterface::class);
         $filterStub->method('filterActivePlugins')->willReturn(null);
@@ -199,17 +199,17 @@ class PluginServiceTest extends TestCase
         $result = $subject->getActiveList();
 
         // Assert: null filter means no restriction — globally active plugins returned
-        $this->assertContains('plugin1', $result);
-        $this->assertNotContains('plugin2', $result);
+        static::assertContains('plugin1', $result);
+        static::assertNotContains('plugin2', $result);
     }
 
     public function testGetActivatableByGroupListExcludesGroupActivatableFalsePlugins(): void
     {
         // Arrange: two plugins, one with group_activatable: false
         $pluginDir = $this->tempDir . '/plugins';
-        mkdir($pluginDir, 0777, true);
-        mkdir($pluginDir . '/plugin1', 0777, true);
-        mkdir($pluginDir . '/hidden_plugin', 0777, true);
+        mkdir($pluginDir, 0o777, true);
+        mkdir($pluginDir . '/plugin1', 0o777, true);
+        mkdir($pluginDir . '/hidden_plugin', 0o777, true);
 
         file_put_contents($pluginDir . '/plugin1/manifest.json', json_encode([
             'name' => 'Plugin 1',
@@ -224,8 +224,8 @@ class PluginServiceTest extends TestCase
         $fsStub = $this->createStub(ExtendedFilesystem::class);
         $fsStub->method('exists')->willReturn(true);
         $fsStub->method('glob')->willReturn([$pluginDir . '/plugin1', $pluginDir . '/hidden_plugin']);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
-        $fsStub->method('getFileContents')->willReturnCallback(fn($path) => file_get_contents($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
+        $fsStub->method('getFileContents')->willReturnCallback(file_get_contents(...));
 
         // plugin1 is globally active, hidden_plugin is not in test config
         $subject = new PluginService($this->createStub(CommandService::class), $fsStub, $this->tempDir, 'test');
@@ -235,18 +235,18 @@ class PluginServiceTest extends TestCase
 
         // Assert: only plugin1 appears (plugin1 active + no group_activatable restriction)
         $keys = array_column($result, 'key');
-        $this->assertContains('plugin1', $keys);
-        $this->assertNotContains('hidden_plugin', $keys);
+        static::assertContains('plugin1', $keys);
+        static::assertNotContains('hidden_plugin', $keys);
     }
 
     public function testInstallAddsPluginToConfigAsDisabled(): void
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
         $fsStub
             ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) {
+            ->willReturnCallback(static function ($path, $content) {
                 // Write to the standard plugins.php file
                 file_put_contents($path, $content);
                 return true;
@@ -262,15 +262,15 @@ class PluginServiceTest extends TestCase
 
         // Assert: plugin is added as disabled to the main plugins.php file
         $config = include $this->configFile;
-        $this->assertArrayHasKey('test-plugin', $config);
-        $this->assertFalse($config['test-plugin']);
+        static::assertArrayHasKey('test-plugin', $config);
+        static::assertFalse($config['test-plugin']);
     }
 
     public function testInstallSkipsIfPluginAlreadyInstalled(): void
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
@@ -282,17 +282,17 @@ class PluginServiceTest extends TestCase
 
         // Assert: config unchanged (plugin1 was already in config)
         $config = include $this->envConfigFile;
-        $this->assertTrue($config['plugin1']);
+        static::assertTrue($config['plugin1']);
     }
 
     public function testUninstallRemovesPluginFromConfig(): void
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
         $fsStub
             ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) {
+            ->willReturnCallback(static function ($path, $content) {
                 file_put_contents($path, $content);
                 return true;
             });
@@ -307,14 +307,14 @@ class PluginServiceTest extends TestCase
 
         // Assert: plugin is removed from config
         $config = include $this->configFile;
-        $this->assertArrayNotHasKey('plugin1', $config);
+        static::assertArrayNotHasKey('plugin1', $config);
     }
 
     public function testUninstallSkipsIfPluginNotInstalled(): void
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(file_exists(...));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
@@ -327,17 +327,17 @@ class PluginServiceTest extends TestCase
 
         // Assert: config unchanged
         $config = include $this->envConfigFile;
-        $this->assertArrayNotHasKey('non-existent-plugin', $config);
+        static::assertArrayNotHasKey('non-existent-plugin', $config);
     }
 
     public function testEnableSetsPluginToTrue(): void
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
         $fsStub
             ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) {
+            ->willReturnCallback(static function ($path, $content) {
                 file_put_contents($path, $content);
                 return true;
             });
@@ -352,14 +352,14 @@ class PluginServiceTest extends TestCase
 
         // Assert: plugin is enabled
         $config = include $this->configFile;
-        $this->assertTrue($config['plugin2']);
+        static::assertTrue($config['plugin2']);
     }
 
     public function testEnableSkipsIfPluginNotInstalled(): void
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(file_exists(...));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
@@ -371,14 +371,14 @@ class PluginServiceTest extends TestCase
         $subject->enable('non-existent-plugin');
 
         // Assert: nothing happens
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testEnableSkipsIfPluginAlreadyEnabled(): void
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(file_exists(...));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
@@ -390,17 +390,17 @@ class PluginServiceTest extends TestCase
         $subject->enable('plugin1');
 
         // Assert: nothing happens
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testDisableSetsPluginToFalse(): void
     {
         // Arrange: mock filesystem for config operations
         $fsStub = $this->createStub(ExtendedFilesystem::class);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
         $fsStub
             ->method('putFileContents')
-            ->willReturnCallback(function ($path, $content) {
+            ->willReturnCallback(static function ($path, $content) {
                 file_put_contents($path, $content);
                 return true;
             });
@@ -415,14 +415,14 @@ class PluginServiceTest extends TestCase
 
         // Assert: plugin is disabled
         $config = include $this->configFile;
-        $this->assertFalse($config['plugin1']);
+        static::assertFalse($config['plugin1']);
     }
 
     public function testDisableSkipsIfPluginNotInstalled(): void
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(file_exists(...));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
@@ -434,14 +434,14 @@ class PluginServiceTest extends TestCase
         $subject->disable('non-existent-plugin');
 
         // Assert: nothing happens
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testDisableSkipsIfPluginAlreadyDisabled(): void
     {
         // Arrange: mock filesystem for config operations
         $fsMock = $this->createMock(ExtendedFilesystem::class);
-        $fsMock->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsMock->method('fileExists')->willReturnCallback(file_exists(...));
         $fsMock->expects($this->never())->method('putFileContents');
 
         $cmdMock = $this->createMock(CommandService::class);
@@ -453,7 +453,7 @@ class PluginServiceTest extends TestCase
         $subject->disable('plugin2');
 
         // Assert: nothing happens
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testSetPluginConfigSkipsWhenConfigPathIsFalse(): void
@@ -461,7 +461,7 @@ class PluginServiceTest extends TestCase
         // Arrange: mock filesystem to return false for config path
         $fsStub = $this->createStub(ExtendedFilesystem::class);
         $fsStub->method('putFileContents')->willReturn(false);
-        $fsStub->method('fileExists')->willReturnCallback(fn($path) => file_exists($path));
+        $fsStub->method('fileExists')->willReturnCallback(file_exists(...));
 
         $cmdMock = $this->createMock(CommandService::class);
         $cmdMock->expects($this->never())->method('clearCache');
@@ -472,7 +472,7 @@ class PluginServiceTest extends TestCase
         $subject->setPluginConfig(['test-plugin' => true]);
 
         // Assert: nothing happens (verified by mock expectations)
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     private function removeDirectory(string $dir): void

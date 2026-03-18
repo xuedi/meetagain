@@ -45,8 +45,8 @@ class CmsServiceTest extends TestCase
         $response = $subject->createNotFoundPage();
 
         // Assert: returns 404 response with rendered content
-        $this->assertSame($expectedContent, $response->getContent());
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        static::assertSame($expectedContent, $response->getContent());
+        static::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     public function testGetSitesReturnsAllCmsPages(): void
@@ -74,7 +74,7 @@ class CmsServiceTest extends TestCase
         $result = $subject->getSites();
 
         // Assert: returns array of CMS pages
-        $this->assertSame($expectedSites, $result);
+        static::assertSame($expectedSites, $result);
     }
 
     public function testHandleReturns404WhenPageNotFound(): void
@@ -97,7 +97,7 @@ class CmsServiceTest extends TestCase
         $twigMock
             ->expects($this->once())
             ->method('render')
-            ->with('cms/404.html.twig', $this->anything())
+            ->with('cms/404.html.twig', static::anything())
             ->willReturn($expectedContent);
 
         $subject = new CmsService(
@@ -114,8 +114,8 @@ class CmsServiceTest extends TestCase
         $response = $subject->handle($locale, $slug, new Response());
 
         // Assert: returns 404 response
-        $this->assertSame($expectedContent, $response->getContent());
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        static::assertSame($expectedContent, $response->getContent());
+        static::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
     }
 
     public function testHandleReturns204WhenPageHasNoContentInRequestedLanguage(): void
@@ -162,8 +162,8 @@ class CmsServiceTest extends TestCase
         $response = $subject->handle($locale, $slug, new Response());
 
         // Assert: returns 204 No Content response
-        $this->assertSame($expectedContent, $response->getContent());
-        $this->assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+        static::assertSame($expectedContent, $response->getContent());
+        static::assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
     public function testHandleReturns200WithContentWhenPageExists(): void
@@ -228,8 +228,8 @@ class CmsServiceTest extends TestCase
         $response = $subject->handle($locale, $slug, new Response());
 
         // Assert: returns 200 OK response with rendered content
-        $this->assertSame($expectedContent, $response->getContent());
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        static::assertSame($expectedContent, $response->getContent());
+        static::assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 
     public function testHandleUsesDefaultTitleWhenPageTitleIsNull(): void
@@ -287,6 +287,6 @@ class CmsServiceTest extends TestCase
         $response = $subject->handle($locale, $slug, new Response());
 
         // Assert: uses default title "No Title set"
-        $this->assertSame($expectedContent, $response->getContent());
+        static::assertSame($expectedContent, $response->getContent());
     }
 }

@@ -80,7 +80,7 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
 
         // Get all users from database
         $users = $this->userRepository->findAll();
-        if (empty($users)) {
+        if ($users === []) {
             echo 'SKIP (no users found)' . PHP_EOL;
             return;
         }

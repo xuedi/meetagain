@@ -9,15 +9,15 @@ use App\Entity\Host;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\Location;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
-use App\EntityActionDispatcher;
+use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageService;
-use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_FOUNDER'), Route('/admin/events')]
-class EventController extends AbstractAdminController
+final class EventController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
@@ -107,9 +107,11 @@ class EventController extends AbstractAdminController
             $hostsData = $form->get('host')->getData();
             if (is_iterable($hostsData)) {
                 foreach ($hostsData as $host) {
-                    if ($host instanceof Host) {
-                        $event->addHost($host);
+                    if (!$host instanceof Host) {
+                        continue;
                     }
+
+                    $event->addHost($host);
                 }
             }
 
@@ -233,9 +235,11 @@ class EventController extends AbstractAdminController
             $hostsData = $form->get('host')->getData();
             if (is_iterable($hostsData)) {
                 foreach ($hostsData as $host) {
-                    if ($host instanceof Host) {
-                        $event->addHost($host);
+                    if (!$host instanceof Host) {
+                        continue;
                     }
+
+                    $event->addHost($host);
                 }
             }
 

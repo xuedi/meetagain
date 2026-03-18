@@ -82,7 +82,7 @@ class TestCoverageReportCommand extends Command
 
             // Get class/file metrics (not method metrics)
             $metrics = $file->xpath('.//metrics[@complexity]');
-            if (empty($metrics)) {
+            if ($metrics === false || $metrics === []) {
                 continue;
             }
 
@@ -115,9 +115,9 @@ class TestCoverageReportCommand extends Command
 
         // Sort
         if ($sortBy === 'uncovered') {
-            usort($files, fn($a, $b) => $b['uncovered'] <=> $a['uncovered']);
+            usort($files, static fn($a, $b) => $b['uncovered'] <=> $a['uncovered']);
         } else {
-            usort($files, fn($a, $b) => $a['percentage'] <=> $b['percentage']);
+            usort($files, static fn($a, $b) => $a['percentage'] <=> $b['percentage']);
         }
 
         // Get total metrics
@@ -131,13 +131,13 @@ class TestCoverageReportCommand extends Command
         $output->writeln("COVERAGE: {$totalPercentage}% ({$totalCovered}/{$totalElements})");
         $output->writeln('---');
 
-        if (empty($files)) {
+        if ($files === []) {
             $output->writeln("All files above {$threshold}% threshold");
         } else {
             // Only show files below 80% (needs attention)
-            $needsWork = array_filter($files, fn($f) => $f['percentage'] < 80);
+            $needsWork = array_filter($files, static fn($f) => $f['percentage'] < 80);
 
-            if (!empty($needsWork)) {
+            if ($needsWork !== []) {
                 $output->writeln('NEEDS ATTENTION:');
                 foreach ($needsWork as $file) {
                     $impact = $file['uncovered'] > 50 ? 'HIGH' : ($file['uncovered'] > 20 ? 'MED' : 'LOW');

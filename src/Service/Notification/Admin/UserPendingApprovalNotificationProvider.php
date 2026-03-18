@@ -8,7 +8,9 @@ use DateTimeImmutable;
 
 readonly class UserPendingApprovalNotificationProvider implements AdminNotificationProviderInterface
 {
-    public function __construct(private UserRepository $userRepository) {}
+    public function __construct(
+        private UserRepository $userRepository,
+    ) {}
 
     public function getSection(): string
     {

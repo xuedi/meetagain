@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/bookclub/poll')]
-class PollController extends AbstractController
+final class PollController extends AbstractController
 {
     public function __construct(
         private readonly PollService $pollService,
@@ -37,10 +37,12 @@ class PollController extends AbstractController
         foreach ($polls as $poll) {
             $winner = null;
             foreach ($poll->getSuggestions() as $suggestion) {
-                if ($suggestion->getStatus() === SuggestionStatus::Selected) {
-                    $winner = $suggestion;
-                    break;
+                if ($suggestion->getStatus() !== SuggestionStatus::Selected) {
+                    continue;
                 }
+
+                $winner = $suggestion;
+                break;
             }
             $winners[$poll->getId()] = $winner;
             $events[$poll->getId()] = $this->eventRepository->find($poll->getEventId());
@@ -127,17 +129,21 @@ class PollController extends AbstractController
         $usedEventIds = $this->pollService->getUsedEventIds();
         $upcomingEvents = array_filter(
             $this->eventRepository->getUpcomingEvents(20),
-            fn($event) => !in_array($event->getId(), $usedEventIds),
+            static fn($event) => !in_array($event->getId(), $usedEventIds),
         );
 
         $preselectedEventId = $request->query->getInt('eventId') ?: null;
 
-        $form = $this->createForm(PollCreateType::class, ['event_id' => $preselectedEventId], [
-            'suggestions' => $pendingSuggestions,
-            'books' => $approvedBooks,
-            'events' => $upcomingEvents,
-            'suggestion_service' => $this->suggestionService,
-        ]);
+        $form = $this->createForm(
+            PollCreateType::class,
+            ['event_id' => $preselectedEventId],
+            [
+                'suggestions' => $pendingSuggestions,
+                'books' => $approvedBooks,
+                'events' => $upcomingEvents,
+                'suggestion_service' => $this->suggestionService,
+            ],
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

@@ -5,13 +5,13 @@ namespace App\Service\Email;
 use App\CronTaskInterface;
 use App\EmailContextEnricherInterface;
 use App\Entity\EmailQueue;
-use App\Service\Config\ConfigService;
 use App\Entity\EmailQueueStatus;
 use App\Entity\Event;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
+use App\Service\Config\ConfigService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -89,7 +89,7 @@ readonly class EmailService implements CronTaskInterface
     public function prepareAggregatedRsvpNotification(User $recipient, array $attendees, Event $event): bool
     {
         $language = $recipient->getLocale();
-        $attendeeNames = implode(', ', array_map(fn(User $user) => $user->getName(), $attendees));
+        $attendeeNames = implode(', ', array_map(static fn(User $user) => $user->getName(), $attendees));
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());

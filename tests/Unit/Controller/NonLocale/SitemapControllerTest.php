@@ -26,7 +26,7 @@ class SitemapControllerTest extends TestCase
         $response = $controller->index($request);
 
         // Assert
-        $this->assertSame($expectedResponse, $response);
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        static::assertSame($expectedResponse, $response);
+        static::assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 }

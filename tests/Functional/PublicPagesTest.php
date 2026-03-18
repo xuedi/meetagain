@@ -33,8 +33,8 @@ class PublicPagesTest extends WebTestCase
         $content = $client->getResponse()->getContent();
 
         // Assert
-        $this->assertStringContainsString('<?xml', $content, 'Sitemap should be valid XML');
-        $this->assertStringContainsString('<urlset', $content, 'Sitemap should contain urlset element');
-        $this->assertStringContainsString('<loc>', $content, 'Sitemap should contain at least one URL');
+        static::assertStringContainsString('<?xml', $content, 'Sitemap should be valid XML');
+        static::assertStringContainsString('<urlset', $content, 'Sitemap should contain urlset element');
+        static::assertStringContainsString('<loc>', $content, 'Sitemap should contain at least one URL');
     }
 }

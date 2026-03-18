@@ -138,9 +138,11 @@ readonly class EmailTemplateService
     public function renderContent(string $content, array $context): string
     {
         foreach ($context as $key => $value) {
-            if (is_scalar($value)) {
-                $content = str_replace('{{' . $key . '}}', (string) $value, $content);
+            if (!is_scalar($value)) {
+                continue;
             }
+
+            $content = str_replace('{{' . $key . '}}', (string) $value, $content);
         }
 
         return $content;

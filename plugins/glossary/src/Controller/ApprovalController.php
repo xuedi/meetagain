@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/glossary/approval')]
-class ApprovalController extends AbstractGlossaryController
+final class ApprovalController extends AbstractGlossaryController
 {
     #[Route('/list/{id}', name: 'app_plugin_glossary_approval_list', methods: ['GET'])]
     public function approvalList(int $id): Response

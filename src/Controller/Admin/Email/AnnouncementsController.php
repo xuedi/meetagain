@@ -7,11 +7,11 @@ use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Announcement;
 use App\Entity\AnnouncementStatus;
 use App\Entity\Cms;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Form\AnnouncementType;
 use App\Repository\AnnouncementRepository;
 use App\Service\Cms\AnnouncementService;
-use App\EntityActionDispatcher;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/announcements')]
-class AnnouncementsController extends AbstractAdminController
+final class AnnouncementsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

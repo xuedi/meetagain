@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system/import')]
-class ImportController extends AbstractAdminController
+final class ImportController extends AbstractAdminController
 {
     public function __construct(
         private readonly ImportService $importService,

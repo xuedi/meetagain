@@ -2,8 +2,8 @@
 
 namespace Plugin\Bookclub\Service;
 
-use App\Enum\EntityAction;
 use App\EntityActionDispatcher;
+use App\Enum\EntityAction;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;

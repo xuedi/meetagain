@@ -43,26 +43,26 @@ class LanguageExtensionTest extends TestCase
 
         $globals = $this->subject->getGlobals();
 
-        $this->assertArrayHasKey('enabled_locales', $globals);
-        $this->assertSame(['en', 'de', 'zh'], $globals['enabled_locales']);
+        static::assertArrayHasKey('enabled_locales', $globals);
+        static::assertSame(['en', 'de', 'zh'], $globals['enabled_locales']);
     }
 
     public function testGetFunctionsReturnsExpectedFunctions(): void
     {
         $functions = $this->subject->getFunctions();
 
-        $this->assertCount(9, $functions);
+        static::assertCount(9, $functions);
 
-        $functionNames = array_map(fn($f) => $f->getName(), $functions);
-        $this->assertContains('get_enabled_locales', $functionNames);
-        $this->assertContains('get_all_languages', $functionNames);
-        $this->assertContains('current_locale', $functionNames);
-        $this->assertContains('get_alternative_languages', $functionNames);
-        $this->assertContains('get_language_codes', $functionNames);
-        $this->assertContains('get_admin_language_codes', $functionNames);
-        $this->assertContains('route_exists', $functionNames);
-        $this->assertContains('get_canonical_url', $functionNames);
-        $this->assertContains('get_meta_description', $functionNames);
+        $functionNames = array_map(static fn($f) => $f->getName(), $functions);
+        static::assertContains('get_enabled_locales', $functionNames);
+        static::assertContains('get_all_languages', $functionNames);
+        static::assertContains('current_locale', $functionNames);
+        static::assertContains('get_alternative_languages', $functionNames);
+        static::assertContains('get_language_codes', $functionNames);
+        static::assertContains('get_admin_language_codes', $functionNames);
+        static::assertContains('route_exists', $functionNames);
+        static::assertContains('get_canonical_url', $functionNames);
+        static::assertContains('get_meta_description', $functionNames);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
@@ -71,7 +71,7 @@ class LanguageExtensionTest extends TestCase
         $request->method('getLocale')->willReturn('de');
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
 
-        $this->assertSame('de', $this->subject->getCurrentLocale());
+        static::assertSame('de', $this->subject->getCurrentLocale());
     }
 
     public function testGetCurrentLocaleThrowsWhenNoRequest(): void
@@ -98,7 +98,7 @@ class LanguageExtensionTest extends TestCase
 
         $result = $this->subject->getAlternativeLanguageCodes();
 
-        $this->assertSame(['de' => '/de/events', 'zh' => '/zh/events'], $result);
+        static::assertSame(['de' => '/de/events', 'zh' => '/zh/events'], $result);
     }
 
     public function testGetAlternativeLanguageCodesReturnsEmptyForProfiler(): void
@@ -110,7 +110,7 @@ class LanguageExtensionTest extends TestCase
 
         $result = $this->subject->getAlternativeLanguageCodes();
 
-        $this->assertSame([], $result);
+        static::assertSame([], $result);
     }
 
     public function testGetAlternativeLanguageCodesReturnsEmptyWhenNoRequest(): void
@@ -119,7 +119,7 @@ class LanguageExtensionTest extends TestCase
 
         $result = $this->subject->getAlternativeLanguageCodes();
 
-        $this->assertSame([], $result);
+        static::assertSame([], $result);
     }
 
     public function testRouteExistsReturnsTrueWhenRouteCanBeGenerated(): void
@@ -134,7 +134,7 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->routeExists('some_route');
 
         // Assert
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testRouteExistsReturnsFalseWhenRouteNotFound(): void
@@ -146,7 +146,7 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->routeExists('nonexistent_route');
 
         // Assert
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     public function testRouteExistsReturnsTrueWhenRouteExistsButRequiresParams(): void
@@ -158,7 +158,7 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->routeExists('parameterized_route');
 
         // Assert
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testGetCanonicalUrlCombinesConfigHostWithRequestUri(): void
@@ -173,7 +173,7 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->getCanonicalUrl();
 
         // Assert
-        $this->assertSame('https://meetagain.local/en/events', $result);
+        static::assertSame('https://meetagain.local/en/events', $result);
     }
 
     public function testGetMetaDescriptionReturnsProviderValueWhenAvailable(): void
@@ -194,7 +194,7 @@ class LanguageExtensionTest extends TestCase
         $result = $subject->getMetaDescription('events');
 
         // Assert
-        $this->assertSame('Weiqi club upcoming events', $result);
+        static::assertSame('Weiqi club upcoming events', $result);
     }
 
     public function testGetMetaDescriptionFallsBackToSystemConfigWhenNoProviderValue(): void
@@ -209,7 +209,7 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->getMetaDescription('events');
 
         // Assert
-        $this->assertSame('System events description', $result);
+        static::assertSame('System events description', $result);
     }
 
     public function testGetMetaDescriptionFallsBackToHardcodedWhenNothingConfigured(): void
@@ -221,7 +221,7 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->getMetaDescription('members');
 
         // Assert
-        $this->assertSame('Meet the members of this community.', $result);
+        static::assertSame('Meet the members of this community.', $result);
     }
 
     public function testGetCanonicalUrlStripsTrailingSlashFromHost(): void
@@ -236,6 +236,6 @@ class LanguageExtensionTest extends TestCase
         $result = $this->subject->getCanonicalUrl();
 
         // Assert
-        $this->assertSame('https://meetagain.local/en/members', $result);
+        static::assertSame('https://meetagain.local/en/members', $result);
     }
 }

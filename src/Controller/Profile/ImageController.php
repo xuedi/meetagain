@@ -7,7 +7,7 @@ use App\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ImageController extends AbstractController
+final class ImageController extends AbstractController
 {
     public function __construct(
         private readonly ImageRepository $imageRepo,

@@ -54,7 +54,7 @@ readonly class NotificationService
         foreach ($user->getFollowers() as $follower) {
             try {
                 $key = sprintf('rsvp_notification_send_%s_%s_%s', $user->getId(), $follower->getId(), $event->getId());
-                $this->appCache->get($key, function (ItemInterface $item) use ($follower): string {
+                $this->appCache->get($key, static function (ItemInterface $item) use ($follower): string {
                     $item->expiresAfter(self::HOUR);
                     if (!$follower->isNotification()) {
                         return 'skip';
@@ -71,7 +71,7 @@ readonly class NotificationService
                     return 'send';
                 });
             } catch (InvalidArgumentException) {
-                // Cache write failure for RSVP notification tracking - non-critical, continue without cache
+                continue; // Cache write failure for RSVP notification tracking - non-critical, continue without cache
             }
         }
     }

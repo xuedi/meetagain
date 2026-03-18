@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
-class DefaultController extends AbstractController
+final class DefaultController extends AbstractController
 {
     public function __construct(
         private readonly CmsService $cms,

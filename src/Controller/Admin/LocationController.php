@@ -4,12 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 use App\Entity\Location;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\LocationType;
 use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
-use App\EntityActionDispatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_FOUNDER'), Route('/admin/locations')]
-class LocationController extends AbstractAdminController
+final class LocationController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

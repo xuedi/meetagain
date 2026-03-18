@@ -35,10 +35,10 @@ class UnFollowedUserTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::UnFollowedUser, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::UnFollowedUser, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testHandlesDeletedUser(): void
@@ -53,8 +53,8 @@ class UnFollowedUserTest extends TestCase
         $subject = new UnFollowedUser();
         $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
 
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingUserId(): void

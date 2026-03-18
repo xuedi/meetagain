@@ -12,8 +12,10 @@ readonly class LogReaderService
     private const int READ_MULTIPLIER = 10;
 
     public function __construct(
-        #[Autowire('%kernel.logs_dir%')] private string $logsDir,
-        #[Autowire('%kernel.environment%')] private string $environment,
+        #[Autowire('%kernel.logs_dir%')]
+        private string $logsDir,
+        #[Autowire('%kernel.environment%')]
+        private string $environment,
     ) {}
 
     /** @return LogEntry[] */
@@ -26,9 +28,7 @@ readonly class LogReaderService
             return [];
         }
 
-        $rawLimit = ($level !== null || $channel !== null)
-            ? $limit * self::READ_MULTIPLIER
-            : $limit;
+        $rawLimit = $level !== null || $channel !== null ? $limit * self::READ_MULTIPLIER : $limit;
 
         $lines = $this->readTail($logFile, $rawLimit);
         $entries = [];
@@ -66,7 +66,7 @@ readonly class LogReaderService
         $pattern = $this->logsDir . '/' . $this->environment . '-*.log';
         $files = glob($pattern);
 
-        if (!empty($files)) {
+        if ($files !== []) {
             usort($files, static fn($a, $b) => filemtime($b) <=> filemtime($a));
             return $files[0];
         }

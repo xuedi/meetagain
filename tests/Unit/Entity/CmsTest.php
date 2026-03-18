@@ -20,8 +20,8 @@ class CmsTest extends TestCase
         $cms->addMenuLocation($menuLocation);
 
         // Assert
-        $this->assertCount(1, $cms->getMenuLocations());
-        $this->assertTrue($cms->getMenuLocations()->contains($menuLocation));
+        static::assertCount(1, $cms->getMenuLocations());
+        static::assertTrue($cms->getMenuLocations()->contains($menuLocation));
     }
 
     public function testAddMenuLocationSetsCmsReference(): void
@@ -35,7 +35,7 @@ class CmsTest extends TestCase
         $cms->addMenuLocation($menuLocation);
 
         // Assert
-        $this->assertSame($cms, $menuLocation->getCms());
+        static::assertSame($cms, $menuLocation->getCms());
     }
 
     public function testAddMenuLocationPreventsDuplicates(): void
@@ -50,7 +50,7 @@ class CmsTest extends TestCase
         $cms->addMenuLocation($menuLocation);
 
         // Assert
-        $this->assertCount(1, $cms->getMenuLocations());
+        static::assertCount(1, $cms->getMenuLocations());
     }
 
     public function testRemoveMenuLocationRemovesLocation(): void
@@ -65,8 +65,8 @@ class CmsTest extends TestCase
         $cms->removeMenuLocation($menuLocation);
 
         // Assert
-        $this->assertCount(0, $cms->getMenuLocations());
-        $this->assertFalse($cms->getMenuLocations()->contains($menuLocation));
+        static::assertCount(0, $cms->getMenuLocations());
+        static::assertFalse($cms->getMenuLocations()->contains($menuLocation));
     }
 
     public function testRemoveMenuLocationClearsCmsReference(): void
@@ -81,7 +81,7 @@ class CmsTest extends TestCase
         $cms->removeMenuLocation($menuLocation);
 
         // Assert
-        $this->assertNull($menuLocation->getCms());
+        static::assertNull($menuLocation->getCms());
     }
 
     public function testGetMenuLocationsReturnsEmptyCollectionByDefault(): void
@@ -93,6 +93,6 @@ class CmsTest extends TestCase
         $locations = $cms->getMenuLocations();
 
         // Assert
-        $this->assertCount(0, $locations);
+        static::assertCount(0, $locations);
     }
 }

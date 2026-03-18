@@ -369,9 +369,11 @@ class Event
     public function findTranslation(string $language): ?EventTranslation
     {
         foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() === $language) {
-                return $translation;
+            if ($translation->getLanguage() !== $language) {
+                continue;
             }
+
+            return $translation;
         }
 
         return null;

@@ -41,7 +41,7 @@ readonly class ImportService
     public function import(string $zipPath): ImportSummary
     {
         $tempDir = sys_get_temp_dir() . '/meetagain-import-' . uniqid('', true);
-        mkdir($tempDir, 0755, true);
+        mkdir($tempDir, 0o755, true);
 
         try {
             $zip = new ZipArchive();
@@ -180,7 +180,7 @@ readonly class ImportService
             $user->setCreatedAt(new DateTimeImmutable());
             $user->setLastLogin(new DateTime());
 
-            if (!empty($userData['image_file'])) {
+            if (isset($userData['image_file']) && $userData['image_file'] !== '') {
                 $imagePath = $tempDir . '/' . $userData['image_file'];
                 $image = $this->importImage($imagePath, ImageType::ProfilePicture, $systemUser);
                 if ($image !== null) {
@@ -226,18 +226,18 @@ readonly class ImportService
             $event->setStart(new DateTime((string) $eventData['start']));
             $event->setLocation($location);
 
-            if (!empty($eventData['stop'])) {
+            if (isset($eventData['stop']) && $eventData['stop'] !== '') {
                 $event->setStop(new DateTime((string) $eventData['stop']));
             }
 
             $status = EventStatus::tryFrom((string) ($eventData['status'] ?? '')) ?? EventStatus::Published;
             $event->setStatus($status);
 
-            if (!empty($eventData['type'])) {
+            if (isset($eventData['type']) && $eventData['type'] !== '') {
                 $event->setType($this->findEventTypeByName((string) $eventData['type']));
             }
 
-            if (!empty($eventData['recurring_rule'])) {
+            if (isset($eventData['recurring_rule']) && $eventData['recurring_rule'] !== '') {
                 $event->setRecurringRule($this->findEventIntervalByName((string) $eventData['recurring_rule']));
             }
 
@@ -257,7 +257,7 @@ readonly class ImportService
                 $this->em->persist($translation);
             }
 
-            if (!empty($eventData['image_file'])) {
+            if (isset($eventData['image_file']) && $eventData['image_file'] !== '') {
                 $imagePath = $tempDir . '/' . $eventData['image_file'];
                 $image = $this->importImage($imagePath, ImageType::EventTeaser, $systemUser);
                 if ($image !== null) {
@@ -329,7 +329,7 @@ readonly class ImportService
                 $block->setJson(is_array($blockData['json'] ?? null) ? $blockData['json'] : []);
                 $block->setPage($cms);
 
-                if (!empty($blockData['image_file'])) {
+                if (isset($blockData['image_file']) && $blockData['image_file'] !== '') {
                     $imagePath = $tempDir . '/' . $blockData['image_file'];
                     $image = $this->importImage($imagePath, ImageType::CmsBlock, $systemUser);
                     if ($image !== null) {
@@ -368,7 +368,7 @@ readonly class ImportService
 
         $targetDir = $this->projectDir . '/data/images/';
         if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
+            mkdir($targetDir, 0o755, true);
         }
 
         file_put_contents($targetDir . $hash . '.' . $extension, $content);
@@ -406,9 +406,11 @@ readonly class ImportService
     private function findEventTypeByName(string $name): ?EventTypes
     {
         foreach (EventTypes::cases() as $case) {
-            if ($case->name === $name) {
-                return $case;
+            if ($case->name !== $name) {
+                continue;
             }
+
+            return $case;
         }
 
         return null;
@@ -417,9 +419,11 @@ readonly class ImportService
     private function findEventIntervalByName(string $name): ?EventIntervals
     {
         foreach (EventIntervals::cases() as $case) {
-            if ($case->name === $name) {
-                return $case;
+            if ($case->name !== $name) {
+                continue;
             }
+
+            return $case;
         }
 
         return null;

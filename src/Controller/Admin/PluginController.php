@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
-class PluginController extends AbstractAdminController
+final class PluginController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

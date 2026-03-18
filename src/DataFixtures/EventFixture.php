@@ -384,7 +384,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
     {
         $date = new DateTime('now');
 
-        return $date->modify('-2 month')->modify('first wednesday')->setTime(18, 00);
+        return $date->modify('-2 month')->modify('first wednesday')->setTime(18, 0o0);
     }
 
     public static function getGroups(): array

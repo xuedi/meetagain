@@ -23,7 +23,8 @@ class BookSuggestionRepository extends ServiceEntityRepository
      */
     public function findUserPendingSuggestions(int $userId, ?array $allowedIds = null): array
     {
-        $qb = $this->createQueryBuilder('s')
+        $qb = $this
+            ->createQueryBuilder('s')
             ->where('s.suggestedBy = :userId')
             ->andWhere('s.status = :status')
             ->setParameter('userId', $userId)
@@ -45,7 +46,8 @@ class BookSuggestionRepository extends ServiceEntityRepository
      */
     public function findAllPending(?array $allowedIds = null): array
     {
-        $qb = $this->createQueryBuilder('s')
+        $qb = $this
+            ->createQueryBuilder('s')
             ->where('s.status = :status')
             ->setParameter('status', SuggestionStatus::Pending)
             ->orderBy('s.suggestedAt', 'ASC');

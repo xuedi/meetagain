@@ -9,7 +9,7 @@ use App\Service\Notification\User\NotificationService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class NotificationsController extends AbstractController
+final class NotificationsController extends AbstractController
 {
     public function __construct(
         private readonly NotificationService $notificationService,

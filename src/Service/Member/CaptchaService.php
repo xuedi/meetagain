@@ -90,9 +90,11 @@ readonly class CaptchaService
         $session = $this->getSession();
         $refresh = $session->get('captcha_refresh', []);
         foreach ($refresh as $key => $value) {
-            if ($value->modify('+1 minute') < new DateTimeImmutable()) {
-                unset($refresh[$key]);
+            if ($value->modify('+1 minute') >= new DateTimeImmutable()) {
+                continue;
             }
+
+            unset($refresh[$key]);
         }
         $session->set('captcha_refresh', $refresh);
 

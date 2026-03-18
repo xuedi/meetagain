@@ -2,19 +2,17 @@
 
 namespace Tests\Unit\Service;
 
-use App\Service\Notification\Admin\AdminNotificationItem;
-use App\Service\Notification\Admin\AdminNotificationProviderInterface;
+use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Admin\AdminNotificationService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\EmailService;
-use App\Entity\User;
+use App\Service\Notification\Admin\AdminNotificationItem;
+use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class AdminNotificationServiceTest extends TestCase
@@ -55,7 +53,7 @@ class AdminNotificationServiceTest extends TestCase
         $result = $service->processNotification();
 
         // Assert
-        $this->assertSame('disabled', $result);
+        static::assertSame('disabled', $result);
     }
 
     public function testReturnsNothingPendingWhenNoProviders(): void
@@ -76,7 +74,7 @@ class AdminNotificationServiceTest extends TestCase
         $result = $service->processNotification();
 
         // Assert
-        $this->assertSame('nothing pending', $result);
+        static::assertSame('nothing pending', $result);
     }
 
     public function testReturnsNoNewItemsWhenNothingNewerThanLastSent(): void
@@ -106,7 +104,7 @@ class AdminNotificationServiceTest extends TestCase
         $result = $service->processNotification();
 
         // Assert
-        $this->assertSame('no new items', $result);
+        static::assertSame('no new items', $result);
     }
 
     public function testSendsEmailToAllAdminsWhenNewItemsExist(): void
@@ -120,9 +118,11 @@ class AdminNotificationServiceTest extends TestCase
         $provider = $this->createStub(AdminNotificationProviderInterface::class);
         $provider->method('getLatestPendingAt')->willReturn($pendingAt);
         $provider->method('getSection')->willReturn('Users Pending Approval');
-        $provider->method('getPendingItems')->willReturn([
-            new AdminNotificationItem('Jane Smith (jane@example.org)', 'app_admin_member'),
-        ]);
+        $provider
+            ->method('getPendingItems')
+            ->willReturn([
+                new AdminNotificationItem('Jane Smith (jane@example.org)', 'app_admin_member'),
+            ]);
 
         $cache = $this->createStub(TagAwareCacheInterface::class);
         $cache->method('get')->willReturn(null); // no previous send
@@ -139,7 +139,7 @@ class AdminNotificationServiceTest extends TestCase
         $emailService
             ->expects($this->once())
             ->method('prepareAdminNotification')
-            ->with($adminUser, $this->stringContains('Jane Smith'));
+            ->with($adminUser, static::stringContains('Jane Smith'));
 
         $service = $this->buildService(
             providers: [$provider],
@@ -153,7 +153,7 @@ class AdminNotificationServiceTest extends TestCase
         $result = $service->processNotification();
 
         // Assert
-        $this->assertSame('1 sent', $result);
+        static::assertSame('1 sent', $result);
     }
 
     public function testSkipsProvidersWithNoItems(): void
@@ -183,6 +183,6 @@ class AdminNotificationServiceTest extends TestCase
         $result = $service->processNotification();
 
         // Assert
-        $this->assertSame('no items', $result);
+        static::assertSame('no items', $result);
     }
 }

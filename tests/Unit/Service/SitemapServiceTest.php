@@ -69,8 +69,8 @@ class SitemapServiceTest extends TestCase
             ->expects($this->once())
             ->method('render')
             ->with(
-                $this->equalTo('sitemap/index.xml.twig'),
-                $this->callback(function ($params) use (&$capturedSites) {
+                static::equalTo('sitemap/index.xml.twig'),
+                static::callback(static function ($params) use (&$capturedSites) {
                     $capturedSites = $params['sites'] ?? null;
 
                     return isset($params['sites']);
@@ -82,17 +82,17 @@ class SitemapServiceTest extends TestCase
         $response = $this->subject->getContent($host);
 
         // Assert: response has correct status, content type and content
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertSame('text/xml', $response->headers->get('Content-Type'));
-        $this->assertSame($renderedContent, $response->getContent());
+        static::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        static::assertSame('text/xml', $response->headers->get('Content-Type'));
+        static::assertSame($renderedContent, $response->getContent());
 
         // Assert: sites array contains expected entries
         // 2 locales * (1 CMS page + 3 static pages + 1 event) = 10 sites
-        $this->assertNotNull($capturedSites);
-        $this->assertCount(10, $capturedSites);
+        static::assertNotNull($capturedSites);
+        static::assertCount(10, $capturedSites);
 
         // Assert: CMS page entry exists
-        $this->assertContains(
+        static::assertContains(
             [
                 'loc' => 'https://example.com/en/about',
                 'lastmod' => '2025-01-01',
@@ -102,7 +102,7 @@ class SitemapServiceTest extends TestCase
         );
 
         // Assert: event page entry exists
-        $this->assertContains(
+        static::assertContains(
             [
                 'loc' => 'https://example.com/de/event/123',
                 'lastmod' => '2025-02-01',
@@ -112,7 +112,7 @@ class SitemapServiceTest extends TestCase
         );
 
         // Assert: static page entry exists
-        $this->assertContains(
+        static::assertContains(
             [
                 'loc' => 'https://example.com/en/events',
                 'lastmod' => new DateTime()->format('Y-m-d'),

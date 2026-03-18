@@ -17,7 +17,7 @@ class PluginListCommand extends Command
     {
         $plugins = $this->getPluginsWithKeys();
 
-        if (empty($plugins)) {
+        if ($plugins === []) {
             $output->writeln('No plugins found in plugins/ directory.');
 
             return Command::SUCCESS;

@@ -67,9 +67,9 @@ readonly class OpenLibraryIsbnLookup implements IsbnLookupInterface
             return null;
         }
 
-        $names = array_filter(array_map(fn($author) => $author['name'] ?? null, $data['authors']));
+        $names = array_filter(array_map(static fn($author) => $author['name'] ?? null, $data['authors']));
 
-        return empty($names) ? null : implode(', ', $names);
+        return $names === [] ? null : implode(', ', $names);
     }
 
     private function extractDescription(array $data): ?string

@@ -55,9 +55,9 @@ class FixturesLoadCommand extends Command
         // Check if any fixtures exist for the specified groups
         $fixtures = $this->fixturesLoader->getFixtures($groups);
 
-        if (empty($fixtures)) {
+        if ($fixtures === []) {
             if ($output->isVerbose() === false) {
-                $groupText = empty($groups) ? 'all groups' : implode(', ', $groups);
+                $groupText = ($groups === []) ? 'all groups' : implode(', ', $groups);
                 $output->writeln(sprintf('No fixtures found for %s. Skipping.', $groupText));
             }
             return Command::SUCCESS;
@@ -75,7 +75,7 @@ class FixturesLoadCommand extends Command
             $arguments['--append'] = true;
         }
 
-        if (!empty($groups)) {
+        if ($groups !== []) {
             $arguments['--group'] = $groups;
         }
 

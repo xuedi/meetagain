@@ -28,7 +28,7 @@ class PluginCommandTest extends TestCase
         $exitCode = $this->commandTester->execute([]);
 
         // Assert: returns success
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testInvalidActionReturnsFailure(): void
@@ -40,7 +40,7 @@ class PluginCommandTest extends TestCase
         ]);
 
         // Assert: returns failure
-        $this->assertSame(Command::FAILURE, $exitCode);
+        static::assertSame(Command::FAILURE, $exitCode);
     }
 
     public function testEnableWithoutPluginArgumentIsNoOp(): void
@@ -55,7 +55,7 @@ class PluginCommandTest extends TestCase
         ]);
 
         // Assert: returns success without calling service
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testEnableWithEmptyPluginArgumentIsNoOp(): void
@@ -71,7 +71,7 @@ class PluginCommandTest extends TestCase
         ]);
 
         // Assert: returns success without calling service
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testEnablePluginCallsService(): void
@@ -94,7 +94,7 @@ class PluginCommandTest extends TestCase
         ]);
 
         // Assert: returns success
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testDisablePluginCallsService(): void
@@ -112,7 +112,7 @@ class PluginCommandTest extends TestCase
         ]);
 
         // Assert: returns success
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testDisableAllClearsConfig(): void
@@ -130,6 +130,6 @@ class PluginCommandTest extends TestCase
         ]);
 
         // Assert: returns success
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 }

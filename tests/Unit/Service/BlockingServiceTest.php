@@ -86,10 +86,10 @@ class BlockingServiceTest extends TestCase
         $emMock
             ->expects($this->exactly(3))
             ->method('persist')
-            ->with($this->logicalOr(
-                $this->isInstanceOf(UserBlock::class),
-                $this->identicalTo($blocker),
-                $this->identicalTo($blocked),
+            ->with(static::logicalOr(
+                static::isInstanceOf(UserBlock::class),
+                static::identicalTo($blocker),
+                static::identicalTo($blocked),
             ));
         $emMock->expects($this->once())->method('flush');
 
@@ -198,7 +198,7 @@ class BlockingServiceTest extends TestCase
         );
 
         // Act & Assert: check if blocked
-        $this->assertTrue($subject->isBlocked($user1, $user2));
+        static::assertTrue($subject->isBlocked($user1, $user2));
     }
 
     public function testHasBlockedDelegatesToRepository(): void
@@ -218,7 +218,7 @@ class BlockingServiceTest extends TestCase
         );
 
         // Act & Assert: check if has blocked
-        $this->assertTrue($subject->hasBlocked($blocker, $blocked));
+        static::assertTrue($subject->hasBlocked($blocker, $blocked));
     }
 
     public function testCanInteractReturnsTrueWhenNotBlocked(): void
@@ -238,7 +238,7 @@ class BlockingServiceTest extends TestCase
         );
 
         // Act & Assert: can interact
-        $this->assertTrue($subject->canInteract($actor, $target));
+        static::assertTrue($subject->canInteract($actor, $target));
     }
 
     public function testCanInteractReturnsFalseWhenBlocked(): void
@@ -258,7 +258,7 @@ class BlockingServiceTest extends TestCase
         );
 
         // Act & Assert: cannot interact
-        $this->assertFalse($subject->canInteract($actor, $target));
+        static::assertFalse($subject->canInteract($actor, $target));
     }
 
     public function testGetBlockedUsersDelegatesToRepository(): void
@@ -282,7 +282,7 @@ class BlockingServiceTest extends TestCase
         );
 
         // Act & Assert: get blocked users
-        $this->assertSame($expectedBlocks, $subject->getBlockedUsers($user));
+        static::assertSame($expectedBlocks, $subject->getBlockedUsers($user));
     }
 
     public function testGetExcludedUserIdsDelegatesToRepository(): void
@@ -304,6 +304,6 @@ class BlockingServiceTest extends TestCase
         );
 
         // Act & Assert: get excluded user IDs
-        $this->assertSame($expectedIds, $subject->getExcludedUserIds($user));
+        static::assertSame($expectedIds, $subject->getExcludedUserIds($user));
     }
 }

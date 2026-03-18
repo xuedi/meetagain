@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/dishes/suggestion')]
 #[IsGranted('ROLE_ORGANIZER')]
-class SuggestionController extends AbstractController
+final class SuggestionController extends AbstractController
 {
     public function __construct(
         private readonly DishService $dishService,

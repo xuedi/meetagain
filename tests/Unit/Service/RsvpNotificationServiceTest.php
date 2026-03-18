@@ -89,7 +89,7 @@ class RsvpNotificationServiceTest extends TestCase
             ->with($follower, [$attendee], $event);
 
         $count = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(1, $count);
+        static::assertSame(1, $count);
     }
 
     public function testNotifyFollowersForEventSendsEmailAggregated(): void
@@ -132,7 +132,7 @@ class RsvpNotificationServiceTest extends TestCase
             ->with($follower, [$attendee1, $attendee2], $event);
 
         $count = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(1, $count);
+        static::assertSame(1, $count);
     }
 
     public function testNotifyFollowersForEventSkipsIfAlreadyNotified(): void
@@ -158,7 +158,7 @@ class RsvpNotificationServiceTest extends TestCase
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(0, $count);
+        static::assertSame(0, $count);
     }
 
     public function testNotifyFollowersForEventSkipsIfNotificationsDisabled(): void
@@ -175,7 +175,7 @@ class RsvpNotificationServiceTest extends TestCase
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(0, $count);
+        static::assertSame(0, $count);
     }
 
     public function testProcessUpcomingEvents(): void
@@ -190,7 +190,7 @@ class RsvpNotificationServiceTest extends TestCase
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $result = $this->service->processUpcomingEvents();
-        $this->assertEquals('0 sent', $result);
+        static::assertSame('0 sent', $result);
     }
 
     public function testNotifyFollowersForEventEmptyAttendees(): void
@@ -201,7 +201,7 @@ class RsvpNotificationServiceTest extends TestCase
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(0, $count);
+        static::assertSame(0, $count);
     }
 
     public function testNotifyFollowersForEventSkipsIfRecipientHasRsvp(): void
@@ -225,7 +225,7 @@ class RsvpNotificationServiceTest extends TestCase
         $this->emailService->expects($this->never())->method('prepareAggregatedRsvpNotification');
 
         $count = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(0, $count);
+        static::assertSame(0, $count);
     }
 
     public function testNotifyFollowersForEventDoesNotSendDuplicateEmails(): void
@@ -284,11 +284,11 @@ class RsvpNotificationServiceTest extends TestCase
 
         // First call - should send notification
         $count1 = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(1, $count1);
+        static::assertSame(1, $count1);
 
         // Second call - should NOT send notification (already cached)
         $count2 = $this->service->notifyFollowersForEvent($event);
-        $this->assertEquals(0, $count2);
+        static::assertSame(0, $count2);
     }
 
     public function testNotifyFollowersForEventSkipsWhenGlobalSettingDisabled(): void
@@ -325,7 +325,7 @@ class RsvpNotificationServiceTest extends TestCase
         $count = $service->notifyFollowersForEvent($event);
 
         // Assert
-        $this->assertEquals(0, $count);
+        static::assertSame(0, $count);
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -353,7 +353,7 @@ class RsvpNotificationServiceTest extends TestCase
         $result = $service->processUpcomingEvents();
 
         // Assert
-        $this->assertEquals('disabled', $result);
+        static::assertSame('disabled', $result);
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -379,7 +379,7 @@ class RsvpNotificationServiceTest extends TestCase
         $output = new BufferedOutput();
         $service->runCronTask($output);
 
-        $this->assertStringContainsString('outside allowed hours', $output->fetch());
+        static::assertStringContainsString('outside allowed hours', $output->fetch());
     }
 
     #[AllowMockObjectsWithoutExpectations]
@@ -405,7 +405,7 @@ class RsvpNotificationServiceTest extends TestCase
         $output = new BufferedOutput();
         $service->runCronTask($output);
 
-        $this->assertStringContainsString('outside allowed hours', $output->fetch());
+        static::assertStringContainsString('outside allowed hours', $output->fetch());
     }
 
     #[AllowMockObjectsWithoutExpectations]

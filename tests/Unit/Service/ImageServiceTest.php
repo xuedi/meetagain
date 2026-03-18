@@ -49,9 +49,7 @@ class ImageServiceTest extends TestCase
         $existingImage
             ->expects($this->once())
             ->method('setUpdatedAt')
-            ->with($this->callback(function ($date) {
-                return $date instanceof DateTimeImmutable;
-            }));
+            ->with(static::callback(static fn($date) => $date instanceof DateTimeImmutable));
 
         // Arrange: mock image repository to return existing image
         $imageRepoMock = $this->createMock(ImageRepository::class);
@@ -75,7 +73,7 @@ class ImageServiceTest extends TestCase
         $result = $subject->upload($uploadedFile, $user, $type);
 
         // Assert: returns existing image
-        $this->assertSame($existingImage, $result);
+        static::assertSame($existingImage, $result);
     }
 
     public function testUploadNewImage(): void
@@ -114,8 +112,8 @@ class ImageServiceTest extends TestCase
         $entityManagerMock
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (Image $image) use ($hash, $mimeType, $extension, $type, $size, $user) {
-                return (
+            ->with(static::callback(
+                static fn(Image $image) => (
                     $image->getHash() === $hash
                     && $image->getMimeType() === $mimeType
                     && $image->getExtension() === $extension
@@ -123,8 +121,8 @@ class ImageServiceTest extends TestCase
                     && $image->getSize() === $size
                     && $image->getUploader() === $user
                     && $image->getCreatedAt() instanceof DateTimeImmutable
-                );
-            }));
+                ),
+            ));
 
         $subject = $this->createService(
             imageRepo: $imageRepoMock,
@@ -136,13 +134,13 @@ class ImageServiceTest extends TestCase
         $result = $subject->upload($uploadedFile, $user, $type);
 
         // Assert: returns new image with correct properties
-        $this->assertInstanceOf(Image::class, $result);
-        $this->assertEquals($hash, $result->getHash());
-        $this->assertEquals($mimeType, $result->getMimeType());
-        $this->assertEquals($extension, $result->getExtension());
-        $this->assertEquals($type, $result->getType());
-        $this->assertEquals($size, $result->getSize());
-        $this->assertEquals($user, $result->getUploader());
+        static::assertInstanceOf(Image::class, $result);
+        static::assertEquals($hash, $result->getHash());
+        static::assertEquals($mimeType, $result->getMimeType());
+        static::assertEquals($extension, $result->getExtension());
+        static::assertEquals($type, $result->getType());
+        static::assertEquals($size, $result->getSize());
+        static::assertEquals($user, $result->getUploader());
     }
 
     public function testCreateThumbnails(): void
@@ -174,7 +172,7 @@ class ImageServiceTest extends TestCase
         $result = $subject->createThumbnails($image);
 
         // Assert: returns expected thumbnail count
-        $this->assertEquals(2, $result);
+        static::assertSame(2, $result);
     }
 
     public function testRotateThumbNail(): void
@@ -260,19 +258,19 @@ class ImageServiceTest extends TestCase
         $result = $subject->getStatistics();
 
         // Assert: returns expected structure with correct values
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('imageCount', $result);
-        $this->assertArrayHasKey('imageTypeList', $result);
-        $this->assertArrayHasKey('thumbnailSizeList', $result);
-        $this->assertArrayHasKey('thumbnailCount', $result);
-        $this->assertArrayHasKey('thumbnailObsoleteCount', $result);
-        $this->assertArrayHasKey('thumbnailMissingCount', $result);
-        $this->assertEquals(2, $result['imageCount']);
-        $this->assertEquals(['ProfilePicture' => 1, 'EventTeaser' => 1], $result['imageTypeList']);
-        $this->assertEquals(['100x100' => 1, '200x200' => 1], $result['thumbnailSizeList']);
-        $this->assertEquals(2, $result['thumbnailCount']);
-        $this->assertEquals(0, $result['thumbnailObsoleteCount']);
-        $this->assertEquals(0, $result['thumbnailMissingCount']);
+        static::assertIsArray($result);
+        static::assertArrayHasKey('imageCount', $result);
+        static::assertArrayHasKey('imageTypeList', $result);
+        static::assertArrayHasKey('thumbnailSizeList', $result);
+        static::assertArrayHasKey('thumbnailCount', $result);
+        static::assertArrayHasKey('thumbnailObsoleteCount', $result);
+        static::assertArrayHasKey('thumbnailMissingCount', $result);
+        static::assertSame(2, $result['imageCount']);
+        static::assertEquals(['ProfilePicture' => 1, 'EventTeaser' => 1], $result['imageTypeList']);
+        static::assertEquals(['100x100' => 1, '200x200' => 1], $result['thumbnailSizeList']);
+        static::assertSame(2, $result['thumbnailCount']);
+        static::assertSame(0, $result['thumbnailObsoleteCount']);
+        static::assertSame(0, $result['thumbnailMissingCount']);
     }
 
     public function testGetObsoleteThumbnails(): void
@@ -309,7 +307,7 @@ class ImageServiceTest extends TestCase
         $configServiceMock
             ->expects($this->exactly(3))
             ->method('isValidThumbnailSize')
-            ->willReturnCallback(function (ImageType $type, int $width, int $height) {
+            ->willReturnCallback(static function (ImageType $type, int $width, int $height) {
                 if ($type === ImageType::ProfilePicture && $width === 100 && $height === 100) {
                     return true;
                 }
@@ -333,10 +331,10 @@ class ImageServiceTest extends TestCase
         $result = $subject->getObsoleteThumbnails();
 
         // Assert: returns only obsolete thumbnails
-        $this->assertIsArray($result);
-        $this->assertCount(2, $result);
-        $this->assertContains('hash3_100x100.webp', $result);
-        $this->assertContains('hash1_300x300.webp', $result);
+        static::assertIsArray($result);
+        static::assertCount(2, $result);
+        static::assertContains('hash3_100x100.webp', $result);
+        static::assertContains('hash1_300x300.webp', $result);
     }
 
     public function testDeleteObsoleteThumbnails(): void
@@ -373,7 +371,7 @@ class ImageServiceTest extends TestCase
         $filesystemMock
             ->expects($this->exactly(2))
             ->method('remove')
-            ->willReturnCallback(function ($path) use (&$removedFiles) {
+            ->willReturnCallback(static function ($path) use (&$removedFiles) {
                 $removedFiles[] = $path;
 
                 return true;
@@ -383,8 +381,8 @@ class ImageServiceTest extends TestCase
         $result = $subject->deleteObsoleteThumbnails();
 
         // Assert: correct files were removed
-        $this->assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash3_100x100.webp', $removedFiles);
-        $this->assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash1_300x300.webp', $removedFiles);
-        $this->assertEquals(2, $result);
+        static::assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash3_100x100.webp', $removedFiles);
+        static::assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash1_300x300.webp', $removedFiles);
+        static::assertSame(2, $result);
     }
 }

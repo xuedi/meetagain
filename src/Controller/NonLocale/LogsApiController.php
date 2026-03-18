@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api'), IsGranted('ROLE_ADMIN')]
-class LogsApiController extends AbstractController
+final class LogsApiController extends AbstractController
 {
     public function __construct(
         private readonly LogReaderService $logReaderService,
@@ -19,15 +19,15 @@ class LogsApiController extends AbstractController
     #[Route('/logs', name: 'app_api_logs', methods: ['GET'])]
     public function index(Request $request): JsonResponse
     {
-        $limit   = $request->query->getInt('limit', 100);
-        $level   = $request->query->get('level');
+        $limit = $request->query->getInt('limit', 100);
+        $level = $request->query->get('level');
         $channel = $request->query->get('channel');
 
         $entries = $this->logReaderService->getRecentEntries($limit, $level, $channel);
 
         return new JsonResponse([
-            'count'   => count($entries),
-            'file'    => basename($this->logReaderService->getLogFilePath()),
+            'count' => count($entries),
+            'file' => basename($this->logReaderService->getLogFilePath()),
             'entries' => array_map(static fn($e) => $e->toArray(), $entries),
         ]);
     }

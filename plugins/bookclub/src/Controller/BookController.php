@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/bookclub')]
-class BookController extends AbstractController
+final class BookController extends AbstractController
 {
     public function __construct(
         private readonly BookService $bookService,
@@ -49,9 +49,7 @@ class BookController extends AbstractController
             throw $this->createNotFoundException('Book not found');
         }
 
-        $createdBy = $book->getCreatedBy() !== null
-            ? $this->userRepository->find($book->getCreatedBy())
-            : null;
+        $createdBy = $book->getCreatedBy() !== null ? $this->userRepository->find($book->getCreatedBy()) : null;
 
         return $this->render('@Bookclub/book/detail.html.twig', [
             'book' => $book,

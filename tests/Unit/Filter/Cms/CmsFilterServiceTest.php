@@ -19,7 +19,7 @@ class CmsFilterServiceTest extends TestCase
         $result = $service->isCmsAccessible(123);
 
         // Assert - Default behavior allows access when no filters registered
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testIsCmsAccessibleWithAllowingFilter(): void
@@ -35,7 +35,7 @@ class CmsFilterServiceTest extends TestCase
         $result = $service->isCmsAccessible(456);
 
         // Assert
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testIsCmsAccessibleWithDenyingFilter(): void
@@ -51,7 +51,7 @@ class CmsFilterServiceTest extends TestCase
         $result = $service->isCmsAccessible(456);
 
         // Assert
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     public function testIsCmsAccessibleWithMultipleFilters(): void
@@ -71,7 +71,7 @@ class CmsFilterServiceTest extends TestCase
         $result = $service->isCmsAccessible(456);
 
         // Assert
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testIsCmsAccessibleStopsOnFirstDeny(): void
@@ -91,7 +91,7 @@ class CmsFilterServiceTest extends TestCase
         $result = $service->isCmsAccessible(456);
 
         // Assert
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     public function testIsCmsAccessibleChecksFiltersInPriorityOrder(): void
@@ -111,6 +111,6 @@ class CmsFilterServiceTest extends TestCase
         $result = $service->isCmsAccessible(789);
 
         // Assert - Returns false without checking low priority filter
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 }

@@ -11,7 +11,7 @@ use App\Entity\EventFilterRsvp;
 use App\Entity\EventFilterSort;
 use App\Entity\EventFilterTime;
 use App\Entity\EventTypes;
-use App\Entity\User;
+use App\FeaturedEventProviderInterface;
 use App\Filter\Event\EventFilterService;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
@@ -19,7 +19,6 @@ use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\Activity\ActivityService;
 use App\Service\Event\EventService;
-use App\FeaturedEventProviderInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -28,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class EventController extends AbstractController
+final class EventController extends AbstractController
 {
     public const string ROUTE_EVENT = 'app_event';
     public const string ROUTE_FEATURED = 'app_event_featured';
@@ -183,9 +182,11 @@ class EventController extends AbstractController
         );
 
         foreach ($providers as $provider) {
-            if ($provider->shouldProvide()) {
-                return $provider->getFeaturedEvents();
+            if (!$provider->shouldProvide()) {
+                continue;
             }
+
+            return $provider->getFeaturedEvents();
         }
 
         return null;

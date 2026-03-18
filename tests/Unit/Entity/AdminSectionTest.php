@@ -19,7 +19,7 @@ class AdminSectionTest extends TestCase
         $section = new AdminSection('Admin', $links);
 
         // Assert
-        $this->assertNull($section->getRole());
+        static::assertNull($section->getRole());
     }
 
     public function testGetRoleReturnsSpecifiedRole(): void
@@ -33,7 +33,7 @@ class AdminSectionTest extends TestCase
         $section = new AdminSection('Settings', $links, 'ROLE_ADMIN');
 
         // Assert
-        $this->assertSame('ROLE_ADMIN', $section->getRole());
+        static::assertSame('ROLE_ADMIN', $section->getRole());
     }
 
     public function testConstructorAcceptsAllParameters(): void
@@ -48,8 +48,8 @@ class AdminSectionTest extends TestCase
         $section = new AdminSection('User Management', $links, 'ROLE_META_ADMIN');
 
         // Assert
-        $this->assertSame('User Management', $section->getSection());
-        $this->assertSame($links, $section->getLinks());
-        $this->assertSame('ROLE_META_ADMIN', $section->getRole());
+        static::assertSame('User Management', $section->getSection());
+        static::assertSame($links, $section->getLinks());
+        static::assertSame('ROLE_META_ADMIN', $section->getRole());
     }
 }

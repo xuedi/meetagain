@@ -34,8 +34,8 @@ class LoginSubscriberTest extends TestCase
     {
         $events = LoginSubscriber::getSubscribedEvents();
 
-        $this->assertArrayHasKey(LoginSuccessEvent::class, $events);
-        $this->assertEquals('onLoginSuccess', $events[LoginSuccessEvent::class]);
+        static::assertArrayHasKey(LoginSuccessEvent::class, $events);
+        static::assertSame('onLoginSuccess', $events[LoginSuccessEvent::class]);
     }
 
     public function testOnLoginSuccessReturnsEarlyWhenUserNotUserInstance(): void
@@ -84,7 +84,7 @@ class LoginSubscriberTest extends TestCase
         $subscriber->onLoginSuccess($event);
 
         // Response should not have any cookies set (returns early before setting consent)
-        $this->assertEmpty($response->headers->getCookies());
+        static::assertEmpty($response->headers->getCookies());
     }
 
     public function testOnLoginSuccessSetsConsentCookiesWhenUserHasOsmConsent(): void
@@ -104,10 +104,10 @@ class LoginSubscriberTest extends TestCase
         $subscriber->onLoginSuccess($event);
 
         $cookies = $response->headers->getCookies();
-        $this->assertNotEmpty($cookies);
+        static::assertNotEmpty($cookies);
 
-        $cookieNames = array_map(fn($c) => $c->getName(), $cookies);
-        $this->assertContains('consent_cookies_osm', $cookieNames);
-        $this->assertContains('consent_cookies', $cookieNames);
+        $cookieNames = array_map(static fn($c) => $c->getName(), $cookies);
+        static::assertContains('consent_cookies_osm', $cookieNames);
+        static::assertContains('consent_cookies', $cookieNames);
     }
 }

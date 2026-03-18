@@ -47,9 +47,11 @@ class Kernel extends BaseKernel
     {
         $this->doConfigureRoutes($routes, $this->getConfigDir());
         foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
-            if ($pluginEnabled) {
-                $this->doConfigureRoutes($routes, $pluginConfigDir);
+            if (!$pluginEnabled) {
+                continue;
             }
+
+            $this->doConfigureRoutes($routes, $pluginConfigDir);
         }
     }
 

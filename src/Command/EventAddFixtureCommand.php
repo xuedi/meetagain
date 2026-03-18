@@ -87,7 +87,7 @@ class EventAddFixtureCommand extends Command
             ->createQuery('SELECT e FROM App\Entity\Event e WHERE e.recurringOf IS NOT NULL')
             ->getResult();
 
-        if (empty($recurringEvents)) {
+        if ($recurringEvents === []) {
             $output->writeln('<comment>No recurring events found to enhance.</comment>');
 
             return Command::SUCCESS;

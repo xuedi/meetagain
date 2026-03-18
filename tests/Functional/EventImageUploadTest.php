@@ -35,12 +35,12 @@ class EventImageUploadTest extends WebTestCase
 
         // Verify user is logged in
         $user = $client->getContainer()->get('security.token_storage')->getToken()?->getUser();
-        $this->assertInstanceOf(User::class, $user);
+        static::assertInstanceOf(User::class, $user);
 
         // Step 2: Get an event from the database
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $event = $em->getRepository(Event::class)->findOneBy([]);
-        $this->assertNotNull($event, 'At least one event should exist in fixtures');
+        static::assertNotNull($event, 'At least one event should exist in fixtures');
         $eventId = $event->getId();
 
         // Count existing images for this event before upload
@@ -61,7 +61,7 @@ class EventImageUploadTest extends WebTestCase
         imagefill($img, 0, 0, $color);
         imagejpeg($img, $tempFile, 90);
         imagedestroy($img);
-        $this->assertFileExists($tempFile, 'Test image file should be created');
+        static::assertFileExists($tempFile, 'Test image file should be created');
 
         // Get CSRF token from the form
         $csrfToken = $crawler->filter('input[name="event_upload[_token]"]')->attr('value');
@@ -86,7 +86,7 @@ class EventImageUploadTest extends WebTestCase
             'type' => ImageType::EventUpload,
         ]);
 
-        $this->assertGreaterThan(
+        static::assertGreaterThan(
             $imageCountBefore,
             $imageCountAfter,
             'A new image should be created in the database after upload',
@@ -98,10 +98,10 @@ class EventImageUploadTest extends WebTestCase
             'type' => ImageType::EventUpload,
             'uploader' => $user,
         ]);
-        $this->assertNotNull($newImage, 'The uploaded image should be linked to the event');
-        $this->assertSame(ImageType::EventUpload, $newImage->getType());
-        $this->assertNotNull($newImage->getHash(), 'Image should have a hash');
-        $this->assertNotNull($newImage->getCreatedAt(), 'Image should have a creation date');
+        static::assertNotNull($newImage, 'The uploaded image should be linked to the event');
+        static::assertSame(ImageType::EventUpload, $newImage->getType());
+        static::assertNotNull($newImage->getHash(), 'Image should have a hash');
+        static::assertNotNull($newImage->getCreatedAt(), 'Image should have a creation date');
 
         // Cleanup temp file
         if (file_exists($tempFile)) {
