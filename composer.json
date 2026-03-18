@@ -80,7 +80,6 @@
   "autoload": {
     "psr-4": {
       "App\\": "src/",
-      "Plugin\\AdminTables\\": "plugins/adminTables/src/",
       "Plugin\\Bookclub\\": "plugins/bookclub/src/",
       "Plugin\\Dishes\\": "plugins/dishes/src/",
       "Plugin\\Filmclub\\": "plugins/filmclub/src/",
@@ -122,8 +121,7 @@
     "ext-xdebug": "*",
     "carthage-software/mago": "^1.0.0",
     "dama/doctrine-test-bundle": "^8.4",
-    "phpunit/phpunit": "^12",
-    "roave/security-advisories": "dev-latest",
+    "phpunit/phpunit": "^13",
     "symfony/browser-kit": "8.0.*",
     "symfony/debug-bundle": "8.0.*",
     "symfony/maker-bundle": "^1",

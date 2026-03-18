@@ -93,7 +93,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: create notification settings that allow announcements
         $notificationSettings = $this->createStub(NotificationSettings::class);
-        $notificationSettings->method('isActive')->with('announcements')->willReturn(true);
+        $notificationSettings->method('isActive')->willReturn(true);
 
         // Arrange: create subscribers
         $subscriber1 = $this->createStub(User::class);
@@ -154,10 +154,10 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: notification settings - one enabled, one disabled
         $enabledSettings = $this->createStub(NotificationSettings::class);
-        $enabledSettings->method('isActive')->with('announcements')->willReturn(true);
+        $enabledSettings->method('isActive')->willReturn(true);
 
         $disabledSettings = $this->createStub(NotificationSettings::class);
-        $disabledSettings->method('isActive')->with('announcements')->willReturn(false);
+        $disabledSettings->method('isActive')->willReturn(false);
 
         // Arrange: create subscribers
         $enabledSubscriber = $this->createStub(User::class);
@@ -339,8 +339,8 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: create email template
         $emailTemplate = $this->createStub(EmailTemplate::class);
-        $emailTemplate->method('getSubject')->with('en')->willReturn('Subject: {{title}}');
-        $emailTemplate->method('getBody')->with('en')->willReturn('Body: {{content}}');
+        $emailTemplate->method('getSubject')->willReturn('Subject: {{title}}');
+        $emailTemplate->method('getBody')->willReturn('Body: {{content}}');
 
         // Arrange: template service
         $templateServiceMock = $this->createMock(EmailTemplateService::class);

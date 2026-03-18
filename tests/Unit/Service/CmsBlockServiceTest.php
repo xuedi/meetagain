@@ -40,7 +40,7 @@ class CmsBlockServiceTest extends TestCase
         $block->setType(CmsBlockTypes::Paragraph);
         $block->setJson(['title' => 'old', 'content' => 'old content']);
 
-        $blockRepoStub->method('find')->with(42)->willReturn($block);
+        $blockRepoStub->method('find')->willReturn($block);
         $emMock->expects($this->once())->method('persist')->with($block);
         $emMock->expects($this->once())->method('flush');
 
@@ -70,7 +70,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
 
         $block = new CmsBlock();
-        $blockRepoStub->method('find')->with(42)->willReturn($block);
+        $blockRepoStub->method('find')->willReturn($block);
 
         $emMock->expects($this->once())->method('remove')->with($block);
         $emMock->expects($this->once())->method('flush');
@@ -101,7 +101,7 @@ class CmsBlockServiceTest extends TestCase
         $block = new CmsBlock();
         $block->setPriority(3);
 
-        $blockRepoStub->method('find')->with(42)->willReturn($block);
+        $blockRepoStub->method('find')->willReturn($block);
         $blockRepoStub->method('findBy')->willReturn([$block]);
 
         $emMock->expects($this->exactly(2))->method('persist');
@@ -130,7 +130,7 @@ class CmsBlockServiceTest extends TestCase
             'imageRight' => true,
         ]);
 
-        $blockRepoStub->method('find')->with(42)->willReturn($block);
+        $blockRepoStub->method('find')->willReturn($block);
 
         $subject = new CmsBlockService($emMock, $blockRepoStub);
 

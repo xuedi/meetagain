@@ -93,7 +93,6 @@ class LanguageExtensionTest extends TestCase
 
         $this->languageServiceStub
             ->method('getAltLangList')
-            ->with('en', '/en/events')
             ->willReturn(['de' => '/de/events', 'zh' => '/zh/events']);
 
         $result = $this->subject->getAlternativeLanguageCodes();
@@ -127,7 +126,6 @@ class LanguageExtensionTest extends TestCase
         // Arrange
         $this->routerStub
             ->method('generate')
-            ->with('some_route')
             ->willReturn('/some/path');
 
         // Act
@@ -180,7 +178,7 @@ class LanguageExtensionTest extends TestCase
     {
         // Arrange
         $provider = $this->createStub(MetaDescriptionProviderInterface::class);
-        $provider->method('getMetaDescription')->with('events')->willReturn('Weiqi club upcoming events');
+        $provider->method('getMetaDescription')->willReturn('Weiqi club upcoming events');
 
         $subject = new LanguageExtension(
             $this->languageServiceStub,
@@ -202,7 +200,6 @@ class LanguageExtensionTest extends TestCase
         // Arrange
         $this->configServiceStub
             ->method('getSeoDescription')
-            ->with('events')
             ->willReturn('System events description');
 
         // Act

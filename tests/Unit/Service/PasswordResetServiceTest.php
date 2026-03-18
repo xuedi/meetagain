@@ -48,7 +48,7 @@ class PasswordResetServiceTest extends TestCase
         $user->setEmail('test@example.com');
 
         $userRepoStub = $this->createStub(UserRepository::class);
-        $userRepoStub->method('findOneBy')->with(['email' => 'test@example.com'])->willReturn($user);
+        $userRepoStub->method('findOneBy')->willReturn($user);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('persist')->with($user);
@@ -93,7 +93,7 @@ class PasswordResetServiceTest extends TestCase
         $user->setRegcode('abc123');
 
         $userRepoStub = $this->createStub(UserRepository::class);
-        $userRepoStub->method('findOneBy')->with(['regcode' => 'abc123'])->willReturn($user);
+        $userRepoStub->method('findOneBy')->willReturn($user);
 
         $service = $this->createService(userRepo: $userRepoStub);
 

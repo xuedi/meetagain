@@ -251,17 +251,17 @@ testPerformance:
 # Check Mago (linter)
 [group('checks')]
 checkMago:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml lint
+    vendor/bin/mago --config=tests/config/mago.toml lint
 
 # Analyze code with Mago
 [group('checks')]
 checkMagoAnalyze:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml analyze
+    vendor/bin/mago --config=tests/config/mago.toml analyze
 
 # Check architectural rules with Mago
 [group('checks')]
 checkMagoGuard:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml guard
+    vendor/bin/mago --config=tests/config/mago.toml guard
 
 # Run all Mago checks (lint + analyze + guard)
 [group('checks')]
@@ -286,7 +286,7 @@ checkVersions:
 # Format code with Mago
 [group('fixing')]
 fixMago:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml format
+    vendor/bin/mago --config=tests/config/mago.toml format
 
 # Generate coverage badge (CI)
 [group('fixing')]
