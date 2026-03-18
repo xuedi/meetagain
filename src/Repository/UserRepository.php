@@ -54,9 +54,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $friendLessList = [];
         $following = $user->getFollowing();
         foreach ($user->getFollowers() as $follower) {
-            if (!$following->contains($follower)) {
-                $friendLessList[] = $follower;
+            if ($following->contains($follower)) {
+                continue;
             }
+
+            $friendLessList[] = $follower;
         }
 
         return $friendLessList;
@@ -70,9 +72,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $friendLessList = [];
         $followers = $user->getFollowers();
         foreach ($user->getFollowing() as $follow) {
-            if (!$followers->contains($follow)) {
-                $friendLessList[] = $follow;
+            if ($followers->contains($follow)) {
+                continue;
             }
+
+            $friendLessList[] = $follow;
         }
 
         return $friendLessList;
@@ -83,9 +87,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $friendList = [];
         $followers = $user->getFollowers();
         foreach ($user->getFollowing() as $follow) {
-            if ($followers->contains($follow)) {
-                $friendList[] = $follow;
+            if (!$followers->contains($follow)) {
+                continue;
             }
+
+            $friendList[] = $follow;
         }
 
         return $friendList;
@@ -95,8 +101,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * Used to upgrade (rehash) the user's password automatically over time.
      */
     #[Override]
-    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
-    {
+    public function upgradePassword(
+        PasswordAuthenticatedUserInterface $user,
+        #[\SensitiveParameter] string $newHashedPassword,
+    ): void {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
         }

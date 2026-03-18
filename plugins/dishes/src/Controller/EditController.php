@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/dishes')]
-class EditController extends AbstractController
+final class EditController extends AbstractController
 {
     public function __construct(
         private readonly DishService $dishService,
@@ -28,7 +28,7 @@ class EditController extends AbstractController
             throw $this->createNotFoundException('Dish not found');
         }
 
-        $lang = $lang ?? $request->getLocale();
+        $lang ??= $request->getLocale();
         $existingTranslation = $dish->findTranslation($lang);
 
         $form = $this->createForm(DishTranslationType::class, null, [

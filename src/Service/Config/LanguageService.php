@@ -50,7 +50,7 @@ readonly class LanguageService
             $this->appCache->delete(self::CACHE_KEY_ENABLED_CODES);
             $this->appCache->delete(self::CACHE_KEY_ALL_LANGUAGES);
         } catch (InvalidArgumentException) {
-            // Cache invalidation failures are non-critical - cache will be refreshed on next request
+            return; // Cache invalidation failures are non-critical - cache will be refreshed on next request
         }
     }
 

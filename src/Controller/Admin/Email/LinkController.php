@@ -6,7 +6,7 @@ use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\AdminLink;
 
-class LinkController extends AbstractAdminController
+final class LinkController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

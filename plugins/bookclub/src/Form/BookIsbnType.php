@@ -21,7 +21,10 @@ class BookIsbnType extends AbstractType
             ],
             'constraints' => [
                 new NotBlank(),
-                new Regex(pattern: '/^[\d\-\s X]+$/i', message: 'Please enter a valid ISBN (digits, hyphens, spaces, and X only)'),
+                new Regex(
+                    pattern: '/^[\d\-\s X]+$/i',
+                    message: 'Please enter a valid ISBN (digits, hyphens, spaces, and X only)',
+                ),
             ],
         ]);
     }

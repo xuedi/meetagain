@@ -39,7 +39,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->generate();
 
         // Assert: returns existing image from session
-        $this->assertSame($expectedImage, $result);
+        static::assertSame($expectedImage, $result);
     }
 
     public function testGenerateCreatesNewImageWhenNoneExists(): void
@@ -91,7 +91,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->isValid('hgfw');
 
         // Assert
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testIsValidReturnErrorOnMismatchedCode(): void
@@ -117,7 +117,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->isValid('hgfw');
 
         // Assert: generic message does not reveal the expected code
-        $this->assertSame('Wrong captcha code, please try again.', $result);
+        static::assertSame('Wrong captcha code, please try again.', $result);
     }
 
     public function testIsValidForcesResetAfterMaxAttempts(): void
@@ -142,7 +142,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->isValid('hgfw');
 
         // Assert
-        $this->assertSame('Wrong captcha code, please try again.', $result);
+        static::assertSame('Wrong captcha code, please try again.', $result);
     }
 
     public function testGetRefreshTimeReturnsZeroWhenNoRefreshHistory(): void
@@ -163,7 +163,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->getRefreshTime();
 
         // Assert: returns zero when no refresh history exists
-        $this->assertSame(0, $result);
+        static::assertSame(0, $result);
     }
 
     public function testGetRefreshTimeReturnsSecondsUntilNextRefresh(): void
@@ -184,7 +184,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->getRefreshTime();
 
         // Assert: returns remaining seconds (with 5 second tolerance for test execution)
-        $this->assertGreaterThan(5, $result);
+        static::assertGreaterThan(5, $result);
     }
 
     public function testGetRefreshTimeReturnsSmallestRemainingTime(): void
@@ -211,7 +211,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->getRefreshTime();
 
         // Assert: returns time based on oldest timestamp (35 seconds ago = ~25 seconds remaining)
-        $this->assertLessThanOrEqual(25, $result);
+        static::assertLessThanOrEqual(25, $result);
     }
 
     #[DataProvider('refreshCountDataProvider')]
@@ -237,7 +237,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->getRefreshCount();
 
         // Assert: returns count of non-expired refresh attempts
-        $this->assertSame($expectedCount, $result);
+        static::assertSame($expectedCount, $result);
     }
 
     public static function refreshCountDataProvider(): Generator

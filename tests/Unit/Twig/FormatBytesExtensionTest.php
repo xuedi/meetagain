@@ -20,14 +20,14 @@ class FormatBytesExtensionTest extends TestCase
     {
         $filters = $this->subject->getFilters();
 
-        $this->assertCount(1, $filters);
-        $this->assertSame('format_bytes', $filters[0]->getName());
+        static::assertCount(1, $filters);
+        static::assertSame('format_bytes', $filters[0]->getName());
     }
 
     #[DataProvider('bytesProvider')]
     public function testFormatBytes(int $bytes, string $expected): void
     {
-        $this->assertSame($expected, $this->subject->formatBytes($bytes));
+        static::assertSame($expected, $this->subject->formatBytes($bytes));
     }
 
     public static function bytesProvider(): Generator

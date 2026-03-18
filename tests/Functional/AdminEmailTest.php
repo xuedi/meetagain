@@ -34,7 +34,7 @@ class AdminEmailTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        $this->assertGreaterThan(0, $crawler->filter('table')->count(), 'Templates table should exist');
+        static::assertGreaterThan(0, $crawler->filter('table')->count(), 'Templates table should exist');
     }
 
     public function testEmailTemplateEditPageLoads(): void
@@ -49,7 +49,7 @@ class AdminEmailTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        $this->assertGreaterThan(0, $crawler->filter('form')->count(), 'Edit form should exist');
+        static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Edit form should exist');
         // Form fields are now language-specific
         $this->assertSelectorExists('input[name="email_template[subject-en]"]');
         $this->assertSelectorExists('textarea[name="email_template[body-en]"]');
@@ -96,7 +96,7 @@ class AdminEmailTest extends WebTestCase
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $em->clear();
         $updated = $em->getRepository(EmailTemplate::class)->find($template->getId());
-        $this->assertSame('Updated Subject', $updated->getSubject('en'));
+        static::assertSame('Updated Subject', $updated->getSubject('en'));
     }
 
     public function testEmailTemplateResetToDefault(): void
@@ -126,7 +126,7 @@ class AdminEmailTest extends WebTestCase
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $em->clear();
         $reset = $em->getRepository(EmailTemplate::class)->find($template->getId());
-        $this->assertSame($originalSubject, $reset->getSubject('en'));
+        static::assertSame($originalSubject, $reset->getSubject('en'));
     }
 
     private function loginAsAdmin($client): void

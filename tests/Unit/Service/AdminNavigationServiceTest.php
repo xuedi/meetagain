@@ -49,11 +49,11 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertNotEmpty($sections);
-        $this->assertContainsOnlyInstancesOf(AdminSection::class, $sections);
+        static::assertNotEmpty($sections);
+        static::assertContainsOnlyInstancesOf(AdminSection::class, $sections);
 
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
-        $this->assertContains('System', $sectionNames);
+        $sectionNames = array_map(static fn(AdminSection $s) => $s->getSection(), $sections);
+        static::assertContains('System', $sectionNames);
     }
 
     public function testGetSidebarSectionsSortsAlphabetically(): void
@@ -101,9 +101,9 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert - sections should be in alphabetical order
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
+        $sectionNames = array_map(static fn(AdminSection $s) => $s->getSection(), $sections);
 
-        $this->assertSame(['Apple', 'Mango', 'Zebra'], $sectionNames, 'Sections should be sorted alphabetically');
+        static::assertSame(['Apple', 'Mango', 'Zebra'], $sectionNames, 'Sections should be sorted alphabetically');
     }
 
     public function testGetSidebarSectionsSortsByPriorityThenAlphabetically(): void
@@ -153,8 +153,8 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert - priority-0 sections appear first (alphabetically), then priority-100
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
-        $this->assertSame(
+        $sectionNames = array_map(static fn(AdminSection $s) => $s->getSection(), $sections);
+        static::assertSame(
             ['Apple Group', 'Zebra Group', 'System'],
             $sectionNames,
             'Priority-0 sections appear before priority-100, alphabetically within same priority',
@@ -203,12 +203,12 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertCount(1, $sections, 'Should have one section');
+        static::assertCount(1, $sections, 'Should have one section');
         $systemSection = $sections[0];
-        $this->assertSame('System', $systemSection->getSection());
+        static::assertSame('System', $systemSection->getSection());
 
-        $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $systemSection->getLinks());
-        $this->assertSame(
+        $linkLabels = array_map(static fn(AdminLink $link) => $link->getLabel(), $systemSection->getLinks());
+        static::assertSame(
             ['menu_admin_apple', 'menu_admin_mango', 'menu_admin_zebra'],
             $linkLabels,
             'Links should be sorted alphabetically by label',
@@ -240,7 +240,7 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert - should not contain admin-only sections
-        $this->assertEmpty($sections, 'System section should be hidden without ROLE_ADMIN');
+        static::assertEmpty($sections, 'System section should be hidden without ROLE_ADMIN');
     }
 
     public function testControllerReturningNullIsSkipped(): void
@@ -261,7 +261,7 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert - should have no sections
-        $this->assertEmpty($sections, 'Controllers returning null should not appear in navigation');
+        static::assertEmpty($sections, 'Controllers returning null should not appear in navigation');
     }
 
     public function testGetSidebarSectionsHandlesMultipleLinksPerController(): void
@@ -289,15 +289,15 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertCount(1, $sections, 'Should have one section');
+        static::assertCount(1, $sections, 'Should have one section');
         $systemSection = $sections[0];
-        $this->assertSame('System', $systemSection->getSection());
+        static::assertSame('System', $systemSection->getSection());
 
         $links = $systemSection->getLinks();
-        $this->assertCount(2, $links, 'Should have two links from the same controller');
+        static::assertCount(2, $links, 'Should have two links from the same controller');
 
-        $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $links);
-        $this->assertSame(['menu_admin_email', 'menu_admin_translation'], $linkLabels, 'Both links should be present');
+        $linkLabels = array_map(static fn(AdminLink $link) => $link->getLabel(), $links);
+        static::assertSame(['menu_admin_email', 'menu_admin_translation'], $linkLabels, 'Both links should be present');
     }
 
     public function testMultiLinkControllerLinksSortedAlphabeticallyWithOtherControllers(): void
@@ -334,11 +334,11 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertCount(1, $sections, 'Should have one section');
+        static::assertCount(1, $sections, 'Should have one section');
         $systemSection = $sections[0];
 
-        $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $systemSection->getLinks());
-        $this->assertSame(
+        $linkLabels = array_map(static fn(AdminLink $link) => $link->getLabel(), $systemSection->getLinks());
+        static::assertSame(
             ['menu_admin_apple', 'menu_admin_banana', 'menu_admin_zebra'],
             $linkLabels,
             'Links from both single and multi-link controllers should be sorted alphabetically',
@@ -365,20 +365,22 @@ final class AdminNavigationServiceTest extends TestCase
         $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
         // Only grant base admin role, not ROLE_SUPER_ADMIN
-        $this->security->method('isGranted')->willReturnCallback(fn(string $role) => $role !== 'ROLE_SUPER_ADMIN');
+        $this->security
+            ->method('isGranted')
+            ->willReturnCallback(static fn(string $role) => $role !== 'ROLE_SUPER_ADMIN');
 
         // Act
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertCount(1, $sections, 'Should have one section');
+        static::assertCount(1, $sections, 'Should have one section');
         $systemSection = $sections[0];
 
         $links = $systemSection->getLinks();
-        $this->assertCount(1, $links, 'Should only show the public link');
+        static::assertCount(1, $links, 'Should only show the public link');
 
-        $linkLabels = array_map(fn(AdminLink $link) => $link->getLabel(), $links);
-        $this->assertSame(['menu_admin_public'], $linkLabels, 'Restricted link should be filtered out');
+        $linkLabels = array_map(static fn(AdminLink $link) => $link->getLabel(), $links);
+        static::assertSame(['menu_admin_public'], $linkLabels, 'Restricted link should be filtered out');
     }
 
     public function testModifiesChangesLinkSection(): void
@@ -417,13 +419,13 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert - link should appear in modified section with modified label
-        $this->assertCount(1, $sections, 'Should have one section');
-        $this->assertEquals('Group Section', $sections[0]->getSection(), 'Section should be modified');
+        static::assertCount(1, $sections, 'Should have one section');
+        static::assertSame('Group Section', $sections[0]->getSection(), 'Section should be modified');
 
         $links = $sections[0]->getLinks();
-        $this->assertCount(1, $links, 'Should have one link');
-        $this->assertEquals('Modified CMS', $links[0]->getLabel(), 'Label should be modified');
-        $this->assertEquals('app_admin_cms', $links[0]->getRoute(), 'Route should remain unchanged');
+        static::assertCount(1, $links, 'Should have one link');
+        static::assertSame('Modified CMS', $links[0]->getLabel(), 'Label should be modified');
+        static::assertSame('app_admin_cms', $links[0]->getRoute(), 'Route should remain unchanged');
     }
 
     public function testModifiesOnlyAffectsSpecifiedRoute(): void
@@ -474,12 +476,12 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertCount(2, $sections, 'Should have two sections (System and Group)');
+        static::assertCount(2, $sections, 'Should have two sections (System and Group)');
 
-        $sectionNames = array_map(fn(AdminSection $s) => $s->getSection(), $sections);
-        $this->assertContains('System', $sectionNames, 'System section should be visible');
-        $this->assertContains('Group', $sectionNames, 'Group section should be visible');
-        $this->assertNotContains('CMS', $sectionNames, 'CMS section should not exist (link moved to Group)');
+        $sectionNames = array_map(static fn(AdminSection $s) => $s->getSection(), $sections);
+        static::assertContains('System', $sectionNames, 'System section should be visible');
+        static::assertContains('Group', $sectionNames, 'Group section should be visible');
+        static::assertNotContains('CMS', $sectionNames, 'CMS section should not exist (link moved to Group)');
     }
 
     public function testMultipleModificationsOverwriteEachOther(): void
@@ -529,11 +531,11 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert - last modification wins
-        $this->assertCount(1, $sections, 'Should have one section');
-        $this->assertEquals('Modified Section 2', $sections[0]->getSection(), 'Last modifier should win');
+        static::assertCount(1, $sections, 'Should have one section');
+        static::assertSame('Modified Section 2', $sections[0]->getSection(), 'Last modifier should win');
 
         $links = $sections[0]->getLinks();
-        $this->assertEquals('Label 2', $links[0]->getLabel(), 'Last modifier should set label');
+        static::assertSame('Label 2', $links[0]->getLabel(), 'Last modifier should set label');
     }
 
     public function testModifiesCanChangeMultipleProperties(): void
@@ -573,13 +575,13 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertCount(1, $sections);
-        $this->assertEquals('New Section', $sections[0]->getSection());
+        static::assertCount(1, $sections);
+        static::assertSame('New Section', $sections[0]->getSection());
 
         $link = $sections[0]->getLinks()[0];
-        $this->assertEquals('New Label', $link->getLabel());
-        $this->assertEquals('new_active', $link->getActive());
-        $this->assertEquals('app_admin_test', $link->getRoute());
+        static::assertSame('New Label', $link->getLabel());
+        static::assertSame('new_active', $link->getActive());
+        static::assertSame('app_admin_test', $link->getRoute());
     }
 
     public function testLinksWithNonExistentRoutesAreFiltered(): void
@@ -598,7 +600,7 @@ final class AdminNavigationServiceTest extends TestCase
         $router = $this->createStub(RouterInterface::class);
         $router
             ->method('generate')
-            ->willReturnCallback(function (string $name): string {
+            ->willReturnCallback(static function (string $name): string {
                 if ($name === 'app_missing_route') {
                     throw new RouteNotFoundException();
                 }
@@ -613,9 +615,9 @@ final class AdminNavigationServiceTest extends TestCase
         $sections = $service->getSidebarSections();
 
         // Assert
-        $this->assertCount(1, $sections);
+        static::assertCount(1, $sections);
         $links = $sections[0]->getLinks();
-        $this->assertCount(1, $links, 'Link with non-existent route should be filtered out');
-        $this->assertSame('Valid Link', $links[0]->getLabel());
+        static::assertCount(1, $links, 'Link with non-existent route should be filtered out');
+        static::assertSame('Valid Link', $links[0]->getLabel());
     }
 }

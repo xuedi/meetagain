@@ -121,7 +121,7 @@ class DishList
 
     public function removeDishId(int $dishId): static
     {
-        $this->dishIds = array_values(array_filter($this->dishIds, fn(int $id) => $id !== $dishId));
+        $this->dishIds = array_values(array_filter($this->dishIds, static fn(int $id) => $id !== $dishId));
 
         return $this;
     }

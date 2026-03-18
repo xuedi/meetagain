@@ -145,7 +145,7 @@ readonly class RsvpNotificationService implements CronTaskInterface
     {
         $key = $this->getCacheKey($recipient, $attendee, $event);
         try {
-            return (bool) $this->appCache->get($key, fn(ItemInterface $item) => false);
+            return (bool) $this->appCache->get($key, static fn(ItemInterface $item) => false);
         } catch (InvalidArgumentException) {
             return false;
         }
@@ -157,15 +157,15 @@ readonly class RsvpNotificationService implements CronTaskInterface
         try {
             $this->appCache->get(
                 $key,
-                function (ItemInterface $item) {
+                static function (ItemInterface $item) {
                     $item->expiresAfter(self::THIRTY_DAYS);
 
                     return true;
                 },
                 beta: INF,
             ); // beta: INF forces the callback to run and save the new value
-        } catch (InvalidArgumentException) {
-            // Cache write failures are non-critical - notification tracking continues without cache
+        } catch (InvalidArgumentException $e) {
+            $this->logger->debug('Cache write failure for RSVP notification tracking - non-critical', ['exception' => $e]);
         }
     }
 

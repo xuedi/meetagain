@@ -45,10 +45,10 @@ class CommentedOnEventTest extends TestCase
         $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
 
         // Act & Assert
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::CommentedOnEvent, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::CommentedOnEvent, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testRendersDeletedEventGracefully(): void
@@ -60,8 +60,8 @@ class CommentedOnEventTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta, [], []);
 
         // Act & Assert
-        $this->assertEquals('commented on event: [deleted]', $subject->render());
-        $this->assertEquals('commented on event [deleted]', $subject->render(true));
+        static::assertSame('commented on event: [deleted]', $subject->render());
+        static::assertSame('commented on event [deleted]', $subject->render(true));
     }
 
     public function testCanCatchMissingEventId(): void

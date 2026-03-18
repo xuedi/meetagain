@@ -19,7 +19,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
         $blockRepoStub->method('getMaxPriority')->willReturn(5.0);
 
-        $emMock->expects($this->once())->method('persist')->with($this->isInstanceOf(CmsBlock::class));
+        $emMock->expects($this->once())->method('persist')->with(static::isInstanceOf(CmsBlock::class));
         $emMock->expects($this->once())->method('flush');
 
         $subject = new CmsBlockService($emMock, $blockRepoStub);
@@ -27,8 +27,8 @@ class CmsBlockServiceTest extends TestCase
 
         $block = $subject->createBlock($page, 'en', CmsBlockTypes::Headline, ['title' => 'Test']);
 
-        $this->assertSame('en', $block->getLanguage());
-        $this->assertSame(6.0, $block->getPriority());
+        static::assertSame('en', $block->getLanguage());
+        static::assertSame(6.0, $block->getPriority());
     }
 
     public function testUpdateBlockModifiesExistingBlock(): void
@@ -47,7 +47,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub);
         $result = $subject->updateBlock(42, CmsBlockTypes::Paragraph, ['title' => 'new', 'content' => 'new content']);
 
-        $this->assertSame($block, $result);
+        static::assertSame($block, $result);
     }
 
     public function testUpdateBlockThrowsWhenBlockNotFound(): void
@@ -110,7 +110,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub);
         $subject->moveBlockDown(1, 42, 'en');
 
-        $this->assertEquals(1, $block->getPriority());
+        static::assertSame(1, $block->getPriority());
     }
 
     public function testUpdateHeroBlockHandlesImageRightCheckbox(): void
@@ -144,11 +144,11 @@ class CmsBlockServiceTest extends TestCase
             'color' => 'new',
         ];
         $subject->updateBlock(42, CmsBlockTypes::Hero, $payload);
-        $this->assertFalse($block->getJson()['imageRight']);
+        static::assertFalse($block->getJson()['imageRight']);
 
         // Test when imageRight is in payload (checked)
         $payload['imageRight'] = '1';
         $subject->updateBlock(42, CmsBlockTypes::Hero, $payload);
-        $this->assertTrue($block->getJson()['imageRight']);
+        static::assertTrue($block->getJson()['imageRight']);
     }
 }

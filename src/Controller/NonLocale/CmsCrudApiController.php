@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/cms'), IsGranted('ROLE_ADMIN')]
-class CmsCrudApiController extends AbstractController
+final class CmsCrudApiController extends AbstractController
 {
     public function __construct(
         private readonly CmsRepository $cmsRepository,
@@ -379,21 +379,25 @@ class CmsCrudApiController extends AbstractController
         $newValues = array_map('intval', $locationValues);
 
         foreach ($existingByValue as $value => $menuLocation) {
-            if (!in_array($value, $newValues, true)) {
-                $cms->removeMenuLocation($menuLocation);
-                $this->em->remove($menuLocation);
+            if (in_array($value, $newValues, true)) {
+                continue;
             }
+
+            $cms->removeMenuLocation($menuLocation);
+            $this->em->remove($menuLocation);
         }
 
         foreach ($newValues as $locationValue) {
-            if (!isset($existingByValue[$locationValue])) {
-                $location = MenuLocation::tryFrom($locationValue);
-                if ($location !== null) {
-                    $menuLocation = new CmsMenuLocation();
-                    $menuLocation->setLocation($location);
-                    $cms->addMenuLocation($menuLocation);
-                    $this->em->persist($menuLocation);
-                }
+            if (isset($existingByValue[$locationValue])) {
+                continue;
+            }
+
+            $location = MenuLocation::tryFrom($locationValue);
+            if ($location !== null) {
+                $menuLocation = new CmsMenuLocation();
+                $menuLocation->setLocation($location);
+                $cms->addMenuLocation($menuLocation);
+                $this->em->persist($menuLocation);
             }
         }
     }

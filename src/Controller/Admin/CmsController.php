@@ -9,11 +9,11 @@ use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
-use App\Entity\BlockType\Title;
 use App\Entity\Cms;
 use App\Entity\CmsBlockTypes;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\CmsType;
@@ -23,9 +23,8 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\Cms\CmsBlockService;
 use App\Service\Cms\CmsPageCacheService;
-use App\EntityActionDispatcher;
-use App\Service\Media\ImageService;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -40,7 +39,7 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_FOUNDER'), Route('/admin/cms')]
-class CmsController extends AbstractAdminController
+final class CmsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
@@ -359,7 +358,7 @@ class CmsController extends AbstractAdminController
         $json = $block->getJson();
         $json['images'] = array_values(array_filter(
             $json['images'] ?? [],
-            fn(array $item) => $item['id'] !== $imageId,
+            static fn(array $item) => $item['id'] !== $imageId,
         ));
         $block->setJson($json);
         $this->em->persist($block);

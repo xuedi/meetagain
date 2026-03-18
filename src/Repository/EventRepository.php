@@ -112,10 +112,8 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return array<Event>
      */
-    public function findUpcomingEventsNeedingRsvpNotification(
-        DateTimeInterface $from,
-        DateTimeInterface $to,
-    ): array {
+    public function findUpcomingEventsNeedingRsvpNotification(DateTimeInterface $from, DateTimeInterface $to): array
+    {
         return $this
             ->createQueryBuilder('e')
             ->innerJoin('e.rsvp', 'r')

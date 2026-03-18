@@ -13,7 +13,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/bookclub')]
 #[IsGranted('ROLE_USER')]
-class SuggestionController extends AbstractController
+final class SuggestionController extends AbstractController
 {
     public function __construct(
         private readonly SuggestionService $suggestionService,
@@ -26,12 +26,15 @@ class SuggestionController extends AbstractController
         $user = $this->getAuthedUser();
 
         $userSuggestions = $this->suggestionService->getUserPendingSuggestions($user->getId());
-        $suggestedBookIds = array_map(fn($s) => $s->getBook()->getId(), $userSuggestions);
+        $suggestedBookIds = array_map(static fn($s) => $s->getBook()->getId(), $userSuggestions);
 
         return $this->render('@Bookclub/suggestion/list.html.twig', [
             'suggestions' => $this->suggestionService->getPendingSuggestionsWithPriority(),
             'userSuggestions' => $userSuggestions,
-            'books' => array_filter($this->bookService->getApprovedList(), fn($b) => !in_array($b->getId(), $suggestedBookIds)),
+            'books' => array_filter(
+                $this->bookService->getApprovedList(),
+                static fn($b) => !in_array($b->getId(), $suggestedBookIds),
+            ),
         ]);
     }
 

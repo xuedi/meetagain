@@ -42,12 +42,12 @@ class DashboardStatsServiceTest extends TestCase
     {
         $result = $this->subject->getTimeControl(2025, 1);
 
-        $this->assertSame(1, $result['week']);
-        $this->assertSame(2025, $result['year']);
-        $this->assertSame(2, $result['weekNext']);
-        $this->assertSame(0, $result['weekPrevious']);
-        $this->assertStringContainsString('2024-12-30', $result['weekDetails']);
-        $this->assertStringContainsString('2025-01-05', $result['weekDetails']);
+        static::assertSame(1, $result['week']);
+        static::assertSame(2025, $result['year']);
+        static::assertSame(2, $result['weekNext']);
+        static::assertSame(0, $result['weekPrevious']);
+        static::assertStringContainsString('2024-12-30', $result['weekDetails']);
+        static::assertStringContainsString('2025-01-05', $result['weekDetails']);
     }
 
     public function testGetDetailsReturnsExpectedKeys(): void
@@ -64,11 +64,11 @@ class DashboardStatsServiceTest extends TestCase
         // Skip week counts as they require matching() which needs lazy collections
         // Full integration test would cover this
 
-        $this->assertSame(100, $this->notFoundRepoStub->count());
-        $this->assertSame(50, $this->userRepoStub->count());
-        $this->assertSame(200, $this->activityRepoStub->count());
-        $this->assertSame(25, $this->eventRepoStub->count());
-        $this->assertSame(75, $this->mailRepoStub->count());
+        static::assertSame(100, $this->notFoundRepoStub->count());
+        static::assertSame(50, $this->userRepoStub->count());
+        static::assertSame(200, $this->activityRepoStub->count());
+        static::assertSame(25, $this->eventRepoStub->count());
+        static::assertSame(75, $this->mailRepoStub->count());
     }
 
     public function testGetPagesNotFoundReturnsList(): void
@@ -81,26 +81,26 @@ class DashboardStatsServiceTest extends TestCase
 
         $result = $this->subject->getPagesNotFound(2025, 1);
 
-        $this->assertSame($expectedList, $result['list']);
+        static::assertSame($expectedList, $result['list']);
     }
 
     public function testCalculateDatesReturnsCorrectRange(): void
     {
         $result = $this->subject->calculateDates(2025, 1);
 
-        $this->assertArrayHasKey('start', $result);
-        $this->assertArrayHasKey('stop', $result);
-        $this->assertSame('2024-12-30', $result['start']->format('Y-m-d'));
-        $this->assertSame('2025-01-05', $result['stop']->format('Y-m-d'));
+        static::assertArrayHasKey('start', $result);
+        static::assertArrayHasKey('stop', $result);
+        static::assertSame('2024-12-30', $result['start']->format('Y-m-d'));
+        static::assertSame('2025-01-05', $result['stop']->format('Y-m-d'));
     }
 
     public function testCalculateDatesWithNullUsesCurrentWeek(): void
     {
         $result = $this->subject->calculateDates(null, null);
 
-        $this->assertArrayHasKey('start', $result);
-        $this->assertArrayHasKey('stop', $result);
-        $this->assertInstanceOf(DateTimeImmutable::class, $result['start']);
-        $this->assertInstanceOf(DateTimeImmutable::class, $result['stop']);
+        static::assertArrayHasKey('start', $result);
+        static::assertArrayHasKey('stop', $result);
+        static::assertInstanceOf(DateTimeImmutable::class, $result['start']);
+        static::assertInstanceOf(DateTimeImmutable::class, $result['stop']);
     }
 }

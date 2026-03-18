@@ -4,8 +4,8 @@ namespace App\DataFixtures;
 
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
-use App\Service\Email\EmailTemplateService;
 use App\Service\Config\LanguageService;
+use App\Service\Email\EmailTemplateService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;

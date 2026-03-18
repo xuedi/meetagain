@@ -32,7 +32,8 @@ class BookNoteRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('n')
+        $qb = $this
+            ->createQueryBuilder('n')
             ->where('n.userId = :userId')
             ->setParameter('userId', $userId)
             ->orderBy('COALESCE(n.updatedAt, n.createdAt)', 'DESC');

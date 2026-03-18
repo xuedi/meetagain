@@ -38,8 +38,8 @@ class LocaleSubscriberTest extends TestCase
     {
         $events = LocaleSubscriber::getSubscribedEvents();
 
-        $this->assertArrayHasKey(KernelEvents::REQUEST, $events);
-        $this->assertEquals([['onKernelRequest', 250]], $events[KernelEvents::REQUEST]);
+        static::assertArrayHasKey(KernelEvents::REQUEST, $events);
+        static::assertEquals([['onKernelRequest', 250]], $events[KernelEvents::REQUEST]);
     }
 
     public function testOnKernelRequestReturnsEarlyWhenNoPreviousSession(): void
@@ -56,7 +56,7 @@ class LocaleSubscriberTest extends TestCase
         // Should not throw any errors, just return early
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true); // If we got here, no exception was thrown
+        static::assertTrue(true); // If we got here, no exception was thrown
     }
 
     public function testOnKernelRequestSavesLocaleToSessionWhenAttributePresent(): void
@@ -92,7 +92,7 @@ class LocaleSubscriberTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertEquals('fr', $request->getLocale());
+        static::assertSame('fr', $request->getLocale());
     }
 
     public function testOnKernelRequestUsesDefaultLocaleWhenSessionEmpty(): void
@@ -110,6 +110,6 @@ class LocaleSubscriberTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertEquals('es', $request->getLocale());
+        static::assertSame('es', $request->getLocale());
     }
 }

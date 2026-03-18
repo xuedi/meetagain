@@ -63,7 +63,7 @@ class LanguageServiceTest extends TestCase
 
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
 
-        $this->assertEquals(['en', 'de'], $this->service->getEnabledCodes());
+        static::assertEquals(['en', 'de'], $this->service->getEnabledCodes());
     }
 
     public function testGetEnabledCodesFallbackOnCacheError(): void
@@ -83,15 +83,15 @@ class LanguageServiceTest extends TestCase
 
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en']);
 
-        $this->assertEquals(['en'], $this->service->getEnabledCodes());
+        static::assertEquals(['en'], $this->service->getEnabledCodes());
     }
 
     public function testIsValidCode(): void
     {
         $this->appCache->method('get')->willReturn(['en', 'de']);
 
-        $this->assertTrue($this->service->isValidCode('en'));
-        $this->assertFalse($this->service->isValidCode('fr'));
+        static::assertTrue($this->service->isValidCode('en'));
+        static::assertFalse($this->service->isValidCode('fr'));
     }
 
     public function testInvalidateCache(): void
@@ -107,9 +107,9 @@ class LanguageServiceTest extends TestCase
         $this->appCache
             ->expects($this->exactly(2))
             ->method('delete')
-            ->with($this->logicalOr(
-                $this->equalTo('language.enabled_codes'),
-                $this->equalTo('language.all_languages'),
+            ->with(static::logicalOr(
+                static::equalTo('language.enabled_codes'),
+                static::equalTo('language.all_languages'),
             ));
 
         $this->service->invalidateCache();
@@ -122,13 +122,13 @@ class LanguageServiceTest extends TestCase
             ->willThrowException(new class extends Exception implements InvalidArgumentException {});
 
         $this->service->invalidateCache();
-        $this->assertTrue(true); // Should not throw
+        static::assertTrue(true); // Should not throw
     }
 
     public function testGetLocaleRegexPattern(): void
     {
         $this->appCache->method('get')->willReturn(['en', 'de']);
-        $this->assertEquals('en|de', $this->service->getLocaleRegexPattern());
+        static::assertSame('en|de', $this->service->getLocaleRegexPattern());
 
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->service = new LanguageService(
@@ -138,7 +138,7 @@ class LanguageServiceTest extends TestCase
             $this->adminLanguageFilterService,
         );
         $this->appCache->method('get')->willReturn([]);
-        $this->assertEquals('en', $this->service->getLocaleRegexPattern());
+        static::assertSame('en', $this->service->getLocaleRegexPattern());
     }
 
     public function testGetAllLanguagesUsesCache(): void
@@ -164,7 +164,7 @@ class LanguageServiceTest extends TestCase
 
         $this->languageRepo->method('findAllOrdered')->willReturn([$langEn]);
 
-        $this->assertEquals([$langEn], $this->service->getAllLanguages());
+        static::assertEquals([$langEn], $this->service->getAllLanguages());
     }
 
     public function testGetAllLanguagesFallbackOnCacheError(): void
@@ -184,7 +184,7 @@ class LanguageServiceTest extends TestCase
 
         $this->languageRepo->method('findAllOrdered')->willReturn([]);
 
-        $this->assertEquals([], $this->service->getAllLanguages());
+        static::assertEquals([], $this->service->getAllLanguages());
     }
 
     public function testFindByCode(): void
@@ -195,6 +195,6 @@ class LanguageServiceTest extends TestCase
             ->with('en')
             ->willReturn($lang);
 
-        $this->assertSame($lang, $this->service->findByCode('en'));
+        static::assertSame($lang, $this->service->findByCode('en'));
     }
 }

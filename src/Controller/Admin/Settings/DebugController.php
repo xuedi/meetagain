@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system/debug')]
-class DebugController extends AbstractAdminController
+final class DebugController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

@@ -2,7 +2,6 @@
 
 namespace Tests\Functional\Api;
 
-use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -32,8 +31,8 @@ class AuthApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('token', $data);
-        $this->assertNotEmpty($data['token']);
+        static::assertArrayHasKey('token', $data);
+        static::assertNotEmpty($data['token']);
     }
 
     public function testTokenGenerationWithInvalidPassword(): void
@@ -50,7 +49,7 @@ class AuthApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseStatusCodeSame(401);
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('error', $data);
+        static::assertArrayHasKey('error', $data);
     }
 
     public function testTokenGenerationWithUnknownEmail(): void
@@ -88,7 +87,7 @@ class AuthApiControllerTest extends WebTestCase
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $em->clear();
         $user = $client->getContainer()->get(UserRepository::class)->findOneBy(['email' => self::ADMIN_EMAIL]);
-        $this->assertNull($user->getApiTokenHash());
+        static::assertNull($user->getApiTokenHash());
     }
 
     public function testTokenRevocationWithNoToken(): void

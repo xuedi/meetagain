@@ -31,7 +31,7 @@ class CronCommandTest extends KernelTestCase
         $em->flush();
 
         $emailId = $email->getId();
-        $this->assertNotNull($emailId);
+        static::assertNotNull($emailId);
 
         // 2. Act: Run the app:cron command
         $application = new Application($kernel);
@@ -40,12 +40,12 @@ class CronCommandTest extends KernelTestCase
         $commandTester->execute([]);
 
         $commandTester->assertCommandIsSuccessful();
-        $this->assertMatchesRegularExpression('/EmailService: \d+/', $commandTester->getDisplay());
+        static::assertMatchesRegularExpression('/EmailService: \d+/', $commandTester->getDisplay());
 
         // 3. Assert: Check if email is marked as sent
         $em->clear();
         $updatedEmail = $em->getRepository(EmailQueue::class)->find($emailId);
-        $this->assertSame(EmailQueueStatus::Sent, $updatedEmail->getStatus(), 'Email status should be sent');
-        $this->assertNotNull($updatedEmail->getSendAt(), 'Email should have a send date');
+        static::assertSame(EmailQueueStatus::Sent, $updatedEmail->getStatus(), 'Email status should be sent');
+        static::assertNotNull($updatedEmail->getSendAt(), 'Email should have a send date');
     }
 }

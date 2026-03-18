@@ -22,7 +22,8 @@ class BookPollRepository extends ServiceEntityRepository
      */
     public function findActivePoll(?array $allowedEventIds = null): ?BookPoll
     {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.status = :status')
             ->setParameter('status', PollStatus::Active)
             ->setMaxResults(1);
@@ -42,7 +43,8 @@ class BookPollRepository extends ServiceEntityRepository
      */
     public function findLatestClosed(?array $allowedEventIds = null): ?BookPoll
     {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.status = :status')
             ->setParameter('status', PollStatus::Closed)
             ->orderBy('p.createdAt', 'DESC')

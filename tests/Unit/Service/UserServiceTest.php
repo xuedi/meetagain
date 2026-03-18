@@ -26,6 +26,6 @@ class UserServiceTest extends TestCase
             ->with(123)
             ->willReturn('John Doe');
 
-        $this->assertEquals('John Doe', $this->service->resolveUserName(123));
+        static::assertSame('John Doe', $this->service->resolveUserName(123));
     }
 }

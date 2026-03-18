@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/auth')]
-class AuthApiController extends AbstractController
+final class AuthApiController extends AbstractController
 {
     public function __construct(
         private readonly UserRepository $userRepository,
@@ -62,7 +62,7 @@ class AuthApiController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    private function authenticateWithToken(string $email, string $password): string
+    private function authenticateWithToken(string $email, #[\SensitiveParameter] string $password): string
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 

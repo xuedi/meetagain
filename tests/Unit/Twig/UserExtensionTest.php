@@ -22,8 +22,8 @@ class UserExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        $this->assertCount(1, $functions);
-        $this->assertSame('get_user_name', $functions[0]->getName());
+        static::assertCount(1, $functions);
+        static::assertSame('get_user_name', $functions[0]->getName());
     }
 
     public function testGetUserNameDelegatesToUserService(): void
@@ -35,7 +35,7 @@ class UserExtensionTest extends TestCase
 
         $result = $this->subject->getUserName(42);
 
-        $this->assertSame('John Doe', $result);
+        static::assertSame('John Doe', $result);
     }
 
     public function testGetUserNameHandlesUnknownUser(): void
@@ -47,6 +47,6 @@ class UserExtensionTest extends TestCase
 
         $result = $this->subject->getUserName(999);
 
-        $this->assertSame('[deleted]', $result);
+        static::assertSame('[deleted]', $result);
     }
 }

@@ -29,9 +29,9 @@ class PasswordResetTest extends TestCase
         $subject->injectServices($this->router, $this->imageService);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::PasswordReset, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::PasswordReset, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 }

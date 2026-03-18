@@ -87,9 +87,11 @@ class Dish
     public function findTranslation(string $language): ?DishTranslation
     {
         foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() === $language) {
-                return $translation;
+            if ($translation->getLanguage() !== $language) {
+                continue;
             }
+
+            return $translation;
         }
         return null;
     }
@@ -97,9 +99,11 @@ class Dish
     public function getTranslatedName(string $language): string
     {
         foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() === $language) {
-                return $translation->getName() ?? '';
+            if ($translation->getLanguage() !== $language) {
+                continue;
             }
+
+            return $translation->getName() ?? '';
         }
         return '';
     }
@@ -107,9 +111,11 @@ class Dish
     public function getTranslatedDescription(string $language): string
     {
         foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() === $language) {
-                return $translation->getDescription() ?? '';
+            if ($translation->getLanguage() !== $language) {
+                continue;
             }
+
+            return $translation->getDescription() ?? '';
         }
         return '';
     }
@@ -117,9 +123,11 @@ class Dish
     public function getPhonetic(string $language): string
     {
         foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() === $language) {
-                return $translation->getPhonetic() ?? '';
+            if ($translation->getLanguage() !== $language) {
+                continue;
             }
+
+            return $translation->getPhonetic() ?? '';
         }
         return '';
     }
@@ -232,7 +240,7 @@ class Dish
 
         $this->suggestions = array_values(array_filter(
             $this->suggestions,
-            fn(array $s) => DishSuggestion::fromJson($s)->getHash() !== $hash,
+            static fn(array $s) => DishSuggestion::fromJson($s)->getHash() !== $hash,
         ));
 
         if ($this->suggestions === []) {
@@ -267,7 +275,7 @@ class Dish
             return [];
         }
 
-        return array_map(fn(array $s) => DishSuggestion::fromJson($s), $this->suggestions);
+        return array_map(DishSuggestion::fromJson(...), $this->suggestions);
     }
 
     public function hasSuggestions(): bool
@@ -290,9 +298,11 @@ class Dish
     public function getTranslatedRecipe(string $language): string
     {
         foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() === $language) {
-                return $translation->getRecipe() ?? '';
+            if ($translation->getLanguage() !== $language) {
+                continue;
             }
+
+            return $translation->getRecipe() ?? '';
         }
         return '';
     }

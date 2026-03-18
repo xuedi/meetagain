@@ -8,7 +8,6 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -26,7 +25,7 @@ class FixturesLoadCommandTest extends TestCase
         $exitCode = $this->commandTester->execute(['--group' => ['plugin']]);
 
         // Assert: Command succeeds
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testOutputsMessageWhenNoFixturesFound(): void
@@ -40,8 +39,8 @@ class FixturesLoadCommandTest extends TestCase
 
         // Assert: Message is displayed
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('No fixtures found for plugin', $output);
-        $this->assertStringContainsString('Skipping', $output);
+        static::assertStringContainsString('No fixtures found for plugin', $output);
+        static::assertStringContainsString('Skipping', $output);
     }
 
     public function testNoOutputInQuietModeWhenNoFixturesFound(): void
@@ -55,7 +54,7 @@ class FixturesLoadCommandTest extends TestCase
 
         // Assert: No output (quiet mode suppresses messages)
         $output = $this->commandTester->getDisplay();
-        $this->assertEmpty($output);
+        static::assertEmpty($output);
     }
 
     public function testDelegatesToDoctrineCommandWhenFixturesExist(): void
@@ -83,7 +82,7 @@ class FixturesLoadCommandTest extends TestCase
         $exitCode = $this->commandTester->execute(['--group' => ['plugin']]);
 
         // Assert: Command delegates to doctrine command
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testHandlesMultipleGroups(): void
@@ -97,7 +96,7 @@ class FixturesLoadCommandTest extends TestCase
 
         // Assert: Message includes all groups
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('plugin, test', $output);
+        static::assertStringContainsString('plugin, test', $output);
     }
 
     public function testHandlesNoGroupOption(): void
@@ -111,7 +110,7 @@ class FixturesLoadCommandTest extends TestCase
 
         // Assert: Message mentions "all groups"
         $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('all groups', $output);
+        static::assertStringContainsString('all groups', $output);
     }
 
     private function setupCommandTester(Command $command): void

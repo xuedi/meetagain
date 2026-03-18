@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 #[Route('/glossary/edit')]
-class EditController extends AbstractGlossaryController
+final class EditController extends AbstractGlossaryController
 {
     #[Route('/{id}', name: 'app_plugin_glossary_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ?int $id = null): Response

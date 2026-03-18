@@ -56,7 +56,7 @@ class PluginListCommandTest extends TestCase
                 // Temporarily modify __DIR__ behavior by creating a custom implementation
                 $plugins = $this->getTestPlugins();
 
-                if (empty($plugins)) {
+                if ($plugins === []) {
                     $output->writeln('No plugins found in plugins/ directory.');
                     return Command::SUCCESS;
                 }
@@ -137,11 +137,11 @@ class PluginListCommandTest extends TestCase
 
         // Assert: output contains plugin info
         $output = $commandTester->getDisplay();
-        $this->assertSame(Command::SUCCESS, $exitCode);
-        $this->assertStringContainsString('multisite', $output);
-        $this->assertStringContainsString('Multisite', $output);
-        $this->assertStringContainsString('1.0.0', $output);
-        $this->assertStringContainsString('Enabled', $output);
+        static::assertSame(Command::SUCCESS, $exitCode);
+        static::assertStringContainsString('multisite', $output);
+        static::assertStringContainsString('Multisite', $output);
+        static::assertStringContainsString('1.0.0', $output);
+        static::assertStringContainsString('Enabled', $output);
     }
 
     public function testReturnsSuccessWhenNoPluginsFound(): void
@@ -163,7 +163,7 @@ class PluginListCommandTest extends TestCase
             {
                 $plugins = $this->getTestPlugins();
 
-                if (empty($plugins)) {
+                if ($plugins === []) {
                     $output->writeln('No plugins found in plugins/ directory.');
                     return Command::SUCCESS;
                 }
@@ -184,7 +184,7 @@ class PluginListCommandTest extends TestCase
                     return [];
                 }
 
-                return array_filter($directories, fn($dir) => file_exists($dir . '/manifest.json'));
+                return array_filter($directories, static fn($dir) => file_exists($dir . '/manifest.json'));
             }
         };
 
@@ -194,9 +194,9 @@ class PluginListCommandTest extends TestCase
         $exitCode = $commandTester->execute([]);
 
         // Assert: returns success with appropriate message
-        $this->assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(Command::SUCCESS, $exitCode);
         $output = $commandTester->getDisplay();
-        $this->assertStringContainsString('No plugins found', $output);
+        static::assertStringContainsString('No plugins found', $output);
 
         // Cleanup
         rmdir($emptyDir . '/config');

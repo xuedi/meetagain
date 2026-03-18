@@ -72,7 +72,7 @@ readonly class ImageGalleryFilterService
             return [];
         }
 
-        return array_values(array_filter($images, fn(Image $img) => in_array($img->getId(), $allowedIds, true)));
+        return array_values(array_filter($images, static fn(Image $img) => in_array($img->getId(), $allowedIds, true)));
     }
 
     /**

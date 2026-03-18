@@ -24,9 +24,7 @@ class BookRepository extends ServiceEntityRepository
     /** @return Book[] */
     public function findApproved(?array $allowedBookIds = null): array
     {
-        $qb = $this->createQueryBuilder('b')
-            ->where('b.approved = true')
-            ->orderBy('b.title', 'ASC');
+        $qb = $this->createQueryBuilder('b')->where('b.approved = true')->orderBy('b.title', 'ASC');
 
         if ($allowedBookIds !== null) {
             if ($allowedBookIds === []) {
@@ -41,9 +39,7 @@ class BookRepository extends ServiceEntityRepository
     /** @return Book[] */
     public function findPending(?array $allowedBookIds = null): array
     {
-        $qb = $this->createQueryBuilder('b')
-            ->where('b.approved = false')
-            ->orderBy('b.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('b')->where('b.approved = false')->orderBy('b.createdAt', 'DESC');
 
         if ($allowedBookIds !== null) {
             if ($allowedBookIds === []) {
@@ -58,8 +54,7 @@ class BookRepository extends ServiceEntityRepository
     /** @return Book[] */
     public function findAllBooks(?array $allowedBookIds = null): array
     {
-        $qb = $this->createQueryBuilder('b')
-            ->orderBy('b.title', 'ASC');
+        $qb = $this->createQueryBuilder('b')->orderBy('b.title', 'ASC');
 
         if ($allowedBookIds !== null) {
             if ($allowedBookIds === []) {

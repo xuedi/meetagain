@@ -9,6 +9,7 @@ use App\Service\Activity\ActivityService;
 use App\Service\Email\EmailService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use SensitiveParameter;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 readonly class PasswordResetService
@@ -51,7 +52,7 @@ readonly class PasswordResetService
         return $user;
     }
 
-    public function resetPassword(User $user, string $newPassword): void
+    public function resetPassword(User $user, #[SensitiveParameter] string $newPassword): void
     {
         $user->setPassword($this->hasher->hashPassword($user, $newPassword));
         $user->setRegcode(null);

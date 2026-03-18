@@ -14,7 +14,7 @@ readonly class ActionAuthorizationMessageService
     public function __construct(iterable $providers)
     {
         $providersArray = iterator_to_array($providers);
-        usort($providersArray, fn($a, $b) => $b->getPriority() <=> $a->getPriority());
+        usort($providersArray, static fn($a, $b) => $b->getPriority() <=> $a->getPriority());
         $this->providers = $providersArray;
     }
 

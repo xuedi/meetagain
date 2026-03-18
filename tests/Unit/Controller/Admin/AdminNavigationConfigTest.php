@@ -22,9 +22,9 @@ final class AdminNavigationConfigTest extends TestCase
         $config = new AdminNavigationConfig(section: 'System', links: $links, sectionRole: 'ROLE_META_ADMIN');
 
         // Assert
-        $this->assertSame('System', $config->section);
-        $this->assertSame($links, $config->links);
-        $this->assertSame('ROLE_META_ADMIN', $config->sectionRole);
+        static::assertSame('System', $config->section);
+        static::assertSame($links, $config->links);
+        static::assertSame('ROLE_META_ADMIN', $config->sectionRole);
     }
 
     public function testConstructorWithMultipleLinks(): void
@@ -39,10 +39,10 @@ final class AdminNavigationConfigTest extends TestCase
         $config = new AdminNavigationConfig(section: 'System', links: $links);
 
         // Assert
-        $this->assertSame('System', $config->section);
-        $this->assertCount(2, $config->links);
-        $this->assertSame($links, $config->links);
-        $this->assertNull($config->sectionRole);
+        static::assertSame('System', $config->section);
+        static::assertCount(2, $config->links);
+        static::assertSame($links, $config->links);
+        static::assertNull($config->sectionRole);
     }
 
     public function testReadonlyPropertiesCannotBeModified(): void

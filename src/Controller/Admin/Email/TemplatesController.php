@@ -4,15 +4,14 @@ namespace App\Controller\Admin\Email;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
-use App\Entity\AdminLink;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
 use App\Form\EmailTemplateType;
 use App\Repository\EmailTemplateRepository;
 use App\Repository\EmailTemplateTranslationRepository;
+use App\Service\Config\LanguageService;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
-use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/templates')]
-class TemplatesController extends AbstractAdminController
+final class TemplatesController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

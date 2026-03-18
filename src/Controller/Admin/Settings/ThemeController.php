@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system/theme')]
-class ThemeController extends AbstractAdminController
+final class ThemeController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

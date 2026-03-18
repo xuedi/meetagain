@@ -3,22 +3,21 @@
 namespace App\Controller;
 
 use App\Entity\ActivityType;
-use App\Entity\Message;
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
 use App\Entity\User;
 use App\Entity\UserRole;
 use App\Entity\UserStatus;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
 use App\Service\Activity\ActivityService;
-use App\Service\Member\CaptchaService;
 use App\Service\Config\ConfigService;
-use App\Service\Member\ConsentService;
 use App\Service\Email\EmailService;
-use App\EntityActionDispatcher;
+use App\Service\Member\CaptchaService;
+use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
 use DateTime;
 use DateTimeImmutable;
@@ -33,7 +32,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class SecurityController extends AbstractController
+final class SecurityController extends AbstractController
 {
     public const string LOGIN_ROUTE = 'app_login';
 

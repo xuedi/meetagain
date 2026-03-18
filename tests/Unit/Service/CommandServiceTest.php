@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Service;
 
-use App\Service\Command\EchoCommand;
 use App\Service\Admin\CommandService;
+use App\Service\Command\EchoCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -31,7 +31,7 @@ class CommandServiceTest extends TestCase
         $service = $this->createService();
 
         // Act & Assert: execute echo command returns output
-        $this->assertNotEmpty($service->execute(new EchoCommand('test')));
+        static::assertNotEmpty($service->execute(new EchoCommand('test')));
     }
 
     public function testClearCacheExecutesWithoutError(): void
@@ -41,7 +41,7 @@ class CommandServiceTest extends TestCase
 
         // Act & Assert: clear cache runs without throwing
         $service->clearCache();
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testExecuteMigrationsExecutesWithoutError(): void
@@ -51,6 +51,6 @@ class CommandServiceTest extends TestCase
 
         // Act & Assert: execute migrations runs without throwing
         $service->executeMigrations();
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 }

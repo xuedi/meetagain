@@ -4,14 +4,13 @@ namespace App\Controller\Admin\Settings;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
-use App\Entity\AdminLink;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\Language;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
-use App\Service\Media\ImageService;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/language')]
-class LanguageController extends AbstractAdminController
+final class LanguageController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

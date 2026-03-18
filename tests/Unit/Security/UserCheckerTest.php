@@ -26,7 +26,7 @@ class UserCheckerTest extends TestCase
 
         // Act & Assert: should complete without exception for non-User objects
         $subject->checkPreAuth($nonUserObject);
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testCheckPreAuthAllowsActiveUsers(): void
@@ -39,7 +39,7 @@ class UserCheckerTest extends TestCase
 
         // Act & Assert: should complete without exception for active users
         $subject->checkPreAuth($activeUser);
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testCheckPreAuthThrowsExceptionForNonActiveUsers(): void
@@ -67,7 +67,7 @@ class UserCheckerTest extends TestCase
 
         // Act & Assert: should complete without exception for non-User objects
         $subject->checkPostAuth($nonUserObject);
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testCheckPostAuthSkipsWhenNoRequest(): void
@@ -80,7 +80,7 @@ class UserCheckerTest extends TestCase
 
         // Act & Assert: should complete without exception when no request
         $subject->checkPostAuth($this->createStub(User::class));
-        $this->assertTrue(true);
+        static::assertTrue(true);
     }
 
     public function testCheckPostAuthUpdatesUserLoginAndLogsActivity(): void
@@ -102,7 +102,7 @@ class UserCheckerTest extends TestCase
 
         // Arrange: mock entity manager to verify user is persisted and flushed
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')->with($this->isInstanceOf(User::class));
+        $emMock->expects($this->once())->method('persist')->with(static::isInstanceOf(User::class));
         $emMock->expects($this->once())->method('flush');
 
         // Arrange: mock activity service to verify login is logged
@@ -128,7 +128,7 @@ class UserCheckerTest extends TestCase
     {
         // Arrange: mock session to verify only lastLogin is set (not hasNewMessage)
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())->method('set')->with('lastLogin', $this->anything());
+        $sessionMock->expects($this->once())->method('set')->with('lastLogin', static::anything());
 
         $request = new Request();
         $request->setSession($sessionMock);

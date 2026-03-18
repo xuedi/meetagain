@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/sendlog')]
-class SendlogController extends AbstractAdminController
+final class SendlogController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
@@ -58,7 +58,11 @@ class SendlogController extends AbstractAdminController
         $result = $this->syncService->syncPending(200);
 
         if ($result->available) {
-            $this->addFlash('success', sprintf('Synced %d of %d email statuses from provider.', $result->updated, $result->checked));
+            $this->addFlash('success', sprintf(
+                'Synced %d of %d email statuses from provider.',
+                $result->updated,
+                $result->checked,
+            ));
         } else {
             $this->addFlash('warning', 'Email delivery provider is not configured.');
         }

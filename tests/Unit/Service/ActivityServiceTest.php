@@ -6,9 +6,9 @@ use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
+use App\Service\Activity\ActivityService;
 use App\Service\Activity\MessageFactory;
 use App\Service\Activity\MessageInterface;
-use App\Service\Activity\ActivityService;
 use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,14 +41,14 @@ class ActivityServiceTest extends TestCase
         $entityManagerMock
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (Activity $activity) use ($type, $user, $meta) {
-                return (
+            ->with(static::callback(
+                static fn(Activity $activity) => (
                     $activity->getType() === $type
                     && $activity->getUser() === $user
                     && $activity->getMeta() === $meta
                     && $activity->getCreatedAt() instanceof DateTimeImmutable
-                );
-            }));
+                ),
+            ));
         $entityManagerMock->expects($this->once())->method('flush');
 
         // Arrange: create subject with mocked dependencies
@@ -111,7 +111,7 @@ class ActivityServiceTest extends TestCase
         $result = $subject->getUserList($user);
 
         // Assert: returned activities match expected
-        $this->assertSame($activities, $result);
+        static::assertSame($activities, $result);
     }
 
     public function testGetAdminList(): void
@@ -160,6 +160,6 @@ class ActivityServiceTest extends TestCase
         $result = $subject->getAdminList();
 
         // Assert: returned activities match expected
-        $this->assertSame($activities, $result);
+        static::assertSame($activities, $result);
     }
 }

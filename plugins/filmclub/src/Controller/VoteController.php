@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/vote')]
-class VoteController extends AbstractController
+final class VoteController extends AbstractController
 {
     public function __construct(
         private readonly VoteRepository $voteRepository,
@@ -33,8 +33,8 @@ class VoteController extends AbstractController
         $closedVotes = $this->voteRepository->findClosedVotes();
 
         $eventIds = array_unique(array_merge(
-            array_map(fn(Vote $v) => $v->getEventId(), $openVotes),
-            array_map(fn(Vote $v) => $v->getEventId(), $closedVotes),
+            array_map(static fn(Vote $v) => $v->getEventId(), $openVotes),
+            array_map(static fn(Vote $v) => $v->getEventId(), $closedVotes),
         ));
 
         $events = [];

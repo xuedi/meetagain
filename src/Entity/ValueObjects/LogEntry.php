@@ -70,9 +70,9 @@ class LogEntry
         }
 
         return [
-            'date'    => $this->date->format('c'),
+            'date' => $this->date->format('c'),
             'channel' => $this->type,
-            'level'   => $this->level,
+            'level' => $this->level,
             'message' => $this->message,
             'context' => $context,
         ];

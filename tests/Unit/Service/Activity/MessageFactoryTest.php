@@ -73,7 +73,7 @@ class MessageFactoryTest extends TestCase
         $result = $factory->build($this->activity);
 
         // Assert the result
-        $this->assertSame($this->message, $result);
+        static::assertSame($this->message, $result);
     }
 
     public function testBuildThrowsExceptionWhenNoMatchingMessage(): void

@@ -75,13 +75,13 @@ class Film
     /** @return array<FilmGenre> */
     public function getGenres(): array
     {
-        return array_map(fn(string $genre) => FilmGenre::from($genre), $this->genres);
+        return array_map(FilmGenre::from(...), $this->genres);
     }
 
     /** @param array<FilmGenre> $genres */
     public function setGenres(array $genres): static
     {
-        $this->genres = array_map(fn(FilmGenre $genre) => $genre->value, $genres);
+        $this->genres = array_map(static fn(FilmGenre $genre) => $genre->value, $genres);
 
         return $this;
     }
