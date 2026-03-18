@@ -4,7 +4,7 @@ namespace App\Service\Media;
 
 use App\Entity\Event;
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\User;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;

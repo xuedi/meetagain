@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
-enum EventFilterSort: string
+enum EventSortFilter: string
 {
     case OldToNew = 'asc';
     case NewToOld = 'desc';

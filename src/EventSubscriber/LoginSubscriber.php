@@ -3,7 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Session\Consent;
-use App\Entity\Session\ConsentType;
+use App\Enum\ConsentType;
 use App\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;

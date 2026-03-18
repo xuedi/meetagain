@@ -2,7 +2,7 @@
 
 namespace App\Service\Cms;
 
-use App\Entity\MenuLocation;
+use App\Enum\MenuLocation;
 use App\Filter\Cms\CmsFilterService;
 use App\Repository\CmsRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;

@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\EventFilterRsvp;
-use App\Entity\EventFilterSort;
-use App\Entity\EventFilterTime;
-use App\Entity\EventIntervals;
-use App\Entity\EventTypes;
+use App\Enum\EventRsvpFilter;
+use App\Enum\EventSortFilter;
+use App\Enum\EventTimeFilter;
+use App\Enum\EventInterval;
+use App\Enum\EventType;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
 use App\Service\Email\EmailService;
@@ -74,10 +74,10 @@ class EventServiceTest extends TestCase
 
     #[DataProvider('filteredListDataProvider')]
     public function testGetFilteredListAppliesCorrectCriteria(
-        EventFilterTime $time,
-        EventFilterSort $sort,
-        EventTypes $types,
-        EventFilterRsvp $rsvp,
+        EventTimeFilter $time,
+        EventSortFilter $sort,
+        EventType $types,
+        EventRsvpFilter $rsvp,
     ): void {
         // Arrange: mock repository to verify call and return empty array
         $repoMock = $this->createMock(EventRepository::class);
@@ -106,10 +106,10 @@ class EventServiceTest extends TestCase
     public static function filteredListDataProvider(): Generator
     {
         yield 'all events sorted newest first' => [
-            'time' => EventFilterTime::All,
-            'sort' => EventFilterSort::NewToOld,
-            'types' => EventTypes::All,
-            'rsvp' => EventFilterRsvp::All,
+            'time' => EventTimeFilter::All,
+            'sort' => EventSortFilter::NewToOld,
+            'types' => EventType::All,
+            'rsvp' => EventRsvpFilter::All,
         ];
     }
 
@@ -265,7 +265,7 @@ class EventServiceTest extends TestCase
         // Arrange: create parent event with recurring rule
         $parent = new EventStub()
             ->setId(1)
-            ->setRecurringRule(EventIntervals::Weekly);
+            ->setRecurringRule(EventInterval::Weekly);
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);

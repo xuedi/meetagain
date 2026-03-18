@@ -6,7 +6,7 @@ use App\Entity\Cms;
 use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
-use App\Entity\MenuLocation;
+use App\Enum\MenuLocation;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

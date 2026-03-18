@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
-enum EventFilterTime: int
+enum EventTimeFilter: int
 {
     case All = 1;
     case Past = 2;

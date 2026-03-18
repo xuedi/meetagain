@@ -6,7 +6,7 @@ use App\Entity\Cms;
 use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
-use App\Entity\MenuLocation;
+use App\Enum\MenuLocation;
 use DateTimeImmutable;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;

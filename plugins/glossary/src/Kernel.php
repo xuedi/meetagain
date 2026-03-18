@@ -3,7 +3,7 @@
 namespace Plugin\Glossary;
 
 use App\Entity\AdminSection;
-use App\Entity\WarmCacheType;
+use App\Enum\WarmCacheType;
 use App\Plugin;
 use Symfony\Component\Console\Output\OutputInterface;
 

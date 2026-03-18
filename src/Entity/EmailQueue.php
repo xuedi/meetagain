@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\EmailQueueStatus;
 use App\Enum\EmailType;
 use DateTime;
 use DateTimeImmutable;

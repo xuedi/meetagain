@@ -2,7 +2,7 @@
 
 namespace App\Service\System;
 
-use App\Entity\ValueObjects\LogEntry;
+use App\ValueObject\LogEntry;
 use SplFileObject;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 

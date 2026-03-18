@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\Language;
 use App\Service\Media\ImageService;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;

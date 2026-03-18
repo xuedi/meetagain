@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Enum\UserRole;
+use App\Enum\UserStatus;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;

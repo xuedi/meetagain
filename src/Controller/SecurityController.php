@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\Session\Consent;
-use App\Entity\Session\ConsentType;
+use App\Enum\ConsentType;
 use App\Entity\User;
-use App\Entity\UserRole;
-use App\Entity\UserStatus;
+use App\Enum\UserRole;
+use App\Enum\UserStatus;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Form\NewPasswordType;

@@ -3,7 +3,7 @@
 namespace Plugin\Bookclub\Service;
 
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageService;
 use Psr\Log\LoggerInterface;

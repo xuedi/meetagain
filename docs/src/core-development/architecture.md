@@ -147,8 +147,8 @@ class Event
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(enumType: EventTypes::class)]
-    private EventTypes $type;
+    #[ORM\Column(enumType: EventType::class)]
+    private EventType $type;
 
     /** @var Collection<int, User> */
     #[ORM\ManyToMany(targetEntity: User::class)]

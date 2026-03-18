@@ -3,8 +3,8 @@
 namespace App\Service\Event;
 
 use App\Entity\Event;
-use App\Entity\EventIntervals;
-use App\Entity\EventStatus;
+use App\Enum\EventInterval;
+use App\Enum\EventStatus;
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
@@ -47,7 +47,7 @@ readonly class RecurringEventService
 
     public function updateRecurringEvents(Event $event): int
     {
-        if ($event->getRecurringRule() instanceof EventIntervals) {
+        if ($event->getRecurringRule() instanceof EventInterval) {
             // is recurring, must be the parent
             $parent = clone $event;
         } elseif ($event->getRecurringOf() !== null) {
@@ -94,7 +94,7 @@ readonly class RecurringEventService
 
     private function fillRecurringEvents(Event $event): int
     {
-        if (!$event->getRecurringRule() instanceof EventIntervals) {
+        if (!$event->getRecurringRule() instanceof EventInterval) {
             return 0;
         }
 
@@ -126,15 +126,15 @@ readonly class RecurringEventService
         return count($createdEvents);
     }
 
-    private function createRRule(Event $event, EventIntervals $recurringRule): RRule
+    private function createRRule(Event $event, EventInterval $recurringRule): RRule
     {
         $today = new DateTime();
-        $ruleInterval = EventIntervals::BiMonthly === $recurringRule ? 2 : 1;
+        $ruleInterval = EventInterval::BiMonthly === $recurringRule ? 2 : 1;
         $ruleFrequency = match ($recurringRule) {
-            EventIntervals::Daily => RRule::DAILY,
-            EventIntervals::Weekly, EventIntervals::BiMonthly => RRule::WEEKLY,
-            EventIntervals::Monthly => RRule::MONTHLY,
-            EventIntervals::Yearly => RRule::YEARLY,
+            EventInterval::Daily => RRule::DAILY,
+            EventInterval::Weekly, EventInterval::BiMonthly => RRule::WEEKLY,
+            EventInterval::Monthly => RRule::MONTHLY,
+            EventInterval::Yearly => RRule::YEARLY,
         };
 
         return new RRule([
@@ -142,11 +142,11 @@ readonly class RecurringEventService
             'interval' => $ruleInterval,
             'dtstart' => $this->getLastRecurringEventDate($event),
             'until' => (match ($recurringRule) {
-                EventIntervals::Daily => (clone $today)->modify('+2 weeks'),
-                EventIntervals::Weekly => (clone $today)->modify('+3 months'),
-                EventIntervals::BiMonthly => (clone $today)->modify('+6 months'),
-                EventIntervals::Monthly => (clone $today)->modify('+6 months'),
-                EventIntervals::Yearly => (clone $today)->modify('+3 years'),
+                EventInterval::Daily => (clone $today)->modify('+2 weeks'),
+                EventInterval::Weekly => (clone $today)->modify('+3 months'),
+                EventInterval::BiMonthly => (clone $today)->modify('+6 months'),
+                EventInterval::Monthly => (clone $today)->modify('+6 months'),
+                EventInterval::Yearly => (clone $today)->modify('+3 years'),
             })->format('Y-m-d'),
         ]);
     }

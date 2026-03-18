@@ -5,7 +5,7 @@ namespace App\Controller\Admin\Settings;
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\Language;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;

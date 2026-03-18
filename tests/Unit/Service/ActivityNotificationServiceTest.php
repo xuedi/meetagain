@@ -3,7 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\Activity;
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Activity\NotificationService as ActivityNotificationService;

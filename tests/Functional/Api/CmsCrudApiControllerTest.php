@@ -2,7 +2,7 @@
 
 namespace Tests\Functional\Api;
 
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -247,7 +247,7 @@ class CmsCrudApiControllerTest extends WebTestCase
             ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => 'Bearer ' . $token],
             json_encode([
                 'language' => 'en',
-                'type' => CmsBlockTypes::Headline->value,
+                'type' => CmsBlockType::Headline->value,
                 'priority' => 1.0,
                 'json' => ['text' => 'Hello API'],
             ]),
@@ -258,7 +258,7 @@ class CmsCrudApiControllerTest extends WebTestCase
         $data = json_decode((string) $client->getResponse()->getContent(), true);
         static::assertArrayHasKey('id', $data);
         static::assertSame('en', $data['language']);
-        static::assertSame(CmsBlockTypes::Headline->value, $data['type']);
+        static::assertSame(CmsBlockType::Headline->value, $data['type']);
     }
 
     public function testUpdateBlock(): void
@@ -285,7 +285,7 @@ class CmsCrudApiControllerTest extends WebTestCase
             ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => 'Bearer ' . $token],
             json_encode([
                 'language' => 'en',
-                'type' => CmsBlockTypes::Headline->value,
+                'type' => CmsBlockType::Headline->value,
                 'priority' => 1.0,
                 'json' => ['text' => 'Original'],
             ]),
@@ -333,7 +333,7 @@ class CmsCrudApiControllerTest extends WebTestCase
             ['CONTENT_TYPE' => 'application/json', 'HTTP_AUTHORIZATION' => 'Bearer ' . $token],
             json_encode([
                 'language' => 'en',
-                'type' => CmsBlockTypes::Headline->value,
+                'type' => CmsBlockType::Headline->value,
                 'priority' => 1.0,
                 'json' => ['text' => 'To delete'],
             ]),

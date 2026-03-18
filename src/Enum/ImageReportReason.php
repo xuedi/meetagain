@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum ImageReported: int
+enum ImageReportReason: int
 {
     case Privacy = 1;
     case Copyright = 2;

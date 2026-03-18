@@ -2,9 +2,9 @@
 
 namespace App\Security;
 
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\User;
-use App\Entity\UserStatus;
+use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
 use App\Service\Activity\ActivityService;
 use DateTime;

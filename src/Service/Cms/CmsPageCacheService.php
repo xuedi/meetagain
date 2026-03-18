@@ -2,7 +2,7 @@
 
 namespace App\Service\Cms;
 
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use App\Repository\CmsBlockRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -86,7 +86,7 @@ readonly class CmsPageCacheService
      */
     public function findEventTeaserPageIds(): array
     {
-        return $this->blockRepo->findPageIdsWithType(CmsBlockTypes::EventTeaser);
+        return $this->blockRepo->findPageIdsWithType(CmsBlockType::EventTeaser);
     }
 
     /**

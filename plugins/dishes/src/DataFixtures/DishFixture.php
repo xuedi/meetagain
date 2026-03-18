@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageService;

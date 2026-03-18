@@ -5,7 +5,7 @@ namespace App\Controller\Admin\Email;
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\Announcement;
-use App\Entity\AnnouncementStatus;
+use App\Enum\AnnouncementStatus;
 use App\Entity\Cms;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;

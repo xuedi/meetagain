@@ -91,14 +91,14 @@ Enums eliminate magic strings and give the type system visibility into valid val
 $event->setType('meeitng');
 
 // ✅ Enum — invalid values are compile errors
-$event->setType(EventTypes::Meeting);
+$event->setType(EventType::Meeting);
 
 // Entity column definition:
-#[ORM\Column(enumType: EventTypes::class)]
-private EventTypes $type;
+#[ORM\Column(enumType: EventType::class)]
+private EventType $type;
 
 // Enum definition:
-enum EventTypes: string
+enum EventType: string
 {
     case All     = 'all';
     case Meeting = 'meeting';

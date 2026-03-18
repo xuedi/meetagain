@@ -3,11 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Event;
-use App\Entity\EventFilterRsvp;
-use App\Entity\EventFilterSort;
-use App\Entity\EventFilterTime;
-use App\Entity\EventStatus;
-use App\Entity\EventTypes;
+use App\Enum\EventRsvpFilter;
+use App\Enum\EventSortFilter;
+use App\Enum\EventTimeFilter;
+use App\Enum\EventStatus;
+use App\Enum\EventType;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -27,11 +27,11 @@ class EventRepository extends ServiceEntityRepository
      * @return Event[]
      */
     public function findByFilters(
-        EventFilterTime $time,
-        EventFilterSort $sort,
-        EventTypes $type,
+        EventTimeFilter $time,
+        EventSortFilter $sort,
+        EventType $type,
         ?UserInterface $user = null,
-        ?EventFilterRsvp $rsvp = null,
+        ?EventRsvpFilter $rsvp = null,
         ?array $restrictToEventIds = null,
     ): array {
         $qb = $this
@@ -46,17 +46,17 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
 
         match ($time) {
-            EventFilterTime::Past => $qb->andWhere('e.start <= :now')->setParameter('now', new DateTime()),
-            EventFilterTime::Future => $qb->andWhere('e.start >= :now')->setParameter('now', new DateTime()),
-            EventFilterTime::All => null,
+            EventTimeFilter::Past => $qb->andWhere('e.start <= :now')->setParameter('now', new DateTime()),
+            EventTimeFilter::Future => $qb->andWhere('e.start >= :now')->setParameter('now', new DateTime()),
+            EventTimeFilter::All => null,
         };
 
-        if ($type !== EventTypes::All) {
+        if ($type !== EventType::All) {
             $qb->andWhere('e.type = :type')->setParameter('type', $type->value);
         }
 
-        if ($rsvp instanceof EventFilterRsvp && $rsvp !== EventFilterRsvp::All && $user instanceof \App\Entity\User) {
-            if ($rsvp === EventFilterRsvp::My) {
+        if ($rsvp instanceof EventRsvpFilter && $rsvp !== EventRsvpFilter::All && $user instanceof \App\Entity\User) {
+            if ($rsvp === EventRsvpFilter::My) {
                 $qb->innerJoin('e.rsvp', 'u', 'WITH', 'u.id = :userId')->setParameter('userId', $user->getId());
             }
 

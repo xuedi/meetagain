@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Cms;
-use App\Entity\MenuLocation;
+use App\Enum\MenuLocation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;

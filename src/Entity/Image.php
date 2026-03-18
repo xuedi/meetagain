@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Enum\ImageReportReason;
+use App\Enum\ImageType;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -45,8 +47,8 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'images')]
     private ?Event $event = null;
 
-    #[ORM\Column(nullable: true, enumType: ImageReported::class)]
-    private ?ImageReported $reported = null;
+    #[ORM\Column(nullable: true, enumType: ImageReportReason::class)]
+    private ?ImageReportReason $reported = null;
 
     public function getId(): ?int
     {
@@ -173,12 +175,12 @@ class Image
         return $this;
     }
 
-    public function getReported(): ?ImageReported
+    public function getReported(): ?ImageReportReason
     {
         return $this->reported;
     }
 
-    public function setReported(?ImageReported $reported): static
+    public function setReported(?ImageReportReason $reported): static
     {
         $this->reported = $reported;
 

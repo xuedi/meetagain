@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
-enum CommandEnum: string
+enum ScheduledCommand: string
 {
     case clearCache = 'cache:clear';
     case executeMigrations = 'doctrine:migrations:migrate';

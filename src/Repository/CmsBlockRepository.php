@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CmsBlock;
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Throwable;
@@ -36,7 +36,7 @@ class CmsBlockRepository extends ServiceEntityRepository
      *
      * @return array<int>
      */
-    public function findPageIdsWithType(CmsBlockTypes $type): array
+    public function findPageIdsWithType(CmsBlockType $type): array
     {
         $rows = $this
             ->createQueryBuilder('cb')

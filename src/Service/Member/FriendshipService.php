@@ -2,7 +2,7 @@
 
 namespace App\Service\Member;
 
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;

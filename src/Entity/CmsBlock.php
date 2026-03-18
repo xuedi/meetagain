@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\BlockType\BlockType;
+use App\Enum\CmsBlockType;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -16,8 +17,8 @@ class CmsBlock
     #[ORM\Column(length: 2)]
     private ?string $language = null;
 
-    #[ORM\Column(enumType: CmsBlockTypes::class)]
-    private ?CmsBlockTypes $type = null;
+    #[ORM\Column(enumType: CmsBlockType::class)]
+    private ?CmsBlockType $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'blocks')]
     #[ORM\JoinColumn(nullable: false)]
@@ -49,12 +50,12 @@ class CmsBlock
         return $this;
     }
 
-    public function getType(): ?CmsBlockTypes
+    public function getType(): ?CmsBlockType
     {
         return $this->type;
     }
 
-    public function setType(CmsBlockTypes $type): static
+    public function setType(CmsBlockType $type): static
     {
         $this->type = $type;
 
@@ -80,7 +81,7 @@ class CmsBlock
 
     public function getBlockObject(): BlockType
     {
-        return CmsBlockTypes::buildObject($this->getType(), $this->getJson(), $this->getImage());
+        return CmsBlockType::buildObject($this->getType(), $this->getJson(), $this->getImage());
     }
 
     public function setJson(array $json): static

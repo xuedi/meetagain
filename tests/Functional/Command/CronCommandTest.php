@@ -3,7 +3,7 @@
 namespace Tests\Functional\Command;
 
 use App\Entity\EmailQueue;
-use App\Entity\EmailQueueStatus;
+use App\Enum\EmailQueueStatus;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

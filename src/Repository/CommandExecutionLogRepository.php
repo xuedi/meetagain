@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CommandExecutionLog;
-use App\Entity\CommandExecutionStatus;
+use App\Enum\CommandExecutionStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

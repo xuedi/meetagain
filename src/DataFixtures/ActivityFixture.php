@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Activity;
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use DateTimeImmutable;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;

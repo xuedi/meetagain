@@ -2,10 +2,10 @@
 
 namespace App\Form;
 
-use App\Entity\EventFilterRsvp;
-use App\Entity\EventFilterSort;
-use App\Entity\EventFilterTime;
-use App\Entity\EventTypes;
+use App\Enum\EventRsvpFilter;
+use App\Enum\EventSortFilter;
+use App\Enum\EventTimeFilter;
+use App\Enum\EventType;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Form\AbstractType;
@@ -26,36 +26,36 @@ class EventFilterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('time', ChoiceType::class, [
-            'data' => EventFilterTime::Future,
+            'data' => EventTimeFilter::Future,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_time_all') => EventFilterTime::All,
-                $this->translator->trans('event_filter_time_past') => EventFilterTime::Past,
-                $this->translator->trans('event_filter_time_future') => EventFilterTime::Future,
+                $this->translator->trans('event_filter_time_all') => EventTimeFilter::All,
+                $this->translator->trans('event_filter_time_past') => EventTimeFilter::Past,
+                $this->translator->trans('event_filter_time_future') => EventTimeFilter::Future,
             ],
         ])->add('sort', ChoiceType::class, [
-            'data' => EventFilterSort::OldToNew,
+            'data' => EventSortFilter::OldToNew,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_sort_past') => EventFilterSort::OldToNew,
-                $this->translator->trans('event_filter_sort_future') => EventFilterSort::NewToOld,
+                $this->translator->trans('event_filter_sort_past') => EventSortFilter::OldToNew,
+                $this->translator->trans('event_filter_sort_future') => EventSortFilter::NewToOld,
             ],
         ])->add('type', ChoiceType::class, [
-            'data' => EventTypes::All,
+            'data' => EventType::All,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_type_all') => EventTypes::All,
-                $this->translator->trans('event_filter_type_regular') => EventTypes::Regular,
-                $this->translator->trans('event_filter_type_outdoor') => EventTypes::Outdoor,
-                $this->translator->trans('event_filter_type_dinner') => EventTypes::Dinner,
+                $this->translator->trans('event_filter_type_all') => EventType::All,
+                $this->translator->trans('event_filter_type_regular') => EventType::Regular,
+                $this->translator->trans('event_filter_type_outdoor') => EventType::Outdoor,
+                $this->translator->trans('event_filter_type_dinner') => EventType::Dinner,
             ],
         ])->add('rsvp', ChoiceType::class, [
-            'data' => EventFilterRsvp::All,
+            'data' => EventRsvpFilter::All,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_who_all') => EventFilterRsvp::All,
-                $this->translator->trans('event_filter_who_my') => EventFilterRsvp::My,
-                $this->translator->trans('event_filter_who_my_friends') => EventFilterRsvp::Friends,
+                $this->translator->trans('event_filter_who_all') => EventRsvpFilter::All,
+                $this->translator->trans('event_filter_who_my') => EventRsvpFilter::My,
+                $this->translator->trans('event_filter_who_my_friends') => EventRsvpFilter::Friends,
             ],
         ]);
 

@@ -4,11 +4,11 @@ namespace App\DataFixtures;
 
 use App\Entity\Comment;
 use App\Entity\Event;
-use App\Entity\EventIntervals;
-use App\Entity\EventStatus;
+use App\Enum\EventInterval;
+use App\Enum\EventStatus;
 use App\Entity\EventTranslation;
-use App\Entity\EventTypes;
-use App\Entity\ImageType;
+use App\Enum\EventType;
+use App\Enum\ImageType;
 use App\Service\Media\ImageService;
 use DateTime;
 use DateTimeImmutable;
@@ -113,9 +113,9 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 'stop' => $this->getWednesdayMeetupDate()->modify('+3 hour'),
                 'name' => self::WEEKLY_GO_STUDY,
                 'location' => $this->getRefLocation(LocationFixture::WEIQI_CAFE),
-                'type' => EventTypes::Regular,
+                'type' => EventType::Regular,
                 'featured' => true,
-                'recurringRule' => EventIntervals::Weekly,
+                'recurringRule' => EventInterval::Weekly,
                 'createdBy' => $this->getRefUser(UserFixture::ADEM_LANE),
                 'previewImage' => 'preview_wednesday_meetup.jpg',
                 'hosts' => [
@@ -184,7 +184,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                     ->setTime(18, 0),
                 'name' => self::BERLIN_TOURNAMENT,
                 'location' => $this->getRefLocation(LocationFixture::COMMUNITY_CENTER),
-                'type' => EventTypes::Regular,
+                'type' => EventType::Regular,
                 'featured' => true,
                 'createdBy' => $this->getRefUser(UserFixture::ADMIN),
                 'previewImage' => 'preview_wednesday_meetup.jpg',
@@ -243,8 +243,8 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                     ->setTime(17, 0),
                 'name' => self::BEGINNER_WORKSHOP,
                 'location' => $this->getRefLocation(LocationFixture::WEIQI_CAFE),
-                'type' => EventTypes::Regular,
-                'recurringRule' => EventIntervals::Monthly,
+                'type' => EventType::Regular,
+                'recurringRule' => EventInterval::Monthly,
                 'createdBy' => $this->getRefUser(UserFixture::CRYSTAL_LIU),
                 'previewImage' => 'preview_wednesday_meetup.jpg',
                 'hosts' => [
@@ -288,7 +288,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                     ->setTime(18, 0),
                 'name' => self::ONLINE_SIMULTANEOUS,
                 'location' => $this->getRefLocation(LocationFixture::ONLINE_PLATFORM),
-                'type' => EventTypes::Regular,
+                'type' => EventType::Regular,
                 'createdBy' => $this->getRefUser(UserFixture::ADMIN),
                 'previewImage' => 'preview_wednesday_meetup.jpg',
                 'hosts' => [
@@ -345,7 +345,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                     ->setTime(16, 0),
                 'name' => self::WEEKEND_RETREAT,
                 'location' => $this->getRefLocation(LocationFixture::GRUNEWALD_CAMPING),
-                'type' => EventTypes::Outdoor,
+                'type' => EventType::Outdoor,
                 'createdBy' => $this->getRefUser(UserFixture::ADMIN),
                 'previewImage' => 'preview_wednesday_meetup.jpg',
                 'hosts' => [

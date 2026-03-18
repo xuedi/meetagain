@@ -3,8 +3,8 @@
 namespace App\Service\Admin;
 
 use App\Entity\CommandExecutionLog;
-use App\Entity\CommandExecutionStatus;
-use App\Entity\CommandTriggerType;
+use App\Enum\CommandExecutionStatus;
+use App\Enum\CommandTriggerType;
 use App\Repository\CommandExecutionLogRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
