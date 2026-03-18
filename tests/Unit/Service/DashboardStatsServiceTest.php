@@ -7,7 +7,7 @@ use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
-use App\Service\DashboardStatsService;
+use App\Service\Admin\DashboardStatsService;
 use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

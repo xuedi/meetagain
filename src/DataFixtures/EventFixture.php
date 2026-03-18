@@ -9,7 +9,7 @@ use App\Entity\EventStatus;
 use App\Entity\EventTranslation;
 use App\Entity\EventTypes;
 use App\Entity\ImageType;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;

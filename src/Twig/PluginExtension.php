@@ -6,7 +6,7 @@ use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
 use App\Entity\WarmCacheType;
 use App\Plugin;
-use App\Service\PluginService;
+use App\Service\Config\PluginService;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;

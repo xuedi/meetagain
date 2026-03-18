@@ -11,7 +11,7 @@ use App\Entity\Location;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Repository\EventTranslationRepository;
 use App\Repository\LocationRepository;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

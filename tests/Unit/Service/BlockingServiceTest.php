@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Entity\UserBlock;
 use App\Repository\UserBlockRepository;
 use App\Service\ActivityService;
-use App\Service\BlockingService;
+use App\Service\Member\BlockingService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

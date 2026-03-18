@@ -2,7 +2,7 @@
 
 namespace Plugin\Dishes\Form;
 
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Repository\DishTranslationRepository;
 use Symfony\Component\Form\AbstractType;

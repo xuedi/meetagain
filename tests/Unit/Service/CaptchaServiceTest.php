@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Service;
 
-use App\Service\CaptchaService;
+use App\Service\Member\CaptchaService;
 use DateTimeImmutable;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;

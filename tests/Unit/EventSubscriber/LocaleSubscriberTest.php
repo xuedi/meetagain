@@ -3,7 +3,7 @@
 namespace Tests\Unit\EventSubscriber;
 
 use App\EventSubscriber\LocaleSubscriber;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;

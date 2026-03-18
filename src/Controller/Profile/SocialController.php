@@ -5,7 +5,7 @@ namespace App\Controller\Profile;
 use App\Controller\AbstractController;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
-use App\Service\FriendshipService;
+use App\Service\Member\FriendshipService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 

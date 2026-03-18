@@ -17,7 +17,7 @@ use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Service\ActivityService;
 use App\Service\EntityActionDispatcher;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

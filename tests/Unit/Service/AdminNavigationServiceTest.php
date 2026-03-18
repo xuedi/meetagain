@@ -6,7 +6,7 @@ use App\Controller\Admin\AdminNavigationConfig;
 use App\Controller\Admin\AdminNavigationInterface;
 use App\Entity\AdminLink;
 use App\Entity\AdminSection;
-use App\Service\AdminNavigationService;
+use App\Service\Admin\AdminNavigationService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;

@@ -4,7 +4,7 @@ namespace Plugin\Filmclub\Controller;
 
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use Plugin\Filmclub\Entity\Vote;
 use Plugin\Filmclub\Entity\VoteBallot;
 use Plugin\Filmclub\Repository\FilmRepository;

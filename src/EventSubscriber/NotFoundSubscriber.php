@@ -3,7 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\NotFoundLog;
-use App\Service\CmsService;
+use App\Service\Cms\CmsService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;

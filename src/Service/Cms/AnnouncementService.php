@@ -1,0 +1,165 @@
+<?php declare(strict_types=1);
+
+namespace App\Service\Cms;
+
+use App\Entity\Announcement;
+use App\Entity\AnnouncementStatus;
+use App\Entity\BlockType\Gallery as GalleryType;
+use App\Entity\BlockType\Text as TextType;
+use App\Entity\Cms;
+use App\Entity\CmsBlockTypes;
+use App\Entity\EmailTemplate;
+use App\Entity\User;
+use App\Enum\EmailType;
+use App\Repository\UserRepository;
+use App\Service\Config\ConfigService;
+use App\Service\EmailTemplateService;
+use App\Service\EmailService;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
+
+readonly class AnnouncementService
+{
+    public function __construct(
+        private EntityManagerInterface $em,
+        private UserRepository $userRepo,
+        private ConfigService $configService,
+        private EmailTemplateService $templateService,
+        private EmailService $emailService,
+    ) {}
+
+    public function send(Announcement $announcement): int
+    {
+        if (!$announcement->isDraft()) {
+            throw new RuntimeException('Announcement has already been sent');
+        }
+
+        $cmsPage = $announcement->getCmsPage();
+        if (!$cmsPage instanceof Cms) {
+            throw new RuntimeException('Announcement must have a CMS page linked before sending');
+        }
+
+        $announcement->setLinkHash($this->generateLinkHash());
+
+        $subscribers = $this->getAnnouncementSubscribers();
+        $recipientCount = 0;
+        $announcementUrl = $this->configService->getHost() . '/announcement/' . $announcement->getLinkHash();
+
+        foreach ($subscribers as $subscriber) {
+            $renderedContent = $this->renderContent($cmsPage, $subscriber->getLocale());
+            $this->emailService->prepareAnnouncementEmail(
+                $subscriber,
+                $renderedContent,
+                $announcementUrl,
+                flush: false,
+            );
+            ++$recipientCount;
+        }
+
+        $announcement->setStatus(AnnouncementStatus::Sent);
+        $announcement->setSentAt(new DateTimeImmutable());
+        $announcement->setRecipientCount($recipientCount);
+
+        $this->em->persist($announcement);
+        $this->em->flush();
+
+        return $recipientCount;
+    }
+
+    /**
+     * @return User[]
+     */
+    private function getAnnouncementSubscribers(): array
+    {
+        $subscribers = $this->userRepo->findAnnouncementSubscribers();
+
+        return array_filter($subscribers, fn(User $user) => $user->getNotificationSettings()->isActive(
+            'announcements',
+        ));
+    }
+
+    private function generateLinkHash(): string
+    {
+        return bin2hex(random_bytes(16));
+    }
+
+    /**
+     * @return array{title: string|null, content: string}
+     */
+    private function renderContent(Cms $cmsPage, string $locale): array
+    {
+        $title = $cmsPage->getPageTitle($locale) ?? "ERROR: The CMS page has no title for the language [$locale]";
+        $contentParts = [];
+
+        foreach ($cmsPage->getBlocks() as $block) {
+            if ($block->getLanguage() !== $locale) {
+                continue;
+            }
+
+            match ($block->getType()) {
+                CmsBlockTypes::Text => $contentParts[] =
+                    '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
+                CmsBlockTypes::Gallery
+                    => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson())),
+                default => null,
+            };
+        }
+
+        if ($contentParts === []) {
+            $contentParts[] = "ERROR: The CMS page has no content for the language [$locale]";
+        }
+
+        return [
+            'title' => $title,
+            'content' => implode("\n", array_filter($contentParts)),
+        ];
+    }
+
+    private function renderGalleryBlock(GalleryType $galleryBlock): string
+    {
+        $parts = [];
+        foreach ($galleryBlock->images as $item) {
+            $url = $this->configService->getHost() . '/images/thumbnails/' . $item['hash'] . '_600x400.webp';
+            $parts[] = sprintf('<p><img src="%s" alt="" style="max-width: 100%%; height: auto;"></p>', $url);
+        }
+
+        return implode("\n", $parts);
+    }
+
+    public function getPreviewContext(Announcement $announcement, string $locale = 'en'): array
+    {
+        $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
+        $cmsPage = $announcement->getCmsPage();
+
+        $renderedContent = $cmsPage instanceof Cms
+            ? $this->renderContent($cmsPage, $locale)
+            : ['title' => null, 'content' => ''];
+
+        return [
+            'title' => $renderedContent['title'],
+            'content' => $renderedContent['content'],
+            'announcementUrl' => $this->configService->getHost() . '/announcement/' . $linkHash,
+            'username' => 'User',
+            'host' => $this->configService->getHost(),
+            'lang' => $locale,
+        ];
+    }
+
+    public function renderPreview(Announcement $announcement, string $locale = 'en'): array
+    {
+        $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
+        if (!$dbTemplate instanceof EmailTemplate) {
+            throw new RuntimeException(
+                'Announcement email template not found in database. Run app:email-templates:seed command.',
+            );
+        }
+
+        $context = $this->getPreviewContext($announcement, $locale);
+
+        return [
+            'subject' => $this->templateService->renderContent($dbTemplate->getSubject($locale), $context),
+            'body' => $this->templateService->renderContent($dbTemplate->getBody($locale), $context),
+        ];
+    }
+}

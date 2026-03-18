@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\EventService;
+use App\Service\Event\EventService;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

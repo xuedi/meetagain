@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;

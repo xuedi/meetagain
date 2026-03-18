@@ -18,7 +18,7 @@ use App\Form\EventFilterType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\ActivityService;
-use App\Service\EventService;
+use App\Service\Event\EventService;
 use App\Service\FeaturedEventProviderInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

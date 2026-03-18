@@ -3,8 +3,8 @@
 namespace App\Controller\NonLocale;
 
 use App\Controller\AbstractController;
-use App\Service\ConfigService;
-use App\Service\LanguageService;
+use App\Service\Config\ConfigService;
+use App\Service\Config\LanguageService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

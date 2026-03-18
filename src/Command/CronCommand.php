@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\CronTaskInterface;
-use App\Service\CommandExecutionService;
+use App\Service\Admin\CommandExecutionService;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;

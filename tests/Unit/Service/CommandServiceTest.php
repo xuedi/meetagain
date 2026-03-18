@@ -3,7 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Service\Command\EchoCommand;
-use App\Service\CommandService;
+use App\Service\Admin\CommandService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;

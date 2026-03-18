@@ -6,7 +6,7 @@ use App\Entity\EmailQueue;
 use App\Entity\EmailQueueStatus;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use App\Service\EmailService;
 use App\Service\EmailTemplateService;
 use DateTime;

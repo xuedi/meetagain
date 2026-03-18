@@ -3,7 +3,7 @@
 namespace Tests\Unit\Command;
 
 use App\Command\PluginCommand;
-use App\Service\PluginService;
+use App\Service\Config\PluginService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;

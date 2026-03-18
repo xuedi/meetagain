@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
-use App\Service\FriendshipService;
+use App\Service\Member\FriendshipService;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

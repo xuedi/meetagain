@@ -2,7 +2,7 @@
 
 namespace App\Controller\NonLocale;
 
-use App\Service\SitemapService;
+use App\Service\Event\SitemapService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

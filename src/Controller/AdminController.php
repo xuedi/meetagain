@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Service\DashboardActionService;
-use App\Service\DashboardStatsService;
-use App\Service\HealthCheckService;
+use App\Service\Admin\DashboardActionService;
+use App\Service\Admin\DashboardStatsService;
+use App\Service\System\HealthCheckService;
 use DateTime;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

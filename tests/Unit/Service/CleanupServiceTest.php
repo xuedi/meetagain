@@ -7,7 +7,7 @@ use App\Entity\Image;
 use App\Entity\User;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
-use App\Service\CleanupService;
+use App\Service\System\CleanupService;
 use App\Service\EntityActionDispatcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;

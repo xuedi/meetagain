@@ -6,7 +6,7 @@ use App\Controller\AbstractController;
 use App\Entity\ActivityType;
 use App\Form\ChangePassword;
 use App\Service\ActivityService;
-use App\Service\BlockingService;
+use App\Service\Member\BlockingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;

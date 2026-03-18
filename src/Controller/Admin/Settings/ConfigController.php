@@ -7,7 +7,7 @@ use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\AdminLink;
 use App\Form\SeoSettingsType;
 use App\Form\SettingsType;
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

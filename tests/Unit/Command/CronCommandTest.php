@@ -3,7 +3,7 @@
 namespace Tests\Unit\Command;
 
 use App\Command\CronCommand;
-use App\Service\CommandExecutionService;
+use App\Service\Admin\CommandExecutionService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
