@@ -110,7 +110,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub);
         $subject->moveBlockDown(1, 42, 'en');
 
-        static::assertSame(1, $block->getPriority());
+        static::assertSame(1.0, $block->getPriority());
     }
 
     public function testUpdateHeroBlockHandlesImageRightCheckbox(): void

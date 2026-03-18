@@ -218,6 +218,13 @@ class Cms
         return $this->blocks;
     }
 
+    public function getLanguages(): array
+    {
+        return array_values(array_unique(
+            $this->blocks->map(static fn(CmsBlock $b) => $b->getLanguage())->toArray()
+        ));
+    }
+
     public function getLanguageFilteredBlockJsonList(string $language): Collection
     {
         return new ArrayCollection(
