@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\EmailQueue;
-use App\Entity\EmailQueueStatus;
+use App\Enum\EmailQueueStatus;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

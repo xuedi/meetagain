@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Entity\ActivityType;
-use App\Entity\ImageReported;
+use App\Enum\ActivityType;
+use App\Enum\ImageReportReason;
 use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\ReportedImage;
 use App\Service\Media\ImageHtmlRenderer;
@@ -25,7 +25,7 @@ class ReportedImageTest extends TestCase
     public function testCanBuild(): void
     {
         $imageId = 42;
-        $reason = ImageReported::Privacy->value; // Using Privacy reason (value 1)
+        $reason = ImageReportReason::Privacy->value; // Using Privacy reason (value 1)
         $expectedText = 'Reported image for reason: Privacy';
         $expectedHtml = 'Reported image for reason: <b>Privacy</b>';
 
@@ -44,7 +44,7 @@ class ReportedImageTest extends TestCase
     public function testCanBuildWithDifferentReason(): void
     {
         $imageId = 42;
-        $reason = ImageReported::Inappropriate->value; // Using Inappropriate reason (value 3)
+        $reason = ImageReportReason::Inappropriate->value; // Using Inappropriate reason (value 3)
         $expectedText = 'Reported image for reason: Inappropriate';
         $expectedHtml = 'Reported image for reason: <b>Inappropriate</b>';
 
@@ -65,7 +65,7 @@ class ReportedImageTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'image_id' in meta in ReportedImage"));
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, ['reason' => ImageReported::Privacy->value]);
+        $subject->injectServices($this->router, $this->imageService, ['reason' => ImageReportReason::Privacy->value]);
         $subject->validate();
     }
 
@@ -78,7 +78,7 @@ class ReportedImageTest extends TestCase
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, [
             'image_id' => 'not-a-number',
-            'reason' => ImageReported::Privacy->value,
+            'reason' => ImageReportReason::Privacy->value,
         ]);
         $subject->validate();
     }

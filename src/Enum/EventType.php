@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-enum MenuLocation: int
+enum EventType: int
 {
-    case TopBar = 0;
-    case BottomCol1 = 1;
-    case BottomCol2 = 2;
-    case BottomCol3 = 3;
-    case BottomCol4 = 4;
+    case All = 1;
+    case Regular = 2;
+    case Outdoor = 3;
+    case Dinner = 4;
 
     public static function getChoices(TranslatorInterface $translator): array
     {
@@ -21,7 +20,7 @@ enum MenuLocation: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('menu_location_' . strtolower($case->name));
+            $choices[$case->value] = $translator->trans('event_type_' . strtolower($case->name));
         }
 
         return $choices;

@@ -3,7 +3,7 @@
 namespace App\Service\Member;
 
 use App\Entity\Session\Consent;
-use App\Entity\Session\ConsentType;
+use App\Enum\ConsentType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 

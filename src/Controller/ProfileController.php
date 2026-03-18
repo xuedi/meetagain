@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\Event;
 use App\Filter\Event\EventFilterService;
 use App\Form\ProfileType;

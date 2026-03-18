@@ -3,8 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\CmsBlock;
-use App\Entity\CmsBlockTypes;
-use App\Entity\ImageType;
+use App\Enum\CmsBlockType;
+use App\Enum\ImageType;
 use App\Service\Media\ImageService;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -34,7 +34,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 $imageFile = __DIR__ . "/CmsBlock/$imageName";
                 $uploadedImage = new UploadedFile($imageFile, $block->getId() . '.jpg');
 
-                if ($type === CmsBlockTypes::Gallery) {
+                if ($type === CmsBlockType::Gallery) {
                     // Gallery blocks store image refs in JSON; flush first to get image ID
                     $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsGallery);
                     $manager->persist($image);
@@ -73,7 +73,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => 'Imprint',
                 ],
@@ -82,7 +82,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => '1. Paragraph',
                     'content' => 'Some text p1',
@@ -92,7 +92,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => '2. Paragraph',
                     'content' => 'Some text p2',
@@ -102,7 +102,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => 'Impressum',
                 ],
@@ -111,7 +111,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => '1. Paragraf',
                     'content' => 'Etwas text p1',
@@ -121,7 +121,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => '版本说明',
                 ],
@@ -130,7 +130,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::IMPRINT,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => '第 1 段',
                     'content' => '第一段的一些文字',
@@ -140,7 +140,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => 'About',
                 ],
@@ -149,7 +149,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'content' => $this->getText('about_en'),
                 ],
@@ -158,7 +158,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => 'Über Uns',
                 ],
@@ -167,7 +167,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'content' => $this->getText('about_de'),
                 ],
@@ -176,7 +176,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => '关于我们',
                 ],
@@ -185,7 +185,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ABOUT,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'content' => $this->getText('about_cn'),
                 ],
@@ -194,7 +194,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::INDEX,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Hero,
+                CmsBlockType::Hero,
                 [
                     'headline' => 'International weiqi Club',
                     'subHeadline' => 'learn, play and have fun',
@@ -208,7 +208,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::INDEX,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::EventTeaser,
+                CmsBlockType::EventTeaser,
                 [
                     'headline' => 'Welcome',
                     'text' => $this->getText('index_events_lorem'),
@@ -218,7 +218,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::INDEX,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Hero,
+                CmsBlockType::Hero,
                 [
                     'headline' => 'Internationales weiqi Treffen',
                     'subHeadline' => 'Spiel, Spass und lernen',
@@ -232,7 +232,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::INDEX,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::EventTeaser,
+                CmsBlockType::EventTeaser,
                 [
                     'headline' => 'Willkommen',
                     'text' => $this->getText('index_events_lorem'),
@@ -242,7 +242,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::INDEX,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Hero,
+                CmsBlockType::Hero,
                 [
                     'headline' => '国际围棋大会',
                     'subHeadline' => '游戏、娱乐和学习',
@@ -256,7 +256,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::INDEX,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::EventTeaser,
+                CmsBlockType::EventTeaser,
                 [
                     'headline' => '欢迎光临',
                     'text' => $this->getText('index_events_lorem'),
@@ -267,7 +267,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => 'Game Rules',
                 ],
@@ -276,7 +276,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => 'Introduction to Go',
                     'content' => 'Go (Weiqi in Chinese, Baduk in Korean) is an ancient board game for two players that originated in China over 2,500 years ago. The game is played on a 19×19 grid, though beginners often start with smaller 9×9 or 13×13 boards.',
@@ -286,7 +286,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => 'Basic Rules',
                     'content' => '1. Players alternate placing stones on empty intersections\n2. Stones are captured when surrounded (no liberties)\n3. The game ends when both players pass\n4. Winner is determined by controlled territory plus captures\n\nFor detailed rules and strategy guides, join our beginner workshops!',
@@ -296,7 +296,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => 'Spielregeln',
                 ],
@@ -305,7 +305,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => 'Einführung in Go',
                     'content' => 'Go (Weiqi auf Chinesisch, Baduk auf Koreanisch) ist ein altes Brettspiel für zwei Spieler, das vor über 2.500 Jahren in China entstand. Das Spiel wird auf einem 19×19-Gitter gespielt, obwohl Anfänger oft mit kleineren 9×9- oder 13×13-Brettern beginnen.',
@@ -315,7 +315,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => 'Grundregeln',
                     'content' => '1. Spieler platzieren abwechselnd Steine auf leeren Schnittpunkten\n2. Steine werden gefangen, wenn sie umzingelt sind (keine Freiheiten)\n3. Das Spiel endet, wenn beide Spieler passen\n4. Der Gewinner wird durch kontrolliertes Gebiet plus Gefangene bestimmt\n\nFür detaillierte Regeln und Strategieanleitungen besuchen Sie unsere Anfänger-Workshops!',
@@ -325,7 +325,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Headline,
+                CmsBlockType::Headline,
                 [
                     'title' => '游戏规则',
                 ],
@@ -334,7 +334,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => '围棋简介',
                     'content' => '围棋（中文称围棋，韩文称바둑）是一种起源于中国2500多年前的古老双人棋盘游戏。游戏在19×19的棋盘上进行，虽然初学者通常从较小的9×9或13×13棋盘开始。',
@@ -344,7 +344,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::RULES,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'title' => '基本规则',
                     'content' => '1. 玩家轮流在空交叉点上放置棋子\n2. 当棋子被包围时（无气）会被吃掉\n3. 当双方都选择弃权时游戏结束\n4. 赢家由控制的地盘加上吃掉的棋子数决定\n\n详细规则和策略指南，请参加我们的初学者工作坊！',
@@ -356,7 +356,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'content' => 'We are excited to announce the launch of our new website version. Enjoy a better experience and new features!',
                 ],
@@ -365,14 +365,14 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::ENGLISH,
-                CmsBlockTypes::Gallery,
+                CmsBlockType::Gallery,
                 ['title' => '', 'images' => []],
                 'screenshot-en.png',
             ],
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'content' => 'Wir freuen uns, den Start unserer neuen Website-Version bekannt zu geben. Genießen Sie eine bessere Benutzererfahrung und neue Funktionen!',
                 ],
@@ -381,14 +381,14 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::GERMAN,
-                CmsBlockTypes::Gallery,
+                CmsBlockType::Gallery,
                 ['title' => '', 'images' => []],
                 'screenshot-de.png',
             ],
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Text,
+                CmsBlockType::Text,
                 [
                     'content' => '我们很高兴地宣布新版本网站正式上线。享受更好的体验和更多新功能！',
                 ],
@@ -397,7 +397,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::CHINESE,
-                CmsBlockTypes::Gallery,
+                CmsBlockType::Gallery,
                 ['title' => '', 'images' => []],
                 'screenshot-cn.png',
             ],

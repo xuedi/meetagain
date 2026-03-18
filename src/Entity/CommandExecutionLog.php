@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Enum\CommandExecutionStatus;
+use App\Enum\CommandTriggerType;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

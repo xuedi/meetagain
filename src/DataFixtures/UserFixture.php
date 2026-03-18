@@ -2,10 +2,10 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\User;
-use App\Entity\UserRole;
-use App\Entity\UserStatus;
+use App\Enum\UserRole;
+use App\Enum\UserStatus;
 use App\Service\Media\ImageService;
 use DateTime;
 use DateTimeImmutable;

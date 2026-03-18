@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\User;
 use App\Entity\UserBlock;
 use App\Repository\UserBlockRepository;

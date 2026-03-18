@@ -154,8 +154,8 @@ class Event
     #[ORM\Column(length: 255)]
     private string $title;
 
-    #[ORM\Column(enumType: EventTypes::class)]   // ← enum column
-    private EventTypes $type;
+    #[ORM\Column(enumType: EventType::class)]   // ← enum column
+    private EventType $type;
 
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $start;
@@ -229,7 +229,7 @@ Form types extend `AbstractType` and define field configuration and constraints.
 namespace App\Form;
 
 use App\Entity\Event;
-use App\Entity\EventTypes;
+use App\Enum\EventType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -250,7 +250,7 @@ class EventType extends AbstractType
                 ],
             ])
             ->add('type', EnumType::class, [
-                'class' => EventTypes::class,
+                'class' => EventType::class,
             ])
             ->add('start', DateTimeType::class, [
                 'widget' => 'single_text',

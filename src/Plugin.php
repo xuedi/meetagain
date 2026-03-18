@@ -5,7 +5,7 @@ namespace App;
 use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
 use App\Entity\Link;
-use App\Entity\WarmCacheType;
+use App\Enum\WarmCacheType;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

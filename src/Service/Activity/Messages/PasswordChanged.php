@@ -2,7 +2,7 @@
 
 namespace App\Service\Activity\Messages;
 
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Service\Activity\MessageAbstract;
 
 class PasswordChanged extends MessageAbstract

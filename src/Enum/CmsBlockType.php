@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
 use App\Entity\BlockType\BlockType;
 use App\Entity\BlockType\EventTeaser;
@@ -12,7 +12,7 @@ use App\Entity\BlockType\Text;
 use App\Entity\Image as ImageEntity;
 use RuntimeException;
 
-enum CmsBlockTypes: int
+enum CmsBlockType: int
 {
     case Headline = 1;
     case Text = 2;
@@ -26,12 +26,12 @@ enum CmsBlockTypes: int
     public static function buildObject(self $type, array $data, ?ImageEntity $image = null): BlockType
     {
         return match ($type) {
-            CmsBlockTypes::Headline => Headline::fromJson($data, $image),
-            CmsBlockTypes::Text => Text::fromJson($data, $image),
-            CmsBlockTypes::Gallery => Gallery::fromJson($data, $image),
-            CmsBlockTypes::Hero => Hero::fromJson($data, $image),
-            CmsBlockTypes::Paragraph => Paragraph::fromJson($data, $image),
-            CmsBlockTypes::EventTeaser => EventTeaser::fromJson($data, $image),
+            CmsBlockType::Headline => Headline::fromJson($data, $image),
+            CmsBlockType::Text => Text::fromJson($data, $image),
+            CmsBlockType::Gallery => Gallery::fromJson($data, $image),
+            CmsBlockType::Hero => Hero::fromJson($data, $image),
+            CmsBlockType::Paragraph => Paragraph::fromJson($data, $image),
+            CmsBlockType::EventTeaser => EventTeaser::fromJson($data, $image),
             default => throw new RuntimeException('Unknown block type: ' . $type->name),
         };
     }

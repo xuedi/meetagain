@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\MenuLocation;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]

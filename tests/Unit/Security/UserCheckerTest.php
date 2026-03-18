@@ -3,7 +3,7 @@
 namespace Tests\Unit\Security;
 
 use App\Entity\User;
-use App\Entity\UserStatus;
+use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
 use App\Security\UserChecker;
 use App\Service\Activity\ActivityService;

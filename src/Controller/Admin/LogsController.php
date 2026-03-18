@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
-use App\Entity\ValueObjects\LogEntry;
+use App\ValueObject\LogEntry;
 use App\Repository\NotFoundLogRepository;
 use App\Service\Activity\ActivityService;
 use Symfony\Component\HttpFoundation\Response;

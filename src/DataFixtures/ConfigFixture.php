@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Config;
-use App\Entity\ConfigType;
+use App\Enum\ConfigType;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;

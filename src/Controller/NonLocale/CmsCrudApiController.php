@@ -5,11 +5,11 @@ namespace App\Controller\NonLocale;
 use App\Controller\AbstractController;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
-use App\Entity\MenuLocation;
+use App\Enum\MenuLocation;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\Cms\CmsPageCacheService;
@@ -201,7 +201,7 @@ final class CmsCrudApiController extends AbstractController
         $priority = (float) ($data['priority'] ?? ($this->blockRepository->getMaxPriority() + 1));
         $json = (array) ($data['json'] ?? []);
 
-        $type = CmsBlockTypes::tryFrom($typeValue);
+        $type = CmsBlockType::tryFrom($typeValue);
         if ($type === null) {
             return new JsonResponse(['error' => 'Invalid block type'], Response::HTTP_BAD_REQUEST);
         }

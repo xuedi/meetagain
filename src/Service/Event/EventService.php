@@ -3,10 +3,10 @@
 namespace App\Service\Event;
 
 use App\Entity\Event;
-use App\Entity\EventFilterRsvp;
-use App\Entity\EventFilterSort;
-use App\Entity\EventFilterTime;
-use App\Entity\EventTypes;
+use App\Enum\EventRsvpFilter;
+use App\Enum\EventSortFilter;
+use App\Enum\EventTimeFilter;
+use App\Enum\EventType;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
@@ -32,10 +32,10 @@ readonly class EventService
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      */
     public function getFilteredList(
-        EventFilterTime $time,
-        EventFilterSort $sort,
-        EventTypes $type,
-        EventFilterRsvp $rsvp,
+        EventTimeFilter $time,
+        EventSortFilter $sort,
+        EventType $type,
+        EventRsvpFilter $rsvp,
         ?UserInterface $user = null,
         ?array $restrictToEventIds = null,
     ): array {

@@ -4,7 +4,7 @@ namespace Tests\Functional;
 
 use App\Entity\Event;
 use App\Entity\Image;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

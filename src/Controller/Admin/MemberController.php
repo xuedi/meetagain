@@ -4,8 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 use App\Entity\User;
-use App\Entity\UserRole;
-use App\Entity\UserStatus;
+use App\Enum\UserRole;
+use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Form\UserType;
 use App\Repository\UserRepository;

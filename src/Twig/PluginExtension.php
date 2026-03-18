@@ -4,7 +4,7 @@ namespace App\Twig;
 
 use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
-use App\Entity\WarmCacheType;
+use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\Service\Config\PluginService;
 use Override;

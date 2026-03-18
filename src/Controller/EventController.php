@@ -4,13 +4,13 @@ namespace App\Controller;
 
 use App\Filter\Action\ActionAuthorizationMessageService;
 use App\Filter\Action\ActionAuthorizationService;
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Entity\Comment;
 use App\Entity\Event;
-use App\Entity\EventFilterRsvp;
-use App\Entity\EventFilterSort;
-use App\Entity\EventFilterTime;
-use App\Entity\EventTypes;
+use App\Enum\EventRsvpFilter;
+use App\Enum\EventSortFilter;
+use App\Enum\EventTimeFilter;
+use App\Enum\EventType;
 use App\FeaturedEventProviderInterface;
 use App\Filter\Event\EventFilterService;
 use App\Form\CommentType;
@@ -52,10 +52,10 @@ final class EventController extends AbstractController
         $form->handleRequest($request);
 
         $data = $form->getData() ?? [];
-        $time = $data['time'] ?? EventFilterTime::Future;
-        $sort = $data['sort'] ?? EventFilterSort::OldToNew;
-        $type = $data['type'] ?? EventTypes::All;
-        $rsvp = $data['rsvp'] ?? EventFilterRsvp::All;
+        $time = $data['time'] ?? EventTimeFilter::Future;
+        $sort = $data['sort'] ?? EventSortFilter::OldToNew;
+        $type = $data['type'] ?? EventType::All;
+        $rsvp = $data['rsvp'] ?? EventRsvpFilter::All;
 
         // Apply content filtering from all registered filters
         $filterResult = $this->eventFilterService->getEventIdFilter();

@@ -4,7 +4,7 @@ namespace App\Controller\NonLocale;
 
 use App\Controller\AbstractController;
 use App\Entity\User;
-use App\Entity\UserStatus;
+use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

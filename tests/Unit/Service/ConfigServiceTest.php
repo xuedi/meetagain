@@ -3,7 +3,7 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\Config;
-use App\Entity\ImageType;
+use App\Enum\ImageType;
 use App\Repository\ConfigRepository;
 use App\Service\Config\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;

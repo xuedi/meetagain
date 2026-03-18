@@ -4,7 +4,7 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\Cms;
 use App\Entity\CmsMenuLocation;
-use App\Entity\MenuLocation;
+use App\Enum\MenuLocation;
 use PHPUnit\Framework\TestCase;
 
 class CmsTest extends TestCase

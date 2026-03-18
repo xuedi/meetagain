@@ -2,7 +2,7 @@
 
 namespace App\Entity\BlockType;
 
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use App\Entity\Image as ImageEntity;
 use Override;
 
@@ -21,9 +21,9 @@ class EventTeaser implements BlockType
     }
 
     #[Override]
-    public static function getType(): CmsBlockTypes
+    public static function getType(): CmsBlockType
     {
-        return CmsBlockTypes::EventTeaser;
+        return CmsBlockType::EventTeaser;
     }
 
     #[Override]

@@ -3,10 +3,10 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\Announcement;
-use App\Entity\AnnouncementStatus;
+use App\Enum\AnnouncementStatus;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use App\Entity\EmailTemplate;
 use App\Entity\NotificationSettings;
 use App\Entity\User;
@@ -73,7 +73,7 @@ class AnnouncementServiceTest extends TestCase
         // Arrange: create CMS blocks
         $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
-        $textBlock->method('getType')->willReturn(CmsBlockTypes::Text);
+        $textBlock->method('getType')->willReturn(CmsBlockType::Text);
         $textBlock->method('getJson')->willReturn(['content' => 'Test content']);
         $textBlock->method('getImage')->willReturn(null);
 
@@ -201,7 +201,7 @@ class AnnouncementServiceTest extends TestCase
         // Arrange: create CMS blocks
         $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
-        $textBlock->method('getType')->willReturn(CmsBlockTypes::Text);
+        $textBlock->method('getType')->willReturn(CmsBlockType::Text);
         $textBlock->method('getJson')->willReturn(['content' => 'Preview content']);
         $textBlock->method('getImage')->willReturn(null);
 
@@ -383,7 +383,7 @@ class AnnouncementServiceTest extends TestCase
         // Arrange: create gallery block
         $imageBlock = $this->createStub(CmsBlock::class);
         $imageBlock->method('getLanguage')->willReturn('en');
-        $imageBlock->method('getType')->willReturn(CmsBlockTypes::Gallery);
+        $imageBlock->method('getType')->willReturn(CmsBlockType::Gallery);
         $imageBlock
             ->method('getJson')
             ->willReturn([
@@ -426,13 +426,13 @@ class AnnouncementServiceTest extends TestCase
         // Arrange: create blocks for different locales
         $enBlock = $this->createStub(CmsBlock::class);
         $enBlock->method('getLanguage')->willReturn('en');
-        $enBlock->method('getType')->willReturn(CmsBlockTypes::Text);
+        $enBlock->method('getType')->willReturn(CmsBlockType::Text);
         $enBlock->method('getJson')->willReturn(['content' => 'English content']);
         $enBlock->method('getImage')->willReturn(null);
 
         $deBlock = $this->createStub(CmsBlock::class);
         $deBlock->method('getLanguage')->willReturn('de');
-        $deBlock->method('getType')->willReturn(CmsBlockTypes::Text);
+        $deBlock->method('getType')->willReturn(CmsBlockType::Text);
         $deBlock->method('getJson')->willReturn(['content' => 'German content']);
         $deBlock->method('getImage')->willReturn(null);
 
@@ -471,7 +471,7 @@ class AnnouncementServiceTest extends TestCase
         // Arrange: create block for different locale only
         $deBlock = $this->createStub(CmsBlock::class);
         $deBlock->method('getLanguage')->willReturn('de');
-        $deBlock->method('getType')->willReturn(CmsBlockTypes::Text);
+        $deBlock->method('getType')->willReturn(CmsBlockType::Text);
         $deBlock->method('getJson')->willReturn(['content' => 'German content']);
         $deBlock->method('getImage')->willReturn(null);
 

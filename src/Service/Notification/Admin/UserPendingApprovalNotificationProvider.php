@@ -2,7 +2,7 @@
 
 namespace App\Service\Notification\Admin;
 
-use App\Entity\UserStatus;
+use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 

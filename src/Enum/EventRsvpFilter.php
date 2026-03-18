@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Enum;
 
-enum EventFilterRsvp: string
+enum EventRsvpFilter: string
 {
     case All = 'all';
     case My = 'my';

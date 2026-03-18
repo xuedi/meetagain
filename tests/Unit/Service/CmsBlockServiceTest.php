@@ -4,7 +4,7 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Entity\CmsBlockTypes;
+use App\Enum\CmsBlockType;
 use App\Repository\CmsBlockRepository;
 use App\Service\Cms\CmsBlockService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,7 +25,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub);
         $page = new Cms();
 
-        $block = $subject->createBlock($page, 'en', CmsBlockTypes::Headline, ['title' => 'Test']);
+        $block = $subject->createBlock($page, 'en', CmsBlockType::Headline, ['title' => 'Test']);
 
         static::assertSame('en', $block->getLanguage());
         static::assertSame(6.0, $block->getPriority());
@@ -37,7 +37,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
 
         $block = new CmsBlock();
-        $block->setType(CmsBlockTypes::Paragraph);
+        $block->setType(CmsBlockType::Paragraph);
         $block->setJson(['title' => 'old', 'content' => 'old content']);
 
         $blockRepoStub->method('find')->willReturn($block);
@@ -45,7 +45,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->once())->method('flush');
 
         $subject = new CmsBlockService($emMock, $blockRepoStub);
-        $result = $subject->updateBlock(42, CmsBlockTypes::Paragraph, ['title' => 'new', 'content' => 'new content']);
+        $result = $subject->updateBlock(42, CmsBlockType::Paragraph, ['title' => 'new', 'content' => 'new content']);
 
         static::assertSame($block, $result);
     }
@@ -61,7 +61,7 @@ class CmsBlockServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not load block');
 
-        $subject->updateBlock(999, CmsBlockTypes::Paragraph, ['title' => '', 'content' => '']);
+        $subject->updateBlock(999, CmsBlockType::Paragraph, ['title' => '', 'content' => '']);
     }
 
     public function testDeleteBlockRemovesBlock(): void
@@ -119,7 +119,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
 
         $block = new CmsBlock();
-        $block->setType(CmsBlockTypes::Hero);
+        $block->setType(CmsBlockType::Hero);
         $block->setJson([
             'headline' => 'old',
             'subHeadline' => 'old',
@@ -143,12 +143,12 @@ class CmsBlockServiceTest extends TestCase
             'buttonText' => 'new',
             'color' => 'new',
         ];
-        $subject->updateBlock(42, CmsBlockTypes::Hero, $payload);
+        $subject->updateBlock(42, CmsBlockType::Hero, $payload);
         static::assertFalse($block->getJson()['imageRight']);
 
         // Test when imageRight is in payload (checked)
         $payload['imageRight'] = '1';
-        $subject->updateBlock(42, CmsBlockTypes::Hero, $payload);
+        $subject->updateBlock(42, CmsBlockType::Hero, $payload);
         static::assertTrue($block->getJson()['imageRight']);
     }
 }

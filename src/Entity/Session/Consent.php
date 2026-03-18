@@ -2,6 +2,7 @@
 
 namespace App\Entity\Session;
 
+use App\Enum\ConsentType;
 use DateTime;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Cookie;

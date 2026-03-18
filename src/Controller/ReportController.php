@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\ActivityType;
+use App\Enum\ActivityType;
 use App\Form\ReportImageType;
 use App\Repository\ImageRepository;
 use App\Service\Activity\ActivityService;

@@ -3,9 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Event;
-use App\Entity\EventIntervals;
-use App\Entity\EventStatus;
-use App\Entity\EventTypes;
+use App\Enum\EventInterval;
+use App\Enum\EventStatus;
+use App\Enum\EventType as EventTypeEnum;
 use App\Entity\Host;
 use App\Entity\Location;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
@@ -65,7 +65,7 @@ class EventType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('recurringRule', EnumType::class, [
-                'class' => EventIntervals::class,
+                'class' => EventInterval::class,
                 'label' => 'Recurring',
                 'placeholder' => 'NonRecurring',
                 'required' => false,
@@ -74,7 +74,7 @@ class EventType extends AbstractType
                 'disabled' => $event?->getRecurringOf() !== null,
             ])
             ->add('type', EnumType::class, [
-                'class' => EventTypes::class,
+                'class' => EventTypeEnum::class,
                 'label' => 'Type',
                 'placeholder' => 'Types',
                 'required' => false,
