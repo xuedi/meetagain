@@ -18,7 +18,6 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 readonly class EmailService implements CronTaskInterface
@@ -27,7 +26,6 @@ readonly class EmailService implements CronTaskInterface
      * @param iterable<EmailContextEnricherInterface> $enrichers
      */
     public function __construct(
-        private MailerInterface $mailer,
         private TransportInterface $transport,
         private ConfigService $config,
         private EmailQueueRepository $mailRepo,
