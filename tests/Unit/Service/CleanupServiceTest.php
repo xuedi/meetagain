@@ -8,7 +8,7 @@ use App\Entity\User;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use App\Service\System\CleanupService;
-use App\Service\EntityActionDispatcher;
+use App\EntityActionDispatcher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

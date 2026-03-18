@@ -23,7 +23,7 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\Cms\CmsBlockService;
 use App\Service\Cms\CmsPageCacheService;
-use App\Service\EntityActionDispatcher;
+use App\EntityActionDispatcher;
 use App\Service\Media\ImageService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;

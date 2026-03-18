@@ -6,7 +6,7 @@ use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Repository\MessageRepository;
-use App\Service\ActivityService;
+use App\Service\Activity\ActivityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;

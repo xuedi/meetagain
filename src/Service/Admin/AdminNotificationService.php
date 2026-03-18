@@ -6,7 +6,7 @@ use App\CronTaskInterface;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use App\Service\Notification\Admin\AdminNotificationSection;
 use App\Repository\UserRepository;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use App\Service\Config\ConfigService;
 use DateTimeImmutable;
 use Psr\Cache\InvalidArgumentException;

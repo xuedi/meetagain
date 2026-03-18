@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
 use App\Service\Member\CaptchaService;
-use App\Service\EmailService;
+use App\Service\Email\EmailService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;

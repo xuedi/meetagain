@@ -3,7 +3,7 @@
 namespace App\Tests\Unit\Command;
 
 use App\Command\FixturesLoadCommand;
-use App\Service\FixturesLoaderInterface;
+use App\Command\FixturesLoaderInterface;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
