@@ -56,6 +56,11 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 ConfigType::Boolean,
             ],
             [
+                'send_admin_notification',
+                'true',
+                ConfigType::Boolean,
+            ],
+            [
                 'email_delivery_sync_enabled',
                 'false',
                 ConfigType::Boolean,

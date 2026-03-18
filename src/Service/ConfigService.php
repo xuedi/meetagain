@@ -109,6 +109,11 @@ readonly class ConfigService
         return $this->getBoolean('send_rsvp_notifications', true);
     }
 
+    public function isSendAdminNotification(): bool
+    {
+        return $this->getBoolean('send_admin_notification', true);
+    }
+
     public function isEmailDeliverySyncEnabled(): bool
     {
         return $this->getBoolean('email_delivery_sync_enabled', false);

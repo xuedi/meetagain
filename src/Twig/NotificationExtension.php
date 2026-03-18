@@ -2,8 +2,8 @@
 
 namespace App\Twig;
 
-use App\Notification\NotificationService;
-use App\Notification\NotificationSummary;
+use App\Service\Notification\User\NotificationService;
+use App\Service\Notification\User\NotificationSummary;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Twig\Extension\AbstractExtension;

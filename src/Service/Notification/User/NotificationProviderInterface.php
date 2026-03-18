@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Notification;
+namespace App\Service\Notification\User;
 
 use App\Entity\User;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;

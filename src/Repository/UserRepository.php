@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\UserRole;
 use App\Entity\UserStatus;
 use DateTime;
 use DateTimeImmutable;
@@ -428,6 +429,36 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @param array<int>|null $restrictToUserIds Optional user ID filter
      * @return User[]
      */
+    public function getLatestPendingCreatedAt(): ?DateTimeImmutable
+    {
+        $result = $this
+            ->createQueryBuilder('u')
+            ->select('MAX(u.createdAt)')
+            ->where('u.status = :status')
+            ->setParameter('status', UserStatus::EmailVerified)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $result !== null ? new DateTimeImmutable($result) : null;
+    }
+
+    /**
+     * Find all active admin users with an email address.
+     * @return User[]
+     */
+    public function findAdminUsers(): array
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->where('u.role = :role')
+            ->andWhere('u.status = :status')
+            ->andWhere('u.email IS NOT NULL')
+            ->setParameter('role', UserRole::Admin)
+            ->setParameter('status', UserStatus::Active)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findAllForAdmin(?array $restrictToUserIds = null): array
     {
         if ($restrictToUserIds === []) {
