@@ -79,14 +79,9 @@
   },
   "autoload": {
     "psr-4": {
-      "App\\": "src/",
-      "Plugin\\Bookclub\\": "plugins/bookclub/src/",
-      "Plugin\\Dishes\\": "plugins/dishes/src/",
-      "Plugin\\Filmclub\\": "plugins/filmclub/src/",
-      "Plugin\\Glossary\\": "plugins/glossary/src/",
-      "Plugin\\Karaoke\\": "plugins/karaoke/src/",
-      "Plugin\\MultiSite\\": "plugins/multisite/src/"
-    }
+      "App\\": "src/"
+    },
+    "files": ["plugins/autoload.php"]
   },
   "autoload-dev": {
     "psr-4": {

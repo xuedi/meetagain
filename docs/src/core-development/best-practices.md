@@ -188,8 +188,8 @@ readonly class EventFilterService
 }
 
 // ❌ Core directly depends on plugin — architectural violation
-#[Autowire(service: 'Plugin\MultiSite\Filter\GroupEventFilter')]
-private readonly GroupEventFilter $groupFilter;
+#[Autowire(service: 'Plugin\SomePlugin\Filter\SomeEventFilter')]
+private readonly SomeEventFilter $someFilter;
 ```
 
 ---
