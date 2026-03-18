@@ -20,6 +20,10 @@ default:
     @echo ""
     @{{JUST}} --list --unsorted
 
+
+
+
+
 # Start docker
 start: dockerStart
 
@@ -29,6 +33,10 @@ stop: dockerStop
 # Run command in PHP container
 do +parameter='':
     {{PHP}} {{parameter}}
+
+
+
+
 
 # Start containers and prepare logs
 [group('docker')]
@@ -62,6 +70,10 @@ dockerEnter:
 dockerDatabase query:
     {{DB}} mariadb -u$MARIADB_USER -p$MARIADB_PASSWORD $MARIADB_DATABASE -e "{{query}}"
 
+
+
+
+
 # Run Symfony console command
 [group('app')]
 app +parameter='':
@@ -83,6 +95,10 @@ appClearCache:
 [group('app')]
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -n -q
+
+
+
+
 
 # Shared reset sequence used by devModeFixtures and devModeMinimal
 [group('development')]
@@ -151,6 +167,10 @@ devResetDatabase:
     {{PHP}} php bin/console doctrine:database:drop --force --if-exists
     {{PHP}} php bin/console doctrine:database:create --if-not-exists
 
+
+
+
+
 # List available plugins with their manifest information
 [group('plugins')]
 plugin-list:
@@ -165,6 +185,10 @@ plugin-enable name:
 [group('plugins')]
 plugin-disable name:
     {{PHP}} php bin/console app:plugin disable {{name}}
+
+
+
+
 
 # Run all tests and checks
 [group('testing')]
@@ -214,6 +238,10 @@ testPerformance:
     {{DOCKER}} stop php-bench
     xdg-open "$(find tests/reports/performance/sitespeed-result -name 'index.html' -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2)"
 
+
+
+
+
 # Check Mago (linter)
 [group('checks')]
 checkMago:
@@ -245,6 +273,10 @@ checkA11y url='http://meetagain.local/':
 checkVersions:
     {{DOCKER}} run --rm renovate
 
+
+
+
+
 # Format code with Mago
 [group('fixing')]
 fixMago:
@@ -261,6 +293,10 @@ fixCoverageBadge:
 [group('fixing')]
 fixDocumentation:
     docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/docs zensical/zensical build --config-file docs/mkdocs.yml
+
+
+
+
 
 # Extract translation keys from templates into YAML files (run after adding new trans keys)
 [group('translations')]
