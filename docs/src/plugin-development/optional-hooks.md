@@ -235,7 +235,7 @@ readonly class GroupMemberFilter implements MemberFilterInterface
 
 **Purpose:** Allow or deny users from performing specific actions.
 
-**File:** `src/Authorization/Action/ActionAuthorizationInterface.php`
+**File:** `src/Filter/Action/ActionAuthorizationInterface.php`
 
 **Tag:** `#[AutoconfigureTag('app.action_authorization')]`
 
@@ -244,9 +244,9 @@ readonly class GroupMemberFilter implements MemberFilterInterface
 **Priority logic:** AND logic — any provider returning `false` denies the action.
 
 ```php
-namespace Plugin\YourPlugin\Authorization;
+namespace Plugin\YourPlugin\Filter\Action;
 
-use App\Authorization\Action\ActionAuthorizationInterface;
+use App\Filter\Action\ActionAuthorizationInterface;
 use App\Entity\User;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -285,17 +285,17 @@ readonly class MembershipAuthorizationProvider implements ActionAuthorizationInt
 
 **Purpose:** Provide custom error messages when an action is denied.
 
-**File:** `src/Authorization/Action/ActionAuthorizationMessageProviderInterface.php`
+**File:** `src/Filter/Action/ActionAuthorizationMessageProviderInterface.php`
 
 **Tag:** `#[AutoconfigureTag('app.action_authorization_message')]`
 
 **When called:** When an action is denied by `ActionAuthorizationInterface`.
 
 ```php
-namespace Plugin\YourPlugin\Authorization;
+namespace Plugin\YourPlugin\Filter\Action;
 
-use App\Authorization\Action\ActionAuthorizationMessageProviderInterface;
-use App\Authorization\Action\UnauthorizedMessage;
+use App\Filter\Action\ActionAuthorizationMessageProviderInterface;
+use App\Filter\Action\UnauthorizedMessage;
 use App\Entity\User;
 use App\Enum\FlashMessageType;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;

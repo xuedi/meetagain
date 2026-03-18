@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Authorization\Action;
+namespace App\Filter\Action;
 
 use App\Entity\User;
 use App\Enum\FlashMessageType;

@@ -43,11 +43,11 @@ services:
         arguments:
             - '@doctrine.fixtures.loader'
 
-    App\Authorization\Action\ActionAuthorizationService:
+    App\Filter\Action\ActionAuthorizationService:
         arguments:
             $providers: !tagged_iterator app.action_authorization
 
-    App\Authorization\Action\ActionAuthorizationMessageService:
+    App\Filter\Action\ActionAuthorizationMessageService:
         arguments:
             $providers: !tagged_iterator app.action_authorization_message
 
