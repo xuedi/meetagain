@@ -39,7 +39,7 @@
                         <tr>
                             <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
                             <td class="is-nowrap">{{ entry.ip }}</td>
-                            <td>{{ entry.url|length > 80 ? entry.url|slice(0, 77) ~ '...' : entry.url }}</td>
+                            <td>{{ entry.url|length > 60 ? entry.url|slice(0, 57) ~ '...' : entry.url }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
