@@ -5,7 +5,7 @@ namespace App\Controller\Admin\Settings;
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
 use App\Repository\ImageRepository;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;

@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Controller;
 
 use App\Controller\AbstractController;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use Plugin\Dishes\Form\DishTranslationType;
 use Plugin\Dishes\Service\DishService;
 use Symfony\Component\HttpFoundation\Request;

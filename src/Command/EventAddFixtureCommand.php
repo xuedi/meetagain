@@ -6,7 +6,7 @@ use App\Entity\Comment;
 use App\Entity\User;
 use App\Plugin;
 use App\Repository\UserRepository;
-use App\Service\PluginService;
+use App\Service\Config\PluginService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;

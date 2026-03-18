@@ -3,7 +3,7 @@
 namespace App\Controller\NonLocale;
 
 use App\Controller\AbstractController;
-use App\Service\LogReaderService;
+use App\Service\System\LogReaderService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;

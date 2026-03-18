@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

@@ -5,7 +5,7 @@ namespace Tests\Unit\Service;
 use App\Entity\Config;
 use App\Entity\ImageType;
 use App\Repository\ConfigRepository;
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;

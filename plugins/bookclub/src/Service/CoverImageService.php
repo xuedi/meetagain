@@ -6,7 +6,7 @@ use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

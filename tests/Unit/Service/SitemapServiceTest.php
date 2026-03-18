@@ -4,9 +4,9 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Event;
 use App\Repository\EventRepository;
-use App\Service\CmsService;
-use App\Service\LanguageService;
-use App\Service\SitemapService;
+use App\Service\Cms\CmsService;
+use App\Service\Config\LanguageService;
+use App\Service\Event\SitemapService;
 use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;

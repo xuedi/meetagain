@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Controller;
 
 use App\Controller\AbstractController;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dishes\Entity\Dish;

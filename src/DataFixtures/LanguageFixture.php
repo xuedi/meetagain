@@ -4,7 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\ImageType;
 use App\Entity\Language;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;

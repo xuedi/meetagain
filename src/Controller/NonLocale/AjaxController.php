@@ -5,7 +5,7 @@ namespace App\Controller\NonLocale;
 use App\Controller\AbstractController;
 use App\Entity\Session\Consent;
 use App\Entity\Session\ConsentType;
-use App\Service\CaptchaService;
+use App\Service\Member\CaptchaService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

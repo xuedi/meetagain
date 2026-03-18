@@ -12,7 +12,7 @@ use App\Repository\EmailTemplateRepository;
 use App\Repository\EmailTemplateTranslationRepository;
 use App\Service\EmailService;
 use App\Service\EmailTemplateService;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;

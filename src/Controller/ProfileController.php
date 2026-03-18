@@ -10,7 +10,7 @@ use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
-use App\Service\BlockingService;
+use App\Service\Member\BlockingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;

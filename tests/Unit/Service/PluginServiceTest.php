@@ -4,8 +4,8 @@ namespace Tests\Unit\Service;
 
 use App\ExtendedFilesystem;
 use App\Filter\Plugin\PluginListFilterInterface;
-use App\Service\CommandService;
-use App\Service\PluginService;
+use App\Service\Admin\CommandService;
+use App\Service\Config\PluginService;
 use PHPUnit\Framework\TestCase;
 
 class PluginServiceTest extends TestCase

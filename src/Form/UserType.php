@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use App\Entity\UserRole;
 use App\Entity\UserStatus;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

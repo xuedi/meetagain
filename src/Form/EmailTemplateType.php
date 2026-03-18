@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\EmailTemplate;
 use App\Repository\EmailTemplateTranslationRepository;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;

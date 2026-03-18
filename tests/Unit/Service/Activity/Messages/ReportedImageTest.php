@@ -6,7 +6,7 @@ use App\Entity\ActivityType;
 use App\Entity\ImageReported;
 use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\ReportedImage;
-use App\Service\ImageHtmlRenderer;
+use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;

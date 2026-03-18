@@ -2,7 +2,7 @@
 
 namespace App\Service\Activity;
 
-use App\Service\ImageHtmlRenderer;
+use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
 

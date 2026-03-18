@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Twig;
 
-use App\Service\ConfigService;
-use App\Service\LanguageService;
+use App\Service\Config\ConfigService;
+use App\Service\Config\LanguageService;
 use App\Twig\LanguageExtension;
 use App\Twig\MetaDescriptionProviderInterface;
 use PHPUnit\Framework\MockObject\Stub;

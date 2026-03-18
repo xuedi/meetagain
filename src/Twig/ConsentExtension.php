@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Service\ConsentService;
+use App\Service\Member\ConsentService;
 use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

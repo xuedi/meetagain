@@ -6,7 +6,7 @@ use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
 use App\Repository\CmsBlockRepository;
-use App\Service\CmsBlockService;
+use App\Service\Cms\CmsBlockService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

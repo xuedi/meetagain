@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;

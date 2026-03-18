@@ -3,7 +3,7 @@
 namespace App\Tests\Unit\Service;
 
 use App\Repository\UserRepository;
-use App\Service\UserService;
+use App\Service\Member\UserService;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
