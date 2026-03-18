@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Authorization\Action\ActionAuthorizationMessageService;
-use App\Authorization\Action\ActionAuthorizationService;
+use App\Filter\Action\ActionAuthorizationMessageService;
+use App\Filter\Action\ActionAuthorizationService;
 use App\Entity\ActivityType;
 use App\Entity\CmsBlock;
 use App\Entity\Event;
