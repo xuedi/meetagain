@@ -15,7 +15,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
 
 final class EmailServiceTest extends TestCase
@@ -105,9 +106,11 @@ final class EmailServiceTest extends TestCase
             ->with(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000)
             ->willReturn([$queued]);
 
-        // Arrange: mock mailer to verify send is called
-        $mailerMock = $this->createMock(MailerInterface::class);
-        $mailerMock->expects($this->once())->method('send')->with($this->isInstanceOf(TemplatedEmail::class));
+        // Arrange: mock transport to verify send is called
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('msg-id-123');
+        $mailerMock = $this->createMock(TransportInterface::class);
+        $mailerMock->expects($this->once())->method('send')->with($this->isInstanceOf(TemplatedEmail::class))->willReturn($sentMessage);
 
         // Arrange: mock entity manager to verify persist/flush
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -261,7 +264,7 @@ final class EmailServiceTest extends TestCase
     }
 
     private function createService(
-        ?MailerInterface $mailer = null,
+        ?TransportInterface $mailer = null,
         ?ConfigService $config = null,
         ?EmailQueueRepository $mailRepo = null,
         ?EntityManagerInterface $em = null,
@@ -290,7 +293,7 @@ final class EmailServiceTest extends TestCase
         }
 
         return new EmailService(
-            mailer: $mailer ?? $this->createStub(MailerInterface::class),
+            transport: $mailer ?? $this->createStub(TransportInterface::class),
             config: $config,
             mailRepo: $mailRepo ?? $this->createStub(EmailQueueRepository::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
