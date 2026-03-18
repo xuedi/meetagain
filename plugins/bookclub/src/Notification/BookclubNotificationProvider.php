@@ -3,8 +3,8 @@
 namespace Plugin\Bookclub\Notification;
 
 use App\Entity\User;
-use App\Notification\NotificationItem;
-use App\Notification\NotificationProviderInterface;
+use App\Service\Notification\User\NotificationItem;
+use App\Service\Notification\User\NotificationProviderInterface;
 use Plugin\Bookclub\Repository\BookRepository;
 use Plugin\Bookclub\Service\PollService;
 use Symfony\Bundle\SecurityBundle\Security;

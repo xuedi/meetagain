@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
-use App\Notification\NotificationService;
+use App\Service\Notification\User\NotificationService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 

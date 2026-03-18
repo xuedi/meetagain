@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Activity;
 
 use App\Entity\Activity;
 use App\Entity\ActivityType;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Service\EmailService;
 use DateTime;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Cache\ItemInterface;
