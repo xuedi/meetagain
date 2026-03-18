@@ -178,7 +178,11 @@ testSetup:
     {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
     {{PHP}} php bin/console doctrine:database:create --env=test
     {{PHP}} php bin/console doctrine:schema:create --env=test -q
-    {{PHP}} php bin/console doctrine:fixtures:load --env=test -q
+    {{PHP}} php bin/console doctrine:fixtures:load --env=test -q --group=install
+    {{PHP}} php bin/console doctrine:fixtures:load --env=test -q --append --group=base
+    {{PHP}} php bin/console app:plugin:pre-fixtures --env=test
+    {{PHP}} php bin/console app:fixtures:load --env=test -q --append --group=plugin
+    {{PHP}} php bin/console app:plugin:post-fixtures --env=test
 
 # Run unit tests
 [group('testing')]

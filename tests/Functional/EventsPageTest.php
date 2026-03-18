@@ -102,7 +102,7 @@ class EventsPageTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/en/event/upload/1');
+        $client->request('GET', '/en/image/event/1/modal');
 
         $this->assertResponseRedirects();
     }
@@ -113,7 +113,7 @@ class EventsPageTest extends WebTestCase
 
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
-        $crawler = $client->request('GET', '/en/event/upload/1');
+        $crawler = $client->request('GET', '/en/image/event/1/modal');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('form', 'Upload form should exist');
