@@ -2,8 +2,8 @@
 
 namespace App\Twig;
 
-use App\Service\ConfigService;
-use App\Service\LanguageService;
+use App\Service\Config\ConfigService;
+use App\Service\Config\LanguageService;
 use Exception;
 use Override;
 use RuntimeException;

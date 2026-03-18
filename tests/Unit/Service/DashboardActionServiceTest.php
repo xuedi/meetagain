@@ -10,7 +10,7 @@ use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
-use App\Service\DashboardActionService;
+use App\Service\Admin\DashboardActionService;
 use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

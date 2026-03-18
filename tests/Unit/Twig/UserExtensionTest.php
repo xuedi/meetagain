@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Twig;
 
-use App\Service\UserService;
+use App\Service\Member\UserService;
 use App\Twig\UserExtension;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

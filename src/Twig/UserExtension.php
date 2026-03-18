@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Service\UserService;
+use App\Service\Member\UserService;
 use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

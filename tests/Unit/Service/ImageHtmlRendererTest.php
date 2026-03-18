@@ -4,7 +4,7 @@ namespace App\Tests\Unit\Service;
 
 use App\Entity\Image;
 use App\Repository\ImageRepository;
-use App\Service\ImageHtmlRenderer;
+use App\Service\Media\ImageHtmlRenderer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment;

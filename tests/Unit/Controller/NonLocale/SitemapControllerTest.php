@@ -3,7 +3,7 @@
 namespace Tests\Unit\Controller\NonLocale;
 
 use App\Controller\NonLocale\SitemapController;
-use App\Service\SitemapService;
+use App\Service\Event\SitemapService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

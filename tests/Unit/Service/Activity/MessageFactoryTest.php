@@ -8,7 +8,7 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Activity\MessageFactory;
 use App\Service\Activity\MessageInterface;
-use App\Service\ImageHtmlRenderer;
+use App\Service\Media\ImageHtmlRenderer;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

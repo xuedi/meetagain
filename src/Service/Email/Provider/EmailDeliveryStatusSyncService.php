@@ -4,7 +4,7 @@ namespace App\Service\Email\Provider;
 
 use App\CronTaskInterface;
 use App\Repository\EmailQueueRepository;
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;

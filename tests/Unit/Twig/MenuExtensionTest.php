@@ -3,7 +3,7 @@
 namespace Tests\Unit\Twig;
 
 use App\Entity\User;
-use App\Service\MenuService;
+use App\Service\Cms\MenuService;
 use App\Twig\MenuExtension;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

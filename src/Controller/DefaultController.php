@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\CmsService;
+use App\Service\Cms\CmsService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

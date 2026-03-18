@@ -7,7 +7,7 @@ use App\Entity\EmailTemplateTranslation;
 use App\Enum\EmailType;
 use App\Repository\EmailTemplateTranslationRepository;
 use App\Service\EmailTemplateService;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;

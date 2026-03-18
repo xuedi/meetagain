@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Service\MenuService;
+use App\Service\Cms\MenuService;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;

@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\PluginService;
+use App\Service\Config\PluginService;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Plugin;
-use App\Service\PluginService;
+use App\Service\Config\PluginService;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;

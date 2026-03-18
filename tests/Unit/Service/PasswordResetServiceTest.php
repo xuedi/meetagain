@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\ActivityService;
 use App\Service\EmailService;
-use App\Service\PasswordResetService;
+use App\Service\Member\PasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;

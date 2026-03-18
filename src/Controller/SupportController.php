@@ -6,7 +6,7 @@ use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
-use App\Service\CaptchaService;
+use App\Service\Member\CaptchaService;
 use App\Service\EmailService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

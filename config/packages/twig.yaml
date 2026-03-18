@@ -2,7 +2,7 @@ twig:
     form_themes: ['_form/bulma.html.twig']
     file_name_pattern: '*.twig'
     globals:
-        admin_navigation: '@App\Service\AdminNavigationService'
+        admin_navigation: '@App\Service\Admin\AdminNavigationService'
 
 when@test:
     twig:

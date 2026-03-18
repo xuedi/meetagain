@@ -4,7 +4,7 @@ namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
 use App\Repository\UserRepository;
-use App\Service\BlockingService;
+use App\Service\Member\BlockingService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

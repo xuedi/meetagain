@@ -4,7 +4,7 @@ namespace Tests\Unit\EventSubscriber;
 
 use App\Entity\NotFoundLog;
 use App\EventSubscriber\NotFoundSubscriber;
-use App\Service\CmsService;
+use App\Service\Cms\CmsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;

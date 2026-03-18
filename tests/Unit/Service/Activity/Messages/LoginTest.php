@@ -5,7 +5,7 @@ namespace Tests\Unit\Service\Activity\Messages;
 use App\Entity\ActivityType;
 use App\Service\Activity\MessageInterface;
 use App\Service\Activity\Messages\Login;
-use App\Service\ImageHtmlRenderer;
+use App\Service\Media\ImageHtmlRenderer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 

@@ -7,7 +7,7 @@ use App\Filter\Admin\Language\AdminLanguageFilterService;
 use App\Filter\Language\LanguageFilterResult;
 use App\Filter\Language\LanguageFilterService;
 use App\Repository\LanguageRepository;
-use App\Service\LanguageService;
+use App\Service\Config\LanguageService;
 use Exception;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

@@ -6,7 +6,7 @@ use App\Entity\ImageType;
 use App\Entity\User;
 use App\Entity\UserRole;
 use App\Entity\UserStatus;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Persistence\ObjectManager;

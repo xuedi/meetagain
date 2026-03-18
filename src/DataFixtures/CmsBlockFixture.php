@@ -5,7 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\CmsBlock;
 use App\Entity\CmsBlockTypes;
 use App\Entity\ImageType;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

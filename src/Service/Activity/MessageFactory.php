@@ -5,7 +5,7 @@ namespace App\Service\Activity;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\ImageHtmlRenderer;
+use App\Service\Media\ImageHtmlRenderer;
 use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;

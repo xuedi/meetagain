@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\CommandExecutionService;
+use App\Service\Admin\CommandExecutionService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;

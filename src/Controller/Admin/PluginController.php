@@ -3,8 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
-use App\Service\CommandService;
-use App\Service\PluginService;
+use App\Service\Admin\CommandService;
+use App\Service\Config\PluginService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;

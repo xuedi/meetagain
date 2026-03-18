@@ -12,7 +12,7 @@ use App\Entity\CmsTitle;
 use App\Entity\MenuLocation;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
-use App\Service\CmsPageCacheService;
+use App\Service\Cms\CmsPageCacheService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;

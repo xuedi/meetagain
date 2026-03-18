@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Twig;
 
-use App\Service\ConfigService;
+use App\Service\Config\ConfigService;
 use App\Twig\ConfigExtension;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

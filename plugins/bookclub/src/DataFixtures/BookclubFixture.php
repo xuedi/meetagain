@@ -6,7 +6,7 @@ use App\DataFixtures\AbstractFixture;
 use App\Entity\ImageType;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\ImageService;
+use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
