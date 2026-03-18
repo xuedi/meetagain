@@ -46,12 +46,12 @@ readonly class PluginService
 
             $pluginKey = basename((string) $pluginPath);
             $plugins[] = [
-                'key'         => $pluginKey,
-                'name'        => $pluginData['name'] ?? $pluginKey,
-                'version'     => $pluginData['version'] ?? '0.0.0',
+                'key' => $pluginKey,
+                'name' => $pluginData['name'] ?? $pluginKey,
+                'version' => $pluginData['version'] ?? '0.0.0',
                 'description' => $pluginData['description'] ?? '',
-                'installed'   => $this->isInstalled($pluginKey),
-                'enabled'     => $this->isEnabled($pluginKey),
+                'installed' => $this->isInstalled($pluginKey),
+                'enabled' => $this->isEnabled($pluginKey),
             ];
         }
 
@@ -68,7 +68,7 @@ readonly class PluginService
     {
         $config = $this->getPluginConfig();
 
-        $activePlugins = array_keys(array_filter($config, fn($enabled) => $enabled === true));
+        $activePlugins = array_keys(array_filter($config, static fn($enabled) => $enabled === true));
 
         // Core plugins are always active
         $activePlugins[] = 'core_navigation';
@@ -226,8 +226,8 @@ readonly class PluginService
                 $config = include $envConfigFile;
 
                 return is_array($config) ? $config : [];
-            } catch (Throwable) {
-                // Environment config invalid/corrupt - fall through to default plugins.php
+            } catch (Throwable $e) {
+                unset($e); // Environment config invalid/corrupt - fall through to default plugins.php below
             }
         }
 

@@ -10,13 +10,13 @@ use App\Entity\Event;
 use App\Entity\Image;
 use App\Entity\ImageType;
 use App\Entity\User;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Service\Activity\ActivityService;
-use App\EntityActionDispatcher;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ImageUploadController extends AbstractController
+final class ImageUploadController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -222,7 +222,7 @@ class ImageUploadController extends AbstractController
                 $imageType = ImageType::EventUpload;
                 $entity = $this->em->getRepository(Event::class)->findOneBy(['id' => $id]);
                 $image = null;
-                $extendedGallery = array_map(fn(Image $item) => [
+                $extendedGallery = array_map(static fn(Image $item) => [
                     'image' => $item,
                     'link' => null,
                 ], $entity->getImages()->toArray());

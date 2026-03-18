@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-class AdminController extends AbstractController
+final class AdminController extends AbstractController
 {
     public const string ROUTE_ADMIN = 'app_admin';
 

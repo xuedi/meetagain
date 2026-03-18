@@ -4,7 +4,6 @@ namespace Plugin\Bookclub\Service;
 
 use App\Entity\Image;
 use App\Entity\ImageType;
-use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageService;
 use Psr\Log\LoggerInterface;
@@ -42,13 +41,13 @@ readonly class CoverImageService
             }
 
             $content = $response->getContent();
-            if (empty($content)) {
+            if ($content === '') {
                 return null;
             }
 
             $tempDir = $this->kernelProjectDir . '/var/tmp/';
             if (!is_dir($tempDir)) {
-                mkdir($tempDir, 0755, true);
+                mkdir($tempDir, 0o755, true);
             }
 
             $tempFile = $tempDir . uniqid('cover_') . '.jpg';
@@ -62,7 +61,9 @@ readonly class CoverImageService
                 $this->imageService->createThumbnails($image, ImageType::PluginBookclubCover);
             }
 
-            @unlink($tempFile);
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
 
             return $image;
         } catch (Throwable $e) {

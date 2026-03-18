@@ -28,9 +28,9 @@ class LoginTest extends TestCase
         $subject = new Login()->injectServices($this->router, $this->imageService);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::Login, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::Login, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 }

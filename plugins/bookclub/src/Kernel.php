@@ -38,7 +38,7 @@ class Kernel implements Plugin
     {
         $selection = $this->selectionRepository->findByEventId($eventId);
         $poll = $this->pollRepository->findByEventId($eventId);
-        $activePoll = ($poll !== null && $poll->getStatus() === PollStatus::Active) ? $poll : null;
+        $activePoll = $poll !== null && $poll->getStatus() === PollStatus::Active ? $poll : null;
 
         return $this->twig->render('@Bookclub/tile/event.html.twig', [
             'selection' => $selection,

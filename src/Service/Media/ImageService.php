@@ -198,10 +198,12 @@ readonly class ImageService
     {
         $cnt = 0;
         foreach ($this->getObsoleteThumbnails() as $file) {
-            if ($this->filesystem->exists($this->getThumbnailDir() . $file)) {
-                $this->filesystem->remove($this->getThumbnailDir() . $file);
-                ++$cnt;
+            if (!$this->filesystem->exists($this->getThumbnailDir() . $file)) {
+                continue;
             }
+
+            $this->filesystem->remove($this->getThumbnailDir() . $file);
+            ++$cnt;
         }
 
         return $cnt;

@@ -110,17 +110,17 @@ class TestResultsCommand extends Command
         $output->writeln(sprintf('SUMMARY: %s (%.2fs)', $summary, $totalTime));
         $output->writeln('---');
 
-        if (!empty($failures)) {
+        if ($failures !== []) {
             $output->writeln('FAILURES:');
             foreach ($failures as $i => $f) {
                 $num = $i + 1;
                 $output->writeln("\n{$num}. {$f['test']}");
                 $output->writeln("   File: {$f['file']}:{$f['line']}");
                 $output->writeln("   Type: {$f['type']}");
-                if (!empty($f['message'])) {
+                if ($f['message'] !== '') {
                     $output->writeln("   Message: {$f['message']}");
                 }
-                if (!empty($f['diff'])) {
+                if ($f['diff'] !== '') {
                     $output->writeln("   {$f['diff']}");
                 }
             }

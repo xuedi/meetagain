@@ -94,7 +94,7 @@ readonly class AdminNavigationService
         }
 
         // Sort sections by priority ASC, then alphabetically within same priority
-        uksort($sectionsMap, function (string $a, string $b) use ($sectionsMap): int {
+        uksort($sectionsMap, static function (string $a, string $b) use ($sectionsMap): int {
             $diff = $sectionsMap[$a]['priority'] <=> $sectionsMap[$b]['priority'];
             return $diff !== 0 ? $diff : strcmp($a, $b);
         });
@@ -119,7 +119,7 @@ readonly class AdminNavigationService
             );
 
             // Skip sections with no visible links
-            if (empty($visibleLinks)) {
+            if ($visibleLinks === []) {
                 continue;
             }
 

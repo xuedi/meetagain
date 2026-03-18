@@ -3,11 +3,11 @@
 namespace App\Service\Admin;
 
 use App\CronTaskInterface;
+use App\Repository\UserRepository;
+use App\Service\Config\ConfigService;
+use App\Service\Email\EmailService;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use App\Service\Notification\Admin\AdminNotificationSection;
-use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
-use App\Service\Config\ConfigService;
 use DateTimeImmutable;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -132,7 +132,7 @@ readonly class AdminNotificationService implements CronTaskInterface
     private function getLastSentAt(): ?DateTimeImmutable
     {
         try {
-            $value = $this->appCache->get(self::CACHE_KEY, fn(ItemInterface $item) => null);
+            $value = $this->appCache->get(self::CACHE_KEY, static fn(ItemInterface $item) => null);
 
             return $value !== null ? new DateTimeImmutable($value) : null;
         } catch (InvalidArgumentException) {
@@ -146,15 +146,15 @@ readonly class AdminNotificationService implements CronTaskInterface
             $now = $this->clock->now()->format(DateTimeImmutable::ATOM);
             $this->appCache->get(
                 self::CACHE_KEY,
-                function (ItemInterface $item) use ($now) {
+                static function (ItemInterface $item) use ($now) {
                     $item->expiresAfter(self::CACHE_TTL);
 
                     return $now;
                 },
                 beta: INF,
             );
-        } catch (InvalidArgumentException) {
-            // Non-critical — worst case: one extra notification sent on next run
+        } catch (InvalidArgumentException $e) {
+            $this->logger->debug('Cache write failure for admin notification tracking - non-critical', ['exception' => $e]);
         }
     }
 }

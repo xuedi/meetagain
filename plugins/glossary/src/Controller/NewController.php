@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 #[Route('/glossary')]
-class NewController extends AbstractGlossaryController
+final class NewController extends AbstractGlossaryController
 {
     #[Route('/new', name: 'app_plugin_glossary_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response

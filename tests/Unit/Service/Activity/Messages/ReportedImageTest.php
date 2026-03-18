@@ -35,10 +35,10 @@ class ReportedImageTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::ReportedImage, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::ReportedImage, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanBuildWithDifferentReason(): void
@@ -54,10 +54,10 @@ class ReportedImageTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::ReportedImage, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::ReportedImage, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingImageId(): void

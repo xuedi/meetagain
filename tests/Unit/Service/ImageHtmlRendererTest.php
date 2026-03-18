@@ -41,7 +41,7 @@ class ImageHtmlRendererTest extends TestCase
             ->willReturn('<html>img</html>');
 
         $result = $this->service->renderThumbnail(123, '100x100');
-        $this->assertEquals('<html>img</html>', $result);
+        static::assertSame('<html>img</html>', $result);
     }
 
     public function testRenderThumbnailWithDefaultSize(): void
@@ -63,6 +63,6 @@ class ImageHtmlRendererTest extends TestCase
             ->willReturn('<html>no-img</html>');
 
         $result = $this->service->renderThumbnail(456);
-        $this->assertEquals('<html>no-img</html>', $result);
+        static::assertSame('<html>no-img</html>', $result);
     }
 }

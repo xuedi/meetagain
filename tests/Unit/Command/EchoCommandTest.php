@@ -20,27 +20,30 @@ class EchoCommandTest extends TestCase
 
     public function testCommandHasCorrectName(): void
     {
-        $this->assertSame('app:echo', $this->command->getName());
+        static::assertSame('app:echo', $this->command->getName());
     }
 
     public function testCommandHasCorrectDescription(): void
     {
-        $this->assertSame('simple command for testing, echos parameter', $this->command->getDescription());
+        static::assertSame('simple command for testing, echos parameter', $this->command->getDescription());
     }
 
     public function testExecuteReturnsSuccessAndEchosMessage(): void
     {
         $exitCode = $this->commandTester->execute(['message' => 'Hello World']);
 
-        $this->assertSame(Command::SUCCESS, $exitCode);
-        $this->assertStringContainsString('Echo command: Hello World', $this->commandTester->getDisplay());
+        static::assertSame(Command::SUCCESS, $exitCode);
+        static::assertStringContainsString('Echo command: Hello World', $this->commandTester->getDisplay());
     }
 
     public function testExecuteWithSpecialCharacters(): void
     {
         $exitCode = $this->commandTester->execute(['message' => 'Test with "quotes" and \'apostrophes\'']);
 
-        $this->assertSame(Command::SUCCESS, $exitCode);
-        $this->assertStringContainsString('Test with "quotes" and \'apostrophes\'', $this->commandTester->getDisplay());
+        static::assertSame(Command::SUCCESS, $exitCode);
+        static::assertStringContainsString(
+            'Test with "quotes" and \'apostrophes\'',
+            $this->commandTester->getDisplay(),
+        );
     }
 }

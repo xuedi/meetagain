@@ -30,7 +30,7 @@ final class EmailServiceTest extends TestCase
         $emMock
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($entity) {
+            ->with(static::callback(function ($entity) {
                 $this->assertInstanceOf(EmailQueue::class, $entity);
                 /* @var EmailQueue $entity */
                 $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
@@ -60,7 +60,7 @@ final class EmailServiceTest extends TestCase
                 'subject' => 'Please Confirm your Email',
                 'body' => '<p>Verification body</p>',
             ]);
-        $templateService->method('renderContent')->willReturnCallback(fn(string $content) => $content);
+        $templateService->method('renderContent')->willReturnCallback(static fn(string $content) => $content);
 
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
@@ -68,7 +68,7 @@ final class EmailServiceTest extends TestCase
         $ok = $service->prepareVerificationRequest($user);
 
         // Assert: returns true
-        $this->assertTrue($ok);
+        static::assertTrue($ok);
     }
 
     public function testPrepareWelcomeAndResetPasswordAlsoEnqueue(): void
@@ -83,8 +83,8 @@ final class EmailServiceTest extends TestCase
         $service = $this->createService(em: $emMock);
 
         // Act & Assert: both methods enqueue emails successfully
-        $this->assertTrue($service->prepareWelcome($user));
-        $this->assertTrue($service->prepareResetPassword($user));
+        static::assertTrue($service->prepareWelcome($user));
+        static::assertTrue($service->prepareResetPassword($user));
     }
 
     public function testSendQueueSendsPendingEmailsAndMarksAsSent(): void
@@ -110,14 +110,18 @@ final class EmailServiceTest extends TestCase
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('msg-id-123');
         $mailerMock = $this->createMock(TransportInterface::class);
-        $mailerMock->expects($this->once())->method('send')->with($this->isInstanceOf(TemplatedEmail::class))->willReturn($sentMessage);
+        $mailerMock
+            ->expects($this->once())
+            ->method('send')
+            ->with(static::isInstanceOf(TemplatedEmail::class))
+            ->willReturn($sentMessage);
 
         // Arrange: mock entity manager to verify persist/flush
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($entity) use ($queued) {
+            ->with(static::callback(function ($entity) use ($queued) {
                 $this->assertSame($queued, $entity);
                 $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
                 $this->assertSame(EmailQueueStatus::Sent, $queued->getStatus());
@@ -153,7 +157,7 @@ final class EmailServiceTest extends TestCase
         $emMock
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($entity) {
+            ->with(static::callback(function ($entity) {
                 $this->assertInstanceOf(EmailQueue::class, $entity);
                 /* @var EmailQueue $entity */
                 $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
@@ -182,7 +186,7 @@ final class EmailServiceTest extends TestCase
                 'subject' => 'Event canceled: Test Event',
                 'body' => '<p>Event canceled body</p>',
             ]);
-        $templateService->method('renderContent')->willReturnCallback(fn(string $content) => $content);
+        $templateService->method('renderContent')->willReturnCallback(static fn(string $content) => $content);
 
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
@@ -190,7 +194,7 @@ final class EmailServiceTest extends TestCase
         $ok = $service->prepareEventCanceledNotification($user, $event);
 
         // Assert: returns true
-        $this->assertTrue($ok);
+        static::assertTrue($ok);
     }
 
     public function testPrepareMessageNotificationEnqueuesEmailWithExpectedData(): void
@@ -203,7 +207,7 @@ final class EmailServiceTest extends TestCase
         $emMock
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($entity) {
+            ->with(static::callback(function ($entity) {
                 $this->assertInstanceOf(EmailQueue::class, $entity);
                 /* @var EmailQueue $entity */
                 $this->assertSame('"email sender" <sender@email.com>', $entity->getSender());
@@ -229,7 +233,7 @@ final class EmailServiceTest extends TestCase
                 'subject' => 'You received a message from Bob',
                 'body' => '<p>Message notification body</p>',
             ]);
-        $templateService->method('renderContent')->willReturnCallback(fn(string $content) => $content);
+        $templateService->method('renderContent')->willReturnCallback(static fn(string $content) => $content);
 
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
@@ -237,7 +241,7 @@ final class EmailServiceTest extends TestCase
         $ok = $service->prepareMessageNotification($sender, $recipient);
 
         // Assert: returns true
-        $this->assertTrue($ok);
+        static::assertTrue($ok);
     }
 
     public function testGetMockEmailListReturnsAllEmailTemplates(): void
@@ -249,17 +253,17 @@ final class EmailServiceTest extends TestCase
         $result = $service->getMockEmailList();
 
         // Assert: contains all expected email templates (using EmailType enum values)
-        $this->assertArrayHasKey('notification_message', $result);
-        $this->assertArrayHasKey('notification_rsvp_aggregated', $result);
-        $this->assertArrayHasKey('welcome', $result);
-        $this->assertArrayHasKey('verification_request', $result);
-        $this->assertArrayHasKey('password_reset_request', $result);
-        $this->assertArrayHasKey('notification_event_canceled', $result);
+        static::assertArrayHasKey('notification_message', $result);
+        static::assertArrayHasKey('notification_rsvp_aggregated', $result);
+        static::assertArrayHasKey('welcome', $result);
+        static::assertArrayHasKey('verification_request', $result);
+        static::assertArrayHasKey('password_reset_request', $result);
+        static::assertArrayHasKey('notification_event_canceled', $result);
 
         // Assert: each entry has expected structure
         foreach ($result as $emailData) {
-            $this->assertArrayHasKey('subject', $emailData);
-            $this->assertArrayHasKey('context', $emailData);
+            static::assertArrayHasKey('subject', $emailData);
+            static::assertArrayHasKey('context', $emailData);
         }
     }
 
@@ -289,7 +293,7 @@ final class EmailServiceTest extends TestCase
                 ]);
             $templateService
                 ->method('renderContent')
-                ->willReturnCallback(fn(string $content, array $context) => $content);
+                ->willReturnCallback(static fn(string $content, array $context) => $content);
         }
 
         return new EmailService(

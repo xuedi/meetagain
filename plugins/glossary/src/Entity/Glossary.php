@@ -135,9 +135,11 @@ class Glossary
     public function getSuggestion(string $hash): Suggestion
     {
         foreach ($this->getSuggestions() as $suggestion) {
-            if ($suggestion->getHash() === $hash) {
-                return $suggestion;
+            if ($suggestion->getHash() !== $hash) {
+                continue;
             }
+
+            return $suggestion;
         }
         throw new InvalidArgumentException('Suggestion not found');
     }
@@ -146,9 +148,11 @@ class Glossary
     {
         $newList = [];
         foreach ($this->getSuggestions() as $suggestion) {
-            if ($suggestion->getHash() !== $hash) {
-                $newList[] = $suggestion->jsonSerialize();
+            if ($suggestion->getHash() === $hash) {
+                continue;
             }
+
+            $newList[] = $suggestion->jsonSerialize();
         }
         $this->suggestion = $newList;
 
@@ -157,7 +161,7 @@ class Glossary
 
     public function getSuggestions(): array
     {
-        if (empty($this->suggestion)) {
+        if ($this->suggestion === []) {
             return [];
         }
         $suggestions = [];

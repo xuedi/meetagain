@@ -8,9 +8,9 @@ use App\Entity\EventFilterTime;
 use App\Entity\EventIntervals;
 use App\Entity\EventTypes;
 use App\Repository\EventRepository;
+use App\Service\Config\PluginService;
 use App\Service\Email\EmailService;
 use App\Service\Event\EventService;
-use App\Service\Config\PluginService;
 use App\Service\Event\RecurringEventService;
 use DateTime;
 use DateTimeImmutable;
@@ -60,16 +60,16 @@ class EventServiceTest extends TestCase
         $result = $method->invoke($subject, $eventList);
 
         // Assert: events are grouped by year-month with correct structure
-        $this->assertArrayHasKey('2002-01', $result);
-        $this->assertArrayHasKey('2002-04', $result);
+        static::assertArrayHasKey('2002-01', $result);
+        static::assertArrayHasKey('2002-04', $result);
 
-        $this->assertSame('2002', $result['2002-01']['year']);
-        $this->assertSame('January', $result['2002-01']['month']);
-        $this->assertCount(3, $result['2002-01']['events']);
+        static::assertSame('2002', $result['2002-01']['year']);
+        static::assertSame('January', $result['2002-01']['month']);
+        static::assertCount(3, $result['2002-01']['events']);
 
-        $this->assertSame('2002', $result['2002-04']['year']);
-        $this->assertSame('April', $result['2002-04']['month']);
-        $this->assertCount(2, $result['2002-04']['events']);
+        static::assertSame('2002', $result['2002-04']['year']);
+        static::assertSame('April', $result['2002-04']['month']);
+        static::assertCount(2, $result['2002-04']['events']);
     }
 
     #[DataProvider('filteredListDataProvider')]
@@ -100,7 +100,7 @@ class EventServiceTest extends TestCase
         $result = $subject->getFilteredList($time, $sort, $types, $rsvp);
 
         // Assert: returns structured (empty) list
-        $this->assertSame([], $result);
+        static::assertSame([], $result);
     }
 
     public static function filteredListDataProvider(): Generator
@@ -146,7 +146,7 @@ class EventServiceTest extends TestCase
         $subject->cancelEvent($event);
 
         // Assert: event is marked as canceled
-        $this->assertTrue($event->isCanceled());
+        static::assertTrue($event->isCanceled());
     }
 
     public function testCancelEventWithNoRsvpsDoesNotSendEmails(): void
@@ -177,7 +177,7 @@ class EventServiceTest extends TestCase
         $subject->cancelEvent($event);
 
         // Assert: event is marked as canceled
-        $this->assertTrue($event->isCanceled());
+        static::assertTrue($event->isCanceled());
     }
 
     public function testCancelPastEventDoesNotSendNotifications(): void
@@ -210,7 +210,7 @@ class EventServiceTest extends TestCase
         $subject->cancelEvent($event);
 
         // Assert: event is marked as canceled but no notifications sent
-        $this->assertTrue($event->isCanceled());
+        static::assertTrue($event->isCanceled());
     }
 
     public function testUncancelEventRemovesCanceledFlag(): void
@@ -236,7 +236,7 @@ class EventServiceTest extends TestCase
         $subject->uncancelEvent($event);
 
         // Assert: event is no longer canceled
-        $this->assertFalse($event->isCanceled());
+        static::assertFalse($event->isCanceled());
     }
 
     public function testUpdateRecurringEventsWithNoRecurringReturnZero(): void
@@ -257,7 +257,7 @@ class EventServiceTest extends TestCase
         );
 
         // Act & Assert
-        $this->assertSame(0, $subject->updateRecurringEvents($event));
+        static::assertSame(0, $subject->updateRecurringEvents($event));
     }
 
     public function testUpdateRecurringEventsWithParentReturnsCount(): void
@@ -281,7 +281,7 @@ class EventServiceTest extends TestCase
         );
 
         // Act & Assert
-        $this->assertSame(1, $subject->updateRecurringEvents($parent));
+        static::assertSame(1, $subject->updateRecurringEvents($parent));
     }
 
     public function testCancelEventSendsEmailsAndFlushes(): void
@@ -314,7 +314,7 @@ class EventServiceTest extends TestCase
 
         // Act & Assert
         $subject->cancelEvent($event);
-        $this->assertTrue($event->isCanceled());
+        static::assertTrue($event->isCanceled());
     }
 
     public function testExtentRecurringEventsCallsRecurringService(): void
@@ -359,7 +359,7 @@ class EventServiceTest extends TestCase
         );
 
         // Act & Assert
-        $this->assertSame(1, $subject->updateRecurringEvents($child));
+        static::assertSame(1, $subject->updateRecurringEvents($child));
     }
 
     public function testUpdateRecurringEventsWithDeletedParentReturnsZero(): void
@@ -383,7 +383,7 @@ class EventServiceTest extends TestCase
         );
 
         // Act & Assert
-        $this->assertSame(0, $subject->updateRecurringEvents($child));
+        static::assertSame(0, $subject->updateRecurringEvents($child));
     }
 
     public function testExtentRecurringEventsWithBiMonthly(): void

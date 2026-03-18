@@ -13,8 +13,8 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailTemplateService;
 use App\Service\Email\EmailService;
+use App\Service\Email\EmailTemplateService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -74,7 +74,7 @@ readonly class AnnouncementService
     {
         $subscribers = $this->userRepo->findAnnouncementSubscribers();
 
-        return array_filter($subscribers, fn(User $user) => $user->getNotificationSettings()->isActive(
+        return array_filter($subscribers, static fn(User $user) => $user->getNotificationSettings()->isActive(
             'announcements',
         ));
     }

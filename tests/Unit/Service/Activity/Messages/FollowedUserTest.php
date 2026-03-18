@@ -35,10 +35,10 @@ class FollowedUserTest extends TestCase
         $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::FollowedUser, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::FollowedUser, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingUserId(): void

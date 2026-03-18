@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-class FrontpageController extends AbstractController
+final class FrontpageController extends AbstractController
 {
     public function __construct(
         private readonly ConfigService $configService,

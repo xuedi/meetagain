@@ -23,7 +23,7 @@ readonly class BookGroupFilterService
      */
     public function getAllowedSuggestionIds(): ?array
     {
-        return $this->intersect(fn(BookGroupFilterInterface $f) => $f->getAllowedSuggestionIds());
+        return $this->intersect(static fn(BookGroupFilterInterface $f) => $f->getAllowedSuggestionIds());
     }
 
     /**
@@ -31,7 +31,7 @@ readonly class BookGroupFilterService
      */
     public function getAllowedEventIds(): ?array
     {
-        return $this->intersect(fn(BookGroupFilterInterface $f) => $f->getAllowedEventIds());
+        return $this->intersect(static fn(BookGroupFilterInterface $f) => $f->getAllowedEventIds());
     }
 
     /**
@@ -39,7 +39,7 @@ readonly class BookGroupFilterService
      */
     public function getAllowedBookIds(): ?array
     {
-        return $this->intersect(fn(BookGroupFilterInterface $f) => $f->getAllowedBookIds());
+        return $this->intersect(static fn(BookGroupFilterInterface $f) => $f->getAllowedBookIds());
     }
 
     /**
@@ -55,9 +55,7 @@ readonly class BookGroupFilterService
                 continue;
             }
 
-            $result = $result === null
-                ? $ids
-                : array_values(array_intersect($result, $ids));
+            $result = $result === null ? $ids : array_values(array_intersect($result, $ids));
         }
 
         return $result;

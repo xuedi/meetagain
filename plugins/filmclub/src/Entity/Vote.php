@@ -141,16 +141,18 @@ class Vote
             }
         }
 
-        if (empty($filmCounts)) {
+        if ($filmCounts === []) {
             return null;
         }
 
         $winningFilmId = array_keys($filmCounts, max($filmCounts))[0];
 
         foreach ($this->ballots as $ballot) {
-            if ($ballot->getFilm()?->getId() === $winningFilmId) {
-                return $ballot->getFilm();
+            if ($ballot->getFilm()?->getId() !== $winningFilmId) {
+                continue;
             }
+
+            return $ballot->getFilm();
         }
 
         return null;

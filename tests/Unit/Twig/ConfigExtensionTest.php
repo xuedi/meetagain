@@ -22,13 +22,13 @@ class ConfigExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        $this->assertCount(4, $functions);
+        static::assertCount(4, $functions);
 
-        $functionNames = array_map(fn($f) => $f->getName(), $functions);
-        $this->assertContains('is_show_frontpage', $functionNames);
-        $this->assertContains('get_theme_colors', $functionNames);
-        $this->assertContains('get_date_format', $functionNames);
-        $this->assertContains('get_date_format_flatpickr', $functionNames);
+        $functionNames = array_map(static fn($f) => $f->getName(), $functions);
+        static::assertContains('is_show_frontpage', $functionNames);
+        static::assertContains('get_theme_colors', $functionNames);
+        static::assertContains('get_date_format', $functionNames);
+        static::assertContains('get_date_format_flatpickr', $functionNames);
     }
 
     public function testIsShowFrontpageDelegatesToConfigService(): void
@@ -38,7 +38,7 @@ class ConfigExtensionTest extends TestCase
         $functions = $this->subject->getFunctions();
         $isShowFrontpage = $this->findFunction($functions, 'is_show_frontpage');
 
-        $this->assertTrue($isShowFrontpage->getCallable()());
+        static::assertTrue($isShowFrontpage->getCallable()());
     }
 
     public function testGetThemeColorsDelegatesToConfigService(): void
@@ -49,7 +49,7 @@ class ConfigExtensionTest extends TestCase
         $functions = $this->subject->getFunctions();
         $getThemeColors = $this->findFunction($functions, 'get_theme_colors');
 
-        $this->assertSame($expectedColors, $getThemeColors->getCallable()());
+        static::assertSame($expectedColors, $getThemeColors->getCallable()());
     }
 
     public function testGetDateFormatDelegatesToConfigService(): void
@@ -59,7 +59,7 @@ class ConfigExtensionTest extends TestCase
         $functions = $this->subject->getFunctions();
         $getDateFormat = $this->findFunction($functions, 'get_date_format');
 
-        $this->assertSame('d.m.Y H:i', $getDateFormat->getCallable()());
+        static::assertSame('d.m.Y H:i', $getDateFormat->getCallable()());
     }
 
     public function testGetDateFormatFlatpickrDelegatesToConfigService(): void
@@ -69,15 +69,17 @@ class ConfigExtensionTest extends TestCase
         $functions = $this->subject->getFunctions();
         $getDateFormat = $this->findFunction($functions, 'get_date_format_flatpickr');
 
-        $this->assertSame('d.m.Y H:i', $getDateFormat->getCallable()());
+        static::assertSame('d.m.Y H:i', $getDateFormat->getCallable()());
     }
 
     private function findFunction(array $functions, string $name): ?\Twig\TwigFunction
     {
         foreach ($functions as $function) {
-            if ($function->getName() === $name) {
-                return $function;
+            if ($function->getName() !== $name) {
+                continue;
             }
+
+            return $function;
         }
 
         return null;

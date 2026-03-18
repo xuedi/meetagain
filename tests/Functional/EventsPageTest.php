@@ -140,7 +140,7 @@ class EventsPageTest extends WebTestCase
         $client->request('GET', '/en/event/99999');
 
         // Event not found should result in error (404 or 500 if null check fails)
-        $this->assertTrue(
+        static::assertTrue(
             $client->getResponse()->getStatusCode() >= 400,
             'Non-existent event should return error status',
         );
@@ -158,7 +158,7 @@ class EventsPageTest extends WebTestCase
         $this->assertResponseRedirects();
     }
 
-    private function login($client, string $email, string $password): void
+    private function login($client, string $email, #[\SensitiveParameter] string $password): void
     {
         $crawler = $client->request('GET', '/en/login');
         $form = $crawler

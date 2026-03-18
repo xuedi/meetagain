@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/glossary/suggestion')]
-class SuggestionController extends AbstractGlossaryController
+final class SuggestionController extends AbstractGlossaryController
 {
     #[Route('/list/{id}', name: 'app_plugin_glossary_suggestion_list', methods: ['GET'])]
     public function suggestionList(int $id): Response

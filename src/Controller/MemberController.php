@@ -5,16 +5,16 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Filter\Member\MemberFilterService;
 use App\Repository\UserRepository;
+use App\Service\Media\ImageService;
 use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
-use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 
-class MemberController extends AbstractController
+final class MemberController extends AbstractController
 {
     public const string ROUTE_MEMBER = 'app_member';
     private const int PAGE_SIZE = 24;

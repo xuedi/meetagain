@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/glossary')]
-class IndexController extends AbstractGlossaryController
+final class IndexController extends AbstractGlossaryController
 {
     #[Route('', name: 'app_plugin_glossary', methods: ['GET'])]
     public function show(): Response

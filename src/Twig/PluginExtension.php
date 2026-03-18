@@ -46,9 +46,9 @@ final class PluginExtension extends AbstractExtension
 
     public function getPluginsLinks(): array
     {
-        $links = $this->collectFromPlugins(fn(Plugin $p) => $p->getMenuLinks());
+        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getMenuLinks());
 
-        usort($links, fn($a, $b) => $a->getPriority() <=> $b->getPriority());
+        usort($links, static fn($a, $b) => $a->getPriority() <=> $b->getPriority());
 
         return $links;
     }
@@ -63,7 +63,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginsAdminSystemLinks(): array
     {
-        return $this->collectFromPlugins(fn(Plugin $p) => $p->getAdminSystemLinks());
+        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getAdminSystemLinks());
     }
 
     /**
@@ -71,7 +71,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginStylesheets(): array
     {
-        return $this->collectFromPlugins(function (Plugin $plugin) {
+        return $this->collectFromPlugins(static function (Plugin $plugin) {
             $paths = [];
             foreach ($plugin->getStylesheets() as $path) {
                 $paths[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
@@ -85,7 +85,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginJavascripts(): array
     {
-        return $this->collectFromPlugins(function (Plugin $plugin) {
+        return $this->collectFromPlugins(static function (Plugin $plugin) {
             $paths = [];
             foreach ($plugin->getJavascripts() as $path) {
                 $paths[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
@@ -99,7 +99,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginFooterAbout(): ?string
     {
-        return $this->findFirstFromPlugins(fn(Plugin $p) => $p->getFooterAbout());
+        return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getFooterAbout());
     }
 
     /**
@@ -107,7 +107,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getMemberPageTop(): ?string
     {
-        return $this->findFirstFromPlugins(fn(Plugin $p) => $p->getMemberPageTop());
+        return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getMemberPageTop());
     }
 
     /**
@@ -138,12 +138,14 @@ final class PluginExtension extends AbstractExtension
             return $this->renderTags($this->tagCache[$eventId]);
         }
 
-        $tags = $this->collectFromPlugins(function (Plugin $plugin) use ($eventId) {
+        $tags = $this->collectFromPlugins(static function (Plugin $plugin) use ($eventId) {
             $validTags = [];
             foreach ($plugin->getEventListItemTags($eventId) as $tag) {
-                if ($tag instanceof EventListItemTag) {
-                    $validTags[] = $tag;
+                if (!$tag instanceof EventListItemTag) {
+                    continue;
                 }
+
+                $validTags[] = $tag;
             }
             return $validTags;
         });

@@ -107,9 +107,11 @@ class EmailTemplate
     public function findTranslation(string $language): ?EmailTemplateTranslation
     {
         foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() === $language) {
-                return $translation;
+            if ($translation->getLanguage() !== $language) {
+                continue;
             }
+
+            return $translation;
         }
 
         return null;

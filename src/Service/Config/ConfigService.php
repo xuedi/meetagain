@@ -54,9 +54,11 @@ readonly class ConfigService
     public function isValidThumbnailSize(ImageType $type, int $checkWidth, int $checkHeight): bool
     {
         foreach ($this->getThumbnailSizes($type) as [$width, $height]) {
-            if ($checkWidth == $width && $checkHeight == $height) {
-                return true;
+            if (!($checkWidth == $width && $checkHeight == $height)) {
+                continue;
             }
+
+            return true;
         }
 
         return false;
@@ -209,9 +211,11 @@ readonly class ConfigService
     public function saveColors(array $colors): void
     {
         foreach ($colors as $name => $value) {
-            if (preg_match('/^#[0-9A-Fa-f]{6}$/', (string) $value)) {
-                $this->setString($name, $value);
+            if (!preg_match('/^#[0-9A-Fa-f]{6}$/', (string) $value)) {
+                continue;
             }
+
+            $this->setString($name, $value);
         }
         $this->cache->delete(self::CACHE_KEY_THEME_COLORS);
     }

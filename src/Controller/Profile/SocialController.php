@@ -9,7 +9,7 @@ use App\Service\Member\FriendshipService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class SocialController extends AbstractController
+final class SocialController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,

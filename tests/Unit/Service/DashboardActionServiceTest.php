@@ -51,7 +51,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getNeedForApproval();
 
-        $this->assertCount(2, $result);
+        static::assertCount(2, $result);
     }
 
     public function testGetActionItemsReturnsExpectedCounts(): void
@@ -62,9 +62,9 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getActionItems();
 
-        $this->assertSame(3, $result['reportedImages']);
-        $this->assertSame(2, $result['staleEmails']);
-        $this->assertSame(10, $result['pendingEmails']);
+        static::assertSame(3, $result['reportedImages']);
+        static::assertSame(2, $result['staleEmails']);
+        static::assertSame(10, $result['pendingEmails']);
     }
 
     public function testGetUserStatusBreakdownDelegatesToRepo(): void
@@ -74,7 +74,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getUserStatusBreakdown();
 
-        $this->assertSame($breakdown, $result);
+        static::assertSame($breakdown, $result);
     }
 
     public function testGetActiveUsersCountReturnsCount(): void
@@ -83,7 +83,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getActiveUsersCount();
 
-        $this->assertSame(42, $result);
+        static::assertSame(42, $result);
     }
 
     public function testGetImageStatsDelegatesToRepo(): void
@@ -96,7 +96,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getImageStats($start, $stop);
 
-        $this->assertSame($stats, $result);
+        static::assertSame($stats, $result);
     }
 
     public function testGetUpcomingEventsReturnsEvents(): void
@@ -106,7 +106,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getUpcomingEvents(3);
 
-        $this->assertCount(3, $result);
+        static::assertCount(3, $result);
     }
 
     public function testGetPastEventsWithoutPhotosReturnsEvents(): void
@@ -116,7 +116,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getPastEventsWithoutPhotos(5);
 
-        $this->assertCount(1, $result);
+        static::assertCount(1, $result);
     }
 
     public function testGetRecurringEventsCountReturnsCount(): void
@@ -125,7 +125,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getRecurringEventsCount();
 
-        $this->assertSame(7, $result);
+        static::assertSame(7, $result);
     }
 
     public function testGetUnverifiedCountReturnsCount(): void
@@ -134,7 +134,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getUnverifiedCount();
 
-        $this->assertSame(3, $result);
+        static::assertSame(3, $result);
     }
 
     public function testGetMessageStatsReturnsStats(): void
@@ -144,7 +144,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getMessageStats();
 
-        $this->assertSame($stats, $result);
+        static::assertSame($stats, $result);
     }
 
     public function testGetEmailQueueBreakdownReturnsBreakdown(): void
@@ -154,7 +154,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getEmailQueueBreakdown();
 
-        $this->assertSame($breakdown, $result);
+        static::assertSame($breakdown, $result);
     }
 
     public function testGetCommandExecutionStatsReturnsStats(): void
@@ -164,7 +164,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getCommandExecutionStats();
 
-        $this->assertSame($stats, $result);
+        static::assertSame($stats, $result);
     }
 
     public function testGetLastCommandExecutionsReturnsLogs(): void
@@ -174,7 +174,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getLastCommandExecutions();
 
-        $this->assertSame($logs, $result);
+        static::assertSame($logs, $result);
     }
 
     public function testGetEmailDeliveryStatsReturnsStats(): void
@@ -184,7 +184,7 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getEmailDeliveryStats();
 
-        $this->assertSame($stats, $result);
+        static::assertSame($stats, $result);
     }
 
     public function testGetEmailDeliverySuccessRateReturnsRate(): void
@@ -193,6 +193,6 @@ class DashboardActionServiceTest extends TestCase
 
         $result = $this->subject->getEmailDeliverySuccessRate();
 
-        $this->assertSame(98.5, $result);
+        static::assertSame(98.5, $result);
     }
 }

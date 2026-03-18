@@ -3,7 +3,6 @@
 namespace Plugin\Dishes\Controller;
 
 use App\Controller\AbstractController;
-use Plugin\Dishes\Entity\DishList;
 use Plugin\Dishes\Form\DishListType;
 use Plugin\Dishes\Repository\DishRepository;
 use Plugin\Dishes\Service\DishListService;
@@ -15,7 +14,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/dishes/lists')]
 #[IsGranted('ROLE_USER')]
-class ListController extends AbstractController
+final class ListController extends AbstractController
 {
     public function __construct(
         private readonly DishListService $listService,

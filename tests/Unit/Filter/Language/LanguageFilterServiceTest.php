@@ -19,8 +19,8 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->getLanguageCodeFilter();
 
         // Assert - No active filters means no restriction
-        $this->assertNull($result->getLanguageCodes());
-        $this->assertFalse($result->hasActiveFilter());
+        static::assertNull($result->getLanguageCodes());
+        static::assertFalse($result->hasActiveFilter());
     }
 
     public function testGetLanguageCodeFilterWithSingleFilter(): void
@@ -36,8 +36,8 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->getLanguageCodeFilter();
 
         // Assert
-        $this->assertEquals(['en', 'de'], $result->getLanguageCodes());
-        $this->assertTrue($result->hasActiveFilter());
+        static::assertEquals(['en', 'de'], $result->getLanguageCodes());
+        static::assertTrue($result->hasActiveFilter());
     }
 
     public function testGetLanguageCodeFilterWithNullFilter(): void
@@ -53,8 +53,8 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->getLanguageCodeFilter();
 
         // Assert - null means no opinion, should return no filter
-        $this->assertNull($result->getLanguageCodes());
-        $this->assertFalse($result->hasActiveFilter());
+        static::assertNull($result->getLanguageCodes());
+        static::assertFalse($result->hasActiveFilter());
     }
 
     public function testGetLanguageCodeFilterWithEmptyFilter(): void
@@ -70,9 +70,9 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->getLanguageCodeFilter();
 
         // Assert - Empty array means block all
-        $this->assertTrue($result->isEmpty());
-        $this->assertEquals([], $result->getLanguageCodes());
-        $this->assertTrue($result->hasActiveFilter());
+        static::assertTrue($result->isEmpty());
+        static::assertEquals([], $result->getLanguageCodes());
+        static::assertTrue($result->hasActiveFilter());
     }
 
     public function testGetLanguageCodeFilterWithMultipleFiltersIntersects(): void
@@ -92,8 +92,8 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->getLanguageCodeFilter();
 
         // Assert - AND logic: only codes in both filters
-        $this->assertEquals(['de', 'fr'], $result->getLanguageCodes());
-        $this->assertTrue($result->hasActiveFilter());
+        static::assertEquals(['de', 'fr'], $result->getLanguageCodes());
+        static::assertTrue($result->hasActiveFilter());
     }
 
     public function testGetLanguageCodeFilterWithNoIntersectionReturnsEmpty(): void
@@ -113,8 +113,8 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->getLanguageCodeFilter();
 
         // Assert - No intersection means empty result
-        $this->assertTrue($result->isEmpty());
-        $this->assertEquals([], $result->getLanguageCodes());
+        static::assertTrue($result->isEmpty());
+        static::assertEquals([], $result->getLanguageCodes());
     }
 
     public function testIsLanguageAccessibleWithNoFilters(): void
@@ -126,7 +126,7 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->isLanguageAccessible('en');
 
         // Assert - Default behavior allows access when no filters registered
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testIsLanguageAccessibleWithDenyingFilter(): void
@@ -142,7 +142,7 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->isLanguageAccessible('fr');
 
         // Assert
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 
     public function testIsLanguageAccessibleWithAllowingFilter(): void
@@ -158,7 +158,7 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->isLanguageAccessible('en');
 
         // Assert
-        $this->assertTrue($result);
+        static::assertTrue($result);
     }
 
     public function testFilterPriorityOrdering(): void
@@ -178,6 +178,6 @@ class LanguageFilterServiceTest extends TestCase
         $result = $service->isLanguageAccessible('de');
 
         // Assert - Returns false without checking low priority filter
-        $this->assertFalse($result);
+        static::assertFalse($result);
     }
 }

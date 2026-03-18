@@ -13,7 +13,7 @@ class AdminLinkTest extends TestCase
         $link = new AdminLink('Dashboard', 'app_admin_dashboard', 'dashboard');
 
         // Assert
-        $this->assertNull($link->getRole());
+        static::assertNull($link->getRole());
     }
 
     public function testGetRoleReturnsSpecifiedRole(): void
@@ -22,7 +22,7 @@ class AdminLinkTest extends TestCase
         $link = new AdminLink('Settings', 'app_admin_settings', 'settings', 'ROLE_ADMIN');
 
         // Assert
-        $this->assertSame('ROLE_ADMIN', $link->getRole());
+        static::assertSame('ROLE_ADMIN', $link->getRole());
     }
 
     public function testConstructorAcceptsAllParameters(): void
@@ -31,9 +31,9 @@ class AdminLinkTest extends TestCase
         $link = new AdminLink('Users', 'app_admin_users', 'users', 'ROLE_META_ADMIN');
 
         // Assert
-        $this->assertSame('Users', $link->getLabel());
-        $this->assertSame('app_admin_users', $link->getRoute());
-        $this->assertSame('users', $link->getActive());
-        $this->assertSame('ROLE_META_ADMIN', $link->getRole());
+        static::assertSame('Users', $link->getLabel());
+        static::assertSame('app_admin_users', $link->getRoute());
+        static::assertSame('users', $link->getActive());
+        static::assertSame('ROLE_META_ADMIN', $link->getRole());
     }
 }

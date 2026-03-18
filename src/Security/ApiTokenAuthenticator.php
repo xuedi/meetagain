@@ -54,8 +54,11 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
     }
 
     #[Override]
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
+    public function onAuthenticationSuccess(
+        Request $request,
+        #[\SensitiveParameter] TokenInterface $token,
+        string $firewallName,
+    ): ?Response {
         return null;
     }
 

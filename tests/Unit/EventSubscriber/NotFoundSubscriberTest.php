@@ -34,8 +34,8 @@ class NotFoundSubscriberTest extends TestCase
     {
         $events = NotFoundSubscriber::getSubscribedEvents();
 
-        $this->assertArrayHasKey(KernelEvents::EXCEPTION, $events);
-        $this->assertEquals([['onKernelException', 32]], $events[KernelEvents::EXCEPTION]);
+        static::assertArrayHasKey(KernelEvents::EXCEPTION, $events);
+        static::assertEquals([['onKernelException', 32]], $events[KernelEvents::EXCEPTION]);
     }
 
     public function testOnKernelExceptionIgnoresNonNotFoundExceptions(): void
@@ -53,7 +53,7 @@ class NotFoundSubscriberTest extends TestCase
 
         $subscriber->onKernelException($event);
 
-        $this->assertNull($event->getResponse());
+        static::assertNull($event->getResponse());
     }
 
     public function testOnKernelExceptionCreatesNotFoundPageAndLogsTo404Log(): void
@@ -64,7 +64,7 @@ class NotFoundSubscriberTest extends TestCase
         $cms->expects($this->once())->method('createNotFoundPage')->willReturn($notFoundResponse);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())->method('persist')->with($this->isInstanceOf(NotFoundLog::class));
+        $em->expects($this->once())->method('persist')->with(static::isInstanceOf(NotFoundLog::class));
         $em->expects($this->once())->method('flush');
 
         $subscriber = $this->createSubscriber(cms: $cms, em: $em);
@@ -78,7 +78,7 @@ class NotFoundSubscriberTest extends TestCase
 
         $subscriber->onKernelException($event);
 
-        $this->assertSame($notFoundResponse, $event->getResponse());
+        static::assertSame($notFoundResponse, $event->getResponse());
     }
 
     public function testOnKernelExceptionDoesNotLogWhenResponseIsOk(): void
@@ -119,6 +119,6 @@ class NotFoundSubscriberTest extends TestCase
 
         $subscriber->onKernelException($event);
 
-        $this->assertTrue($event->isPropagationStopped());
+        static::assertTrue($event->isPropagationStopped());
     }
 }

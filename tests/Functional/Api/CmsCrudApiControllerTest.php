@@ -3,10 +3,6 @@
 namespace Tests\Functional\Api;
 
 use App\Entity\CmsBlockTypes;
-use App\Entity\User;
-use App\Repository\UserRepository;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -55,14 +51,14 @@ class CmsCrudApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertIsArray($data);
-        $this->assertNotEmpty($data);
+        static::assertIsArray($data);
+        static::assertNotEmpty($data);
 
         $first = $data[0];
-        $this->assertArrayHasKey('id', $first);
-        $this->assertArrayHasKey('slug', $first);
-        $this->assertArrayHasKey('published', $first);
-        $this->assertArrayHasKey('titles', $first);
+        static::assertArrayHasKey('id', $first);
+        static::assertArrayHasKey('slug', $first);
+        static::assertArrayHasKey('published', $first);
+        static::assertArrayHasKey('titles', $first);
     }
 
     public function testGetSingleCmsPage(): void
@@ -81,9 +77,9 @@ class CmsCrudApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertSame($pageId, $data['id']);
-        $this->assertArrayHasKey('blocks', $data);
-        $this->assertArrayHasKey('linkNames', $data);
+        static::assertSame($pageId, $data['id']);
+        static::assertArrayHasKey('blocks', $data);
+        static::assertArrayHasKey('linkNames', $data);
     }
 
     public function testGetNonexistentCmsPage(): void
@@ -121,9 +117,9 @@ class CmsCrudApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseStatusCodeSame(201);
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertSame($slug, $data['slug']);
-        $this->assertFalse($data['published']);
-        $this->assertSame('API Test Page', $data['titles']['en'] ?? null);
+        static::assertSame($slug, $data['slug']);
+        static::assertFalse($data['published']);
+        static::assertSame('API Test Page', $data['titles']['en'] ?? null);
     }
 
     public function testCreateCmsPageWithoutSlugFails(): void
@@ -177,8 +173,8 @@ class CmsCrudApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertTrue($data['published']);
-        $this->assertSame('Updated Title', $data['titles']['en'] ?? null);
+        static::assertTrue($data['published']);
+        static::assertSame('Updated Title', $data['titles']['en'] ?? null);
     }
 
     public function testDeleteCmsPage(): void
@@ -216,7 +212,7 @@ class CmsCrudApiControllerTest extends WebTestCase
         $client->request('GET', '/api/cms/', [], [], ['HTTP_AUTHORIZATION' => 'Bearer ' . $token]);
         $pages = json_decode((string) $client->getResponse()->getContent(), true);
         $lockedPage = array_filter($pages, static fn(array $p): bool => $p['locked'] === true);
-        $this->assertNotEmpty($lockedPage, 'There should be at least one locked CMS page from fixtures');
+        static::assertNotEmpty($lockedPage, 'There should be at least one locked CMS page from fixtures');
         $lockedId = array_values($lockedPage)[0]['id'];
 
         // Act
@@ -260,9 +256,9 @@ class CmsCrudApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseStatusCodeSame(201);
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('id', $data);
-        $this->assertSame('en', $data['language']);
-        $this->assertSame(CmsBlockTypes::Headline->value, $data['type']);
+        static::assertArrayHasKey('id', $data);
+        static::assertSame('en', $data['language']);
+        static::assertSame(CmsBlockTypes::Headline->value, $data['type']);
     }
 
     public function testUpdateBlock(): void
@@ -309,8 +305,8 @@ class CmsCrudApiControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $data = json_decode((string) $client->getResponse()->getContent(), true);
-        $this->assertEquals(2.0, (float) $data['priority']);
-        $this->assertSame(['text' => 'Updated'], $data['json']);
+        static::assertSame(2.0, (float) $data['priority']);
+        static::assertSame(['text' => 'Updated'], $data['json']);
     }
 
     public function testDeleteBlock(): void

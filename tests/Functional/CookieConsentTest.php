@@ -37,8 +37,8 @@ class CookieConsentTest extends WebTestCase
         $cookies = $client->getCookieJar();
         $consentCookie = $cookies->get(Consent::TYPE_COOKIES);
 
-        $this->assertNotNull($consentCookie, 'Cookie consent cookie should be set');
-        $this->assertSame('granted', $consentCookie->getValue());
+        static::assertNotNull($consentCookie, 'Cookie consent cookie should be set');
+        static::assertSame('granted', $consentCookie->getValue());
     }
 
     public function testAcceptCookiesWithOsmConsentGranted(): void
@@ -50,8 +50,8 @@ class CookieConsentTest extends WebTestCase
         $cookies = $client->getCookieJar();
         $osmCookie = $cookies->get(Consent::TYPE_OSM);
 
-        $this->assertNotNull($osmCookie, 'OSM consent cookie should be set when osmConsent=true');
-        $this->assertSame('granted', $osmCookie->getValue());
+        static::assertNotNull($osmCookie, 'OSM consent cookie should be set when osmConsent=true');
+        static::assertSame('granted', $osmCookie->getValue());
     }
 
     public function testAcceptCookiesWithOsmConsentDenied(): void
@@ -63,8 +63,8 @@ class CookieConsentTest extends WebTestCase
         $cookies = $client->getCookieJar();
         $osmCookie = $cookies->get(Consent::TYPE_OSM);
 
-        $this->assertNotNull($osmCookie, 'OSM consent cookie should be set even when denied');
-        $this->assertSame('denied', $osmCookie->getValue());
+        static::assertNotNull($osmCookie, 'OSM consent cookie should be set even when denied');
+        static::assertSame('denied', $osmCookie->getValue());
     }
 
     public function testDenyCookiesEndpointReturnsSuccess(): void
@@ -92,7 +92,7 @@ class CookieConsentTest extends WebTestCase
         $setCookieHeaders = $response->headers->all('set-cookie');
 
         // The deny endpoint should clear the cookies
-        $this->assertNotEmpty($setCookieHeaders, 'Response should contain Set-Cookie headers to clear cookies');
+        static::assertNotEmpty($setCookieHeaders, 'Response should contain Set-Cookie headers to clear cookies');
     }
 
     public function testCookieConsentResponseIsJson(): void
@@ -102,7 +102,7 @@ class CookieConsentTest extends WebTestCase
         $client->request('GET', '/ajax/cookie/accept');
 
         $response = $client->getResponse();
-        $this->assertJson($response->getContent());
+        static::assertJson($response->getContent());
     }
 
     public function testFullCookieAcceptFlow(): void
@@ -122,10 +122,10 @@ class CookieConsentTest extends WebTestCase
         $consentCookie = $cookies->get(Consent::TYPE_COOKIES);
         $osmCookie = $cookies->get(Consent::TYPE_OSM);
 
-        $this->assertNotNull($consentCookie);
-        $this->assertNotNull($osmCookie);
-        $this->assertSame('granted', $consentCookie->getValue());
-        $this->assertSame('granted', $osmCookie->getValue());
+        static::assertNotNull($consentCookie);
+        static::assertNotNull($osmCookie);
+        static::assertSame('granted', $consentCookie->getValue());
+        static::assertSame('granted', $osmCookie->getValue());
 
         // Step 4: Subsequent requests should include these cookies
         // (The client automatically sends cookies on subsequent requests)
@@ -143,8 +143,8 @@ class CookieConsentTest extends WebTestCase
 
         // Step 2: Verify response indicates cookies should be cleared
         $response = $client->getResponse();
-        $this->assertJson($response->getContent());
-        $this->assertStringContainsString('Saved preferences', $response->getContent());
+        static::assertJson($response->getContent());
+        static::assertStringContainsString('Saved preferences', $response->getContent());
     }
 
     public function testCookiePageLoads(): void
@@ -178,10 +178,10 @@ class CookieConsentTest extends WebTestCase
         $consentCookie = $cookies->get(Consent::TYPE_COOKIES);
         $osmCookie = $cookies->get(Consent::TYPE_OSM);
 
-        $this->assertNotNull($consentCookie);
-        $this->assertSame('granted', $consentCookie->getValue());
-        $this->assertNotNull($osmCookie);
-        $this->assertSame('granted', $osmCookie->getValue());
+        static::assertNotNull($consentCookie);
+        static::assertSame('granted', $consentCookie->getValue());
+        static::assertNotNull($osmCookie);
+        static::assertSame('granted', $osmCookie->getValue());
     }
 
     public function testCookiePageFormSubmitDeny(): void
@@ -208,7 +208,7 @@ class CookieConsentTest extends WebTestCase
         $crawler = $client->request('GET', '/en/');
 
         $form = $crawler->filter('#dropdown-cookie form');
-        $this->assertCount(1, $form, 'Cookie banner form should exist');
-        $this->assertStringContainsString('/en/cookie/', $form->attr('action'));
+        static::assertCount(1, $form, 'Cookie banner form should exist');
+        static::assertStringContainsString('/en/cookie/', $form->attr('action'));
     }
 }

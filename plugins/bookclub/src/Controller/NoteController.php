@@ -13,7 +13,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/bookclub')]
 #[IsGranted('ROLE_USER')]
-class NoteController extends AbstractController
+final class NoteController extends AbstractController
 {
     public function __construct(
         private readonly NoteService $noteService,

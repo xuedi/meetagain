@@ -3,10 +3,10 @@
 namespace App\Service\System;
 
 use App\CronTaskInterface;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
-use App\EntityActionDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;

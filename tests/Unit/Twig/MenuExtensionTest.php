@@ -30,8 +30,8 @@ class MenuExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        $this->assertCount(1, $functions);
-        $this->assertSame('get_menu', $functions[0]->getName());
+        static::assertCount(1, $functions);
+        static::assertSame('get_menu', $functions[0]->getName());
     }
 
     public function testGetMenuDelegatesToMenuService(): void
@@ -51,7 +51,7 @@ class MenuExtensionTest extends TestCase
 
         $result = $this->subject->getMenu('main');
 
-        $this->assertSame($expectedMenu, $result);
+        static::assertSame($expectedMenu, $result);
     }
 
     public function testGetMenuUsesEnglishWhenNoRequest(): void
@@ -63,6 +63,6 @@ class MenuExtensionTest extends TestCase
 
         $result = $this->subject->getMenu('main');
 
-        $this->assertSame([], $result);
+        static::assertSame([], $result);
     }
 }

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ProfileController extends AbstractController
+final class ProfileController extends AbstractController
 {
     public const string ROUTE_PROFILE = 'app_profile';
 

@@ -116,7 +116,8 @@ class EmailQueueRepository extends ServiceEntityRepository
      */
     public function findWithProviderMessageIdAndNoStatus(int $limit): array
     {
-        return $this->createQueryBuilder('eq')
+        return $this
+            ->createQueryBuilder('eq')
             ->where('eq.providerMessageId IS NOT NULL')
             ->andWhere('eq.providerStatus IS NULL')
             ->orderBy('eq.createdAt', 'DESC')

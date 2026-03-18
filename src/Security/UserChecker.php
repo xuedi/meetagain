@@ -10,6 +10,7 @@ use App\Service\Activity\ActivityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
+use SensitiveParameter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -39,7 +40,7 @@ readonly class UserChecker implements UserCheckerInterface
     }
 
     #[Override]
-    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
+    public function checkPostAuth(UserInterface $user, #[SensitiveParameter] ?TokenInterface $token = null): void
     {
         if (!$user instanceof User) {
             return;

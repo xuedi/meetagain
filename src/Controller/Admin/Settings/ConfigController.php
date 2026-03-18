@@ -4,7 +4,6 @@ namespace App\Controller\Admin\Settings;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
-use App\Entity\AdminLink;
 use App\Form\SeoSettingsType;
 use App\Form\SettingsType;
 use App\Service\Config\ConfigService;
@@ -15,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
-class ConfigController extends AbstractAdminController
+final class ConfigController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {

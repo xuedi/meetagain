@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AjaxController extends AbstractController
+final class AjaxController extends AbstractController
 {
     public function __construct(
         private readonly CaptchaService $captchaService,

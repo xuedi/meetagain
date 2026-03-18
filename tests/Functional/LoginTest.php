@@ -27,13 +27,13 @@ class LoginTest extends WebTestCase
         $crawler = $client->request('GET', '/en/login');
 
         $this->assertResponseIsSuccessful();
-        $this->assertGreaterThan(0, $crawler->filter('form')->count(), 'Login form should exist');
-        $this->assertGreaterThan(
+        static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Login form should exist');
+        static::assertGreaterThan(
             0,
             $crawler->filter('input[name="_username"]')->count(),
             'Username field should exist',
         );
-        $this->assertGreaterThan(
+        static::assertGreaterThan(
             0,
             $crawler->filter('input[name="_password"]')->count(),
             'Password field should exist',
@@ -60,8 +60,8 @@ class LoginTest extends WebTestCase
 
         // Verify user is authenticated by checking security token
         $user = $client->getContainer()->get('security.token_storage')->getToken()?->getUser();
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEqualsIgnoringCase(self::ADMIN_EMAIL, $user->getEmail());
+        static::assertInstanceOf(User::class, $user);
+        static::assertEqualsIgnoringCase(self::ADMIN_EMAIL, $user->getEmail());
 
         // Verify login activity was recorded in the database
         $em = $client->getContainer()->get(EntityManagerInterface::class);
@@ -69,8 +69,8 @@ class LoginTest extends WebTestCase
             'user' => $user,
             'type' => ActivityType::Login,
         ]);
-        $this->assertNotNull($activity, 'Login activity should be recorded in the database');
-        $this->assertSame(ActivityType::Login, $activity->getType());
+        static::assertNotNull($activity, 'Login activity should be recorded in the database');
+        static::assertSame(ActivityType::Login, $activity->getType());
     }
 
     public function testLoginWithInvalidCredentials(): void
@@ -91,7 +91,7 @@ class LoginTest extends WebTestCase
         $this->assertResponseRedirects();
 
         $crawler = $client->followRedirect();
-        $this->assertGreaterThan(0, $crawler->filter('.alert')->count(), 'Error alert should be shown');
+        static::assertGreaterThan(0, $crawler->filter('.alert')->count(), 'Error alert should be shown');
     }
 
     public function testLoginWithEmptyCredentials(): void
@@ -174,7 +174,7 @@ class LoginTest extends WebTestCase
         $crawler = $client->request('GET', '/en/register');
 
         $this->assertResponseIsSuccessful();
-        $this->assertGreaterThan(0, $crawler->filter('form')->count(), 'Register form should exist');
+        static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Register form should exist');
     }
 
     public function testPasswordResetPageLoads(): void
@@ -184,6 +184,6 @@ class LoginTest extends WebTestCase
         $crawler = $client->request('GET', '/en/reset');
 
         $this->assertResponseIsSuccessful();
-        $this->assertGreaterThan(0, $crawler->filter('form')->count(), 'Reset form should exist');
+        static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Reset form should exist');
     }
 }

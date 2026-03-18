@@ -39,7 +39,7 @@ class PasswordResetServiceTest extends TestCase
 
         $result = $service->requestReset('unknown@example.com');
 
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testRequestResetSetsRegcodeAndPersistsUser(): void
@@ -58,9 +58,9 @@ class PasswordResetServiceTest extends TestCase
 
         $result = $service->requestReset('test@example.com');
 
-        $this->assertSame($user, $result);
-        $this->assertNotNull($user->getRegcode());
-        $this->assertEquals(64, strlen($user->getRegcode())); // bin2hex(random_bytes(32)) is 64 chars
+        static::assertSame($user, $result);
+        static::assertNotNull($user->getRegcode());
+        static::assertSame(64, strlen($user->getRegcode())); // bin2hex(random_bytes(32)) is 64 chars
     }
 
     public function testRequestResetLogsActivityAndSendsEmail(): void
@@ -99,7 +99,7 @@ class PasswordResetServiceTest extends TestCase
 
         $result = $service->findUserByResetCode('abc123');
 
-        $this->assertSame($user, $result);
+        static::assertSame($user, $result);
     }
 
     public function testFindUserByResetCodeReturnsNullWhenNotFound(): void
@@ -111,7 +111,7 @@ class PasswordResetServiceTest extends TestCase
 
         $result = $service->findUserByResetCode('invalid-code');
 
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testResetPasswordHashesPasswordAndClearsRegcode(): void
@@ -135,8 +135,8 @@ class PasswordResetServiceTest extends TestCase
 
         $service->resetPassword($user, 'newPassword123');
 
-        $this->assertEquals('new-hashed-password', $user->getPassword());
-        $this->assertNull($user->getRegcode());
+        static::assertSame('new-hashed-password', $user->getPassword());
+        static::assertNull($user->getRegcode());
     }
 
     public function testResetPasswordLogsActivity(): void

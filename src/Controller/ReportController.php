@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ReportController extends AbstractController
+final class ReportController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,

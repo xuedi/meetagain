@@ -47,9 +47,9 @@ class UpdatedProfilePictureTest extends TestCase
         $subject = new UpdatedProfilePicture()->injectServices($this->router, $this->imageRenderer, $meta);
 
         // check returns
-        $this->assertInstanceOf(MessageInterface::class, $subject->validate());
-        $this->assertEquals(ActivityType::UpdatedProfilePicture, $subject->getType());
-        $this->assertEquals($expectedText, $subject->render());
-        $this->assertEquals($expectedHtml, $subject->render(true));
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::UpdatedProfilePicture, $subject->getType());
+        static::assertEquals($expectedText, $subject->render());
+        static::assertEquals($expectedHtml, $subject->render(true));
     }
 }

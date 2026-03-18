@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/glossary/delete')]
-class DeleteController extends AbstractGlossaryController
+final class DeleteController extends AbstractGlossaryController
 {
     #[Route('/view/{id}', name: 'app_plugin_glossary_delete_view', methods: ['GET'])]
     public function deleteView(int $id): Response

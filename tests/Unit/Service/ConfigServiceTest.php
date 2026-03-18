@@ -29,9 +29,10 @@ class ConfigServiceTest extends TestCase
         // Always simulate a cache miss so the callback (and thus the repo) is exercised
         $this->cacheStub
             ->method('get')
-            ->willReturnCallback(function (string $key, callable $callback): mixed {
-                return $callback($this->createStub(ItemInterface::class));
-            });
+            ->willReturnCallback(fn(
+                string $key,
+                callable $callback,
+            ): mixed => $callback($this->createStub(ItemInterface::class)));
         $this->subject = new ConfigService(
             repo: $this->configRepoStub,
             em: $this->entityManagerStub,
@@ -42,7 +43,7 @@ class ConfigServiceTest extends TestCase
     #[DataProvider('thumbnailSizeProvider')]
     public function testGetThumbnailSizes(ImageType $imageType, array $expected): void
     {
-        $this->assertSame($expected, $this->subject->getThumbnailSizes($imageType));
+        static::assertSame($expected, $this->subject->getThumbnailSizes($imageType));
     }
 
     public static function thumbnailSizeProvider(): Generator
@@ -85,13 +86,13 @@ class ConfigServiceTest extends TestCase
             '50x50' => 0,
         ];
 
-        $this->assertSame($expected, $this->subject->getThumbnailSizeList());
+        static::assertSame($expected, $this->subject->getThumbnailSizeList());
     }
 
     #[DataProvider('thumbnailSizeValidationProvider')]
     public function testIsValidThumbnailSize(ImageType $imageType, int $width, int $height, bool $expected): void
     {
-        $this->assertSame($expected, $this->subject->isValidThumbnailSize($imageType, $width, $height));
+        static::assertSame($expected, $this->subject->isValidThumbnailSize($imageType, $width, $height));
     }
 
     public static function thumbnailSizeValidationProvider(): Generator
@@ -119,42 +120,42 @@ class ConfigServiceTest extends TestCase
     {
         $this->configRepoStub->method('findOneBy')->willReturn(null);
 
-        $this->assertSame('https://localhost', $this->subject->getHost());
+        static::assertSame('https://localhost', $this->subject->getHost());
     }
 
     public function testGetHostReturnsConfiguredValue(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('https://example.com'));
 
-        $this->assertSame('https://example.com', $this->subject->getHost());
+        static::assertSame('https://example.com', $this->subject->getHost());
     }
 
     public function testGetUrlReturnsDefaultWhenNotConfigured(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(null);
 
-        $this->assertSame('localhost', $this->subject->getUrl());
+        static::assertSame('localhost', $this->subject->getUrl());
     }
 
     public function testGetUrlReturnsConfiguredValue(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('example.com'));
 
-        $this->assertSame('example.com', $this->subject->getUrl());
+        static::assertSame('example.com', $this->subject->getUrl());
     }
 
     public function testGetSystemUserIdReturnsDefaultWhenNotConfigured(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(null);
 
-        $this->assertSame(1, $this->subject->getSystemUserId());
+        static::assertSame(1, $this->subject->getSystemUserId());
     }
 
     public function testGetSystemUserIdReturnsConfiguredValue(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('42'));
 
-        $this->assertSame(42, $this->subject->getSystemUserId());
+        static::assertSame(42, $this->subject->getSystemUserId());
     }
 
     public function testGetMailerAddressReturnsDefaultsWhenNotConfigured(): void
@@ -163,15 +164,15 @@ class ConfigServiceTest extends TestCase
 
         $address = $this->subject->getMailerAddress();
 
-        $this->assertSame('sender@email.com', $address->getAddress());
-        $this->assertSame('email sender', $address->getName());
+        static::assertSame('sender@email.com', $address->getAddress());
+        static::assertSame('email sender', $address->getName());
     }
 
     public function testGetMailerAddressReturnsConfiguredValues(): void
     {
         $this->configRepoStub
             ->method('findOneBy')
-            ->willReturnCallback(fn(array $criteria) => match ($criteria['name']) {
+            ->willReturnCallback(static fn(array $criteria) => match ($criteria['name']) {
                 'email_sender_mail' => new Config()->setValue('noreply@example.com'),
                 'email_sender_name' => new Config()->setValue('Example Sender'),
                 default => null,
@@ -179,50 +180,50 @@ class ConfigServiceTest extends TestCase
 
         $address = $this->subject->getMailerAddress();
 
-        $this->assertSame('noreply@example.com', $address->getAddress());
-        $this->assertSame('Example Sender', $address->getName());
+        static::assertSame('noreply@example.com', $address->getAddress());
+        static::assertSame('Example Sender', $address->getName());
     }
 
     public function testIsShowFrontpageReturnsFalseByDefault(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(null);
 
-        $this->assertFalse($this->subject->isShowFrontpage());
+        static::assertFalse($this->subject->isShowFrontpage());
     }
 
     public function testIsShowFrontpageReturnsTrueWhenEnabled(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('true'));
 
-        $this->assertTrue($this->subject->isShowFrontpage());
+        static::assertTrue($this->subject->isShowFrontpage());
     }
 
     public function testIsShowFrontpageReturnsFalseWhenDisabled(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('false'));
 
-        $this->assertFalse($this->subject->isShowFrontpage());
+        static::assertFalse($this->subject->isShowFrontpage());
     }
 
     public function testIsSendRsvpNotificationsReturnsTrueByDefault(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(null);
 
-        $this->assertTrue($this->subject->isSendRsvpNotifications());
+        static::assertTrue($this->subject->isSendRsvpNotifications());
     }
 
     public function testIsSendRsvpNotificationsReturnsTrueWhenEnabled(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('true'));
 
-        $this->assertTrue($this->subject->isSendRsvpNotifications());
+        static::assertTrue($this->subject->isSendRsvpNotifications());
     }
 
     public function testIsSendRsvpNotificationsReturnsFalseWhenDisabled(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('false'));
 
-        $this->assertFalse($this->subject->isSendRsvpNotifications());
+        static::assertFalse($this->subject->isSendRsvpNotifications());
     }
 
     public function testSaveFormCreatesNewSettings(): void
@@ -231,7 +232,7 @@ class ConfigServiceTest extends TestCase
         $configRepoStub->method('findOneBy')->willReturn(null);
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock->expects($this->exactly(6))->method('persist')->with($this->isInstanceOf(Config::class));
+        $entityManagerMock->expects($this->exactly(6))->method('persist')->with(static::isInstanceOf(Config::class));
         $entityManagerMock->expects($this->exactly(6))->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);
@@ -258,7 +259,7 @@ class ConfigServiceTest extends TestCase
         $configRepoStub->method('findOneBy')->willReturn($existingConfig);
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock->expects($this->exactly(6))->method('persist')->with($this->isInstanceOf(Config::class));
+        $entityManagerMock->expects($this->exactly(6))->method('persist')->with(static::isInstanceOf(Config::class));
         $entityManagerMock->expects($this->exactly(6))->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);

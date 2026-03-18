@@ -218,65 +218,40 @@ class Cms
         return $this->blocks;
     }
 
-    public function getLanguages(): array
-    {
-        $languages = [];
-        foreach ($this->blocks as $block) {
-            $languages[$block->getLanguage()] = true;
-        }
-
-        return array_keys($languages);
-    }
-
     public function getLanguageFilteredBlockJsonList(string $language): Collection
     {
-        $objects = [];
-        foreach ($this->blocks as $block) {
-            if ($block->getLanguage() === $language) {
-                $objects[] = CmsBlockTypes::buildObject($block->getType(), $block->getJson(), $block->getImage());
-            }
-        }
-
-        return new ArrayCollection($objects);
+        return new ArrayCollection(
+            $this->blocks
+                ->filter(static fn(CmsBlock $b) => $b->getLanguage() === $language)
+                ->map(static fn(CmsBlock $b) => CmsBlockTypes::buildObject(
+                    $b->getType(),
+                    $b->getJson(),
+                    $b->getImage(),
+                ))
+                ->toArray(),
+        );
     }
 
     public function getPageTitle(string $language): ?string
     {
-        foreach ($this->titles as $title) {
-            if ($title->getLanguage() === $language) {
-                return $title->getTitle();
-            }
-        }
-
-        return null;
+        return $this->titles->findFirst(static fn(int $k, CmsTitle $t) => $t->getLanguage() === $language)?->getTitle();
     }
 
     public function getLinkName(string $language): ?string
     {
-        foreach ($this->linkNames as $linkName) {
-            if ($linkName->getLanguage() === $language) {
-                return $linkName->getName();
-            }
-        }
-
-        return null;
+        return $this->linkNames
+            ->findFirst(static fn(int $k, CmsLinkName $l) => $l->getLanguage() === $language)
+            ?->getName();
     }
 
     public function getPageContent(string $language): ?string
     {
-        $content = [];
-        foreach ($this->blocks as $block) {
-            if ($block->getLanguage() === $language && $block->getType() === CmsBlockTypes::Text) {
-                $content[] = TextType::fromJson($block->getJson())->content;
-            }
-        }
+        $content = $this->blocks
+            ->filter(static fn(CmsBlock $b) => $b->getLanguage() === $language && $b->getType() === CmsBlockTypes::Text)
+            ->map(static fn(CmsBlock $b) => TextType::fromJson($b->getJson())->content)
+            ->toArray();
 
         return $content !== [] ? implode("\n\n", $content) : null;
-    }
-
-    public function hasContentForLanguage(string $language): bool
-    {
-        return $this->getPageTitle($language) !== null;
     }
 
     public function addBlock(CmsBlock $block): static

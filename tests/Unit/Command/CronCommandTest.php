@@ -19,7 +19,7 @@ class CronCommandTest extends TestCase
         $command = new CronCommand($loggerStub, $commandExecServiceStub);
 
         // Assert
-        $this->assertSame('app:cron', $command->getName());
+        static::assertSame('app:cron', $command->getName());
     }
 
     public function testCommandHasCorrectDescription(): void
@@ -32,6 +32,6 @@ class CronCommandTest extends TestCase
         $command = new CronCommand($loggerStub, $commandExecServiceStub);
 
         // Assert
-        $this->assertSame('cron manager to be called often, maybe every 5 min or so', $command->getDescription());
+        static::assertSame('cron manager to be called often, maybe every 5 min or so', $command->getDescription());
     }
 }

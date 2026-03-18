@@ -37,7 +37,7 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->getTemplate(EmailType::Welcome);
 
         // Assert
-        $this->assertSame($template, $result);
+        static::assertSame($template, $result);
     }
 
     public function testGetTemplateReturnsNullWhenNotFound(): void
@@ -49,7 +49,7 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->getTemplate(EmailType::VerificationRequest);
 
         // Assert
-        $this->assertNull($result);
+        static::assertNull($result);
     }
 
     public function testGetTemplateContentReturnsContentForRequestedLanguage(): void
@@ -62,8 +62,8 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->getTemplateContent(EmailType::Welcome, 'en');
 
         // Assert
-        $this->assertSame('Welcome!', $result['subject']);
-        $this->assertSame('<h1>Hello</h1>', $result['body']);
+        static::assertSame('Welcome!', $result['subject']);
+        static::assertSame('<h1>Hello</h1>', $result['body']);
     }
 
     public function testGetTemplateContentFallsBackToEnglish(): void
@@ -76,8 +76,8 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->getTemplateContent(EmailType::Welcome, 'de');
 
         // Assert - should fall back to English
-        $this->assertSame('Welcome!', $result['subject']);
-        $this->assertSame('<h1>Hello</h1>', $result['body']);
+        static::assertSame('Welcome!', $result['subject']);
+        static::assertSame('<h1>Hello</h1>', $result['body']);
     }
 
     public function testGetTemplateContentThrowsWhenTemplateNotFound(): void
@@ -117,7 +117,7 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->renderContent($content, $context);
 
         // Assert
-        $this->assertSame($expected, $result);
+        static::assertSame($expected, $result);
     }
 
     public static function renderContentProvider(): Generator
@@ -172,7 +172,7 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->renderContent($content, $context);
 
         // Assert: non-scalar values should not be replaced
-        $this->assertSame('Object: {{obj}}, Array: {{arr}}', $result);
+        static::assertSame('Object: {{obj}}, Array: {{arr}}', $result);
     }
 
     public function testGetDefaultTemplatesReturnsAllTemplates(): void
@@ -181,16 +181,16 @@ class EmailTemplateServiceTest extends TestCase
         $templates = $this->subject->getDefaultTemplates();
 
         // Assert
-        $this->assertCount(9, $templates);
-        $this->assertArrayHasKey('verification_request', $templates);
-        $this->assertArrayHasKey('welcome', $templates);
-        $this->assertArrayHasKey('password_reset_request', $templates);
-        $this->assertArrayHasKey('notification_message', $templates);
-        $this->assertArrayHasKey('notification_rsvp_aggregated', $templates);
-        $this->assertArrayHasKey('notification_event_canceled', $templates);
-        $this->assertArrayHasKey('announcement', $templates);
-        $this->assertArrayHasKey('support_notification', $templates);
-        $this->assertArrayHasKey('admin_notification', $templates);
+        static::assertCount(9, $templates);
+        static::assertArrayHasKey('verification_request', $templates);
+        static::assertArrayHasKey('welcome', $templates);
+        static::assertArrayHasKey('password_reset_request', $templates);
+        static::assertArrayHasKey('notification_message', $templates);
+        static::assertArrayHasKey('notification_rsvp_aggregated', $templates);
+        static::assertArrayHasKey('notification_event_canceled', $templates);
+        static::assertArrayHasKey('announcement', $templates);
+        static::assertArrayHasKey('support_notification', $templates);
+        static::assertArrayHasKey('admin_notification', $templates);
     }
 
     public function testGetDefaultTemplatesContainsRequiredKeys(): void
@@ -200,10 +200,10 @@ class EmailTemplateServiceTest extends TestCase
 
         // Assert
         foreach ($templates as $identifier => $template) {
-            $this->assertArrayHasKey('subject', $template, "Template '$identifier' missing 'subject'");
-            $this->assertArrayHasKey('body', $template, "Template '$identifier' missing 'body'");
-            $this->assertArrayHasKey('variables', $template, "Template '$identifier' missing 'variables'");
-            $this->assertIsArray($template['variables'], "Template '$identifier' variables should be array");
+            static::assertArrayHasKey('subject', $template, "Template '$identifier' missing 'subject'");
+            static::assertArrayHasKey('body', $template, "Template '$identifier' missing 'body'");
+            static::assertArrayHasKey('variables', $template, "Template '$identifier' missing 'variables'");
+            static::assertIsArray($template['variables'], "Template '$identifier' variables should be array");
         }
     }
 

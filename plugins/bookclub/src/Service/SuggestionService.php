@@ -2,8 +2,8 @@
 
 namespace Plugin\Bookclub\Service;
 
-use App\Enum\EntityAction;
 use App\EntityActionDispatcher;
+use App\Enum\EntityAction;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;
@@ -24,10 +24,15 @@ readonly class SuggestionService
 
     public function suggest(Book $book, int $userId): BookSuggestion
     {
-        foreach ($this->suggestionRepo->findUserPendingSuggestions($userId, $this->groupFilter->getAllowedSuggestionIds()) as $pending) {
-            if ($pending->getBook()->getId() === $book->getId()) {
-                throw new RuntimeException('You have already suggested this book.');
+        foreach ($this->suggestionRepo->findUserPendingSuggestions(
+            $userId,
+            $this->groupFilter->getAllowedSuggestionIds(),
+        ) as $pending) {
+            if ($pending->getBook()->getId() !== $book->getId()) {
+                continue;
             }
+
+            throw new RuntimeException('You have already suggested this book.');
         }
 
         $suggestion = new BookSuggestion();
@@ -70,7 +75,10 @@ readonly class SuggestionService
     /** @return BookSuggestion[] */
     public function getUserPendingSuggestions(int $userId): array
     {
-        return $this->suggestionRepo->findUserPendingSuggestions($userId, $this->groupFilter->getAllowedSuggestionIds());
+        return $this->suggestionRepo->findUserPendingSuggestions(
+            $userId,
+            $this->groupFilter->getAllowedSuggestionIds(),
+        );
     }
 
     /** @return BookSuggestion[] */

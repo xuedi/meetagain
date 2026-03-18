@@ -30,15 +30,17 @@ readonly class MessageFactory
         $locale = $request instanceof Request ? $request->getLocale() : 'en';
 
         foreach ($this->messages as $message) {
-            if ($message instanceof MessageInterface && $message->getType() === $activity->getType()) {
-                return $message->injectServices(
-                    $this->router,
-                    $this->imageRenderer,
-                    $activity->getMeta(),
-                    $this->userRepository->getUserNameList(),
-                    $this->eventRepository->getEventNameList($locale),
-                );
+            if (!($message instanceof MessageInterface && $message->getType() === $activity->getType())) {
+                continue;
             }
+
+            return $message->injectServices(
+                $this->router,
+                $this->imageRenderer,
+                $activity->getMeta(),
+                $this->userRepository->getUserNameList(),
+                $this->eventRepository->getEventNameList($locale),
+            );
         }
         throw new Exception('Cound not find message for activity type: ' . $activity->getType()->name);
     }

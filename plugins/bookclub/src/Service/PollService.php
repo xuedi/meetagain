@@ -2,8 +2,8 @@
 
 namespace Plugin\Bookclub\Service;
 
-use App\Enum\EntityAction;
 use App\EntityActionDispatcher;
+use App\Enum\EntityAction;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;
@@ -35,12 +35,8 @@ readonly class PollService
      * @param int[] $suggestionIds Existing suggestion IDs to include
      * @param int[] $bookIds       Book IDs to add directly (manager picks)
      */
-    public function create(
-        array $suggestionIds,
-        array $bookIds,
-        int $userId,
-        int $eventId,
-    ): BookPoll {
+    public function create(array $suggestionIds, array $bookIds, int $userId, int $eventId): BookPoll
+    {
         $poll = new BookPoll();
         $poll->setCreatedBy($userId);
         $poll->setCreatedAt(new DateTimeImmutable());
@@ -166,10 +162,12 @@ readonly class PollService
         $winner = null;
         $maxVotes = 0;
         foreach ($voteCounts as $suggestionId => $count) {
-            if ($count > $maxVotes) {
-                $maxVotes = $count;
-                $winner = $this->suggestionRepo->find($suggestionId);
+            if ($count <= $maxVotes) {
+                continue;
             }
+
+            $maxVotes = $count;
+            $winner = $this->suggestionRepo->find($suggestionId);
         }
 
         return [

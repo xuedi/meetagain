@@ -68,7 +68,7 @@ class CmsType extends AbstractType
             'mapped' => false,
         ]);
 
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($options): void {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, static function (FormEvent $event) use ($options): void {
             $cms = $event->getData();
             if (!$cms instanceof Cms) {
                 return;
@@ -86,22 +86,26 @@ class CmsType extends AbstractType
 
             // Populate pageTitle
             foreach ($cms->getTitles() as $title) {
-                if ($title->getLanguage() === $locale) {
-                    $form->get('pageTitle')->setData($title->getTitle());
-                    break;
+                if ($title->getLanguage() !== $locale) {
+                    continue;
                 }
+
+                $form->get('pageTitle')->setData($title->getTitle());
+                break;
             }
 
             // Populate linkName
             foreach ($cms->getLinkNames() as $linkName) {
-                if ($linkName->getLanguage() === $locale) {
-                    $form->get('linkName')->setData($linkName->getName());
-                    break;
+                if ($linkName->getLanguage() !== $locale) {
+                    continue;
                 }
+
+                $form->get('linkName')->setData($linkName->getName());
+                break;
             }
         });
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($options): void {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event) use ($options): void {
             $cms = $event->getData();
             $form = $event->getForm();
             if (!$cms instanceof Cms) {
@@ -122,20 +126,24 @@ class CmsType extends AbstractType
 
                 // Remove locations that are no longer selected
                 foreach ($existingValues as $value => $ml) {
-                    if (!in_array($value, $values, strict: true)) {
-                        $cms->removeMenuLocation($ml);
+                    if (in_array($value, $values, strict: true)) {
+                        continue;
                     }
+
+                    $cms->removeMenuLocation($ml);
                 }
 
                 // Add new locations that don't exist yet
                 foreach ($values as $value) {
-                    if (!isset($existingValues[$value])) {
-                        $location = MenuLocation::from($value);
-                        $menuLocation = new CmsMenuLocation();
-                        $menuLocation->setCms($cms);
-                        $menuLocation->setLocation($location);
-                        $cms->addMenuLocation($menuLocation);
+                    if (isset($existingValues[$value])) {
+                        continue;
                     }
+
+                    $location = MenuLocation::from($value);
+                    $menuLocation = new CmsMenuLocation();
+                    $menuLocation->setCms($cms);
+                    $menuLocation->setLocation($location);
+                    $cms->addMenuLocation($menuLocation);
                 }
             }
 
@@ -143,10 +151,12 @@ class CmsType extends AbstractType
             $titleText = $form->get('pageTitle')->getData();
             $existingTitle = null;
             foreach ($cms->getTitles() as $title) {
-                if ($title->getLanguage() === $locale) {
-                    $existingTitle = $title;
-                    break;
+                if ($title->getLanguage() !== $locale) {
+                    continue;
                 }
+
+                $existingTitle = $title;
+                break;
             }
 
             if ($titleText !== null && $titleText !== '') {
@@ -167,10 +177,12 @@ class CmsType extends AbstractType
             $linkNameText = $form->get('linkName')->getData();
             $existingLinkName = null;
             foreach ($cms->getLinkNames() as $linkName) {
-                if ($linkName->getLanguage() === $locale) {
-                    $existingLinkName = $linkName;
-                    break;
+                if ($linkName->getLanguage() !== $locale) {
+                    continue;
                 }
+
+                $existingLinkName = $linkName;
+                break;
             }
 
             if ($linkNameText !== null && $linkNameText !== '') {
@@ -193,9 +205,11 @@ class CmsType extends AbstractType
 
             $optionalFields = ['locked'];
             foreach ($optionalFields as $field) {
-                if (isset($data[$field]) && $this->isEmpty($data[$field])) {
-                    unset($data[$field]);
+                if (!(isset($data[$field]) && $this->isEmpty($data[$field]))) {
+                    continue;
                 }
+
+                unset($data[$field]);
             }
 
             $event->setData($data);
