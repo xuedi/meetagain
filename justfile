@@ -96,6 +96,12 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -n -q
 
+# Check for upgradable dependencies
+[group('app')]
+appUpgrade:
+    clear
+    {{JUST}} do 'composer show --outdated'
+
 
 
 
