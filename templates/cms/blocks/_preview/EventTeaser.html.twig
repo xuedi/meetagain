@@ -1,21 +1,23 @@
-<div class="columns is-vcentered">
-    {% if blockImage and not block.imageRight %}
-        <div class="column is-4">
-            {% include '_components/image.html.twig' with {'image': blockImage} %}
+<div class="box">
+    <div class="columns is-vcentered">
+        {% if blockImage and not block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': blockImage} %}
+            </div>
+        {% endif %}
+        <div class="column">
+            <h2 class="title is-4">{{ block.headline }}</h2>
+            <p>{{ block.text|nl2br }}</p>
         </div>
-    {% endif %}
-    <div class="column">
-        <h2 class="title is-4">{{ block.headline }}</h2>
-        <p>{{ block.text|nl2br }}</p>
-    </div>
-    {% if blockImage and block.imageRight %}
+        {% if blockImage and block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': blockImage} %}
+            </div>
+        {% endif %}
         <div class="column is-4">
-            {% include '_components/image.html.twig' with {'image': blockImage} %}
-        </div>
-    {% endif %}
-    <div class="column is-4">
-        <div class="box">
-            <p class="has-text-centered has-text-grey is-size-7">[ upcoming Events ]</p>
+            <div class="box">
+                <p class="has-text-centered has-text-grey is-size-7">[ upcoming Events ]</p>
+            </div>
         </div>
     </div>
 </div>
