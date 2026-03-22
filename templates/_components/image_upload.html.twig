@@ -1,34 +1,47 @@
 {# Parameters:
-   entity  (string) - entity type: 'user', 'cmsBlock', 'event'
-   id      (int)    - entity ID
-   image   (Image|null) - current image (null if none)
-   rotate  (bool, default false) - show rotate button
-   label   (string, default 'Change Image') - button label
+   entity         (string)      - entity type: 'user', 'cmsBlock', 'event'
+   id             (int)         - entity ID
+   image          (Image|null)  - current image (null if none)
+   showWhenEmpty  (bool, default false) - when true, shows the upload button even without an image
+   rotate         (bool, default false) - show rotate button
+   label          (string, default 'Change Image') - button label
+   removeImageUrl (string|null, optional) - URL for the remove-image action; shows × button when set
 #}
-{% set modalUrl = path('app_image_modal', {'entity': entity, 'id': id}) %}
-{% set label = label is defined ? label : 'Change Image' %}
-{% set rotate = rotate is defined ? rotate : false %}
+{% if image is not null or (showWhenEmpty is defined and showWhenEmpty) %}
+    {% set modalUrl = path('app_image_modal', {'entity': entity, 'id': id}) %}
+    {% set label = label is defined ? label : 'Change Image' %}
+    {% set rotate = rotate is defined ? rotate : false %}
 
-<div class="card">
-    <div class="card-image">
-        <figure class="image">
-            {% include '_components/image.html.twig' with {'image': image} %}
-        </figure>
-    </div>
-    <div class="card-content is-overlay">
-        <a href="#" class="button is-link modalTrigger" data-modal-url="{{ modalUrl }}">
-            <span class="icon">
-                <i class="fa fa-images"></i>
-            </span>
-            <span>{{ label }}</span>
-        </a>
-        {% if rotate and image is not null %}
-            <a class="button is-link fileRotateTrigger"
-               href="{{ path('app_image_rotate', {'entity': entity, 'id': id}) }}">
+    <div class="card">
+        <div class="card-image">
+            <figure class="image">
+                {% include '_components/image.html.twig' with {'image': image} %}
+            </figure>
+        </div>
+        <div class="card-content is-overlay">
+            <a href="#" class="button is-link modalTrigger" data-modal-url="{{ modalUrl }}">
                 <span class="icon">
-                    <i class="fa fa-rotate-right"></i>
+                    <i class="fa fa-images"></i>
                 </span>
+                <span>{{ label }}</span>
             </a>
-        {% endif %}
+            {% if rotate %}
+                <a class="button is-link fileRotateTrigger"
+                   href="{{ path('app_image_rotate', {'entity': entity, 'id': id}) }}">
+                    <span class="icon">
+                        <i class="fa fa-rotate-right"></i>
+                    </span>
+                </a>
+            {% endif %}
+            {% if removeImageUrl is defined and removeImageUrl is not null %}
+                <a class="button is-danger"
+                   href="{{ removeImageUrl }}"
+                   title="Remove image">
+                    <span class="icon">
+                        <i class="fa fa-times"></i>
+                    </span>
+                </a>
+            {% endif %}
+        </div>
     </div>
-</div>
+{% endif %}
