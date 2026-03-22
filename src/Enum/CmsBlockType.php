@@ -2,6 +2,7 @@
 
 namespace App\Enum;
 
+use App\Entity\BlockType\BlockCapabilities;
 use App\Entity\BlockType\BlockType;
 use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\Gallery;
@@ -16,9 +17,9 @@ enum CmsBlockType: int
 {
     case Headline = 1;
     case Text = 2;
-    case Video = 4;
+    case Video = 4; // TODO: to me implemented
     case Paragraph = 5;
-    case Events = 6;
+    case Events = 6; // TODO: to me implemented
     case Gallery = 7;
     case Hero = 8;
     case EventTeaser = 9;
@@ -32,7 +33,18 @@ enum CmsBlockType: int
             CmsBlockType::Hero => Hero::fromJson($data, $image),
             CmsBlockType::Paragraph => Paragraph::fromJson($data, $image),
             CmsBlockType::EventTeaser => EventTeaser::fromJson($data, $image),
-            default => throw new RuntimeException('Unknown block type: ' . $type->name),
+        };
+    }
+
+    public function getCapabilities(): BlockCapabilities
+    {
+        return match ($this) {
+            self::Headline => Headline::getCapabilities(),
+            self::Text => Text::getCapabilities(),
+            self::Paragraph => Paragraph::getCapabilities(),
+            self::Gallery => Gallery::getCapabilities(),
+            self::Hero => Hero::getCapabilities(),
+            self::EventTeaser => EventTeaser::getCapabilities(),
         };
     }
 }

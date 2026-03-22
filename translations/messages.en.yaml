@@ -43,6 +43,7 @@ published: Published
 draft: Draft
 button_add: Add
 button_cancel: Cancel
+button_discard: Discard
 menu_imprint: Imprint
 menu_privacy: Privacy
 page_title_error: Error

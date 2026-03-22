@@ -3,6 +3,7 @@
 namespace App\Entity\BlockType;
 
 use App\Enum\CmsBlockType;
+use App\Enum\ImageSupport;
 use App\Entity\Image as ImageEntity;
 use Override;
 
@@ -12,6 +13,12 @@ class Gallery implements BlockType
         public readonly string $title,
         public readonly array $images,
     ) {}
+
+    #[Override]
+    public static function getCapabilities(): BlockCapabilities
+    {
+        return new BlockCapabilities(image: ImageSupport::None, supportsImageRight: false, isGallery: true);
+    }
 
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self

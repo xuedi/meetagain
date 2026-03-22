@@ -3,6 +3,7 @@
 namespace App\Entity\BlockType;
 
 use App\Enum\CmsBlockType;
+use App\Enum\ImageSupport;
 use App\Entity\Image as ImageEntity;
 use Override;
 
@@ -10,13 +11,18 @@ class Headline implements BlockType
 {
     private function __construct(
         public string $title,
-        public ?ImageEntity $image,
     ) {}
+
+    #[Override]
+    public static function getCapabilities(): BlockCapabilities
+    {
+        return new BlockCapabilities(image: ImageSupport::None, supportsImageRight: false, isGallery: false);
+    }
 
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
-        return new self($json['title'], $image);
+        return new self($json['title']);
     }
 
     #[Override]
@@ -30,7 +36,6 @@ class Headline implements BlockType
     {
         return [
             'title' => $this->title,
-            'image' => $this->image,
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Entity\BlockType;
 
 use App\Enum\CmsBlockType;
+use App\Enum\ImageSupport;
 use App\Entity\Image as ImageEntity;
 use Override;
 
@@ -11,13 +12,20 @@ class EventTeaser implements BlockType
     private function __construct(
         public string $headline,
         public string $text,
+        public bool $imageRight,
         public ?ImageEntity $image,
     ) {}
 
     #[Override]
+    public static function getCapabilities(): BlockCapabilities
+    {
+        return new BlockCapabilities(image: ImageSupport::Optional, supportsImageRight: true, isGallery: false);
+    }
+
+    #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
-        return new self($json['headline'], $json['text'], $image);
+        return new self($json['headline'], $json['text'], (bool) ($json['imageRight'] ?? false), $image);
     }
 
     #[Override]
@@ -32,6 +40,7 @@ class EventTeaser implements BlockType
         return [
             'headline' => $this->headline,
             'text' => $this->text,
+            'imageRight' => $this->imageRight,
             'image' => $this->image,
         ];
     }
