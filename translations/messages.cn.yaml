@@ -129,6 +129,7 @@ menu_admin_system: 设置
 admin_menu_add: 添加
 admin_menu_edit: 编辑
 menu_admin_menu: 菜单
+menu_groups: 群组
 menu_location_topbar: 顶部菜单
 menu_location_bottomcol1: '页脚 1'
 menu_location_bottomcol2: '页脚 2'
