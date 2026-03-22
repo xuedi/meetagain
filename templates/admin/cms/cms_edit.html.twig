@@ -79,52 +79,28 @@
 
     <div class="container">
         {% for block in blocks %}
-            {% set formAction = path('app_admin_cms_edit_block_save') %}
             {% set moveDownLink = path('app_admin_cms_edit_block_down', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
             {% set moveUpLink = path('app_admin_cms_edit_block_up', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
-            {% set editBlockLink = path('app_admin_cms_edit', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
-            {% set cancelLink = path('app_admin_cms_edit', {'id': cms.id, 'locale': editLocale}) %}
-            {% set deleteBlockLink = path('app_admin_cms_block_delete', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
+            {% set editBlockLink = path('app_admin_cms_block_edit', {'blockId': block.id}) %}
             <div class="box">
-                <form method="post" action="{{ formAction }}">
-                    <input type="hidden" name="id" value="{{ cms.id }}"/>
-                    <input type="hidden" name="locale" value="{{ editLocale }}"/>
-                    <input type="hidden" name="blockId" value="{{ block.id }}"/>
-                    <input type="hidden" name="blockType" value="{{ block.type.value }}"/>
-                    <div class="is-pulled-right">
-                    {% if editBlock == block.id %}
-                        <a class="button is-danger is-small" href="{{ deleteBlockLink }}">
-                            <span class="icon"><i class="fa fa-trash"></i></span>
-                        </a>
-                        <a class="button is-small" href="{{ cancelLink }}">{{ "button_cancel" | trans }}</a>
-                        <button class="button is-small">{{ "button_save" | trans }}</button>
-                    {% else %}
-                        {% if editBlock is not null %}
-                            <span class="icon"><i class="fa fa-angle-down"></i></span>
-                            <span class="icon"><i class="fa fa-angle-up"></i></span>
-                            <span class="icon"><i class="fa fa-edit"></i></span>
-                        {% else %}
-                            <a href="{{ moveDownLink }}"><span class="icon"><i class="fa fa-angle-down"></i></span></a>
-                            <a href="{{ moveUpLink }}"><span class="icon"><i class="fa fa-angle-up"></i></span></a>
-                            <a href="{{ editBlockLink }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
-                        {% endif %}
-                    {% endif %}
-                    </div>
-                    {% include 'cms/blocks/_edit/' ~ block.type.name ~ '.html.twig' with {
-                        'block': block.blockObject,
-                        'blockId': block.id,
-                        'blockImage': block.image,
-                        'cmsId': cms.id,
-                    } %}
-                </form>
+                <div class="is-pulled-right">
+                    <a href="{{ moveDownLink }}"><span class="icon"><i class="fa fa-angle-down"></i></span></a>
+                    <a href="{{ moveUpLink }}"><span class="icon"><i class="fa fa-angle-up"></i></span></a>
+                    <a href="{{ editBlockLink }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
+                </div>
+                {% include 'cms/blocks/_edit/' ~ block.type.name ~ '.html.twig' with {
+                    'block': block.blockObject,
+                    'blockId': block.id,
+                    'blockImage': block.image,
+                    'editBlock': null,
+                    'cmsId': cms.id,
+                } %}
             </div>
         {% endfor %}
     </div>
 
-    {% if editBlock is null %}
-        <div class="container mt-6">
-            {% include 'admin/cms/newBlocks.html.twig' %}
-        </div>
-    {% endif %}
+    <div class="container mt-6">
+        {% include 'admin/cms/newBlocks.html.twig' %}
+    </div>
 
 {% endblock %}
