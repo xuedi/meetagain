@@ -88,7 +88,6 @@ menu_cookie_consent_option_osm: 'Open Street maps'
 menu_cookie_consent_option_osm_text: 'Dieser Cookie wird nicht von uns gesetzt aber durch die Einbindung von OpenStreetMaps, wenn nicht gesetzt gibt es keine Karte auf der Event detail Seite.'
 event: Event
 block_headline: Überschrift
-block_paragraph: Absatz
 block_text: Text
 block_image: Bild
 block_hero: Hero

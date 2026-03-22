@@ -88,7 +88,6 @@ menu_cookie_consent_option_osm: 开放式街道地图
 menu_cookie_consent_option_osm_text: 该(饼干)不是由我们设置的，而是通过集成(OpenStreetMaps)设置的，如果未设置，则活动详情页上没有地图。
 event: 活动
 block_headline: 标题
-block_paragraph: 段落
 block_text: 文本
 block_image: 图片
 block_hero: 英雄
