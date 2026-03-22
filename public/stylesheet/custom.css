@@ -153,3 +153,15 @@ input[type="color"] {
     text-align: left;
     line-height: 1.5;
 }
+
+.float-box-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    background: rgba(245, 245, 245, 0.9);
+    border-bottom-left-radius: 6px;
+    border-left: 1px solid #b0b0b0;
+    border-bottom: 1px solid #b0b0b0;
+    padding: 6px;
+}
