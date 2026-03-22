@@ -3,6 +3,7 @@
 namespace App\Entity\BlockType;
 
 use App\Enum\CmsBlockType;
+use App\Enum\ImageSupport;
 use App\Entity\Image as ImageEntity;
 use Override;
 
@@ -18,6 +19,12 @@ class Hero implements BlockType
         public bool $imageRight,
         public ?ImageEntity $image,
     ) {}
+
+    #[Override]
+    public static function getCapabilities(): BlockCapabilities
+    {
+        return new BlockCapabilities(image: ImageSupport::Required, supportsImageRight: true, isGallery: false);
+    }
 
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self

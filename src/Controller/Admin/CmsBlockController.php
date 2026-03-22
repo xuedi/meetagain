@@ -78,6 +78,10 @@ final class CmsBlockController extends AbstractAdminController
             throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
         }
 
+        if (!$block->getType()->getCapabilities()->supportsImageRight) {
+            throw $this->createAccessDeniedException('Block type does not support imageRight');
+        }
+
         $json = $block->getJson();
         $json['imageRight'] = !($json['imageRight'] ?? false);
         $block->setJson($json);
@@ -99,6 +103,10 @@ final class CmsBlockController extends AbstractAdminController
 
         if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
             throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
+        }
+
+        if (!$block->getType()->getCapabilities()->supportsImage()) {
+            throw $this->createAccessDeniedException('Block type does not support images');
         }
 
         $block->setImage(null);
@@ -172,13 +180,10 @@ final class CmsBlockController extends AbstractAdminController
         $blockId = (int) $request->request->get('blockId');
         $type = CmsBlockType::from((int) $request->request->get('blockType'));
 
-        $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
-        $this->cmsPageCacheService->invalidatePage((int) $request->request->get('id'));
+        $block = $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
+        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
 
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $request->request->get('id'),
-            'locale' => $request->request->get('locale'),
-        ]);
+        return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
     #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
