@@ -1,1 +1,19 @@
-<div class="content">{{ block.content|sanitize_html('cms.content') }}</div>
+{% if block.image %}
+    <div class="columns is-vcentered mb-5">
+        {% if not block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': block.image} %}
+            </div>
+        {% endif %}
+        <div class="column">
+            <div class="content">{{ block.content|sanitize_html('cms.content') }}</div>
+        </div>
+        {% if block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': block.image} %}
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="content">{{ block.content|sanitize_html('cms.content') }}</div>
+{% endif %}

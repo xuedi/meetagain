@@ -8,6 +8,8 @@
         </div>
     </div>
 
+    <input type="hidden" name="imageRight" value="{{ block is defined and block.imageRight ? '1' : '0' }}">
+
 {% else %}
 
     <p>{{ block.content|nl2br }}</p>

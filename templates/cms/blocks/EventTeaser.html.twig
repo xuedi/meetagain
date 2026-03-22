@@ -1,15 +1,22 @@
 
     <div class="container mt-4 mb-4">
         <div class="columns">
-            <div class="column is-4">
-                {% include '_components/image.html.twig' with {'image': block.image} %}
-            </div>
-            <div class="column is-4">
+            {% if block.image and not block.imageRight %}
+                <div class="column is-4">
+                    {% include '_components/image.html.twig' with {'image': block.image} %}
+                </div>
+            {% endif %}
+            <div class="column">
                 <h2 class="title is-4">{{ block.headline }}</h2>
                 <p>
                     {{ block.text|nl2br }}
                 </p>
             </div>
+            {% if block.image and block.imageRight %}
+                <div class="column is-4">
+                    {% include '_components/image.html.twig' with {'image': block.image} %}
+                </div>
+            {% endif %}
             <div class="column is-4">
                 <div class="box mb-6">
                     <div class="has-text-centered mb-4">
