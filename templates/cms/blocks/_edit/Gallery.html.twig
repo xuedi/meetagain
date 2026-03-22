@@ -6,39 +6,53 @@
                    value="{% if block is defined %}{{ block.title }}{% endif %}">
         </div>
     </div>
+
+    {% if blockId is defined %}
+        {% if block is defined and block.images|length > 0 %}
+            <div class="columns is-multiline mt-2">
+                {% for item in block.images %}
+                    <div class="column is-2">
+                        <div class="is-relative">
+                            <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
+                                 alt="" width="210" height="140"
+                                 style="object-fit: cover; width: 100%; display: block;">
+                            <a href="{{ path('app_admin_cms_gallery_remove', {'blockId': blockId, 'imageId': item.id}) }}"
+                               class="delete is-medium has-background-danger"
+                               style="position: absolute; top: 4px; right: 4px;"
+                               title="Remove"></a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="has-text-grey-light mt-2">No images yet.</p>
+        {% endif %}
+
+        <div class="mt-3">
+            <a href="#"
+               class="button is-success is-small modalTrigger"
+               data-modal-url="{{ path('app_admin_cms_gallery_modal', {'blockId': blockId}) }}">
+                <span class="icon"><i class="fa fa-plus"></i></span>
+                <span>Add Images</span>
+            </a>
+        </div>
+    {% endif %}
 {% else %}
     {% if block.title %}
         <p class="has-text-weight-semibold">{{ block.title }}</p>
     {% endif %}
-{% endif %}
 
-{% if blockId is defined %}
-    {% if block is defined and block.images|length > 0 %}
+    {% if block.images|length > 0 %}
         <div class="columns is-multiline mt-2">
             {% for item in block.images %}
                 <div class="column is-2">
-                    <div class="is-relative">
-                        <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
-                             alt="" width="210" height="140"
-                             style="object-fit: cover; width: 100%; display: block;">
-                        <a href="{{ path('app_admin_cms_gallery_remove', {'blockId': blockId, 'imageId': item.id}) }}"
-                           class="delete is-medium has-background-danger"
-                           style="position: absolute; top: 4px; right: 4px;"
-                           title="Remove"></a>
-                    </div>
+                    <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
+                         alt="" width="210" height="140"
+                         style="object-fit: cover; width: 100%; display: block;">
                 </div>
             {% endfor %}
         </div>
     {% else %}
         <p class="has-text-grey-light mt-2">No images yet.</p>
     {% endif %}
-
-    <div class="mt-3">
-        <a href="#"
-           class="button is-success is-small modalTrigger"
-           data-modal-url="{{ path('app_admin_cms_gallery_modal', {'blockId': blockId}) }}">
-            <span class="icon"><i class="fa fa-plus"></i></span>
-            <span>Add Images</span>
-        </a>
-    </div>
 {% endif %}
