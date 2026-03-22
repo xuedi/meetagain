@@ -91,6 +91,7 @@ block_headline: Headline
 block_text: Text
 block_image: Image
 block_hero: Hero
+block_gallery: Gallery
 block_eventteaser: EventTeaser
 menu_glossary: Glossary
 rsvpyes: 'Yes'
