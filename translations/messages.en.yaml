@@ -88,7 +88,6 @@ menu_cookie_consent_option_osm: 'Open street maps'
 menu_cookie_consent_option_osm_text: 'This cookie is set from the OpenStreetMap server and is necessary to show map at the event details page. If not allowed the address will be still there, just no map.'
 event: Event
 block_headline: Headline
-block_paragraph: Paragraph
 block_text: Text
 block_image: Image
 block_hero: Hero

@@ -7,7 +7,6 @@ use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
-use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
 use App\Entity\Cms;
 use App\EntityActionDispatcher;
@@ -118,7 +117,6 @@ final class CmsController extends AbstractAdminController
 
         $newBlocks = [
             Headline::getType(),
-            Paragraph::getType(),
             Text::getType(),
             Gallery::getType(),
             Hero::getType(),

@@ -3,6 +3,7 @@
 namespace App\Entity\BlockType;
 
 use App\Enum\CmsBlock\CmsBlockType;
+use App\Enum\CmsBlock\FieldType;
 use App\Enum\CmsBlock\ImageSupport;
 use App\Entity\Image as ImageEntity;
 use Override;
@@ -10,6 +11,7 @@ use Override;
 class Text implements BlockType
 {
     private function __construct(
+        public string $title,
         public string $content,
         public bool $imageRight,
         public ?ImageEntity $image,
@@ -25,6 +27,7 @@ class Text implements BlockType
     public static function getFieldDefinitions(): array
     {
         return [
+            new FieldDefinition('title', FieldType::String, required: false, default: ''),
             new FieldDefinition('content', FieldType::Text),
             new FieldDefinition('imageRight', FieldType::Boolean, required: false, default: false),
         ];
@@ -33,7 +36,7 @@ class Text implements BlockType
     #[Override]
     public static function fromJson(array $json, ?ImageEntity $image = null): self
     {
-        return new self($json['content'], (bool) ($json['imageRight'] ?? false), $image);
+        return new self($json['title'] ?? '', $json['content'], (bool) ($json['imageRight'] ?? false), $image);
     }
 
     #[Override]
@@ -46,6 +49,7 @@ class Text implements BlockType
     public function toArray(): array
     {
         return [
+            'title' => $this->title,
             'content' => $this->content,
             'imageRight' => $this->imageRight,
             'image' => $this->image,
