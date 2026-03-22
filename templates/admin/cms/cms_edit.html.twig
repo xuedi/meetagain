@@ -82,11 +82,11 @@
             {% set moveDownLink = path('app_admin_cms_edit_block_down', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
             {% set moveUpLink = path('app_admin_cms_edit_block_up', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
             {% set editBlockLink = path('app_admin_cms_block_edit', {'blockId': block.id}) %}
-            <div class="box">
-                <div class="is-pulled-right">
-                    <a href="{{ moveDownLink }}"><span class="icon"><i class="fa fa-angle-down"></i></span></a>
-                    <a href="{{ moveUpLink }}"><span class="icon"><i class="fa fa-angle-up"></i></span></a>
-                    <a href="{{ editBlockLink }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
+            <div class="mb-4" style="position: relative;">
+                <div style="position: absolute; top: .75rem; right: .75rem; z-index: 10; background: rgba(245,245,245,0.9); border-radius: 4px; padding: 2px 6px;">
+                    <a href="{{ moveDownLink }}"><span class="icon has-text-grey"><i class="fa fa-angle-down"></i></span></a>
+                    <a href="{{ moveUpLink }}"><span class="icon has-text-grey"><i class="fa fa-angle-up"></i></span></a>
+                    <a href="{{ editBlockLink }}"><span class="icon has-text-grey"><i class="fa fa-edit"></i></span></a>
                 </div>
                 {% include 'cms/blocks/_preview/' ~ block.type.name ~ '.html.twig' with {
                     'block': block.blockObject,
