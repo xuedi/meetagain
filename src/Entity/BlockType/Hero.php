@@ -2,8 +2,8 @@
 
 namespace App\Entity\BlockType;
 
-use App\Enum\CmsBlockType;
-use App\Enum\ImageSupport;
+use App\Enum\CmsBlock\CmsBlockType;
+use App\Enum\CmsBlock\ImageSupport;
 use App\Entity\Image as ImageEntity;
 use Override;
 
@@ -24,6 +24,20 @@ class Hero implements BlockType
     public static function getCapabilities(): BlockCapabilities
     {
         return new BlockCapabilities(image: ImageSupport::Required, supportsImageRight: true, isGallery: false);
+    }
+
+    #[Override]
+    public static function getFieldDefinitions(): array
+    {
+        return [
+            new FieldDefinition('headline', FieldType::String),
+            new FieldDefinition('subHeadline', FieldType::String),
+            new FieldDefinition('text', FieldType::Text),
+            new FieldDefinition('buttonLink', FieldType::String),
+            new FieldDefinition('buttonText', FieldType::String),
+            new FieldDefinition('color', FieldType::Color, required: false, default: '#f14668'),
+            new FieldDefinition('imageRight', FieldType::Boolean, required: false, default: false),
+        ];
     }
 
     #[Override]

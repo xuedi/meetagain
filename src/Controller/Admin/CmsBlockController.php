@@ -3,8 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Exception\BlockValidationException;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\ImageType;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\EventUploadType;
@@ -133,8 +134,12 @@ final class CmsBlockController extends AbstractAdminController
         $locale = $request->request->get('editLocale');
         $blockType = CmsBlockType::from((int) $request->request->get('blockType'));
 
-        $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
-        $this->cmsPageCacheService->invalidatePage($id);
+        try {
+            $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
+            $this->cmsPageCacheService->invalidatePage($id);
+        } catch (BlockValidationException $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $id,
@@ -180,8 +185,12 @@ final class CmsBlockController extends AbstractAdminController
         $blockId = (int) $request->request->get('blockId');
         $type = CmsBlockType::from((int) $request->request->get('blockType'));
 
-        $block = $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        try {
+            $block = $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
+            $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        } catch (BlockValidationException $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
 
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }

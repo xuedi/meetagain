@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Throwable;

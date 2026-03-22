@@ -1,0 +1,20 @@
+<div class="p-4" style="background-color: {{ block.color }}">
+    <div class="columns is-vcentered">
+        {% if blockImage and not block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': blockImage} %}
+            </div>
+        {% endif %}
+        <div class="column has-text-white">
+            <h1 class="title has-text-white">{{ block.headline }}</h1>
+            <p class="subtitle has-text-white">{{ block.subHeadline }}</p>
+            <p>{{ block.text|nl2br }}</p>
+            <span class="button mt-3">{{ block.buttonText }}</span>
+        </div>
+        {% if blockImage and block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': blockImage} %}
+            </div>
+        {% endif %}
+    </div>
+</div>

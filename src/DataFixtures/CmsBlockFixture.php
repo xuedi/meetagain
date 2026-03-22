@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\ImageType;
 use App\Service\Media\ImageService;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;

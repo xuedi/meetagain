@@ -1,41 +1,15 @@
-{# not defined: new block  #}
-{% if block is not defined or editBlock == blockId %}
-
-    <div class="field">
-        <label class="label">Headline</label>
-        <div class="control">
-            <input class="input" name="headline" type="text" value="{% if block is defined %}{{ block.headline }}{% endif %}">
-        </div>
+<div class="field">
+    <label class="label">Headline</label>
+    <div class="control">
+        <input class="input" name="headline" type="text" value="{{ block is defined ? block.headline : '' }}">
     </div>
+</div>
 
-    <div class="field">
-        <label class="label">Text</label>
-        <div class="control">
-            <textarea class="textarea" name="text" rows="12" placeholder="Textarea">{% if block is defined %}{{ block.text }}{% endif %}</textarea>
-        </div>
+<div class="field">
+    <label class="label">Text</label>
+    <div class="control">
+        <textarea class="textarea" name="text" rows="12" placeholder="Textarea">{{ block is defined ? block.text : '' }}</textarea>
     </div>
+</div>
 
-    <input type="hidden" name="imageRight" value="{{ block is defined and block.imageRight ? '1' : '0' }}">
-
-{% else %}
-
-    {% if blockImage %}
-        <div class="columns is-vcentered">
-            <div class="column is-4">
-                {% include '_components/image.html.twig' with {'image': blockImage} %}
-            </div>
-            <div class="column is-7">
-                <h1 class="title is-4">{{ block.headline }}</h1>
-                <p>{{ block.text|nl2br }}</p>
-            </div>
-            <div class="column is-1">
-                <p>Events</p>
-            </div>
-        </div>
-    {% else %}
-        <h1 class="title is-4">{{ block.headline }}</h1>
-        <p>{{ block.text|nl2br }}</p>
-        <p>Events</p>
-    {% endif %}
-
-{% endif %}
+<input type="hidden" name="imageRight" value="{{ block is defined and block.imageRight ? '1' : '0' }}">

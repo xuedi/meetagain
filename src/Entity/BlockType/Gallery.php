@@ -2,8 +2,9 @@
 
 namespace App\Entity\BlockType;
 
-use App\Enum\CmsBlockType;
-use App\Enum\ImageSupport;
+use App\Enum\CmsBlock\CmsBlockType;
+use App\Enum\CmsBlock\FieldType;
+use App\Enum\CmsBlock\ImageSupport;
 use App\Entity\Image as ImageEntity;
 use Override;
 
@@ -18,6 +19,15 @@ class Gallery implements BlockType
     public static function getCapabilities(): BlockCapabilities
     {
         return new BlockCapabilities(image: ImageSupport::None, supportsImageRight: false, isGallery: true);
+    }
+
+    #[Override]
+    public static function getFieldDefinitions(): array
+    {
+        return [
+            new FieldDefinition('title', FieldType::String, required: false, default: ''),
+            new FieldDefinition('images', FieldType::ImageList, required: false, default: []),
+        ];
     }
 
     #[Override]

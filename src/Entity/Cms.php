@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\BlockType\Text as TextType;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -231,11 +231,7 @@ class Cms
         return new ArrayCollection(
             $this->blocks
                 ->filter(static fn(CmsBlock $b) => $b->getLanguage() === $language)
-                ->map(static fn(CmsBlock $b) => CmsBlockType::buildObject(
-                    $b->getType(),
-                    $b->getJson(),
-                    $b->getImage(),
-                ))
+                ->map(static fn(CmsBlock $b) => $b->getBlockObject())
                 ->toArray(),
         );
     }

@@ -2,7 +2,7 @@
 
 namespace App\Entity\BlockType;
 
-use App\Enum\ImageSupport;
+use App\Enum\CmsBlock\ImageSupport;
 
 readonly class BlockCapabilities
 {
