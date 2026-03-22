@@ -10,6 +10,7 @@ use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
+use App\Entity\BlockType\TrioCards;
 
 enum CmsBlockType: int
 {
@@ -20,6 +21,7 @@ enum CmsBlockType: int
     case Gallery = 7;
     case Hero = 8;
     case EventTeaser = 9;
+    case TrioCards = 10;
 
     /** @return class-string<BlockType> */
     public function getBlockClass(): string
@@ -30,6 +32,7 @@ enum CmsBlockType: int
             self::Gallery     => Gallery::class,
             self::Hero        => Hero::class,
             self::EventTeaser => EventTeaser::class,
+            self::TrioCards   => TrioCards::class,
         };
     }
 

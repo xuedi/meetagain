@@ -8,6 +8,7 @@ use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
+use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
@@ -121,6 +122,7 @@ final class CmsController extends AbstractAdminController
             Gallery::getType(),
             Hero::getType(),
             EventTeaser::getType(),
+            TrioCards::getType(),
         ];
 
         return $this->render('admin/cms/cms_edit.html.twig', [

@@ -93,6 +93,15 @@ block_image: 图片
 block_hero: 英雄
 block_gallery: 图册
 block_eventteaser: 活动预告
+block_triocards: 卡片
+trio_cards_headline: 标题
+trio_cards_card: 卡片
+trio_cards_sub_headline: 副标题
+trio_cards_text: 内容
+trio_cards_button_text: 按钮文字
+trio_cards_button_link: 按钮链接
+trio_cards_add_image: 添加图片
+trio_cards_replace_image: 替换
 menu_glossary: 术语表
 rsvpyes: 是
 rsvpno: 不
