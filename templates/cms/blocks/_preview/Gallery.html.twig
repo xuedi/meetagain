@@ -1,17 +1,19 @@
-{% if block.title %}
-    <p class="has-text-weight-semibold mb-2">{{ block.title }}</p>
-{% endif %}
+<div class="box">
+    {% if block.title %}
+        <p class="has-text-weight-semibold mb-2">{{ block.title }}</p>
+    {% endif %}
 
-{% if block.images|length > 0 %}
-    <div class="columns is-multiline">
-        {% for item in block.images %}
-            <div class="column is-2">
-                <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
-                     alt="" width="210" height="140"
-                     style="object-fit: cover; width: 100%; display: block;">
-            </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <p class="has-text-grey-light">No images yet.</p>
-{% endif %}
+    {% if block.images|length > 0 %}
+        <div class="columns is-multiline">
+            {% for item in block.images %}
+                <div class="column is-2">
+                    <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
+                         alt="" width="210" height="140"
+                         style="object-fit: cover; width: 100%; display: block;">
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="has-text-grey-light">No images yet.</p>
+    {% endif %}
+</div>
