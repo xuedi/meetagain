@@ -91,6 +91,7 @@ block_headline: 标题
 block_text: 文本
 block_image: 图片
 block_hero: 英雄
+block_gallery: 图册
 block_eventteaser: 活动预告
 menu_glossary: 术语表
 rsvpyes: 是

@@ -23,13 +23,15 @@ readonly class CmsBlockService
 
         $block = new CmsBlock();
         $block->setLanguage($locale);
-        $block->setPriority($this->blockRepo->getMaxPriority() + 1);
+        $block->setPriority(99999);
         $block->setType($blockObject::getType());
         $block->setJson($blockObject->toArray());
 
         $page->addBlock($block);
         $this->em->persist($block);
         $this->em->flush();
+
+        $this->reorderBlocks($page->getId(), $locale);
 
         return $block;
     }
