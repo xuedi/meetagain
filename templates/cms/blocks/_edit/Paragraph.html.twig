@@ -1,46 +1,15 @@
-{# not defined: new block  #}
-{% if block is not defined or editBlock == blockId %}
-
-    <div class="field">
-        <label class="label">Titel</label>
-        <div class="control">
-            <input class="input" name="title" type="text" value="{% if block is defined %}{{ block.title }}{% endif %}">
-        </div>
+<div class="field">
+    <label class="label">Titel</label>
+    <div class="control">
+        <input class="input" name="title" type="text" value="{{ block is defined ? block.title : '' }}">
     </div>
+</div>
 
-    <div class="field">
-        <label class="label">Content</label>
-        <div class="control">
-            <textarea class="textarea" name="content" rows="12" placeholder="Textarea">{% if block is defined %}{{ block.content }}{% endif %}</textarea>
-        </div>
+<div class="field">
+    <label class="label">Content</label>
+    <div class="control">
+        <textarea class="textarea" name="content" rows="12" placeholder="Textarea">{{ block is defined ? block.content : '' }}</textarea>
     </div>
+</div>
 
-    <input type="hidden" name="imageRight" value="{{ block is defined and block.imageRight ? '1' : '0' }}">
-
-{% else %}
-
-    {% if blockImage %}
-        <div class="columns is-vcentered">
-            {% if not block.imageRight %}
-                <div class="column is-4">
-                    {% include '_components/image.html.twig' with {'image': blockImage} %}
-                </div>
-                <div class="column is-1"></div>
-            {% endif %}
-            <div class="column">
-                <h2 class="title is-5">{{ block.title }}</h2>
-                <p>{{ block.content|nl2br }}</p>
-            </div>
-            {% if block.imageRight %}
-                <div class="column is-1"></div>
-                <div class="column is-4">
-                    {% include '_components/image.html.twig' with {'image': blockImage} %}
-                </div>
-            {% endif %}
-        </div>
-    {% else %}
-        <h2 class="title is-5">{{ block.title }}</h2>
-        <p>{{ block.content|nl2br }}</p>
-    {% endif %}
-
-{% endif %}
+<input type="hidden" name="imageRight" value="{{ block is defined and block.imageRight ? '1' : '0' }}">

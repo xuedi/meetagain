@@ -6,7 +6,7 @@ use App\Entity\Announcement;
 use App\Enum\AnnouncementStatus;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Entity\EmailTemplate;
 use App\Entity\NotificationSettings;
 use App\Entity\User;

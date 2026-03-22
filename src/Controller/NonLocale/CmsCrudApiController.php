@@ -5,7 +5,7 @@ namespace App\Controller\NonLocale;
 use App\Controller\AbstractController;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
