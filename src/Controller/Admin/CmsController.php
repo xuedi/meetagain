@@ -10,33 +10,22 @@ use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Paragraph;
 use App\Entity\BlockType\Text;
 use App\Entity\Cms;
-use App\Enum\CmsBlockType;
-use App\Enum\ImageType;
-use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\CmsType;
-use App\Form\EventUploadType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
-use App\Service\Cms\CmsBlockService;
-use App\Service\Cms\CmsPageCacheService;
 use App\Service\Config\LanguageService;
-use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_FOUNDER'), Route('/admin/cms')]
 final class CmsController extends AbstractAdminController
@@ -56,15 +45,11 @@ final class CmsController extends AbstractAdminController
         private readonly CmsRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly CmsBlockRepository $blockRepo,
-        private readonly CmsBlockService $blockService,
         private readonly AnnouncementRepository $announcementRepo,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
-        private readonly CmsPageCacheService $cmsPageCacheService,
         private readonly LoggerInterface $logger,
         private readonly LanguageService $languageService,
-        private readonly ImageService $imageService,
-        private readonly ValidatorInterface $validator,
     ) {}
 
     #[Route('', name: 'app_admin_cms')]
@@ -77,11 +62,9 @@ final class CmsController extends AbstractAdminController
             'is_admin' => $isAdmin,
         ]);
 
-        // Apply admin-specific CMS list filtering
         $filterResult = $this->adminCmsListFilterService->getCmsIdFilter();
         $cmsPages = $this->repo->findByIds($filterResult->getCmsIds());
 
-        // Get CMS IDs that have linked announcements
         $cmsIdsWithAnnouncements = [];
         foreach ($cmsPages as $page) {
             $announcement = $this->announcementRepo->findByCmsPage($page->getId());
@@ -100,15 +83,14 @@ final class CmsController extends AbstractAdminController
     }
 
     #[Route(
-        '/{id}/edit/{locale}/{blockId}',
+        '/{id}/edit/{locale}',
         name: 'app_admin_cms_edit',
-        requirements: ['locale' => '[^/]+', 'blockId' => '\d+'],
-        defaults: ['locale' => null, 'blockId' => null],
+        requirements: ['locale' => '[^/]+'],
+        defaults: ['locale' => null],
         methods: ['GET', 'POST'],
     )]
-    public function cmsEdit(Request $request, Cms $cms, ?string $locale = null, ?int $blockId = null): Response
+    public function cmsEdit(Request $request, Cms $cms, ?string $locale = null): Response
     {
-        // Validate CMS is accessible in current admin context
         if (!$this->adminCmsListFilterService->isCmsAccessible($cms->getId())) {
             $this->logAccessDenied($cms, $request, 'edit');
             throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
@@ -147,7 +129,6 @@ final class CmsController extends AbstractAdminController
             'active' => 'cms',
             'newBlocks' => $newBlocks,
             'editLocale' => $locale,
-            'editBlock' => $blockId,
             'blocks' => $this->blockRepo->getBlocks($cms->getId(), $locale),
             'form' => $form,
             'cms' => $cms,
@@ -162,7 +143,6 @@ final class CmsController extends AbstractAdminController
         $id = $request->query->get('id');
         $cmsPage = $this->repo->find($id);
         if ($cmsPage !== null) {
-            // Validate CMS is accessible in current admin context
             if (!$this->adminCmsListFilterService->isCmsAccessible($cmsPage->getId())) {
                 $this->logAccessDenied($cmsPage, $request, 'delete');
                 throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
@@ -201,177 +181,6 @@ final class CmsController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
-    public function cmsBlockAdd(Request $request, int $id): Response
-    {
-        $cmsPage = $this->repo->find($id);
-        if ($cmsPage === null) {
-            throw new RuntimeException('Could not find valid page');
-        }
-
-        // Validate CMS is accessible in current admin context
-        if (!$this->adminCmsListFilterService->isCmsAccessible($cmsPage->getId())) {
-            $this->logAccessDenied($cmsPage, $request, 'add_block');
-            throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
-        }
-
-        $locale = $request->request->get('editLocale');
-        $blockType = CmsBlockType::from((int) $request->request->get('blockType'));
-
-        $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
-        $this->cmsPageCacheService->invalidatePage($id);
-
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $id,
-            'locale' => $locale,
-        ]);
-    }
-
-    #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
-    public function cmsBlockMoveDown(Request $request): Response
-    {
-        $pageId = (int) $request->query->get('id');
-        $blockId = (int) $request->query->get('blockId');
-        $locale = $request->query->get('locale');
-
-        $this->blockService->moveBlockDown($pageId, $blockId, $locale);
-        $this->cmsPageCacheService->invalidatePage($pageId);
-
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $pageId,
-            'locale' => $locale,
-        ]);
-    }
-
-    #[Route('/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
-    public function cmsBlockMoveUp(Request $request): Response
-    {
-        $pageId = (int) $request->query->get('id');
-        $blockId = (int) $request->query->get('blockId');
-        $locale = $request->query->get('locale');
-
-        $this->blockService->moveBlockUp($pageId, $blockId, $locale);
-        $this->cmsPageCacheService->invalidatePage($pageId);
-
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $pageId,
-            'locale' => $locale,
-        ]);
-    }
-
-    #[Route('/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
-    public function cmsBlockSave(Request $request): Response
-    {
-        $blockId = (int) $request->request->get('blockId');
-        $type = CmsBlockType::from((int) $request->request->get('blockType'));
-
-        $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
-        $this->cmsPageCacheService->invalidatePage((int) $request->request->get('id'));
-
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $request->request->get('id'),
-            'locale' => $request->request->get('locale'),
-        ]);
-    }
-
-    #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
-    public function cmsBlockDelete(Request $request): Response
-    {
-        $this->blockService->deleteBlock((int) $request->query->get('blockId'));
-        $this->cmsPageCacheService->invalidatePage((int) $request->query->get('id'));
-
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $request->query->get('id'),
-            'locale' => $request->query->get('locale'),
-        ]);
-    }
-
-    #[Route('/block/{blockId}/gallery/modal', name: 'app_admin_cms_gallery_modal', methods: ['GET'])]
-    public function cmsGalleryModal(int $blockId): Response
-    {
-        $form = $this->createForm(EventUploadType::class, null, [
-            'action' => $this->generateUrl('app_admin_cms_gallery_add', ['blockId' => $blockId]),
-        ]);
-
-        return new Response($this->renderView('admin/cms/gallery_upload_modal.html.twig', [
-            'form' => $form,
-        ]));
-    }
-
-    #[Route('/block/{blockId}/gallery/add', name: 'app_admin_cms_gallery_add', methods: ['POST'])]
-    public function cmsGalleryAdd(Request $request, int $blockId): Response
-    {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not find block');
-        }
-
-        $form = $this->createForm(EventUploadType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted()) {
-            $user = $this->getUser();
-            assert($user instanceof User);
-            $fileConstraint = new File(maxSize: '10M', mimeTypes: ['image/*']);
-            foreach ($form->get('files')->getData() ?? [] as $file) {
-                if (!$file instanceof UploadedFile) {
-                    continue;
-                }
-                $violations = $this->validator->validate($file, $fileConstraint);
-                if (count($violations) > 0) {
-                    $this->logger->warning('Skipping invalid file during gallery upload', [
-                        'error' => $violations->get(0)->getMessage(),
-                        'file' => $file->getClientOriginalName(),
-                    ]);
-                    continue;
-                }
-                $image = $this->imageService->upload($file, $user, ImageType::CmsGallery);
-                $image->setUploader($user);
-                $image->setUpdatedAt(new DateTimeImmutable());
-                $this->em->persist($image);
-                $this->em->flush();
-                $this->imageService->createThumbnails($image, ImageType::CmsGallery);
-
-                $json = $block->getJson();
-                $json['images'][] = ['id' => $image->getId(), 'hash' => $image->getHash()];
-                $block->setJson($json);
-                $this->em->persist($block);
-                $this->em->flush();
-            }
-        }
-
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
-
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $block->getPage()->getId(),
-            'locale' => $block->getLanguage(),
-        ]);
-    }
-
-    #[Route('/block/{blockId}/gallery/remove/{imageId}', name: 'app_admin_cms_gallery_remove', methods: ['GET'])]
-    public function cmsGalleryRemove(int $blockId, int $imageId): Response
-    {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not find block');
-        }
-
-        $json = $block->getJson();
-        $json['images'] = array_values(array_filter(
-            $json['images'] ?? [],
-            static fn(array $item) => $item['id'] !== $imageId,
-        ));
-        $block->setJson($json);
-        $this->em->persist($block);
-        $this->em->flush();
-
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
-
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $block->getPage()->getId(),
-            'locale' => $block->getLanguage(),
-        ]);
-    }
-
     private function getLastEditLocale(?string $locale, SessionInterface $session): string
     {
         $lastEditLocaleKey = 'lastEditLocale';
@@ -399,7 +208,6 @@ final class CmsController extends AbstractAdminController
             'total_allowed' => $allowedIds !== null ? count($allowedIds) : null,
         ];
 
-        // Add filter context for debugging (provided by filters like GroupContextFilter)
         $filterContext = $this->adminCmsListFilterService->getDebugContext($cms->getId());
         if ($filterContext !== []) {
             $context['filter_context'] = $filterContext;

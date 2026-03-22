@@ -1,0 +1,90 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="mb-4">
+        <a class="button is-small" href="{{ path('app_admin_cms_edit', {'id': cms.id, 'locale': block.language}) }}">
+            <span class="icon"><i class="fa fa-arrow-left"></i></span>
+            <span>{{ "button_back" | trans }}</span>
+        </a>
+    </div>
+
+    {% set supportsImage = block.type.name in ['Paragraph', 'Hero', 'EventTeaser'] %}
+    {% set hasImageRight = block.type.name in ['Paragraph', 'Hero'] %}
+    {% set imageOnRight = hasImageRight and blockObject.imageRight %}
+    {% set removeImageUrl = blockImage is not null
+        ? path('app_admin_cms_block_image_remove', {'blockId': block.id})
+        : null %}
+    {% set toggleSideUrl = hasImageRight
+        ? path('app_admin_cms_block_image_toggle_side', {'blockId': block.id})
+        : null %}
+
+    {% set form %}
+        <div class="box">
+            <form method="post" action="{{ path('app_admin_cms_edit_block_save') }}">
+                <input type="hidden" name="id" value="{{ cms.id }}"/>
+                <input type="hidden" name="locale" value="{{ block.language }}"/>
+                <input type="hidden" name="blockId" value="{{ block.id }}"/>
+                <input type="hidden" name="blockType" value="{{ block.type.value }}"/>
+
+                {% include 'cms/blocks/_edit/' ~ block.type.name ~ '.html.twig' with {
+                    'block': blockObject,
+                    'blockId': block.id,
+                    'blockImage': blockImage,
+                    'editBlock': block.id,
+                    'cmsId': cms.id,
+                } only %}
+
+                <div class="buttons mt-4">
+                    <button class="button is-primary">{{ "button_save" | trans }}</button>
+                    <a class="button" href="{{ path('app_admin_cms_edit', {'id': cms.id, 'locale': block.language}) }}">
+                        {{ "button_cancel" | trans }}
+                    </a>
+                    <a class="button is-danger"
+                       href="{{ path('app_admin_cms_block_delete', {'id': cms.id, 'blockId': block.id, 'locale': block.language}) }}">
+                        <span class="icon"><i class="fa fa-trash"></i></span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    {% endset %}
+
+    {% if supportsImage %}
+        {% set imageColumn %}
+            {% include '_components/image_upload.html.twig' with {
+                'entity': 'cmsBlock',
+                'id': block.id,
+                'image': blockImage,
+                'removeImageUrl': removeImageUrl,
+                'showWhenEmpty': true,
+            } %}
+            {% if toggleSideUrl %}
+                <a class="button is-small is-fullwidth mt-2" href="{{ toggleSideUrl }}">
+                    {% if imageOnRight %}
+                        <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                        <span>Move left</span>
+                    {% else %}
+                        <span class="icon"><i class="fa fa-arrow-right"></i></span>
+                        <span>Move right</span>
+                    {% endif %}
+                </a>
+            {% endif %}
+            {% if blockImage is null %}
+                <p class="help has-text-grey mt-2">If no image is uploaded, none will be shown on the page.</p>
+            {% endif %}
+        {% endset %}
+
+        <div class="columns">
+            {% if not imageOnRight %}
+                <div class="column is-one-quarter">{{ imageColumn }}</div>
+            {% endif %}
+            <div class="column">{{ form }}</div>
+            {% if imageOnRight %}
+                <div class="column is-one-quarter">{{ imageColumn }}</div>
+            {% endif %}
+        </div>
+    {% else %}
+        {{ form }}
+    {% endif %}
+
+{% endblock %}
