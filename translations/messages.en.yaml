@@ -129,6 +129,7 @@ menu_admin_system: Settings
 admin_menu_add: 'Add new'
 admin_menu_edit: Edit
 menu_admin_menu: Menus
+menu_groups: Groups
 menu_location_topbar: 'Top Menu'
 menu_location_bottomcol1: 'Footer 1'
 menu_location_bottomcol2: 'Footer 2'

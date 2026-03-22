@@ -129,6 +129,7 @@ menu_admin_system: Einstellungen
 admin_menu_add: Hinzufügen
 admin_menu_edit: Bearbeiten
 menu_admin_menu: Menus
+menu_groups: Gruppen
 menu_location_topbar: 'Top Menu'
 menu_location_bottomcol1: 'Fusszeile 1'
 menu_location_bottomcol2: 'Fusszeile 2'
