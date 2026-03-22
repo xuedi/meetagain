@@ -93,6 +93,15 @@ block_image: Bild
 block_hero: Hero
 block_gallery: Galerie
 block_eventteaser: EventTeaser
+block_triocards: Karten
+trio_cards_headline: "Überschrift"
+trio_cards_card: Karte
+trio_cards_sub_headline: "Unter-Überschrift"
+trio_cards_text: Text
+trio_cards_button_text: Button Text
+trio_cards_button_link: Button Link
+trio_cards_add_image: Bild hinzufügen
+trio_cards_replace_image: Ersetzen
 menu_glossary: Glossar
 rsvpyes: Ja
 rsvpno: Nein
