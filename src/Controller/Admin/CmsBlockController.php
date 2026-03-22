@@ -207,6 +207,93 @@ final class CmsBlockController extends AbstractAdminController
         ]);
     }
 
+    #[Route('/block/{blockId}/card/{slot}/image/modal', name: 'app_admin_cms_card_image_modal', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
+    public function cmsCardImageModal(int $blockId, int $slot): Response
+    {
+        $form = $this->createForm(EventUploadType::class, null, [
+            'action' => $this->generateUrl('app_admin_cms_card_image_upload', [
+                'blockId' => $blockId,
+                'slot' => $slot,
+            ]),
+        ]);
+
+        return new Response($this->renderView('admin/cms/gallery_upload_modal.html.twig', [
+            'form' => $form,
+        ]));
+    }
+
+    #[Route('/block/{blockId}/card/{slot}/image/upload', name: 'app_admin_cms_card_image_upload', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
+    public function cmsCardImageUpload(Request $request, int $blockId, int $slot): Response
+    {
+        $block = $this->blockRepo->find($blockId);
+        if ($block === null) {
+            throw new RuntimeException('Could not find block');
+        }
+
+        if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
+            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
+        }
+
+        $form = $this->createForm(EventUploadType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $user = $this->getUser();
+            assert($user instanceof User);
+            $fileConstraint = new File(maxSize: '10M', mimeTypes: ['image/*']);
+
+            $files = $form->get('files')->getData() ?? [];
+            $file = reset($files);
+            if ($file instanceof UploadedFile) {
+                $violations = $this->validator->validate($file, $fileConstraint);
+                if (count($violations) === 0) {
+                    $image = $this->imageService->upload($file, $user, ImageType::CmsGallery);
+                    $image->setUploader($user);
+                    $image->setUpdatedAt(new DateTimeImmutable());
+                    $this->em->persist($image);
+                    $this->em->flush();
+                    $this->imageService->createThumbnails($image, ImageType::CmsGallery);
+
+                    $json = $block->getJson();
+                    $json['cards'][$slot]['image'] = ['id' => $image->getId(), 'hash' => $image->getHash()];
+                    $block->setJson($json);
+                    $this->em->persist($block);
+                    $this->em->flush();
+                } else {
+                    $this->addFlash('danger', 'Invalid file: ' . $violations->get(0)->getMessage());
+                }
+            }
+        }
+
+        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+
+        return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
+    }
+
+    #[Route('/block/{blockId}/card/{slot}/image/remove', name: 'app_admin_cms_card_image_remove', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
+    public function cmsCardImageRemove(int $blockId, int $slot): Response
+    {
+        $block = $this->blockRepo->find($blockId);
+        if ($block === null) {
+            throw new RuntimeException('Could not find block');
+        }
+
+        if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
+            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
+        }
+
+        $json = $block->getJson();
+        if (isset($json['cards'][$slot])) {
+            $json['cards'][$slot]['image'] = null;
+            $block->setJson($json);
+            $this->em->persist($block);
+            $this->em->flush();
+        }
+
+        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+
+        return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
+    }
+
     #[Route('/block/{blockId}/gallery/modal', name: 'app_admin_cms_gallery_modal', methods: ['GET'])]
     public function cmsGalleryModal(int $blockId): Response
     {

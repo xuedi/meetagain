@@ -44,6 +44,6 @@ readonly class BlockHydrator
             throw new BlockValidationException($errors);
         }
 
-        return $blockClass::fromJson($resolved, $image);
+        return $blockClass::fromJson(array_merge($data, $resolved), $image);
     }
 }

@@ -1,0 +1,26 @@
+<div class="box">
+    {% if block.headline %}
+        <p class="has-text-weight-bold mb-2">{{ block.headline }}</p>
+    {% endif %}
+    <div class="columns">
+        {% for card in block.cards %}
+            <div class="column is-4">
+                <div class="notification is-light" style="min-height: 80px;">
+                    {% if card.image %}
+                        <img src="/images/thumbnails/{{ card.image.hash }}_210x140.webp"
+                             alt="" style="max-height: 40px; margin-bottom: .25rem;">
+                    {% endif %}
+                    {% if card.subHeadline %}
+                        <p class="has-text-weight-semibold is-size-7">{{ card.subHeadline }}</p>
+                    {% endif %}
+                    {% if card.text %}
+                        <p class="is-size-7 has-text-grey">{{ card.text|slice(0, 60) }}{% if card.text|length > 60 %}…{% endif %}</p>
+                    {% endif %}
+                    {% if card.buttonText %}
+                        <span class="tag is-small is-info mt-1">{{ card.buttonText }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
