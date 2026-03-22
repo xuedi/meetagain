@@ -1,0 +1,19 @@
+{% if blockImage %}
+    <div class="columns is-vcentered">
+        {% if not block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': blockImage} %}
+            </div>
+        {% endif %}
+        <div class="column">
+            <div class="content">{{ block.content|nl2br }}</div>
+        </div>
+        {% if block.imageRight %}
+            <div class="column is-4">
+                {% include '_components/image.html.twig' with {'image': blockImage} %}
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="content">{{ block.content|nl2br }}</div>
+{% endif %}

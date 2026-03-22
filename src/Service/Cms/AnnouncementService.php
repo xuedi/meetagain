@@ -7,7 +7,7 @@ use App\Enum\AnnouncementStatus;
 use App\Entity\BlockType\Gallery as GalleryType;
 use App\Entity\BlockType\Text as TextType;
 use App\Entity\Cms;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Enum\EmailType;

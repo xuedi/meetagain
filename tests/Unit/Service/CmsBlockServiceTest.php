@@ -4,8 +4,9 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Repository\CmsBlockRepository;
+use App\Service\Cms\BlockHydrator;
 use App\Service\Cms\CmsBlockService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with(static::isInstanceOf(CmsBlock::class));
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub);
+        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
         $page = new Cms();
 
         $block = $subject->createBlock($page, 'en', CmsBlockType::Headline, ['title' => 'Test']);
@@ -44,7 +45,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($block);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub);
+        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
         $result = $subject->updateBlock(42, CmsBlockType::Paragraph, ['title' => 'new', 'content' => 'new content']);
 
         static::assertSame($block, $result);
@@ -75,7 +76,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->once())->method('remove')->with($block);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub);
+        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
         $subject->deleteBlock(42);
     }
 
@@ -107,7 +108,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->exactly(2))->method('persist');
         $emMock->expects($this->exactly(2))->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub);
+        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
         $subject->moveBlockDown(1, 42, 'en');
 
         static::assertSame(1.0, $block->getPriority());
@@ -132,7 +133,7 @@ class CmsBlockServiceTest extends TestCase
 
         $blockRepoStub->method('find')->willReturn($block);
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub);
+        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
 
         // Test when imageRight is missing from payload (unchecked)
         $payload = [

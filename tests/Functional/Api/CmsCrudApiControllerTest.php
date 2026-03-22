@@ -2,7 +2,7 @@
 
 namespace Tests\Functional\Api;
 
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**

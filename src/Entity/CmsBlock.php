@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\BlockType\BlockType;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -81,7 +81,8 @@ class CmsBlock
 
     public function getBlockObject(): BlockType
     {
-        return CmsBlockType::buildObject($this->getType(), $this->getJson(), $this->getImage());
+        $class = $this->getType()->getBlockClass();
+        return $class::fromJson($this->getJson(), $this->getImage());
     }
 
     public function setJson(array $json): static

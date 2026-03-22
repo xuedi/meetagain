@@ -4,7 +4,7 @@ namespace App\Service\Cms;
 
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlockType;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Repository\CmsBlockRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -14,11 +14,12 @@ readonly class CmsBlockService
     public function __construct(
         private EntityManagerInterface $em,
         private CmsBlockRepository $blockRepo,
+        private BlockHydrator $hydrator,
     ) {}
 
     public function createBlock(Cms $page, string $locale, CmsBlockType $type, array $payload): CmsBlock
     {
-        $blockObject = CmsBlockType::buildObject($type, $payload);
+        $blockObject = $this->hydrator->hydrate($type, $payload);
 
         $block = new CmsBlock();
         $block->setLanguage($locale);
@@ -40,7 +41,7 @@ readonly class CmsBlockService
             throw new RuntimeException('Could not load block');
         }
 
-        $block->setJson(CmsBlockType::buildObject($type, $payload, $block->getImage())->toArray());
+        $block->setJson($this->hydrator->hydrate($type, $payload, $block->getImage())->toArray());
         $this->em->persist($block);
         $this->em->flush();
 
