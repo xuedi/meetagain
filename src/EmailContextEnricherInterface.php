@@ -5,9 +5,8 @@ namespace App;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Interface for plugins to enrich the email context before rendering.
- * Plugins implement this to inject additional variables (e.g. group-specific greeting)
- * into the email context at queue time, while the HTTP request is still available.
+ * Allows plugins to inject additional variables into the email context before rendering.
+ * Implementations are called at queue time, while the HTTP request is still available.
  */
 #[AutoconfigureTag]
 interface EmailContextEnricherInterface
