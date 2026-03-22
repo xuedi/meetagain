@@ -30,6 +30,7 @@ readonly class ConfigService
             ImageType::ProfilePicture => [[400, 400], [80, 80], [50, 50]],
             ImageType::EventTeaser => [[1024, 768], [600, 400], [210, 140]], // included EventUpload
             ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [210, 140]],
+            ImageType::CmsCardImage => [[600, 400], [300, 200]],
             ImageType::CmsBlock => [[432, 432], [80, 80]],
             ImageType::PluginDishPreview => [[1024, 768], [400, 400], [100, 100], [50, 50]], // is also part of gallery
             ImageType::PluginDishGallery => [[1024, 768], [400, 400]],
@@ -45,6 +46,7 @@ readonly class ConfigService
             '600x400' => 0, // event preview image
             '432x432' => 0, // cmsBlock image
             '400x400' => 0, // profile big
+            '300x200' => 0, // cms card image
             '210x140' => 0, // gallery image preview
             '80x80' => 0, // ?
             '50x50' => 0, // ?

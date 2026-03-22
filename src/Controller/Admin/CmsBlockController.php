@@ -246,12 +246,12 @@ final class CmsBlockController extends AbstractAdminController
             if ($file instanceof UploadedFile) {
                 $violations = $this->validator->validate($file, $fileConstraint);
                 if (count($violations) === 0) {
-                    $image = $this->imageService->upload($file, $user, ImageType::CmsGallery);
+                    $image = $this->imageService->upload($file, $user, ImageType::CmsCardImage);
                     $image->setUploader($user);
                     $image->setUpdatedAt(new DateTimeImmutable());
                     $this->em->persist($image);
                     $this->em->flush();
-                    $this->imageService->createThumbnails($image, ImageType::CmsGallery);
+                    $this->imageService->createThumbnails($image, ImageType::CmsCardImage);
 
                     $json = $block->getJson();
                     $json['cards'][$slot]['image'] = ['id' => $image->getId(), 'hash' => $image->getHash()];
