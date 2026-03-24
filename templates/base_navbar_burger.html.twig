@@ -24,6 +24,13 @@
                         <li><a href="{{ path('app_profile_config') }}">{{ "menu_profile_config" | trans }}</a></li>
                     </ul>
 
+                    {% if is_granted('ROLE_ORGANIZER') %}
+                        <p class="menu-label">Admin</p>
+                        <ul class="menu-list pl-3">
+                            <li><a href="{{ path('app_admin') }}">{{ "menu_admin" | trans }}</a></li>
+                        </ul>
+                    {% endif %}
+
                 </aside>
             </div>
         {% endif %}
