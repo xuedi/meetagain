@@ -25,6 +25,16 @@ enum ActivityType: int
     case PasswordChanged = 16;
     case CommentedOnEvent = 17;
     case RegistrationEmailResent = 18;
+    case AdminEventCreated = 19;
+    case AdminEventEdited = 20;
+    case AdminEventDeleted = 21;
+    case AdminEventCancelled = 22;
+    case AdminCmsPageCreated = 23;
+    case AdminCmsPageUpdated = 24;
+    case AdminCmsPageDeleted = 25;
+    case AdminMemberApproved = 26;
+    case AdminMemberDenied = 27;
+    case AdminMemberPromoted = 28;
 
     // TODO: should be separate translator not here in enum
     public static function getChoices(TranslatorInterface $translator): array

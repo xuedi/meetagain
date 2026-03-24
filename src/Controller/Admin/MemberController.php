@@ -4,11 +4,13 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 use App\Entity\User;
+use App\Enum\ActivityType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Service\Activity\ActivityService;
 use App\Service\Email\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -25,6 +27,7 @@ final class MemberController extends AbstractAdminController
         private readonly EmailService $emailService,
         private readonly AdminMemberListFilterService $filterService,
         private readonly EntityManagerInterface $em,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Override]
@@ -139,6 +142,9 @@ final class MemberController extends AbstractAdminController
         $this->em->persist($user);
         $this->em->flush();
 
+        $admin = $this->getAuthedUser();
+        $this->activityService->log(ActivityType::AdminMemberApproved, $admin, ['user_id' => $user->getId()]);
+
         return $this->redirectToRoute('app_admin_member');
     }
 
@@ -158,6 +164,9 @@ final class MemberController extends AbstractAdminController
 
         $this->em->persist($user);
         $this->em->flush();
+
+        $admin = $this->getAuthedUser();
+        $this->activityService->log(ActivityType::AdminMemberDenied, $admin, ['user_id' => $user->getId()]);
 
         return $this->redirectToRoute('app_admin_member');
     }
@@ -201,6 +210,9 @@ final class MemberController extends AbstractAdminController
         if ($user->getRole() !== UserRole::Organizer) {
             $user->setRole(UserRole::Organizer);
             $this->em->flush();
+
+            $admin = $this->getAuthedUser();
+            $this->activityService->log(ActivityType::AdminMemberPromoted, $admin, ['user_id' => $user->getId()]);
             $this->addFlash('success', 'Member promoted to organizer.');
         }
 

@@ -7,14 +7,16 @@ use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Host;
 use App\Entity\Image;
-use App\Enum\ImageType;
 use App\Entity\Location;
+use App\Enum\ImageType;
 use App\EntityActionDispatcher;
+use App\Enum\ActivityType;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
+use App\Service\Activity\ActivityService;
 use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageService;
@@ -54,6 +56,7 @@ final class EventController extends AbstractAdminController
         private readonly EventRepository $repo,
         private readonly AdminEventListFilterService $eventFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('', name: 'app_admin_event')]
@@ -90,7 +93,7 @@ final class EventController extends AbstractAdminController
         // TODO: simplify with vanilla symfony components now the cascading flush effect is fixed
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
+            $user = $this->getAuthedUser();
 
             // overwrite basic data
             $event->setInitial(true);
@@ -140,6 +143,7 @@ final class EventController extends AbstractAdminController
             $this->entityManager->persist($event);
             $this->entityManager->flush();
 
+            $this->activityService->log(ActivityType::AdminEventEdited, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
 
             // create thumbnail
@@ -176,8 +180,10 @@ final class EventController extends AbstractAdminController
     #[Route('/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
     public function cancel(Event $event): Response
     {
+        $user = $this->getAuthedUser();
         $rsvpCount = $event->getRsvp()->count();
         $this->eventService->cancelEvent($event);
+        $this->activityService->log(ActivityType::AdminEventCancelled, $user, ['event_id' => $event->getId()]);
         if ($rsvpCount > 0) {
             $this->addFlash('success', "Event canceled. $rsvpCount user(s) have been notified.");
         }
@@ -217,7 +223,7 @@ final class EventController extends AbstractAdminController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
+            $user = $this->getAuthedUser();
 
             $event->setCreatedAt(new DateTimeImmutable());
             $event->setPreviewImage(null);
@@ -246,6 +252,7 @@ final class EventController extends AbstractAdminController
             $entityManager->persist($event);
             $entityManager->flush();
 
+            $this->activityService->log(ActivityType::AdminEventCreated, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::CreateEvent, $event->getId());
 
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
