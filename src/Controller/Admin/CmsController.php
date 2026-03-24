@@ -11,12 +11,14 @@ use App\Entity\BlockType\Text;
 use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
 use App\EntityActionDispatcher;
+use App\Enum\ActivityType;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\CmsType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
+use App\Service\Activity\ActivityService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -50,6 +52,7 @@ final class CmsController extends AbstractAdminController
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly LoggerInterface $logger,
         private readonly LanguageService $languageService,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('', name: 'app_admin_cms')]
@@ -108,6 +111,8 @@ final class CmsController extends AbstractAdminController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->em->flush();
 
+            $user = $this->getAuthedUser();
+            $this->activityService->log(ActivityType::AdminCmsPageUpdated, $user, ['cms_id' => $cms->getId(), 'cms_slug' => $cms->getSlug()]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateCms, $cms->getId());
 
             return $this->redirectToRoute('app_admin_cms_edit', [
@@ -149,9 +154,12 @@ final class CmsController extends AbstractAdminController
             }
 
             $cmsId = $cmsPage->getId();
+            $cmsSlug = $cmsPage->getSlug();
             $this->em->remove($cmsPage);
             $this->em->flush();
 
+            $user = $this->getAuthedUser();
+            $this->activityService->log(ActivityType::AdminCmsPageDeleted, $user, ['cms_id' => $cmsId, 'cms_slug' => $cmsSlug]);
             $this->entityActionDispatcher->dispatch(EntityAction::DeleteCms, $cmsId);
         }
 
@@ -161,7 +169,7 @@ final class CmsController extends AbstractAdminController
     #[Route('/add', name: 'app_admin_cms_add', methods: ['POST'])]
     public function cmsAdd(Request $request): Response
     {
-        $user = $this->getUser();
+        $user = $this->getAuthedUser();
 
         $newPage = new Cms();
         $newPage->setSlug($request->request->all('cms')['slug']);
@@ -173,6 +181,7 @@ final class CmsController extends AbstractAdminController
         $this->em->persist($newPage);
         $this->em->flush();
 
+        $this->activityService->log(ActivityType::AdminCmsPageCreated, $user, ['cms_id' => $newPage->getId(), 'cms_slug' => $newPage->getSlug()]);
         $this->entityActionDispatcher->dispatch(EntityAction::CreateCms, $newPage->getId());
 
         return $this->redirectToRoute('app_admin_cms_edit', [

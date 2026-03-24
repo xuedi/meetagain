@@ -1,0 +1,77 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit\Service\Activity\Messages;
+
+use App\Enum\ActivityType;
+use App\Service\Activity\MessageInterface;
+use App\Service\Activity\Messages\AdminMemberPromoted;
+use App\Service\Media\ImageHtmlRenderer;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\RouterInterface;
+
+class AdminMemberPromotedTest extends TestCase
+{
+    private RouterInterface $router;
+    private ImageHtmlRenderer $imageService;
+
+    public function setUp(): void
+    {
+        $this->router = $this->createStub(RouterInterface::class);
+        $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+    }
+
+    public function testCanBuild(): void
+    {
+        // Arrange
+        $userId = 42;
+        $userName = 'JohnDoe';
+        $meta = ['user_id' => $userId];
+        $userNames = [$userId => $userName];
+
+        $subject = new AdminMemberPromoted();
+        $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
+
+        // Act & Assert
+        static::assertInstanceOf(MessageInterface::class, $subject->validate());
+        static::assertEquals(ActivityType::AdminMemberPromoted, $subject->getType());
+        static::assertEquals('Promoted member to organizer: JohnDoe', $subject->render());
+        static::assertEquals('Promoted member to organizer: JohnDoe', $subject->render(true));
+    }
+
+    public function testRendersDeletedUserGracefully(): void
+    {
+        // Arrange
+        $subject = new AdminMemberPromoted();
+        $subject->injectServices($this->router, $this->imageService, ['user_id' => 99], []);
+
+        // Act & Assert
+        static::assertSame('Promoted member to organizer: [deleted]', $subject->render());
+    }
+
+    public function testCanCatchMissingUserId(): void
+    {
+        // Arrange
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in AdminMemberPromoted"));
+
+        $subject = new AdminMemberPromoted();
+        $subject->injectServices($this->router, $this->imageService, []);
+
+        // Act
+        $subject->validate();
+    }
+
+    public function testCanCatchNonNumericUserId(): void
+    {
+        // Arrange
+        $this->expectExceptionObject(
+            new InvalidArgumentException("Value 'user_id' has to be numeric in 'AdminMemberPromoted'"),
+        );
+
+        $subject = new AdminMemberPromoted();
+        $subject->injectServices($this->router, $this->imageService, ['user_id' => 'not-a-number']);
+
+        // Act
+        $subject->validate();
+    }
+}
