@@ -4,7 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 use App\Entity\User;
+use App\EntityActionDispatcher;
 use App\Enum\ActivityType;
+use App\Enum\EntityAction;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
@@ -28,6 +30,7 @@ final class MemberController extends AbstractAdminController
         private readonly AdminMemberListFilterService $filterService,
         private readonly EntityManagerInterface $em,
         private readonly ActivityService $activityService,
+        private readonly EntityActionDispatcher $dispatcher,
     ) {}
 
     #[Override]
@@ -179,10 +182,14 @@ final class MemberController extends AbstractAdminController
             throw $this->createNotFoundException('Member not found in current context.');
         }
 
+        $userId = $user->getId();
+
         $user->setStatus(UserStatus::Deleted);
 
         $this->em->persist($user);
         $this->em->flush();
+
+        $this->dispatcher->dispatch(EntityAction::DeleteUser, $userId);
 
         return $this->redirectToRoute('app_admin_member');
     }

@@ -15,7 +15,7 @@ class Host
     #[ORM\Column(length: 16)]
     private ?string $name = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(cascade: ['persist'])]
     private ?User $user = null;
 
     public function getId(): ?int
