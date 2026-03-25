@@ -87,6 +87,11 @@ final class EventController extends AbstractController
 
         $response = $this->getResponse();
         $event = $this->repo->findOneForDetails($id);
+
+        if ($event->findTranslation($request->getLocale()) === null) {
+            return $this->redirectToRoute(self::ROUTE_EVENT);
+        }
+
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
