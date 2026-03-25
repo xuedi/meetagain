@@ -40,6 +40,21 @@ final class LogsController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_activity_log');
     }
 
+    #[Route('/activity/{id}', name: 'app_admin_activity_log_show')]
+    public function activityShow(int $id): Response
+    {
+        $activity = $this->activityService->getAdminDetail($id);
+        if ($activity === null) {
+            throw $this->createNotFoundException();
+        }
+
+        return $this->render('admin/logs/logs_activity_show.html.twig', [
+            'active' => 'logs',
+            'activeLog' => 'activity',
+            'activity' => $activity,
+        ]);
+    }
+
     #[Route('/activity', name: 'app_admin_activity_log')]
     public function activityList(): Response
     {

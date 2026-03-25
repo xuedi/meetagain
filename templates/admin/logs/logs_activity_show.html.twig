@@ -1,0 +1,114 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/logs/_tabs_navigation.html.twig' with {'activeSection': 'logs'} %}
+
+        <div class="mb-4">
+            <a href="{{ path('app_admin_activity_log') }}" class="button is-small">
+                <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                <span>Back</span>
+            </a>
+        </div>
+
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td><code>{{ activity.id }}</code></td>
+                </tr>
+                <tr>
+                    <th>User</th>
+                    <td>
+                        {% if activity.user %}
+                            <a href="{{ path('app_admin_member_edit', {'id': activity.user.id}) }}">
+                                {{ activity.user.email }}
+                            </a>
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <td>{{ activity.createdAt|date('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr>
+                    <th>Type</th>
+                    <td><span class="tag is-light">{{ activity.type.name }}</span></td>
+                </tr>
+                <tr>
+                    <th>Message</th>
+                    <td>{{ activity.message|raw }}</td>
+                </tr>
+                <tr>
+                    <th>Meta</th>
+                    <td>
+                        {% if activity.meta is not empty %}
+                            <table class="table is-narrow is-bordered">
+                                <tbody>
+                                    {% for key, value in activity.meta %}
+                                        <tr>
+                                            <th>{{ key }}</th>
+                                            <td><code>{{ value }}</code></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Related</th>
+                    <td>
+                        {% set meta = activity.meta %}
+                        {% set typeName = activity.type.name %}
+                        {% if meta is not empty %}
+                            {# Event link — but not for deleted events #}
+                            {% if meta.event_id is defined %}
+                                {% if typeName == 'AdminEventDeleted' %}
+                                    {{ meta.event_name|default('Event') }}
+                                    <span class="tag is-danger is-light ml-1">deleted</span>
+                                {% else %}
+                                    <a href="{{ path('app_admin_event_edit', {'id': meta.event_id}) }}" class="button is-small">
+                                        <span class="icon"><i class="fa fa-calendar"></i></span>
+                                        <span>Event #{{ meta.event_id }}</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+
+                            {# CMS link — but not for deleted pages #}
+                            {% if meta.cms_id is defined %}
+                                {% if typeName == 'AdminCmsPageDeleted' %}
+                                    {{ meta.cms_slug|default('Page') }}
+                                    <span class="tag is-danger is-light ml-1">deleted</span>
+                                {% else %}
+                                    <a href="{{ path('app_admin_cms_edit', {'id': meta.cms_id}) }}" class="button is-small">
+                                        <span class="icon"><i class="fa fa-file-text"></i></span>
+                                        <span>CMS #{{ meta.cms_id }}</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+
+                            {# User/member link #}
+                            {% if meta.user_id is defined %}
+                                <a href="{{ path('app_admin_member_edit', {'id': meta.user_id}) }}" class="button is-small">
+                                    <span class="icon"><i class="fa fa-user"></i></span>
+                                    <span>Member #{{ meta.user_id }}</span>
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
