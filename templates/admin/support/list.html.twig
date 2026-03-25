@@ -8,6 +8,7 @@
             <thead>
             <tr>
                 <th>Date</th>
+                <th>Type</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Message</th>
@@ -22,6 +23,7 @@
                         {{ request.createdAt|date('Y-m-d') }}<br>
                         <small class="has-text-grey">{{ request.createdAt|date('H:i:s') }}</small>
                     </td>
+                    <td><span class="tag is-light">{{ request.contactType.label() }}</span></td>
                     <td>
                         {% if request.isNew() %}<strong>{% endif %}
                         {{ request.name }}

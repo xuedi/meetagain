@@ -1,17 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'nav_support' | trans }}{% endblock %}
+{% block title %}{{ 'nav_contact' | trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            <h1 class="title is-5">{{ 'nav_support' | trans }}</h1>
+            <h1 class="title is-5">{{ 'nav_contact' | trans }}</h1>
 
             {{ form_start(form) }}
             <div class="columns">
                 <div class="column is-5">
+                    {{ form_row(form.contactType) }}
                     {{ form_row(form.name, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
                     {{ form_row(form.email, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
                     {{ form_row(form.message) }}

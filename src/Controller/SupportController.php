@@ -26,7 +26,13 @@ final class SupportController extends AbstractController
         private readonly RateLimiterFactory $supportLimiter,
     ) {}
 
-    #[Route('/support', name: 'app_support')]
+    #[Route('/support', name: 'app_support_redirect')]
+    public function supportRedirect(): Response
+    {
+        return $this->redirectToRoute('app_contact', [], 301);
+    }
+
+    #[Route('/contact', name: 'app_contact')]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $limiter = $this->supportLimiter->create($request->getClientIp());
@@ -66,6 +72,7 @@ final class SupportController extends AbstractController
                 $supportRequest->setEmail(
                     $user instanceof User ? (string) $user->getEmail() : (string) $form->get('email')->getData(),
                 );
+                $supportRequest->setContactType($form->get('contactType')->getData());
                 $supportRequest->setMessage((string) $form->get('message')->getData());
                 $supportRequest->setCreatedAt(new DateTimeImmutable());
                 $supportRequest->setStatus(SupportRequestStatus::New);
@@ -79,7 +86,7 @@ final class SupportController extends AbstractController
 
                 $this->addFlash('success', 'Your message has been sent. We will get back to you shortly.');
 
-                return $this->redirectToRoute('app_support');
+                return $this->redirectToRoute('app_contact');
             }
         } else {
             $this->captchaService->reset();
