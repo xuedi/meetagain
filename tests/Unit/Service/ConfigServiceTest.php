@@ -81,6 +81,7 @@ class ConfigServiceTest extends TestCase
             '600x400' => 0,
             '432x432' => 0,
             '400x400' => 0,
+            '300x200' => 0,
             '210x140' => 0,
             '80x80' => 0,
             '50x50' => 0,

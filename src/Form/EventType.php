@@ -8,8 +8,10 @@ use App\Enum\EventStatus;
 use App\Enum\EventType as EventTypeEnum;
 use App\Entity\Host;
 use App\Entity\Location;
+use App\Filter\Admin\Host\AdminHostListFilterService;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Repository\EventTranslationRepository;
+use App\Repository\HostRepository;
 use App\Repository\LocationRepository;
 use App\Service\Config\LanguageService;
 use Override;
@@ -36,6 +38,8 @@ class EventType extends AbstractType
         private readonly EventTranslationRepository $eventTransRepo,
         private readonly AdminLocationListFilterService $locationFilterService,
         private readonly LocationRepository $locationRepository,
+        private readonly AdminHostListFilterService $hostFilterService,
+        private readonly HostRepository $hostRepository,
     ) {}
 
     #[Override]
@@ -100,6 +104,11 @@ class EventType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'mapped' => false,
+                'query_builder' => function () {
+                    $filterResult = $this->hostFilterService->getHostIdFilter();
+
+                    return $this->hostRepository->createQueryBuilderForAdmin($filterResult->getHostIds());
+                },
             ])
             ->add('image', FileType::class, [
                 'mapped' => false,
