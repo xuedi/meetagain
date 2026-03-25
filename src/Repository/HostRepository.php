@@ -15,4 +15,33 @@ class HostRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Host::class);
     }
+
+    /**
+     * @param array<int>|null $restrictToHostIds
+     * @return Host[]
+     */
+    public function findAllForAdmin(?array $restrictToHostIds = null): array
+    {
+        if ($restrictToHostIds === []) {
+            return [];
+        }
+        $qb = $this->createQueryBuilder('h');
+        if ($restrictToHostIds !== null) {
+            $qb->andWhere('h.id IN (:hostIds)')->setParameter('hostIds', $restrictToHostIds);
+        }
+
+        return $qb->orderBy('h.name', 'ASC')->getQuery()->getResult();
+    }
+
+    public function createQueryBuilderForAdmin(?array $restrictToHostIds = null): \Doctrine\ORM\QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('h');
+        if ($restrictToHostIds === []) {
+            $qb->where('1 = 0');
+        } elseif ($restrictToHostIds !== null) {
+            $qb->where('h.id IN (:hostIds)')->setParameter('hostIds', $restrictToHostIds);
+        }
+
+        return $qb->orderBy('h.name', 'ASC');
+    }
 }

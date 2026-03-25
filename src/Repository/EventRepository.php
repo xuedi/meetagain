@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use App\Entity\Host;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
@@ -440,6 +441,20 @@ class EventRepository extends ServiceEntityRepository
             ->where('e.id IN (:eventIds)')
             ->setParameter('eventIds', $eventIds)
             ->orderBy('e.' . $orderBy, $direction)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Event[]
+     */
+    public function findByHost(Host $host): array
+    {
+        return $this
+            ->createQueryBuilder('e')
+            ->join('e.host', 'h')
+            ->where('h = :host')
+            ->setParameter('host', $host)
             ->getQuery()
             ->getResult();
     }

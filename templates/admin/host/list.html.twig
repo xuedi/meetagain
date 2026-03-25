@@ -1,0 +1,35 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>User</th>
+                    <th>
+                        <a href="{{ path('app_admin_host_add') }}">
+                            <span class="icon"><i class="fa fa-plus"></i></span>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for host in hosts %}
+                    <tr>
+                        <td>{{ host.name }}</td>
+                        <td>{{ host.user ? host.user.name : '-' }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_host_edit', {'id': host.id}) }}">
+                                <span class="icon"><i class="fa fa-edit"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

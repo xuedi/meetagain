@@ -23,4 +23,6 @@ enum EntityAction: string
     case DeleteBookSuggestion = 'delete_book_suggestion';
     case CreateBook = 'create_book';
     case DeleteBook = 'delete_book';
+    case CreateHost = 'create_host';
+    case DeleteHost = 'delete_host';
 }
