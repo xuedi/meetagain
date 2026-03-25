@@ -29,7 +29,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             $cms->setCreatedAt(new DateTimeImmutable());
             $cms->setCreatedBy($this->getRefUser(UserFixture::ADMIN));
             $cms->setPublished(true);
-            $cms->setLocked(in_array($slug, [self::PRIVACY, self::IMPRINT], true));
+            $cms->setLocked(in_array($slug, [self::PRIVACY, self::IMPRINT, self::INDEX, self::ABOUT, self::RULES, self::ANNOUNCEMENT], true));
             if ($menuLocations !== null) {
                 foreach ($menuLocations as $value) {
                     $location = MenuLocation::from($value);
