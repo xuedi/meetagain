@@ -32,7 +32,14 @@ class RsvpYes extends MessageAbstract
     {
         $eventId = $this->meta['event_id'];
         $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        if ($eventName === '[deleted]') {
+            return 'Going to event [deleted]';
+        }
 
-        return sprintf('Going to event: %s', $this->escapeHtml($eventName));
+        return sprintf(
+            'Going to event: <a href="%s">%s</a>',
+            $this->router->generate('app_event_details', ['id' => $eventId]),
+            $this->escapeHtml($eventName),
+        );
     }
 }

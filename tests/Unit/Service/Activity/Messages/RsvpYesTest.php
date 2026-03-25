@@ -23,22 +23,44 @@ class RsvpYesTest extends TestCase
 
     public function testCanBuild(): void
     {
+        // Arrange
         $eventId = 42;
         $eventName = 'Test Event';
+        $eventUrl = '/event/42';
         $expectedText = 'Going to event: Test Event';
-        $expectedHtml = 'Going to event: Test Event';
+        $expectedHtml = 'Going to event: <a href="/event/42">Test Event</a>';
 
         $meta = ['event_id' => $eventId];
         $eventNames = [$eventId => $eventName];
 
-        $subject = new RsvpYes();
-        $subject->injectServices($this->router, $this->imageService, $meta, [], $eventNames);
+        $router = $this->createMock(RouterInterface::class);
+        $router
+            ->expects($this->once())
+            ->method('generate')
+            ->with('app_event_details', ['id' => $eventId])
+            ->willReturn($eventUrl);
 
-        // check returns
+        $subject = new RsvpYes();
+        $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
+
+        // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(ActivityType::RsvpYes, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
+    }
+
+    public function testRendersDeletedEventGracefully(): void
+    {
+        // Arrange
+        $meta = ['event_id' => 99];
+
+        $subject = new RsvpYes();
+        $subject->injectServices($this->router, $this->imageService, $meta, [], []);
+
+        // Act & Assert
+        static::assertSame('Going to event: [deleted]', $subject->render());
+        static::assertSame('Going to event [deleted]', $subject->render(true));
     }
 
     public function testCanCatchMissingEventId(): void
