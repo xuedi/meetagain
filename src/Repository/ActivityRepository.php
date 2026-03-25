@@ -59,6 +59,7 @@ class ActivityRepository extends ServiceEntityRepository
                 ActivityType::BlockedUser->value,
                 ActivityType::UnblockedUser->value,
                 ActivityType::FollowedUser->value,
+                ActivityType::RsvpYes->value,
             ])
             ->getQuery()
             ->getResult();
@@ -90,6 +91,12 @@ class ActivityRepository extends ServiceEntityRepository
                 case ActivityType::UnblockedUser->value:
                     // Only visible to the user themselves (self-only visibility)
                     if ($user->getId() === $activityUserId) {
+                        $activityIds[] = $userActivity->getId();
+                    }
+                    break;
+
+                case ActivityType::RsvpYes->value:
+                    if (in_array($activityUserId, $following)) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;
