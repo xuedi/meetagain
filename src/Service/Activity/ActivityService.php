@@ -53,6 +53,18 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->findBy([], ['createdAt' => 'DESC'], 250));
     }
 
+    public function getAdminDetail(int $id): ?Activity
+    {
+        $activity = $this->repo->find($id);
+        if ($activity === null) {
+            return null;
+        }
+
+        $activity->setMessage($this->messageFactory->build($activity)->render(true));
+
+        return $activity;
+    }
+
     /**
      * Validates all activities in the database and returns invalid ones.
      *

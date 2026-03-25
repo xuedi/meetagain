@@ -162,4 +162,60 @@ class ActivityServiceTest extends TestCase
         // Assert: returned activities match expected
         static::assertSame($activities, $result);
     }
+
+    public function testGetAdminDetailReturnsActivityWithHtmlMessage(): void
+    {
+        // Arrange: create an Activity stub
+        $activity = $this->createMock(Activity::class);
+        $activity->expects($this->once())->method('setMessage')->with('<b>HTML</b>')->willReturn($activity);
+
+        // Arrange: mock repository to return the activity by ID
+        $repoMock = $this->createMock(ActivityRepository::class);
+        $repoMock->expects($this->once())->method('find')->with(42)->willReturn($activity);
+
+        // Arrange: mock MessageInterface to return HTML from render(true)
+        $messageMock = $this->createMock(MessageInterface::class);
+        $messageMock->expects($this->once())->method('render')->with(true)->willReturn('<b>HTML</b>');
+
+        // Arrange: mock MessageFactory to build the message
+        $messageFactoryMock = $this->createMock(MessageFactory::class);
+        $messageFactoryMock->expects($this->once())->method('build')->with($activity)->willReturn($messageMock);
+
+        // Arrange: create subject with mocked dependencies
+        $subject = new ActivityService(
+            em: $this->createStub(EntityManagerInterface::class),
+            repo: $repoMock,
+            notificationService: $this->createStub(ActivityNotificationService::class),
+            messageFactory: $messageFactoryMock,
+            logger: $this->createStub(LoggerInterface::class),
+        );
+
+        // Act
+        $result = $subject->getAdminDetail(42);
+
+        // Assert: the activity is returned with its HTML message set
+        static::assertSame($activity, $result);
+    }
+
+    public function testGetAdminDetailReturnsNullWhenNotFound(): void
+    {
+        // Arrange: mock repository to return null
+        $repoMock = $this->createMock(ActivityRepository::class);
+        $repoMock->expects($this->once())->method('find')->with(99)->willReturn(null);
+
+        // Arrange: create subject with mocked dependencies
+        $subject = new ActivityService(
+            em: $this->createStub(EntityManagerInterface::class),
+            repo: $repoMock,
+            notificationService: $this->createStub(ActivityNotificationService::class),
+            messageFactory: $this->createStub(MessageFactory::class),
+            logger: $this->createStub(LoggerInterface::class),
+        );
+
+        // Act
+        $result = $subject->getAdminDetail(99);
+
+        // Assert: null is returned for a missing activity
+        static::assertNull($result);
+    }
 }
