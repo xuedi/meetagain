@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Enum\ContactType;
 use Override;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,7 +20,16 @@ class SupportRequestType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('name', TextType::class, [
+        $choices = [];
+        foreach (ContactType::cases() as $case) {
+            $choices[$case->label()] = $case;
+        }
+
+        $builder->add('contactType', ChoiceType::class, [
+            'choices' => $choices,
+            'label' => 'Contact type',
+            'constraints' => [new NotBlank()],
+        ])->add('name', TextType::class, [
             'constraints' => [
                 new NotBlank(message: 'Please enter your name.'),
                 new Length(max: 100, maxMessage: 'Name cannot be longer than {{ limit }} characters.'),

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\ContactType;
 use App\Enum\SupportRequestStatus;
 use App\Repository\SupportRequestRepository;
 use DateTimeImmutable;
@@ -30,6 +31,9 @@ class SupportRequest
 
     #[ORM\Column(length: 10, enumType: SupportRequestStatus::class)]
     private SupportRequestStatus $status = SupportRequestStatus::New;
+
+    #[ORM\Column(length: 20, enumType: ContactType::class)]
+    private ContactType $contactType = ContactType::General;
 
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
@@ -95,6 +99,18 @@ class SupportRequest
     public function setStatus(SupportRequestStatus $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getContactType(): ContactType
+    {
+        return $this->contactType;
+    }
+
+    public function setContactType(ContactType $contactType): static
+    {
+        $this->contactType = $contactType;
 
         return $this;
     }

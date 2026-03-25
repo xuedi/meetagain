@@ -198,6 +198,7 @@ readonly class EmailService implements CronTaskInterface
         $email->to($this->config->getMailerAddress());
         $email->locale('en');
         $email->context([
+            'contactType' => $request->getContactType()->label(),
             'name' => $request->getName(),
             'email' => $request->getEmail(),
             'message' => $request->getMessage(),

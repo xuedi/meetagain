@@ -301,5 +301,6 @@ menu_admin_translation_publish: Veröffentlichen
 page_title_translation_edit: 'Übersetzung bearbeiten'
 page_title_translation: Übersetzung
 nav_support: Support
+nav_contact: Kontakt
 nav_api: API
 config_option_send_admin_notification: 'Admin Benachrichtigungen'
