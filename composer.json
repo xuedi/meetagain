@@ -48,7 +48,6 @@
     "symfony/mailer": "8.0.*",
     "symfony/mime": "8.0.*",
     "symfony/monolog-bundle": "^4",
-    "symfony/sweego-mailer": "8.0.*",
     "symfony/process": "8.0.*",
     "symfony/property-access": "8.0.*",
     "symfony/property-info": "8.0.*",
@@ -58,6 +57,7 @@
     "symfony/serializer": "8.0.*",
     "symfony/stopwatch": "8.0.*",
     "symfony/string": "8.0.*",
+    "symfony/sweego-mailer": "8.0.*",
     "symfony/translation": "8.0.*",
     "symfony/twig-bundle": "8.0.*",
     "symfony/validator": "8.0.*",
@@ -66,14 +66,16 @@
     "symfonycasts/verify-email-bundle": "^1.17",
     "twig/extra-bundle": "^3",
     "twig/string-extra": "^3.22",
-    "twig/twig": "^3"
+    "twig/twig": "^3",
+    "wikimedia/composer-merge-plugin": "^2.1"
   },
   "config": {
     "allow-plugins": {
       "carthage-software/mago": true,
       "php-http/discovery": true,
       "symfony/flex": true,
-      "symfony/runtime": true
+      "symfony/runtime": true,
+      "wikimedia/composer-merge-plugin": true
     },
     "sort-packages": true
   },
@@ -107,6 +109,15 @@
     "symfony/symfony": "*"
   },
   "extra": {
+    "merge-plugin": {
+      "include": ["plugins/*/composer.json"],
+      "recurse": false,
+      "replace": false,
+      "ignore-duplicates": false,
+      "merge-dev": false,
+      "merge-extra": false,
+      "merge-scripts": false
+    },
     "symfony": {
       "allow-contrib": false,
       "require": "8.0.*"
