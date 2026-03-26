@@ -79,4 +79,16 @@ interface Plugin
      * Return null if the plugin doesn't provide content for this section.
      */
     public function getMemberPageTop(): ?string;
+
+    /**
+     * Returns links to inject into the given footer column (e.g. 'col2').
+     *
+     * @return list<Link>
+     */
+    public function getFooterLinks(string $column): array;
+
+    /**
+     * Returns the display title for the given footer column, or null to use the default.
+     */
+    public function getFooterColumnTitle(string $column): ?string;
 }
