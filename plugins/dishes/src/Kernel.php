@@ -69,4 +69,14 @@ readonly class Kernel implements Plugin
     {
         return null;
     }
+
+    public function getFooterLinks(string $column): array
+    {
+        return [];
+    }
+
+    public function getFooterColumnTitle(string $column): ?string
+    {
+        return null;
+    }
 }
