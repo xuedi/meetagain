@@ -28,7 +28,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>{{ 'footer_col2' | trans }}</p>
+                <p>{{ get_plugin_footer_column_title('col2') ?: ('footer_col2' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col2') %}
                         {% if menu.slug != 'index' %}
@@ -36,6 +36,11 @@
                                 <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
                             </li>
                         {% endif %}
+                    {% endfor %}
+                    {% for link in get_plugin_footer_links('col2') %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ link.slug }}">{{ link.name | trans }}</a>
+                        </li>
                     {% endfor %}
                 </ul>
             </div>

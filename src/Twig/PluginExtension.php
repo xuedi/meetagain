@@ -37,6 +37,8 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_stylesheets', $this->getPluginStylesheets(...)),
             new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
+            new TwigFunction('get_plugin_footer_links', $this->getPluginFooterLinks(...)),
+            new TwigFunction('get_plugin_footer_column_title', $this->getPluginFooterColumnTitle(...)),
             new TwigFunction('get_member_page_top', $this->getMemberPageTop(...), ['is_safe' => ['html']]),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
@@ -100,6 +102,22 @@ final class PluginExtension extends AbstractExtension
     public function getPluginFooterAbout(): ?string
     {
         return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getFooterAbout());
+    }
+
+    /**
+     * Returns links contributed by plugins for the given footer column.
+     */
+    public function getPluginFooterLinks(string $column): array
+    {
+        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getFooterLinks($column));
+    }
+
+    /**
+     * Returns the display title for the given footer column from the first plugin that provides one.
+     */
+    public function getPluginFooterColumnTitle(string $column): ?string
+    {
+        return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getFooterColumnTitle($column));
     }
 
     /**
