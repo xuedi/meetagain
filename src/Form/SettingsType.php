@@ -60,6 +60,26 @@ class SettingsType extends AbstractType
                     '30/12/2025 14:30 (UK)' => 'd/m/Y H:i',
                     '12/30/2025 02:30 PM (US)' => 'm/d/Y h:i A',
                 ],
+            ])
+            ->add('footerCol1Title', TextType::class, [
+                'label' => 'Column 1',
+                'required' => false,
+                'data' => $this->configService->getFooterColumnTitle('col1'),
+            ])
+            ->add('footerCol2Title', TextType::class, [
+                'label' => 'Column 2',
+                'required' => false,
+                'data' => $this->configService->getFooterColumnTitle('col2'),
+            ])
+            ->add('footerCol3Title', TextType::class, [
+                'label' => 'Column 3',
+                'required' => false,
+                'data' => $this->configService->getFooterColumnTitle('col3'),
+            ])
+            ->add('footerCol4Title', TextType::class, [
+                'label' => 'Column 4',
+                'required' => false,
+                'data' => $this->configService->getFooterColumnTitle('col4'),
             ]);
     }
 
