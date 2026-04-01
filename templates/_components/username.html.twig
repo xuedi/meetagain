@@ -1,14 +1,14 @@
 {#
-    User display name with optional verified badge
+    User display name with optional badges
 
     Parameters:
     - link: URL to the user's profile page (required)
     - name: display name of the user (required)
-    - verified: boolean — shows a checkmark icon if true (required)
+    - badges: list of UserBadge DTOs (required)
 #}
 <a href="{{ link }}">{{ name }}</a>
-{% if verified %}
-    <span class="icon has-text-success">
-        <i class="fa-regular fa-user-check"></i>
+{% for badge in badges %}
+    <span class="icon {{ badge.color }}" title="{{ badge.title }}">
+        <i class="{{ badge.icon }}"></i>
     </span>
-{% endif %}
+{% endfor %}
