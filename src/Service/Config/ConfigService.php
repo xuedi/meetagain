@@ -156,6 +156,11 @@ readonly class ConfigService
         return $value;
     }
 
+    public function getFooterColumnTitle(string $column): string
+    {
+        return $this->getString('multisite_footer_' . $column . '_title', '');
+    }
+
     public function saveForm(array $formData): void
     {
         $this->setString('website_url', $formData['url']);
@@ -164,6 +169,10 @@ readonly class ConfigService
         $this->setString('email_sender_mail', $formData['senderEmail']);
         $this->setInt('system_user_id', $formData['systemUser']);
         $this->setString('date_format', $formData['dateFormat']);
+        $this->setString('multisite_footer_col1_title', $formData['footerCol1Title'] ?? '');
+        $this->setString('multisite_footer_col2_title', $formData['footerCol2Title'] ?? '');
+        $this->setString('multisite_footer_col3_title', $formData['footerCol3Title'] ?? '');
+        $this->setString('multisite_footer_col4_title', $formData['footerCol4Title'] ?? '');
     }
 
     public function saveSeoForm(array $formData): void

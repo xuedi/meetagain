@@ -10,7 +10,7 @@
                 {% endif %}
             </div>
             <div class="column is-6-mobile">
-                <p>{{ 'footer_col1' | trans }}</p>
+                <p>{{ get_footer_column_title('col1') ?: ('footer_col1' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col1') %}
                         {% if menu.slug != 'index' %}
@@ -28,7 +28,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>{{ get_plugin_footer_column_title('col2') ?: ('footer_col2' | trans) }}</p>
+                <p>{{ get_footer_column_title('col2') ?: ('footer_col2' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col2') %}
                         {% if menu.slug != 'index' %}
@@ -45,7 +45,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>{{ 'footer_col3' | trans }}</p>
+                <p>{{ get_footer_column_title('col3') ?: ('footer_col3' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col3') %}
                         {% if menu.slug != 'index' %}
@@ -57,7 +57,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>{{ 'footer_col4' | trans }}</p>
+                <p>{{ get_footer_column_title('col4') ?: ('footer_col4' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col4') %}
                         {% if menu.slug != 'index' %}
