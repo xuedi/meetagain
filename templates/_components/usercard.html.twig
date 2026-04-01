@@ -16,7 +16,7 @@
         <div class="card-content p-3 has-text-centered">
             {% include '_components/username.html.twig' with {
                 'link': path('app_member_view', {'id': user.id}),
-                'verified': user.verified,
+                'badges': user_badges(user.id),
                 'name': user.name
             } %}
         </div>
