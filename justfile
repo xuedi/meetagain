@@ -198,7 +198,7 @@ plugin-disable name:
 
 # Run all tests and checks
 [group('testing')]
-test: testSetup testUnit testFunctional checkMago checkMagoAnalyze checkMagoGuard
+test: testSetup testUnit testFunctional
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -247,6 +247,12 @@ testPerformance:
 
 
 
+
+# Run all tests and checks
+[group('testing')]
+check: checkMago checkMagoAnalyze checkMagoGuard
+    {{PHP}} composer validate --strict
+    echo "All tests and checks passed successfully"
 
 # Check Mago (linter)
 [group('checks')]

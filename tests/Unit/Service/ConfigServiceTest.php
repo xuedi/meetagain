@@ -233,8 +233,8 @@ class ConfigServiceTest extends TestCase
         $configRepoStub->method('findOneBy')->willReturn(null);
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock->expects($this->exactly(6))->method('persist')->with(static::isInstanceOf(Config::class));
-        $entityManagerMock->expects($this->exactly(6))->method('flush');
+        $entityManagerMock->expects($this->exactly(10))->method('persist')->with(static::isInstanceOf(Config::class));
+        $entityManagerMock->expects($this->exactly(10))->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
@@ -260,8 +260,8 @@ class ConfigServiceTest extends TestCase
         $configRepoStub->method('findOneBy')->willReturn($existingConfig);
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock->expects($this->exactly(6))->method('persist')->with(static::isInstanceOf(Config::class));
-        $entityManagerMock->expects($this->exactly(6))->method('flush');
+        $entityManagerMock->expects($this->exactly(10))->method('persist')->with(static::isInstanceOf(Config::class));
+        $entityManagerMock->expects($this->exactly(10))->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
