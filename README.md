@@ -19,7 +19,7 @@ A self-hosted, open-source alternative to Meetup.com for organizing groups and s
 
 ## Tech Stack
 
-- **Backend:** Symfony 8.0 / PHP 8.4
+- **Backend:** Symfony 8.0 / PHP 8.4+
 - **Database:** MariaDB with Doctrine ORM
 - **Cache:** Valkey (Redis-compatible)
 - **Web Server:** Caddy/FrankenPHP (HTTP/2, HTTP/3)
@@ -49,23 +49,6 @@ just devModeFixtures
 ```
 
 Login at http://localhost as `admin@example.org` with password `1234`
-
-### Development Modes
-
-| Command                          | Description                                     |
-|----------------------------------|-------------------------------------------------|
-| `just devModeFixtures`           | Full reset with demo data                       |
-| `just devModeInstaller`          | Test the web installer at `/install/`           |
-| `just devResetToFreshCloneState` | Nuclear option - removes vendor/, var/, configs |
-
-### Docker Services
-
-| Service | URL                   |
-|---------|-----------------------|
-| Web     | http://localhost      |
-| MailHog | http://localhost:8025 |
-| Valkey  | localhost:6379        |
-| MariaDB | localhost:3306        |
 
 Run `just` to see all available commands.
 
