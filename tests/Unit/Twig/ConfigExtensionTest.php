@@ -22,13 +22,14 @@ class ConfigExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(4, $functions);
+        static::assertCount(5, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('is_show_frontpage', $functionNames);
         static::assertContains('get_theme_colors', $functionNames);
         static::assertContains('get_date_format', $functionNames);
         static::assertContains('get_date_format_flatpickr', $functionNames);
+        static::assertContains('get_footer_column_title', $functionNames);
     }
 
     public function testIsShowFrontpageDelegatesToConfigService(): void

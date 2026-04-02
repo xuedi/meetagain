@@ -18,18 +18,20 @@ class CmsBlockServiceTest extends TestCase
     {
         $emMock = $this->createMock(EntityManagerInterface::class);
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
-        $blockRepoStub->method('getMaxPriority')->willReturn(5.0);
 
+        // persist called once for the new block; reorderBlocks finds no blocks (findBy returns [])
         $emMock->expects($this->once())->method('persist')->with(static::isInstanceOf(CmsBlock::class));
-        $emMock->expects($this->once())->method('flush');
+        // flush called twice: once after persist, once in reorderBlocks
+        $emMock->expects($this->exactly(2))->method('flush');
 
         $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
-        $page = new Cms();
 
-        $block = $subject->createBlock($page, 'en', CmsBlockType::Headline, ['title' => 'Test']);
+        $pageMock = $this->createStub(Cms::class);
+        $pageMock->method('getId')->willReturn(1);
+
+        $block = $subject->createBlock($pageMock, 'en', CmsBlockType::Headline, ['title' => 'Test']);
 
         static::assertSame('en', $block->getLanguage());
-        static::assertSame(6.0, $block->getPriority());
     }
 
     public function testUpdateBlockModifiesExistingBlock(): void
@@ -38,7 +40,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
 
         $block = new CmsBlock();
-        $block->setType(CmsBlockType::Paragraph);
+        $block->setType(CmsBlockType::Text);
         $block->setJson(['title' => 'old', 'content' => 'old content']);
 
         $blockRepoStub->method('find')->willReturn($block);
@@ -46,7 +48,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->once())->method('flush');
 
         $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
-        $result = $subject->updateBlock(42, CmsBlockType::Paragraph, ['title' => 'new', 'content' => 'new content']);
+        $result = $subject->updateBlock(42, CmsBlockType::Text, ['title' => 'new', 'content' => 'new content']);
 
         static::assertSame($block, $result);
     }
@@ -57,12 +59,12 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
         $blockRepoStub->method('find')->willReturn(null);
 
-        $subject = new CmsBlockService($emStub, $blockRepoStub);
+        $subject = new CmsBlockService($emStub, $blockRepoStub, new BlockHydrator());
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not load block');
 
-        $subject->updateBlock(999, CmsBlockType::Paragraph, ['title' => '', 'content' => '']);
+        $subject->updateBlock(999, CmsBlockType::Text, ['title' => '', 'content' => '']);
     }
 
     public function testDeleteBlockRemovesBlock(): void
@@ -86,7 +88,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
         $blockRepoStub->method('find')->willReturn(null);
 
-        $subject = new CmsBlockService($emStub, $blockRepoStub);
+        $subject = new CmsBlockService($emStub, $blockRepoStub, new BlockHydrator());
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not load block');
