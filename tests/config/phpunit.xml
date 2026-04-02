@@ -21,6 +21,7 @@
     <testsuites>
         <testsuite name="default">
             <directory>../Unit</directory>
+            <directory>../../plugins/*/tests/Unit</directory>
         </testsuite>
         <testsuite name="functional">
             <directory>../Functional</directory>
