@@ -59,6 +59,12 @@ final class EventController extends AbstractController
 
         // Apply content filtering from all registered filters
         $filterResult = $this->eventFilterService->getEventIdFilter();
+        $allowedEventIds = $filterResult->getEventIds();
+
+        $providedFeatured = $this->getProvidedFeaturedEvents();
+        $hasFeatured = $providedFeatured !== null
+            ? $providedFeatured !== []
+            : $this->repo->findFeatured($allowedEventIds) !== [];
 
         return $this->render(
             'events/index.html.twig',
@@ -69,9 +75,10 @@ final class EventController extends AbstractController
                     $type,
                     $rsvp,
                     $this->getUser(),
-                    $filterResult->getEventIds(),
+                    $allowedEventIds,
                 ),
                 'filter' => $form,
+                'hasFeatured' => $hasFeatured,
             ],
             $response,
         );

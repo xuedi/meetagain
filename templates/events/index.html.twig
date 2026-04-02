@@ -5,6 +5,7 @@
 
 {% block body %}
 
+    {% if hasFeatured %}
     <section class="section mt-1 is-hidden-desktop has-text-centered">
         <a class="button has-background-info-light" href="{{ path('app_event_featured') }}">
                         <span class="icon has-text-warning">
@@ -13,6 +14,7 @@
             <span>{{ "events_featured_button" | trans }}</span>
         </a>
     </section>
+    {% endif %}
 
     <section class="section mt-1 is-hidden-mobile">
         <div class="container">
@@ -39,12 +41,14 @@
 
                 <!-- Right side -->
                 <div class="level-right">
+                    {% if hasFeatured %}
                     <a class="button has-background-info-light" href="{{ path('app_event_featured') }}">
                         <span class="icon has-text-warning">
                             <i class="fa-regular fa-star"></i>
                         </span>
                         <span>{{ "events_featured_button" | trans }}</span>
                     </a>
+                    {% endif %}
                 </div>
             </nav>
 
