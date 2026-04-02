@@ -33,6 +33,10 @@ version with no server setup required.
 Your data is always yours — you can export it at any time and migrate to a
 self-hosted instance whenever you want.
 
+## Documentation
+
+generate the documentation by running `just fixDocumentation` or see the generated documentation at https://documentation.meetagain.org/
+
 ## Local Development
 
 Requires [Docker](https://docs.docker.com/get-docker/) with Docker Compose and [Just](https://github.com/casey/just)
@@ -64,18 +68,6 @@ Login at http://localhost as `admin@example.org` with password `1234`
 | MariaDB | localhost:3306        |
 
 Run `just` to see all available commands.
-
-## Plugin Development
-
-Want to extend meetAgain? See the [Plugin Development Guide](docs/plugin-development.md) for:
-
-- Complete plugin interface reference
-- Hook methods and when they're called
-- Optional interfaces (filters, authorization, notifications)
-- Real-world examples from existing plugins
-- Quick start templates
-
-**Enable a plugin:** `just plugin-enable <plugin-name>`
 
 ## Production Installation
 
