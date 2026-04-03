@@ -129,8 +129,7 @@ final class DinnerController extends AbstractController
             throw $this->createNotFoundException('Dish not found');
         }
 
-        $isPrimary = $request->request->get('is_primary') === '1';
-        $this->dinnerService->addDishToCourse($course, $dish, $isPrimary);
+        $this->dinnerService->addDishToCourse($course, $dish);
 
         return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $course->getDinner()->getEvent()->getId()]);
     }
@@ -179,17 +178,4 @@ final class DinnerController extends AbstractController
         return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $dinner->getEvent()->getId()]);
     }
 
-    #[Route('/item/toggle-primary/{itemId}', name: 'app_plugin_dinnerclub_dinner_item_toggle', methods: ['POST'])]
-    public function togglePrimary(int $itemId): Response
-    {
-        $item = $this->itemRepository->find($itemId);
-        if ($item === null) {
-            throw $this->createNotFoundException('Item not found');
-        }
-
-        $eventId = $item->getCourse()->getDinner()->getEvent()->getId();
-        $this->dinnerService->togglePrimary($item);
-
-        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $eventId]);
-    }
 }
