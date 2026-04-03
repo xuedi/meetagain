@@ -2,9 +2,12 @@
 
 namespace Plugin\Glossary\Controller;
 
+use App\Activity\ActivityService;
 use App\Entity\User;
+use Plugin\Glossary\Activity\Messages\EntryCreated;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Form\GlossaryType;
+use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -13,6 +16,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 #[Route('/glossary')]
 final class NewController extends AbstractGlossaryController
 {
+    public function __construct(
+        GlossaryService $service,
+        private readonly ActivityService $activityService,
+    ) {
+        parent::__construct($service);
+    }
+
     #[Route('/new', name: 'app_plugin_glossary_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
@@ -25,6 +35,11 @@ final class NewController extends AbstractGlossaryController
                 throw new AuthenticationException('Only for logged in users');
             }
             $this->service->createNew($glossary, $this->getUser()->getId(), $this->isGranted('ROLE_ORGANIZER'));
+
+            $this->activityService->log(EntryCreated::TYPE, $this->getUser(), [
+                'glossary_id' => $glossary->getId(),
+                'term' => $glossary->getPhrase(),
+            ]);
 
             return $this->redirectToRoute('app_plugin_glossary');
         }

@@ -2,7 +2,10 @@
 
 namespace Plugin\Bookclub\Controller;
 
+use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use Plugin\Bookclub\Activity\Messages\SuggestionCreated;
+use Plugin\Bookclub\Activity\Messages\SuggestionWithdrawn;
 use Plugin\Bookclub\Service\BookService;
 use Plugin\Bookclub\Service\SuggestionService;
 use RuntimeException;
@@ -18,6 +21,7 @@ final class SuggestionController extends AbstractController
     public function __construct(
         private readonly SuggestionService $suggestionService,
         private readonly BookService $bookService,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('/suggestions', name: 'app_plugin_bookclub_suggestions', methods: ['GET'])]
@@ -50,6 +54,10 @@ final class SuggestionController extends AbstractController
 
         try {
             $this->suggestionService->suggest($book, $user->getId());
+            $this->activityService->log(SuggestionCreated::TYPE, $user, [
+                'book_id' => $book->getId(),
+                'book_title' => $book->getTitle(),
+            ]);
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
@@ -65,9 +73,16 @@ final class SuggestionController extends AbstractController
     public function withdraw(int $suggestionId): Response
     {
         $user = $this->getAuthedUser();
+        $suggestion = $this->suggestionService->get($suggestionId);
 
         try {
             $this->suggestionService->withdraw($suggestionId, $user->getId());
+            if ($suggestion !== null) {
+                $this->activityService->log(SuggestionWithdrawn::TYPE, $user, [
+                    'book_id' => $suggestion->getBook()->getId(),
+                    'book_title' => $suggestion->getBook()->getTitle(),
+                ]);
+            }
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }

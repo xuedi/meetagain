@@ -2,8 +2,10 @@
 
 namespace Plugin\Filmclub\Controller;
 
+use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
+use Plugin\Filmclub\Activity\Messages\FilmAdded;
 use Plugin\Filmclub\Entity\Film;
 use Plugin\Filmclub\Form\FilmType;
 use Plugin\Filmclub\Repository\FilmRepository;
@@ -20,6 +22,7 @@ final class FilmController extends AbstractController
         private readonly FilmRepository $filmRepository,
         private readonly VoteRepository $voteRepository,
         private readonly EventRepository $eventRepository,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('/', name: 'app_filmclub_filmlist', methods: ['GET'])]
@@ -64,10 +67,16 @@ final class FilmController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getAuthedUser();
             $film->setCreatedAt(new \DateTimeImmutable());
-            $film->setCreatedBy($this->getAuthedUser()->getId());
+            $film->setCreatedBy($user->getId());
 
             $this->filmRepository->save($film, true);
+
+            $this->activityService->log(FilmAdded::TYPE, $user, [
+                'film_id' => $film->getId(),
+                'film_title' => $film->getTitle(),
+            ]);
 
             return $this->redirectToRoute('app_filmclub_filmlist');
         }
