@@ -2,10 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Activity\ActivityService;
 use App\Entity\AdminLink;
-use App\ValueObject\LogEntry;
 use App\Repository\NotFoundLogRepository;
-use App\Service\Activity\ActivityService;
+use App\ValueObject\LogEntry;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;

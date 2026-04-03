@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Activity;
+namespace App\Activity;
 
 use App\Entity\Activity;
 use App\Entity\User;

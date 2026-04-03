@@ -2,12 +2,12 @@
 
 namespace App\Service\Member;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\FollowedUser;
 use App\Activity\Messages\UnFollowedUser;
 use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
-use App\Service\Activity\ActivityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;

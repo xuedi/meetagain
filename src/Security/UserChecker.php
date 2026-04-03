@@ -2,11 +2,11 @@
 
 namespace App\Security;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\Login;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
-use App\Service\Activity\ActivityService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;

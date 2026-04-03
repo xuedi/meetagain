@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Security;
 
+use App\Activity\ActivityService;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
 use App\Security\UserChecker;
-use App\Service\Activity\ActivityService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

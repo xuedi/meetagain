@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Service\Activity;
 
+use App\Activity\MessageFactory;
 use App\Activity\MessageInterface;
 use App\Activity\UnknownActivityMessage;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\Activity\MessageFactory;
 use App\Service\Media\ImageHtmlRenderer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

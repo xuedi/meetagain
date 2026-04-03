@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\CommentedOnEvent;
 use App\Activity\Messages\RsvpNo;
 use App\Activity\Messages\RsvpYes;
-use App\Filter\Action\ActionAuthorizationMessageService;
-use App\Filter\Action\ActionAuthorizationService;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Enum\EventRsvpFilter;
@@ -14,12 +13,13 @@ use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\FeaturedEventProviderInterface;
+use App\Filter\Action\ActionAuthorizationMessageService;
+use App\Filter\Action\ActionAuthorizationService;
 use App\Filter\Event\EventFilterService;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Event\EventService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
