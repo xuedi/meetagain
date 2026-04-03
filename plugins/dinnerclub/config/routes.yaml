@@ -1,0 +1,7 @@
+controllers:
+    type: attribute
+    prefix: /{_locale}
+    resource:
+        path: ../src/Controller/
+        namespace: Plugin\Dinnerclub\Controller
+

@@ -1,0 +1,28 @@
+<h3 class="title is-5">Dinner Menu</h3>
+
+{% if dinner %}
+    {% for course in dinner.courses %}
+        {% if course.items|length > 0 %}
+            <p class="has-text-weight-semibold is-size-7 mt-3 mb-1">{{ course.name }}</p>
+            {% for item in course.items %}
+                <p class="is-size-7{% if not item.isPrimary %} has-text-grey pl-3{% endif %}">
+                    {% if not item.isPrimary %}or: {% endif %}
+                    {{ item.dish.getTranslatedName(app.locale) ?: item.dish.getTranslatedName('en') }}
+                </p>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+
+    {% if is_granted('ROLE_ORGANIZER') %}
+        <p class="mt-3">
+            <a href="{{ path('app_plugin_dinnerclub_dinner_manage', {eventId: eventId}) }}">Edit menu</a>
+        </p>
+    {% endif %}
+{% else %}
+    {% if is_granted('ROLE_ORGANIZER') %}
+        <p class="has-text-grey is-size-7">No dinner planned yet.</p>
+        <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: eventId}) }}" class="mt-2">
+            <button type="submit" class="button is-small">Create dinner</button>
+        </form>
+    {% endif %}
+{% endif %}
