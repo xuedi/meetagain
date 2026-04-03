@@ -28,6 +28,12 @@ final class Version20260403000001 extends AbstractMigration
 
         foreach ($oldVersions as $old) {
             $new = str_replace('PluginDishesMigrations\\', 'PluginDinnerclubMigrations\\', $old);
+            // If the new version already exists AND the old one is still present (mixed re-deploy state),
+            // remove the old entry so the subsequent UPDATE does not cause a duplicate key violation.
+            $this->addSql(
+                'DELETE FROM doctrine_migration_versions WHERE version = :old AND EXISTS (SELECT 1 FROM (SELECT version FROM doctrine_migration_versions WHERE version = :new) AS t)',
+                ['old' => $old, 'new' => $new]
+            );
             $this->addSql(
                 'UPDATE doctrine_migration_versions SET version = :new WHERE version = :old',
                 ['new' => $new, 'old' => $old]
