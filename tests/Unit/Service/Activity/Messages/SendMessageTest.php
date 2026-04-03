@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\SendMessage;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\SendMessage;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -36,14 +35,14 @@ class SendMessageTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::SendMessage, $subject->getType());
+        static::assertEquals(SendMessage::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingUserId(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in SendMessage"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.send_message"));
 
         $subject = new SendMessage();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -53,7 +52,7 @@ class SendMessageTest extends TestCase
     public function testCanCatchNonNumericUserId(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'user_id' has to be numeric in 'SendMessage'"),
+            new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.send_message'"),
         );
 
         $subject = new SendMessage();

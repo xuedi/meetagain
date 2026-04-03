@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\AdminCmsPageUpdated;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\AdminCmsPageUpdated;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +30,7 @@ class AdminCmsPageUpdatedTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::AdminCmsPageUpdated, $subject->getType());
+        static::assertEquals(AdminCmsPageUpdated::TYPE, $subject->getType());
         static::assertEquals('Updated CMS page: about', $subject->render());
         static::assertEquals('Updated CMS page: about', $subject->render(true));
     }
@@ -39,7 +38,7 @@ class AdminCmsPageUpdatedTest extends TestCase
     public function testCanCatchMissingCmsId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_id' in meta in AdminCmsPageUpdated"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_id' in meta in core.admin_cms_page_updated"));
 
         $subject = new AdminCmsPageUpdated();
         $subject->injectServices($this->router, $this->imageService, ['cms_slug' => 'about']);
@@ -51,7 +50,7 @@ class AdminCmsPageUpdatedTest extends TestCase
     public function testCanCatchMissingCmsSlug(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_slug' in meta in AdminCmsPageUpdated"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_slug' in meta in core.admin_cms_page_updated"));
 
         $subject = new AdminCmsPageUpdated();
         $subject->injectServices($this->router, $this->imageService, ['cms_id' => 5]);

@@ -2,7 +2,8 @@
 
 namespace App\Service\Member;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\FollowedUser;
+use App\Activity\Messages\UnFollowedUser;
 use App\Entity\User;
 use App\Repository\UserBlockRepository;
 use App\Repository\UserRepository;
@@ -45,10 +46,10 @@ readonly class FriendshipService
 
         if ($currentUser->getFollowing()->contains($targetUser)) {
             $currentUser->removeFollowing($targetUser);
-            $activityType = ActivityType::UnFollowedUser;
+            $activityType = UnFollowedUser::TYPE;
         } else {
             $currentUser->addFollowing($targetUser);
-            $activityType = ActivityType::FollowedUser;
+            $activityType = FollowedUser::TYPE;
         }
 
         $this->em->persist($currentUser);

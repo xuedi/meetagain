@@ -2,7 +2,8 @@
 
 namespace App\Service\Member;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\PasswordReset;
+use App\Activity\Messages\PasswordResetRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Activity\ActivityService;
@@ -34,7 +35,7 @@ readonly class PasswordResetService
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->activityService->log(ActivityType::PasswordResetRequest, $user);
+        $this->activityService->log(PasswordResetRequest::TYPE, $user);
         $this->emailService->prepareResetPassword($user);
         $this->emailService->sendQueue();
 
@@ -61,7 +62,7 @@ readonly class PasswordResetService
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->activityService->log(ActivityType::PasswordReset, $user);
+        $this->activityService->log(PasswordReset::TYPE, $user);
     }
 
     private function generateResetToken(): string

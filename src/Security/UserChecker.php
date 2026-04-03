@@ -2,7 +2,7 @@
 
 namespace App\Security;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\Login;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
@@ -57,7 +57,7 @@ readonly class UserChecker implements UserCheckerInterface
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->activityService->log(ActivityType::Login, $user, []);
+        $this->activityService->log(Login::TYPE, $user, []);
 
         if ($this->msgRepo->hasNewMessages($user)) {
             $request->getSession()->set('hasNewMessage', true);

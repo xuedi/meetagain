@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\ChangedUsername;
+use App\Activity\Messages\RsvpNo;
+use App\Activity\Messages\RsvpYes;
 use App\Entity\Event;
 use App\Filter\Event\EventFilterService;
 use App\Form\ProfileType;
@@ -43,7 +45,7 @@ final class ProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $newUserName = $form->get('name')->getData();
             if ($oldUserName !== $newUserName) {
-                $this->activityService->log(ActivityType::ChangedUsername, $user, [
+                $this->activityService->log(ChangedUsername::TYPE, $user, [
                     'old' => $oldUserName,
                     'new' => $newUserName,
                 ]);
@@ -92,7 +94,7 @@ final class ProfileController extends AbstractController
         $em->persist($event);
         $em->flush();
 
-        $type = $status ? ActivityType::RsvpYes : ActivityType::RsvpNo;
+        $type = $status ? RsvpYes::TYPE : RsvpNo::TYPE;
         $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
         if ($request->isXmlHttpRequest()) {

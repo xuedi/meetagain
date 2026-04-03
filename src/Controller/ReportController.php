@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\ReportedImage;
 use App\Form\ReportImageType;
 use App\Repository\ImageRepository;
 use App\Service\Activity\ActivityService;
@@ -27,7 +27,7 @@ final class ReportController extends AbstractController
         $form = $this->createForm(ReportImageType::class, $image);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->activityService->log(ActivityType::ReportedImage, $user, [
+            $this->activityService->log(ReportedImage::TYPE, $user, [
                 'image_id' => $image->getId(),
                 'reason' => $form->get('reported')->getData()->value,
             ]);

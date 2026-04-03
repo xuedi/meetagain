@@ -3,12 +3,12 @@
 namespace App\Service\Activity;
 
 use App\Entity\Activity;
-use App\Enum\ActivityType;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;
 
 readonly class ActivityService
@@ -19,10 +19,24 @@ readonly class ActivityService
         private NotificationService $notificationService,
         private MessageFactory $messageFactory,
         private LoggerInterface $logger,
+        #[AutowireIterator(ActivityMetaEnricherInterface::class)]
+        private iterable $enrichers,
     ) {}
 
-    public function log(ActivityType $type, User $user, array $meta = []): void
+    public function log(string $type, User $user, array $meta = []): void
     {
+        foreach ($this->enrichers as $enricher) {
+            try {
+                $enriched = $enricher->enrich($type, $user, $meta);
+                $meta = array_merge($enriched, $meta); // original keys win
+            } catch (Throwable $e) {
+                $this->logger->warning('Activity meta enricher failed', [
+                    'enricher' => $enricher::class,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         $activity = new Activity();
         $activity->setCreatedAt(new DateTimeImmutable());
         $activity->setUser($user);
@@ -36,7 +50,6 @@ readonly class ActivityService
             $this->em->persist($activity);
             $this->em->flush();
         } catch (Throwable $exception) {
-            // TODO: check why this error still persist on uploading images to events
             $this->logger->error('Could not log Activity', [
                 'error' => $exception->getMessage(),
             ]);
@@ -81,7 +94,7 @@ readonly class ActivityService
             } catch (Throwable $e) {
                 $invalidActivities[] = [
                     'id' => $activity->getId(),
-                    'type' => $activity->getType()->name,
+                    'type' => $activity->getType(),
                     'error' => $e->getMessage(),
                 ];
             }

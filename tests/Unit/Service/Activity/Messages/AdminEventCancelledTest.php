@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\AdminEventCancelled;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\AdminEventCancelled;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +33,7 @@ class AdminEventCancelledTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::AdminEventCancelled, $subject->getType());
+        static::assertEquals(AdminEventCancelled::TYPE, $subject->getType());
         static::assertEquals('Cancelled event: Test Event', $subject->render());
         static::assertEquals('Cancelled event: Test Event', $subject->render(true));
     }
@@ -52,7 +51,7 @@ class AdminEventCancelledTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in AdminEventCancelled"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_cancelled"));
 
         $subject = new AdminEventCancelled();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -65,7 +64,7 @@ class AdminEventCancelledTest extends TestCase
     {
         // Arrange
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'AdminEventCancelled'"),
+            new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.admin_event_cancelled'"),
         );
 
         $subject = new AdminEventCancelled();

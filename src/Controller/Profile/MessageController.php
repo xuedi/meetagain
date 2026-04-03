@@ -2,8 +2,8 @@
 
 namespace App\Controller\Profile;
 
+use App\Activity\Messages\SendMessage;
 use App\Controller\AbstractController;
-use App\Enum\ActivityType;
 use App\Entity\Message;
 use App\Form\CommentType;
 use App\Repository\MessageRepository;
@@ -54,7 +54,7 @@ final class MessageController extends AbstractController
                     $this->em->persist($msg);
                     $this->em->flush();
 
-                    $this->activityService->log(ActivityType::SendMessage, $user, ['user_id' =>
+                    $this->activityService->log(SendMessage::TYPE, $user, ['user_id' =>
                         $conversationPartner->getId()]);
                 }
             }
