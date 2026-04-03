@@ -1,14 +1,4 @@
 
-{% if is_granted('ROLE_USER') %}
-<div class="mb-4">
-    <a href="{{ path('plugin_dinnerclub_add') }}" class="button is-link is-fullwidth">
-        <span class="icon"><i class="fa-solid fa-plus"></i></span>
-        <span>Add Dish</span>
-    </a>
-</div>
-{% endif %}
-
-<p class="has-text-grey is-size-7 has-text-centered mb-2">View</p>
 <div class="buttons has-addons is-centered">
     {% for id, name in viewTypeList %}
     <a class="button {% if viewType == id %} has-background-link has-text-light{% endif %}" href="{{ path('plugin_dinnerclub_set_view_type', {'type': id}) }}">
@@ -38,9 +28,25 @@
 
 {% if is_granted('ROLE_USER') %}
 <hr>
-<p class="has-text-grey is-size-7 has-text-centered mb-2">My Lists</p>
-<a href="{{ path('plugin_dinnerclub_lists') }}" class="button is-light is-fullwidth">
-    <span class="icon"><i class="fa-solid fa-list"></i></span>
-    <span>My Lists</span>
-</a>
+<div class="buttons" id="list-filter-buttons">
+    <a href="{{ path('plugin_dinnerclub_lists') }}" class="button is-light is-small is-fullwidth mt-1">
+        <span class="icon"><i class="fa-solid fa-list"></i></span>
+        <span>My Lists</span>
+    </a>
+    {% if favoriteDishIds|default([])|length > 0 %}
+        <button class="button is-small is-fullwidth list-filter-btn"
+                data-list-id="favorites"
+                data-dish-ids="{{ favoriteDishIds|join(',') }}">
+            <span class="icon is-small"><i class="fa-solid fa-heart"></i></span>
+            <span>Favorites</span>
+        </button>
+    {% endif %}
+    {% for userList in userLists|default([])|filter(l => l.dishCount >= 1) %}
+        <button class="button is-small is-fullwidth list-filter-btn"
+                data-list-id="{{ userList.id }}"
+                data-dish-ids="{{ userList.dishIds|join(',') }}">
+            {{ userList.name }}
+        </button>
+    {% endfor %}
+</div>
 {% endif %}

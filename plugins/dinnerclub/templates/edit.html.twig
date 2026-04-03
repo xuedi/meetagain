@@ -1,87 +1,106 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_dinnerclub_title_new"|trans }}{% endblock %}
+{% block title %}Edit Dish{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            <p>Add a new dish</p>
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
+                    <li><a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">Edit Dish</a></li>
+                </ul>
+            </nav>
 
-            {{ form_start(form) }}
-            <div class="box">
-                <div class="columns">
-                    <div class="column is-6">
-                        <p class="has-text-grey">Edit dish for each language</p>
-                    </div>
-                    <div class="column is-6">
-                        <div class="buttons has-addons is-pulled-right">
-                            {% for locale in languages %}
-                                <a class="button translation-button {% if locale == app.locale %}is-active{% endif %}"
-                                   id="translation-button-{{ locale }}"
-                                   data-id="{{ locale }}">{{ locale }}</a>
-                            {% endfor %}
+            <div class="columns">
+                <div class="column is-8">
+                    <div class="box">
+                        <h2 class="title is-4">
+                            <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                            <span>Edit Dish</span>
+                        </h2>
+
+                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-image"></i></span>
+                                    <span>{{ form.previewImage.vars.label }}</span>
+                                </span>
+                            </label>
+                            {% if dish.previewImage %}
+                                <figure class="image mb-2" style="max-width: 200px;">
+                                    {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '200x150'} %}
+                                </figure>
+                            {% endif %}
+                            <div class="control">
+                                {{ form_widget(form.previewImage) }}
+                            </div>
+                            {{ form_errors(form.previewImage) }}
                         </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-language"></i></span>
+                                    <span>{{ form.originLang.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                <div class="select">
+                                    {{ form_widget(form.originLang) }}
+                                </div>
+                            </div>
+                            {{ form_errors(form.originLang) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                                    <span>{{ form.origin.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                {{ form_widget(form.origin, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(form.origin) }}
+                        </div>
+
+                        <div class="field is-grouped mt-5">
+                            <div class="control">
+                                <button type="submit" class="button is-link">
+                                    <span class="icon"><i class="fa-solid fa-check"></i></span>
+                                    <span>Save Changes</span>
+                                </button>
+                            </div>
+                            <div class="control">
+                                <a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}" class="button">Cancel</a>
+                            </div>
+                        </div>
+
+                        {{ form_end(form) }}
                     </div>
                 </div>
 
-                {% for locale in languages %}
-                    <div class="translation-div {% if locale != app.locale %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
-                        <div class="field">
-                            <label class="label">Name ({{ locale }})</label>
-                            <div class="control">
-                                {{ form_widget(form.("name-"~locale), {'attr': {'class': 'input'}}) }}
-                            </div>
-                            {{ form_errors(form.("name-"~locale)) }}
-                        </div>
-
-                        <div class="field">
-                            <label class="label">Phonetic ({{ locale }})</label>
-                            <div class="control">
-                                {{ form_widget(form.("phonetic-"~locale), {'attr': {'class': 'input'}}) }}
-                            </div>
-                            {{ form_errors(form.("phonetic-"~locale)) }}
-                        </div>
-
-                        <div class="field">
-                            <label class="label">Description ({{ locale }})</label>
-                            <div class="control">
-                                {{ form_widget(form.("description-"~locale), {'attr': {'class': 'textarea', 'rows': 5}}) }}
-                            </div>
-                            {{ form_errors(form.("description-"~locale)) }}
+                <div class="column is-4">
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-circle-info"></i></span>
+                            <span>Note</span>
+                        </h3>
+                        <div class="content is-small has-text-grey">
+                            <p>This form edits the dish's base data. Translation fields (name, phonetic, description, recipe) are edited per-language via the <strong>Translate</strong> page on the dish detail view.</p>
                         </div>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-
-            <button class="button is-link">{{ "button_add" | trans }}</button>
-            {{ form_end(form) }}
 
         </div>
     </section>
 
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            let buttons = document.getElementsByClassName('translation-button');
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].addEventListener('click', event => {
-                    event.preventDefault();
-
-                    {% for locale in languages %}
-                    document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
-                    document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
-                    {% endfor %}
-
-                    let button = 'translation-button-' + event.currentTarget.getAttribute('data-id');
-                    document.getElementById(button).classList.add('is-active');
-
-                    let target = 'translation-div-' + event.currentTarget.getAttribute('data-id');
-                    document.getElementById(target).classList.remove('is-hidden');
-                });
-            }
-        });
-    </script>
-
 {% endblock %}
-

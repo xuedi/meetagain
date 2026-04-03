@@ -7,7 +7,7 @@
         <th>Description</th>
         <th>
             {% if is_granted('ROLE_USER') %}
-                <a href="{{ path('app_plugin_dinnerclub_edit') }}">
+                <a href="{{ path('plugin_dinnerclub_add') }}">
                     <span class="icon"><i class="fa fa-add"></i></span>
                 </a>
             {% endif %}
@@ -16,7 +16,7 @@
     </thead>
     <tbody>
     {% for item in list %}{# action items for managers #}
-        <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
+        <tr class="dish-item {% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}" data-dish-id="{{ item.id }}">
             <td>
                 <a href="{{ path('plugin_dinnerclub_item_show', {'id': item.id}) }}">
                     {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '50x50'} %}
@@ -26,8 +26,8 @@
             <td>{{ item.getPhonetic(app.locale) }}</td>
             <td>{{ item.getTranslatedDescription(app.locale) }}</td>
             <td>
-                {% if is_granted('ROLE_USER') %}
-                    <a href="{{ path('app_plugin_dinnerclub_edit', {'id': item.id}) }}">
+                {% if is_granted('ROLE_ORGANIZER') %}
+                    <a href="{{ path('plugin_dinnerclub_edit', {'id': item.id}) }}">
                         <span class="icon"><i class="fa fa-edit"></i></span>
                     </a>
                 {% endif %}
