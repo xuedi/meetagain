@@ -2,10 +2,13 @@
 
 namespace Plugin\Dinnerclub\Controller;
 
+use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Enum\ImageType;
 use App\Service\Config\LanguageService;
 use App\Service\Media\ImageService;
+use Plugin\Dinnerclub\Activity\Messages\SuggestionCreated;
+use Plugin\Dinnerclub\Entity\Dish;
 use Plugin\Dinnerclub\Form\DishEditType;
 use Plugin\Dinnerclub\Form\DishTranslationType;
 use Plugin\Dinnerclub\Service\DishService;
@@ -21,6 +24,7 @@ final class EditController extends AbstractController
         private readonly DishService $dishService,
         private readonly LanguageService $languageService,
         private readonly ImageService $imageService,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('/translate/{id}/{lang}', name: 'plugin_dinnerclub_translate', methods: ['GET', 'POST'])]
@@ -60,6 +64,14 @@ final class EditController extends AbstractController
                 description: $form->get('description')->getData(),
                 recipe: $form->get('recipe')->getData(),
             );
+
+            if (!$isManager) {
+                $this->activityService->log(SuggestionCreated::TYPE, $user, [
+                    'dish_id' => $id,
+                    'dish_name' => $this->getDishName($dish),
+                    'field' => $lang,
+                ]);
+            }
 
             $this->addFlash(
                 'success',
@@ -108,5 +120,20 @@ final class EditController extends AbstractController
             'form' => $form,
             'dish' => $dish,
         ]);
+    }
+
+    private function getDishName(Dish $dish): string
+    {
+        $originLang = $dish->getOriginLang();
+        if ($originLang !== null) {
+            $translation = $dish->findTranslation($originLang);
+            if ($translation !== null) {
+                return $translation->getName();
+            }
+        }
+
+        $first = $dish->getTranslations()->first();
+
+        return $first !== false ? $first->getName() : '[unknown]';
     }
 }

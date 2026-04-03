@@ -2,7 +2,9 @@
 
 namespace Plugin\Bookclub\Controller;
 
+use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use Plugin\Bookclub\Activity\Messages\NoteAdded;
 use Plugin\Bookclub\Form\NoteType;
 use Plugin\Bookclub\Service\BookService;
 use Plugin\Bookclub\Service\NoteService;
@@ -18,6 +20,7 @@ final class NoteController extends AbstractController
     public function __construct(
         private readonly NoteService $noteService,
         private readonly BookService $bookService,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('/notes', name: 'app_plugin_bookclub_notes', methods: ['GET'])]
@@ -49,6 +52,10 @@ final class NoteController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $content = $form->get('content')->getData();
             $this->noteService->saveNote($book, $user->getId(), $content);
+            $this->activityService->log(NoteAdded::TYPE, $user, [
+                'book_id' => $book->getId(),
+                'book_title' => $book->getTitle(),
+            ]);
             $this->addFlash('success', 'Note saved.');
 
             return $this->redirectToRoute('app_plugin_bookclub_notes');

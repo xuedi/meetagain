@@ -2,10 +2,13 @@
 
 namespace Plugin\Glossary\Controller;
 
+use App\Activity\ActivityService;
 use App\Entity\User;
+use Plugin\Glossary\Activity\Messages\SuggestionCreated;
 use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\SuggestionField;
 use Plugin\Glossary\Form\GlossaryType;
+use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,6 +17,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 #[Route('/glossary/edit')]
 final class EditController extends AbstractGlossaryController
 {
+    public function __construct(
+        GlossaryService $service,
+        private readonly ActivityService $activityService,
+    ) {
+        parent::__construct($service);
+    }
+
     #[Route('/{id}', name: 'app_plugin_glossary_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ?int $id = null): Response
     {
@@ -33,6 +43,15 @@ final class EditController extends AbstractGlossaryController
             } else {
                 // Regular users create suggestions
                 $this->service->generateSuggestions($newGlossary, $id, $this->getUser()->getId());
+
+                $item = $this->service->get($id);
+                if ($item !== null) {
+                    $this->activityService->log(SuggestionCreated::TYPE, $this->getUser(), [
+                        'glossary_id' => $id,
+                        'term' => $item->getPhrase(),
+                        'field' => 'edit',
+                    ]);
+                }
             }
 
             return $this->redirectToRoute('app_plugin_glossary');

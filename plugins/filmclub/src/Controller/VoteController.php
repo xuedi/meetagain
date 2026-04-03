@@ -2,9 +2,11 @@
 
 namespace Plugin\Filmclub\Controller;
 
+use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
+use Plugin\Filmclub\Activity\Messages\VoteCast;
 use Plugin\Filmclub\Entity\Vote;
 use Plugin\Filmclub\Entity\VoteBallot;
 use Plugin\Filmclub\Repository\FilmRepository;
@@ -24,6 +26,7 @@ final class VoteController extends AbstractController
         private readonly FilmRepository $filmRepository,
         private readonly EventRepository $eventRepository,
         private readonly ConfigService $configService,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('/', name: 'app_filmclub_vote', methods: ['GET'])]
@@ -146,6 +149,12 @@ final class VoteController extends AbstractController
         $ballot->setCreatedAt(new \DateTimeImmutable());
 
         $this->voteBallotRepository->save($ballot, true);
+
+        $this->activityService->log(VoteCast::TYPE, $user, [
+            'film_id' => $film->getId(),
+            'film_title' => $film->getTitle(),
+            'event_id' => $vote->getEventId(),
+        ]);
 
         $this->addFlash('success', 'Your vote has been recorded');
         return $this->redirectToRoute('app_filmclub_vote_show', ['id' => $vote->getId()]);
