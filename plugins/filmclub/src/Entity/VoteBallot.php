@@ -13,7 +13,7 @@ class VoteBallot
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Vote::class, inversedBy: 'ballots')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Vote $vote = null;
 
     #[ORM\ManyToOne(targetEntity: Film::class)]

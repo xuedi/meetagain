@@ -14,7 +14,7 @@ class DinnerCourse
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'courses')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Dinner $dinner = null;
 
     #[ORM\Column(length: 255)]
