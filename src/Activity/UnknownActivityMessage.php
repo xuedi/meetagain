@@ -3,8 +3,10 @@
 namespace App\Activity;
 
 use App\Service\Media\ImageHtmlRenderer;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Routing\RouterInterface;
 
+#[Autoconfigure(autowire: false)]
 class UnknownActivityMessage implements MessageInterface
 {
     public function __construct(private readonly string $type) {}
