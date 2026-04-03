@@ -2,10 +2,10 @@
 
 namespace App\Controller\Profile;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\PasswordChanged;
 use App\Controller\AbstractController;
 use App\Form\ChangePassword;
-use App\Service\Activity\ActivityService;
 use App\Service\Member\BlockingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

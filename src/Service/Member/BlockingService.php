@@ -2,12 +2,12 @@
 
 namespace App\Service\Member;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\BlockedUser;
 use App\Activity\Messages\UnblockedUser;
 use App\Entity\User;
 use App\Entity\UserBlock;
 use App\Repository\UserBlockRepository;
-use App\Service\Activity\ActivityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;

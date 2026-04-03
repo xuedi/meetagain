@@ -1,9 +1,7 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Activity;
+namespace App\Activity;
 
-use App\Activity\MessageInterface;
-use App\Activity\UnknownActivityMessage;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;

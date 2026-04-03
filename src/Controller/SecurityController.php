@@ -2,19 +2,19 @@
 
 namespace App\Controller;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\Registered;
 use App\Activity\Messages\RegistrationEmailConfirmed;
 use App\Entity\Session\Consent;
-use App\Enum\ConsentType;
 use App\Entity\User;
+use App\EntityActionDispatcher;
+use App\Enum\ConsentType;
+use App\Enum\EntityAction;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
-use App\EntityActionDispatcher;
-use App\Enum\EntityAction;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
-use App\Service\Activity\ActivityService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\EmailService;
 use App\Service\Member\CaptchaService;

@@ -2,22 +2,22 @@
 
 namespace App\Controller;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\EventImageUploaded;
 use App\Activity\Messages\UpdatedProfilePicture;
-use App\Filter\Action\ActionAuthorizationMessageService;
-use App\Filter\Action\ActionAuthorizationService;
 use App\Entity\CmsBlock;
 use App\Entity\Event;
 use App\Entity\Image;
-use App\Enum\ImageType;
 use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Enum\ImageType;
+use App\Filter\Action\ActionAuthorizationMessageService;
+use App\Filter\Action\ActionAuthorizationService;
 use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

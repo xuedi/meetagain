@@ -2,23 +2,23 @@
 
 namespace App\Controller\Admin;
 
+use App\Activity\ActivityService;
+use App\Activity\Messages\AdminEventCancelled;
+use App\Activity\Messages\AdminEventCreated;
+use App\Activity\Messages\AdminEventEdited;
 use App\Entity\AdminLink;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Host;
 use App\Entity\Image;
 use App\Entity\Location;
-use App\Enum\ImageType;
-use App\Activity\Messages\AdminEventCancelled;
-use App\Activity\Messages\AdminEventCreated;
-use App\Activity\Messages\AdminEventEdited;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Enum\ImageType;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageService;

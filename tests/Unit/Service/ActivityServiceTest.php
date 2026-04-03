@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Service;
 
+use App\Activity\ActivityService;
+use App\Activity\MessageFactory;
+use App\Activity\MessageInterface;
 use App\Activity\Messages\Login;
+use App\Activity\NotificationService as ActivityNotificationService;
 use App\Entity\Activity;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
-use App\Service\Activity\ActivityService;
-use App\Service\Activity\MessageFactory;
-use App\Activity\MessageInterface;
-use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

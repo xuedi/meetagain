@@ -2,11 +2,12 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\AdminLink;
-use App\Entity\User;
+use App\Activity\ActivityService;
 use App\Activity\Messages\AdminMemberApproved;
 use App\Activity\Messages\AdminMemberDenied;
 use App\Activity\Messages\AdminMemberPromoted;
+use App\Entity\AdminLink;
+use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Enum\UserRole;
@@ -14,7 +15,6 @@ use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Email\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;

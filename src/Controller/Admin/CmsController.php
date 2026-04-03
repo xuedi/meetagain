@@ -2,6 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Activity\ActivityService;
+use App\Activity\Messages\AdminCmsPageCreated;
+use App\Activity\Messages\AdminCmsPageDeleted;
+use App\Activity\Messages\AdminCmsPageUpdated;
 use App\Entity\AdminLink;
 use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\Gallery;
@@ -10,9 +14,6 @@ use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
 use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
-use App\Activity\Messages\AdminCmsPageCreated;
-use App\Activity\Messages\AdminCmsPageDeleted;
-use App\Activity\Messages\AdminCmsPageUpdated;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
@@ -20,7 +21,6 @@ use App\Form\CmsType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

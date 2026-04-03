@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Service;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\PasswordReset;
 use App\Activity\Messages\PasswordResetRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Email\EmailService;
 use App\Service\Member\PasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;

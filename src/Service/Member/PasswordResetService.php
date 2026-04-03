@@ -2,11 +2,11 @@
 
 namespace App\Service\Member;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\PasswordReset;
 use App\Activity\Messages\PasswordResetRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Email\EmailService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

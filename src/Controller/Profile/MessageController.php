@@ -2,13 +2,13 @@
 
 namespace App\Controller\Profile;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\SendMessage;
 use App\Controller\AbstractController;
 use App\Entity\Message;
 use App\Form\CommentType;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Member\BlockingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
