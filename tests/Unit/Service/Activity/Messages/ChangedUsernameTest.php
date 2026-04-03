@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\ChangedUsername;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\ChangedUsername;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -33,14 +32,14 @@ class ChangedUsernameTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::ChangedUsername, $subject->getType());
+        static::assertEquals(ChangedUsername::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingOld(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'old' in meta in ChangedUsername"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'old' in meta in core.changed_username"));
 
         $subject = new ChangedUsername();
         $subject->injectServices($this->router, $this->imageService, ['new' => 'newName']);
@@ -49,7 +48,7 @@ class ChangedUsernameTest extends TestCase
 
     public function testCanCatchMissingNew(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'new' in meta in ChangedUsername"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'new' in meta in core.changed_username"));
 
         $subject = new ChangedUsername();
         $subject->injectServices($this->router, $this->imageService, ['old' => 'oldName']);

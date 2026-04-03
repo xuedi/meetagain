@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\PasswordReset;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\PasswordReset;
 use App\Service\Media\ImageHtmlRenderer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
@@ -30,7 +29,7 @@ class PasswordResetTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::PasswordReset, $subject->getType());
+        static::assertEquals(PasswordReset::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }

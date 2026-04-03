@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Activity\Messages\CommentedOnEvent;
+use App\Activity\Messages\RsvpNo;
+use App\Activity\Messages\RsvpYes;
 use App\Filter\Action\ActionAuthorizationMessageService;
 use App\Filter\Action\ActionAuthorizationService;
-use App\Enum\ActivityType;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Enum\EventRsvpFilter;
@@ -120,7 +122,7 @@ final class EventController extends AbstractController
             $em->persist($comment);
             $em->flush();
 
-            $this->activityService->log(ActivityType::CommentedOnEvent, $this->getAuthedUser(), ['event_id' => $id]);
+            $this->activityService->log(CommentedOnEvent::TYPE, $this->getAuthedUser(), ['event_id' => $id]);
 
             $form = $this->createForm(CommentType::class);
         }
@@ -228,7 +230,7 @@ final class EventController extends AbstractController
         $em->persist($event);
         $em->flush();
 
-        $type = $event->hasRsvp($user) ? ActivityType::RsvpYes : ActivityType::RsvpNo;
+        $type = $event->hasRsvp($user) ? RsvpYes::TYPE : RsvpNo::TYPE;
         $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);

@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Service;
 
+use App\Activity\Messages\Login;
 use App\Entity\Activity;
-use App\Enum\ActivityType;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
 use App\Service\Activity\ActivityService;
 use App\Service\Activity\MessageFactory;
-use App\Service\Activity\MessageInterface;
+use App\Activity\MessageInterface;
 use App\Service\Activity\NotificationService as ActivityNotificationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +20,7 @@ class ActivityServiceTest extends TestCase
     public function testLog(): void
     {
         // Arrange: prepare test data
-        $type = ActivityType::Login;
+        $type = Login::TYPE;
         $user = $this->createStub(User::class);
         $meta = ['key' => 'value'];
 
@@ -58,6 +58,7 @@ class ActivityServiceTest extends TestCase
             notificationService: $notificationServiceMock,
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
+            enrichers: [],
         );
 
         // Act: log the activity
@@ -105,6 +106,7 @@ class ActivityServiceTest extends TestCase
             notificationService: $this->createStub(ActivityNotificationService::class),
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
+            enrichers: [],
         );
 
         // Act: get user activity list
@@ -154,6 +156,7 @@ class ActivityServiceTest extends TestCase
             notificationService: $this->createStub(ActivityNotificationService::class),
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
+            enrichers: [],
         );
 
         // Act: get admin activity list
@@ -188,6 +191,7 @@ class ActivityServiceTest extends TestCase
             notificationService: $this->createStub(ActivityNotificationService::class),
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
+            enrichers: [],
         );
 
         // Act
@@ -210,6 +214,7 @@ class ActivityServiceTest extends TestCase
             notificationService: $this->createStub(ActivityNotificationService::class),
             messageFactory: $this->createStub(MessageFactory::class),
             logger: $this->createStub(LoggerInterface::class),
+            enrichers: [],
         );
 
         // Act

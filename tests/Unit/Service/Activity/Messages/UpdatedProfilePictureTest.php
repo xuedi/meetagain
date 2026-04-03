@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\UpdatedProfilePicture;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\UpdatedProfilePicture;
 use App\Service\Media\ImageHtmlRenderer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -48,7 +47,7 @@ class UpdatedProfilePictureTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::UpdatedProfilePicture, $subject->getType());
+        static::assertEquals(UpdatedProfilePicture::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }

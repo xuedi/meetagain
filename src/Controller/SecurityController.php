@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\Registered;
+use App\Activity\Messages\RegistrationEmailConfirmed;
 use App\Entity\Session\Consent;
 use App\Enum\ConsentType;
 use App\Entity\User;
@@ -131,7 +132,7 @@ final class SecurityController extends AbstractController
 
             $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
 
-            $this->activityService->log(ActivityType::Registered, $user, []);
+            $this->activityService->log(Registered::TYPE, $user, []);
             $this->emailService->prepareVerificationRequest($user);
             $this->emailService->sendQueue(); // TODO: use cron instead
 
@@ -154,7 +155,7 @@ final class SecurityController extends AbstractController
         // clean up and write activity
         $user->setRegcode(null);
         $user->setRegcodeExpiresAt(null);
-        $this->activityService->log(ActivityType::RegistrationEmailConfirmed, $user, []);
+        $this->activityService->log(RegistrationEmailConfirmed::TYPE, $user, []);
 
         // Check if automatic registration is enabled
         if ($this->configService->isAutomaticRegistration()) {

@@ -2,10 +2,9 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
 use App\Enum\ImageReportReason;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\ReportedImage;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\ReportedImage;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +35,7 @@ class ReportedImageTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::ReportedImage, $subject->getType());
+        static::assertEquals(ReportedImage::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }
@@ -55,14 +54,14 @@ class ReportedImageTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::ReportedImage, $subject->getType());
+        static::assertEquals(ReportedImage::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingImageId(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'image_id' in meta in ReportedImage"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'image_id' in meta in core.reported_image"));
 
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, ['reason' => ImageReportReason::Privacy->value]);
@@ -72,7 +71,7 @@ class ReportedImageTest extends TestCase
     public function testCanCatchNonNumericImageId(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'image_id' has to be numeric in 'ReportedImage'"),
+            new InvalidArgumentException("Value 'image_id' has to be numeric in 'core.reported_image'"),
         );
 
         $subject = new ReportedImage();
@@ -85,7 +84,7 @@ class ReportedImageTest extends TestCase
 
     public function testCanCatchMissingReason(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'reason' in meta in ReportedImage"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'reason' in meta in core.reported_image"));
 
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, ['image_id' => 42]);
@@ -95,7 +94,7 @@ class ReportedImageTest extends TestCase
     public function testCanCatchNonNumericReason(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'reason' has to be numeric in 'ReportedImage'"),
+            new InvalidArgumentException("Value 'reason' has to be numeric in 'core.reported_image'"),
         );
 
         $subject = new ReportedImage();

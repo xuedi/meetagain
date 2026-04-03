@@ -2,7 +2,8 @@
 
 namespace Tests\Unit\Service;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\BlockedUser;
+use App\Activity\Messages\UnblockedUser;
 use App\Entity\User;
 use App\Entity\UserBlock;
 use App\Repository\UserBlockRepository;
@@ -98,7 +99,7 @@ class BlockingServiceTest extends TestCase
         $activityServiceMock
             ->expects($this->once())
             ->method('log')
-            ->with(ActivityType::BlockedUser, $blocker, [
+            ->with(BlockedUser::TYPE, $blocker, [
                 'user_id' => 2,
             ]);
 
@@ -169,7 +170,7 @@ class BlockingServiceTest extends TestCase
         $activityServiceMock
             ->expects($this->once())
             ->method('log')
-            ->with(ActivityType::UnblockedUser, $blocker, [
+            ->with(UnblockedUser::TYPE, $blocker, [
                 'user_id' => 42,
             ]);
 

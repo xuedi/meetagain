@@ -4,8 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 use App\Entity\User;
+use App\Activity\Messages\AdminMemberApproved;
+use App\Activity\Messages\AdminMemberDenied;
+use App\Activity\Messages\AdminMemberPromoted;
 use App\EntityActionDispatcher;
-use App\Enum\ActivityType;
 use App\Enum\EntityAction;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
@@ -146,7 +148,7 @@ final class MemberController extends AbstractAdminController
         $this->em->flush();
 
         $admin = $this->getAuthedUser();
-        $this->activityService->log(ActivityType::AdminMemberApproved, $admin, ['user_id' => $user->getId()]);
+        $this->activityService->log(AdminMemberApproved::TYPE, $admin, ['user_id' => $user->getId()]);
 
         return $this->redirectToRoute('app_admin_member');
     }
@@ -169,7 +171,7 @@ final class MemberController extends AbstractAdminController
         $this->em->flush();
 
         $admin = $this->getAuthedUser();
-        $this->activityService->log(ActivityType::AdminMemberDenied, $admin, ['user_id' => $user->getId()]);
+        $this->activityService->log(AdminMemberDenied::TYPE, $admin, ['user_id' => $user->getId()]);
 
         return $this->redirectToRoute('app_admin_member');
     }
@@ -219,7 +221,7 @@ final class MemberController extends AbstractAdminController
             $this->em->flush();
 
             $admin = $this->getAuthedUser();
-            $this->activityService->log(ActivityType::AdminMemberPromoted, $admin, ['user_id' => $user->getId()]);
+            $this->activityService->log(AdminMemberPromoted::TYPE, $admin, ['user_id' => $user->getId()]);
             $this->addFlash('success', 'Member promoted to organizer.');
         }
 

@@ -2,8 +2,9 @@
 
 namespace App\Service\Activity;
 
+use App\Activity\Messages\RsvpYes;
+use App\Activity\Messages\SendMessage;
 use App\Entity\Activity;
-use App\Enum\ActivityType;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
@@ -28,8 +29,8 @@ readonly class NotificationService
     public function notify(Activity $activity): void
     {
         $user = $activity->getUser();
-        switch ($activity->getType()->value) {
-            case ActivityType::RsvpYes->value:
+        switch ($activity->getType()) {
+            case RsvpYes::TYPE:
                 $this->sendRsvp($user, $activity->getMeta()['event_id']);
                 $eventId = $activity->getMeta()['event_id'];
                 if ($user instanceof User && $eventId !== null) {
@@ -37,7 +38,7 @@ readonly class NotificationService
                     // $this->messageBus->dispatch(NotificationRsvp::fromParameter($user, $eventId));
                 }
                 break;
-            case ActivityType::SendMessage->value:
+            case SendMessage::TYPE:
                 $this->sendMessage($user, $activity->getMeta()['user_id']);
                 break;
             default:

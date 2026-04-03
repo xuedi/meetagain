@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\AdminMemberApproved;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\AdminMemberApproved;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +33,7 @@ class AdminMemberApprovedTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::AdminMemberApproved, $subject->getType());
+        static::assertEquals(AdminMemberApproved::TYPE, $subject->getType());
         static::assertEquals('Approved member: JohnDoe', $subject->render());
         static::assertEquals('Approved member: JohnDoe', $subject->render(true));
     }
@@ -52,7 +51,7 @@ class AdminMemberApprovedTest extends TestCase
     public function testCanCatchMissingUserId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in AdminMemberApproved"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_approved"));
 
         $subject = new AdminMemberApproved();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -65,7 +64,7 @@ class AdminMemberApprovedTest extends TestCase
     {
         // Arrange
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'user_id' has to be numeric in 'AdminMemberApproved'"),
+            new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.admin_member_approved'"),
         );
 
         $subject = new AdminMemberApproved();
