@@ -37,7 +37,7 @@
                 </tr>
                 <tr>
                     <th>Type</th>
-                    <td><span class="tag is-light">{{ activity.type.name }}</span></td>
+                    <td><span class="tag is-light">{{ activity.type }}</span></td>
                 </tr>
                 <tr>
                     <th>Message</th>
@@ -66,11 +66,11 @@
                     <th>Related</th>
                     <td>
                         {% set meta = activity.meta %}
-                        {% set typeName = activity.type.name %}
+                        {% set typeName = activity.type %}
                         {% if meta is not empty %}
                             {# Event link — but not for deleted events #}
                             {% if meta.event_id is defined %}
-                                {% if typeName == 'AdminEventDeleted' %}
+                                {% if typeName == 'core.admin_event_deleted' %}
                                     {{ meta.event_name|default('Event') }}
                                     <span class="tag is-danger is-light ml-1">deleted</span>
                                 {% else %}
@@ -83,7 +83,7 @@
 
                             {# CMS link — but not for deleted pages #}
                             {% if meta.cms_id is defined %}
-                                {% if typeName == 'AdminCmsPageDeleted' %}
+                                {% if typeName == 'core.admin_cms_page_deleted' %}
                                     {{ meta.cms_slug|default('Page') }}
                                     <span class="tag is-danger is-light ml-1">deleted</span>
                                 {% else %}
