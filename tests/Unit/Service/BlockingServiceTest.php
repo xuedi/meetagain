@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Service;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\BlockedUser;
 use App\Activity\Messages\UnblockedUser;
 use App\Entity\User;
 use App\Entity\UserBlock;
 use App\Repository\UserBlockRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Member\BlockingService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;

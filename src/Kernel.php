@@ -8,7 +8,11 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-// TODO: https://symfony.com/doc/current/configuration/multiple_kernels.html
+/**
+ * This class extends Symfony's BaseKernel and incorporates the MicroKernelTrait
+ * to manage the application's kernel, configuration, plugins, and routing setup.
+ * More: https://symfony.com/doc/current/configuration/multiple_kernels.html
+ */
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;

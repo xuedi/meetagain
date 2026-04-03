@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Activity\ActivityService;
 use App\Activity\Messages\ChangedUsername;
 use App\Activity\Messages\RsvpNo;
 use App\Activity\Messages\RsvpYes;
@@ -11,7 +12,6 @@ use App\Form\ProfileType;
 use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
-use App\Service\Activity\ActivityService;
 use App\Service\Member\BlockingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
