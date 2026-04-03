@@ -1,10 +1,25 @@
 <div class="columns is-multiline">
+    {% if is_granted('ROLE_USER') %}
+        <div class="column is-narrow dish-item" style="width: 200px;">
+            <a href="{{ path('plugin_dinnerclub_add') }}">
+                <div class="card has-background-link-light" style="height: 100%;">
+                    <div class="card-content has-text-centered" style="padding-top: 2rem;">
+                        <span class="icon is-large has-text-link">
+                            <i class="fa-solid fa-plus fa-2x"></i>
+                        </span>
+                        <p class="mt-3 has-text-link">Add Dish</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endif %}
     {% for item in list %}
-        <div class="column is-2">
+        {% set userLiked = item.id in favoriteDishIds|default([]) %}
+        <div class="column is-narrow dish-item" data-dish-id="{{ item.id }}" style="width: 200px;">
             <a href="{{ path('plugin_dinnerclub_item_show', {'id': item.id}) }}">
                 <div class="card">
-                    <div class="card-image">
-                        <figure class="image">
+                    <div class="card-image" style="position: relative;">
+                        <figure class="image is-1by1">
                             {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '400x400'} %}
                         </figure>
                         {% if not item.approved %}
@@ -12,16 +27,18 @@
                         {% endif %}
                     </div>
                     <div class="card-content p-2">
-                        <p class="has-text-centered">{{ item.getTranslatedName(app.locale) ?: item.getTranslatedName(item.originLang) }}</p>
+                        <p class="has-text-centered is-size-7 has-text-dark" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {{ item.getTranslatedName(app.locale) ?: item.getTranslatedName(item.originLang) }}
+                        </p>
                         <div class="is-flex is-justify-content-space-between is-size-7 has-text-grey mt-1">
-                            <span>
+                            <span class="{% if userLiked %}has-text-danger{% endif %}">
                                 <span class="icon is-small"><i class="fa-solid fa-heart"></i></span>
                                 {{ item.likes }}
                             </span>
                             {% if item.origin %}
-                                <span>
+                                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 115px;">
                                     <span class="icon is-small"><i class="fa-solid fa-location-dot"></i></span>
-                                    {{ item.origin|length > 10 ? item.origin|slice(0, 10) ~ '...' : item.origin }}
+                                    {{ item.origin }}
                                 </span>
                             {% endif %}
                         </div>

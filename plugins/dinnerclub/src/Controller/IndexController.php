@@ -4,12 +4,8 @@ namespace Plugin\Dinnerclub\Controller;
 
 use App\Controller\AbstractController;
 use App\Service\Config\LanguageService;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dinnerclub\Entity\Dish;
-use Plugin\Dinnerclub\Entity\DishTranslation;
 use Plugin\Dinnerclub\Entity\ViewType;
-use Plugin\Dinnerclub\Form\DishType;
 use Plugin\Dinnerclub\Repository\DishRepository;
 use Plugin\Dinnerclub\Service\DishListService;
 use Plugin\Dinnerclub\Service\DishService;
@@ -17,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/dinnerclub')]
 final class IndexController extends AbstractController
@@ -24,7 +21,6 @@ final class IndexController extends AbstractController
     public function __construct(
         private readonly DishRepository $repo,
         private readonly LanguageService $languageService,
-        private readonly EntityManagerInterface $em,
         private readonly DishService $dishService,
         private readonly DishListService $listService,
     ) {}
@@ -37,6 +33,14 @@ final class IndexController extends AbstractController
 
         $dishes = $isManager ? $this->repo->findAll() : $this->dishService->getApprovedDishes();
 
+        $userLists = [];
+        $favoriteDishIds = [];
+        if ($this->isGranted('ROLE_USER')) {
+            $userId = $this->getAuthedUser()->getId();
+            $userLists = $this->listService->getUserLists($userId);
+            $favoriteDishIds = $this->dishService->getLikedDishIds($userId);
+        }
+
         return $this->render('@Dinnerclub/index.html.twig', [
             'list' => $dishes,
             'viewType' => $session->get('dishesViewType', ViewType::Tiles->value),
@@ -48,6 +52,8 @@ final class IndexController extends AbstractController
             ],
             'pendingCount' => $isManager ? count($this->dishService->getPendingDishes()) : 0,
             'suggestionCount' => $isManager ? count($this->dishService->getDishesWithSuggestions()) : 0,
+            'userLists' => $userLists,
+            'favoriteDishIds' => $favoriteDishIds,
         ]);
     }
 
@@ -60,24 +66,28 @@ final class IndexController extends AbstractController
         }
 
         $userLists = [];
+        $userLiked = false;
         if ($this->isGranted('ROLE_USER')) {
             $user = $this->getAuthedUser();
             $userLists = $this->listService->getUserLists($user->getId());
+            $userLiked = $this->dishService->isLikedByUser($dish->getId(), $user->getId());
         }
 
         return $this->render('@Dinnerclub/details.html.twig', [
             'dish' => $dish,
             'languages' => $this->languageService->getEnabledCodes(),
             'userLists' => $userLists,
+            'userLiked' => $userLiked,
         ]);
     }
 
     #[Route('/like/{id}', name: 'plugin_dinnerclub_like', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function like(int $id): JsonResponse
     {
-        $newCount = $this->dishService->incrementLike($id);
+        $liked = $this->dishService->toggleLike($id, $this->getAuthedUser()->getId());
 
-        return new JsonResponse(['likes' => $newCount]);
+        return new JsonResponse(['liked' => $liked]);
     }
 
     #[Route('/filter/{name}/set/{value}', name: 'plugin_dinnerclub_filter', methods: ['GET'])]
@@ -96,45 +106,4 @@ final class IndexController extends AbstractController
         return $this->redirectToRoute('app_plugin_dinnerclub');
     }
 
-    #[Route('/edit/{id}', name: 'app_plugin_dinnerclub_edit', defaults: ['id' => null])]
-    public function edit(Request $request, ?Dish $dish = null): Response
-    {
-        if ($dish === null) {
-            $dish = new Dish();
-        }
-        $form = $this->createForm(DishType::class, $dish);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dish->setCreatedBy($this->getAuthedUser()->getId());
-            if ($dish->getCreatedAt() === null) {
-                $dish->setCreatedAt(new DateTimeImmutable());
-            }
-            $dish->setApproved(false);
-
-            $this->em->persist($dish);
-
-            // save translations
-            foreach ($this->languageService->getEnabledCodes() as $languageCode) {
-                $translation = $dish->findTranslation($languageCode);
-                if ($translation === null) {
-                    $translation = new DishTranslation();
-                    $translation->setLanguage($languageCode);
-                    $dish->addTranslation($translation);
-                }
-                $translation->setName($form->get("name-$languageCode")->getData());
-                $translation->setPhonetic($form->get("phonetic-$languageCode")->getData());
-                $translation->setDescription($form->get("description-$languageCode")->getData() ?? '');
-            }
-
-            $this->em->flush();
-
-            return $this->redirectToRoute('app_plugin_dinnerclub');
-        }
-
-        return $this->render('@Dinnerclub/edit.html.twig', [
-            'form' => $form,
-            'languages' => $this->languageService->getEnabledCodes(),
-        ]);
-    }
 }

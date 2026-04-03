@@ -3,7 +3,10 @@
 namespace Plugin\Dinnerclub\Controller;
 
 use App\Controller\AbstractController;
+use App\Enum\ImageType;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageService;
+use Plugin\Dinnerclub\Form\DishEditType;
 use Plugin\Dinnerclub\Form\DishTranslationType;
 use Plugin\Dinnerclub\Service\DishService;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +20,7 @@ final class EditController extends AbstractController
     public function __construct(
         private readonly DishService $dishService,
         private readonly LanguageService $languageService,
+        private readonly ImageService $imageService,
     ) {}
 
     #[Route('/translate/{id}/{lang}', name: 'plugin_dinnerclub_translate', methods: ['GET', 'POST'])]
@@ -74,26 +78,35 @@ final class EditController extends AbstractController
         ]);
     }
 
-    #[Route('/edit/{id}/origin', name: 'plugin_dinnerclub_edit_origin', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function editOrigin(Request $request, int $id): Response
+    #[Route('/edit/{id}', name: 'plugin_dinnerclub_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ORGANIZER')]
+    public function edit(Request $request, int $id): Response
     {
         $dish = $this->dishService->getDish($id);
         if ($dish === null) {
             throw $this->createNotFoundException('Dish not found');
         }
 
-        $origin = $request->request->get('origin');
-        $user = $this->getAuthedUser();
-        $isManager = $this->isGranted('ROLE_ORGANIZER');
+        $form = $this->createForm(DishEditType::class, $dish);
+        $form->handleRequest($request);
 
-        $this->dishService->updateOrigin($id, $user->getId(), $isManager, $origin);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $uploadedFile = $form->get('previewImage')->getData();
+            if ($uploadedFile !== null) {
+                $image = $this->imageService->upload($uploadedFile, $this->getAuthedUser(), ImageType::PluginDishPreview);
+                $this->imageService->createThumbnails($image, ImageType::PluginDishPreview);
+                $dish->setPreviewImage($image);
+            }
 
-        $this->addFlash(
-            'success',
-            $isManager ? 'Origin has been updated.' : 'Origin suggestion has been submitted for review.',
-        );
+            $this->dishService->saveBaseData($dish);
+            $this->addFlash('success', 'Dish has been updated.');
 
-        return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
+            return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
+        }
+
+        return $this->render('@Dinnerclub/edit.html.twig', [
+            'form' => $form,
+            'dish' => $dish,
+        ]);
     }
 }

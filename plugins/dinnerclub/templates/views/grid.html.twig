@@ -1,6 +1,15 @@
 <div class="columns is-multiline">
-    {% for item in list %}{# action items for managers #}
+    {% if is_granted('ROLE_USER') %}
         <div class="column is-1 p-1">
+            <a href="{{ path('plugin_dinnerclub_add') }}" title="Add Dish">
+                <figure class="image" style="background: hsl(217, 71%, 95%); display: flex; align-items: center; justify-content: center; aspect-ratio: 1;">
+                    <span class="icon has-text-link"><i class="fa-solid fa-plus fa-lg"></i></span>
+                </figure>
+            </a>
+        </div>
+    {% endif %}
+    {% for item in list %}{# action items for managers #}
+        <div class="column is-1 p-1 dish-item" data-dish-id="{{ item.id }}">
             <a href="{{ path('plugin_dinnerclub_item_show', {'id': item.id}) }}">
                 <figure class="image">
                     {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '400x400'} %}

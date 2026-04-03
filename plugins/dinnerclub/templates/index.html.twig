@@ -9,6 +9,36 @@
 
 {% block javascripts %}
     <script src="{{ '/javascript/fancybox.umd.js' }}" ></script>
+    <script>
+    (function () {
+        let activeListId = null;
+
+        function applyFilter(allowedIds) {
+            document.querySelectorAll('.dish-item').forEach(function (el) {
+                const dishId = parseInt(el.dataset.dishId, 10);
+                el.style.display = (allowedIds === null || allowedIds.includes(dishId)) ? '' : 'none';
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.list-filter-btn');
+            if (!btn) return;
+
+            const listId = btn.dataset.listId;
+
+            if (activeListId === listId) {
+                activeListId = null;
+                document.querySelectorAll('.list-filter-btn').forEach(b => b.classList.remove('is-link'));
+                applyFilter(null);
+            } else {
+                activeListId = listId;
+                document.querySelectorAll('.list-filter-btn').forEach(b => b.classList.toggle('is-link', b.dataset.listId === listId));
+                const ids = btn.dataset.dishIds ? btn.dataset.dishIds.split(',').map(Number) : [];
+                applyFilter(ids);
+            }
+        });
+    })();
+    </script>
 {% endblock %}
 
 

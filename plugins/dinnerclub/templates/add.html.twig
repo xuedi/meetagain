@@ -23,8 +23,7 @@
                         </h2>
 
                         <p class="mb-4 has-text-grey">
-                            Share a dish you talked about at a meetup! Add it in your language ({{ currentLocale|upper }})
-                            and others can suggest translations later.
+                            Share a dish you talked about at a meetup! Add it in your language and others can suggest translations later.
                         </p>
 
                         {{ form_start(form, {'attr': {'class': 'dish-add-form'}}) }}
@@ -32,10 +31,24 @@
                         <div class="field">
                             <label class="label">
                                 <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-language"></i></span>
+                                    <span>{{ form.language.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                <div class="select">
+                                    {{ form_widget(form.language) }}
+                                </div>
+                            </div>
+                            {{ form_errors(form.language) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-utensils"></i></span>
                                     <span>{{ form.name.vars.label }}</span>
                                 </span>
-                                <span class="tag is-info is-light ml-2">{{ currentLocale|upper }}</span>
                             </label>
                             <div class="control">
                                 {{ form_widget(form.name, {'attr': {'class': 'input'}}) }}
@@ -139,6 +152,29 @@
                                 <li>Include the <strong>origin</strong> to help others find regional dishes</li>
                                 <li>You can add an image later</li>
                             </ul>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
+                            <span>Phonetic systems</span>
+                        </h3>
+                        <div class="content is-small">
+                            <table class="table is-narrow is-fullwidth">
+                                <thead>
+                                    <tr><th>Language</th><th>System</th><th>Example</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Chinese</td><td>Pinyin</td><td>má po dòu fu</td></tr>
+                                    <tr><td>Japanese</td><td>Rōmaji</td><td>ra-men</td></tr>
+                                    <tr><td>Arabic</td><td>Romanisation</td><td>kus-kus</td></tr>
+                                    <tr><td>Korean</td><td>Revised Romanisation</td><td>bi-bim-bap</td></tr>
+                                    <tr><td>Thai</td><td>RTGS</td><td>phàt thai</td></tr>
+                                    <tr><td>Hindi</td><td>IAST</td><td>bi-ryā-nī</td></tr>
+                                    <tr><td>Greek</td><td>Greeklish</td><td>mu-sa-kás</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

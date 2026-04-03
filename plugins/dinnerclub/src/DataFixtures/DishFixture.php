@@ -31,9 +31,10 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
         }
 
         echo 'Creating dishes ... ';
-        foreach ($this->getData() as [$imageFile, $translations]) {
+        foreach ($this->getData() as [$imageFile, $origin, $translations]) {
             $dish = new Dish();
             $dish->setOriginLang('cn');
+            $dish->setOrigin($origin);
             $dish->setApproved(true);
             $dish->setCreatedBy($importUser->getId());
             $dish->setCreatedAt(new DateTimeImmutable());
@@ -44,9 +45,6 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 $translation->setName($data['name']);
                 $translation->setPhonetic($data['phonetic']);
                 $translation->setDescription($data['description']);
-                $translation->setDish($dish);
-
-                $manager->persist($translation);
                 $dish->addTranslation($translation);
             }
 
@@ -70,6 +68,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
         return [
             [
                 '1.jpg',
+                'Chengdu, Sichuan',
                 [
                     'cn' => [
                         'name' => '麻婆豆腐',
@@ -90,6 +89,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
             ],
             [
                 '2.jpg',
+                'Guizhou, China',
                 [
                     'cn' => [
                         'name' => '宫保鸡丁',
@@ -110,6 +110,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
             ],
             [
                 '3.jpg',
+                'Shanghai, China',
                 [
                     'cn' => [
                         'name' => '红烧肉',

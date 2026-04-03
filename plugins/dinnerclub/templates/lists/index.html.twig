@@ -30,11 +30,8 @@
             </div>
 
             {% if myLists is empty %}
-                <div class="notification is-info is-light">
+                <div class="notification is-light">
                     <p>You haven't created any lists yet.</p>
-                    <p class="mt-2">
-                        <a href="{{ path('plugin_dinnerclub_lists_create') }}" class="button is-link is-small">Create your first list</a>
-                    </p>
                 </div>
             {% else %}
                 <div class="columns is-multiline">

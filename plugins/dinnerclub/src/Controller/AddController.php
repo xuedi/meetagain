@@ -21,7 +21,7 @@ final class AddController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function add(Request $request): Response
     {
-        $form = $this->createForm(DishAddType::class);
+        $form = $this->createForm(DishAddType::class, null, ['current_locale' => $request->getLocale()]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -30,7 +30,7 @@ final class AddController extends AbstractController
 
             $this->dishService->createDish(
                 name: $form->get('name')->getData(),
-                language: $request->getLocale(),
+                language: $form->get('language')->getData(),
                 userId: $user->getId(),
                 isManager: $isManager,
                 phonetic: $form->get('phonetic')->getData(),
@@ -46,7 +46,6 @@ final class AddController extends AbstractController
 
         return $this->render('@Dinnerclub/add.html.twig', [
             'form' => $form,
-            'currentLocale' => $request->getLocale(),
         ]);
     }
 }
