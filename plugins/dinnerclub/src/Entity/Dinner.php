@@ -17,7 +17,7 @@ class Dinner
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Event $event = null;
 
     #[ORM\Column]
