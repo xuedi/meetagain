@@ -51,7 +51,7 @@ final class TemplatesController extends AbstractAdminController
                 'context' => $mockData['context'],
                 'renderedBody' => $dbTemplate
                     ? $this->templateService->renderContent(
-                        $dbTemplate->getBody($this->languageService->getFilteredEnabledCodes()[0]),
+                        $dbTemplate->getBody($this->languageService->getAdminFilteredEnabledCodes()[0]),
                         $mockData['context'],
                     )
                     : '<p>Template not found. Run app:email-templates:seed</p>',
@@ -88,7 +88,7 @@ final class TemplatesController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Save translations for each language
-            foreach ($this->languageService->getFilteredEnabledCodes() as $languageCode) {
+            foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->getOrCreateTranslation($languageCode, $template->getId());
                 $translation->setEmailTemplate($template);
                 $translation->setLanguage($languageCode);
@@ -111,14 +111,14 @@ final class TemplatesController extends AbstractAdminController
             'active' => 'email',
             'form' => $form,
             'template' => $template,
-            'languages' => $this->languageService->getFilteredEnabledCodes(),
+            'languages' => $this->languageService->getAdminFilteredEnabledCodes(),
         ]);
     }
 
     #[Route('/{id}/preview', name: 'app_admin_email_templates_preview')]
     public function templatesPreview(Request $request, EmailTemplate $template): Response
     {
-        $language = $request->query->getString('lang', $this->languageService->getFilteredEnabledCodes()[0]);
+        $language = $request->query->getString('lang', $this->languageService->getAdminFilteredEnabledCodes()[0]);
         $mockList = $this->emailService->getMockEmailList();
         $mockContext = $this->getMockContextForTemplate($template->getIdentifier(), $mockList);
 
@@ -132,7 +132,7 @@ final class TemplatesController extends AbstractAdminController
             'renderedBody' => $renderedBody,
             'context' => $mockContext,
             'currentLanguage' => $language,
-            'languages' => $this->languageService->getFilteredEnabledCodes(),
+            'languages' => $this->languageService->getAdminFilteredEnabledCodes(),
         ]);
     }
 
@@ -142,7 +142,7 @@ final class TemplatesController extends AbstractAdminController
         $identifier = $template->getIdentifier();
 
         // Reset translations for all enabled languages with language-specific defaults
-        foreach ($this->languageService->getFilteredEnabledCodes() as $languageCode) {
+        foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
             $langDefaults = $this->templateService->getDefaultTemplates($languageCode);
 
             if (!isset($langDefaults[$identifier])) {
