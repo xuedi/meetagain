@@ -3,136 +3,226 @@
 {% block title %}Dinner Menu — {{ event.getTitle(app.locale) }}{% endblock %}
 
 {% block body %}
-<section class="section">
-    <div class="container">
+    <section class="section">
+        <div class="container">
 
-        <nav class="breadcrumb">
-            <ul>
-                <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                <li class="is-active"><a>Dinner for {{ event.getTitle(app.locale) }}</a></li>
-            </ul>
-        </nav>
+            <nav class="breadcrumb">
+                <ul>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
+                    <li class="is-active"><a>Dinner for {{ event.getTitle(app.locale) }}</a></li>
+                </ul>
+            </nav>
 
-        <h1 class="title">Dinner Menu</h1>
-        <p class="subtitle">
-            <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.getTitle(app.locale) }}</a>
-        </p>
+            <h1 class="title">Dinner Menu</h1>
+            <p class="subtitle">
+                <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.getTitle(app.locale) }}</a>
+            </p>
 
-        {% if not dinner %}
+            {% if not dinner %}
 
-            <p class="has-text-grey mb-4">No dinner planned for this event yet.</p>
-            <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: event.id}) }}">
-                <button type="submit" class="button">Create dinner</button>
-            </form>
+                <p class="has-text-grey mb-4">No dinner planned for this event yet.</p>
+                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: event.id}) }}">
+                    <button type="submit" class="button">Create dinner</button>
+                </form>
 
-        {% else %}
+            {% else %}
 
-        <div class="columns">
-            <div class="column is-half">
+                <div class="columns">
+                <div class="column is-4">
 
                 <div class="box" style="border: 1px solid #dbdbdb; box-shadow: none; padding: 2rem 2.5rem;">
-                    <p class="has-text-centered has-text-weight-light is-uppercase is-size-7 has-letter-spacing mb-4" style="letter-spacing: 0.15em; color: #7a7a7a;">— Menu —</p>
+                    <p class="has-text-centered has-text-weight-light is-uppercase is-size-7 has-letter-spacing mb-4"
+                       style="letter-spacing: 0.15em; color: #7a7a7a;">— Menu —</p>
 
                     {% for course in dinner.courses %}
-                        {% if not loop.first %}<hr style="margin: 1.25rem 0;">{% endif %}
+                        {% if not loop.first %}
+                            <hr style="margin: 1.25rem 0;">{% endif %}
                         <div class="mb-4">
-                            <p class="has-text-weight-semibold is-size-7 is-uppercase mb-2" style="letter-spacing: 0.08em;">{{ course.name }}</p>
+                            <div class="is-flex is-align-items-center mb-2" style="gap: 0.5rem;">
+                                <p class="has-text-weight-semibold is-size-7 is-uppercase mb-0"
+                                   style="letter-spacing: 0.08em;">{{ course.name }}</p>
+                                <form method="post"
+                                      action="{{ path('app_plugin_dinnerclub_dinner_course_delete', {courseId: course.id}) }}">
+                                    <button type="submit" class="button is-ghost p-0"
+                                            style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
+                                        remove
+                                    </button>
+                                </form>
+                            </div>
 
                             {% for item in course.items %}
-                                <p class="is-size-7 mb-1{% if not item.isPrimary %} has-text-grey{% endif %}">
-                                    {% if not item.isPrimary %}<span style="font-style: italic;">or </span>{% endif %}
-                                    {{ item.dish.getTranslatedName(app.locale) ?: item.dish.getTranslatedName('en') }}
-                                    <span class="has-text-grey ml-2" style="font-size: 0.65rem;">
-                                        <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_item_toggle', {itemId: item.id}) }}" style="display: inline;">
-                                            <button type="submit" class="button is-ghost p-0" style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
-                                                {% if item.isPrimary %}↓ alt{% else %}↑ primary{% endif %}
-                                            </button>
-                                        </form>
-                                        ·
-                                        <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_item_delete', {itemId: item.id}) }}" style="display: inline;">
-                                            <button type="submit" class="button is-ghost p-0" style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">remove</button>
-                                        </form>
-                                    </span>
-                                </p>
+                                <div class="is-flex is-align-items-center mb-1" style="gap: 0.5rem;">
+                                    <span class="is-size-7">{{ item.dish.getTranslatedName(app.locale) ?: item.dish.getTranslatedName('en') }}</span>
+                                    <form method="post"
+                                          action="{{ path('app_plugin_dinnerclub_dinner_item_delete', {itemId: item.id}) }}">
+                                        <button type="submit" class="button is-ghost p-0"
+                                                style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
+                                            remove
+                                        </button>
+                                    </form>
+                                </div>
                             {% else %}
                                 <p class="has-text-grey is-size-7">No dishes yet.</p>
                             {% endfor %}
 
-                            <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_item_add', {courseId: course.id}) }}" class="is-flex mt-2" style="gap: 0.4rem; align-items: center;">
-                                <div class="select is-small">
-                                    <select name="dish_id" required>
-                                        <option value="">Add a dish...</option>
-                                        {% for dish in dishes %}
-                                            <option value="{{ dish.id }}">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName('en') }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <label class="checkbox is-size-7">
-                                    <input type="checkbox" name="is_primary" value="1"> primary
-                                </label>
-                                <button type="submit" class="button is-small">Add</button>
-                            </form>
-
-                            <div class="is-flex mt-2" style="gap: 0.5rem; align-items: center;">
-                                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_course_edit', {courseId: course.id}) }}" class="is-flex" style="gap: 0.4rem;">
-                                    <input class="input is-small" type="text" name="name" value="{{ course.name }}" style="width: 140px;" required>
-                                    <button type="submit" class="button is-small">Rename</button>
-                                </form>
-                                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_course_delete', {courseId: course.id}) }}">
-                                    <button type="submit" class="button is-small is-danger is-light">Remove</button>
-                                </form>
-                            </div>
                         </div>
                     {% else %}
                         <p class="has-text-grey is-size-7 has-text-centered">No courses yet. Add one on the right.</p>
                     {% endfor %}
                 </div>
 
-            </div>{# /column left #}
-            <div class="column is-half">
+                </div>{# /column left #}
 
-                {% set location = event.location %}
-                <p class="has-text-weight-semibold mb-1">Event</p>
-                <p class="is-size-7 mb-1">{{ event.start|date('D, d M Y, H:i') }}</p>
-                {% if location %}
-                    <p class="is-size-7">{{ location.name }}{% if location.street %}, {{ location.street }}{% endif %}{% if location.city %}, {{ location.city }}{% endif %}</p>
-                {% endif %}
 
-                <hr>
+
+                <div class="column is-4">
+
 
                 <p class="has-text-weight-semibold mb-2">Add course</p>
-                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_course_add', {dinnerId: dinner.id}) }}" class="is-flex mb-5" style="gap: 0.5rem;">
-                    <input class="input is-small" type="text" name="name" placeholder="e.g. Starter, Main, Dessert" required style="width: 220px;">
+                <form method="post"
+                      action="{{ path('app_plugin_dinnerclub_dinner_course_add', {dinnerId: dinner.id}) }}"
+                      class="is-flex mb-5" style="gap: 0.5rem;">
+                    <input class="input is-small" type="text" name="name" placeholder="e.g. Starter, Main, Dessert"
+                           required style="width: 220px;">
                     <button type="submit" class="button is-small">Add</button>
                 </form>
 
-                <p class="has-text-weight-semibold mb-2">Reservation name</p>
-                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_reservation_name', {dinnerId: dinner.id}) }}" class="is-flex mb-5" style="gap: 0.5rem; align-items: center;">
-                    <input class="input is-small" type="text" name="reservation_name"
-                        value="{{ dinner.reservationName ?? '' }}"
-                        placeholder="e.g. Smith" style="width: 200px;">
-                    <button type="submit" class="button is-small">Save</button>
-                </form>
 
-                <p class="has-text-weight-semibold mb-2">Price per person</p>
-                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_price', {dinnerId: dinner.id}) }}" class="is-flex mb-5" style="gap: 0.5rem; align-items: center;">
-                    <input class="input is-small" type="number" name="price_per_person" step="0.01" min="0"
-                        value="{{ dinner.pricePerPerson is not null ? dinner.pricePerPerson|number_format(2) : '' }}"
-                        placeholder="e.g. 15.00" style="width: 140px;">
-                    <button type="submit" class="button is-small">Save</button>
-                </form>
+                {% if dinner.courses|length > 0 %}
+                    <p class="has-text-weight-semibold mb-2">Rename course</p>
+                    <form method="post"
+                          action="{{ path('app_plugin_dinnerclub_dinner_course_edit', {courseId: '__id__'}) }}"
+                          class="is-flex mb-5" style="gap: 0.5rem; align-items: center;"
+                          id="rename-course-form">
+                        <div class="select is-small">
+                            <select name="_course_id" id="rename-course-select" required>
+                                {% for course in dinner.courses %}
+                                    <option value="{{ course.id }}"
+                                            data-name="{{ course.name }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input class="input is-small" type="text" name="name" id="rename-course-name"
+                               style="width: 140px;" required>
+                        <button type="submit" class="button is-small">Rename</button>
+                    </form>
+                    <script>
+                        (function () {
+                            var select = document.getElementById('rename-course-select');
+                            var nameInput = document.getElementById('rename-course-name');
+                            var form = document.getElementById('rename-course-form');
+                            var baseAction = '{{ path('app_plugin_dinnerclub_dinner_course_edit', {courseId: 0}) }}';
 
-                <hr>
+                            function sync() {
+                                var opt = select.options[select.selectedIndex];
+                                nameInput.value = opt.dataset.name;
+                                form.action = baseAction.replace('/0', '/' + opt.value);
+                            }
 
-                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_delete', {dinnerId: dinner.id}) }}">
-                    <button type="submit" class="button is-small is-danger is-light">Delete entire dinner</button>
-                </form>
+                            select.addEventListener('change', sync);
+                            sync();
+                        })();
+                    </script>
 
-            </div>{# /column right #}
-        </div>{# /columns #}
 
-        {% endif %}
+                    <p class="has-text-weight-semibold mb-2">Add dish</p>
+                    <form method="post"
+                          action="{{ path('app_plugin_dinnerclub_dinner_item_add', {courseId: 0}) }}"
+                          class="is-flex mb-5" style="gap: 0.5rem; align-items: center;"
+                          id="add-dish-form">
+                        <div class="select is-small">
+                            <select id="add-dish-course-select" required>
+                                {% for course in dinner.courses %}
+                                    <option value="{{ course.id }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="select is-small">
+                            <select name="dish_id" required>
+                                <option value="">Select dish...</option>
+                                {% for dish in dishes %}
+                                    <option value="{{ dish.id }}">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName('en') }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="button is-small">Add</button>
+                    </form>
+                    <script>
+                        (function () {
+                            const courseSelect = document.getElementById('add-dish-course-select');
+                            const form = document.getElementById('add-dish-form');
+                            const baseAction = '{{ path('app_plugin_dinnerclub_dinner_item_add', {courseId: 0}) }}';
 
-    </div>
-</section>
+                            function sync() {
+                                form.action = baseAction.replace('/0', '/' + courseSelect.value);
+                            }
+
+                            courseSelect.addEventListener('change', sync);
+                            sync();
+                        })();
+                    </script>
+
+                {% endif %}
+
+
+                </div>{# /column right #}
+
+
+
+
+                <div class="column is-4">
+
+                <div class="box">
+
+                    {% set location = event.location %}
+                    <p class="has-text-weight-semibold mb-1">Event</p>
+                    <p class="is-size-7 mb-1">{{ event.start|date('D, d M Y, H:i') }}</p>
+                    {% if location %}
+                        <p class="is-size-7">{{ location.name }}{% if location.street %}, {{ location.street }}{% endif %}{% if location.city %}, {{ location.city }}{% endif %}</p>
+                    {% endif %}
+
+                    <hr>
+
+                    <p class="has-text-weight-semibold mb-2">Reservation name</p>
+                    <form method="post"
+                          action="{{ path('app_plugin_dinnerclub_dinner_reservation_name', {dinnerId: dinner.id}) }}"
+                          class="is-flex mb-5" style="gap: 0.5rem; align-items: center;">
+                        <input class="input is-small" type="text" name="reservation_name"
+                               value="{{ dinner.reservationName ?? '' }}"
+                               placeholder="e.g. Smith" style="width: 200px;">
+                        <button type="submit" class="button is-small">Save</button>
+                    </form>
+
+                    <p class="has-text-weight-semibold mb-2">Price per person</p>
+                    <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_price', {dinnerId: dinner.id}) }}"
+                          class="is-flex mb-5" style="gap: 0.5rem; align-items: center;">
+                        <input class="input is-small" type="number" name="price_per_person" step="0.01" min="0"
+                               value="{{ dinner.pricePerPerson is not null ? dinner.pricePerPerson|number_format(2) : '' }}"
+                               placeholder="e.g. 15.00" style="width: 140px;">
+                        <button type="submit" class="button is-small">Save</button>
+                    </form>
+
+                    <hr>
+
+                    <form method="post"
+                          action="{{ path('app_plugin_dinnerclub_dinner_delete', {dinnerId: dinner.id}) }}">
+                        <button type="submit" class="button is-small is-danger">Delete entire dinner</button>
+                    </form>
+
+                </div>
+
+                </div>{# /column right #}
+
+
+
+
+
+                </div>{# /columns #}
+
+
+
+            {% endif %}
+
+        </div>
+    </section>
 {% endblock %}
