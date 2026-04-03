@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\AdminMemberPromoted;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\AdminMemberPromoted;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +33,7 @@ class AdminMemberPromotedTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::AdminMemberPromoted, $subject->getType());
+        static::assertEquals(AdminMemberPromoted::TYPE, $subject->getType());
         static::assertEquals('Promoted member to organizer: JohnDoe', $subject->render());
         static::assertEquals('Promoted member to organizer: JohnDoe', $subject->render(true));
     }
@@ -52,7 +51,7 @@ class AdminMemberPromotedTest extends TestCase
     public function testCanCatchMissingUserId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in AdminMemberPromoted"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_promoted"));
 
         $subject = new AdminMemberPromoted();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -65,7 +64,7 @@ class AdminMemberPromotedTest extends TestCase
     {
         // Arrange
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'user_id' has to be numeric in 'AdminMemberPromoted'"),
+            new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.admin_member_promoted'"),
         );
 
         $subject = new AdminMemberPromoted();

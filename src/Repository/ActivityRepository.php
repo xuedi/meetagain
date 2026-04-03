@@ -2,8 +2,16 @@
 
 namespace App\Repository;
 
+use App\Activity\Messages\BlockedUser;
+use App\Activity\Messages\ChangedUsername;
+use App\Activity\Messages\EventImageUploaded;
+use App\Activity\Messages\FollowedUser;
+use App\Activity\Messages\Login;
+use App\Activity\Messages\RsvpNo;
+use App\Activity\Messages\RsvpYes;
+use App\Activity\Messages\UnblockedUser;
+use App\Activity\Messages\UpdatedProfilePicture;
 use App\Entity\Activity;
-use App\Enum\ActivityType;
 use App\Entity\Event;
 use App\Entity\User;
 use DateTimeImmutable;
@@ -53,13 +61,13 @@ class ActivityRepository extends ServiceEntityRepository
             ->addSelect('u')
             ->where('a.type IN (:types)')
             ->setParameter('types', [
-                ActivityType::ChangedUsername->value,
-                ActivityType::EventImageUploaded->value,
-                ActivityType::UpdatedProfilePicture->value,
-                ActivityType::BlockedUser->value,
-                ActivityType::UnblockedUser->value,
-                ActivityType::FollowedUser->value,
-                ActivityType::RsvpYes->value,
+                ChangedUsername::TYPE,
+                EventImageUploaded::TYPE,
+                UpdatedProfilePicture::TYPE,
+                BlockedUser::TYPE,
+                UnblockedUser::TYPE,
+                FollowedUser::TYPE,
+                RsvpYes::TYPE,
             ])
             ->getQuery()
             ->getResult();
@@ -67,41 +75,41 @@ class ActivityRepository extends ServiceEntityRepository
         $activityIds = [];
         foreach ($userActivities as $userActivity) {
             $activityUserId = $userActivity->getUser()->getId();
-            switch ($userActivity->getType()->value) {
-                case ActivityType::ChangedUsername->value:
+            switch ($userActivity->getType()) {
+                case ChangedUsername::TYPE:
                     if (in_array($activityUserId, $following)) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;
 
-                case ActivityType::EventImageUploaded->value:
+                case EventImageUploaded::TYPE:
                     $eventId = $userActivity->getMeta()['event_id'];
                     if (in_array($activityUserId, $following) || in_array($eventId, $events)) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;
 
-                case ActivityType::UpdatedProfilePicture->value:
+                case UpdatedProfilePicture::TYPE:
                     if (in_array($activityUserId, $following) || $user->getId() === $activityUserId) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;
 
-                case ActivityType::BlockedUser->value:
-                case ActivityType::UnblockedUser->value:
+                case BlockedUser::TYPE:
+                case UnblockedUser::TYPE:
                     // Only visible to the user themselves (self-only visibility)
                     if ($user->getId() === $activityUserId) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;
 
-                case ActivityType::RsvpYes->value:
+                case RsvpYes::TYPE:
                     if (in_array($activityUserId, $following)) {
                         $activityIds[] = $userActivity->getId();
                     }
                     break;
 
-                case ActivityType::FollowedUser->value:
+                case FollowedUser::TYPE:
                     // Visible to the target user (the user being followed - "X started following you")
                     $targetUserId = $userActivity->getMeta()['user_id'] ?? null;
                     if ($user->getId() === $targetUserId) {
@@ -141,7 +149,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->where('a.type = :type')
             ->andWhere('a.createdAt >= :start')
             ->andWhere('a.createdAt <= :end')
-            ->setParameter('type', ActivityType::RsvpYes)
+            ->setParameter('type', RsvpYes::TYPE)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->getQuery()
@@ -153,7 +161,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->where('a.type = :type')
             ->andWhere('a.createdAt >= :start')
             ->andWhere('a.createdAt <= :end')
-            ->setParameter('type', ActivityType::RsvpNo)
+            ->setParameter('type', RsvpNo::TYPE)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->getQuery()
@@ -181,7 +189,7 @@ class ActivityRepository extends ServiceEntityRepository
             ->where('a.type = :type')
             ->andWhere('a.createdAt >= :start')
             ->andWhere('a.createdAt <= :end')
-            ->setParameter('type', ActivityType::Login)
+            ->setParameter('type', Login::TYPE)
             ->setParameter('start', $start)
             ->setParameter('end', $end)
             ->groupBy('day')

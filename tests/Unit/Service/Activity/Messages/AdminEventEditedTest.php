@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\AdminEventEdited;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\AdminEventEdited;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +33,7 @@ class AdminEventEditedTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::AdminEventEdited, $subject->getType());
+        static::assertEquals(AdminEventEdited::TYPE, $subject->getType());
         static::assertEquals('Edited event: Test Event', $subject->render());
         static::assertEquals('Edited event: Test Event', $subject->render(true));
     }
@@ -52,7 +51,7 @@ class AdminEventEditedTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in AdminEventEdited"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_edited"));
 
         $subject = new AdminEventEdited();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -65,7 +64,7 @@ class AdminEventEditedTest extends TestCase
     {
         // Arrange
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'AdminEventEdited'"),
+            new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.admin_event_edited'"),
         );
 
         $subject = new AdminEventEdited();

@@ -2,11 +2,12 @@
 
 namespace App\Service\Activity;
 
+use App\Activity\MessageInterface;
+use App\Activity\UnknownActivityMessage;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageHtmlRenderer;
-use Exception;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -42,6 +43,7 @@ readonly class MessageFactory
                 $this->eventRepository->getEventNameList($locale),
             );
         }
-        throw new Exception('Cound not find message for activity type: ' . $activity->getType()->name);
+
+        return new UnknownActivityMessage($activity->getType() ?? 'unknown');
     }
 }

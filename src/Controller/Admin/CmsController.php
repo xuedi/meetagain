@@ -10,8 +10,10 @@ use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
 use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
+use App\Activity\Messages\AdminCmsPageCreated;
+use App\Activity\Messages\AdminCmsPageDeleted;
+use App\Activity\Messages\AdminCmsPageUpdated;
 use App\EntityActionDispatcher;
-use App\Enum\ActivityType;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\CmsType;
@@ -112,7 +114,7 @@ final class CmsController extends AbstractAdminController
             $this->em->flush();
 
             $user = $this->getAuthedUser();
-            $this->activityService->log(ActivityType::AdminCmsPageUpdated, $user, ['cms_id' => $cms->getId(), 'cms_slug' => $cms->getSlug()]);
+            $this->activityService->log(AdminCmsPageUpdated::TYPE, $user, ['cms_id' => $cms->getId(), 'cms_slug' => $cms->getSlug()]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateCms, $cms->getId());
 
             return $this->redirectToRoute('app_admin_cms_edit', [
@@ -159,7 +161,7 @@ final class CmsController extends AbstractAdminController
             $this->em->flush();
 
             $user = $this->getAuthedUser();
-            $this->activityService->log(ActivityType::AdminCmsPageDeleted, $user, ['cms_id' => $cmsId, 'cms_slug' => $cmsSlug]);
+            $this->activityService->log(AdminCmsPageDeleted::TYPE, $user, ['cms_id' => $cmsId, 'cms_slug' => $cmsSlug]);
             $this->entityActionDispatcher->dispatch(EntityAction::DeleteCms, $cmsId);
         }
 
@@ -181,7 +183,7 @@ final class CmsController extends AbstractAdminController
         $this->em->persist($newPage);
         $this->em->flush();
 
-        $this->activityService->log(ActivityType::AdminCmsPageCreated, $user, ['cms_id' => $newPage->getId(), 'cms_slug' => $newPage->getSlug()]);
+        $this->activityService->log(AdminCmsPageCreated::TYPE, $user, ['cms_id' => $newPage->getId(), 'cms_slug' => $newPage->getSlug()]);
         $this->entityActionDispatcher->dispatch(EntityAction::CreateCms, $newPage->getId());
 
         return $this->redirectToRoute('app_admin_cms_edit', [

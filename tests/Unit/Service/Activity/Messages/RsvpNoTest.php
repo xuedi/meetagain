@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\RsvpNo;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\RsvpNo;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -36,14 +35,14 @@ class RsvpNoTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::RsvpNo, $subject->getType());
+        static::assertEquals(RsvpNo::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }
 
     public function testCanCatchMissingEventId(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in RsvpNo"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.rsvp_no"));
 
         $subject = new RsvpNo();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -52,7 +51,7 @@ class RsvpNoTest extends TestCase
 
     public function testCanCatchNonNumericEventId(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'RsvpNo'"));
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.rsvp_no'"));
 
         $subject = new RsvpNo();
         $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number']);

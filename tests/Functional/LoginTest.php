@@ -2,8 +2,8 @@
 
 namespace Tests\Functional;
 
+use App\Activity\Messages\Login;
 use App\Entity\Activity;
-use App\Enum\ActivityType;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -67,10 +67,10 @@ class LoginTest extends WebTestCase
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $activity = $em->getRepository(Activity::class)->findOneBy([
             'user' => $user,
-            'type' => ActivityType::Login,
+            'type' => Login::TYPE,
         ]);
         static::assertNotNull($activity, 'Login activity should be recorded in the database');
-        static::assertSame(ActivityType::Login, $activity->getType());
+        static::assertSame(Login::TYPE, $activity->getType());
     }
 
     public function testLoginWithInvalidCredentials(): void

@@ -2,7 +2,8 @@
 
 namespace Tests\Unit\Service;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\PasswordReset;
+use App\Activity\Messages\PasswordResetRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Activity\ActivityService;
@@ -72,7 +73,7 @@ class PasswordResetServiceTest extends TestCase
         $userRepoStub->method('findOneBy')->willReturn($user);
 
         $activityMock = $this->createMock(ActivityService::class);
-        $activityMock->expects($this->once())->method('log')->with(ActivityType::PasswordResetRequest, $user);
+        $activityMock->expects($this->once())->method('log')->with(PasswordResetRequest::TYPE, $user);
 
         $emailMock = $this->createMock(EmailService::class);
         $emailMock->expects($this->once())->method('prepareResetPassword')->with($user);
@@ -147,7 +148,7 @@ class PasswordResetServiceTest extends TestCase
         $hasherStub->method('hashPassword')->willReturn('hashed');
 
         $activityMock = $this->createMock(ActivityService::class);
-        $activityMock->expects($this->once())->method('log')->with(ActivityType::PasswordReset, $user);
+        $activityMock->expects($this->once())->method('log')->with(PasswordReset::TYPE, $user);
 
         $service = $this->createService(hasher: $hasherStub, activityService: $activityMock);
 

@@ -2,7 +2,8 @@
 
 namespace App\Service\Member;
 
-use App\Enum\ActivityType;
+use App\Activity\Messages\BlockedUser;
+use App\Activity\Messages\UnblockedUser;
 use App\Entity\User;
 use App\Entity\UserBlock;
 use App\Repository\UserBlockRepository;
@@ -45,7 +46,7 @@ readonly class BlockingService
         $this->em->persist($blocked);
         $this->em->flush();
 
-        $this->activityService->log(ActivityType::BlockedUser, $blocker, ['user_id' => $blocked->getId()]);
+        $this->activityService->log(BlockedUser::TYPE, $blocker, ['user_id' => $blocked->getId()]);
     }
 
     public function unblock(User $blocker, User $blocked): void
@@ -62,7 +63,7 @@ readonly class BlockingService
         $this->em->remove($block);
         $this->em->flush();
 
-        $this->activityService->log(ActivityType::UnblockedUser, $blocker, ['user_id' => $blocked->getId()]);
+        $this->activityService->log(UnblockedUser::TYPE, $blocker, ['user_id' => $blocked->getId()]);
     }
 
     public function isBlocked(User $user1, User $user2): bool

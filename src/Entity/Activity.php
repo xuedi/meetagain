@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Enum\ActivityType;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,8 +21,8 @@ class Activity
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(enumType: ActivityType::class)]
-    private ?ActivityType $type = null;
+    #[ORM\Column(length: 80)]
+    private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
     private ?array $Meta = null; // TODO: do lower case
@@ -69,12 +68,12 @@ class Activity
         return $this;
     }
 
-    public function getType(): ?ActivityType
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType(ActivityType $type): static
+    public function setType(string $type): static
     {
         $this->type = $type;
 

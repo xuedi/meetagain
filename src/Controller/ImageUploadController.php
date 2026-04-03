@@ -2,9 +2,10 @@
 
 namespace App\Controller;
 
+use App\Activity\Messages\EventImageUploaded;
+use App\Activity\Messages\UpdatedProfilePicture;
 use App\Filter\Action\ActionAuthorizationMessageService;
 use App\Filter\Action\ActionAuthorizationService;
-use App\Enum\ActivityType;
 use App\Entity\CmsBlock;
 use App\Entity\Event;
 use App\Entity\Image;
@@ -164,7 +165,7 @@ final class ImageUploadController extends AbstractController
             $files = $form->get('files')->getData();
             $count = $this->imageService->uploadForEvent($event, $files, $user);
 
-            $this->activityService->log(ActivityType::EventImageUploaded, $user, [
+            $this->activityService->log(EventImageUploaded::TYPE, $user, [
                 'event_id' => $event->getId(),
                 'images' => $count,
             ]);
@@ -284,7 +285,7 @@ final class ImageUploadController extends AbstractController
     private function logActivity(string $entity, int $previous, int $new): void
     {
         if ($entity === 'user') {
-            $this->activityService->log(ActivityType::UpdatedProfilePicture, $this->getAuthedUser(), [
+            $this->activityService->log(UpdatedProfilePicture::TYPE, $this->getAuthedUser(), [
                 'old' => $previous,
                 'new' => $new,
             ]);

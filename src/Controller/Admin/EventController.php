@@ -9,8 +9,10 @@ use App\Entity\Host;
 use App\Entity\Image;
 use App\Entity\Location;
 use App\Enum\ImageType;
+use App\Activity\Messages\AdminEventCancelled;
+use App\Activity\Messages\AdminEventCreated;
+use App\Activity\Messages\AdminEventEdited;
 use App\EntityActionDispatcher;
-use App\Enum\ActivityType;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
@@ -143,7 +145,7 @@ final class EventController extends AbstractAdminController
             $this->entityManager->persist($event);
             $this->entityManager->flush();
 
-            $this->activityService->log(ActivityType::AdminEventEdited, $user, ['event_id' => $event->getId()]);
+            $this->activityService->log(AdminEventEdited::TYPE, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
 
             // create thumbnail
@@ -183,7 +185,7 @@ final class EventController extends AbstractAdminController
         $user = $this->getAuthedUser();
         $rsvpCount = $event->getRsvp()->count();
         $this->eventService->cancelEvent($event);
-        $this->activityService->log(ActivityType::AdminEventCancelled, $user, ['event_id' => $event->getId()]);
+        $this->activityService->log(AdminEventCancelled::TYPE, $user, ['event_id' => $event->getId()]);
         if ($rsvpCount > 0) {
             $this->addFlash('success', "Event canceled. $rsvpCount user(s) have been notified.");
         }
@@ -252,7 +254,7 @@ final class EventController extends AbstractAdminController
             $entityManager->persist($event);
             $entityManager->flush();
 
-            $this->activityService->log(ActivityType::AdminEventCreated, $user, ['event_id' => $event->getId()]);
+            $this->activityService->log(AdminEventCreated::TYPE, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::CreateEvent, $event->getId());
 
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);

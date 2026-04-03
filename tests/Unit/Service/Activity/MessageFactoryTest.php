@@ -2,14 +2,13 @@
 
 namespace Tests\Unit\Service\Activity;
 
+use App\Activity\MessageInterface;
+use App\Activity\UnknownActivityMessage;
 use App\Entity\Activity;
-use App\Enum\ActivityType;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Activity\MessageFactory;
-use App\Service\Activity\MessageInterface;
 use App\Service\Media\ImageHtmlRenderer;
-use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +41,7 @@ class MessageFactoryTest extends TestCase
     public function testBuildReturnsCorrectMessage(): void
     {
         // Configure mocks
-        $activityType = ActivityType::Login;
+        $activityType = 'core.login';
         $meta = ['key' => 'value'];
         $userNames = ['userNames'];
         $eventNames = ['eventNames'];
@@ -76,11 +75,11 @@ class MessageFactoryTest extends TestCase
         static::assertSame($this->message, $result);
     }
 
-    public function testBuildThrowsExceptionWhenNoMatchingMessage(): void
+    public function testBuildReturnsUnknownActivityMessageWhenNoMatchingMessage(): void
     {
         // Configure mocks
-        $activityType = ActivityType::Login;
-        $differentType = ActivityType::ChangedUsername;
+        $activityType = 'core.login';
+        $differentType = 'core.changed_username';
 
         $this->activity->method('getType')->willReturn($activityType);
         $this->message->method('getType')->willReturn($differentType);
@@ -95,11 +94,10 @@ class MessageFactoryTest extends TestCase
             $this->imageRenderer,
         );
 
-        // Expect exception
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Cound not find message for activity type: ' . $activityType->name);
-
         // Call the method under test
-        $factory->build($this->activity);
+        $result = $factory->build($this->activity);
+
+        // Assert an UnknownActivityMessage is returned instead of throwing
+        static::assertInstanceOf(UnknownActivityMessage::class, $result);
     }
 }

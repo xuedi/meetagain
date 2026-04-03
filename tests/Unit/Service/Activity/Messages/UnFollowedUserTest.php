@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\UnFollowedUser;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\UnFollowedUser;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +35,7 @@ class UnFollowedUserTest extends TestCase
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::UnFollowedUser, $subject->getType());
+        static::assertEquals(UnFollowedUser::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }
@@ -59,7 +58,7 @@ class UnFollowedUserTest extends TestCase
 
     public function testCanCatchMissingUserId(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in UnFollowedUser"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.unfollowed_user"));
 
         $subject = new UnFollowedUser();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -69,7 +68,7 @@ class UnFollowedUserTest extends TestCase
     public function testCanCatchNonNumericUserId(): void
     {
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'user_id' has to be numeric in 'UnFollowedUser'"),
+            new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.unfollowed_user'"),
         );
 
         $subject = new UnFollowedUser();

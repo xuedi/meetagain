@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\CommentedOnEvent;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\CommentedOnEvent;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +45,7 @@ class CommentedOnEventTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::CommentedOnEvent, $subject->getType());
+        static::assertEquals(CommentedOnEvent::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
         static::assertEquals($expectedHtml, $subject->render(true));
     }
@@ -67,7 +66,7 @@ class CommentedOnEventTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in CommentedOnEvent"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.commented_on_event"));
 
         $subject = new CommentedOnEvent();
         $subject->injectServices($this->router, $this->imageService, []);
@@ -80,7 +79,7 @@ class CommentedOnEventTest extends TestCase
     {
         // Arrange
         $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'CommentedOnEvent'"),
+            new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.commented_on_event'"),
         );
 
         $subject = new CommentedOnEvent();

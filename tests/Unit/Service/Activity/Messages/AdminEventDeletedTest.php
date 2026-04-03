@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\AdminEventDeleted;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\AdminEventDeleted;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +30,7 @@ class AdminEventDeletedTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::AdminEventDeleted, $subject->getType());
+        static::assertEquals(AdminEventDeleted::TYPE, $subject->getType());
         static::assertEquals('Deleted event: Old Meetup', $subject->render());
         static::assertEquals('Deleted event: Old Meetup', $subject->render(true));
     }
@@ -39,7 +38,7 @@ class AdminEventDeletedTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in AdminEventDeleted"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_deleted"));
 
         $subject = new AdminEventDeleted();
         $subject->injectServices($this->router, $this->imageService, ['event_name' => 'Old Meetup']);
@@ -51,7 +50,7 @@ class AdminEventDeletedTest extends TestCase
     public function testCanCatchMissingEventName(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_name' in meta in AdminEventDeleted"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_name' in meta in core.admin_event_deleted"));
 
         $subject = new AdminEventDeleted();
         $subject->injectServices($this->router, $this->imageService, ['event_id' => 42]);

@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ActivityType;
-use App\Service\Activity\MessageInterface;
-use App\Service\Activity\Messages\AdminCmsPageDeleted;
+use App\Activity\MessageInterface;
+use App\Activity\Messages\AdminCmsPageDeleted;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +30,7 @@ class AdminCmsPageDeletedTest extends TestCase
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
-        static::assertEquals(ActivityType::AdminCmsPageDeleted, $subject->getType());
+        static::assertEquals(AdminCmsPageDeleted::TYPE, $subject->getType());
         static::assertEquals('Deleted CMS page: old-page', $subject->render());
         static::assertEquals('Deleted CMS page: old-page', $subject->render(true));
     }
@@ -39,7 +38,7 @@ class AdminCmsPageDeletedTest extends TestCase
     public function testCanCatchMissingCmsId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_id' in meta in AdminCmsPageDeleted"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_id' in meta in core.admin_cms_page_deleted"));
 
         $subject = new AdminCmsPageDeleted();
         $subject->injectServices($this->router, $this->imageService, ['cms_slug' => 'old-page']);
@@ -51,7 +50,7 @@ class AdminCmsPageDeletedTest extends TestCase
     public function testCanCatchMissingCmsSlug(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_slug' in meta in AdminCmsPageDeleted"));
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_slug' in meta in core.admin_cms_page_deleted"));
 
         $subject = new AdminCmsPageDeleted();
         $subject->injectServices($this->router, $this->imageService, ['cms_id' => 5]);

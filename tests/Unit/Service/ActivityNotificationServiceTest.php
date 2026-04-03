@@ -2,8 +2,10 @@
 
 namespace Tests\Unit\Service;
 
+use App\Activity\Messages\Login;
+use App\Activity\Messages\RsvpYes;
+use App\Activity\Messages\SendMessage;
 use App\Entity\Activity;
-use App\Enum\ActivityType;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Activity\NotificationService as ActivityNotificationService;
@@ -24,7 +26,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $user = new UserStub()->setId(1);
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn($user);
-        $activity->method('getType')->willReturn(ActivityType::RsvpYes);
+        $activity->method('getType')->willReturn(RsvpYes::TYPE);
         $activity->method('getMeta')->willReturn(['event_id' => 42]);
 
         $eventRepoMock = $this->createMock(EventRepository::class);
@@ -55,7 +57,7 @@ final class ActivityNotificationServiceTest extends TestCase
 
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn($sender);
-        $activity->method('getType')->willReturn(ActivityType::SendMessage);
+        $activity->method('getType')->willReturn(SendMessage::TYPE);
         $activity->method('getMeta')->willReturn(['user_id' => 2]);
 
         $userRepoMock = $this->createMock(UserRepository::class);
@@ -82,7 +84,7 @@ final class ActivityNotificationServiceTest extends TestCase
         // Arrange: create activity with default type
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn(new UserStub());
-        $activity->method('getType')->willReturn(ActivityType::Login);
+        $activity->method('getType')->willReturn(Login::TYPE);
         $activity->method('getMeta')->willReturn([]);
 
         $eventRepoMock = $this->createMock(EventRepository::class);

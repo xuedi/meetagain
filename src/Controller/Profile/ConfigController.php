@@ -2,8 +2,8 @@
 
 namespace App\Controller\Profile;
 
+use App\Activity\Messages\PasswordChanged;
 use App\Controller\AbstractController;
-use App\Enum\ActivityType;
 use App\Form\ChangePassword;
 use App\Service\Activity\ActivityService;
 use App\Service\Member\BlockingService;
@@ -37,7 +37,7 @@ final class ConfigController extends AbstractController
                 $this->em->persist($user);
                 $this->em->flush();
 
-                $this->activityService->log(ActivityType::PasswordChanged, $user);
+                $this->activityService->log(PasswordChanged::TYPE, $user);
 
                 $this->addFlash('success', 'Password was changed, please verify by logging in again');
             } else {
