@@ -51,7 +51,7 @@ final class DebuggingController extends AbstractAdminController
             'active' => 'email',
             'emailTypes' => EmailType::cases(),
             'mockData' => $mockData,
-            'languages' => $this->languageService->getFilteredEnabledCodes(),
+            'languages' => $this->languageService->getAdminFilteredEnabledCodes(),
             'defaultType' => EmailType::cases()[0]->value,
         ]);
     }
