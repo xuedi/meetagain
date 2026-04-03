@@ -4,8 +4,10 @@ namespace Plugin\Dinnerclub;
 
 use App\Entity\AdminSection;
 use App\Entity\Link;
+use App\Enum\EventType;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\Repository\EventRepository;
 use Plugin\Dinnerclub\Repository\DinnerRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -17,6 +19,7 @@ class Kernel implements Plugin
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly Environment $twig,
         private readonly DinnerRepository $dinnerRepository,
+        private readonly EventRepository $eventRepository,
     ) {}
 
     public function getPluginKey(): string
@@ -33,6 +36,11 @@ class Kernel implements Plugin
 
     public function getEventTile(int $eventId): ?string
     {
+        $event = $this->eventRepository->find($eventId);
+        if ($event === null || $event->getType() !== EventType::Dinner) {
+            return null;
+        }
+
         $dinner = $this->dinnerRepository->findByEventId($eventId);
 
         return $this->twig->render('@Dinnerclub/tile/event.html.twig', [

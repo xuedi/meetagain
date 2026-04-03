@@ -76,20 +76,12 @@ readonly class DinnerService
         $this->em->flush();
     }
 
-    public function addDishToCourse(DinnerCourse $course, Dish $dish, bool $isPrimary): DinnerCourseItem
+    public function addDishToCourse(DinnerCourse $course, Dish $dish): DinnerCourseItem
     {
-        if ($isPrimary) {
-            foreach ($course->getItems() as $existing) {
-                if ($existing->isPrimary()) {
-                    $existing->setIsPrimary(false);
-                }
-            }
-        }
-
         $item = new DinnerCourseItem();
         $item->setCourse($course);
         $item->setDish($dish);
-        $item->setIsPrimary($isPrimary);
+        $item->setIsPrimary(false);
         $item->setSortOrder($this->itemRepo->getNextSortOrder($course));
 
         $this->em->persist($item);
@@ -116,19 +108,4 @@ readonly class DinnerService
         $this->em->flush();
     }
 
-    public function togglePrimary(DinnerCourseItem $item): void
-    {
-        $newValue = !$item->isPrimary();
-
-        if ($newValue) {
-            foreach ($item->getCourse()->getItems() as $existing) {
-                if ($existing->isPrimary()) {
-                    $existing->setIsPrimary(false);
-                }
-            }
-        }
-
-        $item->setIsPrimary($newValue);
-        $this->em->flush();
-    }
 }
