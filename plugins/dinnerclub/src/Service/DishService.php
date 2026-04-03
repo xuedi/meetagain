@@ -5,9 +5,11 @@ namespace Plugin\Dinnerclub\Service;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dinnerclub\Entity\Dish;
+use Plugin\Dinnerclub\Entity\DishLike;
 use Plugin\Dinnerclub\Entity\DishSuggestion;
 use Plugin\Dinnerclub\Entity\DishSuggestionField;
 use Plugin\Dinnerclub\Entity\DishTranslation;
+use Plugin\Dinnerclub\Repository\DishLikeRepository;
 use Plugin\Dinnerclub\Repository\DishRepository;
 use RuntimeException;
 
@@ -16,6 +18,7 @@ readonly class DishService
     public function __construct(
         private EntityManagerInterface $em,
         private DishRepository $repo,
+        private DishLikeRepository $likeRepo,
     ) {}
 
     public function createDish(
@@ -175,18 +178,44 @@ readonly class DishService
         return count($dish->getSuggestionObjects());
     }
 
-    public function incrementLike(int $dishId): int
+    public function toggleLike(int $dishId, int $userId): bool
     {
         $dish = $this->repo->find($dishId);
         if ($dish === null) {
             throw new RuntimeException('Dish not found');
         }
 
-        $dish->incrementLikes();
-        $this->em->persist($dish);
+        $existing = $this->likeRepo->findByDishAndUser($dish, $userId);
+        if ($existing !== null) {
+            $this->em->remove($existing);
+            $this->em->flush();
+
+            return false;
+        }
+
+        $like = new DishLike();
+        $like->setDish($dish);
+        $like->setUserId($userId);
+        $this->em->persist($like);
         $this->em->flush();
 
-        return $dish->getLikes();
+        return true;
+    }
+
+    /** @return int[] */
+    public function getLikedDishIds(int $userId): array
+    {
+        return $this->likeRepo->findDishIdsByUser($userId);
+    }
+
+    public function isLikedByUser(int $dishId, int $userId): bool
+    {
+        $dish = $this->repo->find($dishId);
+        if ($dish === null) {
+            return false;
+        }
+
+        return $this->likeRepo->findByDishAndUser($dish, $userId) !== null;
     }
 
     public function updateTranslation(
@@ -295,6 +324,12 @@ readonly class DishService
             $this->em->persist($dish);
             $this->em->flush();
         }
+    }
+
+    public function saveBaseData(Dish $dish): void
+    {
+        $this->em->persist($dish);
+        $this->em->flush();
     }
 
     public function detach(Dish $dish): void

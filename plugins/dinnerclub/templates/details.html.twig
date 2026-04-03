@@ -30,10 +30,15 @@
                             </div>
                             <div class="level-right">
                                 <div class="level-item">
-                                    <button class="button like-button" data-dish-id="{{ dish.id }}">
-                                        <span class="icon has-text-danger"><i class="fa-solid fa-heart"></i></span>
-                                        <span class="like-count">{{ dish.likes }}</span>
-                                    </button>
+                                    {% if is_granted('ROLE_USER') %}
+                                        <button class="button is-white like-button"
+                                                data-url="{{ path('plugin_dinnerclub_like', {id: dish.id}) }}"
+                                                data-liked="{{ userLiked ? 'true' : 'false' }}">
+                                            <span class="icon {% if userLiked %}has-text-danger{% else %}has-text-grey-light{% endif %}">
+                                                <i class="fa-solid fa-heart"></i>
+                                            </span>
+                                        </button>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -81,58 +86,24 @@
                         {% endif %}
                     </div>
 
-                    <div class="box">
-                        <h3 class="title is-5">
-                            <span class="icon"><i class="fa-solid fa-globe"></i></span>
-                            <span>Translations</span>
-                        </h3>
-
-                        <table class="table is-fullwidth">
-                            <thead>
-                                <tr>
-                                    <th>Language</th>
-                                    <th>Name</th>
-                                    <th>Phonetic</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for lang in languages %}
-                                    {% set trans = dish.findTranslation(lang) %}
-                                    <tr>
-                                        <td>
-                                            <span class="tag {% if lang == dish.originLang %}is-success{% elseif trans %}is-info{% else %}is-light{% endif %}">
-                                                {{ lang|upper }}
-                                                {% if lang == dish.originLang %}
-                                                    <span class="icon is-small"><i class="fa-solid fa-star"></i></span>
-                                                {% endif %}
-                                            </span>
-                                        </td>
-                                        <td>{{ trans ? trans.name : '-' }}</td>
-                                        <td>{{ trans ? trans.phonetic : '-' }}</td>
-                                        <td>
-                                            {% if is_granted('ROLE_USER') %}
-                                                <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}" class="button is-small">
-                                                    {% if trans %}
-                                                        <span class="icon"><i class="fa-solid fa-pen"></i></span>
-                                                        <span>Edit</span>
-                                                    {% else %}
-                                                        <span class="icon"><i class="fa-solid fa-plus"></i></span>
-                                                        <span>Add</span>
-                                                    {% endif %}
-                                                </a>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
                 <div class="column is-4">
+
                     <div class="box">
-                        <h3 class="title is-5">Info</h3>
+                        <div class="level">
+                            <div class="level-left">
+                                <h3 class="title is-5 mb-0">Info</h3>
+                            </div>
+                            {% if is_granted('ROLE_ORGANIZER') %}
+                            <div class="level-right">
+                                <a href="{{ path('plugin_dinnerclub_edit', {'id': dish.id}) }}" class="button is-link">
+                                    <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                                    <span>Edit</span>
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
                         <p><strong>Added by:</strong> {{ get_user_name(dish.createdBy) }}</p>
                         <p><strong>Added:</strong> {{ dish.createdAt|time_diff }}</p>
                         <p><strong>Original language:</strong> {{ dish.originLang|upper }}</p>
@@ -146,8 +117,8 @@
                             <span class="icon"><i class="fa-solid fa-list"></i></span>
                             <span>Add to List</span>
                         </h3>
-                        <div class="field">
-                            <div class="control">
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
                                 <div class="select is-fullwidth">
                                     <select id="add-to-list-select">
                                         <option value="">Select a list...</option>
@@ -159,12 +130,14 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="control">
+                                <button class="button is-link add-to-list-btn"
+                                        data-url-template="{{ path('plugin_dinnerclub_lists_add_dish', {'listId': '__LIST__', 'dishId': dish.id}) }}">
+                                    <span>Add</span>
+                                </button>
+                            </div>
                         </div>
-                        <button class="button is-link is-fullwidth add-to-list-btn" data-dish-id="{{ dish.id }}">
-                            <span class="icon"><i class="fa-solid fa-plus"></i></span>
-                            <span>Add to List</span>
-                        </button>
-                        <p class="mt-2 is-size-7 has-text-centered">
+                        <p class="is-size-7 has-text-centered">
                             <a href="{{ path('plugin_dinnerclub_lists_create') }}">Create new list</a>
                         </p>
                     </div>
@@ -174,7 +147,7 @@
                             <span class="icon"><i class="fa-solid fa-list"></i></span>
                             <span>Add to List</span>
                         </h3>
-                        <p class="has-text-grey is-size-7 mb-3">You don't have any lists yet.</p>
+                        <p class="has-text-grey is-size-7 mb-3">You don't have any lists yet. Add a new one like: favorites, plan to cook, want to try, best hungover food</p>
                         <a href="{{ path('plugin_dinnerclub_lists_create') }}" class="button is-link is-fullwidth">
                             <span class="icon"><i class="fa-solid fa-plus"></i></span>
                             <span>Create a List</span>
@@ -194,21 +167,12 @@
                                 <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}"
                                    class="button {% if trans %}is-success is-light{% endif %}">
                                     {{ lang|upper }}
-                                    {% if trans %}
-                                        <span class="icon is-small"><i class="fa-solid fa-check"></i></span>
-                                    {% endif %}
                                 </a>
                             {% endfor %}
                         </div>
                     </div>
                     {% endif %}
 
-                    <div class="box">
-                        <a href="{{ path('app_plugin_dinnerclub') }}" class="button is-fullwidth">
-                            <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
-                            <span>Back to Dishes</span>
-                        </a>
-                    </div>
                 </div>
             </div>
 
@@ -217,21 +181,24 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Like button
+        // Like toggle button
         document.querySelectorAll('.like-button').forEach(function(button) {
             button.addEventListener('click', function() {
-                const dishId = this.dataset.dishId;
-                fetch('/dinnerclub/like/' + dishId, {
+                fetch(button.dataset.url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 })
                 .then(response => response.json())
                 .then(data => {
-                    document.querySelectorAll('.like-count, .like-count-display').forEach(function(el) {
-                        el.textContent = data.likes;
-                    });
+                    const icon = button.querySelector('.icon');
+                    if (data.liked) {
+                        icon.classList.remove('has-text-grey-light');
+                        icon.classList.add('has-text-danger');
+                    } else {
+                        icon.classList.remove('has-text-danger');
+                        icon.classList.add('has-text-grey-light');
+                    }
+                    button.dataset.liked = data.liked ? 'true' : 'false';
                 });
             });
         });
@@ -240,7 +207,6 @@
         const addToListBtn = document.querySelector('.add-to-list-btn');
         if (addToListBtn) {
             addToListBtn.addEventListener('click', function() {
-                const dishId = this.dataset.dishId;
                 const select = document.getElementById('add-to-list-select');
                 const listId = select.value;
 
@@ -249,19 +215,18 @@
                     return;
                 }
 
-                fetch('/dinnerclub/lists/' + listId + '/add/' + dishId, {
+                const url = this.dataset.urlTemplate.replace('__LIST__', listId);
+                fetch(url, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'}
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Mark as added in dropdown
                         const option = select.querySelector('option[value="' + listId + '"]');
                         option.disabled = true;
                         option.textContent += ' (already added)';
                         select.value = '';
-                        alert('Dish added to list!');
                     } else {
                         alert(data.message);
                     }

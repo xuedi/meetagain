@@ -66,7 +66,7 @@ class ConfigServiceTest extends TestCase
         ];
         yield 'plugin dish preview' => [
             ImageType::PluginDishPreview,
-            [[1024, 768], [400, 400], [100, 100], [50, 50]],
+            [[1024, 768], [600, 400], [400, 400], [100, 100], [50, 50]],
         ];
         yield 'plugin dish gallery' => [
             ImageType::PluginDishGallery,
@@ -110,6 +110,7 @@ class ConfigServiceTest extends TestCase
         yield 'cms block 432x432 valid' => [ImageType::CmsBlock, 432, 432, true];
         yield 'cms block 80x80 valid' => [ImageType::CmsBlock, 80, 80, true];
         yield 'cms block 400x400 invalid' => [ImageType::CmsBlock, 400, 400, false];
+        yield 'plugin dish preview 600x400 valid' => [ImageType::PluginDishPreview, 600, 400, true];
         yield 'plugin dish preview 100x100 valid' => [ImageType::PluginDishPreview, 100, 100, true];
         yield 'plugin dish preview 50x50 valid' => [ImageType::PluginDishPreview, 50, 50, true];
         yield 'plugin dish preview 80x80 invalid' => [ImageType::PluginDishPreview, 80, 80, false];
