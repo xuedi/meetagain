@@ -9,6 +9,7 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
+                <th>{{ 'Flag'|trans }}</th>
                 <th>{{ 'Code'|trans }}</th>
                 <th>{{ 'Name'|trans }}</th>
                 <th>{{ 'Has Tile'|trans }}</th>
@@ -24,6 +25,9 @@
             <tbody>
             {% for language in languages %}
                 <tr>
+                    <td>
+                        <img src="/images/flags/{{ language.code }}.svg" width="32" height="24" alt="{{ language.code }}"/>
+                    </td>
                     <td>{{ language.code }}</td>
                     <td>{{ language.name }}</td>
                     <td>
