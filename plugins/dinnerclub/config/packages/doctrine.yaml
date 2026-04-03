@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Dinnerclub:
+                        dir: "%kernel.project_dir%/plugins/dinnerclub/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Dinnerclub\Entity
+                        alias: Dinnerclub
+
+doctrine_migrations:
+    migrations_paths: # add for diff, migrate has own config for parameter
+        PluginDinnerclubMigrations: "%kernel.project_dir%/plugins/dinnerclub/migrations"
