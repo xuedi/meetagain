@@ -19,7 +19,7 @@ final class Version20260403300001 extends AbstractMigration
             dish_id INT NOT NULL,
             user_id INT NOT NULL,
             UNIQUE INDEX unique_dish_user_like (dish_id, user_id),
-            INDEX IDX_dish_like_dish (dish_id),
+            INDEX IDX_2661FFA2148EB0CB (dish_id),
             PRIMARY KEY(id),
             CONSTRAINT FK_dish_like_dish FOREIGN KEY (dish_id) REFERENCES dish (id) ON DELETE CASCADE
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
