@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ORM\Index(fields: ['type'])]
 class Activity
 {
     #[ORM\Id]
