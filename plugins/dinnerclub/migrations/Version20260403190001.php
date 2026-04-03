@@ -20,7 +20,6 @@ final class Version20260403190001 extends AbstractMigration
         $this->addSql('ALTER TABLE dinner_course_item RENAME INDEX idx_dinner_course_item_course TO IDX_FA28170591CC992');
         $this->addSql('ALTER TABLE dinner_course_item RENAME INDEX idx_dinner_course_item_dish TO IDX_FA28170148EB0CB');
         $this->addSql('ALTER TABLE dish CHANGE likes likes INT NOT NULL');
-        $this->addSql('ALTER TABLE dish_like RENAME INDEX idx_dish_like_dish TO IDX_2661FFA2148EB0CB');
         $this->addSql('ALTER TABLE dish_list CHANGE created_at created_at DATETIME NOT NULL');
     }
 
@@ -32,7 +31,6 @@ final class Version20260403190001 extends AbstractMigration
         $this->addSql('ALTER TABLE dinner_course_item RENAME INDEX idx_fa28170591cc992 TO IDX_dinner_course_item_course');
         $this->addSql('ALTER TABLE dinner_course_item RENAME INDEX idx_fa28170148eb0cb TO IDX_dinner_course_item_dish');
         $this->addSql('ALTER TABLE dish CHANGE likes likes INT DEFAULT 0 NOT NULL');
-        $this->addSql('ALTER TABLE dish_like RENAME INDEX idx_2661ffa2148eb0cb TO IDX_dish_like_dish');
         $this->addSql('ALTER TABLE dish_list CHANGE created_at created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
     }
 }
