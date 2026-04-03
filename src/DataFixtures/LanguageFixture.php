@@ -84,9 +84,13 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
         ['code' => 'ga', 'name' => 'Irish',        'sortOrder' => 62],
         ['code' => 'cy', 'name' => 'Welsh',        'sortOrder' => 63],
         ['code' => 'mt', 'name' => 'Maltese',      'sortOrder' => 64],
-        ['code' => 'ca', 'name' => 'Catalan',      'sortOrder' => 65],
-        ['code' => 'eu', 'name' => 'Basque',       'sortOrder' => 66],
-        ['code' => 'gl', 'name' => 'Galician',     'sortOrder' => 67],
+        ['code' => 'ca', 'name' => 'Catalan',        'sortOrder' => 65],
+        ['code' => 'eu', 'name' => 'Basque',         'sortOrder' => 66],
+        ['code' => 'gl', 'name' => 'Galician',       'sortOrder' => 67],
+        ['code' => 'lb', 'name' => 'Luxembourgish',  'sortOrder' => 68],
+        ['code' => 'rm', 'name' => 'Romansh',        'sortOrder' => 69],
+        ['code' => 'fo', 'name' => 'Faroese',        'sortOrder' => 70],
+        ['code' => 'fy', 'name' => 'Frisian',        'sortOrder' => 71],
     ];
 
     public function __construct(

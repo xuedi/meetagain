@@ -72,9 +72,13 @@ final class Version20260403200001 extends AbstractMigration
             ['ga', 'Irish',       62],
             ['cy', 'Welsh',       63],
             ['mt', 'Maltese',     64],
-            ['ca', 'Catalan',     65],
-            ['eu', 'Basque',      66],
-            ['gl', 'Galician',    67],
+            ['ca', 'Catalan',        65],
+            ['eu', 'Basque',         66],
+            ['gl', 'Galician',       67],
+            ['lb', 'Luxembourgish',  68],
+            ['rm', 'Romansh',        69],
+            ['fo', 'Faroese',        70],
+            ['fy', 'Frisian',        71],
         ];
 
         foreach ($languages as [$code, $name, $sortOrder]) {
@@ -90,7 +94,8 @@ final class Version20260403200001 extends AbstractMigration
         $codes = ['fr','es','it','pt','nl','pl','ru','ja','ko','ar','tr','sv','no','da','fi',
                   'uk','cs','hu','ro','el','bg','hr','sk','hi','vi','id','th','ms','he','fa',
                   'sr','sl','lt','lv','et','is','af','sw','bn','ur','ta','my','km','ka','hy',
-                  'az','be','mk','sq','mn','si','lo','ga','cy','mt','ca','eu','gl'];
+                  'az','be','mk','sq','mn','si','lo','ga','cy','mt','ca','eu','gl',
+                  'lb','rm','fo','fy'];
 
         $placeholders = implode(',', array_fill(0, count($codes), '?'));
         $this->addSql("DELETE FROM language WHERE code IN ($placeholders)", $codes);
