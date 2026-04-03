@@ -2,8 +2,12 @@
 
 namespace Plugin\Bookclub\Controller;
 
+use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Repository\EventRepository;
+use Plugin\Bookclub\Activity\Messages\PollClosed;
+use Plugin\Bookclub\Activity\Messages\PollCreated;
+use Plugin\Bookclub\Activity\Messages\PollVoteCast;
 use Plugin\Bookclub\Entity\SuggestionStatus;
 use Plugin\Bookclub\Entity\ViewType;
 use Plugin\Bookclub\Form\PollCreateType;
@@ -24,6 +28,7 @@ final class PollController extends AbstractController
         private readonly SuggestionService $suggestionService,
         private readonly BookService $bookService,
         private readonly EventRepository $eventRepository,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('/list', name: 'app_plugin_bookclub_poll_list', methods: ['GET'])]
@@ -110,9 +115,17 @@ final class PollController extends AbstractController
         }
 
         $user = $this->getAuthedUser();
+        $suggestion = $this->suggestionService->get($suggestionId);
 
         try {
             $this->pollService->vote($activePoll->getId(), $suggestionId, $user->getId());
+            if ($suggestion !== null) {
+                $this->activityService->log(PollVoteCast::TYPE, $user, [
+                    'poll_id' => $activePoll->getId(),
+                    'book_id' => $suggestion->getBook()->getId(),
+                    'book_title' => $suggestion->getBook()->getTitle(),
+                ]);
+            }
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }
@@ -154,7 +167,11 @@ final class PollController extends AbstractController
             $user = $this->getAuthedUser();
 
             try {
-                $this->pollService->create($suggestionIds, $bookIds, $user->getId(), $eventId);
+                $poll = $this->pollService->create($suggestionIds, $bookIds, $user->getId(), $eventId);
+                $this->activityService->log(PollCreated::TYPE, $user, [
+                    'poll_id' => $poll->getId(),
+                    'event_id' => $poll->getEventId(),
+                ]);
                 $this->addFlash('success', 'Poll created. Members can now vote.');
 
                 return $this->redirectToRoute('app_plugin_bookclub_poll');
@@ -192,9 +209,17 @@ final class PollController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function close(int $id): Response
     {
+        $poll = $this->pollService->get($id);
+
         try {
             $winner = $this->pollService->close($id);
             $this->addFlash('success', 'Poll closed. Winner: ' . $winner->getBook()->getTitle());
+            if ($poll !== null) {
+                $this->activityService->log(PollClosed::TYPE, $this->getAuthedUser(), [
+                    'poll_id' => $id,
+                    'event_id' => $poll->getEventId(),
+                ]);
+            }
         } catch (RuntimeException $e) {
             $this->addFlash('danger', $e->getMessage());
         }

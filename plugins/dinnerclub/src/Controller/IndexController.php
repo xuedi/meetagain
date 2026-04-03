@@ -2,8 +2,11 @@
 
 namespace Plugin\Dinnerclub\Controller;
 
+use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Service\Config\LanguageService;
+use Plugin\Dinnerclub\Activity\Messages\DishLiked;
+use Plugin\Dinnerclub\Activity\Messages\DishUnliked;
 use Plugin\Dinnerclub\Entity\Dish;
 use Plugin\Dinnerclub\Entity\ViewType;
 use Plugin\Dinnerclub\Repository\DishRepository;
@@ -23,6 +26,7 @@ final class IndexController extends AbstractController
         private readonly LanguageService $languageService,
         private readonly DishService $dishService,
         private readonly DishListService $listService,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('', name: 'app_plugin_dinnerclub', methods: ['GET'])]
@@ -85,7 +89,15 @@ final class IndexController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function like(int $id): JsonResponse
     {
-        $liked = $this->dishService->toggleLike($id, $this->getAuthedUser()->getId());
+        $dish = $this->dishService->getDish($id);
+        $user = $this->getAuthedUser();
+        $liked = $this->dishService->toggleLike($id, $user->getId());
+
+        $type = $liked ? DishLiked::TYPE : DishUnliked::TYPE;
+        $this->activityService->log($type, $user, [
+            'dish_id' => $id,
+            'dish_name' => $dish !== null ? $this->getDishName($dish) : '[unknown]',
+        ]);
 
         return new JsonResponse(['liked' => $liked]);
     }
@@ -106,4 +118,18 @@ final class IndexController extends AbstractController
         return $this->redirectToRoute('app_plugin_dinnerclub');
     }
 
+    private function getDishName(Dish $dish): string
+    {
+        $originLang = $dish->getOriginLang();
+        if ($originLang !== null) {
+            $translation = $dish->findTranslation($originLang);
+            if ($translation !== null) {
+                return $translation->getName();
+            }
+        }
+
+        $first = $dish->getTranslations()->first();
+
+        return $first !== false ? $first->getName() : '[unknown]';
+    }
 }

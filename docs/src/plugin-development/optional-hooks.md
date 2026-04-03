@@ -19,6 +19,8 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `EventFilterFormContributorInterface` | Add fields to the event filter form | `addFields()` |
 | `NotificationProviderInterface` | Add counts to the notification bell | `getNotifications()` |
 | `EntityActionInterface` | React to core entity lifecycle events | `handleEntityAction()` |
+| `ActivityMetaEnricherInterface` | Enrich metadata on all activity types | `enrich()` |
+| `MessageInterface` | Define a new activity type with display rendering | `getType()`, `validate()`, `render()` |
 
 ---
 
@@ -460,3 +462,92 @@ readonly class MembershipActionHandler implements EntityActionInterface
 !!! tip
     Return `null` from the `default` branch of your `match` — it signals "nothing to do"
     without throwing an error for unknown future actions.
+
+---
+
+## Activity Logging
+
+### Adding activity message types
+
+Plugins define their own activity types by creating message classes. `MessageFactory` auto-discovers
+all `MessageInterface` implementations — no service configuration needed.
+
+**File location:** `plugins/<name>/src/Activity/Messages/<ClassName>.php`
+
+**Naming convention:** Type keys follow `<plugin_key>.<action>` (e.g. `bookclub.suggestion_created`).
+
+```php
+namespace Plugin\YourPlugin\Activity\Messages;
+
+use App\Activity\MessageAbstract;
+
+class ItemCreated extends MessageAbstract
+{
+    public const string TYPE = 'yourplugin.item_created';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
+    public function validate(): MessageAbstract
+    {
+        $this->ensureHasKey('item_id');
+        $this->ensureIsNumeric('item_id');
+
+        return $this;
+    }
+
+    protected function renderText(): string
+    {
+        return sprintf('Created item #%d', $this->meta['item_id']);
+    }
+
+    protected function renderHtml(): string
+    {
+        return sprintf('Created item <strong>#%d</strong>', $this->meta['item_id']);
+    }
+}
+```
+
+Then call `ActivityService::log()` from your controller after the state-changing action:
+
+```php
+$this->activityService->log(ItemCreated::TYPE, $user, ['item_id' => $item->getId()]);
+```
+
+!!! warning
+    When logging destructive actions (delete, reject), read the entity name/title **before**
+    calling the service method, since the entity may be removed during the operation.
+
+---
+
+### Enriching activity metadata
+
+Implement `ActivityMetaEnricherInterface` to inject context into **all** activity types — for
+example, adding the current group or domain to every logged action.
+
+```php
+namespace Plugin\YourPlugin\Activity;
+
+use App\Activity\ActivityMetaEnricherInterface;
+use App\Entity\User;
+
+readonly class GroupContextEnricher implements ActivityMetaEnricherInterface
+{
+    public function enrich(string $type, User $user, array $meta): array
+    {
+        $groupId = $this->resolveCurrentGroupId();
+        if ($groupId === null) {
+            return [];
+        }
+
+        return ['_yourplugin_group_id_' => $groupId];
+    }
+}
+```
+
+**Key rules:**
+- Return only the keys to **add**. The original caller's keys always win.
+- Use a `_<plugin_key>_` prefix to avoid collisions with other plugins.
+- Must not throw — enrichment is best-effort. Failures are logged as warnings.
