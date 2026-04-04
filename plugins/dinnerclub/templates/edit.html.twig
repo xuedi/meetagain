@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Dish{% endblock %}
+{% block title %}{{ "Edit Dish"|trans }} - {{ dish.getTranslatedName(dish.originLang ?? app.locale) }}{% endblock %}
 
 {% block body %}
 
