@@ -38,23 +38,19 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if language.enabled %}
-                            <span class="tag is-success">{{ 'Enabled'|trans }}</span>
-                        {% else %}
-                            <span class="tag is-warning">{{ 'Disabled'|trans }}</span>
-                        {% endif %}
+                        <a href="{{ path('app_admin_language_toggle', {'id': language.id}) }}"
+                           title="{{ language.enabled ? 'Disable'|trans : 'Enable'|trans }}">
+                            {% if language.enabled %}
+                                <span class="tag is-success">{{ 'Enabled'|trans }}</span>
+                            {% else %}
+                                <span class="tag">{{ 'Disabled'|trans }}</span>
+                            {% endif %}
+                        </a>
                     </td>
                     <td>{{ language.sortOrder }}</td>
                     <td>
                         <a href="{{ path('app_admin_language_edit', {'id': language.id}) }}">
                             <span class="icon"><i class="fa fa-edit"></i></span>
-                        </a>
-                        <a href="{{ path('app_admin_language_toggle', {'id': language.id}) }}"
-                           class="ml-2"
-                           title="{{ language.enabled ? 'Disable'|trans : 'Enable'|trans }}">
-                            <span class="icon">
-                                <i class="fa {{ language.enabled ? 'fa-eye-slash' : 'fa-eye' }}"></i>
-                            </span>
                         </a>
                     </td>
                 </tr>
