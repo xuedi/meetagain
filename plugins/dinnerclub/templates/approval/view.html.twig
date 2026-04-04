@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Review Dish"|trans }} - {{ dish.getTranslatedName(dish.originLang ?? app.locale) }}{% endblock %}
+{% block title %}{{ "Review Dish"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
 {% block body %}
 
@@ -11,7 +11,7 @@
                 <ul>
                     <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
                     <li><a href="{{ path('plugin_dinnerclub_approval_pending') }}">Pending</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</a></li>
                 </ul>
             </nav>
 
@@ -24,20 +24,20 @@
                         </h1>
 
                         <div class="content">
-                            <h2>{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</h2>
+                            <h2>{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</h2>
 
-                            {% if dish.getPhonetic(dish.originLang ?? app.locale) %}
-                                <p><strong>Phonetic:</strong> {{ dish.getPhonetic(dish.originLang ?? app.locale) }}</p>
+                            {% if dish.getPhonetic() %}
+                                <p><strong>Phonetic:</strong> {{ dish.getPhonetic() }}</p>
                             {% endif %}
 
-                            {% if dish.getTranslatedDescription(dish.originLang ?? app.locale) %}
+                            {% if dish.getTranslatedDescription(app.locale) ?: dish.getAnyTranslatedDescription() %}
                                 <p><strong>Description:</strong></p>
-                                <blockquote>{{ dish.getTranslatedDescription(dish.originLang ?? app.locale)|nl2br }}</blockquote>
+                                <blockquote>{{ (dish.getTranslatedDescription(app.locale) ?: dish.getAnyTranslatedDescription())|nl2br }}</blockquote>
                             {% endif %}
 
-                            {% if dish.getTranslatedRecipe(dish.originLang ?? app.locale) %}
+                            {% if dish.getTranslatedRecipe(app.locale) ?: dish.getAnyTranslatedRecipe() %}
                                 <p><strong>Recipe:</strong></p>
-                                <blockquote>{{ dish.getTranslatedRecipe(dish.originLang ?? app.locale)|nl2br }}</blockquote>
+                                <blockquote>{{ (dish.getTranslatedRecipe(app.locale) ?: dish.getAnyTranslatedRecipe())|nl2br }}</blockquote>
                             {% endif %}
 
                             {% if dish.origin %}
@@ -73,7 +73,9 @@
                         <h3 class="title is-5">Submission Info</h3>
                         <p><strong>Submitted by:</strong> {{ get_user_name(dish.createdBy) }}</p>
                         <p><strong>Submitted:</strong> {{ dish.createdAt|time_diff }}</p>
-                        <p><strong>Original Language:</strong> {{ dish.originLang|upper }}</p>
+                        {% if dish.pronunciationSystem %}
+                        <p><strong>Pronunciation:</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

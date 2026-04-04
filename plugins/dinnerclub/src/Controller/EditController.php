@@ -39,7 +39,6 @@ final class EditController extends AbstractController
         $form = $this->createForm(DishTranslationType::class, null, [
             'data' => [
                 'name' => $existingTranslation?->getName() ?? '',
-                'phonetic' => $existingTranslation?->getPhonetic() ?? '',
                 'description' => $existingTranslation?->getDescription() ?? '',
                 'recipe' => $existingTranslation?->getRecipe() ?? '',
             ],
@@ -60,7 +59,6 @@ final class EditController extends AbstractController
                 userId: $user->getId(),
                 isManager: $isManager,
                 name: $form->get('name')->getData(),
-                phonetic: $form->get('phonetic')->getData(),
                 description: $form->get('description')->getData(),
                 recipe: $form->get('recipe')->getData(),
             );
@@ -100,16 +98,6 @@ final class EditController extends AbstractController
 
     private function getDishName(Dish $dish): string
     {
-        $originLang = $dish->getOriginLang();
-        if ($originLang !== null) {
-            $translation = $dish->findTranslation($originLang);
-            if ($translation !== null) {
-                return $translation->getName();
-            }
-        }
-
-        $first = $dish->getTranslations()->first();
-
-        return $first !== false ? $first->getName() : '[unknown]';
+        return $dish->getAnyTranslatedName() ?: '[unknown]';
     }
 }

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Review Suggestions - {{ dish.getTranslatedName(dish.originLang ?? app.locale) }}{% endblock %}
+{% block title %}Review Suggestions - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
 {% block body %}
 
@@ -11,7 +11,7 @@
                 <ul>
                     <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
                     <li><a href="{{ path('plugin_dinnerclub_suggestions_list') }}">Suggestions</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</a></li>
                 </ul>
             </nav>
 
@@ -21,7 +21,7 @@
                         <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
                         <span>Review Suggestions</span>
                     </h1>
-                    <p class="subtitle">{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</p>
+                    <p class="subtitle">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</p>
 
                     {% if suggestions is empty %}
                         <div class="notification is-info is-light">
@@ -63,7 +63,7 @@
                                         {% if suggestion.field.value == 'name' %}
                                             {% set currentValue = trans.name %}
                                         {% elseif suggestion.field.value == 'phonetic' %}
-                                            {% set currentValue = trans.phonetic %}
+                                            {% set currentValue = dish.phonetic %}
                                         {% elseif suggestion.field.value == 'description' %}
                                             {% set currentValue = trans.description %}
                                         {% elseif suggestion.field.value == 'recipe' %}
@@ -104,7 +104,9 @@
                         {% if dish.previewImage %}
                             {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
                         {% endif %}
-                        <p class="mt-3"><strong>Original language:</strong> {{ dish.originLang|upper }}</p>
+                        {% if dish.pronunciationSystem %}
+                        <p class="mt-3"><strong>Pronunciation:</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
+                        {% endif %}
                         {% if dish.origin %}
                             <p><strong>Origin:</strong> {{ dish.origin }}</p>
                         {% endif %}
