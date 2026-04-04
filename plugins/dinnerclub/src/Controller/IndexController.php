@@ -79,7 +79,7 @@ final class IndexController extends AbstractController
 
         return $this->render('@Dinnerclub/details.html.twig', [
             'dish' => $dish,
-            'languages' => $this->languageService->getEnabledCodes(),
+            'languages' => $this->languageService->getFilteredEnabledCodes(),
             'userLists' => $userLists,
             'userLiked' => $userLiked,
         ]);
