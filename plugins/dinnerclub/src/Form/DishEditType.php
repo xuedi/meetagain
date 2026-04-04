@@ -21,7 +21,7 @@ class DishEditType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $codes = $this->languageService->getEnabledCodes();
+        $codes = $this->languageService->getFilteredEnabledCodes();
         $choices = array_combine(array_map('strtoupper', $codes), $codes);
 
         $builder

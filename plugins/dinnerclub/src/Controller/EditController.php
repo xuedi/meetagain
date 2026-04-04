@@ -85,7 +85,7 @@ final class EditController extends AbstractController
             'dish' => $dish,
             'form' => $form,
             'targetLanguage' => $lang,
-            'availableLanguages' => $this->languageService->getEnabledCodes(),
+            'availableLanguages' => $this->languageService->getFilteredEnabledCodes(),
             'existingTranslation' => $existingTranslation,
         ]);
     }
