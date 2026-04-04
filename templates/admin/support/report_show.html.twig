@@ -6,11 +6,17 @@
 
         {% include 'admin/support/_tabs_navigation.html.twig' with {'activeSection': 'reports'} %}
 
-        <div class="mb-4">
+        <div class="mb-4 is-flex is-gap-3">
             <a href="{{ path('app_admin_support_reports') }}" class="button is-small">
                 <span class="icon"><i class="fa fa-arrow-left"></i></span>
                 <span>Back</span>
             </a>
+            {% if report.image %}
+                <a href="{{ path('app_admin_system_images_show', {'id': report.image.id}) }}" class="button is-small">
+                    <span class="icon"><i class="fa fa-eye"></i></span>
+                    <span>Image details</span>
+                </a>
+            {% endif %}
         </div>
 
         <div class="columns">

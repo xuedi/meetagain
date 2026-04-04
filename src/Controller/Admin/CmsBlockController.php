@@ -13,6 +13,7 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\Cms\CmsBlockService;
 use App\Service\Cms\CmsPageCacheService;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
@@ -43,6 +44,7 @@ final class CmsBlockController extends AbstractAdminController
         private readonly LoggerInterface $logger,
         private readonly ImageService $imageService,
         private readonly ValidatorInterface $validator,
+        private readonly ImageLocationService $imageLocationService,
     ) {}
 
     #[Route('/block/{blockId}/edit', name: 'app_admin_cms_block_edit', methods: ['GET'])]
@@ -110,9 +112,14 @@ final class CmsBlockController extends AbstractAdminController
             throw $this->createAccessDeniedException('Block type does not support images');
         }
 
+        $oldImageId = $block->getImage()?->getId();
         $block->setImage(null);
         $this->em->persist($block);
         $this->em->flush();
+
+        if ($oldImageId !== null) {
+            $this->imageLocationService->removeLocation($oldImageId, ImageType::CmsBlock, $blockId);
+        }
 
         $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
 
@@ -254,10 +261,16 @@ final class CmsBlockController extends AbstractAdminController
                     $this->imageService->createThumbnails($image, ImageType::CmsCardImage);
 
                     $json = $block->getJson();
+                    $oldCardImageId = $json['cards'][$slot]['image']['id'] ?? null;
                     $json['cards'][$slot]['image'] = ['id' => $image->getId(), 'hash' => $image->getHash()];
                     $block->setJson($json);
                     $this->em->persist($block);
                     $this->em->flush();
+
+                    if ($oldCardImageId !== null) {
+                        $this->imageLocationService->removeLocation((int) $oldCardImageId, ImageType::CmsCardImage, $blockId);
+                    }
+                    $this->imageLocationService->addLocation($image->getId(), ImageType::CmsCardImage, $blockId);
                 } else {
                     $this->addFlash('danger', 'Invalid file: ' . $violations->get(0)->getMessage());
                 }
@@ -283,10 +296,15 @@ final class CmsBlockController extends AbstractAdminController
 
         $json = $block->getJson();
         if (isset($json['cards'][$slot])) {
+            $oldCardImageId = $json['cards'][$slot]['image']['id'] ?? null;
             $json['cards'][$slot]['image'] = null;
             $block->setJson($json);
             $this->em->persist($block);
             $this->em->flush();
+
+            if ($oldCardImageId !== null) {
+                $this->imageLocationService->removeLocation((int) $oldCardImageId, ImageType::CmsCardImage, $blockId);
+            }
         }
 
         $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
@@ -344,6 +362,8 @@ final class CmsBlockController extends AbstractAdminController
                 $block->setJson($json);
                 $this->em->persist($block);
                 $this->em->flush();
+
+                $this->imageLocationService->addLocation($image->getId(), ImageType::CmsGallery, $blockId);
             }
         }
 
@@ -371,6 +391,8 @@ final class CmsBlockController extends AbstractAdminController
         $block->setJson($json);
         $this->em->persist($block);
         $this->em->flush();
+
+        $this->imageLocationService->removeLocation($imageId, ImageType::CmsGallery, $blockId);
 
         $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
 

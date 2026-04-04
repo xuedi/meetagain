@@ -10,6 +10,7 @@ use App\Entity\Language;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -31,6 +32,7 @@ final class LanguageController extends AbstractAdminController
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
         private readonly ImageService $imageService,
+        private readonly ImageLocationService $imageLocationService,
     ) {}
 
     #[Route('', name: 'app_admin_language')]
@@ -54,6 +56,12 @@ final class LanguageController extends AbstractAdminController
 
             $this->em->persist($language);
             $this->em->flush();
+
+            $newTile = $language->getTileImage();
+            if ($newTile !== null) {
+                $this->imageLocationService->addLocation($newTile->getId(), ImageType::LanguageTile, $language->getId());
+            }
+
             $this->languageService->invalidateCache();
 
             $this->addFlash('success', 'Language added successfully');
@@ -76,9 +84,19 @@ final class LanguageController extends AbstractAdminController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $oldTileId = $language->getTileImage()?->getId();
             $this->handleImageUpload($form, $language);
 
             $this->em->flush();
+
+            $newTile = $language->getTileImage();
+            if ($newTile !== null && $newTile->getId() !== $oldTileId) {
+                if ($oldTileId !== null) {
+                    $this->imageLocationService->removeLocation($oldTileId, ImageType::LanguageTile, $language->getId());
+                }
+                $this->imageLocationService->addLocation($newTile->getId(), ImageType::LanguageTile, $language->getId());
+            }
+
             $this->languageService->invalidateCache();
 
             $this->addFlash('success', 'Language updated successfully');

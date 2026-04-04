@@ -1,0 +1,115 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'images'} %}
+
+        <div class="mb-4">
+            <a href="{{ path('app_admin_system_images') }}" class="button is-small">
+                <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                <span>Back</span>
+            </a>
+        </div>
+
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td><code>{{ image.id }}</code></td>
+                </tr>
+                <tr>
+                    <th>Hash</th>
+                    <td><code>{{ image.hash }}</code></td>
+                </tr>
+                <tr>
+                    <th>Type</th>
+                    <td><span class="tag is-light">{{ image.type.name }}</span></td>
+                </tr>
+                <tr>
+                    <th>MimeType</th>
+                    <td>{{ image.mimeType }}</td>
+                </tr>
+                <tr>
+                    <th>Extension</th>
+                    <td>{{ image.extension }}</td>
+                </tr>
+                <tr>
+                    <th>File size</th>
+                    <td>{{ image.size | format_bytes }}</td>
+                </tr>
+                <tr>
+                    <th>Uploader</th>
+                    <td>
+                        <a href="{{ path('app_admin_member_edit', {'id': image.uploader.id}) }}">
+                            {{ image.uploader.email }}
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Created at</th>
+                    <td>{{ image.createdAt | date('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr>
+                    <th>Updated at</th>
+                    <td>
+                        {% if image.updatedAt %}
+                            {{ image.updatedAt | date('Y-m-d H:i:s') }}
+                        {% else %}
+                            <span class="has-text-grey">&mdash;</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Reported</th>
+                    <td>
+                        {% if image.reported %}
+                            <span class="tag is-danger is-light">{{ image.reported.name }}</span>
+                        {% else %}
+                            <span class="has-text-grey">&mdash;</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 class="subtitle mt-5">Preview</h2>
+        {% include '_components/image.html.twig' with {'image': image} %}
+
+        <h2 class="subtitle mt-5">Locations</h2>
+        {% if locations is empty %}
+            <div class="notification is-info is-light">
+                No locations indexed yet &mdash; run the nightly discovery.
+            </div>
+        {% else %}
+            <table class="table is-fullwidth is-narrow">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Location ID</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for location in locations %}
+                        <tr>
+                            <td><span class="tag is-light">{{ location.locationType.name }}</span></td>
+                            <td><code>{{ location.locationId }}</code></td>
+                            <td>
+                                {% set link = editLinks[location.id] ?? null %}
+                                {% if link %}
+                                    <a href="{{ path(link.route, link.params) }}">
+                                        <span class="icon"><i class="fa fa-eye"></i></span>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
