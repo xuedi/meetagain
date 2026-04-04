@@ -122,9 +122,6 @@
                                 <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}"
                                    class="button {% if lang == targetLanguage %}is-link{% endif %} {% if dish.findTranslation(lang) %}is-success is-light{% endif %}">
                                     {{ lang|upper }}
-                                    {% if dish.findTranslation(lang) %}
-                                        <span class="icon is-small"><i class="fa-solid fa-check"></i></span>
-                                    {% endif %}
                                 </a>
                             {% endfor %}
                         </div>
