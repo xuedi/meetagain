@@ -2,6 +2,18 @@
 
 {% block title %}{{ "page_plugin_dinnerclub_title_details"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}{% endblock %}
 
+{% block stylesheets %}
+    {% if dish.previewImage or galleryImages|length > 0 %}
+        <link rel="stylesheet" href="{{ '/stylesheet/fancybox.css' }}"/>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {% if dish.previewImage or galleryImages|length > 0 %}
+        <script src="{{ '/javascript/fancybox.umd.js' }}"></script>
+    {% endif %}
+{% endblock %}
+
 {% block body %}
 
     <section class="section">
@@ -51,9 +63,45 @@
                         {% endif %}
 
                         {% if dish.previewImage %}
-                            <figure class="image mb-4">
-                                {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '600x400'} %}
+                            {% set reportCaption = 'You can <a href=' ~ path('app_report_image', {'id': dish.previewImage.id}) ~ '>report</a> an image if there is something wrong.' %}
+                            <figure class="image mb-2">
+                                <a data-fancybox="dish-gallery" data-caption="{{ reportCaption }}" href="/images/thumbnails/{{ dish.previewImage.hash }}_1024x768.webp">
+                                    {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '600x400'} %}
+                                </a>
                             </figure>
+                        {% endif %}
+
+                        {% if galleryImages|length > 0 %}
+                            <div class="columns is-multiline is-mobile mt-1">
+                                {% for dishImage in galleryImages %}
+                                    {% set img = dishImage.image %}
+                                    {% if not dish.previewImage or img.id != dish.previewImage.id %}
+                                    {% set thumbCaption = 'You can <a href=' ~ path('app_report_image', {'id': img.id}) ~ '>report</a> an image if there is something wrong.' %}
+                                    <div class="column is-2">
+                                        <a data-fancybox="dish-gallery" data-caption="{{ thumbCaption }}" href="/images/thumbnails/{{ img.hash }}_1024x768.webp">
+                                            {% include '_components/image.html.twig' with {'image': img, 'size': '400x400'} %}
+                                        </a>
+                                        {% if is_granted('ROLE_USER') %}
+                                            <div class="has-text-centered mt-1">
+                                                <a href="{{ path('plugin_dinnerclub_suggest_preview', {'dishId': dish.id, 'dishImageId': dishImage.id}) }}"
+                                                   class="is-size-7 has-text-grey"
+                                                   title="{{ isOrganizer ? 'Set as preview' : 'Suggest as preview' }}">
+                                                    <span class="icon is-small"><i class="fa-solid fa-star"></i></span>
+                                                </a>
+                                                {% if isOrganizer %}
+                                                    <a href="{{ path('plugin_dinnerclub_image_delete', {'dishImageId': dishImage.id}) }}"
+                                                       class="is-size-7 has-text-danger"
+                                                       title="Remove from gallery"
+                                                       onclick="return confirm('Remove this image from the gallery?')">
+                                                        <span class="icon is-small"><i class="fa-solid fa-trash"></i></span>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         {% endif %}
 
                         {% if dish.getTranslatedDescription(app.locale) or dish.getTranslatedDescription(dish.originLang) %}
@@ -84,6 +132,14 @@
                                 <a href="{{ path('plugin_dinnerclub_suggestion_view', {'id': dish.id}) }}">Review now</a>
                             </div>
                         {% endif %}
+
+                        {% if imageSuggestionCount > 0 and is_granted('ROLE_ORGANIZER') %}
+                            <div class="notification is-warning is-light mt-2">
+                                <span class="icon"><i class="fa-solid fa-image"></i></span>
+                                This dish has {{ imageSuggestionCount }} pending image suggestion(s).
+                                <a href="{{ path('plugin_dinnerclub_image_suggestion_view', {'id': dish.id}) }}">Review now</a>
+                            </div>
+                        {% endif %}
                     </div>
 
                 </div>
@@ -111,6 +167,32 @@
                     </div>
 
                     {% if is_granted('ROLE_USER') %}
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-camera"></i></span>
+                            <span>{{ isOrganizer ? 'Add Photo' : 'Suggest Photo' }}</span>
+                        </h3>
+                        <p class="mb-3 is-size-7 has-text-grey">
+                            {{ isOrganizer ? 'Add a photo to the gallery' : 'Suggest a photo for this dish' }}
+                        </p>
+                        <form action="{{ path('plugin_dinnerclub_image_upload', {'id': dish.id}) }}"
+                              method="post" enctype="multipart/form-data">
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="file" name="image" accept="image/*" required>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <button type="submit" class="button is-link is-fullwidth">
+                                        <span class="icon"><i class="fa-solid fa-upload"></i></span>
+                                        <span>Upload</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
                     {% if userLists is not empty %}
                     <div class="box">
                         <h3 class="title is-5">
@@ -171,6 +253,7 @@
                             {% endfor %}
                         </div>
                     </div>
+
                     {% endif %}
 
                 </div>
@@ -178,6 +261,12 @@
 
         </div>
     </section>
+
+    {% if dish.previewImage or galleryImages|length > 0 %}
+    <script>
+        Fancybox.bind("[data-fancybox='dish-gallery']", {compact: true});
+    </script>
+    {% endif %}
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
