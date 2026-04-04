@@ -112,16 +112,12 @@ final class LanguageController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/{id}/toggle', name: 'app_admin_language_toggle', methods: ['POST'])]
+    #[Route('/{id}/toggle', name: 'app_admin_language_toggle', methods: ['GET'])]
     public function toggle(Language $language): Response
     {
         $language->setEnabled(!$language->isEnabled());
         $this->em->flush();
         $this->languageService->invalidateCache();
-        $this->translationService->publish();
-
-        $status = $language->isEnabled() ? 'enabled' : 'disabled';
-        $this->addFlash('success', sprintf('Language %s successfully', $status));
 
         return $this->redirectToRoute('app_admin_language');
     }
