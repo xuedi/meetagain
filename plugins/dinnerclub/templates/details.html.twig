@@ -153,7 +153,7 @@
                             </div>
                             {% if is_granted('ROLE_ORGANIZER') %}
                             <div class="level-right">
-                                <a href="{{ path('plugin_dinnerclub_edit', {'id': dish.id}) }}" class="button is-link">
+                                <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': dish.originLang ?? app.locale}) }}" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
                                     <span>Edit</span>
                                 </a>
@@ -236,23 +236,6 @@
                         </a>
                     </div>
                     {% endif %}
-
-                    <div class="box">
-                        <h3 class="title is-5">
-                            <span class="icon"><i class="fa-solid fa-language"></i></span>
-                            <span>Add Translation</span>
-                        </h3>
-                        <p class="mb-3 is-size-7 has-text-grey">Help translate this dish to other languages</p>
-                        <div class="buttons">
-                            {% for lang in languages %}
-                                {% set trans = dish.findTranslation(lang) %}
-                                <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}"
-                                   class="button {% if trans %}is-success is-light{% endif %}">
-                                    {{ lang|upper }}
-                                </a>
-                            {% endfor %}
-                        </div>
-                    </div>
 
                     {% endif %}
 
