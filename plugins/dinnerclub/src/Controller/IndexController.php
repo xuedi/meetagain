@@ -77,11 +77,16 @@ final class IndexController extends AbstractController
             $userLiked = $this->dishService->isLikedByUser($dish->getId(), $user->getId());
         }
 
+        $isOrganizer = $this->isGranted('ROLE_ORGANIZER');
+
         return $this->render('@Dinnerclub/details.html.twig', [
             'dish' => $dish,
             'languages' => $this->languageService->getFilteredEnabledCodes(),
             'userLists' => $userLists,
             'userLiked' => $userLiked,
+            'galleryImages' => $dish->getVisibleGalleryImages(),
+            'isOrganizer' => $isOrganizer,
+            'imageSuggestionCount' => $isOrganizer ? $this->dishService->countImageSuggestions($dish) : 0,
         ]);
     }
 

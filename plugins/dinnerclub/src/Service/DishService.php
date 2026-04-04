@@ -2,13 +2,19 @@
 
 namespace Plugin\Dinnerclub\Service;
 
+use App\Entity\Image;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dinnerclub\Entity\Dish;
+use Plugin\Dinnerclub\Entity\DishImage;
+use Plugin\Dinnerclub\Entity\DishImageSuggestion;
 use Plugin\Dinnerclub\Entity\DishLike;
 use Plugin\Dinnerclub\Entity\DishSuggestion;
 use Plugin\Dinnerclub\Entity\DishSuggestionField;
 use Plugin\Dinnerclub\Entity\DishTranslation;
+use Plugin\Dinnerclub\Enum\DishImageSuggestionType;
+use Plugin\Dinnerclub\Repository\DishImageRepository;
+use Plugin\Dinnerclub\Repository\DishImageSuggestionRepository;
 use Plugin\Dinnerclub\Repository\DishLikeRepository;
 use Plugin\Dinnerclub\Repository\DishRepository;
 use RuntimeException;
@@ -19,6 +25,8 @@ readonly class DishService
         private EntityManagerInterface $em,
         private DishRepository $repo,
         private DishLikeRepository $likeRepo,
+        private DishImageRepository $imageRepo,
+        private DishImageSuggestionRepository $imageSuggestionRepo,
     ) {}
 
     public function createDish(
@@ -335,5 +343,119 @@ readonly class DishService
     public function detach(Dish $dish): void
     {
         $this->em->detach($dish);
+    }
+
+    public function addGalleryImage(Dish $dish, Image $image): DishImage
+    {
+        $dishImage = new DishImage();
+        $dishImage->setDish($dish);
+        $dishImage->setImage($image);
+        $dishImage->setCreatedAt(new DateTimeImmutable());
+
+        $this->em->persist($dishImage);
+
+        if ($dish->getPreviewImage() === null) {
+            $dish->setPreviewImage($image);
+            $this->em->persist($dish);
+        }
+
+        $this->em->flush();
+
+        return $dishImage;
+    }
+
+    public function removeGalleryImage(int $dishImageId): void
+    {
+        $dishImage = $this->imageRepo->find($dishImageId);
+        if ($dishImage === null) {
+            return;
+        }
+
+        $dish = $dishImage->getDish();
+        $image = $dishImage->getImage();
+
+        $this->em->remove($dishImage);
+
+        if ($dish !== null && $image !== null && $dish->getPreviewImage()?->getId() === $image->getId()) {
+            $dish->setPreviewImage(null);
+            $this->em->persist($dish);
+        }
+
+        $this->em->flush();
+    }
+
+    public function addImageSuggestion(Dish $dish, Image $image, DishImageSuggestionType $type, int $userId): DishImageSuggestion
+    {
+        $suggestion = new DishImageSuggestion();
+        $suggestion->setDish($dish);
+        $suggestion->setImage($image);
+        $suggestion->setType($type);
+        $suggestion->setSuggestedBy($userId);
+        $suggestion->setCreatedAt(new DateTimeImmutable());
+
+        $this->em->persist($suggestion);
+        $this->em->flush();
+
+        return $suggestion;
+    }
+
+    public function applyImageSuggestion(int $suggestionId): int
+    {
+        $suggestion = $this->imageSuggestionRepo->find($suggestionId);
+        if ($suggestion === null) {
+            throw new RuntimeException('Image suggestion not found');
+        }
+
+        $dish = $suggestion->getDish();
+        $image = $suggestion->getImage();
+
+        if ($dish === null || $image === null) {
+            throw new RuntimeException('Invalid image suggestion state');
+        }
+
+        if ($suggestion->getType() === DishImageSuggestionType::AddImage) {
+            $this->addGalleryImage($dish, $image);
+        } else {
+            $dish->setPreviewImage($image);
+            $this->em->persist($dish);
+        }
+
+        $this->em->remove($suggestion);
+        $this->em->flush();
+
+        return $this->imageSuggestionRepo->countByDish($dish);
+    }
+
+    public function denyImageSuggestion(int $suggestionId): int
+    {
+        $suggestion = $this->imageSuggestionRepo->find($suggestionId);
+        if ($suggestion === null) {
+            throw new RuntimeException('Image suggestion not found');
+        }
+
+        $dish = $suggestion->getDish();
+        if ($dish === null) {
+            throw new RuntimeException('Invalid image suggestion state');
+        }
+
+        $this->em->remove($suggestion);
+        $this->em->flush();
+
+        return $this->imageSuggestionRepo->countByDish($dish);
+    }
+
+    public function getImageSuggestionsForDish(Dish $dish): array
+    {
+        return $this->imageSuggestionRepo->findByDish($dish);
+    }
+
+    public function getDishesWithImageSuggestions(): array
+    {
+        return $this->imageSuggestionRepo->findDishesWithPendingSuggestions();
+    }
+
+    public function countImageSuggestions(Dish $dish): int
+    {
+        return $this->imageSuggestionRepo->countByDish($dish);
     }
 }

@@ -26,6 +26,15 @@ class Dish
     )]
     private Collection $translations;
 
+    #[ORM\OneToMany(
+        targetEntity: DishImage::class,
+        mappedBy: 'dish',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
+    #[ORM\OrderBy(['sortOrder' => 'ASC', 'createdAt' => 'ASC'])]
+    private Collection $galleryImages;
+
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
@@ -53,6 +62,7 @@ class Dish
     public function __construct()
     {
         $this->translations = new ArrayCollection();
+        $this->galleryImages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -305,5 +315,38 @@ class Dish
             return $translation->getRecipe() ?? '';
         }
         return '';
+    }
+
+    public function getGalleryImages(): Collection
+    {
+        return $this->galleryImages;
+    }
+
+    public function addGalleryImage(DishImage $dishImage): static
+    {
+        if (!$this->galleryImages->contains($dishImage)) {
+            $this->galleryImages->add($dishImage);
+            $dishImage->setDish($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGalleryImage(DishImage $dishImage): static
+    {
+        $this->galleryImages->removeElement($dishImage);
+
+        return $this;
+    }
+
+    /**
+     * @return DishImage[]
+     */
+    public function getVisibleGalleryImages(): array
+    {
+        return array_values(array_filter(
+            $this->galleryImages->toArray(),
+            static fn(DishImage $di) => $di->getImage()?->getReported() === null,
+        ));
     }
 }
