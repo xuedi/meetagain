@@ -32,8 +32,7 @@ readonly class ConfigService
             ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [210, 140]],
             ImageType::CmsCardImage => [[600, 400], [300, 200]],
             ImageType::CmsBlock => [[432, 432], [80, 80]],
-            ImageType::PluginDishPreview => [[1024, 768], [600, 400], [400, 400], [100, 100], [50, 50]], // is also part of gallery
-            ImageType::PluginDishGallery => [[1024, 768], [600, 400], [400, 400]],
+            ImageType::PluginDish => [[1024, 768], [600, 400], [400, 400], [100, 100], [50, 50]],
             ImageType::LanguageTile => [[600, 400], [300, 200]],
             ImageType::PluginBookclubCover => [[400, 500], [200, 250]],
         };
