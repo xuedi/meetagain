@@ -2,6 +2,18 @@
 
 {% block title %}{{ "Translate Dish"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
+{% block stylesheets %}
+    {% if dish.previewImage or galleryImages|length > 0 %}
+        <link rel="stylesheet" href="{{ '/stylesheet/fancybox.css' }}"/>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {% if dish.previewImage or galleryImages|length > 0 %}
+        <script src="{{ '/javascript/fancybox.umd.js' }}"></script>
+    {% endif %}
+{% endblock %}
+
 {% block body %}
 
     <section class="section">
@@ -159,10 +171,94 @@
                 </div>
 
                 <div class="column is-4">
+                    {% set returnUrl = path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': targetLanguage}) %}
+
+                    {% if dish.previewImage %}
+                    <div class="box">
+                        <h3 class="title is-6 mb-2">Preview Image</h3>
+                        {% set reportCaption = 'You can <a href=' ~ path('app_report_image', {'id': dish.previewImage.id}) ~ '>report</a> an image if there is something wrong.' %}
+                        <figure class="image">
+                            <a data-fancybox="dish-gallery" data-caption="{{ reportCaption }}" href="/images/thumbnails/{{ dish.previewImage.hash }}_1024x768.webp">
+                                {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '600x400'} %}
+                            </a>
+                        </figure>
+                    </div>
+                    {% endif %}
+
+                    {% if galleryImages|length > 0 %}
+                    <div class="box">
+                        <h3 class="title is-6 mb-2">Gallery</h3>
+                        <div class="columns is-multiline is-mobile">
+                            {% for dishImage in galleryImages %}
+                                {% set img = dishImage.image %}
+                                {% if not dish.previewImage or img.id != dish.previewImage.id %}
+                                {% set thumbCaption = 'You can <a href=' ~ path('app_report_image', {'id': img.id}) ~ '>report</a> an image if there is something wrong.' %}
+                                <div class="column is-4">
+                                    <a data-fancybox="dish-gallery" data-caption="{{ thumbCaption }}" href="/images/thumbnails/{{ img.hash }}_1024x768.webp">
+                                        {% include '_components/image.html.twig' with {'image': img, 'size': '400x400'} %}
+                                    </a>
+                                    {% if is_granted('ROLE_USER') %}
+                                    <div class="has-text-centered mt-1">
+                                        <a href="{{ path('plugin_dinnerclub_suggest_preview', {'dishId': dish.id, 'dishImageId': dishImage.id}) }}?returnUrl={{ returnUrl|url_encode }}"
+                                           class="is-size-7 has-text-grey"
+                                           title="{{ isOrganizer ? 'Set as preview' : 'Suggest as preview' }}">
+                                            <span class="icon is-small"><i class="fa-solid fa-star"></i></span>
+                                        </a>
+                                        {% if isOrganizer %}
+                                        <a href="{{ path('plugin_dinnerclub_image_delete', {'dishImageId': dishImage.id}) }}?returnUrl={{ returnUrl|url_encode }}"
+                                           class="is-size-7 has-text-danger"
+                                           title="Remove from gallery"
+                                           onclick="return confirm('Remove this image from the gallery?')">
+                                            <span class="icon is-small"><i class="fa-solid fa-trash"></i></span>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if is_granted('ROLE_USER') %}
+                    <div class="box">
+                        <h3 class="title is-5">
+                            <span class="icon"><i class="fa-solid fa-camera"></i></span>
+                            <span>{{ isOrganizer ? 'Add Photo' : 'Suggest Photo' }}</span>
+                        </h3>
+                        <p class="mb-3 is-size-7 has-text-grey">
+                            {{ isOrganizer ? 'Add a photo to the gallery' : 'Suggest a photo for this dish' }}
+                        </p>
+                        <form action="{{ path('plugin_dinnerclub_image_upload', {'id': dish.id}) }}"
+                              method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="returnUrl" value="{{ returnUrl }}">
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="file" name="image" accept="image/*" required>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <button type="submit" class="button is-link is-fullwidth">
+                                        <span class="icon"><i class="fa-solid fa-upload"></i></span>
+                                        <span>Upload</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
             </div>
 
         </div>
     </section>
+
+    {% if dish.previewImage or galleryImages|length > 0 %}
+    <script>
+        Fancybox.bind("[data-fancybox='dish-gallery']", {compact: true});
+    </script>
+    {% endif %}
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
