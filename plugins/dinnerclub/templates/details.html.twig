@@ -109,7 +109,7 @@
                         {% endif %}
 
                         {% if dish.hasSuggestions and is_granted('ROLE_ORGANIZER') %}
-                            <div class="notification is-info is-light mt-4">
+                            <div class="notification is-light mt-4">
                                 <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
                                 This dish has {{ dish.suggestionObjects|length }} pending suggestion(s).
                                 <a href="{{ path('plugin_dinnerclub_suggestion_view', {'id': dish.id}) }}">Review now</a>
@@ -117,7 +117,7 @@
                         {% endif %}
 
                         {% if imageSuggestionCount > 0 and is_granted('ROLE_ORGANIZER') %}
-                            <div class="notification is-warning is-light mt-2">
+                            <div class="notification is-light mt-2">
                                 <span class="icon"><i class="fa-solid fa-image"></i></span>
                                 This dish has {{ imageSuggestionCount }} pending image suggestion(s).
                                 <a href="{{ path('plugin_dinnerclub_image_suggestion_view', {'id': dish.id}) }}">Review now</a>
