@@ -67,11 +67,11 @@ final class DishImageController extends AbstractController
             $this->addFlash('success', 'Image suggestion submitted for review.');
         }
 
-        return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
+        return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $id])));
     }
 
     #[Route('/suggest-preview/{dishId}/{dishImageId}', name: 'plugin_dinnerclub_suggest_preview', methods: ['GET'])]
-    public function suggestPreview(int $dishId, int $dishImageId): Response
+    public function suggestPreview(Request $request, int $dishId, int $dishImageId): Response
     {
         $dish = $this->dishRepository->find($dishId);
         if ($dish === null) {
@@ -104,12 +104,12 @@ final class DishImageController extends AbstractController
             $this->addFlash('success', 'Preview suggestion submitted for review.');
         }
 
-        return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $dishId]);
+        return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $dishId])));
     }
 
     #[Route('/delete/{dishImageId}', name: 'plugin_dinnerclub_image_delete', methods: ['GET'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function delete(int $dishImageId): Response
+    public function delete(Request $request, int $dishImageId): Response
     {
         $dishImage = $this->dishImageRepository->find($dishImageId);
         if ($dishImage === null) {
@@ -121,7 +121,17 @@ final class DishImageController extends AbstractController
         $this->dishService->removeGalleryImage($dishImageId);
         $this->addFlash('success', 'Image removed from gallery.');
 
-        return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $dishId]);
+        return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $dishId])));
+    }
+
+    private function getReturnUrl(Request $request, string $fallback): string
+    {
+        $url = $request->request->get('returnUrl') ?? $request->query->get('returnUrl', '');
+        if (is_string($url) && str_starts_with($url, '/')) {
+            return $url;
+        }
+
+        return $fallback;
     }
 
     private function getDishName(Dish $dish): string

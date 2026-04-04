@@ -81,23 +81,6 @@
                                         <a data-fancybox="dish-gallery" data-caption="{{ thumbCaption }}" href="/images/thumbnails/{{ img.hash }}_1024x768.webp">
                                             {% include '_components/image.html.twig' with {'image': img, 'size': '400x400'} %}
                                         </a>
-                                        {% if is_granted('ROLE_USER') %}
-                                            <div class="has-text-centered mt-1">
-                                                <a href="{{ path('plugin_dinnerclub_suggest_preview', {'dishId': dish.id, 'dishImageId': dishImage.id}) }}"
-                                                   class="is-size-7 has-text-grey"
-                                                   title="{{ isOrganizer ? 'Set as preview' : 'Suggest as preview' }}">
-                                                    <span class="icon is-small"><i class="fa-solid fa-star"></i></span>
-                                                </a>
-                                                {% if isOrganizer %}
-                                                    <a href="{{ path('plugin_dinnerclub_image_delete', {'dishImageId': dishImage.id}) }}"
-                                                       class="is-size-7 has-text-danger"
-                                                       title="Remove from gallery"
-                                                       onclick="return confirm('Remove this image from the gallery?')">
-                                                        <span class="icon is-small"><i class="fa-solid fa-trash"></i></span>
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                        {% endif %}
                                     </div>
                                     {% endif %}
                                 {% endfor %}
@@ -169,31 +152,6 @@
                     </div>
 
                     {% if is_granted('ROLE_USER') %}
-                    <div class="box">
-                        <h3 class="title is-5">
-                            <span class="icon"><i class="fa-solid fa-camera"></i></span>
-                            <span>{{ isOrganizer ? 'Add Photo' : 'Suggest Photo' }}</span>
-                        </h3>
-                        <p class="mb-3 is-size-7 has-text-grey">
-                            {{ isOrganizer ? 'Add a photo to the gallery' : 'Suggest a photo for this dish' }}
-                        </p>
-                        <form action="{{ path('plugin_dinnerclub_image_upload', {'id': dish.id}) }}"
-                              method="post" enctype="multipart/form-data">
-                            <div class="field">
-                                <div class="control">
-                                    <input class="input" type="file" name="image" accept="image/*" required>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <div class="control">
-                                    <button type="submit" class="button is-link is-fullwidth">
-                                        <span class="icon"><i class="fa-solid fa-upload"></i></span>
-                                        <span>Upload</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
 
                     {% if userLists is not empty %}
                     <div class="box">

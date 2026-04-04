@@ -93,6 +93,8 @@ final class EditController extends AbstractController
             'targetLanguage' => $lang,
             'availableLanguages' => $this->languageService->getFilteredEnabledCodes(),
             'existingTranslation' => $existingTranslation,
+            'galleryImages' => $dish->getVisibleGalleryImages(),
+            'isOrganizer' => $this->isGranted('ROLE_ORGANIZER'),
         ]);
     }
 
