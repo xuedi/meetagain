@@ -4,7 +4,6 @@ namespace Plugin\Dinnerclub\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
-use App\Service\Config\LanguageService;
 use Plugin\Dinnerclub\Activity\Messages\DishLiked;
 use Plugin\Dinnerclub\Activity\Messages\DishUnliked;
 use Plugin\Dinnerclub\Entity\Dish;
@@ -23,7 +22,6 @@ final class IndexController extends AbstractController
 {
     public function __construct(
         private readonly DishRepository $repo,
-        private readonly LanguageService $languageService,
         private readonly DishService $dishService,
         private readonly DishListService $listService,
         private readonly ActivityService $activityService,
@@ -81,7 +79,6 @@ final class IndexController extends AbstractController
 
         return $this->render('@Dinnerclub/details.html.twig', [
             'dish' => $dish,
-            'languages' => $this->languageService->getFilteredEnabledCodes(),
             'userLists' => $userLists,
             'userLiked' => $userLiked,
             'galleryImages' => $dish->getVisibleGalleryImages(),

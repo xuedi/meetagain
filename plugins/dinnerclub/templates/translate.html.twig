@@ -18,6 +18,22 @@
             <div class="columns">
                 <div class="column is-8">
                     <div class="box">
+                        <div class="columns mb-0">
+                            <div class="column is-6">
+                                <p class="has-text-grey">Select a language to translate</p>
+                            </div>
+                            <div class="column is-6">
+                                <div class="buttons has-addons is-pulled-right">
+                                    {% for lang in availableLanguages %}
+                                        <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}"
+                                           class="button {% if lang == targetLanguage %}is-active{% endif %}">
+                                            {{ lang|upper }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
                         <h2 class="title is-4">
                             <span class="icon"><i class="fa-solid fa-language"></i></span>
                             <span>{% if existingTranslation %}Edit{% else %}Add{% endif %} Translation</span>
@@ -90,6 +106,56 @@
 
                         {{ form_end(form) }}
                     </div>
+
+                    {% if is_granted('ROLE_ORGANIZER') %}
+                    <div class="box">
+                        <h2 class="title is-4">
+                            <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                            <span>Origin</span>
+                        </h2>
+
+                        {{ form_start(originForm) }}
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-language"></i></span>
+                                    <span>{{ originForm.originLang.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                <div class="select">
+                                    {{ form_widget(originForm.originLang) }}
+                                </div>
+                            </div>
+                            {{ form_errors(originForm.originLang) }}
+                        </div>
+
+                        <div class="field">
+                            <label class="label">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                                    <span>{{ originForm.origin.vars.label }}</span>
+                                </span>
+                            </label>
+                            <div class="control">
+                                {{ form_widget(originForm.origin, {'attr': {'class': 'input'}}) }}
+                            </div>
+                            {{ form_errors(originForm.origin) }}
+                        </div>
+
+                        <div class="field mt-4">
+                            <div class="control">
+                                <button type="submit" class="button is-link">
+                                    <span class="icon"><i class="fa-solid fa-check"></i></span>
+                                    <span>Save Origin</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {{ form_end(originForm) }}
+                    </div>
+                    {% endif %}
                 </div>
 
                 <div class="column is-4">
@@ -109,21 +175,6 @@
                             {% if dish.getTranslatedRecipe(dish.originLang ?? 'en') %}
                                 <p><strong>Recipe:</strong> {{ dish.getTranslatedRecipe(dish.originLang ?? 'en')|nl2br }}</p>
                             {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="box">
-                        <h3 class="title is-5">
-                            <span class="icon"><i class="fa-solid fa-globe"></i></span>
-                            <span>Other Languages</span>
-                        </h3>
-                        <div class="buttons">
-                            {% for lang in availableLanguages %}
-                                <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}"
-                                   class="button {% if lang == targetLanguage %}is-link{% endif %} {% if dish.findTranslation(lang) %}is-success is-light{% endif %}">
-                                    {{ lang|upper }}
-                                </a>
-                            {% endfor %}
                         </div>
                     </div>
 

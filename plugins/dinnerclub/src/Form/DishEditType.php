@@ -6,12 +6,9 @@ use App\Service\Config\LanguageService;
 use Plugin\Dinnerclub\Entity\Dish;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Image;
-
 class DishEditType extends AbstractType
 {
     public function __construct(
@@ -25,14 +22,6 @@ class DishEditType extends AbstractType
         $choices = array_combine(array_map('strtoupper', $codes), $codes);
 
         $builder
-            ->add('previewImage', FileType::class, [
-                'label' => 'Preview Image',
-                'mapped' => false,
-                'required' => false,
-                'constraints' => [
-                    new Image(maxSize: '10M'),
-                ],
-            ])
             ->add('originLang', ChoiceType::class, [
                 'label' => 'Origin Language',
                 'choices' => $choices,
