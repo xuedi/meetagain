@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Translate Dish"|trans }} - {{ dish.getTranslatedName(dish.originLang ?? app.locale) }}{% endblock %}
+{% block title %}{{ "Translate Dish"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
 {% block body %}
 
@@ -10,7 +10,7 @@
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
                     <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li><a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}">{{ dish.getTranslatedName(dish.originLang ?? app.locale) }}</a></li>
+                    <li><a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</a></li>
                     <li class="is-active"><a href="#" aria-current="page">Translate ({{ targetLanguage|upper }})</a></li>
                 </ul>
             </nav>
@@ -23,7 +23,7 @@
                                 <p class="has-text-grey">Select a language to translate</p>
                             </div>
                             <div class="column is-6">
-                                <div class="buttons has-addons is-pulled-right">
+                                <div class="buttons has-addons is-pulled-right" id="lang-switcher">
                                     {% for lang in availableLanguages %}
                                         <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}"
                                            class="button {% if lang == targetLanguage %}is-active{% endif %}">
@@ -58,7 +58,7 @@
                             </p>
                         {% endif %}
 
-                        {{ form_start(form) }}
+                        {{ form_start(form, {'attr': {'id': 'translate-form'}}) }}
 
                         <div class="field">
                             <label class="label">{{ form.name.vars.label }}</label>
@@ -66,14 +66,6 @@
                                 {{ form_widget(form.name, {'attr': {'class': 'input'}}) }}
                             </div>
                             {{ form_errors(form.name) }}
-                        </div>
-
-                        <div class="field">
-                            <label class="label">{{ form.phonetic.vars.label }}</label>
-                            <div class="control">
-                                {{ form_widget(form.phonetic, {'attr': {'class': 'input'}}) }}
-                            </div>
-                            {{ form_errors(form.phonetic) }}
                         </div>
 
                         <div class="field">
@@ -94,13 +86,13 @@
 
                         <div class="field is-grouped mt-5">
                             <div class="control">
-                                <button type="submit" class="button is-link">
+                                <button type="submit" id="save-btn" class="button is-link" disabled>
                                     <span class="icon"><i class="fa-solid fa-check"></i></span>
                                     <span>{% if is_granted('ROLE_ORGANIZER') %}Save{% else %}Submit Suggestion{% endif %}</span>
                                 </button>
                             </div>
                             <div class="control">
-                                <a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}" class="button">Cancel</a>
+                                <a id="reset-btn" href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': targetLanguage}) }}" class="button" style="pointer-events: none; opacity: 0.5;">Reset</a>
                             </div>
                         </div>
 
@@ -116,19 +108,27 @@
 
                         {{ form_start(originForm) }}
 
-                        <div class="field">
-                            <label class="label">
-                                <span class="icon-text">
-                                    <span class="icon"><i class="fa-solid fa-language"></i></span>
-                                    <span>{{ originForm.originLang.vars.label }}</span>
-                                </span>
-                            </label>
-                            <div class="control">
-                                <div class="select">
-                                    {{ form_widget(originForm.originLang) }}
+                        <div class="columns">
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label">{{ originForm.pronunciationSystem.vars.label }}</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            {{ form_widget(originForm.pronunciationSystem, {'attr': {'id': 'pronunciation-system-select'}}) }}
+                                        </div>
+                                    </div>
+                                    {{ form_errors(originForm.pronunciationSystem) }}
                                 </div>
                             </div>
-                            {{ form_errors(originForm.originLang) }}
+                            <div class="column is-6">
+                                <div class="field">
+                                    <label class="label" id="phonetic-label">Transcription</label>
+                                    <div class="control">
+                                        {{ form_widget(originForm.phonetic, {'attr': {'class': 'input', 'id': 'phonetic-input'}}) }}
+                                    </div>
+                                    {{ form_errors(originForm.phonetic) }}
+                                </div>
+                            </div>
                         </div>
 
                         <div class="field">
@@ -159,51 +159,61 @@
                 </div>
 
                 <div class="column is-4">
-                    <div class="box">
-                        <h3 class="title is-5">
-                            <span class="icon"><i class="fa-solid fa-info-circle"></i></span>
-                            <span>Original ({{ dish.originLang|upper }})</span>
-                        </h3>
-                        <div class="content">
-                            <p><strong>Name:</strong> {{ dish.getTranslatedName(dish.originLang ?? 'en') }}</p>
-                            {% if dish.getPhonetic(dish.originLang ?? 'en') %}
-                                <p><strong>Phonetic:</strong> {{ dish.getPhonetic(dish.originLang ?? 'en') }}</p>
-                            {% endif %}
-                            {% if dish.getTranslatedDescription(dish.originLang ?? 'en') %}
-                                <p><strong>Description:</strong> {{ dish.getTranslatedDescription(dish.originLang ?? 'en') }}</p>
-                            {% endif %}
-                            {% if dish.getTranslatedRecipe(dish.originLang ?? 'en') %}
-                                <p><strong>Recipe:</strong> {{ dish.getTranslatedRecipe(dish.originLang ?? 'en')|nl2br }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="box">
-                        <h3 class="title is-5">
-                            <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
-                            <span>Phonetic systems</span>
-                        </h3>
-                        <div class="content is-small">
-                            <table class="table is-narrow is-fullwidth">
-                                <thead>
-                                    <tr><th>Language</th><th>System</th><th>Example</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Chinese</td><td>Pinyin</td><td>má po dòu fu</td></tr>
-                                    <tr><td>Japanese</td><td>Rōmaji</td><td>ra-men</td></tr>
-                                    <tr><td>Arabic</td><td>Romanisation</td><td>kus-kus</td></tr>
-                                    <tr><td>Korean</td><td>Revised Romanisation</td><td>bi-bim-bap</td></tr>
-                                    <tr><td>Thai</td><td>RTGS</td><td>phàt thai</td></tr>
-                                    <tr><td>Hindi</td><td>IAST</td><td>bi-ryā-nī</td></tr>
-                                    <tr><td>Greek</td><td>Greeklish</td><td>mu-sa-kás</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
 
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var saveBtn  = document.getElementById('save-btn');
+            var resetBtn = document.getElementById('reset-btn');
+            var switcher = document.getElementById('lang-switcher');
+            var form     = document.getElementById('translate-form');
+            if (!form) return;
+
+            function onDirty() {
+                saveBtn.disabled       = false;
+                resetBtn.style.pointerEvents = '';
+                resetBtn.style.opacity = '';
+                switcher.querySelectorAll('.button').forEach(function (btn) {
+                    btn.classList.add('is-static');
+                    btn.style.pointerEvents = 'none';
+                });
+                form.removeEventListener('input', onDirty);
+                form.removeEventListener('change', onDirty);
+            }
+
+            form.addEventListener('input', onDirty);
+            form.addEventListener('change', onDirty);
+        });
+    </script>
+
+    {% if is_granted('ROLE_ORGANIZER') %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var select = document.getElementById('pronunciation-system-select');
+            var phonetic = document.getElementById('phonetic-input');
+            if (!select || !phonetic) return;
+
+            var label = document.getElementById('phonetic-label');
+
+            function updatePhonetic() {
+                var hasSystem = select.value !== '';
+                phonetic.disabled = !hasSystem;
+                if (!hasSystem) {
+                    phonetic.value = '';
+                    label.textContent = 'Transcription';
+                } else {
+                    var systemName = select.options[select.selectedIndex].text.split(' (')[0] || 'Transcription';
+                    label.textContent = systemName;
+                }
+            }
+
+            select.addEventListener('change', updatePhonetic);
+            updatePhonetic();
+        });
+    </script>
+    {% endif %}
 
 {% endblock %}

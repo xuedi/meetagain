@@ -122,16 +122,6 @@ final class IndexController extends AbstractController
 
     private function getDishName(Dish $dish): string
     {
-        $originLang = $dish->getOriginLang();
-        if ($originLang !== null) {
-            $translation = $dish->findTranslation($originLang);
-            if ($translation !== null) {
-                return $translation->getName();
-            }
-        }
-
-        $first = $dish->getTranslations()->first();
-
-        return $first !== false ? $first->getName() : '[unknown]';
+        return $dish->getAnyTranslatedName() ?: '[unknown]';
     }
 }

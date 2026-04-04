@@ -31,9 +31,9 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
         }
 
         echo 'Creating dishes ... ';
-        foreach ($this->getData() as [$imageFile, $origin, $translations]) {
+        foreach ($this->getData() as [$imageFile, $origin, $phonetic, $translations]) {
             $dish = new Dish();
-            $dish->setOriginLang('cn');
+            $dish->setPhonetic($phonetic);
             $dish->setOrigin($origin);
             $dish->setApproved(true);
             $dish->setCreatedBy($importUser->getId());
@@ -43,7 +43,6 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 $translation = new DishTranslation();
                 $translation->setLanguage($language);
                 $translation->setName($data['name']);
-                $translation->setPhonetic($data['phonetic']);
                 $translation->setDescription($data['description']);
                 $dish->addTranslation($translation);
             }
@@ -69,64 +68,31 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
             [
                 '1.jpg',
                 'Chengdu, Sichuan',
+                'má po tofu',
                 [
-                    'cn' => [
-                        'name' => '麻婆豆腐',
-                        'phonetic' => 'má po tofu',
-                        'description' => 'Spicy tofu in chili and bean-based sauce. Originated in Chengdu.',
-                    ],
-                    'en' => [
-                        'name' => 'Mapo Tofu',
-                        'phonetic' => null,
-                        'description' => 'Spicy tofu in chili and bean-based sauce.',
-                    ],
-                    'de' => [
-                        'name' => 'Mapo Tofu',
-                        'phonetic' => null,
-                        'description' => 'Würziger Tofu in Chili- und Bohnensauce.',
-                    ],
+                    'cn' => ['name' => '麻婆豆腐',      'description' => 'Spicy tofu in chili and bean-based sauce. Originated in Chengdu.'],
+                    'en' => ['name' => 'Mapo Tofu',     'description' => 'Spicy tofu in chili and bean-based sauce.'],
+                    'de' => ['name' => 'Mapo Tofu',     'description' => 'Würziger Tofu in Chili- und Bohnensauce.'],
                 ],
             ],
             [
                 '2.jpg',
                 'Guizhou, China',
+                'gōng bǎo jī dīng',
                 [
-                    'cn' => [
-                        'name' => '宫保鸡丁',
-                        'phonetic' => 'gōng bǎo jī dīng',
-                        'description' => 'Diced chicken stir-fried with vegetables, peanuts, dried chilis and soy sauce.',
-                    ],
-                    'en' => [
-                        'name' => 'Kung Pao Chicken',
-                        'phonetic' => null,
-                        'description' => 'Diced chicken stir-fried with peanuts and chilis.',
-                    ],
-                    'de' => [
-                        'name' => 'Kung Pao Hühnchen',
-                        'phonetic' => null,
-                        'description' => 'Gehacktes Hähnchen mit Erdnüssen und Chilis angebraten.',
-                    ],
+                    'cn' => ['name' => '宫保鸡丁',         'description' => 'Diced chicken stir-fried with vegetables, peanuts, dried chilis and soy sauce.'],
+                    'en' => ['name' => 'Kung Pao Chicken', 'description' => 'Diced chicken stir-fried with peanuts and chilis.'],
+                    'de' => ['name' => 'Kung Pao Hühnchen','description' => 'Gehacktes Hähnchen mit Erdnüssen und Chilis angebraten.'],
                 ],
             ],
             [
                 '3.jpg',
                 'Shanghai, China',
+                'hóng shāo ròu',
                 [
-                    'cn' => [
-                        'name' => '红烧肉',
-                        'phonetic' => 'hóng shāo ròu',
-                        'description' => 'Braised pork belly in soy sauce, a classic Chinese comfort food.',
-                    ],
-                    'en' => [
-                        'name' => 'Braised Pork Belly',
-                        'phonetic' => null,
-                        'description' => 'Tender pork belly braised in soy sauce.',
-                    ],
-                    'de' => [
-                        'name' => 'Geschmorter Schweinebauch',
-                        'phonetic' => null,
-                        'description' => 'Zarter Schweinebauch geschmort in Sojasauce.',
-                    ],
+                    'cn' => ['name' => '红烧肉',                   'description' => 'Braised pork belly in soy sauce, a classic Chinese comfort food.'],
+                    'en' => ['name' => 'Braised Pork Belly',       'description' => 'Tender pork belly braised in soy sauce.'],
+                    'de' => ['name' => 'Geschmorter Schweinebauch','description' => 'Zarter Schweinebauch geschmort in Sojasauce.'],
                 ],
             ],
         ];

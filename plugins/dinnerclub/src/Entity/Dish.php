@@ -3,6 +3,7 @@
 namespace Plugin\Dinnerclub\Entity;
 
 use App\Entity\Image;
+use App\Entity\PronunciationSystem;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -47,8 +48,11 @@ class Dish
     #[ORM\ManyToOne]
     private ?Image $previewImage = null;
 
-    #[ORM\Column(length: 2, nullable: true)]
-    private ?string $originLang = null;
+    #[ORM\ManyToOne]
+    private ?PronunciationSystem $pronunciationSystem = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $phonetic = null;
 
     #[ORM\Column]
     private int $likes = 0;
@@ -130,16 +134,49 @@ class Dish
         return '';
     }
 
-    public function getPhonetic(string $language): string
+    public function getPhonetic(): ?string
     {
-        foreach ($this->translations as $translation) {
-            if ($translation->getLanguage() !== $language) {
-                continue;
-            }
+        return $this->phonetic;
+    }
 
-            return $translation->getPhonetic() ?? '';
-        }
-        return '';
+    public function setPhonetic(?string $phonetic): static
+    {
+        $this->phonetic = $phonetic;
+
+        return $this;
+    }
+
+    public function getPronunciationSystem(): ?PronunciationSystem
+    {
+        return $this->pronunciationSystem;
+    }
+
+    public function setPronunciationSystem(?PronunciationSystem $pronunciationSystem): static
+    {
+        $this->pronunciationSystem = $pronunciationSystem;
+
+        return $this;
+    }
+
+    public function getAnyTranslatedName(): string
+    {
+        $first = $this->translations->first();
+
+        return $first !== false ? ($first->getName() ?? '') : '';
+    }
+
+    public function getAnyTranslatedDescription(): string
+    {
+        $first = $this->translations->first();
+
+        return $first !== false ? ($first->getDescription() ?? '') : '';
+    }
+
+    public function getAnyTranslatedRecipe(): string
+    {
+        $first = $this->translations->first();
+
+        return $first !== false ? ($first->getRecipe() ?? '') : '';
     }
 
     public function getCreatedAt(): ?DateTimeImmutable
@@ -186,18 +223,6 @@ class Dish
     public function setPreviewImage(?Image $previewImage): static
     {
         $this->previewImage = $previewImage;
-
-        return $this;
-    }
-
-    public function getOriginLang(): ?string
-    {
-        return $this->originLang;
-    }
-
-    public function setOriginLang(?string $originLang): static
-    {
-        $this->originLang = $originLang;
 
         return $this;
     }

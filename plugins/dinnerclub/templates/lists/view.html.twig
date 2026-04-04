@@ -70,7 +70,7 @@
                                     </figure>
                                 </div>
                                 <div class="card-content p-3">
-                                    <p class="title is-6">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}</p>
+                                    <p class="title is-6">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</p>
                                     <p class="is-size-7 has-text-grey">
                                         <span class="icon is-small"><i class="fa-solid fa-heart"></i></span>
                                         {{ dish.likes }}

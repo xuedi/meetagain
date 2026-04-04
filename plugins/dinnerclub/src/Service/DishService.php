@@ -43,13 +43,12 @@ readonly class DishService
         $dish->setCreatedBy($userId);
         $dish->setCreatedAt(new DateTimeImmutable());
         $dish->setApproved($isManager);
-        $dish->setOriginLang($language);
+        $dish->setPhonetic($phonetic);
         $dish->setOrigin($origin);
 
         $translation = new DishTranslation();
         $translation->setLanguage($language);
         $translation->setName($name);
-        $translation->setPhonetic($phonetic);
         $translation->setDescription($description ?? '');
         $translation->setRecipe($recipe);
         $dish->addTranslation($translation);
@@ -159,7 +158,7 @@ readonly class DishService
             $field = $suggestion->field;
             match ($field) {
                 DishSuggestionField::Name => $translation->setName($suggestion->value),
-                DishSuggestionField::Phonetic => $translation->setPhonetic($suggestion->value),
+                DishSuggestionField::Phonetic => $dish->setPhonetic($suggestion->value),
                 DishSuggestionField::Description => $translation->setDescription($suggestion->value),
                 DishSuggestionField::Recipe => $translation->setRecipe($suggestion->value),
             };
@@ -232,7 +231,6 @@ readonly class DishService
         int $userId,
         bool $isManager,
         string $name,
-        ?string $phonetic,
         ?string $description,
         ?string $recipe,
     ): void {
@@ -252,7 +250,6 @@ readonly class DishService
             }
 
             $translation->setName($name);
-            $translation->setPhonetic($phonetic);
             $translation->setDescription($description ?? '');
             $translation->setRecipe($recipe);
 
@@ -269,17 +266,6 @@ readonly class DishService
                 language: $language,
                 value: $name,
             ));
-        }
-
-        if ($isNewTranslation || $translation->getPhonetic() !== $phonetic) {
-            if ($phonetic !== null && $phonetic !== '') {
-                $dish->addSuggestion(DishSuggestion::create(
-                    createdBy: $userId,
-                    field: DishSuggestionField::Phonetic,
-                    language: $language,
-                    value: $phonetic,
-                ));
-            }
         }
 
         $currentDescription = $isNewTranslation ? '' : $translation->getDescription();

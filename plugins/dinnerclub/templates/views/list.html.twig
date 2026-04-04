@@ -23,11 +23,11 @@
                 </a>
             </td>
             <td>{{ item.getTranslatedName(app.locale) }}</td>
-            <td>{{ item.getPhonetic(app.locale) }}</td>
+            <td>{{ item.getPhonetic() }}</td>
             <td>{{ item.getTranslatedDescription(app.locale) }}</td>
             <td>
                 {% if is_granted('ROLE_ORGANIZER') %}
-                    <a href="{{ path('plugin_dinnerclub_translate', {'id': item.id, 'lang': item.originLang ?? app.locale}) }}">
+                    <a href="{{ path('plugin_dinnerclub_translate', {'id': item.id, 'lang': app.locale}) }}">
                         <span class="icon"><i class="fa fa-edit"></i></span>
                     </a>
                 {% endif %}
