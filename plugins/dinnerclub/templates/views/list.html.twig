@@ -27,7 +27,7 @@
             <td>{{ item.getTranslatedDescription(app.locale) }}</td>
             <td>
                 {% if is_granted('ROLE_ORGANIZER') %}
-                    <a href="{{ path('plugin_dinnerclub_edit', {'id': item.id}) }}">
+                    <a href="{{ path('plugin_dinnerclub_translate', {'id': item.id, 'lang': item.originLang ?? app.locale}) }}">
                         <span class="icon"><i class="fa fa-edit"></i></span>
                     </a>
                 {% endif %}
