@@ -4,6 +4,14 @@ namespace App\Enum;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Classifies the purpose of an uploaded image.
+ *
+ * Each case doubles as a location discriminator: because one image type is always used
+ * in exactly one place, the type value is sufficient to identify where an image is used.
+ * This is the key the ImageLocation discovery system relies on — see
+ * src/Service/Media/ImageLocationService.php and src/Service/Media/ImageLocations/.
+ */
 enum ImageType: int
 {
     case ProfilePicture = 1;
