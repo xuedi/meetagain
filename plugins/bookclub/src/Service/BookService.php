@@ -4,6 +4,8 @@ namespace Plugin\Bookclub\Service;
 
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Enum\ImageType;
+use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Bookclub\Entity\Book;
@@ -20,6 +22,7 @@ readonly class BookService
         private CoverImageService $coverImageService,
         private EntityActionDispatcher $dispatcher,
         private BookGroupFilterService $groupFilter,
+        private ImageLocationService $imageLocationService,
     ) {}
 
     public function createFromIsbn(string $isbn, int $userId, bool $isManager): ?Book
@@ -54,6 +57,14 @@ readonly class BookService
 
         $this->em->persist($book);
         $this->em->flush();
+
+        if ($book->getCoverImage() !== null) {
+            $this->imageLocationService->addLocation(
+                $book->getCoverImage()->getId(),
+                ImageType::PluginBookclubCover,
+                $book->getId(),
+            );
+        }
 
         $this->dispatcher->dispatch(EntityAction::CreateBook, $book->getId());
 

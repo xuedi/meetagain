@@ -21,6 +21,7 @@ use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,6 +60,7 @@ final class EventController extends AbstractAdminController
         private readonly AdminEventListFilterService $eventFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ActivityService $activityService,
+        private readonly ImageLocationService $imageLocationService,
     ) {}
 
     #[Route('', name: 'app_admin_event')]
@@ -122,6 +124,7 @@ final class EventController extends AbstractAdminController
 
             // event image
             $image = null;
+            $oldPreviewId = $event->getPreviewImage()?->getId();
             $imageData = $form->get('image')->getData();
             if ($imageData instanceof UploadedFile) {
                 $image = $this->imageService->upload($imageData, $user, ImageType::EventTeaser);
@@ -148,9 +151,13 @@ final class EventController extends AbstractAdminController
             $this->activityService->log(AdminEventEdited::TYPE, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
 
-            // create thumbnail
+            // create thumbnail and update location index
             if ($image instanceof Image) {
                 $this->imageService->createThumbnails($image, ImageType::EventTeaser);
+                if ($oldPreviewId !== null) {
+                    $this->imageLocationService->removeLocation($oldPreviewId, ImageType::EventTeaser, $event->getId());
+                }
+                $this->imageLocationService->addLocation($image->getId(), ImageType::EventTeaser, $event->getId());
             }
 
             $followUp = '';
