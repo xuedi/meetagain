@@ -46,6 +46,33 @@ class DishRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function countWithSuggestions(): int
+    {
+        return (int) $this
+            ->createQueryBuilder('d')
+            ->select('COUNT(d.id)')
+            ->where('d.suggestions IS NOT NULL')
+            ->andWhere("d.suggestions != '[]'")
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getLatestSuggestionCreatedAt(): ?\DateTimeImmutable
+    {
+        $dishes = $this->findWithSuggestions();
+        $latest = null;
+
+        foreach ($dishes as $dish) {
+            foreach ($dish->getSuggestionObjects() as $suggestion) {
+                if ($latest === null || $suggestion->createdAt > $latest) {
+                    $latest = $suggestion->createdAt;
+                }
+            }
+        }
+
+        return $latest;
+    }
+
     /**
      * @param int[] $ids
      * @return Dish[]
