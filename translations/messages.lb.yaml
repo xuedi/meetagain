@@ -63,3 +63,6 @@ language_lb: 'Lëtzebuergesch'
 language_rm: Rumantsch
 language_fo: 'Färöesch'
 language_fy: 'Fräizesch'
+
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'

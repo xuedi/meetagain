@@ -21,20 +21,30 @@ class ReportedImage extends MessageAbstract
         $this->ensureHasKey('reason');
         $this->ensureIsNumeric('reason');
 
+        if (isset($this->meta['remarks']) && !is_string($this->meta['remarks'])) {
+            throw new \InvalidArgumentException("Value 'remarks' must be a string in '" . $this->getType() . "'");
+        }
+
         return $this;
     }
 
     protected function renderText(): string
     {
-        $msgTemplate = 'Reported image for reason: %s';
+        $text = sprintf('Reported image for reason: %s', ImageReportReason::from($this->meta['reason'])->name);
+        if (!empty($this->meta['remarks'])) {
+            $text .= sprintf(' — Remarks: %s', $this->meta['remarks']);
+        }
 
-        return sprintf($msgTemplate, ImageReportReason::from($this->meta['reason'])->name);
+        return $text;
     }
 
     protected function renderHtml(): string
     {
-        $msgTemplate = 'Reported image for reason: <b>%s</b>';
+        $text = sprintf('Reported image for reason: <b>%s</b>', ImageReportReason::from($this->meta['reason'])->name);
+        if (!empty($this->meta['remarks'])) {
+            $text .= sprintf(' &mdash; Remarks: %s', htmlspecialchars($this->meta['remarks']));
+        }
 
-        return sprintf($msgTemplate, ImageReportReason::from($this->meta['reason'])->name);
+        return $text;
     }
 }

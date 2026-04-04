@@ -6,7 +6,7 @@ namespace App\Service\Notification\User;
 
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
-use App\Repository\ImageRepository;
+use App\Repository\ImageReportRepository;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -14,7 +14,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 readonly class CoreNotificationProvider implements NotificationProviderInterface
 {
     public function __construct(
-        private ImageRepository $imageRepo,
+        private ImageReportRepository $imageReportRepo,
         private EmailQueueRepository $emailRepo,
         private UserRepository $userRepo,
         private SupportRequestRepository $supportRequestRepo,
@@ -33,11 +33,12 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
             return $items; // only FOUNDER from here on
         }
 
-        $reportedCount = $this->imageRepo->getReportedCount();
-        if ($reportedCount > 0) {
+        $openReports = $this->imageReportRepo->getOpenCount();
+        if ($openReports > 0) {
             $items[] = new NotificationItem(
-                label: $reportedCount . ' Reported Image' . ($reportedCount > 1 ? 's' : ''),
+                label: $openReports . ' Reported Image' . ($openReports > 1 ? 's' : ''),
                 icon: 'fa-flag',
+                route: 'app_admin_support_reports',
             );
         }
 

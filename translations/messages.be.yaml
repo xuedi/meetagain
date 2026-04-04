@@ -63,3 +63,6 @@ language_lb: Люксембургская
 language_rm: Рэтараманская
 language_fo: Фарэрская
 language_fy: Фрызская
+
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'

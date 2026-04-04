@@ -181,8 +181,17 @@ toggle_no: 'No'
 image_report_reason_privacy: Privacy
 image_report_reason_copyright: Copyright
 image_report_reason_inappropriate: Inappropriate
+image_report_reason_irrelevant: Irrelevant
 report_image_reason: 'Reason of the report'
 button_report: Report
+report_image_remarks: 'Additional remarks'
+report_image_remarks_placeholder: 'Describe the issue...'
+report_image_warning_title: 'Report this image'
+report_image_warning_body: 'You are about to report this image. Please select a reason and optionally add a description.'
+page_title_report_image: 'Report Image'
+report_success_title: 'Report submitted'
+report_success_body: 'The item has been deactivated and sent for review. Thank you.'
+page_title_report_success: 'Report Submitted'
 page_title_events_featured: 'Featured events'
 events_featured_button: Featured
 page_plugin_glossary_new_title: 'New entry'
@@ -327,6 +336,8 @@ email_tab_templates: Templates
 email_tab_sendlog: 'Send log'
 email_tab_announcements: Announcements
 email_tab_debugging: Debugging
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'
 logs_tab_activity: Activity
 logs_tab_system: System
 logs_tab_404: '404 errors'

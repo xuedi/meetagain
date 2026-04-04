@@ -1,17 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_member"|trans }}{% endblock %}
+{% block title %}{{ "page_title_report_success"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-6">
+                    <div class="box">
 
-            <h1 class="title">success</h1>
-            <p>
-                The item was deactivated for now and sent to review
-            </p>
+                        <div class="notification">
+                            <p class="title is-5">{{ "report_success_title"|trans }}</p>
+                            <p>{{ "report_success_body"|trans }}</p>
+                        </div>
 
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

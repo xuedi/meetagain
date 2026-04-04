@@ -1,14 +1,14 @@
 {% for item in list %}
     {% if item.previewImage is not null %}
         {% set href = '/images/thumbnails/' ~ item.previewImage.hash ~ '_1024x768.webp' %}
-        {% set Caption = 'You can <a href=' ~ path('app_report_image', {'id': item.previewImage.id}) ~ '>report</a> an image if there is something wrong.' %}
+        {% set caption = '<div style="text-align:center"><a href=' ~ path('plugin_dinnerclub_item_show', {'id': item.id}) ~ '>' ~ item.getTranslatedName(app.locale) ~ '</a> &middot; You can <a href=' ~ path('app_report_image', {'id': item.previewImage.id}) ~ '>report</a> this image if there is something wrong.</div>' %}
         <span class="dish-item" data-dish-id="{{ item.id }}" style="display:inline-block;">
             {% if loop.first %}
-                <a data-fancybox="gallery" data-caption="{{ item.getTranslatedName(app.locale) }}" href="{{ href }}">
+                <a data-fancybox="gallery" data-caption="{{ caption }}" href="{{ href }}">
                     {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '1024x768'} %}
                 </a>
             {% else %}
-                <a data-fancybox="gallery" data-caption="{{ item.getTranslatedName(app.locale) }}" href="{{ href }}">
+                <a data-fancybox="gallery" data-caption="{{ caption }}" href="{{ href }}">
                     {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '100x100'} %}
                 </a>
             {% endif %}
