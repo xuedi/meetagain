@@ -18,6 +18,7 @@ use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,6 +40,7 @@ final class ImageUploadController extends AbstractController
         private readonly ActionAuthorizationMessageService $authMessageService,
         private readonly ImageGalleryFilterService $imageGalleryFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly ImageLocationService $imageLocationService,
     ) {}
 
     #[Route('/image/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
@@ -76,12 +78,19 @@ final class ImageUploadController extends AbstractController
     public function select(string $entity, int $id, int $newImage): Response
     {
         $entityName = $entity;
-        $entity = $this->prepare($entityName, $id)['entity'];
+        $data = $this->prepare($entityName, $id);
+        $entity = $data['entity'];
+        $imageType = $data['imageType'];
         $previousImage = $entity?->getImage()?->getId() ?? 0;
         $entity->setImage($this->em->getRepository(Image::class)->findOneBy(['id' => $newImage]));
 
         $this->em->persist($entity);
         $this->em->flush();
+
+        if ($previousImage > 0) {
+            $this->imageLocationService->removeLocation($previousImage, $imageType, $id);
+        }
+        $this->imageLocationService->addLocation($newImage, $imageType, $id);
 
         $this->logActivity($entityName, $previousImage, $newImage);
 
@@ -119,6 +128,11 @@ final class ImageUploadController extends AbstractController
                 $entity->setImage($image);
                 $this->em->persist($entity);
                 $this->em->flush();
+
+                if ($previousImage > 0) {
+                    $this->imageLocationService->removeLocation($previousImage, $imageType, $id);
+                }
+                $this->imageLocationService->addLocation($entity->getImage()->getId(), $imageType, $id);
 
                 $this->logActivity($entityName, $previousImage, $entity->getImage()->getId());
                 $this->addFlash('success', 'Changed Image');

@@ -9,7 +9,7 @@ use App\Enum\ImageReportStatus;
 use App\Enum\SupportRequestStatus;
 use App\Repository\ImageReportRepository;
 use App\Repository\SupportRequestRepository;
-use App\Service\ImageLocationService;
+use App\Service\Media\ImageLocationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

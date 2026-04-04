@@ -3,6 +3,8 @@
 namespace Plugin\Dinnerclub\Service;
 
 use App\Entity\Image;
+use App\Enum\ImageType;
+use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Dinnerclub\Entity\Dish;
@@ -27,6 +29,7 @@ readonly class DishService
         private DishLikeRepository $likeRepo,
         private DishImageRepository $imageRepo,
         private DishImageSuggestionRepository $imageSuggestionRepo,
+        private ImageLocationService $imageLocationService,
     ) {}
 
     public function createDish(
@@ -347,6 +350,9 @@ readonly class DishService
 
         $this->em->flush();
 
+        // The unique constraint deduplicates when the same image is both gallery and preview
+        $this->imageLocationService->addLocation($image->getId(), ImageType::PluginDish, $dish->getId());
+
         return $dishImage;
     }
 
@@ -368,6 +374,10 @@ readonly class DishService
         }
 
         $this->em->flush();
+
+        if ($dish !== null && $image !== null) {
+            $this->imageLocationService->removeLocation($image->getId(), ImageType::PluginDish, $dish->getId());
+        }
     }
 
     public function addImageSuggestion(Dish $dish, Image $image, DishImageSuggestionType $type, int $userId): DishImageSuggestion
@@ -399,15 +409,25 @@ readonly class DishService
             throw new RuntimeException('Invalid image suggestion state');
         }
 
+        $oldPreviewId = null;
+
         if ($suggestion->getType() === DishImageSuggestionType::AddImage) {
             $this->addGalleryImage($dish, $image);
         } else {
+            $oldPreviewId = $dish->getPreviewImage()?->getId();
             $dish->setPreviewImage($image);
             $this->em->persist($dish);
         }
 
         $this->em->remove($suggestion);
         $this->em->flush();
+
+        if ($suggestion->getType() !== DishImageSuggestionType::AddImage) {
+            if ($oldPreviewId !== null) {
+                $this->imageLocationService->removeLocation($oldPreviewId, ImageType::PluginDish, $dish->getId());
+            }
+            $this->imageLocationService->addLocation($image->getId(), ImageType::PluginDish, $dish->getId());
+        }
 
         return $this->imageSuggestionRepo->countByDish($dish);
     }

@@ -5,6 +5,7 @@ namespace Plugin\Dinnerclub\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Enum\ImageType;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use Plugin\Dinnerclub\Activity\Messages\ImageSuggestionCreated;
 use Plugin\Dinnerclub\Entity\Dish;
@@ -27,6 +28,7 @@ final class DishImageController extends AbstractController
         private readonly DishService $dishService,
         private readonly ImageService $imageService,
         private readonly ActivityService $activityService,
+        private readonly ImageLocationService $imageLocationService,
     ) {}
 
     #[Route('/upload/{id}', name: 'plugin_dinnerclub_image_upload', methods: ['POST'])]
@@ -91,8 +93,15 @@ final class DishImageController extends AbstractController
         $user = $this->getAuthedUser();
 
         if ($this->isGranted('ROLE_ORGANIZER')) {
+            $oldPreviewId = $dish->getPreviewImage()?->getId();
             $dish->setPreviewImage($image);
             $this->dishService->saveBaseData($dish);
+
+            if ($oldPreviewId !== null) {
+                $this->imageLocationService->removeLocation($oldPreviewId, ImageType::PluginDish, $dishId);
+            }
+            $this->imageLocationService->addLocation($image->getId(), ImageType::PluginDish, $dishId);
+
             $this->addFlash('success', 'Preview image updated.');
         } else {
             $suggestion = $this->dishService->addImageSuggestion($dish, $image, DishImageSuggestionType::SetPreview, $user->getId());

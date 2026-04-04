@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Enum\ImageType;
 use App\Filter\Member\MemberFilterService;
 use App\Repository\UserRepository;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
@@ -26,6 +28,7 @@ final class MemberController extends AbstractController
         private readonly Security $security,
         private readonly BlockingService $blockingService,
         private readonly MemberFilterService $memberFilterService,
+        private readonly ImageLocationService $imageLocationService,
     ) {}
 
     #[Route('/members/{page}', name: self::ROUTE_MEMBER)]
@@ -121,9 +124,14 @@ final class MemberController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
+        $oldImageId = $user->getImage()?->getId();
         $user->setImage(null);
         $em->persist($user);
         $em->flush();
+
+        if ($oldImageId !== null) {
+            $this->imageLocationService->removeLocation($oldImageId, ImageType::ProfilePicture, $user->getId());
+        }
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
