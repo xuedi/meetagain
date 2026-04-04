@@ -63,3 +63,6 @@ language_lb: 'Lúksemboerch'
 language_rm: Reto-Romaansk
 language_fo: Faeröersk
 language_fy: Frysk
+
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'

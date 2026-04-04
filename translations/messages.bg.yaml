@@ -63,3 +63,6 @@ language_lb: Люксембургски
 language_rm: Реторомански
 language_fo: Фарьорски
 language_fy: Фризийски
+
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'

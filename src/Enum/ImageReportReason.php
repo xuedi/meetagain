@@ -9,10 +9,16 @@ enum ImageReportReason: int
     case Privacy = 1;
     case Copyright = 2;
     case Inappropriate = 3;
+    case Irrelevant = 4;
 
     public static function getChoices(TranslatorInterface $translator): array
     {
-        return array_flip(self::getTranslatedList($translator));
+        $choices = [];
+        foreach (self::cases() as $case) {
+            $choices[$translator->trans('image_report_reason_' . strtolower($case->name))] = $case;
+        }
+
+        return $choices;
     }
 
     public static function getTranslatedList(TranslatorInterface $translator): array

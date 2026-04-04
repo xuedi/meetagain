@@ -63,3 +63,6 @@ language_lb: Lwcsembwrgeg
 language_rm: Romaneg
 language_fo: Ffaroeg
 language_fy: Ffriseg
+
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'

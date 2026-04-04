@@ -181,8 +181,17 @@ toggle_no: Nein
 image_report_reason_privacy: Datenschutz
 image_report_reason_copyright: Copyright
 image_report_reason_inappropriate: Unangemessen
+image_report_reason_irrelevant: 'Nicht relevant'
 report_image_reason: 'Grund des Reports'
 button_report: Melden
+report_image_remarks: 'Zusätzliche Bemerkungen'
+report_image_remarks_placeholder: 'Beschreibe das Problem...'
+report_image_warning_title: 'Bild melden'
+report_image_warning_body: 'Du bist dabei, dieses Bild zu melden. Wähle bitte einen Grund aus und füge optional eine Beschreibung hinzu.'
+page_title_report_image: 'Bild melden'
+report_success_title: 'Meldung eingereicht'
+report_success_body: 'Das Element wurde deaktiviert und zur Überprüfung gesendet. Danke.'
+page_title_report_success: 'Meldung eingereicht'
 page_title_events_featured: 'Besondere Treffen'
 events_featured_button: 'Besondere Events'
 page_plugin_glossary_new_title: 'Neuer Eintrag'
@@ -327,6 +336,8 @@ email_tab_templates: Vorlagen
 email_tab_sendlog: Sendeprotokoll
 email_tab_announcements: Ankündigungen
 email_tab_debugging: Debugging
+support_tab_requests: 'Support-Anfragen'
+support_tab_reports: 'Bildmeldungen'
 logs_tab_activity: Aktivität
 logs_tab_system: System
 logs_tab_404: '404 Fehler'
