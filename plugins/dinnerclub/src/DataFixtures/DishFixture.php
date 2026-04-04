@@ -51,8 +51,8 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
             $imagePath = __DIR__ . "/dinnerclub/$imageFile";
             if (file_exists($imagePath)) {
                 $uploadedImage = new UploadedFile($imagePath, $imageFile);
-                $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginDishPreview);
-                $this->imageService->createThumbnails($image, ImageType::PluginDishPreview);
+                $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginDish);
+                $this->imageService->createThumbnails($image, ImageType::PluginDish);
                 $dish->setPreviewImage($image);
             }
 

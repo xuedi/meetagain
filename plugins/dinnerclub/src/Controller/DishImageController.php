@@ -45,14 +45,14 @@ final class DishImageController extends AbstractController
         }
 
         $user = $this->getAuthedUser();
-        $image = $this->imageService->upload($file, $user, ImageType::PluginDishGallery);
+        $image = $this->imageService->upload($file, $user, ImageType::PluginDish);
         if ($image === null) {
             $this->addFlash('danger', 'Could not process the uploaded image.');
 
             return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
         }
 
-        $this->imageService->createThumbnails($image, ImageType::PluginDishGallery);
+        $this->imageService->createThumbnails($image, ImageType::PluginDish);
 
         if ($this->isGranted('ROLE_ORGANIZER')) {
             $this->dishService->addGalleryImage($dish, $image);
