@@ -24,6 +24,13 @@ readonly class ConfigService
         private CacheInterface $cache,
     ) {}
 
+    /**
+     * Returns thumbnail sizes for a given ImageType.
+     *
+     * Note: sizes may appear in multiple ImageType entries — e.g. EventTeaser and EventUpload
+     * share the same size set. This is intentional: each ImageType also represents a location,
+     * and the same physical size can be valid in more than one location context.
+     */
     public function getThumbnailSizes(ImageType $type): array
     {
         return match ($type) {
