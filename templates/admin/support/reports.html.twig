@@ -1,0 +1,78 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/support/_tabs_navigation.html.twig' with {'activeSection': 'reports'} %}
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Image</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Remarks</th>
+                <th>Status</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for report in reports %}
+                <tr{% if report.isOpen() %} class="has-background-warning-light"{% endif %}>
+                    <td>
+                        {{ report.createdAt|date('Y-m-d') }}<br>
+                        <small class="has-text-grey">{{ report.createdAt|date('H:i:s') }}</small>
+                    </td>
+                    <td>
+                        {% if report.image %}
+                            {% include '_components/image.html.twig' with {'image': report.image, 'size': '50x50'} %}
+                        {% else %}
+                            <span class="has-text-grey">deleted</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if report.reporter %}
+                            {{ report.reporter.name }}
+                        {% else %}
+                            <span class="has-text-grey">deleted</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="tag is-light">{{ report.reason.name }}</span></td>
+                    <td>{{ report.remarks|default('')|u.truncate(100) }}</td>
+                    <td>
+                        {% if report.isOpen() %}
+                            <span class="tag is-warning">Open</span>
+                        {% else %}
+                            <span class="tag is-light">Resolved</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if report.isOpen() %}
+                            <form method="post" action="{{ path('app_admin_support_report_resolve', {id: report.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('resolve_report_' ~ report.id) }}">
+                                <button type="submit" class="button is-small is-light">Mark resolved</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_admin_support_report_show', {id: report.id}) }}">
+                            <span class="icon"><i class="fa fa-eye"></i></span>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="has-text-centered has-text-grey">
+                        No image reports found.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

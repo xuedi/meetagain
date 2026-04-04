@@ -63,3 +63,6 @@ language_lb: Lussemburghese
 language_rm: Romancio
 language_fo: Faroese
 language_fy: Frisone
+
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'

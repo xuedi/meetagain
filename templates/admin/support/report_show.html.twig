@@ -1,0 +1,100 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/support/_tabs_navigation.html.twig' with {'activeSection': 'reports'} %}
+
+        <div class="mb-4">
+            <a href="{{ path('app_admin_support_reports') }}" class="button is-small">
+                <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                <span>Back</span>
+            </a>
+        </div>
+
+        <div class="columns">
+            <div class="column is-narrow">
+                {% if report.image %}
+                    {% include '_components/image.html.twig' with {'image': report.image, 'size': '100x100'} %}
+                {% else %}
+                    <span class="has-text-grey">Image deleted</span>
+                {% endif %}
+            </div>
+            <div class="column">
+                <table class="table is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <th>ID</th>
+                            <td><code>{{ report.id }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <td>{{ report.createdAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Reporter</th>
+                            <td>
+                                {% if report.reporter %}
+                                    <a href="{{ path('app_admin_member_edit', {'id': report.reporter.id}) }}">
+                                        {{ report.reporter.name }} ({{ report.reporter.email }})
+                                    </a>
+                                {% else %}
+                                    <span class="has-text-grey">deleted</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Reason</th>
+                            <td><span class="tag is-warning">{{ report.reason.name }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Remarks</th>
+                            <td>{{ report.remarks|default('-') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Location</th>
+                            <td>
+                                {% if location %}
+                                    {% if location.route %}
+                                        <a href="{{ path(location.route, location.params) }}" class="button is-small">
+                                            <span class="icon"><i class="fa fa-external-link"></i></span>
+                                            <span>{{ location.label }}</span>
+                                        </a>
+                                    {% else %}
+                                        {{ location.label }}
+                                    {% endif %}
+                                {% else %}
+                                    <span class="has-text-grey">Unknown (plugin image)</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                {% if report.isOpen() %}
+                                    <span class="tag is-warning">Open</span>
+                                {% else %}
+                                    <span class="tag is-light">Resolved</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if report.isOpen() %}
+                        <tr>
+                            <th></th>
+                            <td>
+                                <form method="post" action="{{ path('app_admin_support_report_resolve', {id: report.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('resolve_report_' ~ report.id) }}">
+                                    <button type="submit" class="button is-light">Mark resolved</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -63,3 +63,6 @@ language_lb: Luxemburg
 language_rm: Romansh
 language_fo: Faroe
 language_fy: Frisian
+
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'

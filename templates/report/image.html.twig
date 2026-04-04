@@ -1,34 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_member"|trans }}{% endblock %}
+{% block title %}{{ "page_title_report_image"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-6">
+                    <div class="box">
 
-            <h1 class="title">Report image</h1>
+                        <div class="notification is-warning">
+                            <p class="has-text-weight-bold">{{ "report_image_warning_title"|trans }}</p>
+                            <p>{{ "report_image_warning_body"|trans }}</p>
+                        </div>
 
-            <div class="columns">
-                <div class="column is-2">
-                    {% include '_components/image.html.twig' with {'image': image} %}
-                </div>
-                <div class="column is-10">
-                    {{ form_start(form) }}
+                        <div class="has-text-centered mb-5">
+                            {% include '_components/image.html.twig' with {'image': image, 'size': '100x100'} %}
+                        </div>
 
-                    {{ form_row(form.reported) }}
+                        {{ form_start(form) }}
 
-                    <button class="button is-danger">
-                        <span class="icon is-small">
-                            <i class="fa-solid fa-circle-exclamation"></i>
-                        </span>
-                        <span>{{ "button_report" | trans }}</span>
-                    </button>
+                        <div class="field">
+                            {{ form_row(form.reported) }}
+                        </div>
 
-                    {{ form_end(form) }}
+                        <div class="field">
+                            {{ form_row(form.remarks) }}
+                        </div>
+
+                        <div class="field">
+                            <button class="button is-danger is-medium is-fullwidth">
+                                <span class="icon is-small">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                </span>
+                                <span>{{ "button_report"|trans }}</span>
+                            </button>
+                        </div>
+
+                        {{ form_end(form) }}
+
+                    </div>
                 </div>
             </div>
-
         </div>
     </section>
 

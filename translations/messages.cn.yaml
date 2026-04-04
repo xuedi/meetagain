@@ -181,8 +181,17 @@ toggle_no: 关掉
 image_report_reason_privacy: 隐私
 image_report_reason_copyright: 版权
 image_report_reason_inappropriate: 不恰当
+image_report_reason_irrelevant: Irrelevant
 report_image_reason: 报告原因
 button_report: 报告
+report_image_remarks: 'Additional remarks'
+report_image_remarks_placeholder: 'Describe the issue...'
+report_image_warning_title: 'Report this image'
+report_image_warning_body: 'You are about to report this image. Please select a reason and optionally add a description.'
+page_title_report_image: 'Report Image'
+report_success_title: 'Report submitted'
+report_success_body: 'The item has been deactivated and sent for review. Thank you.'
+page_title_report_success: 'Report Submitted'
 page_title_events_featured: 推荐会议
 events_featured_button: 精选
 page_plugin_glossary_new_title: 新条目
@@ -327,6 +336,8 @@ email_tab_templates: 模板
 email_tab_sendlog: 发送日志
 email_tab_announcements: 公告
 email_tab_debugging: 调试
+support_tab_requests: 'Support Requests'
+support_tab_reports: 'Image Reports'
 logs_tab_activity: 活动日志
 logs_tab_system: 系统日志
 logs_tab_404: 404错误

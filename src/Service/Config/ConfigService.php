@@ -27,14 +27,14 @@ readonly class ConfigService
     public function getThumbnailSizes(ImageType $type): array
     {
         return match ($type) {
-            ImageType::ProfilePicture => [[400, 400], [80, 80], [50, 50]],
-            ImageType::EventTeaser => [[1024, 768], [600, 400], [210, 140]], // included EventUpload
-            ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [210, 140]],
-            ImageType::CmsCardImage => [[600, 400], [300, 200]],
-            ImageType::CmsBlock => [[432, 432], [80, 80]],
+            ImageType::ProfilePicture => [[400, 400], [100, 100], [80, 80], [50, 50]],
+            ImageType::EventTeaser => [[1024, 768], [600, 400], [210, 140], [100, 100], [50, 50]], // included EventUpload
+            ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [210, 140], [100, 100], [50, 50]],
+            ImageType::CmsCardImage => [[600, 400], [300, 200], [100, 100], [50, 50]],
+            ImageType::CmsBlock => [[432, 432], [100, 100], [80, 80], [50, 50]],
             ImageType::PluginDish => [[1024, 768], [600, 400], [400, 400], [100, 100], [50, 50]],
-            ImageType::LanguageTile => [[600, 400], [300, 200]],
-            ImageType::PluginBookclubCover => [[400, 500], [200, 250]],
+            ImageType::LanguageTile => [[600, 400], [300, 200], [100, 100], [50, 50]],
+            ImageType::PluginBookclubCover => [[400, 500], [200, 250], [100, 100], [50, 50]],
         };
     }
 
@@ -47,6 +47,7 @@ readonly class ConfigService
             '400x400' => 0, // profile big
             '300x200' => 0, // cms card image
             '210x140' => 0, // gallery image preview
+            '100x100' => 0, // report preview
             '80x80' => 0, // ?
             '50x50' => 0, // ?
         ];

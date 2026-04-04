@@ -50,19 +50,19 @@ class ConfigServiceTest extends TestCase
     {
         yield 'profile picture' => [
             ImageType::ProfilePicture,
-            [[400, 400], [80, 80], [50, 50]],
+            [[400, 400], [100, 100], [80, 80], [50, 50]],
         ];
         yield 'event teaser' => [
             ImageType::EventTeaser,
-            [[1024, 768], [600, 400], [210, 140]],
+            [[1024, 768], [600, 400], [210, 140], [100, 100], [50, 50]],
         ];
         yield 'event upload' => [
             ImageType::EventUpload,
-            [[1024, 768], [210, 140]],
+            [[1024, 768], [210, 140], [100, 100], [50, 50]],
         ];
         yield 'cms block' => [
             ImageType::CmsBlock,
-            [[432, 432], [80, 80]],
+            [[432, 432], [100, 100], [80, 80], [50, 50]],
         ];
         yield 'plugin dish' => [
             ImageType::PluginDish,
@@ -79,6 +79,7 @@ class ConfigServiceTest extends TestCase
             '400x400' => 0,
             '300x200' => 0,
             '210x140' => 0,
+            '100x100' => 0,
             '80x80' => 0,
             '50x50' => 0,
         ];
