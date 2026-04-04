@@ -1,0 +1,141 @@
+<?php declare(strict_types=1);
+
+namespace Plugin\Dinnerclub\Controller;
+
+use App\Activity\ActivityService;
+use App\Controller\AbstractController;
+use App\Enum\ImageType;
+use App\Service\Media\ImageService;
+use Plugin\Dinnerclub\Activity\Messages\ImageSuggestionCreated;
+use Plugin\Dinnerclub\Entity\Dish;
+use Plugin\Dinnerclub\Enum\DishImageSuggestionType;
+use Plugin\Dinnerclub\Repository\DishImageRepository;
+use Plugin\Dinnerclub\Repository\DishRepository;
+use Plugin\Dinnerclub\Service\DishService;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[Route('/dinnerclub/image')]
+#[IsGranted('ROLE_USER')]
+final class DishImageController extends AbstractController
+{
+    public function __construct(
+        private readonly DishRepository $dishRepository,
+        private readonly DishImageRepository $dishImageRepository,
+        private readonly DishService $dishService,
+        private readonly ImageService $imageService,
+        private readonly ActivityService $activityService,
+    ) {}
+
+    #[Route('/upload/{id}', name: 'plugin_dinnerclub_image_upload', methods: ['POST'])]
+    public function upload(Request $request, int $id): Response
+    {
+        $dish = $this->dishRepository->find($id);
+        if ($dish === null) {
+            throw $this->createNotFoundException('Dish not found');
+        }
+
+        $file = $request->files->get('image');
+        if ($file === null) {
+            $this->addFlash('danger', 'No image file provided.');
+
+            return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
+        }
+
+        $user = $this->getAuthedUser();
+        $image = $this->imageService->upload($file, $user, ImageType::PluginDishGallery);
+        if ($image === null) {
+            $this->addFlash('danger', 'Could not process the uploaded image.');
+
+            return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
+        }
+
+        $this->imageService->createThumbnails($image, ImageType::PluginDishGallery);
+
+        if ($this->isGranted('ROLE_ORGANIZER')) {
+            $this->dishService->addGalleryImage($dish, $image);
+            $this->addFlash('success', 'Image added to gallery.');
+        } else {
+            $suggestion = $this->dishService->addImageSuggestion($dish, $image, DishImageSuggestionType::AddImage, $user->getId());
+            $this->activityService->log(ImageSuggestionCreated::TYPE, $user, [
+                'dish_id' => $id,
+                'dish_name' => $this->getDishName($dish),
+                'suggestion_type' => $suggestion->getType()?->value,
+            ]);
+            $this->addFlash('success', 'Image suggestion submitted for review.');
+        }
+
+        return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
+    }
+
+    #[Route('/suggest-preview/{dishId}/{dishImageId}', name: 'plugin_dinnerclub_suggest_preview', methods: ['GET'])]
+    public function suggestPreview(int $dishId, int $dishImageId): Response
+    {
+        $dish = $this->dishRepository->find($dishId);
+        if ($dish === null) {
+            throw $this->createNotFoundException('Dish not found');
+        }
+
+        $dishImage = $this->dishImageRepository->find($dishImageId);
+        if ($dishImage === null || $dishImage->getDish()?->getId() !== $dishId) {
+            throw $this->createNotFoundException('Gallery image not found');
+        }
+
+        $image = $dishImage->getImage();
+        if ($image === null) {
+            throw $this->createNotFoundException('Image not found');
+        }
+
+        $user = $this->getAuthedUser();
+
+        if ($this->isGranted('ROLE_ORGANIZER')) {
+            $dish->setPreviewImage($image);
+            $this->dishService->saveBaseData($dish);
+            $this->addFlash('success', 'Preview image updated.');
+        } else {
+            $suggestion = $this->dishService->addImageSuggestion($dish, $image, DishImageSuggestionType::SetPreview, $user->getId());
+            $this->activityService->log(ImageSuggestionCreated::TYPE, $user, [
+                'dish_id' => $dishId,
+                'dish_name' => $this->getDishName($dish),
+                'suggestion_type' => $suggestion->getType()?->value,
+            ]);
+            $this->addFlash('success', 'Preview suggestion submitted for review.');
+        }
+
+        return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $dishId]);
+    }
+
+    #[Route('/delete/{dishImageId}', name: 'plugin_dinnerclub_image_delete', methods: ['GET'])]
+    #[IsGranted('ROLE_ORGANIZER')]
+    public function delete(int $dishImageId): Response
+    {
+        $dishImage = $this->dishImageRepository->find($dishImageId);
+        if ($dishImage === null) {
+            throw $this->createNotFoundException('Gallery image not found');
+        }
+
+        $dishId = $dishImage->getDish()?->getId();
+
+        $this->dishService->removeGalleryImage($dishImageId);
+        $this->addFlash('success', 'Image removed from gallery.');
+
+        return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $dishId]);
+    }
+
+    private function getDishName(Dish $dish): string
+    {
+        $originLang = $dish->getOriginLang();
+        if ($originLang !== null) {
+            $translation = $dish->findTranslation($originLang);
+            if ($translation !== null) {
+                return $translation->getName();
+            }
+        }
+
+        $first = $dish->getTranslation()->first();
+
+        return $first !== false ? $first->getName() : '[unknown]';
+    }
+}
