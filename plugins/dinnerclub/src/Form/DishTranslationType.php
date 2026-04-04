@@ -15,9 +15,6 @@ class DishTranslationType extends AbstractType
         $builder->add('name', TextType::class, [
             'label' => 'Name',
             'required' => true,
-        ])->add('phonetic', TextType::class, [
-            'label' => 'Phonetic',
-            'required' => false,
         ])->add('description', TextareaType::class, [
             'label' => 'Description',
             'required' => false,

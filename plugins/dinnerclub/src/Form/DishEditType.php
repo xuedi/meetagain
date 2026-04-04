@@ -2,30 +2,31 @@
 
 namespace Plugin\Dinnerclub\Form;
 
-use App\Service\Config\LanguageService;
+use App\Entity\PronunciationSystem;
 use Plugin\Dinnerclub\Entity\Dish;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
 class DishEditType extends AbstractType
 {
-    public function __construct(
-        private readonly LanguageService $languageService,
-    ) {}
-
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $codes = $this->languageService->getFilteredEnabledCodes();
-        $choices = array_combine(array_map('strtoupper', $codes), $codes);
-
         $builder
-            ->add('originLang', ChoiceType::class, [
-                'label' => 'Origin Language',
-                'choices' => $choices,
-                'required' => true,
+            ->add('pronunciationSystem', EntityType::class, [
+                'label' => 'Pronunciation System',
+                'class' => PronunciationSystem::class,
+                'choice_label' => fn(PronunciationSystem $s) => $s->getName() . ' (' . $s->getLanguage() . ')',
+                'required' => false,
+                'placeholder' => 'None',
+            ])
+            ->add('phonetic', TextType::class, [
+                'label' => 'Phonetic',
+                'required' => false,
+                'attr' => ['placeholder' => 'e.g. má po dòu fu'],
             ])
             ->add('origin', TextType::class, [
                 'label' => 'Origin / Region',

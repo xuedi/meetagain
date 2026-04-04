@@ -28,7 +28,7 @@
                     </div>
                     <div class="card-content p-2">
                         <p class="has-text-centered is-size-7 has-text-dark" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            {{ item.getTranslatedName(app.locale) ?: item.getTranslatedName(item.originLang) }}
+                            {{ item.getTranslatedName(app.locale) ?: item.getAnyTranslatedName() }}
                         </p>
                         <div class="is-flex is-justify-content-space-between is-size-7 has-text-grey mt-1">
                             <span class="{% if userLiked %}has-text-danger{% endif %}">

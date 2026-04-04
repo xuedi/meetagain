@@ -40,16 +40,6 @@ readonly class DinnerclubImageSuggestionAdminNotificationProvider implements Adm
 
     private function getDishName(Dish $dish): string
     {
-        $originLang = $dish->getOriginLang();
-        if ($originLang !== null) {
-            $translation = $dish->findTranslation($originLang);
-            if ($translation !== null) {
-                return $translation->getName();
-            }
-        }
-
-        $first = $dish->getTranslation()->first();
-
-        return $first !== false ? $first->getName() : '[unknown]';
+        return $dish->getAnyTranslatedName() ?: '[unknown]';
     }
 }

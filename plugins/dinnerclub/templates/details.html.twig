@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_dinnerclub_title_details"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}{% endblock %}
+{% block title %}{{ "page_plugin_dinnerclub_title_details"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
 {% block stylesheets %}
     {% if dish.previewImage or galleryImages|length > 0 %}
@@ -22,7 +22,7 @@
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
                     <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</a></li>
                 </ul>
             </nav>
 
@@ -32,7 +32,7 @@
                         <div class="level">
                             <div class="level-left">
                                 <div class="level-item">
-                                    <h1 class="title is-3">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName(dish.originLang) }}</h1>
+                                    <h1 class="title is-3">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</h1>
                                 </div>
                                 {% if not dish.approved %}
                                     <div class="level-item">
@@ -55,10 +55,10 @@
                             </div>
                         </div>
 
-                        {% if dish.getPhonetic(app.locale) or dish.getPhonetic(dish.originLang) %}
+                        {% if dish.getPhonetic() %}
                             <p class="subtitle is-5 has-text-grey">
                                 <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
-                                {{ dish.getPhonetic(app.locale) ?: dish.getPhonetic(dish.originLang) }}
+                                {{ dish.getPhonetic() }}
                             </p>
                         {% endif %}
 
@@ -104,17 +104,17 @@
                             </div>
                         {% endif %}
 
-                        {% if dish.getTranslatedDescription(app.locale) or dish.getTranslatedDescription(dish.originLang) %}
+                        {% if dish.getTranslatedDescription(app.locale) or dish.getAnyTranslatedDescription() %}
                             <div class="content">
                                 <h4>Description</h4>
-                                <p>{{ (dish.getTranslatedDescription(app.locale) ?: dish.getTranslatedDescription(dish.originLang))|nl2br }}</p>
+                                <p>{{ (dish.getTranslatedDescription(app.locale) ?: dish.getAnyTranslatedDescription())|nl2br }}</p>
                             </div>
                         {% endif %}
 
-                        {% if dish.getTranslatedRecipe(app.locale) or dish.getTranslatedRecipe(dish.originLang) %}
+                        {% if dish.getTranslatedRecipe(app.locale) or dish.getAnyTranslatedRecipe() %}
                             <div class="content">
                                 <h4>Recipe</h4>
-                                <p>{{ (dish.getTranslatedRecipe(app.locale) ?: dish.getTranslatedRecipe(dish.originLang))|nl2br }}</p>
+                                <p>{{ (dish.getTranslatedRecipe(app.locale) ?: dish.getAnyTranslatedRecipe())|nl2br }}</p>
                             </div>
                         {% endif %}
 
@@ -153,7 +153,7 @@
                             </div>
                             {% if is_granted('ROLE_ORGANIZER') %}
                             <div class="level-right">
-                                <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': dish.originLang ?? app.locale}) }}" class="button is-link">
+                                <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': app.locale}) }}" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
                                     <span>Edit</span>
                                 </a>
@@ -162,7 +162,9 @@
                         </div>
                         <p><strong>Added by:</strong> {{ get_user_name(dish.createdBy) }}</p>
                         <p><strong>Added:</strong> {{ dish.createdAt|time_diff }}</p>
-                        <p><strong>Original language:</strong> {{ dish.originLang|upper }}</p>
+                        {% if dish.pronunciationSystem %}
+                        <p><strong>Pronunciation:</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
+                        {% endif %}
                         <p><strong>Likes:</strong> <span class="like-count-display">{{ dish.likes }}</span></p>
                     </div>
 
