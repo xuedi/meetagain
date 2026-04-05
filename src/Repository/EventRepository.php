@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Event;
 use App\Entity\Host;
+use App\Entity\User;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
@@ -199,6 +200,37 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('date', new DateTime());
 
         // Apply event ID filter if provided
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return [];
+            }
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->orderBy('e.start', 'DESC')->setMaxResults($number)->getQuery()->getResult();
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
+     * @return array<Event>
+     */
+    public function getPastAttendedEvents(User $user, int $number = 20, ?array $restrictToEventIds = null): array
+    {
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l')
+            ->leftJoin('e.rsvp', 'r')
+            ->addSelect('r')
+            ->leftJoin('e.previewImage', 'pi')
+            ->addSelect('pi')
+            ->where('e.start < :date')
+            ->andWhere(':user MEMBER OF e.rsvp')
+            ->setParameter('date', new DateTime())
+            ->setParameter('user', $user);
+
         if ($restrictToEventIds !== null) {
             if ($restrictToEventIds === []) {
                 return [];
