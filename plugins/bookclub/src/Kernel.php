@@ -2,10 +2,10 @@
 
 namespace Plugin\Bookclub;
 
-use App\Entity\AdminSection;
 use App\Entity\Link;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\ValueObject\LinkCollection;
 use Plugin\Bookclub\Entity\PollStatus;
 use Plugin\Bookclub\Repository\BookPollRepository;
 use Plugin\Bookclub\Repository\BookSelectionRepository;
@@ -27,11 +27,11 @@ class Kernel implements Plugin
         return 'bookclub';
     }
 
-    public function getMenuLinks(): array
+    public function getLinkCollection(): LinkCollection
     {
-        return [
+        return LinkCollection::empty()->withNavLinks([
             new Link(slug: $this->urlGenerator->generate('app_plugin_bookclub'), name: 'books'),
-        ];
+        ]);
     }
 
     public function getEventTile(int $eventId): ?string
@@ -61,11 +61,6 @@ class Kernel implements Plugin
         // No post-fixture tasks for this plugin
     }
 
-    public function getAdminSystemLinks(): ?AdminSection
-    {
-        return null;
-    }
-
     public function getFooterAbout(): ?string
     {
         return null;
@@ -81,16 +76,6 @@ class Kernel implements Plugin
     }
 
     public function getMemberPageTop(): ?string
-    {
-        return null;
-    }
-
-    public function getFooterLinks(string $column): array
-    {
-        return [];
-    }
-
-    public function getFooterColumnTitle(string $column): ?string
     {
         return null;
     }

@@ -2,10 +2,9 @@
 
 namespace App;
 
-use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
-use App\Entity\Link;
 use App\Enum\WarmCacheType;
+use App\ValueObject\LinkCollection;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
@@ -18,11 +17,9 @@ interface Plugin
     public function getPluginKey(): string;
 
     /**
-     * Returns list of links to be displayed in the top menu or the footer.
-     *
-     * @return list<Link>
+     * Returns all link slots contributed by this plugin.
      */
-    public function getMenuLinks(): array;
+    public function getLinkCollection(): LinkCollection;
 
     /**
      * Returns a rendered tile to be displayed as a box on the event details page.
@@ -47,12 +44,6 @@ interface Plugin
      * Called by app:plugin:post-fixtures command.
      */
     public function postFixtures(OutputInterface $output): void;
-
-    /**
-     * Returns admin sidebar section with links for this plugin.
-     * Return null if the plugin has no admin links.
-     */
-    public function getAdminSystemLinks(): ?AdminSection;
 
     /**
      * Returns rendered HTML for the footer "about" section (copyright/branding area).
@@ -80,15 +71,4 @@ interface Plugin
      */
     public function getMemberPageTop(): ?string;
 
-    /**
-     * Returns links to inject into the given footer column (e.g. 'col2').
-     *
-     * @return list<Link>
-     */
-    public function getFooterLinks(string $column): array;
-
-    /**
-     * Returns the display title for the given footer column, or null to use the default.
-     */
-    public function getFooterColumnTitle(string $column): ?string;
 }
