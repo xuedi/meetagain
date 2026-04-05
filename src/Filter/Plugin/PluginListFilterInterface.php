@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 /**
  * Interface for filtering the active plugin list based on request context.
  * Plugins can implement this to restrict which plugins are considered active
- * for a given context (e.g., a specific group in a multi-tenant setup).
+ * for the current request context.
  *
  * Multiple filters can be registered — they are composed with AND logic.
  * If any filter restricts the set, the intersection is taken.
