@@ -203,7 +203,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Filter returns noFilter() (no active filter)
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
         $this->languageFilterService = $this->createStub(LanguageFilterService::class);
         $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::noFilter());
@@ -220,7 +220,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Filter restricts to ['en', 'de'], enabled codes are ['en', 'de', 'zh']
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
         $this->languageFilterService = $this->createStub(LanguageFilterService::class);
         $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(new LanguageFilterResult(['en', 'de'], true));
@@ -237,7 +237,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Filter returns emptyResult() (hasActiveFilter=true but codes=[])
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
         $this->languageFilterService = $this->createStub(LanguageFilterService::class);
         $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::emptyResult());
@@ -254,7 +254,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Filter is active but returns null codes (hasActiveFilter=true, codes=null)
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
         $this->languageFilterService = $this->createStub(LanguageFilterService::class);
         $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(new LanguageFilterResult(null, true));
@@ -271,7 +271,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Filter returns ['fr'] but enabled codes are ['en', 'de'] — no overlap
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
         $this->languageFilterService = $this->createStub(LanguageFilterService::class);
         $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(new LanguageFilterResult(['fr'], true));
@@ -290,7 +290,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Admin filter returns noFilter()
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
         $this->adminLanguageFilterService = $this->createStub(AdminLanguageFilterService::class);
         $this->adminLanguageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::noFilter());
@@ -307,7 +307,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Admin filter restricts to ['en'] only
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
         $this->adminLanguageFilterService = $this->createStub(AdminLanguageFilterService::class);
         $this->adminLanguageFilterService->method('getLanguageCodeFilter')->willReturn(new LanguageFilterResult(['en'], true));
@@ -324,7 +324,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Admin filter returns emptyResult()
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
         $this->adminLanguageFilterService = $this->createStub(AdminLanguageFilterService::class);
         $this->adminLanguageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::emptyResult());
@@ -341,7 +341,7 @@ class LanguageServiceTest extends TestCase
     {
         // Arrange - Admin filter returns ['fr'] but enabled codes are ['en', 'de'] — no overlap
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
-        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createMock(ItemInterface::class)));
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
         $this->adminLanguageFilterService = $this->createStub(AdminLanguageFilterService::class);
         $this->adminLanguageFilterService->method('getLanguageCodeFilter')->willReturn(new LanguageFilterResult(['fr'], true));
