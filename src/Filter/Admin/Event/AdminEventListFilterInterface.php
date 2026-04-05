@@ -46,7 +46,7 @@ interface AdminEventListFilterInterface
      * Get debug context information for logging when access is denied.
      *
      * @param int $eventId The event ID being checked
-     * @return array<string, mixed> Context information for logging (e.g., current group, domain)
+     * @return array<string, mixed> Context information for logging (e.g., active filter, current context)
      */
     public function getDebugContext(int $eventId): array;
 }
