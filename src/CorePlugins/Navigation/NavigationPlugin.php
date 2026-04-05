@@ -2,10 +2,10 @@
 
 namespace App\CorePlugins\Navigation;
 
-use App\Entity\AdminSection;
 use App\Entity\Link;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\ValueObject\LinkCollection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -24,7 +24,7 @@ readonly class NavigationPlugin implements Plugin
         return 'core_navigation';
     }
 
-    public function getMenuLinks(): array
+    public function getLinkCollection(): LinkCollection
     {
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';
 
@@ -41,7 +41,7 @@ readonly class NavigationPlugin implements Plugin
             $links[] = new Link(slug: $this->router->generate('app_admin'), name: 'admin', priority: 300);
         }
 
-        return $links;
+        return LinkCollection::empty()->withNavLinks($links);
     }
 
     public function getEventTile(int $eventId): ?string
@@ -59,11 +59,6 @@ readonly class NavigationPlugin implements Plugin
 
     public function postFixtures(OutputInterface $output): void
     {
-    }
-
-    public function getAdminSystemLinks(): ?AdminSection
-    {
-        return null;
     }
 
     public function getFooterAbout(): ?string
@@ -85,16 +80,6 @@ readonly class NavigationPlugin implements Plugin
     }
 
     public function getMemberPageTop(): ?string
-    {
-        return null;
-    }
-
-    public function getFooterLinks(string $column): array
-    {
-        return [];
-    }
-
-    public function getFooterColumnTitle(string $column): ?string
     {
         return null;
     }

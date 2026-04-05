@@ -38,6 +38,7 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
             new TwigFunction('get_plugin_footer_links', $this->getPluginFooterLinks(...)),
+            new TwigFunction('get_plugin_profile_dropdown_links', $this->getPluginProfileDropdownLinks(...)),
             new TwigFunction('get_member_page_top', $this->getMemberPageTop(...), ['is_safe' => ['html']]),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
@@ -47,7 +48,7 @@ final class PluginExtension extends AbstractExtension
 
     public function getPluginsLinks(): array
     {
-        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getMenuLinks());
+        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getNavLinks());
 
         usort($links, static fn($a, $b) => $a->getPriority() <=> $b->getPriority());
 
@@ -64,7 +65,7 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginsAdminSystemLinks(): array
     {
-        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getAdminSystemLinks());
+        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getAdminSection());
     }
 
     /**
@@ -108,7 +109,19 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginFooterLinks(string $column): array
     {
-        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getFooterLinks($column));
+        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getFooterLinks($column));
+    }
+
+    /**
+     * Returns links contributed by plugins for the profile dropdown menu, sorted by priority.
+     */
+    public function getPluginProfileDropdownLinks(): array
+    {
+        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileDropdownLinks());
+
+        usort($links, static fn($a, $b) => $a->getPriority() <=> $b->getPriority());
+
+        return $links;
     }
 
     /**
