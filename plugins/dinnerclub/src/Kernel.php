@@ -2,11 +2,11 @@
 
 namespace Plugin\Dinnerclub;
 
-use App\Entity\AdminSection;
 use App\Entity\Link;
 use App\Enum\EventType;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\ValueObject\LinkCollection;
 use App\Repository\EventRepository;
 use Plugin\Dinnerclub\Repository\DinnerRepository;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,11 +27,11 @@ class Kernel implements Plugin
         return 'dinnerclub';
     }
 
-    public function getMenuLinks(): array
+    public function getLinkCollection(): LinkCollection
     {
-        return [
+        return LinkCollection::empty()->withNavLinks([
             new Link(slug: $this->urlGenerator->generate('app_plugin_dinnerclub'), name: 'dishes'),
-        ];
+        ]);
     }
 
     public function getEventTile(int $eventId): ?string
@@ -63,11 +63,6 @@ class Kernel implements Plugin
         // No post-fixture tasks for this plugin
     }
 
-    public function getAdminSystemLinks(): ?AdminSection
-    {
-        return null;
-    }
-
     public function getFooterAbout(): ?string
     {
         return null;
@@ -83,16 +78,6 @@ class Kernel implements Plugin
     }
 
     public function getMemberPageTop(): ?string
-    {
-        return null;
-    }
-
-    public function getFooterLinks(string $column): array
-    {
-        return [];
-    }
-
-    public function getFooterColumnTitle(string $column): ?string
     {
         return null;
     }

@@ -2,9 +2,9 @@
 
 namespace Plugin\Karaoke;
 
-use App\Entity\AdminSection;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\ValueObject\LinkCollection;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Kernel implements Plugin
@@ -14,9 +14,9 @@ class Kernel implements Plugin
         return 'karaoke';
     }
 
-    public function getMenuLinks(): array
+    public function getLinkCollection(): LinkCollection
     {
-        return [];
+        return LinkCollection::empty();
     }
 
     public function getEventTile(int $eventId): ?string
@@ -38,11 +38,6 @@ class Kernel implements Plugin
         // No post-fixture tasks for this plugin
     }
 
-    public function getAdminSystemLinks(): ?AdminSection
-    {
-        return null;
-    }
-
     public function getFooterAbout(): ?string
     {
         return null;
@@ -58,16 +53,6 @@ class Kernel implements Plugin
     }
 
     public function getMemberPageTop(): ?string
-    {
-        return null;
-    }
-
-    public function getFooterLinks(string $column): array
-    {
-        return [];
-    }
-
-    public function getFooterColumnTitle(string $column): ?string
     {
         return null;
     }

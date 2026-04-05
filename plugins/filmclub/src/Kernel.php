@@ -2,10 +2,10 @@
 
 namespace Plugin\Filmclub;
 
-use App\Entity\AdminSection;
 use App\Entity\Link;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\ValueObject\LinkCollection;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -35,12 +35,12 @@ class Kernel implements Plugin
         return 'filmclub';
     }
 
-    public function getMenuLinks(): array
+    public function getLinkCollection(): LinkCollection
     {
-        return [
+        return LinkCollection::empty()->withNavLinks([
             new Link(slug: $this->urlGenerator->generate('app_filmclub_filmlist'), name: 'Filme'),
             new Link(slug: $this->urlGenerator->generate('app_filmclub_vote'), name: 'Vote'),
-        ];
+        ]);
     }
 
     public function getEventTile(int $eventId): ?string
@@ -169,11 +169,6 @@ class Kernel implements Plugin
         // No post-fixture tasks for this plugin
     }
 
-    public function getAdminSystemLinks(): ?AdminSection
-    {
-        return null;
-    }
-
     public function getFooterAbout(): ?string
     {
         return null;
@@ -189,16 +184,6 @@ class Kernel implements Plugin
     }
 
     public function getMemberPageTop(): ?string
-    {
-        return null;
-    }
-
-    public function getFooterLinks(string $column): array
-    {
-        return [];
-    }
-
-    public function getFooterColumnTitle(string $column): ?string
     {
         return null;
     }
