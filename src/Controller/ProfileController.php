@@ -60,8 +60,8 @@ final class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
-        // Apply content filtering from all registered filters
-        $filterResult = $this->eventFilterService->getEventIdFilter();
+        // Apply user-scoped content filtering (group memberships + domain context)
+        $filterResult = $this->eventFilterService->getEventIdFilterForUserProfile($user);
         $eventIds = $filterResult->getEventIds();
 
         return $this->render(
@@ -73,7 +73,7 @@ final class ProfileController extends AbstractController
                 'blockedCount' => count($this->blockingService->getBlockedUsers($user)),
                 'user' => $this->getAuthedUser(),
                 'upcoming' => $this->repo->getUpcomingEvents(10, $eventIds),
-                'past' => $this->repo->getPastEvents(20, $eventIds),
+                'past' => $this->repo->getPastAttendedEvents($user, 20, $eventIds),
                 'form' => $form,
             ],
             $response,
