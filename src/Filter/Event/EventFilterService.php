@@ -2,6 +2,7 @@
 
 namespace App\Filter\Event;
 
+use App\Entity\User;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
@@ -12,10 +13,13 @@ readonly class EventFilterService
 {
     /**
      * @param iterable<EventFilterInterface> $filters
+     * @param iterable<UserProfileEventFilterInterface> $userProfileFilters
      */
     public function __construct(
         #[AutowireIterator(EventFilterInterface::class)]
         private iterable $filters,
+        #[AutowireIterator(UserProfileEventFilterInterface::class)]
+        private iterable $userProfileFilters,
     ) {}
 
     /**
@@ -52,6 +56,55 @@ readonly class EventFilterService
         }
 
         return new EventFilterResult($resultSet, $hasActiveFilter);
+    }
+
+    /**
+     * Get the combined event ID filter for a specific user's profile page.
+     * Intersects the context filter with any registered user-scoped filters.
+     */
+    public function getEventIdFilterForUserProfile(User $user): EventFilterResult
+    {
+        $contextFilter = $this->getEventIdFilter();
+
+        $userResultSet = null;
+        $hasUserFilter = false;
+
+        foreach ($this->userProfileFilters as $filter) {
+            $filterResult = $filter->getEventIdFilterForUser($user);
+
+            if ($filterResult === null) {
+                continue;
+            }
+
+            $hasUserFilter = true;
+
+            if ($filterResult === []) {
+                return EventFilterResult::emptyResult();
+            }
+
+            if ($userResultSet === null) {
+                $userResultSet = $filterResult;
+            } else {
+                $userResultSet = array_values(array_intersect($userResultSet, $filterResult));
+                if ($userResultSet === []) {
+                    return EventFilterResult::emptyResult();
+                }
+            }
+        }
+
+        if (!$hasUserFilter) {
+            return $contextFilter;
+        }
+
+        // Intersect user-scoped result with the context filter
+        $contextIds = $contextFilter->getEventIds();
+        if ($contextIds === null) {
+            return new EventFilterResult($userResultSet, true);
+        }
+
+        $intersection = array_values(array_intersect($contextIds, $userResultSet));
+
+        return new EventFilterResult($intersection, true);
     }
 
     /**
