@@ -73,7 +73,6 @@
                         <div class="hidden">{{ user.roles|join }}</div>
                         {% set color = 'has-text-grey' %}
                         {% if 'ROLE_ORGANIZER' in user.roles %}{% set color = 'has-text-info' %}{% endif %}
-                        {% if 'ROLE_FOUNDER' in user.roles %}{% set color = 'has-text-warning' %}{% endif %}
                         {% if 'ROLE_ADMIN' in user.roles %}{% set color = 'has-text-success' %}{% endif %}
                         <span class="icon {{ color }}"><i class="fa fa-user"></i></span>
                     </td>
