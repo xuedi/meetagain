@@ -77,10 +77,18 @@ readonly class PermissionInspectorService
     /** @return string[] role identifiers sorted ascending by privilege, Anonymous last */
     public function getRoleDisplayOrder(): array
     {
-        $roleIds = self::ROLE_ORDER;
-        $roleIds[] = self::ANONYMOUS;
+        $known = self::ROLE_ORDER;
+        $groups = $this->getEntriesGroupedByRole();
 
-        return $roleIds;
+        foreach (array_keys($groups) as $role) {
+            if ($role !== self::ANONYMOUS && !in_array($role, $known, true)) {
+                $known[] = $role;
+            }
+        }
+
+        $known[] = self::ANONYMOUS;
+
+        return $known;
     }
 
     /** @param \ReflectionAttribute[] $attributes */
