@@ -11,6 +11,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 readonly class PermissionInspectorService
 {
     private const ROLE_ORDER = ['ROLE_USER', 'ROLE_ORGANIZER', 'ROLE_ADMIN'];
+    public const ANONYMOUS = 'Anonymous';
 
     public function __construct(
         private RouterInterface $router,
@@ -66,18 +67,18 @@ readonly class PermissionInspectorService
         $groups = [];
 
         foreach ($this->getEntries() as $entry) {
-            $key           = $entry->resolvedMinRole ?? '__none__';
+            $key           = $entry->resolvedMinRole ?? self::ANONYMOUS;
             $groups[$key][] = $entry;
         }
 
         return $groups;
     }
 
-    /** @return string[] role identifiers sorted ascending by privilege, __none__ last */
+    /** @return string[] role identifiers sorted ascending by privilege, Anonymous last */
     public function getRoleDisplayOrder(): array
     {
         $roleIds = self::ROLE_ORDER;
-        $roleIds[] = '__none__';
+        $roleIds[] = self::ANONYMOUS;
 
         return $roleIds;
     }
