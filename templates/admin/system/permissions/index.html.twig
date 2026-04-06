@@ -31,17 +31,18 @@
     <div class="box">
         <h2 class="title is-5">Permission Overview</h2>
         <p class="content is-size-7 mb-5">
-            All routes decorated with <code>#[RequiresPermission]</code>, grouped by the minimum role required.
-            Method-level permissions (solid tag) take precedence over class-level ones (light tag).
+            All routes decorated with <code>#[IsGranted]</code>, grouped by the minimum role required.
+            Method-level permissions (⬤) take precedence over class-level ones.
+            Routes with no <code>#[IsGranted]</code> are publicly accessible and grouped under <strong>Anonymous</strong>.
         </p>
 
         {# Build dynamic color map — colours assigned by privilege position, lowest first #}
-        {% set palette = ['is-success', 'is-info', 'is-primary', 'is-link', 'is-warning', 'is-danger'] %}
-        {% set nonNoneRoles = roleOrder|filter(r => r != '__none__') %}
-        {% set totalNonNone = nonNoneRoles|length %}
-        {% set roleColorMap = {'__none__': 'is-dark'} %}
-        {% for role in nonNoneRoles %}
-            {% set colorIdx = totalNonNone > 1 ? ((loop.index0 * (palette|length - 1)) // (totalNonNone - 1)) : 0 %}
+        {% set palette = ['is-success', 'is-info', 'is-warning', 'is-danger'] %}
+        {% set nonAnonRoles = roleOrder|filter(r => r != 'Anonymous') %}
+        {% set totalNonAnon = nonAnonRoles|length %}
+        {% set roleColorMap = {'Anonymous': 'is-light'} %}
+        {% for role in nonAnonRoles %}
+            {% set colorIdx = totalNonAnon > 1 ? ((loop.index0 * (palette|length - 1)) // (totalNonAnon - 1)) : 0 %}
             {% set roleColorMap = roleColorMap|merge({(role): palette[colorIdx]}) %}
         {% endfor %}
 
@@ -50,14 +51,17 @@
                 {% set tagClass = roleColorMap[roleId] ?? 'is-light' %}
                 {% set sectionId = 'perm-section-' ~ loop.index %}
 
-                {# Full-width collapsible section header #}
                 <div class="perm-section-header is-flex is-align-items-center mt-4 mb-2 px-4 py-3"
                      data-target="{{ sectionId }}">
 
                     <span class="tag {{ tagClass }} is-medium" style="flex-shrink: 0;">{{ roleId }}</span>
 
                     <span class="has-text-grey is-size-7 ml-3 mr-auto" style="flex-shrink: 0;">
-                        minimum required role
+                        {% if roleId == 'Anonymous' %}
+                            no authentication required
+                        {% else %}
+                            minimum required role
+                        {% endif %}
                     </span>
 
                     <span class="has-text-grey is-size-7 mr-3" style="white-space: nowrap;">
@@ -110,7 +114,7 @@
                                             <span class="tag {{ tagClass }} is-size-7" title="method-level">⬤ {{ perm }}</span>
                                         {% endfor %}
                                         {% if entry.classPermissions is empty and entry.methodPermissions is empty %}
-                                            <span class="tag is-danger is-size-7">NONE</span>
+                                            <span class="tag is-light is-size-7">public</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -122,28 +126,32 @@
             {% endif %}
         {% endfor %}
 
-        {# Dynamic legend #}
+        {# Legend #}
         <div class="notification is-light mt-6 p-4">
             <p class="is-size-7 has-text-weight-semibold mb-3">Legend</p>
 
-            <div class="mb-3">
-                <p class="is-size-7 has-text-grey mb-1">Roles (ordered by privilege, lowest → highest)</p>
+            <div class="mb-4">
+                <p class="is-size-7 has-text-grey mb-2">Core roles (lowest → highest privilege)</p>
                 <div class="tags">
                     {% for roleId in roleOrder %}
-                        {% set roleColor = roleColorMap[roleId] ?? 'is-light' %}
-                        <span class="tag {{ roleColor }}">{{ roleId }}</span>
+                        <span class="tag {{ roleColorMap[roleId] ?? 'is-light' }}">{{ roleId }}</span>
                     {% endfor %}
+                </div>
+                <p class="is-size-7 has-text-grey mt-1">
+                    Hierarchy: <code>ROLE_USER → ROLE_ORGANIZER → ROLE_ADMIN</code> — each role inherits all
+                    permissions of the role below it. Defined in <code>config/packages/security.yaml</code>.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <p class="is-size-7 has-text-grey mb-2">Permission scope</p>
+                <div class="tags mb-1">
+                    <span class="tag is-info is-size-7">ROLE_X — class-level, applies to all actions in the controller</span>
+                    <span class="tag is-info is-size-7">⬤ ROLE_X — method-level, overrides the class-level role</span>
+                    <span class="tag is-light is-size-7">public — no <code>#[IsGranted]</code>, accessible to anyone</span>
                 </div>
             </div>
 
-            <div class="mb-2">
-                <p class="is-size-7 has-text-grey mb-1">Permission scope</p>
-                <div class="tags">
-                    <span class="tag is-info">class-level &mdash; applies to all methods in the controller</span>
-                    <span class="tag is-info">⬤ method-level &mdash; overrides the class-level permission</span>
-                    <span class="tag is-danger">NONE &mdash; no <code>#[RequiresPermission]</code> found</span>
-                </div>
-            </div>
         </div>
 
     </div>
