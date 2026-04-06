@@ -37,7 +37,7 @@
                             <div class="column is-6">
                                 <div class="buttons has-addons is-pulled-right" id="lang-switcher">
                                     {% for lang in availableLanguages %}
-                                        <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': lang}) }}"
+                                        <a href="{{ path('plugin_dinnerclub_edit', {'id': dish.id, 'lang': lang}) }}"
                                            class="button {% if lang == targetLanguage %}is-active{% endif %}">
                                             {{ lang|upper }}
                                         </a>
@@ -104,7 +104,7 @@
                                 </button>
                             </div>
                             <div class="control">
-                                <a id="reset-btn" href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': targetLanguage}) }}" class="button" style="pointer-events: none; opacity: 0.5;">Reset</a>
+                                <a id="reset-btn" href="{{ path('plugin_dinnerclub_edit', {'id': dish.id, 'lang': targetLanguage}) }}" class="button" style="pointer-events: none; opacity: 0.5;">Reset</a>
                             </div>
                         </div>
 
@@ -171,7 +171,7 @@
                 </div>
 
                 <div class="column is-4">
-                    {% set returnUrl = path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': targetLanguage}) %}
+                    {% set returnUrl = path('plugin_dinnerclub_edit', {'id': dish.id, 'lang': targetLanguage}) %}
 
                     {% if dish.previewImage %}
                     <div class="box">
