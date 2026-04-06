@@ -4,8 +4,7 @@ security:
 
     role_hierarchy:
         ROLE_ORGANIZER: ROLE_USER
-        ROLE_FOUNDER: ROLE_ORGANIZER
-        ROLE_ADMIN: ROLE_FOUNDER
+        ROLE_ADMIN: ROLE_ORGANIZER
 
     providers:
         app_user_provider:

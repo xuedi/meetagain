@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 readonly class PermissionInspectorService
 {
-    private const ROLE_ORDER = ['ROLE_USER', 'ROLE_ORGANIZER', 'ROLE_FOUNDER', 'ROLE_ADMIN'];
+    private const ROLE_ORDER = ['ROLE_USER', 'ROLE_ORGANIZER', 'ROLE_ADMIN'];
 
     public function __construct(
         private RouterInterface $router,

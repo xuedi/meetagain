@@ -294,7 +294,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::CRYSTAL_LIU,
                 'email' => str_replace(' ', '.', self::CRYSTAL_LIU) . '@example.org',
                 'password' => '1234',
-                'role' => UserRole::Founder,
+                'role' => UserRole::Admin,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -1548,7 +1548,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::CANDICE_WU,
                 'email' => str_replace(' ', '.', self::CANDICE_WU) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Founder,
+                'role' => UserRole::Admin,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -4292,7 +4292,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::OLIVIA_RHYE,
                 'email' => str_replace(' ', '.', self::OLIVIA_RHYE) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Founder,
+                'role' => UserRole::Admin,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -5276,7 +5276,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::AXISBOS_AUDAX,
                 'email' => str_replace(' ', '.', self::AXISBOS_AUDAX) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Founder,
+                'role' => UserRole::Admin,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
