@@ -36,25 +36,14 @@
             Routes with no <code>#[IsGranted]</code> are publicly accessible and grouped under <strong>Anonymous</strong>.
         </p>
 
-        {# Build dynamic color map — colours assigned by privilege position, lowest first #}
-        {% set palette = ['is-success', 'is-info', 'is-warning', 'is-danger'] %}
-        {% set nonAnonRoles = roleOrder|filter(r => r != 'Anonymous') %}
-        {% set totalNonAnon = nonAnonRoles|length %}
-        {% set roleColorMap = {'Anonymous': 'is-light'} %}
-        {% for role in nonAnonRoles %}
-            {% set colorIdx = totalNonAnon > 1 ? ((loop.index0 * (palette|length - 1)) // (totalNonAnon - 1)) : 0 %}
-            {% set roleColorMap = roleColorMap|merge({(role): palette[colorIdx]}) %}
-        {% endfor %}
-
         {% for roleId in roleOrder %}
             {% if groups[roleId] is defined %}
-                {% set tagClass = roleColorMap[roleId] ?? 'is-light' %}
                 {% set sectionId = 'perm-section-' ~ loop.index %}
 
                 <div class="perm-section-header is-flex is-align-items-center mt-4 mb-2 px-4 py-3"
                      data-target="{{ sectionId }}">
 
-                    <span class="tag {{ tagClass }} is-medium" style="flex-shrink: 0;">{{ roleId }}</span>
+                    <span class="tag is-light is-medium" style="flex-shrink: 0;">{{ roleId }}</span>
 
                     <span class="has-text-grey is-size-7 ml-3 mr-auto" style="flex-shrink: 0;">
                         {% if roleId == 'Anonymous' %}
@@ -108,10 +97,10 @@
                                     <td class="is-size-7">{{ entry.methodName }}</td>
                                     <td>
                                         {% for perm in entry.classPermissions %}
-                                            <span class="tag {{ tagClass }} is-size-7" title="class-level">{{ perm }}</span>
+                                            <span class="tag is-light is-size-7" title="class-level">{{ perm }}</span>
                                         {% endfor %}
                                         {% for perm in entry.methodPermissions %}
-                                            <span class="tag {{ tagClass }} is-size-7" title="method-level">⬤ {{ perm }}</span>
+                                            <span class="tag is-light is-size-7" title="method-level">{{ perm }} ⬤</span>
                                         {% endfor %}
                                         {% if entry.classPermissions is empty and entry.methodPermissions is empty %}
                                             <span class="tag is-light is-size-7">public</span>
@@ -131,24 +120,18 @@
             <p class="is-size-7 has-text-weight-semibold mb-3">Legend</p>
 
             <div class="mb-4">
-                <p class="is-size-7 has-text-grey mb-2">Core roles (lowest → highest privilege)</p>
-                <div class="tags">
-                    {% for roleId in roleOrder %}
-                        <span class="tag {{ roleColorMap[roleId] ?? 'is-light' }}">{{ roleId }}</span>
-                    {% endfor %}
-                </div>
+                <p class="is-size-7 has-text-grey mb-2">Core role hierarchy (lowest → highest privilege)</p>
                 <p class="is-size-7 has-text-grey mt-1">
-                    Hierarchy: <code>ROLE_USER → ROLE_ORGANIZER → ROLE_ADMIN</code> — each role inherits all
+                    <code>ROLE_USER → ROLE_ORGANIZER → ROLE_ADMIN</code> — each role inherits all
                     permissions of the role below it. Defined in <code>config/packages/security.yaml</code>.
                 </p>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-2">
                 <p class="is-size-7 has-text-grey mb-2">Permission scope</p>
                 <div class="tags mb-1">
-                    <span class="tag is-info is-size-7">ROLE_X — class-level, applies to all actions in the controller</span>
-                    <span class="tag is-info is-size-7">⬤ ROLE_X — method-level, overrides the class-level role</span>
-                    <span class="tag is-light is-size-7">public — no <code>#[IsGranted]</code>, accessible to anyone</span>
+                    <span class="tag is-light is-size-7">⬤ - method-level, overrides the class-level role</span>
+                    <span class="tag is-light is-size-7">Anonymous - no <code>#[IsGranted]</code> present</span>
                 </div>
             </div>
 
