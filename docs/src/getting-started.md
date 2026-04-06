@@ -44,12 +44,12 @@ and starts all Docker containers. Default admin credentials: `admin@example.org`
 
 Once started, the following services are available:
 
-| Service | Container | Address | Purpose |
-|---------|-----------|---------|---------|
-| Application | `ma-php` (FrankenPHP + Caddy) | https://meetagain.local | The app |
-| Database | `ma-db` (MariaDB 12) | localhost:3306 | Relational DB |
-| Email | `ma-mailhog` (MailHog) | http://localhost:8025 | Catches all outgoing email |
-| Cache | `ma-valkey` (Valkey) | internal | Redis-compatible cache |
+| Service     | Container                     | Address                 | Purpose                    |
+|-------------|-------------------------------|-------------------------|----------------------------|
+| Application | `ma-php` (FrankenPHP + Caddy) | https://meetagain.local | The app                    |
+| Database    | `ma-db` (MariaDB 12)          | localhost:3306          | Relational DB              |
+| Email       | `ma-mailhog` (MailHog)        | http://localhost:8025   | Catches all outgoing email |
+| Cache       | `ma-valkey` (Valkey)          | internal                | Redis-compatible cache     |
 
 MailHog captures every outgoing email — no real mail is sent in dev mode.
 

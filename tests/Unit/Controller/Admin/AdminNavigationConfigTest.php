@@ -19,12 +19,12 @@ final class AdminNavigationConfigTest extends TestCase
         ];
 
         // Act
-        $config = new AdminNavigationConfig(section: 'System', links: $links, sectionRole: 'ROLE_META_ADMIN');
+        $config = new AdminNavigationConfig(section: 'System', links: $links, sectionRole: 'ROLE_ADMIN');
 
         // Assert
         static::assertSame('System', $config->section);
         static::assertSame($links, $config->links);
-        static::assertSame('ROLE_META_ADMIN', $config->sectionRole);
+        static::assertSame('ROLE_ADMIN', $config->sectionRole);
     }
 
     public function testConstructorWithMultipleLinks(): void

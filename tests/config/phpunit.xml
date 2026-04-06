@@ -27,6 +27,9 @@
             <directory>../Functional</directory>
             <directory>../../plugins/*/tests/Functional</directory>
         </testsuite>
+        <testsuite name="smoke">
+            <directory>../Smoke</directory>
+        </testsuite>
     </testsuites>
     <php>
         <ini name="display_errors" value="1"/>

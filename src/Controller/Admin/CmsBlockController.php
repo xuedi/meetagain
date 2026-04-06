@@ -26,7 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[IsGranted('ROLE_FOUNDER'), Route('/admin/cms')]
+#[IsGranted('ROLE_ORGANIZER'), Route('/admin/cms')]
 final class CmsBlockController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig

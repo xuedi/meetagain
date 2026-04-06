@@ -28,15 +28,15 @@ Services in `src/` are auto-registered via `config/services.yaml`:
 
 ```yaml
 services:
-    _defaults:
-        autowire: true
-        autoconfigure: true
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-    Plugin\YourPlugin\:
-        resource: '../src/'
-        exclude:
-            - '../src/Kernel.php'
-            - '../src/Entity/'
+  Plugin\YourPlugin\:
+    resource: '../src/'
+    exclude:
+      - '../src/Kernel.php'
+      - '../src/Entity/'
 ```
 
 `Kernel.php` and entities are excluded because they are not services.

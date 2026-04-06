@@ -198,7 +198,7 @@ plugin-disable name:
 
 # Run all tests and checks
 [group('testing')]
-test: testSetup testUnit testFunctional
+test: testSetup testUnit testFunctional testSmoke
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
@@ -223,6 +223,11 @@ testUnit +parameter='':
 [group('testing')]
 testFunctional +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-progress --log-junit tests/reports/junit.xml {{parameter}}
+
+# Run smoke tests — hits every discovered GET route, asserts no 5xx (always run last)
+[group('testing')]
+testSmoke +parameter='':
+    {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=smoke --no-progress --log-junit tests/reports/junit.xml {{parameter}}
 
 # Print AI-readable test results (for Haiku agent)
 [group('testing')]

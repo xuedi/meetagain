@@ -1,0 +1,176 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    {% include 'admin/system/_tabs_navigation.html.twig' %}
+
+    <style>
+        .perm-section-header {
+            cursor: pointer;
+            user-select: none;
+            background: #f5f5f5;
+            border-radius: 6px;
+            transition: background 0.12s ease;
+            gap: 0.75rem;
+        }
+        .perm-section-header:hover { background: #ebebeb; }
+        .perm-section-header.is-open {
+            border-radius: 6px 6px 0 0;
+            margin-bottom: 0 !important;
+        }
+        .perm-section-header.is-open + .perm-section-body {
+            border: 1px solid #e8e8e8;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            overflow: hidden;
+        }
+        .perm-section-header.is-open + .perm-section-body table {
+            margin-bottom: 0;
+        }
+    </style>
+
+    <div class="box">
+        <h2 class="title is-5">Permission Overview</h2>
+        <p class="content is-size-7 mb-5">
+            All routes decorated with <code>#[RequiresPermission]</code>, grouped by the minimum role required.
+            Method-level permissions (solid tag) take precedence over class-level ones (light tag).
+        </p>
+
+        {# Build dynamic color map — colours assigned by privilege position, lowest first #}
+        {% set palette = ['is-success', 'is-info', 'is-primary', 'is-link', 'is-warning', 'is-danger'] %}
+        {% set nonNoneRoles = roleOrder|filter(r => r != '__none__') %}
+        {% set totalNonNone = nonNoneRoles|length %}
+        {% set roleColorMap = {'__none__': 'is-dark'} %}
+        {% for role in nonNoneRoles %}
+            {% set colorIdx = totalNonNone > 1 ? ((loop.index0 * (palette|length - 1)) // (totalNonNone - 1)) : 0 %}
+            {% set roleColorMap = roleColorMap|merge({(role): palette[colorIdx]}) %}
+        {% endfor %}
+
+        {% for roleId in roleOrder %}
+            {% if groups[roleId] is defined %}
+                {% set tagClass = roleColorMap[roleId] ?? 'is-light' %}
+                {% set sectionId = 'perm-section-' ~ loop.index %}
+
+                {# Full-width collapsible section header #}
+                <div class="perm-section-header is-flex is-align-items-center mt-4 mb-2 px-4 py-3"
+                     data-target="{{ sectionId }}">
+
+                    <span class="tag {{ tagClass }} is-medium" style="flex-shrink: 0;">{{ roleId }}</span>
+
+                    <span class="has-text-grey is-size-7 ml-3 mr-auto" style="flex-shrink: 0;">
+                        minimum required role
+                    </span>
+
+                    <span class="has-text-grey is-size-7 mr-3" style="white-space: nowrap;">
+                        {{ groups[roleId]|length }} route{{ groups[roleId]|length != 1 ? 's' : '' }}
+                    </span>
+
+                    <button class="button is-small is-light perm-section-toggle"
+                            aria-expanded="false"
+                            aria-controls="{{ sectionId }}"
+                            type="button"
+                            style="flex-shrink: 0;">
+                        <span class="icon is-small"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+
+                </div>
+
+                <div id="{{ sectionId }}" class="perm-section-body mb-4" style="display: none;">
+                    <table class="table is-fullwidth is-hoverable is-narrow is-bordered">
+                        <thead>
+                            <tr>
+                                <th class="is-size-7">Route</th>
+                                <th class="is-size-7">Path</th>
+                                <th class="is-size-7">Methods</th>
+                                <th class="is-size-7">Controller</th>
+                                <th class="is-size-7">Action</th>
+                                <th class="is-size-7">Permissions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in groups[roleId] %}
+                                <tr>
+                                    <td class="is-size-7" style="font-family: monospace;">{{ entry.routeName }}</td>
+                                    <td class="is-size-7" style="font-family: monospace;">{{ entry.routePath }}</td>
+                                    <td>
+                                        {% if entry.httpMethods is empty %}
+                                            <span class="tag is-light is-size-7">ANY</span>
+                                        {% else %}
+                                            {% for method in entry.httpMethods %}
+                                                <span class="tag is-light is-size-7">{{ method }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    <td class="is-size-7">{{ entry.controllerClass }}</td>
+                                    <td class="is-size-7">{{ entry.methodName }}</td>
+                                    <td>
+                                        {% for perm in entry.classPermissions %}
+                                            <span class="tag {{ tagClass }} is-size-7" title="class-level">{{ perm }}</span>
+                                        {% endfor %}
+                                        {% for perm in entry.methodPermissions %}
+                                            <span class="tag {{ tagClass }} is-size-7" title="method-level">⬤ {{ perm }}</span>
+                                        {% endfor %}
+                                        {% if entry.classPermissions is empty and entry.methodPermissions is empty %}
+                                            <span class="tag is-danger is-size-7">NONE</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% endif %}
+        {% endfor %}
+
+        {# Dynamic legend #}
+        <div class="notification is-light mt-6 p-4">
+            <p class="is-size-7 has-text-weight-semibold mb-3">Legend</p>
+
+            <div class="mb-3">
+                <p class="is-size-7 has-text-grey mb-1">Roles (ordered by privilege, lowest → highest)</p>
+                <div class="tags">
+                    {% for roleId in roleOrder %}
+                        {% set roleColor = roleColorMap[roleId] ?? 'is-light' %}
+                        <span class="tag {{ roleColor }}">{{ roleId }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <p class="is-size-7 has-text-grey mb-1">Permission scope</p>
+                <div class="tags">
+                    <span class="tag is-info">class-level &mdash; applies to all methods in the controller</span>
+                    <span class="tag is-info">⬤ method-level &mdash; overrides the class-level permission</span>
+                    <span class="tag is-danger">NONE &mdash; no <code>#[RequiresPermission]</code> found</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.perm-section-header').forEach(function (header) {
+                header.addEventListener('click', function () {
+                    const body = document.getElementById(this.dataset.target);
+                    const btn = this.querySelector('.perm-section-toggle');
+                    const icon = btn.querySelector('i');
+                    const expanded = btn.getAttribute('aria-expanded') === 'true';
+
+                    if (expanded) {
+                        body.style.display = 'none';
+                        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                        btn.setAttribute('aria-expanded', 'false');
+                        this.classList.remove('is-open');
+                    } else {
+                        body.style.display = '';
+                        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                        btn.setAttribute('aria-expanded', 'true');
+                        this.classList.add('is-open');
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock %}

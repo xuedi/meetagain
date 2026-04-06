@@ -21,6 +21,7 @@ use Override;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ORGANIZER')]
@@ -33,17 +34,18 @@ final class MemberController extends AbstractAdminController
         private readonly EntityManagerInterface $em,
         private readonly ActivityService $activityService,
         private readonly EntityActionDispatcher $dispatcher,
+        private readonly Security $security,
     ) {}
 
     #[Override]
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'System',
+            section: 'Content',
             links: [
                 new AdminLink(label: 'Members', route: 'app_admin_member', active: 'member', role: 'ROLE_ORGANIZER'),
             ],
-            sectionPriority: 100,
+            sectionPriority: 50,
         );
     }
 
@@ -56,7 +58,7 @@ final class MemberController extends AbstractAdminController
 
         // Get pending users (EmailVerified status) for approval section
         $pendingUsers = [];
-        if ($this->isGranted('ROLE_FOUNDER')) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             $pendingUsers = $this->repo->findByStatus(UserStatus::EmailVerified);
         }
 
@@ -76,7 +78,7 @@ final class MemberController extends AbstractAdminController
         }
 
         // Route to appropriate view based on role
-        if ($this->isGranted('ROLE_ADMIN')) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return $this->editAdmin($request, $user);
         }
 
@@ -89,17 +91,6 @@ final class MemberController extends AbstractAdminController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Restrict role assignment for FOUNDERs
-            if ($this->isGranted('ROLE_FOUNDER') && !$this->isGranted('ROLE_ADMIN')) {
-                $requestedRole = $form->get('role')->getData();
-
-                if (in_array($requestedRole, [UserRole::Admin, UserRole::Founder], true)) {
-                    $this->addFlash('error', 'You cannot assign FOUNDER or ADMIN roles');
-
-                    return $this->redirectToRoute('app_admin_member');
-                }
-            }
-
             // Handle unmapped boolean fields
             $user->setVerified((bool) $form->get('verified')->getData());
             $user->setRestricted((bool) $form->get('restricted')->getData());
@@ -128,7 +119,7 @@ final class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['POST'])]
-    #[IsGranted('ROLE_FOUNDER')]
+    #[IsGranted('ROLE_ADMIN')]
     public function approve(Request $request, User $user): Response
     {
         if (!$this->isCsrfTokenValid('approve_user', $request->request->get('_token'))) {
@@ -154,7 +145,7 @@ final class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['POST'])]
-    #[IsGranted('ROLE_FOUNDER')]
+    #[IsGranted('ROLE_ADMIN')]
     public function deny(Request $request, User $user): Response
     {
         if (!$this->isCsrfTokenValid('deny_user', $request->request->get('_token'))) {
@@ -177,7 +168,7 @@ final class MemberController extends AbstractAdminController
     }
 
     #[Route('/admin/member/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_FOUNDER')]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(User $user): Response
     {
         if (!$this->filterService->isMemberAccessible($user->getId())) {

@@ -138,6 +138,7 @@ public function testRemoveOrphanedImagesCallsFlush(): void
 ```
 
 **Rule of thumb:**
+
 - `createStub()` for dependencies you configure but don't verify
 - `createMock()` only when you need `expects()` to verify a call was made
 

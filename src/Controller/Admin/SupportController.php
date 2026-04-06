@@ -21,7 +21,7 @@ final class SupportController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(section: 'System', links: [
-            new AdminLink(label: 'Support', route: 'app_admin_support_list', active: 'support'),
+            new AdminLink(label: 'Support', route: 'app_admin_support_list', active: 'support', role: 'ROLE_ADMIN'),
         ]);
     }
 
@@ -79,7 +79,11 @@ final class SupportController extends AbstractAdminController
     public function showReport(int $id): Response
     {
         $report = $this->imageReportRepo->find($id);
-        $location = $report?->getImage() !== null
+        if ($report === null) {
+            throw $this->createNotFoundException();
+        }
+
+        $location = $report->getImage() !== null
             ? $this->imageLocationService->locate($report->getImage())
             : null;
 

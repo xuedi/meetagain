@@ -29,7 +29,7 @@ at different complexity levels:
 
 - `EventFilterInterface` — group-based event visibility
 - `MenuFilterInterface` — domain-context menu filtering
-- `ActionAuthorizationInterface` — membership-gated RSVP
+- `EventActionGuardInterface` — membership-gated RSVP
 - `AdminNavigationInterface` — multi-section admin sidebar
 - `EntityActionInterface` — reacts to member and event lifecycle events
 - **See:** `plugins/multisite/src/` — the reference for all plugin integration points

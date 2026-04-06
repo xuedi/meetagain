@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/dinnerclub')]
+#[IsGranted('ROLE_USER')]
 final class EditController extends AbstractController
 {
     public function __construct(
@@ -25,7 +26,6 @@ final class EditController extends AbstractController
     ) {}
 
     #[Route('/translate/{id}/{lang}', name: 'plugin_dinnerclub_translate', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_USER')]
     public function translate(Request $request, int $id, ?string $lang = null): Response
     {
         $dish = $this->dishService->getDish($id);

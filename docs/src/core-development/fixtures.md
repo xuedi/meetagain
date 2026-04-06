@@ -9,20 +9,20 @@ Fixtures provide deterministic development and test data. The core application s
 
 The following fixture classes live in `src/DataFixtures/` and are loaded on every full dev reset:
 
-| Fixture class | What it creates | Reference names |
-|---|---|---|
-| `SystemUserFixture` | System/bot user for automated actions | `system` |
-| `UserFixture` | Regular users (admin, organizers, members) | `Admin`, `Crystal Liu`, `Adem Lane`, … |
-| `HostFixture` | Host records linked to users | `Admin`, `Crystal`, `Adem`, `Jessie`, `Mollie` |
-| `LocationFixture` | Physical and online venues | `Weiqi Cafe`, `Community Center`, `Online Platform`, … |
-| `EventFixture` | Events with translations, RSVPs, comments | `Weekly Go Study Group`, `Berlin Go Tournament 2026`, … |
-| `CmsFixture` | CMS pages (about, imprint, privacy, …) | `about`, `imprint`, … |
-| `CmsBlockFixture` | Content blocks for CMS pages | — |
-| `ConfigFixture` | Application configuration defaults | — |
-| `LanguageFixture` | Supported languages | — |
-| `EmailTemplateFixture` | Email template content | — |
-| `ActivityFixture` | Activity log entries | — |
-| `MinimalAdminFixture` | Minimal admin user for install group | — |
+| Fixture class          | What it creates                            | Reference names                                         |
+|------------------------|--------------------------------------------|---------------------------------------------------------|
+| `SystemUserFixture`    | System/bot user for automated actions      | `system`                                                |
+| `UserFixture`          | Regular users (admin, organizers, members) | `Admin`, `Crystal Liu`, `Adem Lane`, …                  |
+| `HostFixture`          | Host records linked to users               | `Admin`, `Crystal`, `Adem`, `Jessie`, `Mollie`          |
+| `LocationFixture`      | Physical and online venues                 | `Weiqi Cafe`, `Community Center`, `Online Platform`, …  |
+| `EventFixture`         | Events with translations, RSVPs, comments  | `Weekly Go Study Group`, `Berlin Go Tournament 2026`, … |
+| `CmsFixture`           | CMS pages (about, imprint, privacy, …)     | `about`, `imprint`, …                                   |
+| `CmsBlockFixture`      | Content blocks for CMS pages               | —                                                       |
+| `ConfigFixture`        | Application configuration defaults         | —                                                       |
+| `LanguageFixture`      | Supported languages                        | —                                                       |
+| `EmailTemplateFixture` | Email template content                     | —                                                       |
+| `ActivityFixture`      | Activity log entries                       | —                                                       |
+| `MinimalAdminFixture`  | Minimal admin user for install group       | —                                                       |
 
 Reference names are the string keys passed to `addRefXxx()` in each fixture. Check the
 fixture class constants (e.g. `UserFixture::ADMIN`) for the exact values.
@@ -66,13 +66,13 @@ class MyEntityFixture extends AbstractFixture
 
 `AbstractFixture` provides typed getters and setters for all core reference types:
 
-| Getter | Setter | Returns |
-|---|---|---|
-| `getRefUser(string $name)` | `addRefUser(string $name, User $entity)` | `User` |
-| `getRefEvent(string $name)` | `addRefEvent(string $name, Event $entity)` | `Event` |
+| Getter                         | Setter                                           | Returns    |
+|--------------------------------|--------------------------------------------------|------------|
+| `getRefUser(string $name)`     | `addRefUser(string $name, User $entity)`         | `User`     |
+| `getRefEvent(string $name)`    | `addRefEvent(string $name, Event $entity)`       | `Event`    |
 | `getRefLocation(string $name)` | `addRefLocation(string $name, Location $entity)` | `Location` |
-| `getRefCms(string $name)` | `addRefCms(string $name, Cms $entity)` | `Cms` |
-| `getRefHost(string $name)` | `addRefHost(string $name, Host $entity)` | `Host` |
+| `getRefCms(string $name)`      | `addRefCms(string $name, Cms $entity)`           | `Cms`      |
+| `getRefHost(string $name)`     | `addRefHost(string $name, Host $entity)`         | `Host`     |
 
 References are keyed by the string name you pass. For core fixtures, use the class constants
 (e.g. `UserFixture::ADMIN`, `EventFixture::WEEKLY_GO_STUDY`) to avoid typos.
@@ -122,6 +122,7 @@ class RatingFixture extends AbstractFixture implements DependentFixtureInterface
 ```
 
 Key points:
+
 - Use `#[AsFixture(groups: ['base'])]` for standard dev data
 - Use `#[AsFixture(groups: ['install'])]` only for data required at first-time install
 - Declare `getDependencies()` to ensure load order
@@ -133,11 +134,11 @@ Key points:
 
 Fixtures are tagged with groups to control when they run:
 
-| Group | When used |
-|---|---|
-| `base` | Loaded by `just devModeFixtures` — full development reset (default for core fixtures) |
-| `plugin` | Plugin fixtures loaded during full dev reset |
-| `install` | Loaded during first-time installation (minimal required data only) |
+| Group     | When used                                                                             |
+|-----------|---------------------------------------------------------------------------------------|
+| `base`    | Loaded by `just devModeFixtures` — full development reset (default for core fixtures) |
+| `plugin`  | Plugin fixtures loaded during full dev reset                                          |
+| `install` | Loaded during first-time installation (minimal required data only)                    |
 
 Most new fixtures belong to the `base` (core) or `plugin` (plugin code) group. Only add
 `install` if the data is required for the application to function at all (e.g. default
@@ -174,6 +175,6 @@ just devModeMinimal
 ---
 
 !!! note "Fixture hooks for plugins"
-    Plugins can run code before and after fixture loading via `preFixtures()`,
-    `loadPostExtendFixtures()`, and `postFixtures()` in their `Kernel.php`.
-    These hooks are documented in [Required Hooks](../plugin-development/required-hooks.md).
+Plugins can run code before and after fixture loading via `preFixtures()`,
+`loadPostExtendFixtures()`, and `postFixtures()` in their `Kernel.php`.
+These hooks are documented in [Required Hooks](../plugin-development/required-hooks.md).

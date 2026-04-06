@@ -10,7 +10,7 @@ enum UserRole: string
     case User = 'USER';
     case System = 'SYSTEM';
 
-    // Constants for use in attributes like #[IsGranted()]
+    // Constants for Symfony role strings (used in security.yaml, getRoles(), isGranted())
     public const ROLE_ADMIN = 'ROLE_ADMIN';
     public const ROLE_FOUNDER = 'ROLE_FOUNDER';
     public const ROLE_ORGANIZER = 'ROLE_ORGANIZER';

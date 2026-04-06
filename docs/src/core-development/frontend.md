@@ -212,7 +212,7 @@ action.save: 'Save'
 
 ## HTML sanitization
 
-CMS page content can contain HTML entered by group organizers (`ROLE_FOUNDER`). Never use
+CMS page content can contain HTML entered by admins. Never use
 `|raw` in CMS templates — use `|sanitize_html` instead:
 
 ```twig
