@@ -334,7 +334,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::ABRAHAM_BAKER,
                 'email' => str_replace(' ', '.', self::ABRAHAM_BAKER) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => false,
                 'status' => UserStatus::EmailVerified,
                 'following' => [
@@ -760,7 +760,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::AMELIE_LAURENT,
                 'email' => str_replace(' ', '.', self::AMELIE_LAURENT) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -870,7 +870,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::ANDI_LANE,
                 'email' => str_replace(' ', '.', self::ANDI_LANE) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => true,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -1807,7 +1807,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::DREW_CANO,
                 'email' => str_replace(' ', '.', self::DREW_CANO) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -1876,7 +1876,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::ELENA_OWENS,
                 'email' => str_replace(' ', '.', self::ELENA_OWENS) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => true,
                 'status' => UserStatus::Active,
                 'following' => [self::ALI_MAHDI, self::BRIANNA_WARE, self::MAXWELL_TAN, self::OLLY_SCHROEDER],
@@ -1895,7 +1895,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::ELISA_NISHIKAWA,
                 'email' => str_replace(' ', '.', self::ELISA_NISHIKAWA) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => true,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -1989,7 +1989,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::ETHAN_CAMPBELL,
                 'email' => str_replace(' ', '.', self::ETHAN_CAMPBELL) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
@@ -4348,7 +4348,7 @@ class UserFixture extends AbstractFixture
                 'name' => self::ORLANDO_DIGGS,
                 'email' => str_replace(' ', '.', self::ORLANDO_DIGGS) . '@example.org',
                 'password' => null,
-                'role' => UserRole::Organizer,
+                'role' => UserRole::User,
                 'verified' => false,
                 'status' => UserStatus::Active,
                 'following' => [
