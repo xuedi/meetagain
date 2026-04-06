@@ -11,13 +11,13 @@ developers, and core contributors.
 
 ## What's in here
 
-| Section | For |
-|---------|-----|
-| [Getting Started](getting-started.md) | Developers who want to run the local dev environment |
-| [Hosting](hosting.md) | Self-hosters deploying to production |
-| [Core Development](core-development/index.md) | Contributors to the open-source core |
-| [Plugin Development](plugin-development/index.md) | Developers building plugins |
-| [Contributing](contributing.md) | PR workflow, code standards |
+| Section                                           | For                                                  |
+|---------------------------------------------------|------------------------------------------------------|
+| [Getting Started](getting-started.md)             | Developers who want to run the local dev environment |
+| [Hosting](hosting.md)                             | Self-hosters deploying to production                 |
+| [Core Development](core-development/index.md)     | Contributors to the open-source core                 |
+| [Plugin Development](plugin-development/index.md) | Developers building plugins                          |
+| [Contributing](contributing.md)                   | PR workflow, code standards                          |
 
 ---
 

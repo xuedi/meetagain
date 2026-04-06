@@ -32,7 +32,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
 final class SecurityController extends AbstractController
 {
     public const string LOGIN_ROUTE = 'app_login';

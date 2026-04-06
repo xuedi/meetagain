@@ -29,8 +29,8 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
     public function getNotifications(User $user): array
     {
         $items = [];
-        if (!$this->security->isGranted('ROLE_FOUNDER')) {
-            return $items; // only FOUNDER from here on
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
+            return $items; // only Admin from here on
         }
 
         $openReports = $this->imageReportRepo->getOpenCount();
@@ -40,10 +40,6 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
                 icon: 'fa-flag',
                 route: 'app_admin_support_reports',
             );
-        }
-
-        if (!$this->security->isGranted('ROLE_ADMIN')) {
-            return $items; // only ADMIN from here on
         }
 
         $staleEmails = $this->emailRepo->getStaleCount(60);

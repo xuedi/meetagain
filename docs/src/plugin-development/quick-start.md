@@ -36,11 +36,7 @@ that implements the `App\Plugin` interface.
 
 namespace Plugin\YourPlugin;
 
-use App\Entity\AdminSection;
-use App\Entity\EventListItemTag;
-use App\Entity\Link;
-use App\Plugin;
-use Symfony\Component\Console\Output\OutputInterface;
+use App\Entity\AdminSection;use App\Plugin;use Symfony\Component\Console\Output\OutputInterface;
 
 readonly class Kernel implements Plugin
 {

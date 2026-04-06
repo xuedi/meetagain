@@ -131,7 +131,7 @@ class PrivateEventFilterTest extends TestCase
 
 ---
 
-## Testing an ActionAuthorizationInterface
+## Testing an EventActionGuardInterface
 
 Assert that the provider returns `true`, `false`, or `null` for each action type:
 

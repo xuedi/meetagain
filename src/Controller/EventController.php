@@ -13,8 +13,6 @@ use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\FeaturedEventProviderInterface;
-use App\Filter\Action\ActionAuthorizationMessageService;
-use App\Filter\Action\ActionAuthorizationService;
 use App\Filter\Event\EventFilterService;
 use App\Form\CommentType;
 use App\Form\EventFilterType;
@@ -28,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class EventController extends AbstractController
 {
     public const string ROUTE_EVENT = 'app_event';
@@ -40,8 +38,6 @@ final class EventController extends AbstractController
         private readonly EventRepository $repo,
         private readonly CommentRepository $comments,
         private readonly EventFilterService $eventFilterService,
-        private readonly ActionAuthorizationService $actionAuthService,
-        private readonly ActionAuthorizationMessageService $authMessageService,
         #[AutowireIterator(FeaturedEventProviderInterface::class)]
         private readonly iterable $featuredEventProviders = [],
     ) {}
@@ -104,13 +100,8 @@ final class EventController extends AbstractController
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->actionAuthService->isActionAllowed('event.comment', $id, $this->getUser())) {
-                $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage(
-                    'event.comment',
-                    $id,
-                    $this->getUser(),
-                );
-                $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
+            if (!$this->isGranted('event.comment', $event)) {
+                $this->addFlash('warning', 'This event is for group members only.');
 
                 return $this->redirectToRoute('app_event_details', ['id' => $id]);
             }
@@ -206,6 +197,7 @@ final class EventController extends AbstractController
         return null;
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {
@@ -220,9 +212,8 @@ final class EventController extends AbstractController
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
         $user = $this->getAuthedUser();
-        if (!$this->actionAuthService->isActionAllowed('event.rsvp', $event->getId(), $user)) {
-            $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage('event.rsvp', $event->getId(), $user);
-            $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
+        if (!$this->isGranted('event.rsvp', $event)) {
+            $this->addFlash('warning', 'This event is for group members only.');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
@@ -236,6 +227,7 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/event/{event}/deleteComment/{id}', name: 'app_event_delete_comment', requirements: ['id' => '\d+'])]
     public function deleteComment(Event $event, EntityManagerInterface $em, ?int $id = null): Response
     {

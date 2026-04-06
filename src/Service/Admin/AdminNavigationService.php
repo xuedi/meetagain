@@ -70,7 +70,6 @@ readonly class AdminNavigationService
                     $section = $mods['section'] ?? $section;
                     $label = $mods['label'] ?? $label;
                     $active = $mods['active'] ?? $active;
-                    $role = $mods['role'] ?? $role;
                 }
 
                 // Initialize section if new
@@ -108,14 +107,14 @@ readonly class AdminNavigationService
         $sections = [];
         foreach ($sectionsMap as $sectionName => $data) {
             // Filter section by role
-            if ($data['role'] && !$this->security->isGranted($data['role'])) {
+            if ($data['role'] !== null && !$this->security->isGranted($data['role'])) {
                 continue;
             }
 
             // Filter links by role
             $visibleLinks = array_filter(
                 $data['links'],
-                fn($link) => !$link->getRole() || $this->security->isGranted($link->getRole()),
+                fn($link) => $link->getRole() === null || $this->security->isGranted($link->getRole()),
             );
 
             // Skip sections with no visible links

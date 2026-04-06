@@ -110,17 +110,17 @@ event generation, etc.).
 ```ini
 # /etc/systemd/system/meetagain-cron.service
 [Service]
-Type=oneshot
-User=www-data
-ExecStart=/usr/bin/php /var/www/meetagain/bin/console app:cron
+Type = oneshot
+User = www-data
+ExecStart = /usr/bin/php /var/www/meetagain/bin/console app:cron
 ```
 
 ```ini
 # /etc/systemd/system/meetagain-cron.timer
 [Timer]
-OnCalendar=*:*:00
+OnCalendar = *:*:00
 [Install]
-WantedBy=timers.target
+WantedBy = timers.target
 ```
 
 ---

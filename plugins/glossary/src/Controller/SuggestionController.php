@@ -9,8 +9,10 @@ use Plugin\Glossary\Entity\SuggestionField;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/glossary/suggestion')]
+#[IsGranted('ROLE_ORGANIZER')]
 final class SuggestionController extends AbstractGlossaryController
 {
     public function __construct(
@@ -23,8 +25,6 @@ final class SuggestionController extends AbstractGlossaryController
     #[Route('/list/{id}', name: 'app_plugin_glossary_suggestion_list', methods: ['GET'])]
     public function suggestionList(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
-
         return $this->renderList('@Glossary/suggestion.html.twig', [
             'categoryFieldValue' => SuggestionField::Category->value,
             'categoryNames' => Category::getNames(),
@@ -35,7 +35,6 @@ final class SuggestionController extends AbstractGlossaryController
     #[Route('/apply/{id}/{hash}', name: 'app_plugin_glossary_suggestion_apply', methods: ['GET'])]
     public function suggestionApply(int $id, string $hash): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
         $item = $this->service->get($id);
         $leftOver = $this->service->applySuggestion($id, $hash);
 
@@ -56,7 +55,6 @@ final class SuggestionController extends AbstractGlossaryController
     #[Route('/delete/{id}/{hash}', name: 'app_plugin_glossary_suggestion_delete', methods: ['GET'])]
     public function suggestionDelete(int $id, string $hash): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
         $leftOver = $this->service->denySuggestion($id, $hash);
 
         if ($leftOver === 0) {

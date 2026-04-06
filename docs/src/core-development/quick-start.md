@@ -30,15 +30,15 @@ business logic in a controller. See [Architecture](architecture.md) for the full
 
 ## 3. Find the right file
 
-| If you're changing… | Start in… |
-|---|---|
-| Business logic | `src/Service/` |
-| Database queries | `src/Repository/` |
-| Data model / schema | `src/Entity/` |
+| If you're changing…   | Start in…                                    |
+|-----------------------|----------------------------------------------|
+| Business logic        | `src/Service/`                               |
+| Database queries      | `src/Repository/`                            |
+| Data model / schema   | `src/Entity/`                                |
 | Admin or public pages | `src/Controller/Admin/` or `src/Controller/` |
-| Twig templates | `templates/` |
-| CLI commands | `src/Command/` |
-| Translations | `translations/messages.{en,de,cn}.yaml` |
+| Twig templates        | `templates/`                                 |
+| CLI commands          | `src/Command/`                               |
+| Translations          | `translations/messages.{en,de,cn}.yaml`      |
 
 ---
 
@@ -46,8 +46,10 @@ business logic in a controller. See [Architecture](architecture.md) for the full
 
 Follow the pattern for the layer you're in:
 
-- **Service** — `readonly` class, constructor injection, single responsibility → [Patterns § Service](patterns.md#service)
-- **Repository** — `createQueryBuilder()`, intent-revealing method names → [Patterns § Repository](patterns.md#repository)
+- **Service** — `readonly` class, constructor injection, single
+  responsibility → [Patterns § Service](patterns.md#service)
+- **Repository** — `createQueryBuilder()`, intent-revealing method
+  names → [Patterns § Repository](patterns.md#repository)
 - **Entity** — Doctrine attributes, backed enums, no logic → [Patterns § Entity](patterns.md#entity)
 - **Schema change** — generate a migration after editing an entity → [Patterns § Migrations](patterns.md#migrations)
 

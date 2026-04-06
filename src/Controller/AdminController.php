@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ORGANIZER')]
 final class AdminController extends AbstractController
 {
     public const string ROUTE_ADMIN = 'app_admin';
@@ -21,7 +22,6 @@ final class AdminController extends AbstractController
     ) {}
 
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
-    #[IsGranted('ROLE_ORGANIZER')]
     public function index(?int $year = null, ?int $week = null): Response
     {
         $now = new DateTime();

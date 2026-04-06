@@ -16,22 +16,22 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_FOUNDER'), Route('/admin/hosts')]
+#[IsGranted('ROLE_ORGANIZER'), Route('/admin/hosts')]
 final class HostController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'System',
+            section: 'Content',
             links: [
                 new AdminLink(
                     label: 'Hosts',
                     route: 'app_admin_host',
                     active: 'host',
-                    role: 'ROLE_FOUNDER',
+                    role: 'ROLE_ORGANIZER',
                 ),
             ],
-            sectionPriority: 100,
+            sectionPriority: 50,
         );
     }
 

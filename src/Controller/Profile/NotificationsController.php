@@ -8,7 +8,9 @@ use App\Controller\AbstractController;
 use App\Service\Notification\User\NotificationService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 final class NotificationsController extends AbstractController
 {
     public function __construct(

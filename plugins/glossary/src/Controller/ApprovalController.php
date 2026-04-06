@@ -7,8 +7,10 @@ use Plugin\Glossary\Activity\Messages\EntryApproved;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/glossary/approval')]
+#[IsGranted('ROLE_ORGANIZER')]
 final class ApprovalController extends AbstractGlossaryController
 {
     public function __construct(
@@ -21,8 +23,6 @@ final class ApprovalController extends AbstractGlossaryController
     #[Route('/list/{id}', name: 'app_plugin_glossary_approval_list', methods: ['GET'])]
     public function approvalList(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
-
         return $this->renderList('@Glossary/approval.html.twig', [
             'editItem' => $this->service->get($id),
         ]);
@@ -31,7 +31,6 @@ final class ApprovalController extends AbstractGlossaryController
     #[Route('/approve/{id}', name: 'app_plugin_glossary_approval_approve', methods: ['GET'])]
     public function approvalApprove(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
         $item = $this->service->get($id);
         $this->service->approveNew($id);
 
@@ -48,7 +47,6 @@ final class ApprovalController extends AbstractGlossaryController
     #[Route('/deny/{id}', name: 'app_plugin_glossary_approval_deny', methods: ['GET'])]
     public function approvalDeny(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
         $this->service->deleteNew($id);
 
         return $this->redirectToRoute('app_plugin_glossary');

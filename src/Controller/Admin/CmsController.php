@@ -29,19 +29,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_FOUNDER'), Route('/admin/cms')]
+#[IsGranted('ROLE_ORGANIZER'), Route('/admin/cms')]
 final class CmsController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'System',
+            section: 'Content',
             links: [
-                new AdminLink(label: 'CMS', route: 'app_admin_cms', active: 'cms', role: 'ROLE_FOUNDER'),
+                new AdminLink(label: 'CMS', route: 'app_admin_cms', active: 'cms', role: 'ROLE_ORGANIZER'),
             ],
-            sectionPriority: 100,
+            sectionPriority: 50,
         );
     }
 
@@ -55,12 +56,13 @@ final class CmsController extends AbstractAdminController
         private readonly LoggerInterface $logger,
         private readonly LanguageService $languageService,
         private readonly ActivityService $activityService,
+        private readonly Security $security,
     ) {}
 
     #[Route('', name: 'app_admin_cms')]
     public function cmsList(): Response
     {
-        $isAdmin = $this->isGranted('ROLE_ADMIN');
+        $isAdmin = $this->security->isGranted('ROLE_ADMIN');
 
         $newForm = $this->createForm(CmsType::class, null, [
             'action' => $this->generateUrl('app_admin_cms_add'),
@@ -103,7 +105,7 @@ final class CmsController extends AbstractAdminController
 
         $locale = $this->getLastEditLocale($locale, $request->getSession());
 
-        $isAdmin = $this->isGranted('ROLE_ADMIN');
+        $isAdmin = $this->security->isGranted('ROLE_ADMIN');
 
         $form = $this->createForm(CmsType::class, $cms, [
             'is_admin' => $isAdmin,
