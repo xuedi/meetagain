@@ -25,8 +25,8 @@ final class EditController extends AbstractController
         private readonly ActivityService $activityService,
     ) {}
 
-    #[Route('/translate/{id}/{lang}', name: 'plugin_dinnerclub_translate', methods: ['GET', 'POST'])]
-    public function translate(Request $request, int $id, ?string $lang = null): Response
+    #[Route('/edit/{id}/{lang}', name: 'plugin_dinnerclub_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, int $id, ?string $lang = null): Response
     {
         $dish = $this->dishService->getDish($id);
         if ($dish === null) {
@@ -76,17 +76,17 @@ final class EditController extends AbstractController
                 $isManager ? 'Translation has been updated.' : 'Translation suggestion has been submitted for review.',
             );
 
-            return $this->redirectToRoute('plugin_dinnerclub_translate', ['id' => $id, 'lang' => $lang]);
+            return $this->redirectToRoute('plugin_dinnerclub_edit', ['id' => $id, 'lang' => $lang]);
         }
 
         if ($originForm->isSubmitted() && $originForm->isValid()) {
             $this->dishService->saveBaseData($dish);
             $this->addFlash('success', 'Dish origin has been updated.');
 
-            return $this->redirectToRoute('plugin_dinnerclub_translate', ['id' => $id, 'lang' => $lang]);
+            return $this->redirectToRoute('plugin_dinnerclub_edit', ['id' => $id, 'lang' => $lang]);
         }
 
-        return $this->render('@Dinnerclub/translate.html.twig', [
+        return $this->render('@Dinnerclub/edit.html.twig', [
             'dish' => $dish,
             'form' => $form,
             'originForm' => $originForm,
