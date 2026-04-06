@@ -207,15 +207,6 @@ final class MemberController extends AbstractAdminController
             throw $this->createAccessDeniedException('Cannot modify system users.');
         }
 
-        if ($user->getRole() !== UserRole::Organizer) {
-            $user->setRole(UserRole::Organizer);
-            $this->em->flush();
-
-            $admin = $this->getAuthedUser();
-            $this->activityService->log(AdminMemberPromoted::TYPE, $admin, ['user_id' => $user->getId()]);
-            $this->addFlash('success', 'Member promoted to organizer.');
-        }
-
         return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
     }
 

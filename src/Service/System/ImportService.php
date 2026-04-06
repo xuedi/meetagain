@@ -159,7 +159,6 @@ readonly class ImportService
 
             $role = match ($userData['role'] ?? 'user') {
                 'admin' => UserRole::Admin,
-                'organizer' => UserRole::Organizer,
                 default => UserRole::User,
             };
 
