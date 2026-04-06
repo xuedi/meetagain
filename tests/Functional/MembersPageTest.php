@@ -54,9 +54,7 @@ class MembersPageTest extends WebTestCase
 
         $client->request('GET', '/en/members/view/2');
 
-        // Should show 403 template or redirect
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('body', 'login', 'Should prompt user to login');
+        $this->assertResponseRedirects('/en/login');
     }
 
     public function testMemberViewPageLoadsForLoggedInUser(): void

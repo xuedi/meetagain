@@ -28,12 +28,12 @@ class AdminLinkTest extends TestCase
     public function testConstructorAcceptsAllParameters(): void
     {
         // Arrange & Act
-        $link = new AdminLink('Users', 'app_admin_users', 'users', 'ROLE_META_ADMIN');
+        $link = new AdminLink('Users', 'app_admin_users', 'users', 'ROLE_ORGANIZER');
 
         // Assert
         static::assertSame('Users', $link->getLabel());
         static::assertSame('app_admin_users', $link->getRoute());
         static::assertSame('users', $link->getActive());
-        static::assertSame('ROLE_META_ADMIN', $link->getRole());
+        static::assertSame('ROLE_ORGANIZER', $link->getRole());
     }
 }

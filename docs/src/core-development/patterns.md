@@ -15,9 +15,7 @@ and have a single, focused responsibility.
 
 namespace App\Service;
 
-use App\Entity\Image;
-use App\Repository\ImageRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ImageRepository;use Doctrine\ORM\EntityManagerInterface;
 
 readonly class CleanupService          // ← always readonly
 {

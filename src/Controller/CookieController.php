@@ -8,7 +8,6 @@ use App\Form\CookieConsentType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
 final class CookieController extends AbstractController
 {
     #[Route('/cookie/', name: 'app_cookie', methods: ['GET', 'POST'])]

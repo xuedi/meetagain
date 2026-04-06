@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/bookclub/poll')]
+#[IsGranted('ROLE_USER')]
 final class PollController extends AbstractController
 {
     public function __construct(
@@ -32,7 +33,6 @@ final class PollController extends AbstractController
     ) {}
 
     #[Route('/list', name: 'app_plugin_bookclub_poll_list', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function list(): Response
     {
         $polls = $this->pollService->getAll();
@@ -61,7 +61,6 @@ final class PollController extends AbstractController
     }
 
     #[Route('/set/view/{type}', name: 'app_plugin_bookclub_poll_set_view', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function setView(Request $request, ViewType $type): Response
     {
         $request->getSession()->set('bookclubPollViewType', $type->value);
@@ -70,7 +69,6 @@ final class PollController extends AbstractController
     }
 
     #[Route('', name: 'app_plugin_bookclub_poll', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function index(Request $request): Response
     {
         $user = $this->getAuthedUser();
@@ -105,7 +103,6 @@ final class PollController extends AbstractController
     }
 
     #[Route('/vote/{suggestionId}', name: 'app_plugin_bookclub_poll_vote', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
     public function vote(int $suggestionId): Response
     {
         $activePoll = $this->pollService->getActivePoll();
@@ -187,7 +184,6 @@ final class PollController extends AbstractController
     }
 
     #[Route('/{id}/results', name: 'app_plugin_bookclub_poll_results', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function results(int $id): Response
     {
         $poll = $this->pollService->get($id);

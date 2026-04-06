@@ -196,8 +196,7 @@ private readonly SomeEventFilter $someFilter;
 
 ## HTML-sanitize CMS content
 
-CMS pages are editable by group organizers (`ROLE_FOUNDER`). Using `|raw` creates an XSS
-vector. Always use `|sanitize_html`:
+CMS pages are editable by admins. Using `|raw` creates an XSS vector. Always use `|sanitize_html`:
 
 ```twig
 {# ✅ Safe #}

@@ -29,6 +29,16 @@ final class AdminNavigationServiceTest extends TestCase
         $this->router->method('generate')->willReturn('/some/path');
     }
 
+    private function allowAll(): void
+    {
+        $this->security->method('isGranted')->willReturn(true);
+    }
+
+    private function denyAll(): void
+    {
+        $this->security->method('isGranted')->willReturn(false);
+    }
+
     public function testGetSidebarSectionsWithControllers(): void
     {
         // Arrange - create mock controller
@@ -43,7 +53,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -95,7 +105,7 @@ final class AdminNavigationServiceTest extends TestCase
             [$controllerZ, $controllerA, $controllerM],
         );
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -147,7 +157,7 @@ final class AdminNavigationServiceTest extends TestCase
             [$systemController, $pluginController, $anotherPluginController],
         );
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -197,7 +207,7 @@ final class AdminNavigationServiceTest extends TestCase
             [$controllerZ, $controllerA, $controllerM],
         );
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -234,13 +244,13 @@ final class AdminNavigationServiceTest extends TestCase
         $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
         // Deny ROLE_ADMIN
-        $this->security->method('isGranted')->willReturn(false);
+        $this->denyAll();
 
         // Act
         $sections = $service->getSidebarSections();
 
         // Assert - should not contain admin-only sections
-        static::assertEmpty($sections, 'System section should be hidden without ROLE_ADMIN');
+        static::assertEmpty($sections, 'System section should be hidden without Admin role');
     }
 
     public function testControllerReturningNullIsSkipped(): void
@@ -255,7 +265,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -283,7 +293,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -328,7 +338,7 @@ final class AdminNavigationServiceTest extends TestCase
             [$singleLinkController, $multiLinkController],
         );
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -356,7 +366,7 @@ final class AdminNavigationServiceTest extends TestCase
                     new AdminLink(
                         label: 'menu_admin_restricted',
                         route: 'app_admin_restricted',
-                        role: 'ROLE_SUPER_ADMIN',
+                        role: 'ROLE_ADMIN',
                     ),
                 ]);
             }
@@ -364,10 +374,10 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
 
-        // Only grant base admin role, not ROLE_SUPER_ADMIN
+        // Only deny ROLE_ADMIN
         $this->security
             ->method('isGranted')
-            ->willReturnCallback(static fn(string $role) => $role !== 'ROLE_SUPER_ADMIN');
+            ->willReturnCallback(static fn(string $role) => $role !== 'ROLE_ADMIN');
 
         // Act
         $sections = $service->getSidebarSections();
@@ -413,7 +423,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -470,7 +480,7 @@ final class AdminNavigationServiceTest extends TestCase
             [$cmsController, $systemController, $modifierController],
         );
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -525,7 +535,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService($this->security, $this->router, [$cmsController, $modifier1, $modifier2]);
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -569,7 +579,7 @@ final class AdminNavigationServiceTest extends TestCase
 
         $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
 
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();
@@ -609,7 +619,7 @@ final class AdminNavigationServiceTest extends TestCase
             });
 
         $service = new AdminNavigationService($this->security, $router, [$mockController]);
-        $this->security->method('isGranted')->willReturn(true);
+        $this->allowAll();
 
         // Act
         $sections = $service->getSidebarSections();

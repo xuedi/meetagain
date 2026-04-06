@@ -242,6 +242,58 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Count past events the user attended (RSVPed to).
+     *
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
+     */
+    public function countAttendedEvents(User $user, ?array $restrictToEventIds = null): int
+    {
+        if ($restrictToEventIds === []) {
+            return 0;
+        }
+
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.start < :date')
+            ->andWhere(':user MEMBER OF e.rsvp')
+            ->setParameter('date', new DateTime())
+            ->setParameter('user', $user);
+
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Count upcoming events the user has RSVPed to.
+     *
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
+     */
+    public function countUpcomingRsvpEvents(User $user, ?array $restrictToEventIds = null): int
+    {
+        if ($restrictToEventIds === []) {
+            return 0;
+        }
+
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.start >= :date')
+            ->andWhere(':user MEMBER OF e.rsvp')
+            ->setParameter('date', new DateTime())
+            ->setParameter('user', $user);
+
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
      * @return array<Event>
      */
     public function findAllRecurring(): array

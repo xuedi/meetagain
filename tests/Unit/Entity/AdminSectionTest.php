@@ -45,11 +45,11 @@ class AdminSectionTest extends TestCase
         ];
 
         // Act
-        $section = new AdminSection('User Management', $links, 'ROLE_META_ADMIN');
+        $section = new AdminSection('User Management', $links, 'ROLE_ORGANIZER');
 
         // Assert
         static::assertSame('User Management', $section->getSection());
         static::assertSame($links, $section->getLinks());
-        static::assertSame('ROLE_META_ADMIN', $section->getRole());
+        static::assertSame('ROLE_ORGANIZER', $section->getRole());
     }
 }

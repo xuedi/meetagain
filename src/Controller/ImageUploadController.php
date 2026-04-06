@@ -12,8 +12,6 @@ use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Enum\ImageType;
-use App\Filter\Action\ActionAuthorizationMessageService;
-use App\Filter\Action\ActionAuthorizationService;
 use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
@@ -27,8 +25,12 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 final class ImageUploadController extends AbstractController
 {
     public function __construct(
@@ -36,11 +38,10 @@ final class ImageUploadController extends AbstractController
         private readonly ImageService $imageService,
         private readonly CmsBlockRepository $cmsBlockRepo,
         private readonly ActivityService $activityService,
-        private readonly ActionAuthorizationService $actionAuthService,
-        private readonly ActionAuthorizationMessageService $authMessageService,
         private readonly ImageGalleryFilterService $imageGalleryFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ImageLocationService $imageLocationService,
+        private readonly Security $security,
     ) {}
 
     #[Route('/image/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
@@ -154,7 +155,6 @@ final class ImageUploadController extends AbstractController
     )]
     public function uploadEventImages(Request $request, int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
         $user = $this->getAuthedUser();
         $event = $this->em->getRepository(Event::class)->findOneBy(['id' => $id]);
 
@@ -162,13 +162,8 @@ final class ImageUploadController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        if (!$this->actionAuthService->isActionAllowed('event.upload', $event->getId(), $user)) {
-            $unauthorizedMsg = $this->authMessageService->getUnauthorizedMessage(
-                'event.upload',
-                $event->getId(),
-                $user,
-            );
-            $this->addFlash($unauthorizedMsg->type->value, $unauthorizedMsg->message);
+        if (!$this->isGranted('event.upload', $event)) {
+            $this->addFlash('warning', 'This event is for group members only.');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
@@ -208,7 +203,6 @@ final class ImageUploadController extends AbstractController
     {
         switch ($entityString) {
             case 'user':
-                $this->denyAccessUnlessGranted('ROLE_USER');
                 $imageType = ImageType::ProfilePicture;
                 $entity = $this->em->getRepository(User::class)->findOneBy(['id' => $id]);
                 if ($entity === null || $entity->getId() !== $this->getAuthedUser()->getId()) {
@@ -224,7 +218,9 @@ final class ImageUploadController extends AbstractController
                 $extendedGallery = $this->buildSelectableGallery($rawGallery, $image, $entityString, $id);
                 break;
             case 'cmsBlock':
-                $this->denyAccessUnlessGranted('ROLE_FOUNDER');
+                if (!$this->security->isGranted('ROLE_ADMIN')) {
+                    throw new AccessDeniedException();
+                }
                 $imageType = ImageType::CmsBlock;
                 $entity = $this->em->getRepository(CmsBlock::class)->findOneBy(['id' => $id]);
                 $image = $entity->getImage();
@@ -233,7 +229,6 @@ final class ImageUploadController extends AbstractController
                 $extendedGallery = $this->buildSelectableGallery($rawGallery, $image, $entityString, $id);
                 break;
             case 'event':
-                $this->denyAccessUnlessGranted('ROLE_USER');
                 $imageType = ImageType::EventUpload;
                 $entity = $this->em->getRepository(Event::class)->findOneBy(['id' => $id]);
                 $image = null;

@@ -6,19 +6,19 @@ Every plugin must implement `App\Plugin`. This page is the full reference for ea
 
 ## Method reference
 
-| Method | Return type | When called | Required? |
-|---|---|---|---|
-| `getPluginKey()` | `string` | Plugin registration | Yes |
-| `getMenuLinks()` | `array<Link>` | Every page load (nav rendering) | Yes |
-| `getEventTile()` | `?string` | Event detail page render | Yes |
-| `getEventListItemTags()` | `array<EventListItemTag>` | Event list rendering | Yes |
-| `getMemberPageTop()` | `?string` | Admin member list render | Yes |
-| `getFooterAbout()` | `?string` | Every page load (footer) | Yes |
-| `preFixtures()` | `void` | Before fixture loading | Yes |
-| `loadPostExtendFixtures()` | `void` | After event recurring extension | Yes |
-| `postFixtures()` | `void` | After all fixtures loaded | Yes |
-| `runCronTasks()` | `void` | Every cron run (~5 min) | Yes |
-| `getAdminSystemLinks()` | `?AdminSection` | Admin page render | Yes (deprecated) |
+| Method                     | Return type               | When called                     | Required?        |
+|----------------------------|---------------------------|---------------------------------|------------------|
+| `getPluginKey()`           | `string`                  | Plugin registration             | Yes              |
+| `getMenuLinks()`           | `array<Link>`             | Every page load (nav rendering) | Yes              |
+| `getEventTile()`           | `?string`                 | Event detail page render        | Yes              |
+| `getEventListItemTags()`   | `array<EventListItemTag>` | Event list rendering            | Yes              |
+| `getMemberPageTop()`       | `?string`                 | Admin member list render        | Yes              |
+| `getFooterAbout()`         | `?string`                 | Every page load (footer)        | Yes              |
+| `preFixtures()`            | `void`                    | Before fixture loading          | Yes              |
+| `loadPostExtendFixtures()` | `void`                    | After event recurring extension | Yes              |
+| `postFixtures()`           | `void`                    | After all fixtures loaded       | Yes              |
+| `runCronTasks()`           | `void`                    | Every cron run (~5 min)         | Yes              |
+| `getAdminSystemLinks()`    | `?AdminSection`           | Admin page render               | Yes (deprecated) |
 
 ---
 
@@ -51,18 +51,19 @@ public function getPluginKey(): string
 
 **Priority ordering:**
 
-| Priority range | Position |
-|---|---|
-| 0–99 | Before Events |
-| 100 | Events (core) |
-| 101–199 | Between Events and Members |
-| 200 | Members (core) |
-| 201–249 | Between Members and Groups |
-| 250 | Groups (core) |
-| 251–299 | Between Groups and Admin |
-| 300+ | Admin (core) and after |
+| Priority range | Position                   |
+|----------------|----------------------------|
+| 0–99           | Before Events              |
+| 100            | Events (core)              |
+| 101–199        | Between Events and Members |
+| 200            | Members (core)             |
+| 201–249        | Between Members and Groups |
+| 250            | Groups (core)              |
+| 251–299        | Between Groups and Admin   |
+| 300+           | Admin (core) and after     |
 
 **Example — single link, no priority:**
+
 ```php
 public function getMenuLinks(): array
 {
@@ -76,6 +77,7 @@ public function getMenuLinks(): array
 ```
 
 **Example — multiple links with explicit priority:**
+
 ```php
 public function getMenuLinks(): array
 {
@@ -95,6 +97,7 @@ public function getMenuLinks(): array
 ```
 
 **No links:**
+
 ```php
 public function getMenuLinks(): array
 {
@@ -139,6 +142,7 @@ public function getEventTile(int $eventId): ?string
 **Returns:** `array<EventListItemTag>` — empty array means no badges for this event.
 
 **Tag properties:**
+
 - `text` — Display label
 - `color` — Bulma color class: `is-info`, `is-success`, `is-warning`, `is-danger`
 - `icon` — FontAwesome icon class
@@ -231,6 +235,7 @@ public function preFixtures(OutputInterface $output): void
 ```
 
 Leave empty if not needed:
+
 ```php
 public function preFixtures(OutputInterface $output): void
 {
@@ -312,6 +317,7 @@ public function runCronTasks(OutputInterface $output): void
 ```
 
 Leave empty if not needed:
+
 ```php
 public function runCronTasks(OutputInterface $output): void
 {

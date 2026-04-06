@@ -7,8 +7,10 @@ use Plugin\Glossary\Activity\Messages\EntryDeleted;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/glossary/delete')]
+#[IsGranted('ROLE_ORGANIZER')]
 final class DeleteController extends AbstractGlossaryController
 {
     public function __construct(
@@ -21,8 +23,6 @@ final class DeleteController extends AbstractGlossaryController
     #[Route('/view/{id}', name: 'app_plugin_glossary_delete_view', methods: ['GET'])]
     public function deleteView(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
-
         return $this->renderList('@Glossary/delete.html.twig', [
             'editItem' => $this->service->get($id),
         ]);
@@ -31,7 +31,6 @@ final class DeleteController extends AbstractGlossaryController
     #[Route('/{id}', name: 'app_plugin_glossary_delete', methods: ['GET'])]
     public function delete(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
         $item = $this->service->get($id);
         $this->service->delete($id);
 

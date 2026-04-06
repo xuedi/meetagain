@@ -38,22 +38,22 @@ controllers. These rules are enforced automatically on every `just test` run.
 
 ## Layer responsibility table
 
-| Layer | Responsibility | May use | May NOT use |
-|---|---|---|---|
-| **Controller** | Thin HTTP/CLI entry point; validates input; renders response | Service, Entity, Form, Repository (sparingly) | Other controllers |
-| **Service** | Business logic, orchestration | Repository, Entity, other Services | Controller, Form |
-| **Repository** | Database queries | Entity | Service, Controller |
-| **Entity** | Doctrine-mapped data object | — (nothing) | Everything else |
+| Layer          | Responsibility                                               | May use                                       | May NOT use         |
+|----------------|--------------------------------------------------------------|-----------------------------------------------|---------------------|
+| **Controller** | Thin HTTP/CLI entry point; validates input; renders response | Service, Entity, Form, Repository (sparingly) | Other controllers   |
+| **Service**    | Business logic, orchestration                                | Repository, Entity, other Services            | Controller, Form    |
+| **Repository** | Database queries                                             | Entity                                        | Service, Controller |
+| **Entity**     | Doctrine-mapped data object                                  | — (nothing)                                   | Everything else     |
 
 Supporting layers:
 
-| Layer | Responsibility |
-|---|---|
-| **Form** | Form type classes for building and validating forms |
-| **Command** | CLI commands; same rules as controllers |
+| Layer               | Responsibility                                            |
+|---------------------|-----------------------------------------------------------|
+| **Form**            | Form type classes for building and validating forms       |
+| **Command**         | CLI commands; same rules as controllers                   |
 | **EventSubscriber** | React to Symfony framework events (login, response, etc.) |
-| **Twig extension** | Presentation helpers for templates |
-| **DataFixtures** | Test and dev data; allowed extra flexibility |
+| **Twig extension**  | Presentation helpers for templates                        |
+| **DataFixtures**    | Test and dev data; allowed extra flexibility              |
 
 ---
 
@@ -272,22 +272,22 @@ Plugins implement `EntityActionInterface` to receive these notifications.
 
 ## Directory tour
 
-| Directory | What lives there |
-|---|---|
-| `src/Controller/` | HTTP controllers (frontend + admin) |
-| `src/Controller/Admin/` | Admin-only controllers, grouped by submenu |
-| `src/Service/` | Business logic services (all `readonly`) |
-| `src/Repository/` | Doctrine repositories |
-| `src/Entity/` | Doctrine-mapped entities and enums |
-| `src/Form/` | Symfony form type classes |
-| `src/Command/` | CLI commands |
-| `src/Security/` | UserChecker, authenticators |
-| `src/EventSubscriber/` | Symfony event listeners |
-| `src/Filter/` | Filter interfaces and composite services |
-| `src/DataFixtures/` | Dev and test data fixtures |
-| `src/Twig/` | Twig extensions |
-| `templates/` | Twig templates (mirrors controller structure) |
-| `translations/` | YAML translation files (en, de, cn) |
-| `plugins/` | Optional plugin modules |
-| `tests/Unit/` | PHPUnit unit tests |
-| `tests/Functional/` | PHPUnit functional (HTTP) tests |
+| Directory               | What lives there                              |
+|-------------------------|-----------------------------------------------|
+| `src/Controller/`       | HTTP controllers (frontend + admin)           |
+| `src/Controller/Admin/` | Admin-only controllers, grouped by submenu    |
+| `src/Service/`          | Business logic services (all `readonly`)      |
+| `src/Repository/`       | Doctrine repositories                         |
+| `src/Entity/`           | Doctrine-mapped entities and enums            |
+| `src/Form/`             | Symfony form type classes                     |
+| `src/Command/`          | CLI commands                                  |
+| `src/Security/`         | UserChecker, authenticators                   |
+| `src/EventSubscriber/`  | Symfony event listeners                       |
+| `src/Filter/`           | Filter interfaces and composite services      |
+| `src/DataFixtures/`     | Dev and test data fixtures                    |
+| `src/Twig/`             | Twig extensions                               |
+| `templates/`            | Twig templates (mirrors controller structure) |
+| `translations/`         | YAML translation files (en, de, cn)           |
+| `plugins/`              | Optional plugin modules                       |
+| `tests/Unit/`           | PHPUnit unit tests                            |
+| `tests/Functional/`     | PHPUnit functional (HTTP) tests               |

@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/dinnerclub')]
+#[IsGranted('ROLE_USER')]
 final class AddController extends AbstractController
 {
     public function __construct(
@@ -21,7 +22,6 @@ final class AddController extends AbstractController
     ) {}
 
     #[Route('/add', name: 'plugin_dinnerclub_add', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_USER')]
     public function add(Request $request): Response
     {
         $form = $this->createForm(DishAddType::class, null, ['current_locale' => $request->getLocale()]);

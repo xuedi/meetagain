@@ -15,7 +15,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MemberController extends AbstractController
 {
     public const string ROUTE_MEMBER = 'app_member';
@@ -65,6 +65,7 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/view/{id}', name: 'app_member_view')]
+    #[IsGranted('ROLE_USER')]
     public function view(int $id): Response
     {
         $response = $this->getResponse();
@@ -100,15 +101,16 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/toggleFollow/{id}', name: 'app_member_toggle_follow')]
+    #[IsGranted('ROLE_USER')]
     public function toggleFollow(int $id): Response
     {
         return $this->service->toggleFollow($id, 'app_member_view');
     }
 
     #[Route('/members/rotate-avatar/{id}', name: 'app_member_rotate_avatar')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function rotateProfileImage(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         if ($user->getImage() !== null) {
@@ -119,9 +121,9 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/remove-image/{id}', name: 'app_member_remove_avatar')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function removeProfileImage(EntityManagerInterface $em, int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $oldImageId = $user->getImage()?->getId();
@@ -137,9 +139,9 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/restrict/{id}', name: 'app_member_restrict')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function restrictUser(EntityManagerInterface $em, int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $user->setRestricted(!$user->isRestricted());
@@ -150,9 +152,9 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/verify/{id}', name: 'app_member_verify')]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function verifyUser(EntityManagerInterface $em, int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ORGANIZER');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $user->setVerified(!$user->isVerified());
@@ -163,9 +165,9 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/takeover/{id}', name: 'app_member_takeover')]
+    #[IsGranted('ROLE_ADMIN')]
     public function takeoverUser(int $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $this->security->login($user);

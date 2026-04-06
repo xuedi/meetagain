@@ -7,20 +7,21 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 
 ## Capabilities at a glance
 
-| Interface | When to use it | Key method |
-|---|---|---|
-| `AdminNavigationInterface` | Add sections and links to the admin sidebar | `getAdminNavigationConfig()` |
-| `EventFilterInterface` | Control which events are visible | `getEventIdFilter()` |
-| `MenuFilterInterface` | Filter or modify navigation links | `filterMenuLinks()` |
-| `CmsFilterInterface` | Control which CMS pages are visible | `getCmsPageSlugs()` |
-| `MemberFilterInterface` | Filter which members appear in lists | `getUserIds()` |
-| `ActionAuthorizationInterface` | Allow or deny user actions | `canPerformAction()` |
-| `ActionAuthorizationMessageProviderInterface` | Custom messages for denied actions | `getUnauthorizedMessage()` |
-| `EventFilterFormContributorInterface` | Add fields to the event filter form | `addFields()` |
-| `NotificationProviderInterface` | Add counts to the notification bell | `getNotifications()` |
-| `EntityActionInterface` | React to core entity lifecycle events | `handleEntityAction()` |
-| `ActivityMetaEnricherInterface` | Enrich metadata on all activity types | `enrich()` |
-| `MessageInterface` | Define a new activity type with display rendering | `getType()`, `validate()`, `render()` |
+| Interface                                     | When to use it                                       | Key method                            |
+|-----------------------------------------------|------------------------------------------------------|---------------------------------------|
+| `AdminNavigationInterface`                    | Add sections and links to the admin sidebar          | `getAdminNavigation()`                |
+| `EventFilterInterface`                        | Control which events are visible                     | `getEventIdFilter()`                  |
+| `MenuFilterInterface`                         | Filter or modify navigation links                    | `filterMenuLinks()`                   |
+| `CmsFilterInterface`                          | Control which CMS pages are visible                  | `getCmsPageSlugs()`                   |
+| `MemberFilterInterface`                       | Filter which members appear in lists                 | `getUserIds()`                        |
+| `EventActionGuardInterface`                   | Allow or deny event-scoped actions (RSVP, comments…) | `canPerformAction()`                  |
+| `EventActionDenyMessageProviderInterface`     | Custom messages for denied event actions             | `getUnauthorizedMessage()`            |
+| `PermissionVoterInterface`                    | Override or veto any permission decision             | `vote()`                              |
+| `EventFilterFormContributorInterface`         | Add fields to the event filter form                  | `addFields()`                         |
+| `NotificationProviderInterface`               | Add counts to the notification bell                  | `getNotifications()`                  |
+| `EntityActionInterface`                       | React to core entity lifecycle events                | `handleEntityAction()`                |
+| `ActivityMetaEnricherInterface`               | Enrich metadata on all activity types                | `enrich()`                            |
+| `MessageInterface`                            | Define a new activity type with display rendering    | `getType()`, `validate()`, `render()` |
 
 ---
 
@@ -28,7 +29,8 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 
 ### AdminNavigationInterface
 
-**Purpose:** Add sections and links to the admin sidebar (the modern approach — replaces the deprecated `getAdminSystemLinks()`).
+**Purpose:** Add sections and links to the admin sidebar (the modern approach — replaces the deprecated
+`getAdminSystemLinks()`).
 
 **File:** `src/Controller/Admin/AdminNavigationInterface.php`
 
@@ -37,14 +39,15 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 ```php
 namespace Plugin\YourPlugin\Controller\Admin;
 
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Controller\Admin\AdminNavigationInterface;
-use App\ValueObject\AdminNavigationConfig;
-use App\ValueObject\AdminLink;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\AdminLink;
+use App\Enum\CoreRole;
 
-class DashboardController extends AbstractController implements AdminNavigationInterface
+class DashboardController extends AbstractAdminController implements AdminNavigationInterface
 {
-    public function getAdminNavigationConfig(): ?AdminNavigationConfig
+    public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
             section: 'Your Plugin',
@@ -58,31 +61,34 @@ class DashboardController extends AbstractController implements AdminNavigationI
                     label: 'menu_admin_settings',
                     route: 'app_admin_plugin_settings',
                     active: 'settings',
-                    role: 'ROLE_ADMIN', // Optional — restrict this link by role
+                    role: CoreRole::Admin, // Optional — restrict this link by role
                 ),
             ],
-            sectionRole: 'ROLE_ORGANIZER', // Optional — hide entire section by role
+            sectionRole: CoreRole::Organizer, // Optional — hide entire section by role
         );
     }
 }
 ```
 
 **AdminLink parameters:**
+
 - `label` — Translation key for link text
 - `route` — Symfony route name
 - `active` — State identifier (used to highlight the active link)
-- `role` — Optional role requirement (hides this link if user lacks role)
+- `role` — Optional `RoleInterface` value (hides this link if user lacks that role)
 
 **AdminNavigationConfig parameters:**
+
 - `section` — Section heading in the sidebar
 - `links` — Array of `AdminLink` objects
-- `sectionRole` — Optional role requirement (hides the entire section)
+- `sectionRole` — Optional `RoleInterface` value (hides the entire section)
 
 ---
 
 ## Filters
 
-Filter interfaces use AND logic with a priority chain: a filter with `getEventIdFilter()` returning a non-empty array will restrict results to that set. Returning an empty array means "no filtering from this provider."
+Filter interfaces use AND logic with a priority chain: a filter with `getEventIdFilter()` returning a non-empty array
+will restrict results to that set. Returning an empty array means "no filtering from this provider."
 
 ### EventFilterInterface
 
@@ -231,15 +237,15 @@ readonly class GroupMemberFilter implements MemberFilterInterface
 
 ---
 
-## Authorization
+## Event Action Guards
 
-### ActionAuthorizationInterface
+### EventActionGuardInterface
 
 **Purpose:** Allow or deny users from performing specific actions.
 
-**File:** `src/Filter/Action/ActionAuthorizationInterface.php`
+**File:** `src/Filter/Action/EventActionGuardInterface.php`
 
-**Tag:** `#[AutoconfigureTag('app.action_authorization')]`
+**Tag:** `#[AutoconfigureTag('app.event_action_guard')]`
 
 **When called:** Before RSVP, comments, photo uploads, and other actions.
 
@@ -248,12 +254,12 @@ readonly class GroupMemberFilter implements MemberFilterInterface
 ```php
 namespace Plugin\YourPlugin\Filter\Action;
 
-use App\Filter\Action\ActionAuthorizationInterface;
+use App\Filter\Action\EventActionGuardInterface;
 use App\Entity\User;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('app.action_authorization')]
-readonly class MembershipAuthorizationProvider implements ActionAuthorizationInterface
+#[AutoconfigureTag('app.event_action_guard')]
+readonly class MembershipGuardProvider implements EventActionGuardInterface
 {
     public function getPriority(): int
     {
@@ -277,33 +283,34 @@ readonly class MembershipAuthorizationProvider implements ActionAuthorizationInt
 ```
 
 **Available actions:**
+
 - `'event.rsvp'` — Toggle RSVP on an event
 - `'event.comment'` — Add a comment to an event
 - `'event.upload'` — Upload images to an event
 
 ---
 
-### ActionAuthorizationMessageProviderInterface
+### EventActionDenyMessageProviderInterface
 
 **Purpose:** Provide custom error messages when an action is denied.
 
-**File:** `src/Filter/Action/ActionAuthorizationMessageProviderInterface.php`
+**File:** `src/Filter/Action/EventActionDenyMessageProviderInterface.php`
 
-**Tag:** `#[AutoconfigureTag('app.action_authorization_message')]`
+**Tag:** `#[AutoconfigureTag('app.event_action_deny_message')]`
 
-**When called:** When an action is denied by `ActionAuthorizationInterface`.
+**When called:** When an action is denied by `EventActionGuardInterface`.
 
 ```php
 namespace Plugin\YourPlugin\Filter\Action;
 
-use App\Filter\Action\ActionAuthorizationMessageProviderInterface;
+use App\Filter\Action\EventActionDenyMessageProviderInterface;
 use App\Filter\Action\UnauthorizedMessage;
 use App\Entity\User;
 use App\Enum\FlashMessageType;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('app.action_authorization_message')]
-readonly class CustomMessageProvider implements ActionAuthorizationMessageProviderInterface
+#[AutoconfigureTag('app.event_action_deny_message')]
+readonly class CustomDenyMessageProvider implements EventActionDenyMessageProviderInterface
 {
     public function getPriority(): int
     {
@@ -325,10 +332,67 @@ readonly class CustomMessageProvider implements ActionAuthorizationMessageProvid
 ```
 
 **FlashMessageType values:**
+
 - `FlashMessageType::Success` — Green notification
 - `FlashMessageType::Warning` — Orange/yellow notification
 - `FlashMessageType::Error` — Red notification
 - `FlashMessageType::Info` — Blue notification
+
+---
+
+### PermissionVoterInterface
+
+**Purpose:** Override or veto any permission decision — allow, deny (with optional message and redirect),
+or abstain (defer to other voters and the default role check).
+
+**File:** `src/Permission/PermissionVoterInterface.php`
+
+**Tag:** `#[AutoconfigureTag('app.permission_voter')]` (applied on the interface)
+
+```php
+namespace Plugin\YourPlugin\Permission;
+
+use App\Enum\CoreRole;
+use App\Permission\PermissionVote;
+use App\Permission\PermissionVoterInterface;
+use App\Permission\RoleInterface;
+
+readonly class SubscriptionRequiredVoter implements PermissionVoterInterface
+{
+    public function getPriority(): int
+    {
+        return 0;
+    }
+
+    public function vote(RoleInterface $role, array $effectiveRoles): PermissionVote
+    {
+        // Only intercept User-level checks; abstain for everything else
+        if ($role->roleId() !== CoreRole::User->roleId()) {
+            return PermissionVote::abstain();
+        }
+
+        if ($this->subscriptionService->isActive()) {
+            return PermissionVote::allow();
+        }
+
+        return PermissionVote::deny(
+            messageKey: 'subscription.required',
+            redirectRoute: 'app_subscription_upgrade',
+        );
+    }
+}
+```
+
+**Vote outcomes:**
+
+- `PermissionVote::allow()` — explicitly grant access (overrides a default deny)
+- `PermissionVote::deny($messageKey, $redirectRoute)` — block access with a flash message and optional redirect
+- `PermissionVote::abstain()` — no opinion; other voters and the default rule decide
+
+**Decision order:** Any `Deny` vote wins over everything. Any `Allow` vote wins over a default deny.
+If all voters abstain, the core role hierarchy check is used.
+
+See [Permissions](permissions.md) for the full guide.
 
 ---
 
@@ -449,19 +513,19 @@ readonly class MembershipActionHandler implements EntityActionInterface
 
 **EntityAction enum values** — the full list of actions you can react to:
 
-| Value | Triggered when |
-|---|---|
-| `EntityAction::MemberCreated` | A new member joins |
-| `EntityAction::MemberDeleted` | A member is removed |
-| `EntityAction::EventCreated` | A new event is created |
-| `EntityAction::EventUpdated` | An event is updated |
-| `EntityAction::EventDeleted` | An event is deleted |
-| `EntityAction::RsvpAdded` | A user RSVPs to an event |
-| `EntityAction::RsvpRemoved` | A user removes their RSVP |
+| Value                         | Triggered when            |
+|-------------------------------|---------------------------|
+| `EntityAction::MemberCreated` | A new member joins        |
+| `EntityAction::MemberDeleted` | A member is removed       |
+| `EntityAction::EventCreated`  | A new event is created    |
+| `EntityAction::EventUpdated`  | An event is updated       |
+| `EntityAction::EventDeleted`  | An event is deleted       |
+| `EntityAction::RsvpAdded`     | A user RSVPs to an event  |
+| `EntityAction::RsvpRemoved`   | A user removes their RSVP |
 
 !!! tip
-    Return `null` from the `default` branch of your `match` — it signals "nothing to do"
-    without throwing an error for unknown future actions.
+Return `null` from the `default` branch of your `match` — it signals "nothing to do"
+without throwing an error for unknown future actions.
 
 ---
 
@@ -517,8 +581,8 @@ $this->activityService->log(ItemCreated::TYPE, $user, ['item_id' => $item->getId
 ```
 
 !!! warning
-    When logging destructive actions (delete, reject), read the entity name/title **before**
-    calling the service method, since the entity may be removed during the operation.
+When logging destructive actions (delete, reject), read the entity name/title **before**
+calling the service method, since the entity may be removed during the operation.
 
 ---
 
@@ -548,6 +612,7 @@ readonly class GroupContextEnricher implements ActivityMetaEnricherInterface
 ```
 
 **Key rules:**
+
 - Return only the keys to **add**. The original caller's keys always win.
 - Use a `_<plugin_key>_` prefix to avoid collisions with other plugins.
 - Must not throw — enrichment is best-effort. Failures are logged as warnings.

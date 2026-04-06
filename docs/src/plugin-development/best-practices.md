@@ -47,7 +47,8 @@ be `readonly`. In that case, document why.
 ## Never modify core entities
 
 Do not add properties to core entities (`Event`, `User`, `Member`, etc.) or create Doctrine
-associations from core to plugin entities. Instead, use [junction tables with INT IDs](architecture.md#use-int-ids-not-foreign-keys).
+associations from core to plugin entities. Instead,
+use [junction tables with INT IDs](architecture.md#use-int-ids-not-foreign-keys).
 
 This keeps the plugin removable without leaving orphaned schema changes in core.
 
