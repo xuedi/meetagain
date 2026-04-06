@@ -136,7 +136,7 @@
                             </div>
                             {% if is_granted('ROLE_ORGANIZER') %}
                             <div class="level-right">
-                                <a href="{{ path('plugin_dinnerclub_translate', {'id': dish.id, 'lang': app.locale}) }}" class="button is-link">
+                                <a href="{{ path('plugin_dinnerclub_edit', {'id': dish.id, 'lang': app.locale}) }}" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
                                     <span>Edit</span>
                                 </a>
