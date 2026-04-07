@@ -72,7 +72,6 @@
                         <thead>
                             <tr>
                                 <th class="is-size-7">Route</th>
-                                <th class="is-size-7">Path</th>
                                 <th class="is-size-7">Methods</th>
                                 <th class="is-size-7">Controller</th>
                                 <th class="is-size-7">Action</th>
@@ -83,7 +82,6 @@
                             {% for entry in groups[roleId] %}
                                 <tr>
                                     <td class="is-size-7" style="font-family: monospace;">{{ entry.routeName }}</td>
-                                    <td class="is-size-7" style="font-family: monospace;">{{ entry.routePath }}</td>
                                     <td>
                                         {% if entry.httpMethods is empty %}
                                             <span class="tag is-light is-size-7">ANY</span>
@@ -114,28 +112,6 @@
 
             {% endif %}
         {% endfor %}
-
-        {# Legend #}
-        <div class="notification is-light mt-6 p-4">
-            <p class="is-size-7 has-text-weight-semibold mb-3">Legend</p>
-
-            <div class="mb-4">
-                <p class="is-size-7 has-text-grey mb-2">Core role hierarchy (lowest → highest privilege)</p>
-                <p class="is-size-7 has-text-grey mt-1">
-                    <code>ROLE_USER → ROLE_ORGANIZER → ROLE_ADMIN</code> — each role inherits all
-                    permissions of the role below it. Defined in <code>config/packages/security.yaml</code>.
-                </p>
-            </div>
-
-            <div class="mb-2">
-                <p class="is-size-7 has-text-grey mb-2">Permission scope</p>
-                <div class="tags mb-1">
-                    <span class="tag is-light is-size-7">⬤ - method-level, overrides the class-level role</span>
-                    <span class="tag is-light is-size-7">Anonymous - no <code>#[IsGranted]</code> present</span>
-                </div>
-            </div>
-
-        </div>
 
     </div>
 
