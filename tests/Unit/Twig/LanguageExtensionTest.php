@@ -51,9 +51,10 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(9, $functions);
+        static::assertCount(10, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
+        static::assertContains('get_hreflang_code', $functionNames);
         static::assertContains('get_enabled_locales', $functionNames);
         static::assertContains('get_all_languages', $functionNames);
         static::assertContains('current_locale', $functionNames);
@@ -94,13 +95,13 @@ class LanguageExtensionTest extends TestCase
 
         $this->languageServiceStub
             ->method('getAltLangList')
-            ->willReturn(['de' => '/de/events', 'zh' => '/zh/events']);
+            ->willReturn(['de' => '/de/events', 'cn' => '/cn/events']);
 
         $result = $this->subject->getAlternativeLanguageCodes();
 
         static::assertSame([
             'de' => 'https://meetagain.local/de/events',
-            'zh' => 'https://meetagain.local/zh/events',
+            'cn' => 'https://meetagain.local/cn/events',
         ], $result);
     }
 

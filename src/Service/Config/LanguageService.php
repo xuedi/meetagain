@@ -168,6 +168,15 @@ readonly class LanguageService
     }
 
     /**
+     * Map an internal routing code to its correct BCP 47 language tag for hreflang output.
+     * Internal codes that differ from BCP 47 (e.g. "cn" → "zh") are remapped here.
+     */
+    public function toHreflangCode(string $code): string
+    {
+        return self::HREFLANG_CODE_MAP[$code] ?? $code;
+    }
+
+    /**
      * Build an hreflang alternate-language list for the given URI.
      *
      * @return array<string, string> locale => URL
@@ -176,13 +185,11 @@ readonly class LanguageService
     {
         $altLangList = array_fill_keys($this->getFilteredEnabledCodes(), $currentUri);
         unset($altLangList[$currentLocale]);
-        $result = [];
         foreach ($altLangList as $languageCode => $link) {
-            $hreflangCode = self::HREFLANG_CODE_MAP[$languageCode] ?? $languageCode;
-            $result[$hreflangCode] = $this->replaceUriLanguageCode($link, $languageCode);
+            $altLangList[$languageCode] = $this->replaceUriLanguageCode($link, $languageCode);
         }
 
-        return $result;
+        return $altLangList;
     }
 
     public function replaceUriLanguageCode(string $link, string $newCode): string
