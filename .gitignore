@@ -18,3 +18,15 @@ installed.lock
 /plugins/multisite/
 /.claude/
 /docs/site/
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> symfonycasts/sass-bundle ###
+/public/assets/
+/bin/dart-sass/
+###< symfonycasts/sass-bundle ###
+
+/assets/styles/_config.scss

@@ -26,7 +26,7 @@
             {% for language in languages %}
                 <tr>
                     <td>
-                        <img src="/images/flags/{{ language.code }}.svg" width="32" height="24" alt="{{ language.code }}"/>
+                        <img src="{{ asset('images/flags/' ~ language.code ~ '.svg') }}" width="32" height="24" alt="{{ language.code }}"/>
                     </td>
                     <td>{{ language.code }}</td>
                     <td>{{ language.name }}</td>

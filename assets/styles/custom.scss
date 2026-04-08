@@ -1,0 +1,118 @@
+@use 'config' as cfg;
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+// Accessibility: Bulma's default grey fails WCAG on white — use our darker overrides.
+.has-text-grey       { color: cfg.$text-grey       !important; }
+.has-text-grey-light { color: cfg.$text-grey-light !important; }
+
+input[type="color"] {
+    min-width: 50px;
+    min-height: 30px;
+    cursor: pointer;
+}
+
+#osm-map {
+    z-index: 0;
+}
+
+.navbar-top {
+    border-bottom: 1px solid lightgray;
+}
+
+.is-flag {
+    height: 24px;
+}
+.is-flag-mini {
+    height: 20px;
+}
+
+.is-pulled-top-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#eventFilter {
+    .field {
+        display: inline;
+
+        .control {
+            display: inline;
+        }
+    }
+}
+
+.menu {
+    .menu-list {
+        .is-active {
+            color: black;
+            background-color: aliceblue;
+        }
+    }
+}
+
+.cookie-button {
+    padding-left:70px;
+    background-image: url('../images/monster.png');
+    background-repeat: no-repeat;
+}
+#dropdown-cookie {
+    min-width: 350px;
+}
+
+.breakText {
+    display: block;
+    max-width: 720px !important;
+    word-break: break-all;
+}
+
+.flashNotification {
+    position: fixed;
+    width: max-content;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 1rem;
+    z-index: 1000;
+}
+
+/* Message body borders for better visual separation TODO: move the adjustments later to a clean sass precompile modification */
+.message-body {
+    border-left: 2px solid #b5b5b5 !important;
+    border-right: 2px solid #b5b5b5 !important;
+    border-bottom: 2px solid #b5b5b5 !important;
+}
+
+/* Flatpickr time picker fix - v4.6+ uses .hasTime instead of .showTimeInput */
+.flatpickr-calendar.hasTime .flatpickr-time {
+    border-top: 1px solid rgba(10,10,10,.1);
+    height: calc(2.25rem + 1px);
+}
+
+.is-nowrap {
+    white-space: nowrap;
+}
+
+.LinkLikeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: .5rem .75rem;
+    font-size: 1em;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.float-box-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    background: rgba(245, 245, 245, 0.9);
+    border-bottom-left-radius: 6px;
+    border-left: 1px solid #b0b0b0;
+    border-bottom: 1px solid #b0b0b0;
+    padding: 6px;
+}

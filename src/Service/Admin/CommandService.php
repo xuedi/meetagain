@@ -5,6 +5,7 @@ namespace App\Service\Admin;
 use App\Service\Command\ClearCacheCommand;
 use App\Service\Command\CommandInterface;
 use App\Service\Command\ExecuteMigrationsCommand;
+use App\Service\Command\RebuildThemeCommand;
 use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -49,6 +50,16 @@ readonly class CommandService
     public function clearCache(): string
     {
         return $this->execute(new ClearCacheCommand());
+    }
+
+    public function rebuildTheme(): string
+    {
+        $output  = $this->execute(new RebuildThemeCommand());
+        $output .= $this->run(['command' => 'asset-map:compile']);
+        $output .= $this->clearCache();
+        $output .= $this->run(['command' => 'cache:pool:clear', 'pools' => ['cache.cms_page_cache']]);
+
+        return $output;
     }
 
     public function executeMigrations(): string

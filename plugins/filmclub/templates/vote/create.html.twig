@@ -3,7 +3,7 @@
 {% block title %}{{ "Create vote"|trans }}{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href='/stylesheet/flatpickr-bulma.min.css'/>
+    <link rel="stylesheet" href="{{ asset('styles/vendor/flatpickr-bulma.min.css') }}"/>
 {% endblock %}
 
 {% block body %}
@@ -45,9 +45,9 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src='/javascript/flatpickr.min.js'></script>
+    <script src="{{ asset('js/vendor/flatpickr.min.js') }}"></script>
     {% if app.request.locale != 'en' %}
-    <script src='/javascript/flatpickr-l10n/{{ app.request.locale }}.js'></script>
+    <script src="{{ asset('js/vendor/flatpickr-l10n/' ~ app.request.locale ~ '.js') }}"></script>
     {% endif %}
     <script>
         document.querySelectorAll('.flatpickr-field').forEach((el) => {

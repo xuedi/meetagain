@@ -9,6 +9,7 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 
 | Interface                                     | When to use it                                       | Key method                            |
 |-----------------------------------------------|------------------------------------------------------|---------------------------------------|
+| `Plugin` (base interface)                     | Serve CSS/JS assets from your plugin                 | `getStylesheets()`, `getJavascripts()` |
 | `AdminNavigationInterface`                    | Add sections and links to the admin sidebar          | `getAdminNavigation()`                |
 | `EventFilterInterface`                        | Control which events are visible                     | `getEventIdFilter()`                  |
 | `MenuFilterInterface`                         | Filter or modify navigation links                    | `filterMenuLinks()`                   |
@@ -19,6 +20,68 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `EntityActionInterface`                       | React to core entity lifecycle events                | `handleEntityAction()`                |
 | `ActivityMetaEnricherInterface`               | Enrich metadata on all activity types                | `enrich()`                            |
 | `MessageInterface`                            | Define a new activity type with display rendering    | `getType()`, `validate()`, `render()` |
+
+---
+
+## Plugin Assets
+
+Plugins can serve their own CSS and JavaScript through Symfony AssetMapper by implementing
+two methods on the base `Plugin` interface.
+
+### Directory structure
+
+Place assets inside your plugin's `assets/` directory:
+
+```
+plugins/your-plugin/
+└── assets/
+    ├── styles/        ← CSS/SCSS files
+    ├── js/            ← JavaScript files
+    ├── images/        ← Plugin-specific static images
+    └── fonts/         ← Plugin-specific fonts (rare)
+```
+
+This directory is auto-discovered by the AssetMapper configuration — no core changes needed.
+
+### Returning asset paths from Kernel.php
+
+```php
+public function getStylesheets(): array
+{
+    return ['styles/myplugin.css'];  // relative to plugins/your-plugin/assets/
+}
+
+public function getJavascripts(): array
+{
+    return ['js/myplugin.js'];  // relative to plugins/your-plugin/assets/
+}
+```
+
+### How paths resolve
+
+| What you return | File on disk | Logical asset path | `asset()` output |
+|---|---|---|---|
+| `styles/myplugin.css` | `plugins/your-plugin/assets/styles/myplugin.css` | `plugins/your-plugin/styles/myplugin.css` | `/assets/plugins/your-plugin/styles/myplugin-{hash}.css` |
+| `js/myplugin.js` | `plugins/your-plugin/assets/js/myplugin.js` | `plugins/your-plugin/js/myplugin.js` | `/assets/plugins/your-plugin/js/myplugin-{hash}.js` |
+
+The `PluginExtension` Twig service prefixes your paths with `plugins/your-plugin/` automatically.
+The base template wraps each path in `{{ asset(...) }}` — you never call `asset()` yourself from `Kernel.php`.
+
+### Referencing plugin images in CSS
+
+From `plugins/your-plugin/assets/styles/myplugin.css`, images are at `../images/`:
+
+```css
+.my-icon {
+    background-image: url('../images/icon.svg');
+}
+```
+
+### Referencing plugin images in Twig
+
+```twig
+<img src="{{ asset('plugins/your-plugin/images/icon.svg') }}" alt="">
+```
 
 ---
 

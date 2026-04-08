@@ -71,4 +71,20 @@ interface Plugin
      */
     public function getMemberPageTop(): ?string;
 
+    /**
+     * Returns logical asset paths for stylesheets this plugin contributes.
+     * Paths are relative to the plugin's assets/ directory.
+     * Example: ['styles/filmclub.css']
+     * @return list<string>
+     */
+    public function getStylesheets(): array;
+
+    /**
+     * Returns logical asset paths for JavaScript files this plugin contributes.
+     * Paths are relative to the plugin's assets/ directory.
+     * Example: ['js/ratings.js']
+     * @return list<string>
+     */
+    public function getJavascripts(): array;
+
 }

@@ -59,9 +59,71 @@ Plugin templates always use their own namespace:
 
 ---
 
+## Asset Pipeline
+
+Assets are managed by **Symfony AssetMapper** — no Node.js required.
+
+### Directory layout
+
+```
+assets/
+├── styles/
+│   ├── app.scss          ← SCSS entry point (imports Bulma, fonts, custom)
+│   ├── custom.scss       ← theme overrides and custom rules
+│   ├── fonts.scss        ← @font-face declarations
+│   └── vendor/           ← vendored CSS/SCSS (leaflet, fancybox, flatpickr, etc.)
+├── js/
+│   ├── app.js            ← minimal AssetMapper entry point
+│   ├── custom.js         ← main app JS (progressive enhancement)
+│   └── vendor/           ← vendored JS (leaflet, fancybox, chart.js, etc.)
+├── images/               ← static images (flags, logo, 404, defaults, leaflet markers)
+└── fonts/                ← web fonts (Inter, FontAwesome, captcha)
+```
+
+### Referencing assets in templates
+
+Always use `{{ asset('...') }}` — never hard-code paths:
+
+```twig
+{# Core CSS (compiled from app.scss) #}
+<link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+
+{# Core JS #}
+<script src="{{ asset('js/custom.js') }}" defer></script>
+
+{# Page-specific vendor libraries — in {% block stylesheets %} / {% block javascripts %} #}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/vendor/leaflet.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/vendor/leaflet.js') }}" defer></script>
+{% endblock %}
+
+{# Images #}
+<img src="{{ asset('images/logo.webp') }}" alt="Logo">
+```
+
+### Development workflow
+
+```bash
+just appAssetsWatch    # watch SCSS for changes during development
+just appAssets         # compile + version all assets for production
+```
+
+### Adding custom styles
+
+Edit `assets/styles/custom.scss`. It is imported last in `app.scss` so rules here
+override Bulma defaults. Use Bulma's CSS custom properties (`var(--bulma-*)`) for
+theme-aware overrides.
+
+---
+
 ## Bulma CSS
 
-The entire UI uses [Bulma](https://bulma.io/) — no other CSS framework. Keep styling minimal.
+The entire UI uses [Bulma](https://bulma.io/) compiled from SCSS source — no other CSS framework. Keep styling minimal.
 
 **Use these elements:**
 

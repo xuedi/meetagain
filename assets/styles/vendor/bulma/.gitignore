@@ -1,0 +1,24 @@
+# Files
+
+.DS_Store
+.ruby-version
+npm-debug.log
+test.css
+test.css.map
+test.html
+test*.html
+test.sass
+test.scss
+test.css
+test.css.map
+
+# Folders
+
+.idea/
+.sass-cache
+_gh_pages
+_site
+dev
+dist
+node_modules
+test/output/

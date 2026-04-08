@@ -79,4 +79,14 @@ class Kernel implements Plugin
     {
         return null;
     }
+
+    public function getStylesheets(): array
+    {
+        return [];
+    }
+
+    public function getJavascripts(): array
+    {
+        return [];
+    }
 }

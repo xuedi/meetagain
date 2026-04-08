@@ -8,6 +8,7 @@ use App\Enum\ImageType;
 use App\Repository\ConfigRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -22,6 +23,7 @@ readonly class ConfigService
         private ConfigRepository $repo,
         private EntityManagerInterface $em,
         private CacheInterface $cache,
+        private KernelInterface $kernel,
     ) {}
 
     /**
@@ -189,53 +191,76 @@ readonly class ConfigService
         $this->setString('seo_description_members', $formData['seoDescriptionMembers'] ?? '');
     }
 
-    public function getThemeColorDefaults(): array
-    {
-        return [
-            'color_primary' => '#00d1b2',
-            'color_link' => '#485fc7',
-            'color_info' => '#3e8ed0',
-            'color_success' => '#48c78e',
-            'color_warning' => '#ffe08a',
-            'color_danger' => '#f14668',
-            'color_text_grey' => '#767676',
-            'color_text_grey_light' => '#959595',
-        ];
-    }
-
     public function getThemeColors(): array
     {
         return $this->cache->get(self::CACHE_KEY_THEME_COLORS, function (ItemInterface $item): array {
             $item->expiresAfter(self::CACHE_TTL);
 
-            $defaults = $this->getThemeColorDefaults();
-            $colorNames = array_keys($defaults);
-
-            $configs = $this->repo->findBy(['name' => $colorNames]);
-            $dbColors = [];
-            foreach ($configs as $config) {
-                $dbColors[$config->getName()] = $config->getValue();
-            }
-
-            return array_merge($defaults, $dbColors);
+            return $this->parseConfigScss();
         });
-    }
-
-    public function getColor(string $name, string $default): string
-    {
-        return $this->getString('color_' . $name, $default);
     }
 
     public function saveColors(array $colors): void
     {
-        foreach ($colors as $name => $value) {
-            if (!preg_match('/^#[0-9A-Fa-f]{6}$/', (string) $value)) {
+        $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
+        $content = file_get_contents($path);
+
+        $scssToKey = [
+            'primary'         => 'color_primary',
+            'link'            => 'color_link',
+            'info'            => 'color_info',
+            'success'         => 'color_success',
+            'warning'         => 'color_warning',
+            'danger'          => 'color_danger',
+            'text-grey'       => 'color_text_grey',
+            'text-grey-light' => 'color_text_grey_light',
+        ];
+
+        foreach ($scssToKey as $scssVar => $key) {
+            if (!isset($colors[$key])) {
                 continue;
             }
 
-            $this->setString($name, $value);
+            $value = (string) $colors[$key];
+            if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $value)) {
+                continue;
+            }
+
+            $content = preg_replace(
+                '/(\$' . preg_quote($scssVar, '/') . '\s*:\s*)#[0-9a-fA-F]{3,6}(\s*;)/',
+                '${1}' . $value . '${2}',
+                $content
+            );
         }
+
+        file_put_contents($path, $content);
         $this->cache->delete(self::CACHE_KEY_THEME_COLORS);
+    }
+
+    private function parseConfigScss(): array
+    {
+        $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
+        $content = file_get_contents($path);
+
+        $scssToKey = [
+            'primary'         => 'color_primary',
+            'link'            => 'color_link',
+            'info'            => 'color_info',
+            'success'         => 'color_success',
+            'warning'         => 'color_warning',
+            'danger'          => 'color_danger',
+            'text-grey'       => 'color_text_grey',
+            'text-grey-light' => 'color_text_grey_light',
+        ];
+
+        $map = [];
+        foreach ($scssToKey as $scssVar => $key) {
+            if (preg_match('/\$' . preg_quote($scssVar, '/') . '\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/', $content, $m)) {
+                $map[$key] = $m[1];
+            }
+        }
+
+        return $map;
     }
 
     private function getCachedValue(string $name): ?string
