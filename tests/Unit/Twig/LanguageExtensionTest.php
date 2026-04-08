@@ -84,12 +84,13 @@ class LanguageExtensionTest extends TestCase
         $this->subject->getCurrentLocale();
     }
 
-    public function testGetAlternativeLanguageCodesReturnsListFromService(): void
+    public function testGetAlternativeLanguageCodesReturnsAbsoluteUrls(): void
     {
         $request = $this->createStub(Request::class);
         $request->method('getRequestUri')->willReturn('/en/events');
         $request->method('getLocale')->willReturn('en');
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local');
 
         $this->languageServiceStub
             ->method('getAltLangList')
@@ -97,7 +98,10 @@ class LanguageExtensionTest extends TestCase
 
         $result = $this->subject->getAlternativeLanguageCodes();
 
-        static::assertSame(['de' => '/de/events', 'zh' => '/zh/events'], $result);
+        static::assertSame([
+            'de' => 'https://meetagain.local/de/events',
+            'zh' => 'https://meetagain.local/zh/events',
+        ], $result);
     }
 
     public function testGetAlternativeLanguageCodesReturnsEmptyForProfiler(): void
