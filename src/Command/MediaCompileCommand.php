@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\AssetMapper\OpaqueMediaPathResolver;
+use MatthiasMullie\Minify\JS;
 use Override;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -48,11 +49,20 @@ final class MediaCompileCommand extends Command
             $seen[$filename] = true;
 
             $content = $asset->content ?? file_get_contents($asset->sourcePath);
+            $content = $this->minify($content, $ext);
             file_put_contents("$target/$filename", $content);
             $count++;
         }
 
         $output->writeln("Wrote $count media files to $target");
         return Command::SUCCESS;
+    }
+
+    private function minify(string $content, string $ext): string
+    {
+        return match ($ext) {
+            'js'    => (new JS())->add($content)->minify(),
+            default => $content,
+        };
     }
 }
