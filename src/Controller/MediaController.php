@@ -29,15 +29,12 @@ final class MediaController extends AbstractController
         $asset = $assetMapper->getAsset($logicalPath)
             ?? throw new NotFoundHttpException("Asset disappeared: $logicalPath");
 
-        // Use $asset->content when available: it contains AssetMapper-processed output
-        // (e.g. CSS with url() references rewritten to /media/ hashes). Falling back to
-        // BinaryFileResponse($asset->sourcePath) would serve raw SCSS or unprocessed content.
         if ($asset->content !== null) {
             return new Response(
                 $asset->content,
                 200,
                 [
-                    'Content-Type'  => $this->guessMime($ext),
+                    'Content-Type' => $this->guessMime($ext),
                     'Cache-Control' => 'public, max-age=5',
                 ],
             );
@@ -53,16 +50,16 @@ final class MediaController extends AbstractController
     private function guessMime(string $ext): string
     {
         return match ($ext) {
-            'png'   => 'image/png',
+            'png' => 'image/png',
             'jpg',
-            'jpeg'  => 'image/jpeg',
-            'webp'  => 'image/webp',
-            'gif'   => 'image/gif',
-            'svg'   => 'image/svg+xml',
-            'css'   => 'text/css',
-            'js'    => 'application/javascript',
+            'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            'css' => 'text/css',
+            'js' => 'application/javascript',
             'woff2' => 'font/woff2',
-            'woff'  => 'font/woff',
+            'woff' => 'font/woff',
             default => 'application/octet-stream',
         };
     }
