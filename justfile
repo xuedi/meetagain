@@ -102,14 +102,14 @@ appUpgrade:
     clear
     {{JUST}} do 'composer show --outdated'
 
-# Set up dart-sass (downloads if missing), compile SCSS and version all assets into public/assets/
+# Compile SCSS and version all assets into public/assets/
 [group('app')]
 appAssets:
-    bin/install-dart-sass.sh "{{PHP}}"
     rm -rf public/assets/
     {{PHP}} php bin/console sass:build
     {{PHP}} php bin/console asset-map:compile
     {{PHP}} php bin/console app:media:compile
+    {{PHP}} purgecss --config assets/purgecss.config.js
     {{PHP}} php bin/console cache:clear -q
     {{PHP}} php bin/console cache:pool:clear cache.cms_page_cache -q
 

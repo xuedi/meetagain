@@ -36,4 +36,23 @@ ENV PATH="$PATH:/usr/local/bin"
 
 COPY php.ini /usr/local/etc/php/conf.d/99-custom.ini
 
+# --- Build tools (Dart Sass, Node.js, PurgeCSS) ---------------------------
+# Dart Sass — pinned, baked into the image (replaces bin/install-dart-sass.sh)
+ARG DART_SASS_VERSION=1.86.3
+RUN set -eux; \
+    curl -fsSL "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz" \
+      | tar xz -C /usr/local/ \
+    && ln -s /usr/local/dart-sass/sass /usr/local/bin/sass
+
+# Node.js 22 LTS (NodeSource) — provides node, npm, npx
+RUN set -eux; \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# PurgeCSS, installed globally so it's on PATH for all users
+ARG PURGECSS_VERSION=6.0.0
+RUN npm install -g purgecss@${PURGECSS_VERSION} \
+    && npm cache clean --force
+
 USER ${UNAME}
