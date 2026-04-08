@@ -125,4 +125,17 @@ class OpaqueMediaPathResolverTest extends TestCase
         // Assert
         $this->assertStringEndsWith('.bin', $result);
     }
+
+    public function testScssExtensionIsNormalizedToCss(): void
+    {
+        // Arrange: SCSS logical paths are compiled to CSS by sass:build; URL must reflect the actual content type
+        $logicalPath = 'styles/app.scss';
+
+        // Act
+        $result = $this->resolver->resolvePublicPath($logicalPath);
+
+        // Assert: extension in URL is .css, not .scss
+        $this->assertStringEndsWith('.css', $result);
+        $this->assertStringStartsWith('/media/', $result);
+    }
 }
