@@ -14,14 +14,7 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
     public function resolvePublicPath(string $logicalPath): string
     {
         $ext = pathinfo($logicalPath, PATHINFO_EXTENSION);
-        if (in_array($ext, ['js', 'mjs', 'map'], true)) {
-            return $this->inner->resolvePublicPath($logicalPath);
-        }
 
-        // AssetMapper appends a 7-char content-digest before the extension when building
-        // the public path: "styles/app.scss" → "styles/app-XbB8z_u.scss".
-        // Strip it so the opaque hash stays stable across content changes and matches
-        // what app:media:compile writes to public/media/.
         $stablePath = preg_replace('/-[A-Za-z0-9_-]{7}(\.\w+)$/', '$1', $logicalPath);
 
         $ext = self::normalizeExtension($ext);
@@ -32,6 +25,7 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
     {
         return match ($ext) {
             'scss', 'sass' => 'css',
+            'mjs'          => 'js',
             default        => $ext,
         };
     }
