@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\AssetMapper\MediaMap;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -21,12 +22,26 @@ final class MediaController extends AbstractController
         string $ext,
         MediaMap $mediaMap,
         AssetMapperInterface $assetMapper,
-    ): BinaryFileResponse {
+    ): Response {
         $map = $mediaMap->build();
         $logicalPath = $map[$hash] ?? throw new NotFoundHttpException("Unknown media hash: $hash");
 
         $asset = $assetMapper->getAsset($logicalPath)
             ?? throw new NotFoundHttpException("Asset disappeared: $logicalPath");
+
+        // Use $asset->content when available: it contains AssetMapper-processed output
+        // (e.g. CSS with url() references rewritten to /media/ hashes). Falling back to
+        // BinaryFileResponse($asset->sourcePath) would serve raw SCSS or unprocessed content.
+        if ($asset->content !== null) {
+            return new Response(
+                $asset->content,
+                200,
+                [
+                    'Content-Type'  => $this->guessMime($ext),
+                    'Cache-Control' => 'public, max-age=5',
+                ],
+            );
+        }
 
         $response = new BinaryFileResponse($asset->sourcePath);
         $response->headers->set('Content-Type', $this->guessMime($ext));
