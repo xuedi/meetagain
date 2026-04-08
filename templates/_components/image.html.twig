@@ -32,5 +32,5 @@
     {% endif %}
     <img src="/images/thumbnails/{{ file }}" alt="{{ image.alt|default('') }}" width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
 {% else %}
-    <img src="/images/default_{{ size }}.png" alt="Placeholder IMAGE"/>
+    <img src="{{ asset('images/default_' ~ size ~ '.png') }}" alt="Placeholder IMAGE"/>
 {% endif %}

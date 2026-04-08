@@ -1,0 +1,27 @@
+{
+  "name": "bulma",
+  "version": "1.0.3",
+  "homepage": "https://bulma.io",
+  "authors": ["jgthms <bbxdesign@gmail.com>"],
+  "description": "Modern CSS framework based on Flexbox",
+  "main": "bulma.scss",
+  "keywords": [
+    "css",
+    "sass",
+    "scss",
+    "flexbox",
+    "grid",
+    "responsive",
+    "framework"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "docs",
+    "images",
+    "node_modules",
+    "test",
+    "tests"
+  ]
+}

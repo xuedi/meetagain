@@ -4,13 +4,13 @@
 
 {% block stylesheets %}
     {% if dish.previewImage %}
-        <link rel="stylesheet" href="{{ '/stylesheet/fancybox.css' }}"/>
+        <link rel="stylesheet" href="{{ asset('styles/vendor/fancybox.css') }}"/>
     {% endif %}
 {% endblock %}
 
 {% block javascripts %}
     {% if dish.previewImage %}
-        <script src="{{ '/javascript/fancybox.umd.js' }}"></script>
+        <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
     {% endif %}
 {% endblock %}
 

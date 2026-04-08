@@ -20,32 +20,15 @@
 
     {% block json_ld %}{% endblock %}
 
-    <link rel="stylesheet" href="/stylesheet/bulma.min.css"/>
-    <link rel="stylesheet" href="/stylesheet/fontawesome.min.css"/>
-    <link rel="stylesheet" href="/stylesheet/fontawesome-solid.css"/>
-    <link rel="stylesheet" href="/stylesheet/fonts.css"/>
-    <link rel="stylesheet" href="/stylesheet/custom.css"/>
-    {% for stylesheet in get_plugin_stylesheets() %}
-        <link rel="stylesheet" href="{{ stylesheet }}"/>
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+    <link rel="stylesheet" href="{{ asset('styles/app.scss') }}"/>
+    {% for stylesheetPath in get_plugin_stylesheets() %}
+        <link rel="stylesheet" href="{{ asset(stylesheetPath) }}"/>
     {% endfor %}
-    <script src="/javascript/custom.js?v=2" defer></script>
-    {% for javascript in get_plugin_javascripts() %}
-        <script src="{{ javascript }}" defer></script>
+    <script src="{{ asset('js/custom.js') }}" defer></script>
+    {% for javascriptPath in get_plugin_javascripts() %}
+        <script src="{{ asset(javascriptPath) }}" defer></script>
     {% endfor %}
-
-    {% set colors = get_theme_colors() %}
-    <style>
-        :root {
-            --theme-primary: {{ colors.color_primary }};
-            --theme-link: {{ colors.color_link }};
-            --theme-info: {{ colors.color_info }};
-            --theme-success: {{ colors.color_success }};
-            --theme-warning: {{ colors.color_warning }};
-            --theme-danger: {{ colors.color_danger }};
-            --theme-text-grey: {{ colors.color_text_grey }};
-            --theme-text-grey-light: {{ colors.color_text_grey_light }};
-        }
-    </style>
 
     {% block stylesheets %}{% endblock %}
     {% block javascripts %}{% endblock %}

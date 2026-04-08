@@ -1,0 +1,3 @@
+symfonycasts_sass:
+    sass_options:
+        style: compressed

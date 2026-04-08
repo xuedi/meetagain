@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Settings;
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
 use App\Form\ThemeColorsType;
+use App\Service\Admin\CommandService;
 use App\Service\Config\ConfigService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,7 @@ final class ThemeController extends AbstractAdminController
 
     public function __construct(
         private readonly ConfigService $configService,
+        private readonly CommandService $commandService,
     ) {}
 
     #[Route('', name: 'app_admin_system_theme', methods: ['GET', 'POST'])]
@@ -31,13 +33,13 @@ final class ThemeController extends AbstractAdminController
 
         if ($colorsForm->isSubmitted() && $colorsForm->isValid()) {
             $this->configService->saveColors($colorsForm->getData());
-            $this->addFlash('success', 'Theme colors saved');
+            $this->commandService->rebuildTheme();
+            $this->addFlash('success', 'Theme colors saved and CSS rebuilt');
         }
 
         return $this->render('admin/system/theme/index.html.twig', [
             'active' => 'system',
             'colorsForm' => $colorsForm,
-            'colorDefaults' => $this->configService->getThemeColorDefaults(),
         ]);
     }
 }

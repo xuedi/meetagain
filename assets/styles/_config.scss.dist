@@ -1,0 +1,14 @@
+// assets/styles/_config.scss.dist
+// Default theme colors. Copy to _config.scss and run `just appAssets` to apply changes.
+// This file is the reset baseline — edit _config.scss directly, not this file.
+
+$primary:          #00d1b2;
+$link:             #485fc7;
+$info:             #3e8ed0;
+$success:          #48c78e;
+$warning:          #ffe08a;
+$danger:           #f14668;
+
+// Text greys (accessibility contrast overrides — darker than Bulma defaults)
+$text-grey:        #767676;
+$text-grey-light:  #959595;
