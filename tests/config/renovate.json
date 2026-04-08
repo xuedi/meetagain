@@ -32,6 +32,25 @@
   "composer": {
     "enabled": true
   },
+  "customManagers": [
+    {
+      "description": "Track Dart Sass version in Dockerfile ARG",
+      "customType": "regex",
+      "fileMatch": ["^docker/php/Dockerfile$"],
+      "matchStrings": ["ARG DART_SASS_VERSION=(?<currentValue>[\\d.]+)"],
+      "depNameTemplate": "sass/dart-sass",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^(?<version>.*)$"
+    },
+    {
+      "description": "Track PurgeCSS version in Dockerfile ARG",
+      "customType": "regex",
+      "fileMatch": ["^docker/php/Dockerfile$"],
+      "matchStrings": ["ARG PURGECSS_VERSION=(?<currentValue>[\\d.]+)"],
+      "depNameTemplate": "purgecss",
+      "datasourceTemplate": "npm"
+    }
+  ],
   "labels": ["dependencies"],
   "assignees": [],
   "reviewers": [],

@@ -2,12 +2,6 @@
 
 {% block title %}Review Image Suggestions - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
-{% block stylesheets %}
-    {% if dish.previewImage %}
-        <link rel="stylesheet" href="{{ asset('styles/vendor/fancybox.css') }}"/>
-    {% endif %}
-{% endblock %}
-
 {% block javascripts %}
     {% if dish.previewImage %}
         <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>

@@ -9,6 +9,10 @@
 // Vendor CSS libraries (imported as plain CSS, no SCSS processing needed)
 @use 'vendor/fontawesome.min' as *;
 @use 'vendor/fontawesome-solid' as *;
+@use 'vendor/flatpickr-bulma.min' as *;
+@use 'vendor/fancybox.css' as *;
+@use 'leaflet.css' as *;
+@use 'vendor/jstable.min.css' as *;
 
 // Custom overrides (non-color rules and accessibility grey text overrides)
 @use 'custom';
