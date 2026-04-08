@@ -34,12 +34,9 @@ final class MediaCompileCommand extends Command
 
         foreach ($this->assetMapper->allAssets() as $asset) {
             $rawExt = pathinfo($asset->logicalPath, PATHINFO_EXTENSION) ?: 'bin';
-            if (in_array($rawExt, ['js', 'mjs', 'map'], true)) {
-                continue;
-            }
-
             $ext = match ($rawExt) {
                 'scss', 'sass' => 'css',
+                'mjs'          => 'js',
                 default        => $rawExt,
             };
             $hash = OpaqueMediaPathResolver::hashLogicalPath($asset->logicalPath);
