@@ -20,7 +20,6 @@
 
     {% block json_ld %}{% endblock %}
 
-    {% block importmap %}{{ importmap('app') }}{% endblock %}
     <link rel="stylesheet" href="{{ asset('styles/app.scss') }}"/>
     {% for stylesheetPath in get_plugin_stylesheets() %}
         <link rel="stylesheet" href="{{ asset(stylesheetPath) }}"/>
