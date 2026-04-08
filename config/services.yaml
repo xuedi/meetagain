@@ -43,7 +43,7 @@ services:
             - !php/const Monolog\Logger::INFO
 
     App\AssetMapper\OpaqueMediaPathResolver:
-        decorates: Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface
+        decorates: asset_mapper.public_assets_path_resolver
 
     App\Controller\SecurityController:
         arguments:
