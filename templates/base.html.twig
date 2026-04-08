@@ -8,7 +8,7 @@
     <link rel="canonical" href="{{ get_canonical_url() }}" />
 
     {% for altLangCode, altLangLink in get_alternative_languages() %}
-        <link rel="alternate" hreflang="{{ altLangCode }}" href="{{ altLangLink }}" />
+        <link rel="alternate" hreflang="{{ get_hreflang_code(altLangCode) }}" href="{{ altLangLink }}" />
     {% endfor %}
 
     <title>{% block title %}meetAgain{% endblock %}</title>
