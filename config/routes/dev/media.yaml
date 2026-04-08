@@ -1,0 +1,3 @@
+media_serve:
+    resource: '../../../src/Controller/MediaController.php'
+    type: attribute

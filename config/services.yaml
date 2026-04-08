@@ -42,6 +42,9 @@ services:
         arguments:
             - !php/const Monolog\Logger::INFO
 
+    App\AssetMapper\OpaqueMediaPathResolver:
+        decorates: Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface
+
     App\Controller\SecurityController:
         arguments:
             $passwordResetLimiter: '@limiter.password_reset'
