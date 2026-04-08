@@ -109,6 +109,7 @@ appAssets:
     rm -rf public/assets/
     {{PHP}} php bin/console sass:build
     {{PHP}} php bin/console asset-map:compile
+    {{PHP}} php bin/console app:media:compile
     {{PHP}} php bin/console cache:clear -q
     {{PHP}} php bin/console cache:pool:clear cache.cms_page_cache -q
 
