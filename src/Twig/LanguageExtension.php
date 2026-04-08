@@ -67,7 +67,10 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             $currentUri = $request->getRequestUri();
             $currentLocale = $request->getLocale();
             if (!str_starts_with($currentUri, '/_profiler')) {
-                return $this->languageService->getAltLangList($currentLocale, $currentUri);
+                $altLangList = $this->languageService->getAltLangList($currentLocale, $currentUri);
+                $host = rtrim($this->configService->getHost(), '/');
+
+                return array_map(fn(string $path) => $host . $path, $altLangList);
             }
         }
 
