@@ -18,8 +18,16 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
             return $this->inner->resolvePublicPath($logicalPath);
         }
 
-        $ext = $ext ?: 'bin';
+        $ext = self::normalizeExtension($ext ?: 'bin');
         return '/media/' . self::hashLogicalPath($logicalPath) . '.' . $ext;
+    }
+
+    private static function normalizeExtension(string $ext): string
+    {
+        return match ($ext) {
+            'scss', 'sass' => 'css',
+            default        => $ext,
+        };
     }
 
     public function getPublicFilesystemPath(): string
