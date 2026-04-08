@@ -21,6 +21,7 @@ installed.lock
 
 ###> symfony/asset-mapper ###
 /public/assets/
+/public/media/
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
