@@ -27,6 +27,7 @@ installed.lock
 
 ###> symfonycasts/sass-bundle ###
 /public/assets/
+/bin/dart-sass/
 ###< symfonycasts/sass-bundle ###
 
 /assets/styles/_config.scss
