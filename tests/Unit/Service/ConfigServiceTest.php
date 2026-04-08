@@ -11,6 +11,7 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -19,6 +20,7 @@ class ConfigServiceTest extends TestCase
     private Stub&ConfigRepository $configRepoStub;
     private Stub&EntityManagerInterface $entityManagerStub;
     private Stub&CacheInterface $cacheStub;
+    private Stub&KernelInterface $kernelStub;
     private ConfigService $subject;
 
     protected function setUp(): void
@@ -26,6 +28,7 @@ class ConfigServiceTest extends TestCase
         $this->configRepoStub = $this->createStub(ConfigRepository::class);
         $this->entityManagerStub = $this->createStub(EntityManagerInterface::class);
         $this->cacheStub = $this->createStub(CacheInterface::class);
+        $this->kernelStub = $this->createStub(KernelInterface::class);
         // Always simulate a cache miss so the callback (and thus the repo) is exercised
         $this->cacheStub
             ->method('get')
@@ -37,6 +40,7 @@ class ConfigServiceTest extends TestCase
             repo: $this->configRepoStub,
             em: $this->entityManagerStub,
             cache: $this->cacheStub,
+            kernel: $this->kernelStub,
         );
     }
 
@@ -234,7 +238,7 @@ class ConfigServiceTest extends TestCase
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub);
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class));
 
         $subject->saveForm([
             'url' => 'example.com',
@@ -261,7 +265,7 @@ class ConfigServiceTest extends TestCase
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub);
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class));
 
         $subject->saveForm([
             'url' => 'new-example.com',

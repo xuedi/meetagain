@@ -74,6 +74,7 @@ services:
     volumes:
       - ../:/var/www/html/
       - ./php/Caddyfile:/etc/frankenphp/Caddyfile:ro
+      - ./certs:/certs:ro
     environment:
       - UID=${HOST_UID}
       - GID=${HOST_GID}
@@ -94,7 +95,7 @@ services:
       - NODE_TLS_REJECT_UNAUTHORIZED=0
     volumes:
       - ../tests/reports/performance:/sitespeed.io
-    command: --browsertime.chrome.args ignore-certificate-errors https://localhost:8443/en https://localhost:8443/en/events https://localhost:8443/en/members https://localhost:8443/en/about
+    command: http://localhost:8080/en http://localhost:8080/en/events http://localhost:8080/en/members http://localhost:8080/en/about
     profiles:
       - tools
 

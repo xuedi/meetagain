@@ -27,7 +27,12 @@ return static function (ContainerConfigurator $container): void {
         'asset_mapper' => [
             'paths' => $paths,
             'missing_import_mode' => 'strict',
-            'excluded_patterns' => ['**/_*.scss'],
+            'excluded_patterns' => [
+                '**/_*.scss',
+                // Bulma vendor tree: only the sass/ source is needed (used at compile time by sass:build).
+                // Everything else — pre-built CSS variants, docs, package files — must not be served.
+                '**/styles/vendor/bulma/**',
+            ],
             'importmap_path' => '%kernel.project_dir%/config/importmap.php',
         ],
     ]);
