@@ -16,6 +16,11 @@ readonly class LanguageService
     private const string CACHE_KEY_ALL_LANGUAGES = 'language.all_languages';
     private const int CACHE_TTL = 3600;
 
+    /** Maps internal routing codes to their correct BCP 47 language tags for hreflang output. */
+    private const array HREFLANG_CODE_MAP = [
+        'cn' => 'zh',
+    ];
+
     public function __construct(
         private LanguageRepository $languageRepo,
         private TagAwareCacheInterface $appCache,
@@ -171,11 +176,13 @@ readonly class LanguageService
     {
         $altLangList = array_fill_keys($this->getFilteredEnabledCodes(), $currentUri);
         unset($altLangList[$currentLocale]);
+        $result = [];
         foreach ($altLangList as $languageCode => $link) {
-            $altLangList[$languageCode] = $this->replaceUriLanguageCode($link, $languageCode);
+            $hreflangCode = self::HREFLANG_CODE_MAP[$languageCode] ?? $languageCode;
+            $result[$hreflangCode] = $this->replaceUriLanguageCode($link, $languageCode);
         }
 
-        return $altLangList;
+        return $result;
     }
 
     public function replaceUriLanguageCode(string $link, string $newCode): string
