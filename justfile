@@ -102,6 +102,26 @@ appUpgrade:
     clear
     {{JUST}} do 'composer show --outdated'
 
+# Set up dart-sass (downloads if missing), compile SCSS and version all assets into public/assets/
+[group('app')]
+appAssets:
+    bin/install-dart-sass.sh "{{PHP}}"
+    rm -rf public/assets/
+    {{PHP}} php bin/console sass:build
+    {{PHP}} php bin/console asset-map:compile
+    {{PHP}} php bin/console cache:clear -q
+    {{PHP}} php bin/console cache:pool:clear cache.cms_page_cache -q
+
+# Watch SCSS for changes during development
+[group('app')]
+appAssetsWatch:
+    {{PHP}} php bin/console sass:build --watch
+
+# Download/update Bulma SCSS source (run when updating Bulma version)
+[group('app')]
+appUpdateBulma version='latest':
+    bin/update-bulma.sh "{{PHP}}" "{{version}}"
+
 
 
 
@@ -112,9 +132,11 @@ devModeReset plugins='':
     {{JUST}} dockerStop
     {{JUST}} devResetConfigs
     cp .env.dist .env
+    cp assets/styles/_config.scss.dist assets/styles/_config.scss
     touch installed.lock
     {{JUST}} dockerStart
     {{JUST}} do "composer install"
+    {{JUST}} appAssets
     {{PHP}} php bin/console app:plugin disable all
     {{PHP}} php bin/console app:plugin enable {{plugins}}
     {{PHP}} php bin/console cache:clear -q
@@ -165,7 +187,8 @@ devResetConfigs:
 # Reset to fresh clone state
 [group('development')]
 devResetToFreshCloneState:
-    rm -rf .env installed.lock config/plugins.php vendor/ var/ public/bundles/
+    rm -rf .env installed.lock config/plugins.php vendor/ var/ public/bundles/ public/assets/
+    cp assets/styles/_config.scss.dist assets/styles/_config.scss
 
 # Reset database
 [group('development')]

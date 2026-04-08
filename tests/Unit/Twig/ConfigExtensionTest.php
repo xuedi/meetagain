@@ -22,11 +22,10 @@ class ConfigExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(5, $functions);
+        static::assertCount(4, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('is_show_frontpage', $functionNames);
-        static::assertContains('get_theme_colors', $functionNames);
         static::assertContains('get_date_format', $functionNames);
         static::assertContains('get_date_format_flatpickr', $functionNames);
         static::assertContains('get_footer_column_title', $functionNames);
@@ -40,17 +39,6 @@ class ConfigExtensionTest extends TestCase
         $isShowFrontpage = $this->findFunction($functions, 'is_show_frontpage');
 
         static::assertTrue($isShowFrontpage->getCallable()());
-    }
-
-    public function testGetThemeColorsDelegatesToConfigService(): void
-    {
-        $expectedColors = ['primary' => '#ff0000', 'link' => '#0000ff'];
-        $this->configServiceStub->method('getThemeColors')->willReturn($expectedColors);
-
-        $functions = $this->subject->getFunctions();
-        $getThemeColors = $this->findFunction($functions, 'get_theme_colors');
-
-        static::assertSame($expectedColors, $getThemeColors->getCallable()());
     }
 
     public function testGetDateFormatDelegatesToConfigService(): void

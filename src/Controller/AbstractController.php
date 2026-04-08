@@ -6,7 +6,6 @@ use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
-use Symfony\Component\WebLink\Link;
 
 abstract class AbstractController extends AbstractSymfonyController
 {
@@ -24,16 +23,6 @@ abstract class AbstractController extends AbstractSymfonyController
 
     protected function getResponse(): Response
     {
-        $links = [
-            new Link(href: '/stylesheet/bulma.min.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/fontawesome.min.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/fontawesome-solid.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/fonts.css')->withAttribute('as', 'style'),
-            new Link(href: '/stylesheet/custom.css')->withAttribute('as', 'style'),
-            new Link(href: '/javascript/custom.js')->withAttribute('as', 'script'),
-            new Link(href: '/fonts/fa-solid-900.woff2')->withAttribute('as', 'font'),
-        ];
-
-        return $this->sendEarlyHints($links);
+        return new Response();
     }
 }

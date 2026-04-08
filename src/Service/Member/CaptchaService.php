@@ -160,7 +160,7 @@ readonly class CaptchaService
             $angle = random_int(-20, 20);
             $y = $baseY + random_int(-6, 6);
             $draw = new ImagickDraw();
-            $draw->setFont($this->projectDir . '/public/fonts/captcha.ttf');
+            $draw->setFont($this->projectDir . '/assets/fonts/captcha.ttf');
             $draw->setFontSize($size + random_int(-4, 6));
             $draw->setFillColor(sprintf('rgb(%d,%d,%d)', random_int(0, 80), random_int(0, 80), random_int(0, 80)));
             $image->annotateImage($draw, $x, $y, $angle, $char);

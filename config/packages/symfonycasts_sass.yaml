@@ -1,0 +1,4 @@
+symfonycasts_sass:
+    root_sass:
+        - 'assets/styles/app.scss'
+    binary: '%kernel.project_dir%/bin/dart-sass/sass'

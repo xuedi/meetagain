@@ -3,7 +3,7 @@
 {% block title %}{{ "page_plugin_glossary_title"|trans }}{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href='/stylesheet/jstable.min.css'/>
+    <link rel="stylesheet" href="{{ asset('styles/vendor/jstable.min.css') }}"/>
 {% endblock %}
 
 {% block body %}
@@ -16,7 +16,7 @@
         </div>
     </section>
 
-    <script src='/javascript/jstable.min.js'></script>
+    <script src="{{ asset('js/vendor/jstable.min.js') }}"></script>
     <script>
         let myTable = new JSTable("#filteredTable", {
             sortable: true,

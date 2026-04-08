@@ -9,6 +9,11 @@ Get a working plugin skeleton running in about 5 minutes.
 ```
 plugins/
   your-plugin/
+    assets/
+      styles/            # CSS/SCSS files (served via AssetMapper)
+      js/                # JavaScript files
+      images/            # Plugin-specific static images
+      fonts/             # Plugin-specific fonts (rare)
     config/
       packages/          # Symfony package configs (optional)
       routes.yaml        # Plugin routes
@@ -36,7 +41,10 @@ that implements the `App\Plugin` interface.
 
 namespace Plugin\YourPlugin;
 
-use App\Entity\AdminSection;use App\Plugin;use Symfony\Component\Console\Output\OutputInterface;
+use App\Plugin;
+use App\Enum\WarmCacheType;
+use App\ValueObject\LinkCollection;
+use Symfony\Component\Console\Output\OutputInterface;
 
 readonly class Kernel implements Plugin
 {
@@ -45,9 +53,9 @@ readonly class Kernel implements Plugin
         return 'your-plugin'; // Must match the directory name
     }
 
-    public function getMenuLinks(): array
+    public function getLinkCollection(): LinkCollection
     {
-        return [];
+        return new LinkCollection();
     }
 
     public function getEventTile(int $eventId): ?string
@@ -60,6 +68,10 @@ readonly class Kernel implements Plugin
         return [];
     }
 
+    public function warmCache(WarmCacheType $type, array $ids): void
+    {
+    }
+
     public function getMemberPageTop(): ?string
     {
         return null;
@@ -68,6 +80,16 @@ readonly class Kernel implements Plugin
     public function getFooterAbout(): ?string
     {
         return null;
+    }
+
+    public function getStylesheets(): array
+    {
+        return []; // e.g. ['styles/myplugin.css'] — relative to assets/
+    }
+
+    public function getJavascripts(): array
+    {
+        return []; // e.g. ['js/myplugin.js'] — relative to assets/
     }
 
     public function preFixtures(OutputInterface $output): void
@@ -80,15 +102,6 @@ readonly class Kernel implements Plugin
 
     public function postFixtures(OutputInterface $output): void
     {
-    }
-
-    public function runCronTasks(OutputInterface $output): void
-    {
-    }
-
-    public function getAdminSystemLinks(): ?AdminSection
-    {
-        return null; // Deprecated — use AdminNavigationInterface instead
     }
 }
 ```

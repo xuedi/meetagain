@@ -69,30 +69,32 @@ final class PluginExtension extends AbstractExtension
     }
 
     /**
+     * Returns AssetMapper logical paths for all plugin stylesheets.
+     * Wrapped in asset() by the Twig template.
      * @return list<string>
      */
     public function getPluginStylesheets(): array
     {
         return $this->collectFromPlugins(static function (Plugin $plugin) {
-            $paths = [];
-            foreach ($plugin->getStylesheets() as $path) {
-                $paths[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
-            }
-            return $paths;
+            return array_map(
+                static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
+                $plugin->getStylesheets()
+            );
         });
     }
 
     /**
+     * Returns AssetMapper logical paths for all plugin JavaScript files.
+     * Wrapped in asset() by the Twig template.
      * @return list<string>
      */
     public function getPluginJavascripts(): array
     {
         return $this->collectFromPlugins(static function (Plugin $plugin) {
-            $paths = [];
-            foreach ($plugin->getJavascripts() as $path) {
-                $paths[] = '/plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/');
-            }
-            return $paths;
+            return array_map(
+                static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
+                $plugin->getJavascripts()
+            );
         });
     }
 
