@@ -18,8 +18,14 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
             return $this->inner->resolvePublicPath($logicalPath);
         }
 
-        $ext = self::normalizeExtension($ext ?: 'bin');
-        return '/media/' . self::hashLogicalPath($logicalPath) . '.' . $ext;
+        // AssetMapper appends a 7-char content-digest before the extension when building
+        // the public path: "styles/app.scss" → "styles/app-XbB8z_u.scss".
+        // Strip it so the opaque hash stays stable across content changes and matches
+        // what app:media:compile writes to public/media/.
+        $stablePath = preg_replace('/-[A-Za-z0-9_-]{7}(\.\w+)$/', '$1', $logicalPath);
+
+        $ext = self::normalizeExtension($ext);
+        return '/media/' . self::hashLogicalPath($stablePath) . '.' . $ext;
     }
 
     private static function normalizeExtension(string $ext): string
