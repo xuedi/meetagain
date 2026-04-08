@@ -58,7 +58,8 @@ Run `just` to see all available commands.
 Nginx, Apache)
 
 1. Clone repository from https://codeberg.org/xuedi/meetAgain.git and configure web server to serve `public/`
-2. Navigate to your domain - redirects to `/install/`
+2. Configure your web server to serve `public/media/` as static files (required — see below)
+3. Navigate to your domain - redirects to `/install/`
 3. Follow the wizard:
     - **Step 1:** Verify PHP requirements, configure database
     - **Step 2:** Choose mail provider (SMTP, SendGrid, Mailgun, Amazon SES, or Null)
@@ -66,6 +67,33 @@ Nginx, Apache)
 4. Installer auto-runs composer, migrations, and user creation
 
 The `installed.lock` file prevents re-running the installer.
+
+### Webserver Configuration
+
+All assets (CSS, fonts, images) are served from `public/media/` as opaque hashed files. The web server
+must handle `/media/*` as static files directly — without this, all asset requests return 503.
+
+**Caddy (recommended):**
+```caddy
+root * /path/to/public
+handle /media/* {
+    file_server { pass_thru }
+    header Cache-Control "public, max-age=86400"
+}
+php_server
+```
+
+**Nginx:**
+```nginx
+location /media/ {
+    try_files $uri =404;
+    expires 1d;
+    add_header Cache-Control "public";
+}
+```
+
+The `public/media/` directory is generated at deploy time by `php bin/console app:media:compile` and
+is not included in the repository.
 
 ## PhpStorm Setup
 
