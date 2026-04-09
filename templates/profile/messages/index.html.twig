@@ -14,8 +14,8 @@
 
 {% endblock %}
 
-{% if messages is not null %}
 {% block javascripts %}
-    <script src="{{ asset('js/messages.js') }}" defer></script>
+    {% if messages is not null %}
+        <script src="{{ asset('js/messages.js') }}" defer></script>
+    {% endif %}
 {% endblock %}
-{% endif %}
