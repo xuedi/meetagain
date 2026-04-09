@@ -6,15 +6,21 @@
 
     <section class="section">
         <div class="container">
-
-            <div class="columns">
-                <div class="column is-5">
-
-                    Your email was verified, the next days an administrator will activate your account
-
+            <div class="columns is-centered mt-6">
+                <div class="column is-6-tablet is-5-desktop has-text-centered">
+                    <span class="icon is-large has-text-success">
+                        <i class="fas fa-check-circle fa-4x"></i>
+                    </span>
+                    <h1 class="title is-3 mt-5">{{ 'register_success.heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'register_success.description'|trans }}</p>
+                    <div class="mt-5">
+                        <a href="{{ path('app_login') }}" class="button is-primary">
+                            <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+                            <span>{{ 'register_success.cta'|trans }}</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-
         </div>
     </section>
 

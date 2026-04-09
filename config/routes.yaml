@@ -31,3 +31,7 @@ api_cms:
 api_logs:
     type: attribute
     resource: ../src/Controller/NonLocale/LogsApiController.php
+
+robots:
+    type: attribute
+    resource: ../src/Controller/NonLocale/RobotsController.php

@@ -7,16 +7,16 @@
     <section class="section">
         <div class="container">
 
-            <div class="columns">
-                <div class="column is-5">
+            <div class="columns is-centered mt-5">
+                <div class="column is-6-tablet is-5-desktop">
 
                     <h1 class="title is-5">{{ "page_login_headline"|trans }}</h1>
 
-                    <form method="post" class="box">
+                    <form method="post">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                         <input type="hidden" name="_target_path" value="{{ redirectPath }}"/>
                         {% if error %}
-                            <div class="alert alert-danger mb-5">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            <div class="notification is-danger is-light mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                         {% endif %}
 
                         <div class="field">
@@ -37,23 +37,35 @@
 
                         <div class="field is-grouped mt-5">
                             <div class="control">
-                                <button type="submit" class="button is-link">Login</button>
-                                <a href="{{ path('app_register') }}" type="button" class="button">Register</a>
+                                <button type="submit" class="button is-primary">{{ 'menu_login'|trans }}</button>
+                                <a href="{{ path('app_register') }}" class="button is-light">{{ 'button_Register'|trans }}</a>
                             </div>
                         </div>
                     </form>
 
-
-                    <p>
+                    <p class="mt-4 is-size-7">
                         {{ "page_login_reset"|trans }} <a href="{{ path('app_reset') }}">{{ 'link_here' | trans }}</a>
                     </p>
 
                 </div>
 
+                <div class="column is-5-tablet is-4-desktop">
+                    {% include '_components/info_sidebar.html.twig' with {
+                        title: 'login.sidebar.title'|trans,
+                        intro: 'login.sidebar.intro'|trans,
+                        bullets: [
+                            'login.sidebar.bullet1'|trans,
+                            'login.sidebar.bullet2'|trans,
+                            'login.sidebar.bullet3'|trans,
+                        ],
+                        link_url: path('app_register'),
+                        link_text: 'login.sidebar.link'|trans,
+                        link_icon: 'arrow-right',
+                    } only %}
+                </div>
             </div>
 
         </div>
     </section>
-
 
 {% endblock %}

@@ -6,18 +6,21 @@
 
     <section class="section">
         <div class="container">
-
-            <div class="columns">
-                <div class="column is-5">
-
-                    <h1 class="title is-5">{{ "page_reset_success_headline"|trans }}</h1>
-                    <p>
-                        Your password has been reset successfully. You can now <a href="{{ path('app_login') }}">login</a>.
-                    </p>
-
+            <div class="columns is-centered mt-6">
+                <div class="column is-6-tablet is-5-desktop has-text-centered">
+                    <span class="icon is-large has-text-success">
+                        <i class="fas fa-check-circle fa-4x"></i>
+                    </span>
+                    <h1 class="title is-3 mt-5">{{ 'reset_success.heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'reset_success.description'|trans }}</p>
+                    <div class="mt-5">
+                        <a href="{{ path('app_login') }}" class="button is-primary">
+                            <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+                            <span>{{ 'reset_success.cta'|trans }}</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-
         </div>
     </section>
 

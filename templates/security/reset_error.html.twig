@@ -1,22 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_register"|trans }}{% endblock %}
+{% block title %}{{ "page_title_error"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
-
-            <div class="columns">
-                <div class="column is-5">
-
-                    There was a problem with your password reset, please contact xuedi next meeting
-
+            <div class="columns is-centered mt-6">
+                <div class="column is-6-tablet is-5-desktop has-text-centered">
+                    <span class="icon is-large has-text-danger">
+                        <i class="fas fa-exclamation-circle fa-4x"></i>
+                    </span>
+                    <h1 class="title is-3 mt-5">{{ 'reset_error.heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'reset_error.description'|trans }}</p>
+                    <div class="mt-5">
+                        <a href="{{ path('app_reset') }}" class="button is-primary">
+                            <span class="icon"><i class="fas fa-sync-alt"></i></span>
+                            <span>{{ 'reset_error.cta'|trans }}</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-
         </div>
     </section>
-
 
 {% endblock %}
