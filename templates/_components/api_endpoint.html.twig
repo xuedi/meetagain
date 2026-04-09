@@ -1,3 +1,20 @@
+{#
+    API Endpoint — Collapsible HTTP method + path row with example payload
+
+    Renders one API endpoint as a colour-coded method badge, a path button, and a chevron
+    toggle that reveals a description and curl/JSON example. Colour is driven by the HTTP
+    method; the path optionally links to a Symfony route. Expand/collapse is handled by
+    the admin debug JS.
+
+    Used in:    templates/_non_locale/api.html.twig
+    Parameters:
+        - method      (string, required)       — HTTP verb: GET, POST, PUT, or DELETE
+        - apiPath     (string, required)       — display path e.g. '/api/v1/events'
+        - description (string, required)       — short description shown in the expanded panel
+        - example     (string, required)       — example request body; HOST is replaced at render time
+        - route       (string|null, optional)  — Symfony route name; makes the path a clickable link
+    Depends on: assets/js/admin/debug.js (.api-toggle, .api-example)
+#}
 {% set methodColors = {'GET': 'is-success', 'POST': 'is-info', 'PUT': 'is-warning', 'DELETE': 'is-danger'} %}
 
 <div class="api-endpoint">

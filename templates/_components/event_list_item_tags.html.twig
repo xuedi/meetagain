@@ -1,12 +1,17 @@
 {#
-    Render event list item plugin tags
+    Event List Item Tags — Renders a row of Bulma tags for event list entries
 
+    Iterates over a tag array provided by plugins and renders each as a coloured Bulma tag.
+    Tags with a URL become anchor links; tags without render as plain spans. Used by
+    PluginExtension to let plugins annotate event list items with contextual badges.
+
+    Used in:    src/Twig/PluginExtension.php (rendered programmatically by plugins)
     Parameters:
-    - tags: array of tag objects, each with:
-        - url:   link URL (optional — renders <a> if set, <span> otherwise)
-        - color: Bulma tag colour class e.g. 'is-primary' (required)
-        - icon:  FontAwesome class string e.g. 'fas fa-star' (optional)
-        - text:  visible tag label (required)
+        - tags (array, required) — array of tag objects, each with:
+            - text  (string, required)        — visible label
+            - color (string, required)        — Bulma modifier class e.g. 'is-primary'
+            - url   (string|null, optional)   — if set, wraps tag in an <a>; otherwise <span>
+            - icon  (string|null, optional)   — FontAwesome class e.g. 'fas fa-star'
 #}
 {% for tag in tags %}
     {% if tag.url %}

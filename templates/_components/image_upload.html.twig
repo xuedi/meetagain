@@ -1,11 +1,21 @@
-{# Parameters:
-   entity         (string)      - entity type: 'user', 'cmsBlock', 'event'
-   id             (int)         - entity ID
-   image          (Image|null)  - current image (null if none)
-   showWhenEmpty  (bool, default false) - when true, shows the upload button even without an image
-   rotate         (bool, default false) - show rotate button
-   label          (string, default 'Change Image') - button label
-   removeImageUrl (string|null, optional) - URL for the remove-image action; shows × button when set
+{#
+    Image Upload — Image preview card with modal upload, rotate, and remove actions
+
+    Renders a Bulma card overlay with the current image and action buttons. The upload button
+    opens the image modal via AJAX; an optional rotate button posts a rotation request. Hidden
+    entirely when no image is set and showWhenEmpty is false.
+
+    Used in:    templates/admin/cms/cms_block_edit.html.twig
+                templates/profile/index.html.twig
+    Parameters:
+        - entity         (string, required)       — entity type key: 'user', 'cmsBlock', 'event'
+        - id             (int, required)           — entity ID passed to image modal and rotate routes
+        - image          (Image|null, required)    — current image entity; null hides the component unless showWhenEmpty
+        - showWhenEmpty  (bool, optional)          — show upload button even when no image; default: false
+        - rotate         (bool, optional)          — show rotate button; default: false
+        - label          (string, optional)        — upload button label; default: 'Change Image'
+        - removeImageUrl (string|null, optional)   — URL for the remove-image action; shows × button when set
+    Depends on: _components/image.html.twig, assets/js/modal.js (.modalTrigger, .fileRotateTrigger)
 #}
 {% if image is not null or (showWhenEmpty is defined and showWhenEmpty) %}
     {% set modalUrl = path('app_image_modal', {'entity': entity, 'id': id}) %}
