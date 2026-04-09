@@ -33,6 +33,7 @@
     {% if is_granted('ROLE_USER') and event.images|length > 0 %}
         <script src="{{ asset('js/vendor/fancybox.umd.js') }}" ></script>
     {% endif %}
+    <script src="{{ asset('js/event-details.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -92,31 +93,6 @@
 
         </div>
     </section>
-
-    <script type="text/javascript">
-
-        document.addEventListener('DOMContentLoaded', function() {
-            let replyInput = document.getElementById('replyInput');
-            let replyButton = document.getElementsByClassName('replyButton');
-            for (let i = 0; i < replyButton.length; i++) {
-                replyButton[i].addEventListener('click', e => {
-                    e.preventDefault();
-                    replyInput.value = '> ' + e.currentTarget.getAttribute('data-comment') + '\n';
-                });
-            }
-        });
-
-        {% if event.hasMap and show_osm() %}
-            {% include 'events/detailsOpenStreetMap.js.twig' %}
-        {% endif %}
-
-        {% if is_granted('ROLE_USER') and event.images|length > 0 %}
-            Fancybox.bind("[data-fancybox]", {
-                // Your custom options
-            });
-        {% endif %}
-
-    </script>
 
 
 {% endblock %}

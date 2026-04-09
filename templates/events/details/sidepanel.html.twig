@@ -18,7 +18,7 @@
     <h2 class="title is-4">Hosts</h2>
     <div class="columns is-multiline">
         {% for host in event.host %}
-            <div class="tag is-large m-1">{{ host.user.name }}</div>
+            <div class="tag is-large m-1">{{ host.user ? host.user.name : host.name }}</div>
         {% endfor %}
     </div>
 </div>
@@ -35,6 +35,10 @@
         </p>
     {% endif %}
     {% if event.hasMap and show_osm() %}
-        <div class="mt-3" id="osm-map"></div>
+        <div class="mt-3" id="osm-map"
+             data-lat="{{ event.location.latitude }}"
+             data-lng="{{ event.location.longitude }}"
+             data-marker-icon="{{ asset('images/leaflet/marker-icon.png') }}"
+             data-marker-shadow="{{ asset('images/leaflet/marker-shadow.png') }}"></div>
     {% endif %}
 </div>

@@ -4,12 +4,6 @@
 
 {% block body %}
 
-    <style>
-        .api-endpoint .buttons.has-addons { display: inline-flex; }
-        .api-method { min-width: 6.5rem; justify-content: center; }
-        .api-path   { font-family: monospace; min-width: 20rem; justify-content: flex-start; }
-    </style>
-
     <section class="section">
         <div class="container">
             <h1 class="title is-3">API Documentation</h1>
@@ -34,26 +28,8 @@
         </div>
     </section>
 
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.api-toggle').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    const example = this.closest('.api-endpoint').querySelector('.api-example');
-                    const icon = this.querySelector('i');
-                    const expanded = this.getAttribute('aria-expanded') === 'true';
-
-                    if (expanded) {
-                        example.classList.add('is-hidden');
-                        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-                        this.setAttribute('aria-expanded', 'false');
-                    } else {
-                        example.classList.remove('is-hidden');
-                        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-                        this.setAttribute('aria-expanded', 'true');
-                    }
-                });
-            });
-        });
-    </script>
+    {% block javascripts %}
+        <script src="{{ asset('js/api-docs.js') }}" defer></script>
+    {% endblock %}
 
 {% endblock %}

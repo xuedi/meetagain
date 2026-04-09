@@ -8,7 +8,7 @@
         </a>
     </div>
     {% if notifications.totalCount > 0 %}
-    <div class="dropdown-menu" role="menu" style="min-width: 300px;">
+    <div class="dropdown-menu notifications-dropdown" role="menu">
         <div class="dropdown-content">
             {% for item in notifications.items %}
                 {% if item.route and route_exists(item.route) %}

@@ -11,6 +11,7 @@
  * Loaded in:  templates/base.html.twig (all pages)
  * Used by:    templates/_components/warning_box.html.twig,
  *             templates/profile/index.html.twig,
+ *             templates/profile/_partials/social_list.html.twig,
  *             templates/admin/event/edit.html.twig,
  *             templates/admin/location/edit.html.twig,
  *             templates/admin/host/edit.html.twig,
@@ -38,6 +39,23 @@ document.addEventListener('DOMContentLoaded', function () {
             const target = event.currentTarget.getAttribute('data-id');
             const node = document.getElementById(target);
             if (node) node.classList.toggle('is-hidden');
+        });
+    });
+});
+
+// Show-more toggle: reveals hidden rows in the nearest table body and hides the trigger row
+document.addEventListener('DOMContentLoaded', function () {
+    Array.from(document.querySelectorAll('[data-show-more]')).forEach((el) => {
+        el.addEventListener('click', (event) => {
+            event.preventDefault();
+            const triggerRow = event.currentTarget.closest('tr');
+            const container = triggerRow ? triggerRow.parentElement : null;
+            if (container) {
+                container.querySelectorAll('.is-hidden').forEach((hidden) => {
+                    hidden.classList.remove('is-hidden');
+                });
+            }
+            if (triggerRow) triggerRow.classList.add('is-hidden');
         });
     });
 });

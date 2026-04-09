@@ -29,19 +29,19 @@
                         {% if plugin.installed %}
                             {% if plugin.enabled %}
                                 <button class="button is-danger is-light" disabled>Uninstall</button>
-                                <form method="post" action="{{ path('admin_plugin_disable', {key: plugin.key}) }}" style="display:inline">
+                                <form method="post" action="{{ path('admin_plugin_disable', {key: plugin.key}) }}" class="is-inline">
                                     <button type="submit" class="button is-danger is-light">Disable</button>
                                 </form>
                             {% else %}
-                                <form method="post" action="{{ path('admin_plugin_uninstall', {key: plugin.key}) }}" style="display:inline">
+                                <form method="post" action="{{ path('admin_plugin_uninstall', {key: plugin.key}) }}" class="is-inline">
                                     <button type="submit" class="button is-danger is-light">Uninstall</button>
                                 </form>
-                                <form method="post" action="{{ path('admin_plugin_enable', {key: plugin.key}) }}" style="display:inline">
+                                <form method="post" action="{{ path('admin_plugin_enable', {key: plugin.key}) }}" class="is-inline">
                                     <button type="submit" class="button is-success is-light">Enable</button>
                                 </form>
                             {% endif %}
                         {% else %}
-                            <form method="post" action="{{ path('admin_plugin_install', {key: plugin.key}) }}" style="display:inline">
+                            <form method="post" action="{{ path('admin_plugin_install', {key: plugin.key}) }}" class="is-inline">
                                 <button type="submit" class="button is-success is-light">Install</button>
                             </form>
                             <button class="button is-success is-light" disabled>Enable</button>

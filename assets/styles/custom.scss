@@ -32,10 +32,18 @@ body {
     right: 0;
 }
 
-.is-nowrap  { white-space: nowrap; }
-.breakText  { display: block; max-width: 720px !important; word-break: break-all; }
+.is-nowrap       { white-space: nowrap; }
+.is-contents     { display: contents; }
+.is-full-height  { height: 100%; }
+.flex-shrink-0   { flex-shrink: 0; }
+.breakText       { display: block; max-width: 720px !important; word-break: break-all; }
 
 // ── Forms ────────────────────────────────────────────────────────────────────
+
+.fieldset-warning  { border: 2px solid #f14668; border-radius: 4px; }
+.fieldset-default  { border: 1px solid #dbdbdb; border-radius: 4px; }
+.col-narrow        { width: 60px; }
+.col-medium        { width: 200px; }
 
 input[type="color"] {
     min-width: 50px;
@@ -62,6 +70,8 @@ input[type="color"] {
 
 .is-flag      { height: 24px; }
 .is-flag-mini { height: 20px; }
+.flag-icon              { width: 32px; height: 24px; flex-shrink: 0; overflow: hidden; }
+.notifications-dropdown { min-width: 300px; }
 
 .cookie-button {
     padding-left: 70px;
@@ -92,6 +102,52 @@ input[type="color"] {
     bottom: 1rem;
     z-index: 1000;
 }
+
+// CMS image blocks
+.img-fluid         { width: 100%; height: auto; }
+.img-fluid-block   { width: 100%; height: auto; display: block; }
+.img-cover         { object-fit: cover; width: 100%; display: block; }
+.overlay-controls  { position: absolute; top: 4px; right: 4px; }
+.card-preview-min  { min-height: 80px; }
+.card-preview-img  { max-height: 40px; margin-bottom: 0.25rem; }
+
+// Admin charts
+.chart-container   { max-height: 200px; }
+
+// Messaging
+.chat-layout         { display: flex; flex-direction: column; height: 70vh; }
+.chat-layout-mobile  { display: flex; flex-direction: column; height: 60vh; }
+.messages-scroll     { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
+.message-own         { background-color: aliceblue; }
+
+// Permissions accordion
+.perm-section-header {
+    cursor: pointer;
+    user-select: none;
+    background: #f5f5f5;
+    border-radius: 6px;
+    transition: background 0.12s ease;
+    gap: 0.75rem;
+}
+.perm-section-header:hover { background: #ebebeb; }
+.perm-section-header.is-open {
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 0 !important;
+}
+.perm-section-header.is-open + .perm-section-body {
+    border: 1px solid #e8e8e8;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+}
+.perm-section-header.is-open + .perm-section-body table {
+    margin-bottom: 0;
+}
+
+// API documentation
+.api-endpoint .buttons.has-addons { display: inline-flex; }
+.api-method { min-width: 6.5rem; justify-content: center; }
+.api-path   { font-family: monospace; min-width: 20rem; justify-content: flex-start; }
 
 // Floating action menu — absolute top-right overlay on image/card containers.
 .float-box-menu {

@@ -50,7 +50,7 @@
 
     {% if supportsImage %}
         {% set imageColumn %}
-            <div style="position: relative;">
+            <div class="is-relative">
                 {% include '_components/image_upload.html.twig' with {
                     'entity': 'cmsBlock',
                     'id': block.id,
@@ -94,21 +94,10 @@
         {{ form }}
     {% endif %}
 
-{% if supportsImage %}
-    <script>
-    (function () {
-        const form = document.getElementById('cms-block-form');
-        const overlay = document.getElementById('cms-image-overlay');
-        if (!form || !overlay) return;
-        function onDirty() {
-            overlay.style.display = 'flex';
-            form.removeEventListener('input', onDirty);
-            form.removeEventListener('change', onDirty);
-        }
-        form.addEventListener('input', onDirty);
-        form.addEventListener('change', onDirty);
-    }());
-    </script>
-{% endif %}
-
 {% endblock %}
+
+{% if supportsImage %}
+{% block javascripts %}
+    <script src="{{ asset('js/admin/cms-block-edit.js') }}" defer></script>
+{% endblock %}
+{% endif %}

@@ -10,7 +10,7 @@
             <table class="table is-fullwidth">
                 <tbody>
                     <tr>
-                        <th style="width: 200px;">Email</th>
+                        <th class="col-medium">Email</th>
                         <td>{{ user.email }}</td>
                     </tr>
                     <tr>
@@ -75,7 +75,7 @@
             <div class="buttons">
                 {# Promote to Organizer (only if not already organizer and not current user) #}
                 {% if 'ROLE_ORGANIZER' not in user.roles and user.id != app.user.id %}
-                    <form method="post" action="{{ path('app_admin_member_promote_organizer', {id: user.id}) }}" style="display:inline;">
+                    <form method="post" action="{{ path('app_admin_member_promote_organizer', {id: user.id}) }}" class="is-inline">
                         <input type="hidden" name="_token" value="{{ csrf_token('promote_organizer' ~ user.id) }}">
                         <button type="submit" class="button is-info">
                             <span class="icon"><i class="fa fa-arrow-up"></i></span>
@@ -90,7 +90,7 @@
                 {% endif %}
 
                 {# Toggle Verified #}
-                <form method="post" action="{{ path('app_admin_member_toggle_verified', {id: user.id}) }}" style="display:inline;">
+                <form method="post" action="{{ path('app_admin_member_toggle_verified', {id: user.id}) }}" class="is-inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('toggle_verified' ~ user.id) }}">
                     <button type="submit" class="button {{ user.verified ? 'is-warning' : 'is-success' }}">
                         <span class="icon"><i class="fa fa-{{ user.verified ? 'times' : 'check' }}"></i></span>

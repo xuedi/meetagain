@@ -15,7 +15,7 @@
                     This is a soft-delete that preserves all related data until permanent cleanup runs.
                 </p>
                 <div class="has-text-right">
-                    <form method="post" action="{{ path('app_admin_member_delete', {'id': user.id}) }}" style="display:inline;">
+                    <form method="post" action="{{ path('app_admin_member_delete', {'id': user.id}) }}" class="is-inline">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
                         <button type="submit" class="button">
                             <span class="icon"><i class="fa fa-trash"></i></span>

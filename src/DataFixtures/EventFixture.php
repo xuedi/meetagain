@@ -122,6 +122,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                     HostFixture::ADMIN,
                     HostFixture::ADEM,
                     HostFixture::CRYSTAL,
+                    HostFixture::GHOST,
                 ],
                 'rsvps' => [
                     UserFixture::ADMIN,

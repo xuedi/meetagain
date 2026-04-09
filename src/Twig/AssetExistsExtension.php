@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\AssetMapper\OpaqueMediaPathResolver;
 use App\ExtendedFilesystem;
 use Override;
 use Twig\Extension\AbstractExtension;
@@ -19,6 +20,7 @@ class AssetExistsExtension extends AbstractExtension
     {
         return [
             new TwigFunction('asset_exists', $this->assetExists(...)),
+            new TwigFunction('get_app_bundle_url', OpaqueMediaPathResolver::appBundlePath(...)),
         ];
     }
 
