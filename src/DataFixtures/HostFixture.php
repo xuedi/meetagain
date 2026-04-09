@@ -13,6 +13,7 @@ class HostFixture extends AbstractFixture implements DependentFixtureInterface
     public const string CRYSTAL = 'Crystal';
     public const string JESSIE = 'Jessie';
     public const string MOLLIE = 'Mollie';
+    public const string GHOST = 'Ghost';
 
     public function load(ObjectManager $manager): void
     {
@@ -46,6 +47,7 @@ class HostFixture extends AbstractFixture implements DependentFixtureInterface
             [self::CRYSTAL, UserFixture::CRYSTAL_LIU],
             [self::JESSIE, UserFixture::JESSIE_MEYTON],
             [self::MOLLIE, UserFixture::MOLLIE_HALL],
+            [self::GHOST, null],
         ];
     }
 

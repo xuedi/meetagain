@@ -70,50 +70,8 @@
 
     </div>
 
-    <script>
-        const emailTypeSelect = document.getElementById('emailType');
-        const contextFieldsContainer = document.getElementById('contextFields');
+{% endblock %}
 
-        function updateContextFields() {
-            const selectedOption = emailTypeSelect.options[emailTypeSelect.selectedIndex];
-            const context = JSON.parse(selectedOption.dataset.context || '{}');
-
-            contextFieldsContainer.innerHTML = '';
-
-            for (const [key, value] of Object.entries(context)) {
-                const field = document.createElement('div');
-                field.className = 'field is-horizontal';
-
-                const fieldLabel = document.createElement('div');
-                fieldLabel.className = 'field-label is-normal';
-                fieldLabel.innerHTML = '<label class="label">' + key + '</label>';
-
-                const fieldBody = document.createElement('div');
-                fieldBody.className = 'field-body';
-
-                const fieldDiv = document.createElement('div');
-                fieldDiv.className = 'field';
-
-                const control = document.createElement('div');
-                control.className = 'control';
-
-                const input = document.createElement('input');
-                input.className = 'input';
-                input.type = 'text';
-                input.name = 'context[' + key + ']';
-                input.value = value;
-
-                control.appendChild(input);
-                fieldDiv.appendChild(control);
-                fieldBody.appendChild(fieldDiv);
-                field.appendChild(fieldLabel);
-                field.appendChild(fieldBody);
-                contextFieldsContainer.appendChild(field);
-            }
-        }
-
-        emailTypeSelect.addEventListener('change', updateContextFields);
-        updateContextFields();
-    </script>
-
+{% block javascripts %}
+    <script src="{{ asset('js/admin/email-debug.js') }}" defer></script>
 {% endblock %}

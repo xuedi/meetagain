@@ -19,34 +19,13 @@
     </section>
 
     <script src="{{ asset('js/vendor/jstable.min.js') }}"></script>
-    <script>
-        let myTable = new JSTable("#filteredTable", {
-            sortable: true,
-            searchable: true,
-            perPage: 15,
-            perPageSelect: [
-                5, 10, 15, 25, 50, 100,
-            ]
-        });
-    </script>
-
     <script src="{{ asset('js/vendor/flatpickr.min.js') }}"></script>
     {% if app.request.locale != 'en' %}
     <script src="{{ asset('js/vendor/flatpickr-l10n/' ~ app.request.locale ~ '.js') }}"></script>
     {% endif %}
-    <script>
-        document.querySelectorAll('.flatpickr-field').forEach((el) => {
-            const enableTime = el.dataset.enableTime === 'true';
-            const dateFormat = enableTime ? "Y-m-d H:i" : "{{ get_date_format_flatpickr() }}";
-
-            flatpickr(el, {
-                wrap: true,
-                enableTime: enableTime,
-                dateFormat: dateFormat,
-                time_24hr: true,
-                locale: "{{ app.request.locale }}"
-            });
-        });
-    </script>
+    <script src="{{ asset('js/admin/base.js') }}"
+            data-date-format="{{ get_date_format_flatpickr() }}"
+            data-locale="{{ app.request.locale }}"
+            defer></script>
 
 {% endblock %}

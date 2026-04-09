@@ -89,8 +89,9 @@ final class MediaCompileCommand extends Command
             $minifier->add($content);
         }
 
-        file_put_contents("$target/app.js", $minifier->minify());
-        $output->writeln('Wrote global JS bundle to public/media/app.js');
+        $filename = basename(OpaqueMediaPathResolver::appBundlePath());
+        file_put_contents("$target/$filename", $minifier->minify());
+        $output->writeln("Wrote global JS bundle to public/media/$filename");
     }
 
     private function minify(string $content, string $ext): string

@@ -65,20 +65,5 @@
         </div>
     </section>
 
-    <script>
-
-        document.addEventListener('DOMContentLoaded', function () {
-            (document.querySelectorAll('.showMore') || []).forEach((trigger) => {
-                trigger.addEventListener('click', event => {
-                    event.preventDefault();
-                    event.currentTarget.parentNode.parentNode.parentNode.querySelectorAll('.is-hidden').forEach(el => {
-                        el.classList.remove('is-hidden');
-                    });
-                    event.currentTarget.parentNode.parentNode.classList.add('is-hidden');
-                });
-            });
-        });
-
-    </script>
 
 {% endblock %}
