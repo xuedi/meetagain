@@ -377,3 +377,63 @@ language_lb: Luxemburgisch
 language_rm: Rätoromanisch
 language_fo: Färöisch
 language_fy: Friesisch
+# Login-Seite Sidebar
+'login.sidebar.title': 'Neu bei meetAgain?'
+'login.sidebar.intro': 'Werde Teil einer freundlichen Gemeinschaft und verpasse keine Veranstaltung mehr.'
+'login.sidebar.bullet1': 'Entdecke lokale Events und melde dich an'
+'login.sidebar.bullet2': 'Vernetze dich mit Mitgliedern mit gleichen Interessen'
+'login.sidebar.bullet3': 'Verwalte dein Profil und deine Einstellungen'
+'login.sidebar.link': 'Konto erstellen'
+# Registrierungs-Seite Sidebar
+'register.sidebar.title': 'Bereits Mitglied?'
+'register.sidebar.intro': 'Melde dich an und mach dort weiter, wo du aufgehört hast.'
+'register.sidebar.bullet1': 'Kostenlos beitreten'
+'register.sidebar.bullet2': 'Deine Daten gehören dir'
+'register.sidebar.bullet3': 'Jederzeit abmelden'
+'register.sidebar.link': 'Anmelden'
+# Passwort-Zurücksetzen Sidebar
+'reset.sidebar.title': 'Was passiert als nächstes?'
+'reset.sidebar.intro': 'Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen deines Passworts.'
+'reset.sidebar.bullet1': 'Der Link ist eine Stunde gültig'
+'reset.sidebar.bullet2': 'Prüfe deinen Spam-Ordner, falls die E-Mail nicht ankommt'
+'reset.sidebar.bullet3': 'Das Captcha schützt das Formular vor Missbrauch'
+'reset.sidebar.link': 'Zurück zur Anmeldung'
+# Neues Passwort Sidebar
+'reset_password.sidebar.title': 'Fast geschafft'
+'reset_password.sidebar.intro': 'Wähle ein starkes Passwort, das du dir merken kannst.'
+'reset_password.sidebar.bullet1': 'Mindestens 8 Zeichen'
+'reset_password.sidebar.bullet2': 'Buchstaben und Zahlen kombinieren'
+'reset_password.sidebar.bullet3': 'Kein altes Passwort wiederverwenden'
+'reset_password.sidebar.link': 'Falsche Seite? Anmelden'
+# Geteilter Captcha-Text
+'captcha.limit_text': 'Du kannst nicht mehr als 7 neue Captchas pro Minute anfordern.'
+'captcha.tries_pre': 'Du hast'
+'captcha.tries_mid': 'Versuche genutzt. Nächster freier Versuch in'
+'captcha.tries_post': 'Sekunden.'
+# Registrierungs-Statusseiten
+'register_email_send.heading': 'Posteingang prüfen'
+'register_email_send.description': 'Wir haben einen Bestätigungslink an deine E-Mail-Adresse gesendet. Klicke auf den Link, um dein Konto zu aktivieren.'
+'register_email_send.cta': 'Zurück zur Anmeldung'
+'register_success.heading': 'E-Mail bestätigt'
+'register_success.description': 'Deine E-Mail wurde bestätigt. Ein Administrator wird dein Konto in den nächsten Tagen aktivieren.'
+'register_success.cta': 'Zurück zur Anmeldung'
+'register_error.heading': 'Etwas ist schiefgelaufen'
+'register_error.description': 'Wir konnten deine Registrierung nicht abschließen. Der Link ist möglicherweise abgelaufen.'
+'register_error.cta': 'Erneut versuchen'
+# Passwort-Zurücksetzen Statusseiten
+'reset_email_send.heading': 'Posteingang prüfen'
+'reset_email_send.description': 'Falls ein Konto mit dieser E-Mail existiert, haben wir einen Link zum Zurücksetzen des Passworts gesendet.'
+'reset_email_send.cta': 'Zurück zur Anmeldung'
+'reset_success.heading': 'Passwort aktualisiert'
+'reset_success.description': 'Dein neues Passwort wurde gesetzt. Du kannst dich jetzt anmelden.'
+'reset_success.cta': 'Anmelden'
+'reset_error.heading': 'Link abgelaufen oder ungültig'
+'reset_error.description': 'Dieser Link ist nicht mehr gültig. Bitte fordere einen neuen an.'
+'reset_error.cta': 'Neuen Link anfordern'
+# Support-Seite Sidebar
+'support.sidebar.title': 'Wie wir helfen können'
+'support.sidebar.intro': 'Schick uns eine Nachricht und wir melden uns so schnell wie möglich.'
+'support.sidebar.bullet1': 'Fragen zu Events oder Mitgliedschaft'
+'support.sidebar.bullet2': 'Technische Probleme mit der Seite'
+'support.sidebar.bullet3': 'Datenschutz- und Datenanfragen'
+'support.response_time': 'Wir antworten in der Regel innerhalb von 2 Werktagen.'

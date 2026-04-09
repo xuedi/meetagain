@@ -1,48 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_login"|trans }}{% endblock %}
+{% block title %}{{ "page_reset_headline"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            <h1 class="title is-5">{{ "page_reset_headline"|trans }}</h1>
+            <div class="columns is-centered mt-5">
+                <div class="column is-6-tablet is-5-desktop">
 
-            {{ form_start(form) }}
-            <div class="columns">
-                <div class="column is-5">
+                    <h1 class="title is-5">{{ "page_reset_headline"|trans }}</h1>
+
+                    {{ form_start(form) }}
+
                     {{ form_row(form.email) }}
-                </div>
-            </div>
-            <div class="columns">
-                <div class="column is-1">
-                    <strong>Captcha</strong><br>
-                    <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
-                </div>
-                <div class="column is-4">
-                    {{ form_row(form.captcha) }}
-                </div>
-            </div>
 
-            {{ form_widget(form) }}
-            <p>
-                You will receive an email with a link to reset your password, if you can't<br>
-                read the captcha code, please refresh the page or just try, and you will get a new one.
-            <p class="mt-4">
-                You cannot get more than <strong>7</strong> new captcha per minute.
-            </p>
-            <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
-                <p class="mb-5">
-                    You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free try in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
-                </p>
+                    <div class="field">
+                        <label class="label">Captcha</label>
+                        <img src="data:image/png;base64, {{ captcha }}" alt="captcha" class="mb-2">
+                        <div class="control">
+                            {{ form_widget(form.captcha) }}
+                        </div>
+                    </div>
+
+                    {{ form_widget(form) }}
+
+                    <p class="is-size-7 has-text-grey mt-2">{{ 'captcha.limit_text'|trans }}</p>
+                    <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
+                        <p class="mb-4 is-size-7 has-text-grey">
+                            {{ 'captcha.tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'captcha.tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'captcha.tries_post'|trans }}
+                        </p>
+                    </div>
+
+                    <button class="button is-primary">{{ "button_send_reset_link" | trans }}</button>
+                    {{ form_end(form) }}
+
+                </div>
+
+                <div class="column is-5-tablet is-4-desktop">
+                    {% include '_components/info_sidebar.html.twig' with {
+                        title: 'reset.sidebar.title'|trans,
+                        intro: 'reset.sidebar.intro'|trans,
+                        bullets: [
+                            'reset.sidebar.bullet1'|trans,
+                            'reset.sidebar.bullet2'|trans,
+                            'reset.sidebar.bullet3'|trans,
+                        ],
+                        link_url: path('app_login'),
+                        link_text: 'reset.sidebar.link'|trans,
+                        link_icon: 'arrow-left',
+                    } only %}
+                </div>
             </div>
-            <button class="button">{{ "button_send_reset_link" | trans }}</button>
-            {{ form_end(form) }}
 
         </div>
     </section>
-
 
 {% endblock %}
 
