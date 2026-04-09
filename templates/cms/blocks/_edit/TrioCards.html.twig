@@ -10,7 +10,7 @@
 {% for i in 0..2 %}
     {% set card = block is defined ? block.cards[i] : null %}
     <div class="column is-4">
-        <div class="box" style="height: 100%;">
+        <div class="box is-full-height">
             <p class="has-text-weight-bold mb-3">{{ "trio_cards_card"|trans }} {{ i + 1 }}</p>
 
             {% if blockId is defined %}
@@ -22,10 +22,9 @@
                             <input type="hidden" name="cards[{{ i }}][image][hash]" value="{{ card.image.hash }}">
                             <div class="is-relative mb-2">
                                 <img src="/images/thumbnails/{{ card.image.hash }}_300x200.webp"
-                                     alt="" style="width: 100%; height: auto; display: block;">
+                                     alt="" class="img-fluid-block">
                                 <a href="{{ path('app_admin_cms_card_image_remove', {'blockId': blockId, 'slot': i}) }}"
-                                   class="delete is-small has-background-danger"
-                                   style="position: absolute; top: 4px; right: 4px;"
+                                   class="delete is-small has-background-danger overlay-controls"
                                    title="Remove"></a>
                             </div>
                             <a href="#"

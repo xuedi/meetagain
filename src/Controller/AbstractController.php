@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\AssetMapper\OpaqueMediaPathResolver;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -37,7 +38,6 @@ abstract class AbstractController extends AbstractSymfonyController
 
         $preloads = [
             'styles/app.scss'          => ['as' => 'style'],
-            'js/custom.js'             => ['as' => 'script'],
             'fonts/fa-solid-900.woff2' => ['as' => 'font', 'crossorigin' => 'anonymous'],
         ];
 
@@ -53,6 +53,9 @@ abstract class AbstractController extends AbstractSymfonyController
             }
             $links[] = $link;
         }
+
+        // app.js bundle is compiled by MediaCompileCommand — not AssetMapper-managed, use static path
+        $links[] = new Link(href: OpaqueMediaPathResolver::appBundlePath())->withAttribute('as', 'script');
 
         return $links !== [] ? $this->sendEarlyHints($links) : new Response();
     }

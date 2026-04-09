@@ -12,7 +12,7 @@
                 {% for conversation in conversations %}
                     <!-- TODO: is-active -->
                     <a class="panel-block is-block"
-                            {% if conversationsId == conversation.user.id %} style="background-color: aliceblue;" {% endif %}
+                            {% if conversationsId == conversation.user.id %} class="message-own" {% endif %}
                        href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}"
                     >
                         <div class="level">
@@ -58,7 +58,7 @@
                     implements a kind addressbook here
                 </p>
             {% else %}
-                <div style="display: flex; flex-direction: column; height: 70vh;">
+                <div class="chat-layout">
                     {# Block button in header #}
                     {% if conversationsId %}
                         <div class="level mb-2">
@@ -81,7 +81,7 @@
                         </div>
                     {% endif %}
 
-                    <div class="pr-3" id="desktop-message-container" style="flex: 1; overflow-y: auto; margin-bottom: 1rem;">
+                    <div class="pr-3 messages-scroll" id="desktop-message-container">
                         {% for message in messages %}
                             {% if user.id == message.sender.id %}
                                 <div class="level is-block">

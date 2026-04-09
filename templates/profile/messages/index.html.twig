@@ -12,21 +12,10 @@
         {% include 'profile/messages/chat_mobile.html.twig' %}
     </section>
 
-    {% if messages is not null %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Scroll desktop message container to bottom
-            const desktopContainer = document.getElementById('desktop-message-container');
-            if (desktopContainer) {
-                desktopContainer.scrollTop = desktopContainer.scrollHeight;
-            }
-
-            // Scroll mobile message container to bottom
-            const mobileContainer = document.getElementById('mobile-message-container');
-            if (mobileContainer) {
-                mobileContainer.scrollTop = mobileContainer.scrollHeight;
-            }
-        });
-    </script>
-    {% endif %}
 {% endblock %}
+
+{% if messages is not null %}
+{% block javascripts %}
+    <script src="{{ asset('js/messages.js') }}" defer></script>
+{% endblock %}
+{% endif %}

@@ -32,9 +32,11 @@
             <p class="mt-4">
                 You cannot get more than <strong>7</strong> new captcha per minute.
             </p>
-            <p class="mb-5">
-                You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free try in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
-            </p>
+            <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
+                <p class="mb-5">
+                    You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free try in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
+                </p>
+            </div>
             <button class="button">{{ "button_send_reset_link" | trans }}</button>
             {{ form_end(form) }}
 
@@ -42,31 +44,8 @@
     </section>
 
 
-    <script type="text/javascript">
+{% endblock %}
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const refreshCount = document.getElementById('refreshCount');
-            const refreshTime = document.getElementById('refreshTime');
-            const timeID = setInterval(timeAndDate, 1000);
-
-            function timeAndDate() {
-                let xhr = new XMLHttpRequest();
-                xhr.open("GET", '{{ path('app_ajax_get_captcha_count') }}', true);
-                xhr.responseType = 'json'; // Set response type to JSON
-
-                xhr.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        if (this.response && refreshCount && refreshTime) {
-                            refreshCount.textContent = this.response.count ?? '';
-                            refreshTime.textContent = this.response.next ?? '';
-                        }
-                    }
-                }
-                xhr.send();
-            }
-        });
-
-    </script>
-
-
+{% block javascripts %}
+    <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
 {% endblock %}

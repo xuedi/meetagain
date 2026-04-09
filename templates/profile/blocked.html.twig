@@ -33,7 +33,7 @@
                             <tbody>
                             {% for block in blockedUsers %}
                                 <tr>
-                                    <td style="width: 60px;">
+                                    <td class="col-narrow">
                                         {% include '_components/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
                                     </td>
                                     <td>

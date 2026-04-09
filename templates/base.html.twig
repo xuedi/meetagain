@@ -25,7 +25,7 @@
         <link rel="stylesheet" href="{{ asset(stylesheetPath) }}"/>
     {% endfor %}
     {% if app.environment == 'prod' %}
-        <script src="/media/app.js" defer></script>
+        <script src="{{ get_app_bundle_url() }}" defer></script>
     {% else %}
         <script src="{{ asset('js/ma-fetch.js') }}" defer></script>
         <script src="{{ asset('js/notifications.js') }}" defer></script>

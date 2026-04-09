@@ -14,10 +14,9 @@
                     <div class="is-relative">
                         <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
                              alt="" width="210" height="140"
-                             style="object-fit: cover; width: 100%; display: block;">
+                             class="img-cover">
                         <a href="{{ path('app_admin_cms_gallery_remove', {'blockId': blockId, 'imageId': item.id}) }}"
-                           class="delete is-medium has-background-danger"
-                           style="position: absolute; top: 4px; right: 4px;"
+                           class="delete is-medium has-background-danger overlay-controls"
                            title="Remove"></a>
                     </div>
                 </div>

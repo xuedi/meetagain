@@ -5,7 +5,7 @@
 {% if block.images|length == 1 %}
     <div class="mt-4 mb-4">
         <img src="/images/thumbnails/{{ block.images[0].hash }}_1024x768.webp"
-             alt="" style="width: 100%; height: auto;">
+             alt="" class="img-fluid">
     </div>
 {% elseif block.images|length > 1 %}
     <div class="columns is-multiline mt-2">
@@ -13,7 +13,7 @@
             <div class="column is-2">
                 <a data-fancybox="cms-gallery" href="/images/thumbnails/{{ item.hash }}_1024x768.webp">
                     <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
-                         alt="" width="210" height="140" style="object-fit: cover; width: 100%;">
+                         alt="" width="210" height="140" class="img-cover">
                 </a>
             </div>
         {% endfor %}

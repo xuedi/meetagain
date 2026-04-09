@@ -18,13 +18,13 @@
             <tbody>
                 {% for item in notifications.items %}
                     <tr>
-                        <td style="width: 50px;">
+                        <td class="col-narrow">
                             <span class="icon">
                                 <i class="fa {{ item.icon }}"></i>
                             </span>
                         </td>
                         <td>{{ item.label|raw }}</td>
-                        <td style="width: 50px;">
+                        <td class="col-narrow">
                             {% if item.route %}
                                 <a href="{{ path(item.route, item.routeParams) }}">
                                     <span class="icon"><i class="fa fa-arrow-right"></i></span>

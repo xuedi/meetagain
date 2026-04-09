@@ -28,7 +28,7 @@
         until xuedi implements a kind addressbook here
     </p>
 {% else %}
-    <div style="display: flex; flex-direction: column; height: 60vh;">
+    <div class="chat-layout-mobile">
         {# Block button in header #}
         {% if conversationsId %}
             <div class="level mb-2">
@@ -51,7 +51,7 @@
             </div>
         {% endif %}
 
-        <div id="mobile-message-container" style="flex: 1; overflow-y: auto; margin-bottom: 1rem;">
+        <div id="mobile-message-container" class="messages-scroll">
             {% for message in messages %}
                 <div class="box {% if user.id == message.sender.id %}has-background-link-light{% endif %}">
                     <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>

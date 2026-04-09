@@ -75,26 +75,8 @@
 
     </div>
 
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            let buttons = document.getElementsByClassName('translation-button');
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].addEventListener('click', event => {
-                    event.preventDefault();
+{% endblock %}
 
-                    {% for locale in languages %}
-                    document.getElementById('translation-button-{{ locale }}').classList.remove('is-active');
-                    document.getElementById('translation-div-{{ locale }}').classList.add('is-hidden');
-                    {% endfor %}
-
-                    let button = 'translation-button-' + event.currentTarget.getAttribute('data-id');
-                    document.getElementById(button).classList.add('is-active');
-
-                    let target = 'translation-div-' + event.currentTarget.getAttribute('data-id');
-                    document.getElementById(target).classList.remove('is-hidden');
-                });
-            }
-        });
-    </script>
-
+{% block javascripts %}
+    <script src="{{ asset('js/admin/email-template-edit.js') }}" defer></script>
 {% endblock %}
