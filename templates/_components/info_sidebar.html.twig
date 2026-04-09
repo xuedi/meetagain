@@ -1,0 +1,42 @@
+{#
+    Info Sidebar — Contextual guidance column for informational/form pages
+
+    Renders a right-side content column used alongside auth and support forms.
+    Shows a heading, intro paragraph, an optional bullet list of benefits or
+    expectations, and an optional secondary link. Exists as a component so the
+    two-column pattern stays consistent across login, register, reset, and
+    support pages.
+
+    Used in:    templates/security/login.html.twig, register.html.twig,
+                reset.html.twig, reset_password.html.twig,
+                templates/support/index.html.twig
+    Parameters:
+        - title (string, required)     — heading text (already translated)
+        - intro (string, required)     — intro paragraph (already translated)
+        - bullets (array, optional)    — list of strings (already translated); default: []
+        - link_url (string, optional)  — URL for the CTA link; default: none
+        - link_text (string, optional) — text for the CTA link (already translated); default: none
+        - link_icon (string, optional) — Font Awesome icon name for the link; default: none
+    Depends on: Font Awesome (globally loaded)
+#}
+<aside class="content">
+    <h3 class="title is-5">{{ title }}</h3>
+    <p>{{ intro }}</p>
+    {% if bullets is defined and bullets|length > 0 %}
+        <ul>
+            {% for bullet in bullets %}
+                <li>{{ bullet }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if link_url is defined and link_url and link_text is defined and link_text %}
+        <p class="mt-4">
+            <a href="{{ link_url }}" class="has-text-link">
+                {% if link_icon is defined and link_icon %}
+                    <span class="icon"><i class="fas fa-{{ link_icon }}"></i></span>
+                {% endif %}
+                <span>{{ link_text }}</span>
+            </a>
+        </p>
+    {% endif %}
+</aside>

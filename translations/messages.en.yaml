@@ -377,3 +377,63 @@ language_lb: Luxembourgish
 language_rm: Romansh
 language_fo: Faroese
 language_fy: Frisian
+# Login page sidebar
+'login.sidebar.title': 'New to meetAgain?'
+'login.sidebar.intro': 'Join a friendly community and never miss an event you care about.'
+'login.sidebar.bullet1': 'Discover and RSVP to local events'
+'login.sidebar.bullet2': 'Connect with members who share your interests'
+'login.sidebar.bullet3': 'Manage your own profile and preferences'
+'login.sidebar.link': 'Create an account'
+# Register page sidebar
+'register.sidebar.title': 'Already a member?'
+'register.sidebar.intro': 'Log in to pick up where you left off.'
+'register.sidebar.bullet1': 'Free to join'
+'register.sidebar.bullet2': 'Your data stays yours'
+'register.sidebar.bullet3': 'Unsubscribe any time'
+'register.sidebar.link': 'Log in'
+# Reset page sidebar
+'reset.sidebar.title': 'What happens next?'
+'reset.sidebar.intro': 'Enter your email and we will send you a link to choose a new password.'
+'reset.sidebar.bullet1': 'The link is valid for one hour'
+'reset.sidebar.bullet2': 'Check your spam folder if it does not arrive'
+'reset.sidebar.bullet3': 'The captcha protects the form from abuse'
+'reset.sidebar.link': 'Back to login'
+# Reset password page sidebar
+'reset_password.sidebar.title': 'Almost done'
+'reset_password.sidebar.intro': 'Choose a strong password you will remember.'
+'reset_password.sidebar.bullet1': 'At least 8 characters'
+'reset_password.sidebar.bullet2': 'Mix letters and numbers'
+'reset_password.sidebar.bullet3': 'Avoid reusing old passwords'
+'reset_password.sidebar.link': 'Wrong page? Log in'
+# Shared captcha counter text
+'captcha.limit_text': 'You cannot get more than 7 new captcha per minute.'
+'captcha.tries_pre': 'You used'
+'captcha.tries_mid': 'tries so far. Next free try in'
+'captcha.tries_post': 'seconds.'
+# Register status pages
+'register_email_send.heading': 'Check your inbox'
+'register_email_send.description': 'We sent a confirmation link to your email address. Click the link to activate your account.'
+'register_email_send.cta': 'Back to login'
+'register_success.heading': 'Email verified'
+'register_success.description': 'Your email was verified. An administrator will activate your account in the next few days.'
+'register_success.cta': 'Back to login'
+'register_error.heading': 'Something went wrong'
+'register_error.description': 'We could not complete your registration. The link may have expired.'
+'register_error.cta': 'Try again'
+# Reset password status pages
+'reset_email_send.heading': 'Check your inbox'
+'reset_email_send.description': 'If an account exists for that email, we sent a link to reset your password.'
+'reset_email_send.cta': 'Back to login'
+'reset_success.heading': 'Password updated'
+'reset_success.description': 'Your new password is set. You can now log in.'
+'reset_success.cta': 'Log in'
+'reset_error.heading': 'Link expired or invalid'
+'reset_error.description': 'This reset link is no longer valid. Please request a new one.'
+'reset_error.cta': 'Request a new link'
+# Support page sidebar
+'support.sidebar.title': 'How we can help'
+'support.sidebar.intro': 'Send us a message and we will get back to you as soon as we can.'
+'support.sidebar.bullet1': 'Questions about events or membership'
+'support.sidebar.bullet2': 'Technical issues with the site'
+'support.sidebar.bullet3': 'Privacy and data requests'
+'support.response_time': 'We usually respond within 2 working days.'

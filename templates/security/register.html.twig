@@ -7,35 +7,52 @@
     <section class="section">
         <div class="container">
 
-            <div class="columns">
-                <div class="column is-5">
+            <div class="columns is-centered mt-5">
+                <div class="column is-6-tablet is-5-desktop">
 
                     <h1 class="title is-5">{{ "page_register_headline"|trans }}</h1>
 
-                    <div class="box">
-                        {{ form_start(form) }}
+                    {{ form_start(form) }}
 
-                        {% for flash_error in app.flashes('verify_email_error') %}
-                            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-                        {% endfor %}
+                    {% for flash_error in app.flashes('verify_email_error') %}
+                        <div class="notification is-danger is-light mb-4" role="alert">{{ flash_error }}</div>
+                    {% endfor %}
 
-                        {{ form_errors(form) }}
+                    {{ form_errors(form) }}
 
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.email) }}
+                    {{ form_row(form.plainPassword, {
+                        label: 'Password'
+                    }) }}
+                    {{ form_row(form.agreeTerms) }}
 
-                        {{ form_row(form.name) }}
-                        {{ form_row(form.email) }}
-                        {{ form_row(form.plainPassword, {
-                            label: 'Password'
-                        }) }}
-                        {{ form_row(form.agreeTerms) }}
-
-
-                        <button class="button is-link">{{ "button_Register" | trans }}</button>
-                        <a class="button" href="/{{ app.request.locale }}/terms" target="_blank">{{ "terms" | trans }}</a>
-                        {{ form_end(form) }}
+                    <div class="field is-grouped mt-4">
+                        <div class="control">
+                            <button class="button is-primary">{{ "button_Register" | trans }}</button>
+                            <a class="button is-light" href="/{{ app.request.locale }}/terms" target="_blank" rel="noopener">{{ "terms" | trans }}</a>
+                        </div>
                     </div>
+                    {{ form_end(form) }}
+
+                </div>
+
+                <div class="column is-5-tablet is-4-desktop">
+                    {% include '_components/info_sidebar.html.twig' with {
+                        title: 'register.sidebar.title'|trans,
+                        intro: 'register.sidebar.intro'|trans,
+                        bullets: [
+                            'register.sidebar.bullet1'|trans,
+                            'register.sidebar.bullet2'|trans,
+                            'register.sidebar.bullet3'|trans,
+                        ],
+                        link_url: path('app_login'),
+                        link_text: 'register.sidebar.link'|trans,
+                        link_icon: 'sign-in-alt',
+                    } only %}
                 </div>
             </div>
+
         </div>
     </section>
 

@@ -6,17 +6,22 @@
 
     <section class="section">
         <div class="container">
-
-            <div class="columns">
-                <div class="column is-5">
-
-                    We send you an activation email with a link, as soon as you confirmed the email you are on board
-
+            <div class="columns is-centered mt-6">
+                <div class="column is-6-tablet is-5-desktop has-text-centered">
+                    <span class="icon is-large has-text-primary">
+                        <i class="fas fa-envelope fa-4x"></i>
+                    </span>
+                    <h1 class="title is-3 mt-5">{{ 'register_email_send.heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'register_email_send.description'|trans }}</p>
+                    <div class="mt-5">
+                        <a href="{{ path('app_login') }}" class="button is-primary">
+                            <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+                            <span>{{ 'register_email_send.cta'|trans }}</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-
         </div>
     </section>
-
 
 {% endblock %}

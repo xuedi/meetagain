@@ -7,43 +7,56 @@
     <section class="section">
         <div class="container">
 
-            <h1 class="title is-5">{{ 'nav_contact' | trans }}</h1>
+            <div class="columns is-centered mt-5">
+                <div class="column is-6-tablet is-5-desktop">
 
-            {{ form_start(form) }}
-            <div class="columns">
-                <div class="column is-5">
+                    <h1 class="title is-5">{{ 'nav_contact' | trans }}</h1>
+
+                    {{ form_start(form) }}
                     {{ form_row(form.contactType) }}
                     {{ form_row(form.name, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
                     {{ form_row(form.email, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
                     {{ form_row(form.message) }}
-                </div>
-            </div>
 
-            {% if not app.user %}
-            <div class="columns">
-                <div class="column is-1">
-                    <strong>Captcha</strong><br>
-                    <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
-                </div>
-                <div class="column is-4">
-                    {{ form_row(form.captcha) }}
-                </div>
-            </div>
-            <p class="mt-4">
-                You cannot get more than <strong>7</strong> new captcha per minute.
-            </p>
-            <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
-                <p class="mb-5">
-                    You used <strong id="refreshCount">{{ refreshCount }}</strong> tries so far. Next free try in <strong id="refreshTime">{{ refreshTime }}</strong> seconds.
-                </p>
-            </div>
-            {% else %}
-                {{ form_widget(form.captcha, {'attr': {'style': 'display:none'}}) }}
-            {% endif %}
+                    {% if not app.user %}
+                        <div class="field">
+                            <label class="label">Captcha</label>
+                            <img src="data:image/png;base64, {{ captcha }}" alt="captcha" class="mb-2">
+                            <div class="control">
+                                {{ form_widget(form.captcha) }}
+                            </div>
+                        </div>
 
-            {{ form_widget(form) }}
-            <button class="button is-primary">Send</button>
-            {{ form_end(form) }}
+                        <p class="is-size-7 has-text-grey mt-2">{{ 'captcha.limit_text'|trans }}</p>
+                        <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
+                            <p class="mb-4 is-size-7 has-text-grey">
+                                {{ 'captcha.tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'captcha.tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'captcha.tries_post'|trans }}
+                            </p>
+                        </div>
+                    {% else %}
+                        {{ form_widget(form.captcha, {'attr': {'style': 'display:none'}}) }}
+                    {% endif %}
+
+                    {{ form_widget(form) }}
+                    <button class="button is-primary mt-2">{{ 'button_send'|trans }}</button>
+                    {{ form_end(form) }}
+
+                    <p class="is-size-7 has-text-grey mt-4">{{ 'support.response_time'|trans }}</p>
+
+                </div>
+
+                <div class="column is-5-tablet is-4-desktop">
+                    {% include '_components/info_sidebar.html.twig' with {
+                        title: 'support.sidebar.title'|trans,
+                        intro: 'support.sidebar.intro'|trans,
+                        bullets: [
+                            'support.sidebar.bullet1'|trans,
+                            'support.sidebar.bullet2'|trans,
+                            'support.sidebar.bullet3'|trans,
+                        ],
+                    } only %}
+                </div>
+            </div>
 
         </div>
     </section>
