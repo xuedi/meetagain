@@ -50,8 +50,8 @@
 
 {% endblock %}
 
-{% if not app.user %}
 {% block javascripts %}
+{% if not app.user %}
     <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
-{% endblock %}
 {% endif %}
+{% endblock %}
