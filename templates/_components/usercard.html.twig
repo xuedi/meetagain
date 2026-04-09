@@ -1,8 +1,15 @@
 {#
-    User profile card with avatar and name link
+    Usercard — User profile card with avatar and name link
 
+    Renders a Bulma card with the user's avatar and display name. When the viewer is
+    authenticated the avatar and name link to the member profile and badges are shown;
+    for anonymous visitors the card is non-interactive and shows the name as plain text.
+
+    Used in:    templates/member/index.html.twig
+                templates/events/details/rsvp.html.twig
     Parameters:
-    - user: User entity with id, name, image, verified properties (required)
+        - user (User, required) — entity with id, name, image properties
+    Depends on: _components/image.html.twig, _components/username.html.twig
 #}
 {% if is_granted('ROLE_USER') %}
     <div class="card">

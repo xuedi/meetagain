@@ -1,14 +1,24 @@
 {#
-    Reusable warning/confirmation box for destructive actions
+    Warning Box — Collapsible confirmation panel for destructive admin actions
 
+    Renders a hidden Bulma message element that can be revealed by a toggleTrigger elsewhere
+    on the page. Supports danger (red) and warning (orange) variants. An optional confirmation
+    button with a trash icon links to the action URL. Used in admin edit pages for delete/reset
+    "Danger Zone" sections.
+
+    Used in:    templates/admin/event/edit.html.twig
+                templates/admin/cms/cms_edit.html.twig
+                templates/admin/host/edit.html.twig
+                templates/admin/location/edit.html.twig
     Parameters:
-    - id: Unique ID for the warning box (required)
-    - title: Header title (required)
-    - content: Warning message content (required, can be HTML)
-    - buttonLabel: Confirmation button label (optional)
-    - buttonUrl: Delete/action URL (optional)
-    - type: 'danger' (red, default) or 'warning' (orange)
-    - showButton: Whether to show the confirmation button (default: true if buttonUrl is set)
+        - id          (string, required)        — unique element ID used by toggleTrigger
+        - title       (string, required)        — header text of the message box
+        - content     (string, required)        — body HTML; rendered raw
+        - type        (string, optional)        — 'danger' (default) or 'warning'
+        - buttonUrl   (string, optional)        — action URL; shows button when set
+        - buttonLabel (string, optional)        — label for the confirmation button
+        - showButton  (bool, optional)          — override button visibility; default true when buttonUrl set
+    Depends on: assets/js/toggles.js (.toggleTrigger)
 #}
 <article class="message is-{{ type|default('danger') }} is-hidden" id="{{ id }}">
     <div class="message-header">

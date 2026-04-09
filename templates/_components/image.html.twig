@@ -1,11 +1,17 @@
 {#
-    Render a thumbnail image or placeholder
+    Image — Thumbnail image tag with automatic size selection and cache-busting
 
+    Renders a WebP thumbnail from /images/thumbnails/ or a default PNG placeholder when
+    no image is provided. The size can be passed explicitly; when omitted it is derived
+    from the image type enum value. A cache-busting query string is appended via updatedAt.
+
+    Used in:    widely used — _components/comment, usercard, image_upload and many page templates
     Parameters:
-    - image: Image entity with hash, alt, updatedAt, type properties (optional — shows placeholder if null)
-    - size:  thumbnail dimensions as 'WxH' string e.g. '400x400' (optional)
-             auto-selected from image.type when omitted:
-               type 1 → 400x400, type 2 → 600x400, type 3 → 210x140, type 4 → 432x432, default → 50x50
+        - image (Image|null, optional) — entity with hash, alt, updatedAt, type; null shows placeholder
+        - size  (string, optional)     — explicit thumbnail dimensions as 'WxH' e.g. '400x400';
+                                         auto-selected from image.type when omitted:
+                                         type 1 → 400x400, type 2 → 600x400, type 3 → 210x140,
+                                         type 4 → 432x432, default → 50x50
 #}
 {% if size is not defined  %}
     {% set size = '50x50' %}

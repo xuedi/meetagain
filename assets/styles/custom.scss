@@ -1,4 +1,20 @@
+// custom.scss — Application-specific styles and Bulma overrides
+//
+// All custom CSS lives here; compiled into app.css alongside Bulma.
+// Use Bulma helpers first — add a class here only when Bulma has no equivalent.
+// Sections are separated by ── Section Name ── banners.
+//
+// Sections:
+//   Base             — font family, accessibility contrast overrides
+//   Layout utilities — positioning, sizing, text helpers
+//   Forms            — input styling, button-reset pattern
+//   Navbar           — navigation border, flag icons, cookie dropdown
+//   Components       — flash notifications, floating overlay menus
+//   Vendor fixes     — third-party library CSS overrides and z-index patches
+
 @use 'config' as cfg;
+
+// ── Base ─────────────────────────────────────────────────────────────────────
 
 body {
     font-family: 'Inter', sans-serif;
@@ -8,26 +24,7 @@ body {
 .has-text-grey       { color: cfg.$text-grey       !important; }
 .has-text-grey-light { color: cfg.$text-grey-light !important; }
 
-input[type="color"] {
-    min-width: 50px;
-    min-height: 30px;
-    cursor: pointer;
-}
-
-#osm-map {
-    z-index: 0;
-}
-
-.navbar-top {
-    border-bottom: 1px solid lightgray;
-}
-
-.is-flag {
-    height: 24px;
-}
-.is-flag-mini {
-    height: 20px;
-}
+// ── Layout utilities ─────────────────────────────────────────────────────────
 
 .is-pulled-top-right {
     position: absolute;
@@ -35,14 +32,44 @@ input[type="color"] {
     right: 0;
 }
 
-#eventFilter {
-    .field {
-        display: inline;
+.is-nowrap  { white-space: nowrap; }
+.breakText  { display: block; max-width: 720px !important; word-break: break-all; }
 
-        .control {
-            display: inline;
-        }
-    }
+// ── Forms ────────────────────────────────────────────────────────────────────
+
+input[type="color"] {
+    min-width: 50px;
+    min-height: 30px;
+    cursor: pointer;
+}
+
+// Renders a <button> visually as a plain text link (no border, no background).
+.LinkLikeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: .5rem .75rem;
+    font-size: 1em;
+    text-align: left;
+    line-height: 1.5;
+}
+
+// ── Navbar ───────────────────────────────────────────────────────────────────
+
+.navbar-top {
+    border-bottom: 1px solid lightgray;
+}
+
+.is-flag      { height: 24px; }
+.is-flag-mini { height: 20px; }
+
+.cookie-button {
+    padding-left: 70px;
+    background-image: url('../images/monster.png');
+    background-repeat: no-repeat;
+}
+#dropdown-cookie {
+    min-width: 350px;
 }
 
 .menu {
@@ -54,21 +81,9 @@ input[type="color"] {
     }
 }
 
-.cookie-button {
-    padding-left:70px;
-    background-image: url('../images/monster.png');
-    background-repeat: no-repeat;
-}
-#dropdown-cookie {
-    min-width: 350px;
-}
+// ── Components ───────────────────────────────────────────────────────────────
 
-.breakText {
-    display: block;
-    max-width: 720px !important;
-    word-break: break-all;
-}
-
+// Flash notification — fixed bottom-center overlay for Symfony flash messages.
 .flashNotification {
     position: fixed;
     width: max-content;
@@ -78,33 +93,7 @@ input[type="color"] {
     z-index: 1000;
 }
 
-/* Message body borders for better visual separation TODO: move the adjustments later to a clean sass precompile modification */
-.message-body {
-    border-left: 2px solid #b5b5b5 !important;
-    border-right: 2px solid #b5b5b5 !important;
-    border-bottom: 2px solid #b5b5b5 !important;
-}
-
-/* Flatpickr time picker fix - v4.6+ uses .hasTime instead of .showTimeInput */
-.flatpickr-calendar.hasTime .flatpickr-time {
-    border-top: 1px solid rgba(10,10,10,.1);
-    height: calc(2.25rem + 1px);
-}
-
-.is-nowrap {
-    white-space: nowrap;
-}
-
-.LinkLikeButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: .5rem .75rem;
-    font-size: 1em;
-    text-align: left;
-    line-height: 1.5;
-}
-
+// Floating action menu — absolute top-right overlay on image/card containers.
 .float-box-menu {
     position: absolute;
     top: 0;
@@ -115,4 +104,36 @@ input[type="color"] {
     border-left: 1px solid #b0b0b0;
     border-bottom: 1px solid #b0b0b0;
     padding: 6px;
+}
+
+// Event filter — inline layout for filter controls in the event list sidebar.
+#eventFilter {
+    .field {
+        display: inline;
+
+        .control {
+            display: inline;
+        }
+    }
+}
+
+// ── Vendor fixes ─────────────────────────────────────────────────────────────
+
+// Leaflet map: reset z-index so map tiles render below Bulma dropdowns/modals.
+#osm-map {
+    z-index: 0;
+}
+
+// Bulma message-body: add side and bottom borders for better visual separation.
+// TODO: replace with a clean Sass variable override during Bulma theming refactor.
+.message-body {
+    border-left: 2px solid #b5b5b5 !important;
+    border-right: 2px solid #b5b5b5 !important;
+    border-bottom: 2px solid #b5b5b5 !important;
+}
+
+// Flatpickr: v4.6+ uses .hasTime instead of .showTimeInput — restore time row height.
+.flatpickr-calendar.hasTime .flatpickr-time {
+    border-top: 1px solid rgba(10, 10, 10, .1);
+    height: calc(2.25rem + 1px);
 }

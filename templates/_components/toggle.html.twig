@@ -1,10 +1,18 @@
 {#
-    Toggle yes/no button pair for boolean settings
+    Toggle — Yes/No button pair for boolean settings
 
+    Renders two small Bulma buttons as an addons group. The active state is colour-coded:
+    yes is highlighted green when true, no is highlighted red when false. By default both
+    buttons trigger the AJAX toggle handler; passing noAjax disables this for plain form use.
+
+    Used in:    templates/admin/system/config/index.html.twig
+                templates/profile/_partials/rsvp_list.html.twig
+                templates/profile/config.html.twig
     Parameters:
-    - link: URL for the toggle action (required)
-    - status: boolean — true highlights "yes" in green, false highlights "no" in red (required)
-    - noAjax: if defined, disables AJAX toggling (optional)
+        - link   (string, required)   — URL for both the yes and no actions
+        - status (bool, required)     — current value; drives active button highlight
+        - noAjax (any, optional)      — when defined, disables AJAX toggling (.triggerToggleBlock)
+    Depends on: assets/js/toggles.js (.triggerToggleBlock)
 #}
 <div class="buttons has-addons is-right {% if noAjax is not defined %}triggerToggleBlock{% endif %}">
     <a href="{{ link }}" class="button is-small {% if status %}is-success{% endif %}" data-type="yes">{{ "toggle_yes"|trans }}</a>
