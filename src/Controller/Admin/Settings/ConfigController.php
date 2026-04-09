@@ -77,4 +77,5 @@ final class ConfigController extends AbstractAdminController
 
         return $this->redirectToRoute('app_admin_system_config');
     }
+
 }
