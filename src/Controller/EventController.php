@@ -19,6 +19,9 @@ use App\Form\EventFilterType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Service\Event\EventService;
+use App\Service\Seo\CanonicalUrlService;
+use App\Service\Seo\EventSchemaService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -38,6 +41,8 @@ final class EventController extends AbstractController
         private readonly EventRepository $repo,
         private readonly CommentRepository $comments,
         private readonly EventFilterService $eventFilterService,
+        private readonly EventSchemaService $eventSchemaService,
+        private readonly CanonicalUrlService $canonicalUrlService,
         #[AutowireIterator(FeaturedEventProviderInterface::class)]
         private readonly iterable $featuredEventProviders = [],
     ) {}
@@ -122,6 +127,9 @@ final class EventController extends AbstractController
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
         }
 
+        $canonicalUrl = $this->canonicalUrlService->getCanonicalUrl($request);
+        $locale = $request->getLocale();
+
         return $this->render(
             'events/details.html.twig',
             [
@@ -130,6 +138,12 @@ final class EventController extends AbstractController
                 'comments' => $this->comments->findByEventWithUser($id),
                 'event' => $event,
                 'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
+                'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
+                'breadcrumbs' => [
+                    ['label' => 'Home', 'url' => $this->generateUrl('app_default', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL)],
+                    ['label' => 'Events', 'url' => $this->generateUrl('app_event', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL)],
+                    ['label' => $event->getTitle($locale)],
+                ],
             ],
             $response,
         );

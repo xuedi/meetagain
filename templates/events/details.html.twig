@@ -3,27 +3,9 @@
 {% block title %}{{ "event"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
 {% block meta_description %}{{ event.description(app.locale)|striptags|slice(0, 160) ?: get_meta_description('events') }}{% endblock %}
 {% block og_type %}event{% endblock %}
-{% block json_ld %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Event",
-  "name": {{ event.title(app.locale)|json_encode|raw }},
-  "startDate": "{{ event.start|date('c') }}",
-  "url": {{ get_canonical_url()|json_encode|raw }},
-  "location": {
-    "@type": "Place",
-    "name": {{ event.location.name|json_encode|raw }},
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": {{ event.location.street|json_encode|raw }},
-      "postalCode": {{ event.location.postcode|json_encode|raw }},
-      "addressLocality": {{ event.location.city|json_encode|raw }}
-    }
-  }
-}
-</script>
-{% endblock %}
+{% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
+{% block twitter_image %}{% if event.previewImage %}<meta name="twitter:image" content="{{ json_ld.image[0]|default('') }}"/>{% endif %}{% endblock %}
+{% block json_ld %}<script type="application/ld+json">{{ json_ld|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_PRETTY_PRINT'))|raw }}</script>{% endblock %}
 
 
 {% block javascripts %}

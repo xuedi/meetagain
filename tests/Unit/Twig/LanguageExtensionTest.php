@@ -4,6 +4,7 @@ namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Seo\CanonicalUrlService;
 use App\Twig\LanguageExtension;
 use App\Twig\MetaDescriptionProviderInterface;
 use PHPUnit\Framework\MockObject\Stub;
@@ -21,6 +22,7 @@ class LanguageExtensionTest extends TestCase
     private Stub&RequestStack $requestStackStub;
     private Stub&RouterInterface $routerStub;
     private Stub&ConfigService $configServiceStub;
+    private Stub&CanonicalUrlService $canonicalUrlServiceStub;
     private LanguageExtension $subject;
 
     protected function setUp(): void
@@ -29,11 +31,13 @@ class LanguageExtensionTest extends TestCase
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->routerStub = $this->createStub(RouterInterface::class);
         $this->configServiceStub = $this->createStub(ConfigService::class);
+        $this->canonicalUrlServiceStub = $this->createStub(CanonicalUrlService::class);
         $this->subject = new LanguageExtension(
             $this->languageServiceStub,
             $this->requestStackStub,
             $this->routerStub,
             $this->configServiceStub,
+            $this->canonicalUrlServiceStub,
         );
     }
 
@@ -51,7 +55,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(10, $functions);
+        static::assertCount(11, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('get_hreflang_code', $functionNames);
@@ -64,6 +68,7 @@ class LanguageExtensionTest extends TestCase
         static::assertContains('route_exists', $functionNames);
         static::assertContains('get_canonical_url', $functionNames);
         static::assertContains('get_meta_description', $functionNames);
+        static::assertContains('get_organization_schema', $functionNames);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
@@ -164,19 +169,33 @@ class LanguageExtensionTest extends TestCase
         static::assertTrue($result);
     }
 
-    public function testGetCanonicalUrlCombinesConfigHostWithRequestUri(): void
+    public function testGetCanonicalUrlDelegatesToCanonicalUrlService(): void
     {
         // Arrange
-        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local');
         $request = $this->createStub(Request::class);
-        $request->method('getRequestUri')->willReturn('/en/events');
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+        $this->canonicalUrlServiceStub
+            ->method('getCanonicalUrl')
+            ->willReturn('https://meetagain.local/en/events');
 
         // Act
         $result = $this->subject->getCanonicalUrl();
 
         // Assert
         static::assertSame('https://meetagain.local/en/events', $result);
+    }
+
+    public function testGetCanonicalUrlReturnsFallbackWhenNoRequest(): void
+    {
+        // Arrange
+        $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
+        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local/');
+
+        // Act
+        $result = $this->subject->getCanonicalUrl();
+
+        // Assert
+        static::assertSame('https://meetagain.local/', $result);
     }
 
     public function testGetMetaDescriptionReturnsProviderValueWhenAvailable(): void
@@ -190,6 +209,7 @@ class LanguageExtensionTest extends TestCase
             $this->requestStackStub,
             $this->routerStub,
             $this->configServiceStub,
+            $this->canonicalUrlServiceStub,
             [$provider],
         );
 
@@ -224,20 +244,5 @@ class LanguageExtensionTest extends TestCase
 
         // Assert
         static::assertSame('Meet the members of this community.', $result);
-    }
-
-    public function testGetCanonicalUrlStripsTrailingSlashFromHost(): void
-    {
-        // Arrange
-        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local/');
-        $request = $this->createStub(Request::class);
-        $request->method('getRequestUri')->willReturn('/en/members');
-        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
-
-        // Act
-        $result = $this->subject->getCanonicalUrl();
-
-        // Assert
-        static::assertSame('https://meetagain.local/en/members', $result);
     }
 }
