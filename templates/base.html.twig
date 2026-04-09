@@ -24,7 +24,17 @@
     {% for stylesheetPath in get_plugin_stylesheets() %}
         <link rel="stylesheet" href="{{ asset(stylesheetPath) }}"/>
     {% endfor %}
-    <script src="{{ asset('js/custom.js') }}" defer></script>
+    {% if app.environment == 'prod' %}
+        <script src="/media/app.js" defer></script>
+    {% else %}
+        <script src="{{ asset('js/ma-fetch.js') }}" defer></script>
+        <script src="{{ asset('js/notifications.js') }}" defer></script>
+        <script src="{{ asset('js/navbar.js') }}" defer></script>
+        <script src="{{ asset('js/toggles.js') }}" defer></script>
+        <script src="{{ asset('js/cookie-consent.js') }}" defer></script>
+        <script src="{{ asset('js/modal.js') }}" defer></script>
+        <script src="{{ asset('js/block-user.js') }}" defer></script>
+    {% endif %}
     {% for javascriptPath in get_plugin_javascripts() %}
         <script src="{{ asset(javascriptPath) }}" defer></script>
     {% endfor %}

@@ -1,10 +1,15 @@
 {#
-    User display name with optional badges
+    Username — User display name with optional role/status badges
 
+    Renders the user's name as a profile link followed by zero or more icon badges.
+    Badges are coloured Font Awesome icons with a tooltip title, sourced from the
+    user_badges() Twig function.
+
+    Used in:    templates/_components/usercard.html.twig
     Parameters:
-    - link: URL to the user's profile page (required)
-    - name: display name of the user (required)
-    - badges: list of UserBadge DTOs (required)
+        - link   (string, required)        — URL to the user's profile page
+        - name   (string, required)        — display name shown as the link text
+        - badges (UserBadge[], required)   — list of UserBadge DTOs with color, icon, title
 #}
 <a href="{{ link }}">{{ name }}</a>
 {% for badge in badges %}
