@@ -2,22 +2,29 @@
 
 namespace App\EventSubscriber;
 
+use App\Filter\Sitemap\CmsSitemapFilterInterface;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Service\Config\LanguageService;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Sitemap\Url\GoogleMultilangUrlDecorator;
 use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final readonly class CoreSitemapSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @param iterable<CmsSitemapFilterInterface> $cmsSitemapFilters
+     */
     public function __construct(
         private EventRepository $eventRepository,
         private CmsRepository $cmsRepository,
         private LanguageService $languageService,
         private UrlGeneratorInterface $urlGenerator,
+        #[AutowireIterator(CmsSitemapFilterInterface::class)]
+        private iterable $cmsSitemapFilters,
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -83,7 +90,17 @@ final readonly class CoreSitemapSubscriber implements EventSubscriberInterface
         $locales = $this->languageService->getFilteredEnabledCodes();
         $defaultLocale = $this->languageService->getFilteredDefaultLocale();
 
-        foreach ($this->cmsRepository->findPublished() as $page) {
+        $pages = $this->cmsRepository->findPublished();
+
+        // Apply sitemap CMS filters (e.g. group-scoping in multisite)
+        $allowedIds = array_values(array_filter(array_map(static fn($p) => $p->getId(), $pages)));
+        foreach ($this->cmsSitemapFilters as $filter) {
+            $allowedIds = $filter->filterCmsIds($allowedIds);
+        }
+        $allowedIdSet = array_flip($allowedIds);
+        $pages = array_filter($pages, static fn($p) => isset($allowedIdSet[$p->getId()]));
+
+        foreach ($pages as $page) {
             $slug = $page->getSlug();
             if ($slug === null) {
                 continue;
