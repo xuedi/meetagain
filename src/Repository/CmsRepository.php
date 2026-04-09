@@ -70,6 +70,21 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find all published CMS pages for sitemap generation.
+     *
+     * @return array<Cms>
+     */
+    public function findPublished(): array
+    {
+        return $this
+            ->createQueryBuilder('c')
+            ->where('c.published = true')
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Find CMS pages by IDs, optionally filtered by allowed IDs.
      * If no IDs provided, returns all pages.
      *

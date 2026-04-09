@@ -17,6 +17,18 @@
     <meta property="og:url" content="{{ get_canonical_url() }}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:site_name" content="meetAgain">
+    {% block og_image %}{% endblock %}
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="{{ block('og_title') }}"/>
+    <meta name="twitter:description" content="{{ block('og_description') }}"/>
+    {% block twitter_image %}{% endblock %}
+
+    <script type="application/ld+json">{{ get_organization_schema()|raw }}</script>
+
+    {% if breadcrumbs is defined and breadcrumbs|length > 1 %}
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{% for crumb in breadcrumbs %}{"@type":"ListItem","position":{{ loop.index }},"name":{{ crumb.label|json_encode|raw }}{% if crumb.url is defined %},"item":{{ crumb.url|json_encode|raw }}{% endif %}}{% if not loop.last %},{% endif %}{% endfor %}]}</script>
+    {% endif %}
 
     {% block json_ld %}{% endblock %}
 

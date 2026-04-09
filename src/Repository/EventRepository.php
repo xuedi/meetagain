@@ -530,6 +530,22 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find all published events for sitemap generation.
+     *
+     * @return Event[]
+     */
+    public function findForSitemap(): array
+    {
+        return $this
+            ->createQueryBuilder('e')
+            ->where('e.status IN (:statuses)')
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->orderBy('e.start', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return Event[]
      */
     public function findByHost(Host $host): array

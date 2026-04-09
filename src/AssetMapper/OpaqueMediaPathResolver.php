@@ -15,10 +15,14 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
     {
         $ext = pathinfo($logicalPath, PATHINFO_EXTENSION);
 
+        // JS, module, and source map files are version-stamped by asset-mapper — delegate directly
+        if (in_array($ext, ['js', 'mjs', 'map'], true)) {
+            return $this->inner->resolvePublicPath($logicalPath);
+        }
+
         $stablePath = preg_replace('/-[A-Za-z0-9_-]{7}(\.\w+)$/', '$1', $logicalPath);
 
-        $ext = self::normalizeExtension($ext);
-        return '/media/' . self::hashLogicalPath($stablePath) . '.' . $ext;
+        return '/media/' . self::hashLogicalPath($stablePath) . '.' . self::normalizeExtension($ext);
     }
 
     private static function normalizeExtension(string $ext): string
@@ -26,6 +30,7 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
         return match ($ext) {
             'scss', 'sass' => 'css',
             'mjs'          => 'js',
+            ''             => 'bin',
             default        => $ext,
         };
     }

@@ -2,8 +2,10 @@
 
 namespace App\Twig;
 
+use App\Filter\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Seo\CanonicalUrlService;
 use Exception;
 use Override;
 use RuntimeException;
@@ -23,8 +25,11 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly RequestStack $requestStack,
         private readonly RouterInterface $router,
         private readonly ConfigService $configService,
+        private readonly CanonicalUrlService $canonicalUrlService,
         #[AutowireIterator(MetaDescriptionProviderInterface::class)]
         private readonly iterable $metaDescriptionProviders = [],
+        #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
+        private readonly iterable $organizationProviders = [],
     ) {}
 
     #[Override]
@@ -49,6 +54,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('route_exists', $this->routeExists(...)),
             new TwigFunction('get_canonical_url', $this->getCanonicalUrl(...)),
             new TwigFunction('get_meta_description', $this->getMetaDescription(...)),
+            new TwigFunction('get_organization_schema', $this->getOrganizationSchema(...), ['is_safe' => ['html']]),
         ];
     }
 
@@ -105,9 +111,34 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
     public function getCanonicalUrl(): string
     {
         $request = $this->requestStack->getCurrentRequest();
-        $path = $request instanceof Request ? $request->getRequestUri() : '/';
+        if (!$request instanceof Request) {
+            return rtrim($this->configService->getHost(), '/') . '/';
+        }
 
-        return rtrim($this->configService->getHost(), '/') . $path;
+        return $this->canonicalUrlService->getCanonicalUrl($request);
+    }
+
+    public function getOrganizationSchema(): string
+    {
+        foreach ($this->organizationProviders as $provider) {
+            $schema = $provider->getOrganizationSchema();
+            if ($schema !== null) {
+                return json_encode(
+                    ['@context' => 'https://schema.org', ...$schema],
+                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
+                ) ?: '';
+            }
+        }
+
+        $host = rtrim($this->configService->getHost(), '/');
+
+        return json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            '@id' => $host . '/#organization',
+            'name' => 'MeetAgain',
+            'url' => $host,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
     }
 
     public function routeExists(string $name): bool
