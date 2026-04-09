@@ -3,20 +3,20 @@
 {% block content %}
 <div class="container">
 
+    {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'sitemap'} %}
+
     <div class="level mb-4">
         <div class="level-left">
-            <h1 class="title is-4">SEO — Sitemap Preview</h1>
+            <div class="notification is-info is-light mb-0">
+                <strong>{{ total }}</strong> URLs across 3 sections will be included in the sitemap.
+                Each URL is expanded to all enabled locales in the sitemap XML.
+            </div>
         </div>
         <div class="level-right">
             <a class="button is-info is-light" href="https://search.google.com/search-console/sitemaps" target="_blank" rel="noopener">
                 Google Search Console ↗
             </a>
         </div>
-    </div>
-
-    <div class="notification is-info is-light mb-4">
-        <strong>{{ total }}</strong> URLs across 3 sections will be included in the sitemap.
-        Each URL is expanded to all enabled locales in the sitemap XML.
     </div>
 
     {% set warnings_total = urls|filter(u => u.warnings|length > 0)|length %}
@@ -26,7 +26,7 @@
     </div>
     {% endif %}
 
-    <table id="filteredTable" class="table is-fullwidth is-striped is-hoverable">
+    <table class="table is-fullwidth is-striped is-hoverable">
         <thead>
             <tr>
                 <th>Section</th>
