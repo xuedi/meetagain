@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\Settings;
 
-use App\Entity\AdminLink;
+use App\Controller\Admin\AbstractAdminController;
+use App\Controller\Admin\AdminNavigationConfig;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Service\Config\LanguageService;
@@ -11,23 +12,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/seo')]
-final class SeoController extends AbstractAdminController
+#[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
+final class SitemapController extends AbstractAdminController
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return new AdminNavigationConfig(
-            section: 'System',
-            links: [
-                new AdminLink(
-                    label: 'SEO',
-                    route: 'app_admin_seo_sitemap_preview',
-                    active: 'seo',
-                    role: 'ROLE_ADMIN',
-                ),
-            ],
-            sectionPriority: 100,
-        );
+        return null;
     }
 
     public function __construct(
@@ -37,15 +27,14 @@ final class SeoController extends AbstractAdminController
         private readonly UrlGeneratorInterface $urlGenerator,
     ) {}
 
-    #[Route('/sitemap-preview', name: 'app_admin_seo_sitemap_preview')]
-    public function sitemapPreview(): Response
+    #[Route('/sitemap', name: 'app_admin_system_sitemap')]
+    public function sitemap(): Response
     {
         $locales = $this->languageService->getFilteredEnabledCodes();
         $defaultLocale = $this->languageService->getFilteredDefaultLocale();
 
         $urls = [];
 
-        // Static routes
         $staticRoutes = [
             ['route' => 'app_default', 'params' => [], 'section' => 'static', 'label' => 'Home'],
             ['route' => 'app_event', 'params' => [], 'section' => 'static', 'label' => 'Events list'],
@@ -67,7 +56,6 @@ final class SeoController extends AbstractAdminController
             ];
         }
 
-        // CMS pages
         foreach ($this->cmsRepository->findPublished() as $page) {
             $slug = $page->getSlug();
             if ($slug === null) {
@@ -93,7 +81,6 @@ final class SeoController extends AbstractAdminController
             ];
         }
 
-        // Events
         foreach ($this->eventRepository->findForSitemap() as $event) {
             $id = $event->getId();
             if ($id === null) {
@@ -122,8 +109,8 @@ final class SeoController extends AbstractAdminController
             ];
         }
 
-        return $this->render('admin/seo/sitemap_preview.html.twig', [
-            'active' => 'seo',
+        return $this->render('admin/system/sitemap/index.html.twig', [
+            'active' => 'system',
             'urls' => $urls,
             'total' => count($urls),
         ]);
