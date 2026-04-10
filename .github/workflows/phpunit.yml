@@ -93,7 +93,9 @@ jobs:
           restore-keys: ${{ runner.os }}-php-
 
       - name: Setup plugins
-        run: cp config/plugins.dist.php config/plugins.php
+        run: |
+          cp config/plugins.dist.php config/plugins.php
+          cp config/plugins_test.dist.php config/plugins_test.php
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
