@@ -98,6 +98,9 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
 
+      - name: Install Sass
+        run: npm install -g sass
+
       - name: Build assets
         run: php bin/console sass:build
 
