@@ -141,7 +141,7 @@ class RoutesSmokeTest extends WebTestCase
     private static function shouldSkip(string $routeName, array $methods): bool
     {
         // Skip non-GET routes
-        if (!empty($methods) && !in_array('GET', $methods, true)) {
+        if ($methods !== [] && !in_array('GET', $methods, true)) {
             return true;
         }
 

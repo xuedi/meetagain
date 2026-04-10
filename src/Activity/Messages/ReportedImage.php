@@ -31,7 +31,7 @@ class ReportedImage extends MessageAbstract
     protected function renderText(): string
     {
         $text = sprintf('Reported image for reason: %s', ImageReportReason::from($this->meta['reason'])->name);
-        if (!empty($this->meta['remarks'])) {
+        if (isset($this->meta['remarks']) && $this->meta['remarks'] !== '') {
             $text .= sprintf(' — Remarks: %s', $this->meta['remarks']);
         }
 
@@ -41,7 +41,7 @@ class ReportedImage extends MessageAbstract
     protected function renderHtml(): string
     {
         $text = sprintf('Reported image for reason: <b>%s</b>', ImageReportReason::from($this->meta['reason'])->name);
-        if (!empty($this->meta['remarks'])) {
+        if (isset($this->meta['remarks']) && $this->meta['remarks'] !== '') {
             $text .= sprintf(' &mdash; Remarks: %s', htmlspecialchars($this->meta['remarks']));
         }
 
