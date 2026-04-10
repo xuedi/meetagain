@@ -43,7 +43,7 @@ jobs:
           cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
           echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
-          sudo ln -sfn $GITHUB_WORKSPACE /var/www/html
+          sudo rm -rf /var/www/html && sudo ln -s $GITHUB_WORKSPACE /var/www/html
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
@@ -97,6 +97,9 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
+
+      - name: Build assets
+        run: php bin/console sass:build
 
       - name: Setup test environment
         env:
