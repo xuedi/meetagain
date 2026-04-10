@@ -2,8 +2,13 @@
 
 namespace Tests\Unit\Service;
 
+use App\EmailContextEnricherInterface;
 use App\Entity\EmailQueue;
+use App\Entity\EventTranslation;
+use App\Entity\SupportRequest;
+use App\Enum\ContactType;
 use App\Enum\EmailQueueStatus;
+use App\Enum\EmailType;
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Service\Config\ConfigService;
@@ -12,12 +17,16 @@ use App\Service\Email\EmailTemplateService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Stubs\EventStub;
 
 final class EmailServiceTest extends TestCase
 {
@@ -265,6 +274,300 @@ final class EmailServiceTest extends TestCase
             static::assertArrayHasKey('subject', $emailData);
             static::assertArrayHasKey('context', $emailData);
         }
+    }
+
+    // ---- prepareAggregatedRsvpNotification ----
+
+    #[DataProvider('aggregatedRsvpProvider')]
+    public function testPrepareAggregatedRsvpNotification(
+        array $attendeeNames,
+        string $expectedAttendeeNames,
+    ): void {
+        // Arrange
+        $recipient = $this->makeUser('host@example.com', 'Host', 'de');
+        $attendees = array_map(
+            fn(string $name) => $this->makeUser($name . '@example.com', $name),
+            $attendeeNames,
+        );
+
+        $translation = new EventTranslation();
+        $translation->setLanguage('de');
+        $translation->setTitle('Event Title');
+
+        $event = new EventStub();
+        $event->setId(5);
+        $event->setStart(new DateTime('2025-07-10 18:00'));
+        $event->addTranslation($translation);
+
+        $capturedContext = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')
+            ->with(static::callback(function (EmailQueue $q) use (&$capturedContext) {
+                $capturedContext = $q->getContext();
+                return true;
+            }));
+
+        $service = $this->createService(em: $emMock);
+
+        // Act
+        $result = $service->prepareAggregatedRsvpNotification($recipient, $attendees, $event);
+
+        // Assert
+        static::assertTrue($result);
+        static::assertSame($expectedAttendeeNames, $capturedContext['attendeeNames']);
+        static::assertSame('de', $capturedContext['lang']);
+        static::assertSame('Host', $capturedContext['username']);
+    }
+
+    public static function aggregatedRsvpProvider(): iterable
+    {
+        yield 'single attendee — attendeeNames is their name'       => [['Alice'], 'Alice'];
+        yield 'two attendees — attendeeNames is comma-separated'    => [['Alice', 'Bob'], 'Alice, Bob'];
+        yield 'three attendees — attendeeNames lists all three'     => [['Alice', 'Bob', 'Carol'], 'Alice, Bob, Carol'];
+    }
+
+    // ---- prepareAnnouncementEmail ----
+
+    public function testPrepareAnnouncementEmailFlushTrueCallsPersistAndFlush(): void
+    {
+        // Arrange
+        $recipient = $this->makeUser('user@example.com', 'Alice', 'en');
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist');
+        $emMock->expects($this->once())->method('flush');
+
+        $service = $this->createService(em: $emMock);
+
+        // Act
+        $result = $service->prepareAnnouncementEmail(
+            recipient: $recipient,
+            renderedContent: ['title' => 'Big News', 'content' => '<p>...</p>'],
+            announcementUrl: 'https://example.com/announcement/1',
+        );
+
+        // Assert
+        static::assertTrue($result);
+    }
+
+    public function testPrepareAnnouncementEmailFlushFalsePersistsButDoesNotFlush(): void
+    {
+        // Arrange
+        $recipient = $this->makeUser('user@example.com', 'Alice', 'en');
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist');
+        $emMock->expects($this->never())->method('flush');
+
+        $service = $this->createService(em: $emMock);
+
+        // Act
+        $result = $service->prepareAnnouncementEmail(
+            recipient: $recipient,
+            renderedContent: ['title' => 'Big News', 'content' => '<p>...</p>'],
+            announcementUrl: 'https://example.com/announcement/1',
+            flush: false,
+        );
+
+        // Assert
+        static::assertTrue($result);
+    }
+
+    // ---- prepareAdminNotification ----
+
+    public function testPrepareAdminNotificationEnqueuesWithCorrectContext(): void
+    {
+        // Arrange
+        $recipient = $this->makeUser('admin@example.com', 'Admin', 'en');
+
+        $capturedQueue = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')
+            ->with(static::callback(function (EmailQueue $q) use (&$capturedQueue) {
+                $capturedQueue = $q;
+                return true;
+            }));
+
+        $service = $this->createService(em: $emMock);
+
+        // Act
+        $result = $service->prepareAdminNotification($recipient, '<ul><li>1 pending</li></ul>');
+
+        // Assert
+        static::assertTrue($result);
+        $ctx = $capturedQueue->getContext();
+        static::assertSame('Admin', $ctx['username']);
+        static::assertSame('<ul><li>1 pending</li></ul>', $ctx['sections']);
+        static::assertSame('https://example.com', $ctx['host']);
+        static::assertSame('en', $ctx['lang']);
+    }
+
+    // ---- prepareSupportNotification ----
+
+    public function testPrepareSupportNotificationEnqueuesWithCorrectContextAndSendsToAdmin(): void
+    {
+        // Arrange
+        $request = new SupportRequest();
+        $request->setName('Jane Doe');
+        $request->setEmail('jane@example.com');
+        $request->setMessage('Help me please');
+        $request->setCreatedAt(new DateTimeImmutable('2025-08-01 10:00:00'));
+        $request->setContactType(ContactType::Bug);
+
+        $capturedQueue = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')
+            ->with(static::callback(function (EmailQueue $q) use (&$capturedQueue) {
+                $capturedQueue = $q;
+                return true;
+            }));
+
+        $service = $this->createService(em: $emMock);
+
+        // Act
+        $result = $service->prepareSupportNotification($request);
+
+        // Assert
+        static::assertTrue($result);
+        // Recipient is the admin mailer address (sends to itself)
+        static::assertSame('"email sender" <sender@email.com>', $capturedQueue->getRecipient());
+        $ctx = $capturedQueue->getContext();
+        static::assertSame('Report a bug', $ctx['contactType']);
+        static::assertSame('Jane Doe', $ctx['name']);
+        static::assertSame('jane@example.com', $ctx['email']);
+        static::assertSame('Help me please', $ctx['message']);
+        static::assertSame('2025-08-01 10:00:00', $ctx['createdAt']);
+    }
+
+    // ---- sendQueue() error path ----
+
+    public function testSendQueueTransportExceptionSetsFailedStatusAndReturnsFailedCount(): void
+    {
+        // Arrange
+        $queued = new EmailQueue()
+            ->setSender('"email sender" <sender@email.com>')
+            ->setRecipient('user@example.com')
+            ->setSubject('Fail test')
+            ->setRenderedBody('<p>Body</p>')
+            ->setLang('en')
+            ->setContext([]);
+
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturn([$queued]);
+
+        $exception = new class('Connection refused') extends \RuntimeException implements TransportExceptionInterface {
+            public function getDebug(): string { return ''; }
+            public function appendDebug(string $debug): void {}
+        };
+
+        $mailerStub = $this->createStub(TransportInterface::class);
+        $mailerStub->method('send')->willThrowException($exception);
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())->method('warning');
+
+        $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, logger: $loggerMock);
+
+        // Act
+        $result = $service->sendQueue();
+
+        // Assert
+        static::assertSame('0 (Failed: 1)', $result);
+        static::assertSame(EmailQueueStatus::Failed, $queued->getStatus());
+        static::assertSame('Connection refused', $queued->getErrorMessage());
+    }
+
+    public function testSendQueueMixedResultReturnsCorrectCountAndLogsWarning(): void
+    {
+        // Arrange: 1 good email, 1 failing email
+        $good = new EmailQueue()
+            ->setSender('"email sender" <sender@email.com>')
+            ->setRecipient('good@example.com')
+            ->setSubject('Ok')
+            ->setRenderedBody('<p>Ok</p>')
+            ->setLang('en')
+            ->setContext([]);
+
+        $bad = new EmailQueue()
+            ->setSender('"email sender" <sender@email.com>')
+            ->setRecipient('bad@example.com')
+            ->setSubject('Fail')
+            ->setRenderedBody('<p>Fail</p>')
+            ->setLang('en')
+            ->setContext([]);
+
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturn([$good, $bad]);
+
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('ok-id');
+
+        $exception = new class('Timeout') extends \RuntimeException implements TransportExceptionInterface {
+            public function getDebug(): string { return ''; }
+            public function appendDebug(string $debug): void {}
+        };
+
+        $mailerStub = $this->createStub(TransportInterface::class);
+        $mailerStub->method('send')->willReturnOnConsecutiveCalls($sentMessage, $this->throwException($exception));
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())->method('warning')
+            ->with('Email queue processed with failures', ['sent' => 1, 'failed' => 1]);
+
+        $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, logger: $loggerMock);
+
+        // Act
+        $result = $service->sendQueue();
+
+        // Assert
+        static::assertSame('1 (Failed: 1)', $result);
+    }
+
+    // ---- runCronTask ----
+
+    public function testRunCronTaskWritesQueueCountToOutput(): void
+    {
+        // Arrange: empty queue → count = '0'
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturn([]);
+
+        $outputMock = $this->createMock(OutputInterface::class);
+        $outputMock->expects($this->once())->method('writeln')->with('EmailService: 0');
+
+        $service = $this->createService(mailRepo: $mailRepoStub);
+
+        // Act
+        $service->runCronTask($outputMock);
+    }
+
+    // ---- addToEmailQueue with enrichers ----
+
+    public function testEnricherContextKeyAppearsInPersistedEmailQueue(): void
+    {
+        // Arrange: enricher that injects a custom key
+        $enricher = new class implements EmailContextEnricherInterface {
+            public function enrich(array $context, string $locale): array
+            {
+                $context['custom_key'] = 'enriched_value';
+                return $context;
+            }
+        };
+
+        $capturedQueue = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')
+            ->with(static::callback(function (EmailQueue $q) use (&$capturedQueue) {
+                $capturedQueue = $q;
+                return true;
+            }));
+
+        $service = $this->createService(em: $emMock, enrichers: [$enricher]);
+
+        // Act
+        $service->prepareWelcome($this->makeUser('user@example.com', 'Alice', 'en'));
+
+        // Assert
+        static::assertSame('enriched_value', $capturedQueue->getContext()['custom_key']);
     }
 
     private function createService(
