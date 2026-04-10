@@ -262,6 +262,7 @@ testPrintResults +parameter='':
 [group('testing')]
 testCoverage +parameter='':
     {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml
+    {{PHP}} php bin/console app:badge:generate
     {{PHP}} php bin/console app:test:coverage-report {{parameter}}
 
 # Analyze Page speed in various browsers
