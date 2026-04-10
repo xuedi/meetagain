@@ -102,7 +102,9 @@ jobs:
         run: npm install -g sass
 
       - name: Build assets
-        run: php bin/console sass:build
+        run: |
+          cp assets/styles/_config.scss.dist assets/styles/_config.scss
+          php bin/console sass:build
 
       - name: Setup test environment
         env:
