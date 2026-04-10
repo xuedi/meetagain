@@ -91,7 +91,7 @@ class LoginTest extends WebTestCase
         $this->assertResponseRedirects();
 
         $crawler = $client->followRedirect();
-        static::assertGreaterThan(0, $crawler->filter('.alert')->count(), 'Error alert should be shown');
+        static::assertGreaterThan(0, $crawler->filter('.notification.is-danger')->count(), 'Error alert should be shown');
     }
 
     public function testLoginWithEmptyCredentials(): void

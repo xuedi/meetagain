@@ -34,6 +34,10 @@ security:
                 max_attempts: 10
                 interval: '15 minutes'
 
+    access_decision_manager:
+        strategy: affirmative
+        allow_if_all_abstain: true
+
     access_control:
         - { path: "^/api/auth",   roles: PUBLIC_ACCESS }
         - { path: "^/api/$",      roles: PUBLIC_ACCESS }
