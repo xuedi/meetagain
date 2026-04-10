@@ -45,7 +45,7 @@ jobs:
           echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress --no-scripts
 
       - name: Run unit tests
         run: vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=default --no-coverage
@@ -95,7 +95,7 @@ jobs:
         run: cp config/plugins.dist.php config/plugins.php
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress --no-scripts
 
       - name: Setup test environment
         env:
@@ -139,7 +139,7 @@ jobs:
           cp .env.dist .env
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress --no-scripts
 
       - name: Validate composer
         run: composer validate --strict
