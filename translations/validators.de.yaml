@@ -175,7 +175,7 @@ Error: Fehler
 'You should agree to our terms.': 'Sie müssen unseren Nutzungsbedingungen zustimmen.'
 'Please enter a password': 'Bitte geben Sie ein Passwort ein'
 'Your password should be at least {{ limit }} characters': 'Ihr Passwort muss mindestens {{ limit }} Zeichen lang sein'
-'Language code must be 2 lowercase letters (e.g., en, de, cn)': 'Der Sprachcode muss aus 2 Kleinbuchstaben bestehen (z.B. en, de, cn)'
+'Language code must be 2 lowercase letters (e.g., en, de, zh)': 'Der Sprachcode muss aus 2 Kleinbuchstaben bestehen (z.B. en, de, cn)'
 'Please upload a valid image': 'Bitte laden Sie ein gültiges Bild hoch'
 'Please enter your email address.': 'Bitte geben Sie Ihre E-Mail-Adresse ein.'
 'Please upload a valid image, preferable a square format': 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im quadratischen Format'

@@ -290,7 +290,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::CRYSTAL_LIU,
                 'email' => str_replace(' ', '.', self::CRYSTAL_LIU) . '@example.org',
                 'password' => '1234',
@@ -377,7 +377,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::ADEM_LANE,
                 'email' => str_replace(' ', '.', self::ADEM_LANE) . '@example.org',
                 'password' => null,
@@ -1233,7 +1233,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::BEC_FERGUSON,
                 'email' => str_replace(' ', '.', self::BEC_FERGUSON) . '@example.org',
                 'password' => null,
@@ -1271,7 +1271,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::BELLE_WOODS,
                 'email' => str_replace(' ', '.', self::BELLE_WOODS) . '@example.org',
                 'password' => null,
@@ -2095,7 +2095,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::EVE_LEROY,
                 'email' => str_replace(' ', '.', self::EVE_LEROY) . '@example.org',
                 'password' => null,
@@ -2169,7 +2169,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::FLEUR_COOK,
                 'email' => str_replace(' ', '.', self::FLEUR_COOK) . '@example.org',
                 'password' => null,
@@ -2847,7 +2847,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::JULIUS_VAUGHAN,
                 'email' => str_replace(' ', '.', self::JULIUS_VAUGHAN) . '@example.org',
                 'password' => null,
@@ -3139,7 +3139,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::KORAY_OKUMUS,
                 'email' => str_replace(' ', '.', self::KORAY_OKUMUS) . '@example.org',
                 'password' => null,
@@ -3563,7 +3563,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::LUQMAN_ANTHONY,
                 'email' => str_replace(' ', '.', self::LUQMAN_ANTHONY) . '@example.org',
                 'password' => null,
@@ -3591,7 +3591,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::LYLE_KAUFFMAN,
                 'email' => str_replace(' ', '.', self::LYLE_KAUFFMAN) . '@example.org',
                 'password' => null,
@@ -3831,7 +3831,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::MAXWELL_TAN,
                 'email' => str_replace(' ', '.', self::MAXWELL_TAN) . '@example.org',
                 'password' => null,
@@ -4725,7 +4725,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::RILEY_O_MOORE,
                 'email' => str_replace(' ', '.', self::RILEY_O_MOORE) . '@example.org',
                 'password' => null,
@@ -4757,7 +4757,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::RORY_HUFF,
                 'email' => str_replace(' ', '.', self::RORY_HUFF) . '@example.org',
                 'password' => null,
@@ -4790,7 +4790,7 @@ class UserFixture extends AbstractFixture
                 'restricted' => false,
             ],
             [
-                'language' => 'cn',
+                'language' => 'zh',
                 'name' => self::ROSALEE_MELVIN,
                 'email' => str_replace(' ', '.', self::ROSALEE_MELVIN) . '@example.org',
                 'password' => null,

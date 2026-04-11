@@ -187,7 +187,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 LanguageFixture::CHINESE,
                 CmsBlockType::Text,
                 [
-                    'content' => $this->getText('about_cn'),
+                    'content' => $this->getText('about_zh'),
                 ],
                 null,
             ],
@@ -246,12 +246,12 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 [
                     'headline' => '国际围棋大会',
                     'subHeadline' => '游戏、娱乐和学习',
-                    'text' => $this->getText('index_hero_cn'),
+                    'text' => $this->getText('index_hero_zh'),
                     'buttonLink' => '/register',
                     'buttonText' => '加入我们',
                     'color' => '#0700da',
                 ],
-                'hero-cn.jpg',
+                'hero-zh.jpg',
             ],
             [
                 CmsFixture::INDEX,
@@ -261,7 +261,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                     'headline' => '欢迎光临',
                     'text' => $this->getText('index_events_lorem'),
                 ],
-                'group-cn.jpg',
+                'group-zh.jpg',
             ],
             // ========== Rules Page ==========
             [
@@ -399,7 +399,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 LanguageFixture::CHINESE,
                 CmsBlockType::Gallery,
                 ['title' => '', 'images' => []],
-                'screenshot-cn.png',
+                'screenshot-zh.png',
             ],
         ];
     }

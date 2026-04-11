@@ -28,7 +28,7 @@ class LanguageType extends AbstractType
                 new Length(exactly: 2),
                 new Regex(
                     pattern: '/^[a-z]{2}$/',
-                    message: 'Language code must be 2 lowercase letters (e.g., en, de, cn)',
+                    message: 'Language code must be 2 lowercase letters (e.g., en, de, zh)',
                 ),
             ],
             'disabled' => $options['is_edit'],
