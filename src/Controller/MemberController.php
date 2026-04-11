@@ -170,8 +170,8 @@ final class MemberController extends AbstractController
     {
 
         $user = $this->repo->findOneBy(['id' => $id]);
-        $this->security->login($user);
+        $loginResponse = $this->security->login($user);
 
-        return $this->redirectToRoute('app_member_view', ['id' => $id]);
+        return $loginResponse ?? $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 }
