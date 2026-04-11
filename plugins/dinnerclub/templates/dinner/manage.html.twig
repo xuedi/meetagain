@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Dinner Menu"|trans }} — {{ event.getTitle(app.locale) }}{% endblock %}
+{% block title %}{{ "Dinner Menu"|trans }} - {{ event.getTitle(app.locale) }}{% endblock %}
 
 {% block body %}
     <section class="section">
@@ -32,7 +32,7 @@
 
                 <div class="box" style="border: 1px solid #dbdbdb; box-shadow: none; padding: 2rem 2.5rem;">
                     <p class="has-text-centered has-text-weight-light is-uppercase is-size-7 has-letter-spacing mb-4"
-                       style="letter-spacing: 0.15em; color: #7a7a7a;">— Menu —</p>
+                       style="letter-spacing: 0.15em; color: #7a7a7a;">- Menu -</p>
 
                     {% for course in dinner.courses %}
                         {% if not loop.first %}

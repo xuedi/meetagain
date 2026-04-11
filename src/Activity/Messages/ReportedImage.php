@@ -32,7 +32,7 @@ class ReportedImage extends MessageAbstract
     {
         $text = sprintf('Reported image for reason: %s', ImageReportReason::from($this->meta['reason'])->name);
         if (isset($this->meta['remarks']) && $this->meta['remarks'] !== '') {
-            $text .= sprintf(' — Remarks: %s', $this->meta['remarks']);
+            $text .= sprintf(' - Remarks: %s', $this->meta['remarks']);
         }
 
         return $text;
