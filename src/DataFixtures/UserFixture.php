@@ -179,7 +179,7 @@ class UserFixture extends AbstractFixture
             $user->setStatus($data['status']);
             $user->setName($name);
             $user->setEmail($data['email']);
-            $user->setPassword($data['password'] ? $this->hasher->hashPassword($user, $data['password']) : '');
+            $user->setPassword($this->hasher->hashPassword($user, $data['password'] ?? '1234'));
             $user->setPublic(true);
             $user->setTagging(true);
             $user->setRestricted(false);
