@@ -253,7 +253,7 @@ Translation files live in `translations/`:
 translations/
 ├── messages.en.yaml
 ├── messages.de.yaml
-└── messages.cn.yaml
+└── messages.zh.yaml
 ```
 
 YAML format — quote values that contain special characters:

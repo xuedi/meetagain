@@ -37,7 +37,7 @@ readonly class EmailTemplateService
             EmailType::SupportNotification->value => 'Neue Supportanfrage von {{name}}',
             EmailType::AdminNotification->value => 'Admin: Es gibt Punkte, die deine Aufmerksamkeit erfordern',
         ],
-        'cn' => [
+        'zh' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
             EmailType::Welcome->value => '欢迎！',
             EmailType::PasswordResetRequest->value => '密码重置请求',

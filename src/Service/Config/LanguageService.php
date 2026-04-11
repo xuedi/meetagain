@@ -16,11 +16,6 @@ readonly class LanguageService
     private const string CACHE_KEY_ALL_LANGUAGES = 'language.all_languages';
     private const int CACHE_TTL = 3600;
 
-    /** Maps internal routing codes to their correct BCP 47 language tags for hreflang output. */
-    private const array HREFLANG_CODE_MAP = [
-        'cn' => 'zh',
-    ];
-
     public function __construct(
         private LanguageRepository $languageRepo,
         private TagAwareCacheInterface $appCache,
@@ -165,15 +160,6 @@ readonly class LanguageService
         }
 
         return $filteredCodes[0] ?? 'en'; // First by sort order, or 'en' as absolute fallback
-    }
-
-    /**
-     * Map an internal routing code to its correct BCP 47 language tag for hreflang output.
-     * Internal codes that differ from BCP 47 (e.g. "cn" → "zh") are remapped here.
-     */
-    public function toHreflangCode(string $code): string
-    {
-        return self::HREFLANG_CODE_MAP[$code] ?? $code;
     }
 
     /**

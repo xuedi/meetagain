@@ -15,7 +15,7 @@ interface EmailContextEnricherInterface
      * Enrich the email context before template rendering.
      *
      * @param array<string, mixed> $context Existing context variables
-     * @param string $locale The recipient's locale (e.g. 'en', 'de', 'cn')
+     * @param string $locale The recipient's locale (e.g. 'en', 'de', 'zh')
      * @return array<string, mixed> The enriched context
      */
     public function enrich(array $context, string $locale): array;

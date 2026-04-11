@@ -70,7 +70,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 'Chengdu, Sichuan',
                 'má po tofu',
                 [
-                    'cn' => ['name' => '麻婆豆腐',      'description' => 'Spicy tofu in chili and bean-based sauce. Originated in Chengdu.'],
+                    'zh' => ['name' => '麻婆豆腐',      'description' => 'Spicy tofu in chili and bean-based sauce. Originated in Chengdu.'],
                     'en' => ['name' => 'Mapo Tofu',     'description' => 'Spicy tofu in chili and bean-based sauce.'],
                     'de' => ['name' => 'Mapo Tofu',     'description' => 'Würziger Tofu in Chili- und Bohnensauce.'],
                 ],
@@ -80,7 +80,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 'Guizhou, China',
                 'gōng bǎo jī dīng',
                 [
-                    'cn' => ['name' => '宫保鸡丁',         'description' => 'Diced chicken stir-fried with vegetables, peanuts, dried chilis and soy sauce.'],
+                    'zh' => ['name' => '宫保鸡丁',         'description' => 'Diced chicken stir-fried with vegetables, peanuts, dried chilis and soy sauce.'],
                     'en' => ['name' => 'Kung Pao Chicken', 'description' => 'Diced chicken stir-fried with peanuts and chilis.'],
                     'de' => ['name' => 'Kung Pao Hühnchen','description' => 'Gehacktes Hähnchen mit Erdnüssen und Chilis angebraten.'],
                 ],
@@ -90,7 +90,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 'Shanghai, China',
                 'hóng shāo ròu',
                 [
-                    'cn' => ['name' => '红烧肉',                   'description' => 'Braised pork belly in soy sauce, a classic Chinese comfort food.'],
+                    'zh' => ['name' => '红烧肉',                   'description' => 'Braised pork belly in soy sauce, a classic Chinese comfort food.'],
                     'en' => ['name' => 'Braised Pork Belly',       'description' => 'Tender pork belly braised in soy sauce.'],
                     'de' => ['name' => 'Geschmorter Schweinebauch','description' => 'Zarter Schweinebauch geschmort in Sojasauce.'],
                 ],

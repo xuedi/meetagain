@@ -143,10 +143,10 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => $this->getText('wednesday_meetup_teaser_de'),
                         'description' => $this->getText('wednesday_meetup_description_de'),
                     ],
-                    'cn' => [
+                    'zh' => [
                         'title' => '每周围棋学习小组',
-                        'teaser' => $this->getText('wednesday_meetup_teaser_cn'),
-                        'description' => $this->getText('wednesday_meetup_description_cn'),
+                        'teaser' => $this->getText('wednesday_meetup_teaser_zh'),
+                        'description' => $this->getText('wednesday_meetup_description_zh'),
                     ],
                 ],
                 'comments' => [
@@ -210,7 +210,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => 'Jährliche Stadtmeisterschaft für alle Spielstärken. McMahon-Paarungssystem, 5 Runden.',
                         'description' => 'Nehmen Sie am jährlichen Berliner Go-Turnier teil! Offen für alle Spielstärken mit separaten Divisionen. McMahon-Paarungssystem garantiert faire Spiele. Teilnahmegebühr: 15€ inkl. Mittagessen. Preise für die Top 3 in jeder Division.',
                     ],
-                    'cn' => [
+                    'zh' => [
                         'title' => '2026年柏林围棋锦标赛',
                         'teaser' => '年度城市锦标赛，所有水平均可参加。麦克马洪配对系统，5轮比赛。',
                         'description' => '参加年度柏林围棋锦标赛！对所有水平开放，设有不同组别。麦克马洪配对系统确保公平对局。参赛费：15欧元含午餐。各组别前三名有奖。',
@@ -268,7 +268,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => 'Vollständige Einführung in Go für absolute Anfänger. Kostenlose Veranstaltung, alle Materialien gestellt.',
                         'description' => 'Noch nie Go gespielt? Perfekt! Dieser Workshop deckt die Grundregeln, strategische Grundlagen und Ihre ersten Spiele auf einem 9x9-Brett ab. Unsere zertifizierten Instruktoren führen Sie Schritt für Schritt. Alle Materialien werden gestellt, keine Erfahrung nötig. Kostenlose Veranstaltung!',
                     ],
-                    'cn' => [
+                    'zh' => [
                         'title' => '初学者工作坊：学习围棋',
                         'teaser' => '为零基础初学者提供的完整围棋入门。免费活动，提供所有材料。',
                         'description' => '从未下过围棋？太好了！本工作坊涵盖基本规则、策略基础和您在9路棋盘上的首局对弈。我们的认证教练将逐步指导。提供所有材料，无需经验。免费活动！',
@@ -312,7 +312,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => 'Sehen Sie einen 5-Dan-Spieler gegen mehrere Gegner gleichzeitig antreten. Mit Kommentar!',
                         'description' => 'Erleben Sie die Kraft eines starken Spielers! Unser ansässiger 5-Dan spielt simultane Partien gegen 6 Teilnehmer und liefert Live-Kommentar. Großartige Lernmöglichkeit, um High-Level-Denken zu verstehen. Online über OGS-Plattform.',
                     ],
-                    'cn' => [
+                    'zh' => [
                         'title' => '与5段棋手的在线联棋',
                         'teaser' => '观看5段棋手同时对抗多名对手。包含解说！',
                         'description' => '体验强者的力量！我们的常驻5段棋手将同时与6名参与者对弈，并提供现场解说。这是理解高水平思维的绝佳学习机会。通过OGS平台在线进行。',
@@ -370,7 +370,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => 'Intensives Trainingswochenende in der Natur. Vorträge, Spielanalysen und viel Spielzeit.',
                         'description' => 'Begleiten Sie uns zu einem immersiven Go-Wochenende im schönen Grunewald! Inklusive Unterkunft, Verpflegung, strukturierte Trainingseinheiten, professionelle Vorträge und viel Zeit zum Spielen. Alle Level willkommen. Begrenzt auf 20 Teilnehmer.',
                     ],
-                    'cn' => [
+                    'zh' => [
                         'title' => '周末围棋静修',
                         'teaser' => '在大自然中进行的密集训练周末。讲座、棋局复盘和大量对弈时间。',
                         'description' => '加入我们在美丽的格鲁内瓦尔德森林度过沉浸式围棋周末！包括住宿、餐饮、结构化训练课程、专业讲座和充足的对弈时间。欢迎所有水平。限20名参与者。',
