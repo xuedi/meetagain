@@ -76,7 +76,7 @@ final class SitemapController extends AbstractAdminController
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 ),
                 'locales' => count($locales),
-                'lastmod' => $page->getCreatedAt()?->format('Y-m-d') ?? '—',
+                'lastmod' => $page->getCreatedAt()?->format('Y-m-d') ?? '-',
                 'warnings' => $warnings,
             ];
         }

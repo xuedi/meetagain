@@ -52,7 +52,7 @@
                                         {{ winner.book.title }}
                                     </a>
                                 {% else %}
-                                    <span class="has-text-grey">—</span>
+                                    <span class="has-text-grey">-</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -60,7 +60,7 @@
                                     <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.getTitle('en') }}</a>
                                     <span class="has-text-grey is-size-7">{{ event.start|date('Y-m-d') }}</span>
                                 {% else %}
-                                    <span class="has-text-grey">—</span>
+                                    <span class="has-text-grey">-</span>
                                 {% endif %}
                             </td>
                             <td>{{ poll.suggestions|length }}</td>

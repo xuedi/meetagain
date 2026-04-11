@@ -91,14 +91,14 @@ final class ApiController extends AbstractController
                         'method' => 'POST',
                         'apiPath' => '/api/cms/',
                         'route' => null,
-                        'description' => 'Create page — body: {slug, titles, linkNames}',
+                        'description' => 'Create page - body: {slug, titles, linkNames}',
                         'example' => "curl -X POST HOST/api/cms/ \\\n  -H \"Authorization: Bearer \$TOKEN\" \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"slug\":\"my-page\",\"titles\":{\"en\":\"My Page\",\"de\":\"Meine Seite\"},\"linkNames\":{\"en\":\"My Page\",\"de\":\"Meine Seite\"}}'",
                     ],
                     [
                         'method' => 'PUT',
                         'apiPath' => '/api/cms/{id}',
                         'route' => null,
-                        'description' => 'Update metadata — slug, published, titles, linkNames',
+                        'description' => 'Update metadata - slug, published, titles, linkNames',
                         'example' => "curl -X PUT HOST/api/cms/1 \\\n  -H \"Authorization: Bearer \$TOKEN\" \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"published\":true,\"titles\":{\"en\":\"Updated Title\"}}'",
                     ],
                     [
@@ -131,7 +131,7 @@ final class ApiController extends AbstractController
                         'method' => 'POST',
                         'apiPath' => '/api/cms/{id}/blocks',
                         'route' => null,
-                        'description' => 'Add block — body: {language, type, priority, json}',
+                        'description' => 'Add block - body: {language, type, priority, json}',
                         'example' => "curl -X POST HOST/api/cms/1/blocks \\\n  -H \"Authorization: Bearer \$TOKEN\" \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"language\":\"en\",\"type\":1,\"priority\":1,\"json\":{\"text\":\"Hello World\"}}'",
                     ],
                     [

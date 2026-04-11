@@ -46,7 +46,7 @@
                                     <select id="book_id" name="book_id" required>
                                         <option value="">-- Choose a book --</option>
                                         {% for book in books %}
-                                            <option value="{{ book.id }}">{{ book.title }}{% if book.author %} — {{ book.author }}{% endif %}</option>
+                                            <option value="{{ book.id }}">{{ book.title }}{% if book.author %} - {{ book.author }}{% endif %}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -73,7 +73,7 @@
                             <span class="icon"><i class="fas fa-trophy"></i></span>
                             <strong>Winner: {{ pollResults.winner.book.title }}</strong>
                             {% if pollResults.winner.book.author %}
-                                <span class="has-text-grey"> — {{ pollResults.winner.book.author }}</span>
+                                <span class="has-text-grey"> - {{ pollResults.winner.book.author }}</span>
                             {% endif %}
 
                             {% if not currentSelection %}
