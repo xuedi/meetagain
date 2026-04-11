@@ -96,8 +96,8 @@
 
 {% endblock %}
 
-{% if supportsImage %}
 {% block javascripts %}
+    {% if supportsImage %}
     <script src="{{ asset('js/admin/cms-block-edit.js') }}" defer></script>
+    {% endif %}
 {% endblock %}
-{% endif %}
