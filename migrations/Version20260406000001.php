@@ -14,7 +14,7 @@ final class Version20260406000001 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("UPDATE users SET role = 'USER' WHERE role = 'ORGANIZER'");
+        $this->addSql("UPDATE user SET role = 'USER' WHERE role = 'ORGANIZER'");
     }
 
     public function down(Schema $schema): void
