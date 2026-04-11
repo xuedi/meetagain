@@ -4,7 +4,6 @@ namespace App\Controller\Admin\Settings;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
-use App\Form\SeoSettingsType;
 use App\Form\SettingsType;
 use App\Service\Config\ConfigService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -49,23 +48,6 @@ final class ConfigController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/seo', name: 'app_admin_system_seo', methods: ['GET', 'POST'])]
-    public function seo(Request $request): Response
-    {
-        $form = $this->createForm(SeoSettingsType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->configService->saveSeoForm($form->getData());
-            $this->addFlash('success', 'SEO settings saved');
-        }
-
-        return $this->render('admin/system/seo/index.html.twig', [
-            'active' => 'system',
-            'form' => $form,
-        ]);
-    }
-
     #[Route('/boolean/{name}', name: 'app_admin_system_boolean', methods: ['POST'])]
     public function boolean(Request $request, string $name): Response
     {
@@ -77,5 +59,4 @@ final class ConfigController extends AbstractAdminController
 
         return $this->redirectToRoute('app_admin_system_config');
     }
-
 }
