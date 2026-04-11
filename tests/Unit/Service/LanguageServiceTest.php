@@ -353,4 +353,99 @@ class LanguageServiceTest extends TestCase
         // Assert - Safety fallback: empty intersection returns all enabled codes
         static::assertEquals(['en', 'de'], $result);
     }
+
+    // --- getAltLangList ---
+
+    public function testGetAltLangListReturnsAlternativesExcludingCurrentLocale(): void
+    {
+        // Arrange
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
+        $this->languageFilterService = $this->createStub(LanguageFilterService::class);
+        $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::noFilter());
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act
+        $result = $this->service->getAltLangList('en', '/en/events');
+
+        // Assert
+        static::assertArrayNotHasKey('en', $result);
+        static::assertSame('/de/events', $result['de']);
+        static::assertSame('/zh/events', $result['zh']);
+    }
+
+    public function testGetAltLangListWithZhLocaleReplacesCorrectly(): void
+    {
+        // Arrange — zh locale after DB rename: zh is a first-class code with no mapping needed
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'zh']);
+        $this->languageFilterService = $this->createStub(LanguageFilterService::class);
+        $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::noFilter());
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act
+        $result = $this->service->getAltLangList('zh', '/zh/events');
+
+        // Assert — current locale excluded; en alternative URL uses en prefix
+        static::assertArrayNotHasKey('zh', $result);
+        static::assertSame('/en/events', $result['en']);
+    }
+
+    public function testGetAltLangListReturnsEmptyWhenOnlyOneLocale(): void
+    {
+        // Arrange
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en']);
+        $this->languageFilterService = $this->createStub(LanguageFilterService::class);
+        $this->languageFilterService->method('getLanguageCodeFilter')->willReturn(LanguageFilterResult::noFilter());
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act
+        $result = $this->service->getAltLangList('en', '/en/events');
+
+        // Assert
+        static::assertSame([], $result);
+    }
+
+    // --- replaceUriLanguageCode ---
+
+    public function testReplaceUriLanguageCodeSwapsLocaleInPath(): void
+    {
+        // Arrange
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act & Assert
+        static::assertSame('/zh/events', $this->service->replaceUriLanguageCode('/en/events', 'zh'));
+        static::assertSame('/en/events', $this->service->replaceUriLanguageCode('/zh/events', 'en'));
+    }
+
+    public function testReplaceUriLanguageCodeHandlesLocaleOnlyUri(): void
+    {
+        // Arrange
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'zh']);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act & Assert
+        static::assertSame('/zh/', $this->service->replaceUriLanguageCode('/en/', 'zh'));
+    }
+
+    public function testReplaceUriLanguageCodeReturnsSameWhenNoLocalePrefix(): void
+    {
+        // Arrange
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'zh']);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act & Assert — URI without a known locale prefix is returned unchanged
+        static::assertSame('/some/path', $this->service->replaceUriLanguageCode('/some/path', 'zh'));
+    }
 }

@@ -72,7 +72,7 @@ final readonly class CoreSitemapSubscriber implements EventSubscriberInterface
                 $url = new UrlConcrete($localeUrls[$locale], priority: $routeConfig['priority']);
                 $decorated = new GoogleMultilangUrlDecorator($url);
                 foreach ($localeUrls as $altLocale => $altUrl) {
-                    $decorated->addLink($altUrl, $this->languageService->toHreflangCode($altLocale));
+                    $decorated->addLink($altUrl, $altLocale);
                 }
                 $event->getUrlContainer()->addUrl($decorated, 'static');
             }
@@ -112,7 +112,7 @@ final readonly class CoreSitemapSubscriber implements EventSubscriberInterface
                 $url = new UrlConcrete($localeUrls[$locale], lastmod: $lastmod, priority: 0.7);
                 $decorated = new GoogleMultilangUrlDecorator($url);
                 foreach ($localeUrls as $altLocale => $altUrl) {
-                    $decorated->addLink($altUrl, $this->languageService->toHreflangCode($altLocale));
+                    $decorated->addLink($altUrl, $altLocale);
                 }
                 $event->getUrlContainer()->addUrl($decorated, 'cms');
             }
@@ -144,7 +144,7 @@ final readonly class CoreSitemapSubscriber implements EventSubscriberInterface
                 $url = new UrlConcrete($localeUrls[$locale], lastmod: $lastmod, priority: 0.6);
                 $decorated = new GoogleMultilangUrlDecorator($url);
                 foreach ($localeUrls as $altLocale => $altUrl) {
-                    $decorated->addLink($altUrl, $this->languageService->toHreflangCode($altLocale));
+                    $decorated->addLink($altUrl, $altLocale);
                 }
                 $event->getUrlContainer()->addUrl($decorated, 'events');
             }

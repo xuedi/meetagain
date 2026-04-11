@@ -15,7 +15,7 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
     // Keep constants for backward compatibility in other fixtures
     public const string ENGLISH = 'en';
     public const string GERMAN = 'de';
-    public const string CHINESE = 'cn';
+    public const string CHINESE = 'zh';
 
     /**
      * Curated list of standard languages. Only the 3 original languages are enabled by default.
@@ -26,7 +26,7 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
         // Enabled by default
         ['code' => 'en', 'name' => 'English',    'sortOrder' => 1,  'enabled' => true,  'image' => 'en.jpg'],
         ['code' => 'de', 'name' => 'German',     'sortOrder' => 2,  'enabled' => true,  'image' => 'de.jpg'],
-        ['code' => 'cn', 'name' => 'Chinese',    'sortOrder' => 3,  'enabled' => true,  'image' => 'cn.jpg'],
+        ['code' => 'zh', 'name' => 'Chinese',    'sortOrder' => 3,  'enabled' => true,  'image' => 'zh.jpg'],
 
         // Disabled by default
         ['code' => 'fr', 'name' => 'French',       'sortOrder' => 10],

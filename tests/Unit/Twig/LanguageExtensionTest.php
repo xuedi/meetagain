@@ -100,13 +100,13 @@ class LanguageExtensionTest extends TestCase
 
         $this->languageServiceStub
             ->method('getAltLangList')
-            ->willReturn(['de' => '/de/events', 'cn' => '/cn/events']);
+            ->willReturn(['de' => '/de/events', 'zh' => '/zh/events']);
 
         $result = $this->subject->getAlternativeLanguageCodes();
 
         static::assertSame([
             'de' => 'https://meetagain.local/de/events',
-            'cn' => 'https://meetagain.local/cn/events',
+            'zh' => 'https://meetagain.local/zh/events',
         ], $result);
     }
 
