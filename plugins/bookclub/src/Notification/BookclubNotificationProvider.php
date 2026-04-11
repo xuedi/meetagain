@@ -42,7 +42,7 @@ readonly class BookclubNotificationProvider implements NotificationProviderInter
             $vote = $this->pollService->getUserVote($activePoll->getId(), $user->getId());
             if ($vote === null) {
                 $notifications[] = new NotificationItem(
-                    label: 'Open book poll — cast your vote!',
+                    label: 'Open book poll - cast your vote!',
                     icon: 'fa-vote-yea',
                     route: 'app_plugin_bookclub_poll',
                 );

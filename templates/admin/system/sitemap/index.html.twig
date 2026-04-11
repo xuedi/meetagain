@@ -22,7 +22,7 @@
     {% set warnings_total = urls|filter(u => u.warnings|length > 0)|length %}
     {% if warnings_total > 0 %}
     <div class="notification is-warning is-light mb-4">
-        <strong>{{ warnings_total }}</strong> URL(s) have warnings — check the table below.
+        <strong>{{ warnings_total }}</strong> URL(s) have warnings - check the table below.
     </div>
     {% endif %}
 
