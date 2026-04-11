@@ -55,6 +55,7 @@ class Cms
      * @var Collection<int, CmsBlock>
      */
     #[ORM\OneToMany(targetEntity: CmsBlock::class, mappedBy: 'page', orphanRemoval: true)]
+    #[ORM\OrderBy(['priority' => 'ASC'])]
     private Collection $blocks;
 
     public function __construct()
