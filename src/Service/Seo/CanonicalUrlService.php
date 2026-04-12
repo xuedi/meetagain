@@ -29,7 +29,7 @@ readonly class CanonicalUrlService
 
     public function getCanonicalUrl(Request $request): string
     {
-        $defaultUrl = rtrim($this->configService->getHost(), '/') . $request->getRequestUri();
+        $defaultUrl = rtrim($this->configService->getHost(), '/') . $request->getPathInfo();
 
         foreach ($this->providers as $provider) {
             $override = $provider->getCanonicalUrl($defaultUrl, $request);
