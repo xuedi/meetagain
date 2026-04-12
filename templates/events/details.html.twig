@@ -6,6 +6,7 @@
 {% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
 {% block twitter_image %}{% if event.previewImage %}<meta name="twitter:image" content="{{ json_ld.image[0]|default('') }}"/>{% endif %}{% endblock %}
 {% block json_ld %}<script type="application/ld+json">{{ json_ld|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_PRETTY_PRINT'))|raw }}</script>{% endblock %}
+{% block meta_robots %}{% if event.start < date() %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
 
 
 {% block javascripts %}
