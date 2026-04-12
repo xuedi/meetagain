@@ -14,7 +14,7 @@
                     <p class="subtitle has-text-white">{{ block.subHeadline }}</p>
                     <p>{{ block.text|nl2br }}</p>
                     <p class="pt-5">
-                        <a class="button" href="\{{ app.request.locale }}{{ block.buttonLink }}">{{ block.buttonText }}</a>
+                        <a class="button" href="{{ block.buttonLink }}">{{ block.buttonText }}</a>
                     </p>
                 </div>
                 {% if block.imageRight %}
