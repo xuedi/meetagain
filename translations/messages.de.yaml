@@ -341,6 +341,7 @@ support_tab_reports: 'Bildmeldungen'
 logs_tab_activity: Aktivität
 logs_tab_system: System
 logs_tab_404: '404 Fehler'
+logs_tab_cron: Cron
 system_tab_config: Konfiguration
 system_tab_theme: Design
 system_tab_images: Bilder

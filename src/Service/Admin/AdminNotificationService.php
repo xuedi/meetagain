@@ -3,7 +3,9 @@
 namespace App\Service\Admin;
 
 use App\CronTaskInterface;
+use App\Enum\CronTaskStatus;
 use App\Repository\UserRepository;
+use App\ValueObject\CronTaskResult;
 use App\Service\Config\ConfigService;
 use App\Service\Email\EmailService;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
@@ -36,18 +38,32 @@ readonly class AdminNotificationService implements CronTaskInterface
         private ClockInterface $clock,
     ) {}
 
-    public function runCronTask(OutputInterface $output): void
+    public function getIdentifier(): string
     {
-        $currentHour = (int) $this->clock->now()->format('H');
-        if ($currentHour < 7 || $currentHour >= 22) {
-            $output->writeln('Admin notifications skipped: outside allowed hours (07:00-22:00)');
+        return 'admin-notifications';
+    }
 
-            return;
+    public function runCronTask(OutputInterface $output): CronTaskResult
+    {
+        try {
+            $currentHour = (int) $this->clock->now()->format('H');
+            if ($currentHour < 7 || $currentHour >= 22) {
+                $message = 'skipped: outside allowed hours (07:00-22:00)';
+                $output->writeln('Admin notifications ' . $message);
+
+                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+            }
+
+            $result = $this->processNotification();
+            $output->writeln('Admin notifications: ' . $result);
+            $this->logger->info('Admin notifications processed', ['result' => $result]);
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $result);
+        } catch (\Throwable $e) {
+            $output->writeln('AdminNotificationService exception: ' . $e->getMessage());
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
         }
-
-        $result = $this->processNotification();
-        $output->writeln('Admin notifications: ' . $result);
-        $this->logger->info('Admin notifications processed', ['result' => $result]);
     }
 
     public function processNotification(): string
