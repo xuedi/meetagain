@@ -437,3 +437,5 @@ language_fy: Frisian
 'support.sidebar.bullet2': 'Technical issues with the site'
 'support.sidebar.bullet3': 'Privacy and data requests'
 'support.response_time': 'We usually respond within 2 working days.'
+meta_description_cookie: 'Manage your cookie preferences for this site. Control which optional features are enabled.'
+meta_description_events_featured: 'Handpicked special events and highlights from our community. Discover featured meetups worth attending.'
