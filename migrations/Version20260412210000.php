@@ -16,8 +16,8 @@ final class Version20260412210000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("INSERT INTO config (name, value, type) VALUES ('send_event_reminders', 'false', 'Boolean')");
-        $this->addSql("INSERT INTO config (name, value, type) VALUES ('send_upcoming_digest', 'false', 'Boolean')");
+        $this->addSql("INSERT INTO config (name, value, type) VALUES ('send_event_reminders', 'false', 'boolean')");
+        $this->addSql("INSERT INTO config (name, value, type) VALUES ('send_upcoming_digest', 'false', 'boolean')");
     }
 
     public function down(Schema $schema): void
