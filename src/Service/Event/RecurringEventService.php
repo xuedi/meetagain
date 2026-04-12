@@ -2,7 +2,9 @@
 
 namespace App\Service\Event;
 
+use App\CronTaskInterface;
 use App\Entity\Event;
+use App\Enum\CronTaskStatus;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
 use App\Entity\EventTranslation;
@@ -10,13 +12,15 @@ use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Repository\EventRepository;
 use App\Service\Cms\CmsPageCacheService;
+use App\ValueObject\CronTaskResult;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use RRule\RRule;
+use Symfony\Component\Console\Output\OutputInterface;
 
-readonly class RecurringEventService
+readonly class RecurringEventService implements CronTaskInterface
 {
     public function __construct(
         private EventRepository $repo,
@@ -25,7 +29,19 @@ readonly class RecurringEventService
         private CmsPageCacheService $cmsPageCacheService,
     ) {}
 
-    public function extentRecurringEvents(): void
+    public function getIdentifier(): string
+    {
+        return 'recurring-events';
+    }
+
+    public function runCronTask(OutputInterface $output): CronTaskResult
+    {
+        $count = $this->extentRecurringEvents();
+
+        return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $count . ' events extended');
+    }
+
+    public function extentRecurringEvents(): int
     {
         $eventIds = array_map(static fn(Event $e) => $e->getId(), $this->repo->findAllRecurring());
 
@@ -43,6 +59,8 @@ readonly class RecurringEventService
                 $this->cmsPageCacheService->invalidatePage($pageId);
             }
         }
+
+        return $totalCreated;
     }
 
     public function updateRecurringEvents(Event $event): int

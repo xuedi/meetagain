@@ -44,11 +44,6 @@ readonly class EventService
         return $this->structureList($result);
     }
 
-    public function extentRecurringEvents(): void
-    {
-        $this->recurringEventService->extentRecurringEvents();
-    }
-
     public function updateRecurringEvents(Event $event): int
     {
         return $this->recurringEventService->updateRecurringEvents($event);

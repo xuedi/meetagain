@@ -317,27 +317,6 @@ class EventServiceTest extends TestCase
         static::assertTrue($event->isCanceled());
     }
 
-    public function testExtentRecurringEventsCallsRecurringService(): void
-    {
-        // Arrange: create mock that verifies call to recurring service
-        $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock->expects($this->once())->method('extentRecurringEvents');
-
-        $subject = new EventService(
-            repo: $this->createStub(EventRepository::class),
-            em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
-            pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $recurringServiceMock,
-            plugins: [],
-        );
-
-        // Act
-        $subject->extentRecurringEvents();
-
-        // Assert: verified through mock expectations
-    }
-
     public function testUpdateRecurringEventsWithChildUpdatesParent(): void
     {
         // Arrange: create child event with parent reference
@@ -386,24 +365,4 @@ class EventServiceTest extends TestCase
         static::assertSame(0, $subject->updateRecurringEvents($child));
     }
 
-    public function testExtentRecurringEventsWithBiMonthly(): void
-    {
-        // Arrange: create mock that verifies call to recurring service
-        $recurringServiceMock = $this->createMock(RecurringEventService::class);
-        $recurringServiceMock->expects($this->once())->method('extentRecurringEvents');
-
-        $subject = new EventService(
-            repo: $this->createStub(EventRepository::class),
-            em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
-            pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $recurringServiceMock,
-            plugins: [],
-        );
-
-        // Act
-        $subject->extentRecurringEvents();
-
-        // Assert: verified through mock expectations
-    }
 }
