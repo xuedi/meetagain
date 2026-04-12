@@ -23,7 +23,7 @@
                 </div>
                 {% if card.buttonText %}
                     <footer class="card-footer">
-                        <a href="/{{ app.request.locale }}{{ card.buttonLink }}"
+                        <a href="{{ card.buttonLink }}"
                            class="card-footer-item">
                             {{ card.buttonText }}
                         </a>
