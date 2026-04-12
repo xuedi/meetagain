@@ -90,6 +90,9 @@ class Event
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $rsvpNotificationSentAt = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $eventReminderSentAt = null;
+
     public function __construct()
     {
         $this->host = new ArrayCollection();
@@ -467,6 +470,18 @@ class Event
     public function setRsvpNotificationSentAt(?DateTimeImmutable $rsvpNotificationSentAt): static
     {
         $this->rsvpNotificationSentAt = $rsvpNotificationSentAt;
+
+        return $this;
+    }
+
+    public function getEventReminderSentAt(): ?DateTimeImmutable
+    {
+        return $this->eventReminderSentAt;
+    }
+
+    public function setEventReminderSentAt(?DateTimeImmutable $eventReminderSentAt): static
+    {
+        $this->eventReminderSentAt = $eventReminderSentAt;
 
         return $this;
     }

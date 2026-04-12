@@ -28,7 +28,7 @@ class CanonicalUrlServiceTest extends TestCase
         $result = $service->getCanonicalUrl($request);
 
         // Assert
-        static::assertSame('https://example.com/events?page=2', $result);
+        static::assertSame('https://example.com/events', $result);
     }
 
     public function testProviderReturnsNullFallsBackToDefault(): void

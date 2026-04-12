@@ -363,6 +363,8 @@ page_title_CMD: CMS
 config_option_show_frontpage: 显示在首页
 config_option_automatic_registration: 自动注册
 config_option_send_rsvp_notifications: 发送RSVP通知
+config_option_send_event_reminders: 活动提醒邮件
+config_option_send_upcoming_digest: 每周摘要邮件
 config_option_email_delivery_sync_enabled: 邮件投递状态同步
 menu_admin_translation_edit: 编辑
 menu_admin_translation_extract: 搜索
