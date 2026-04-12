@@ -3,7 +3,9 @@
 namespace App\Service\Email\Provider;
 
 use App\CronTaskInterface;
+use App\Enum\CronTaskStatus;
 use App\Repository\EmailQueueRepository;
+use App\ValueObject\CronTaskResult;
 use App\Service\Config\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -46,18 +48,32 @@ final readonly class EmailDeliveryStatusSyncService implements CronTaskInterface
         return SyncResult::success($updated, count($emails));
     }
 
-    public function runCronTask(OutputInterface $output): void
+    public function getIdentifier(): string
     {
-        if (!$this->configService->isEmailDeliverySyncEnabled()) {
-            return;
+        return 'email-delivery-sync';
+    }
+
+    public function runCronTask(OutputInterface $output): CronTaskResult
+    {
+        try {
+            if (!$this->configService->isEmailDeliverySyncEnabled()) {
+                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'disabled');
+            }
+
+            $result = $this->syncPending(100);
+
+            if (!$result->available) {
+                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'provider unavailable');
+            }
+
+            $message = sprintf('%d/%d synced', $result->updated, $result->checked);
+            $output->writeln('EmailDeliveryStatusSyncService: ' . $message);
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+        } catch (\Throwable $e) {
+            $output->writeln('EmailDeliveryStatusSyncService exception: ' . $e->getMessage());
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
         }
-
-        $result = $this->syncPending(100);
-
-        if (!$result->available) {
-            return;
-        }
-
-        $output->writeln(sprintf('EmailDeliveryStatusSyncService: %d/%d synced', $result->updated, $result->checked));
     }
 }

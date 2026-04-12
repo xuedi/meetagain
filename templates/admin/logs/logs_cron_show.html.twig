@@ -1,0 +1,74 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/logs/_tabs_navigation.html.twig' with {'activeLog': activeLog} %}
+
+        <div class="box">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <strong>{{ log.runAt | date('Y-m-d H:i:s') }}</strong>
+                    </div>
+                    <div class="level-item">
+                        {% if log.status.value == 'ok' %}
+                            <span class="tag is-success is-medium">ok</span>
+                        {% elseif log.status.value == 'warning' %}
+                            <span class="tag is-warning is-medium">warning</span>
+                        {% elseif log.status.value == 'error' %}
+                            <span class="tag is-danger is-medium">error</span>
+                        {% else %}
+                            <span class="tag is-danger is-dark is-medium">exception</span>
+                        {% endif %}
+                    </div>
+                    <div class="level-item has-text-grey">
+                        {{ log.durationMs }} ms total
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <a href="{{ path('app_admin_cron_log') }}" class="button is-small">
+                            <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
+                            <span>Back</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for task in log.tasks %}
+                <tr>
+                    <td><code>{{ task.identifier }}</code></td>
+                    <td>
+                        {% if task.status == 'ok' %}
+                            <span class="tag is-success">ok</span>
+                        {% elseif task.status == 'warning' %}
+                            <span class="tag is-warning">warning</span>
+                        {% elseif task.status == 'error' %}
+                            <span class="tag is-danger">error</span>
+                        {% else %}
+                            <span class="tag is-danger is-dark">exception</span>
+                        {% endif %}
+                    </td>
+                    <td class="has-text-grey">{{ task.duration_ms }} ms</td>
+                    <td>{{ task.message }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/logs/_tabs_navigation.html.twig' with {'activeLog': activeLog} %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Run At</th>
+                <th>Status</th>
+                <th>Tasks</th>
+                <th>Duration</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.runAt | date('Y-m-d H:i:s') }}</td>
+                    <td>
+                        {% if log.status.value == 'ok' %}
+                            <span class="tag is-success">ok</span>
+                        {% elseif log.status.value == 'warning' %}
+                            <span class="tag is-warning">warning</span>
+                        {% elseif log.status.value == 'error' %}
+                            <span class="tag is-danger">error</span>
+                        {% else %}
+                            <span class="tag is-danger is-dark">exception</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ log.tasks | length }}</td>
+                    <td class="has-text-grey">{{ log.durationMs }} ms</td>
+                    <td>
+                        <a href="{{ path('app_admin_cron_log_show', {'id': log.id}) }}">
+                            <span class="icon"><i class="fa fa-eye"></i></span>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="has-text-grey has-text-centered">No cron logs yet.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

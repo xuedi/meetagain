@@ -341,6 +341,7 @@ support_tab_reports: 'Image Reports'
 logs_tab_activity: Activity
 logs_tab_system: System
 logs_tab_404: '404 errors'
+logs_tab_cron: Cron
 system_tab_config: Config
 system_tab_theme: Theme
 system_tab_images: Images
