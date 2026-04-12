@@ -212,6 +212,46 @@ readonly class EmailService implements CronTaskInterface
         return $this->addToEmailQueue($email, EmailType::SupportNotification);
     }
 
+    public function prepareEventReminder(User $recipient, Event $event): bool
+    {
+        $language = $recipient->getLocale();
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $recipient->getEmail());
+        $email->locale($language);
+        $email->context([
+            'username' => $recipient->getName(),
+            'eventTitle' => $event->getTitle($language),
+            'eventLocation' => $event->getLocation()?->getName() ?? '',
+            'eventDate' => $event->getStart()->format('Y-m-d'),
+            'eventTime' => $event->getStart()->format('H:i'),
+            'eventId' => $event->getId(),
+            'host' => $this->config->getHost(),
+            'lang' => $language,
+        ]);
+
+        return $this->addToEmailQueue($email, EmailType::EventReminder);
+    }
+
+    public function prepareUpcomingEvents(User $recipient, string $eventsHtml): bool
+    {
+        $language = $recipient->getLocale();
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $recipient->getEmail());
+        $email->locale($language);
+        $email->context([
+            'username' => $recipient->getName(),
+            'eventsHtml' => $eventsHtml,
+            'host' => $this->config->getHost(),
+            'lang' => $language,
+        ]);
+
+        return $this->addToEmailQueue($email, EmailType::UpcomingEvents);
+    }
+
     public function getMockEmailList(): array
     {
         return [
@@ -302,6 +342,28 @@ readonly class EmailService implements CronTaskInterface
                 'context' => [
                     'username' => 'Admin User',
                     'sections' => '<h3>Users Pending Approval</h3><ul><li>Jane Smith (jane@example.org)</li></ul>',
+                    'host' => 'https://localhost',
+                    'lang' => 'en',
+                ],
+            ],
+            EmailType::EventReminder->value => [
+                'subject' => 'Reminder: Go tournament afterparty is today',
+                'context' => [
+                    'username' => 'John Doe',
+                    'eventTitle' => 'Go tournament afterparty',
+                    'eventLocation' => 'NightBar 64',
+                    'eventDate' => '2025-01-01',
+                    'eventTime' => '19:00',
+                    'eventId' => 1,
+                    'host' => 'https://localhost',
+                    'lang' => 'en',
+                ],
+            ],
+            EmailType::UpcomingEvents->value => [
+                'subject' => 'Upcoming events this week',
+                'context' => [
+                    'username' => 'John Doe',
+                    'eventsHtml' => '<div style="margin-bottom:16px;padding:12px;border:1px solid #ddd;"><p><b>Go tournament afterparty</b></p><p>2025-01-01 19:00 - NightBar 64</p><p><a href="https://localhost/en/event/1">More Info</a> &nbsp; <a href="https://localhost/en/event/1#rsvp">I Want to Go</a></p></div>',
                     'host' => 'https://localhost',
                     'lang' => 'en',
                 ],

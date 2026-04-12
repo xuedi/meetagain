@@ -6,6 +6,7 @@ use App\Entity\Cms;
 use App\Entity\Event;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Seo\IndexNowService;
@@ -19,6 +20,7 @@ class IndexNowServiceTest extends TestCase
 {
     private function makeService(
         ?ConfigService $configService = null,
+        ?AppStateService $appStateService = null,
         ?HttpClientInterface $httpClient = null,
         ?UrlGeneratorInterface $urlGenerator = null,
         ?LanguageService $languageService = null,
@@ -31,6 +33,7 @@ class IndexNowServiceTest extends TestCase
 
         return new IndexNowService(
             configService: $configStub,
+            appStateService: $appStateService ?? $this->createStub(AppStateService::class),
             httpClient: $httpClient ?? $this->createStub(HttpClientInterface::class),
             urlGenerator: $urlGenerator ?? $this->createStub(UrlGeneratorInterface::class),
             languageService: $languageStub,
@@ -203,10 +206,7 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         $configStub = $this->createStub(ConfigService::class);
-        $configStub->method('getString')->willReturnMap([
-            ['indexnow_key', '', 'abc123def456abc1'],
-            ['indexnow_last_submitted', '', ''],
-        ]);
+        $configStub->method('getString')->willReturn('abc123def456abc1');
         $configStub->method('getHost')->willReturn('https://example.com');
 
         $responseMock = $this->createStub(ResponseInterface::class);
@@ -255,10 +255,10 @@ class IndexNowServiceTest extends TestCase
     public function testGetLastSubmittedAtReturnsNullWhenNeverSubmitted(): void
     {
         // Arrange
-        $configStub = $this->createStub(ConfigService::class);
-        $configStub->method('getString')->willReturn('');
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn(null);
 
-        $service = $this->makeService(configService: $configStub);
+        $service = $this->makeService(appStateService: $appStateStub);
 
         // Act
         $result = $service->getLastSubmittedAt();
@@ -271,10 +271,10 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         $timestamp = '2026-04-11T10:00:00+00:00';
-        $configStub = $this->createStub(ConfigService::class);
-        $configStub->method('getString')->willReturn($timestamp);
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn($timestamp);
 
-        $service = $this->makeService(configService: $configStub);
+        $service = $this->makeService(appStateService: $appStateStub);
 
         // Act
         $result = $service->getLastSubmittedAt();
@@ -287,15 +287,15 @@ class IndexNowServiceTest extends TestCase
     public function testRecordSubmissionPersistsIso8601Timestamp(): void
     {
         // Arrange
-        $configMock = $this->createMock(ConfigService::class);
-        $configMock->expects($this->once())
-            ->method('setString')
+        $appStateMock = $this->createMock(AppStateService::class);
+        $appStateMock->expects($this->once())
+            ->method('set')
             ->with(
-                'indexnow_last_submitted',
+                'seo_indexnow_last_submit',
                 static::matchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/'),
             );
 
-        $service = $this->makeService(configService: $configMock);
+        $service = $this->makeService(appStateService: $appStateMock);
 
         // Act
         $service->recordSubmission();

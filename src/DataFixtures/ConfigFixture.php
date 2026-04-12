@@ -66,6 +66,16 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 ConfigType::Boolean,
             ],
             [
+                'send_event_reminders',
+                'true',
+                ConfigType::Boolean,
+            ],
+            [
+                'send_upcoming_digest',
+                'true',
+                ConfigType::Boolean,
+            ],
+            [
                 'email_sender_mail',
                 'email@localhost',
                 ConfigType::String,

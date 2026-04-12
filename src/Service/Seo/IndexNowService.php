@@ -4,6 +4,7 @@ namespace App\Service\Seo;
 
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
@@ -13,11 +14,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 readonly class IndexNowService
 {
     private const string CONFIG_KEY = 'indexnow_key';
-    private const string CONFIG_LAST_SUBMITTED = 'indexnow_last_submitted';
+    private const string STATE_KEY_LAST_SUBMIT = 'seo_indexnow_last_submit';
     private const string INDEXNOW_ENDPOINT = 'https://api.indexnow.org/IndexNow';
 
     public function __construct(
         private ConfigService $configService,
+        private AppStateService $appStateService,
         private HttpClientInterface $httpClient,
         private UrlGeneratorInterface $urlGenerator,
         private LanguageService $languageService,
@@ -119,9 +121,9 @@ readonly class IndexNowService
 
     public function getLastSubmittedAt(): ?DateTimeImmutable
     {
-        $value = $this->configService->getString(self::CONFIG_LAST_SUBMITTED, '');
+        $value = $this->appStateService->get(self::STATE_KEY_LAST_SUBMIT);
 
-        if ($value === '') {
+        if ($value === null || $value === '') {
             return null;
         }
 
@@ -132,8 +134,8 @@ readonly class IndexNowService
 
     public function recordSubmission(): void
     {
-        $this->configService->setString(
-            self::CONFIG_LAST_SUBMITTED,
+        $this->appStateService->set(
+            self::STATE_KEY_LAST_SUBMIT,
             (new DateTimeImmutable('now'))->format(DateTimeImmutable::ATOM),
         );
     }

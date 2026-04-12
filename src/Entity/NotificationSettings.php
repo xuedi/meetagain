@@ -13,6 +13,10 @@ class NotificationSettings implements JsonSerializable
 
     public bool $receivedMessage;
 
+    public bool $eventReminder;
+
+    public bool $upcomingEvents;
+
     public static function fromJson(?array $notificationSettings): self
     {
         if ($notificationSettings === null) {
@@ -27,6 +31,8 @@ class NotificationSettings implements JsonSerializable
         $this->announcements = $data['announcements'] ?? true;
         $this->followingUpdates = $data['followingUpdates'] ?? true;
         $this->receivedMessage = $data['receivedMessage'] ?? true;
+        $this->eventReminder = $data['eventReminder'] ?? true;
+        $this->upcomingEvents = $data['upcomingEvents'] ?? true;
     }
 
     public function jsonSerialize(): array
@@ -35,6 +41,8 @@ class NotificationSettings implements JsonSerializable
             'announcements' => $this->announcements,
             'followingUpdates' => $this->followingUpdates,
             'receivedMessage' => $this->receivedMessage,
+            'eventReminder' => $this->eventReminder,
+            'upcomingEvents' => $this->upcomingEvents,
         ];
     }
 
@@ -56,6 +64,16 @@ class NotificationSettings implements JsonSerializable
                 'value' => $this->receivedMessage,
                 'label' => '--> When i received a message',
             ],
+            [
+                'key' => 'eventReminder',
+                'value' => $this->eventReminder,
+                'label' => 'Event day reminder',
+            ],
+            [
+                'key' => 'upcomingEvents',
+                'value' => $this->upcomingEvents,
+                'label' => 'Weekly upcoming events',
+            ],
         ];
     }
 
@@ -71,6 +89,12 @@ class NotificationSettings implements JsonSerializable
             case 'receivedMessage':
                 $this->receivedMessage = !$this->receivedMessage;
                 break;
+            case 'eventReminder':
+                $this->eventReminder = !$this->eventReminder;
+                break;
+            case 'upcomingEvents':
+                $this->upcomingEvents = !$this->upcomingEvents;
+                break;
             default:
                 throw new Exception(sprintf("Invalid type: '%s'", $type));
         }
@@ -84,6 +108,8 @@ class NotificationSettings implements JsonSerializable
             'announcements' => $this->announcements,
             'followingUpdates' => $this->followingUpdates,
             'receivedMessage' => $this->receivedMessage,
+            'eventReminder' => $this->eventReminder,
+            'upcomingEvents' => $this->upcomingEvents,
             default => throw new Exception(sprintf("Invalid type: '%s'", $type)),
         };
     }
