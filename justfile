@@ -153,7 +153,7 @@ devModeFixtures plugins='':
     {{PHP}} php bin/console app:plugin:pre-fixtures
     {{PHP}} php bin/console app:fixtures:load -q --append --group=plugin
     {{PHP}} php bin/console app:plugin:post-fixtures
-    {{PHP}} php bin/console app:event:extent
+    {{JUST}} appCron
     {{PHP}} php bin/console app:event:add-fixture
     {{JUST}} appClearCache
 

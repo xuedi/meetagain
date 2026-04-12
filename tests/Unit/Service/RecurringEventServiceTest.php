@@ -4,6 +4,7 @@ namespace Tests\Unit\Service;
 
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
+use App\Enum\CronTaskStatus;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
 use App\Repository\EventRepository;
@@ -13,6 +14,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Output\OutputInterface;
 use Tests\Unit\Stubs\EventStub;
 
 class RecurringEventServiceTest extends TestCase
@@ -37,6 +39,24 @@ class RecurringEventServiceTest extends TestCase
             entityActionDispatcher: $this->createStub(EntityActionDispatcher::class),
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
         );
+    }
+
+    // ---- runCronTask ----
+
+    public function testRunCronTaskReturnsOkResult(): void
+    {
+        // Arrange
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findAllRecurring')->willReturn([]);
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        // Act
+        $result = $service->runCronTask($this->createStub(OutputInterface::class));
+
+        // Assert
+        static::assertSame('recurring-events', $result->identifier);
+        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame('0 events extended', $result->message);
     }
 
     // ---- updateRecurringEvents: early-return cases (data provider) ----
