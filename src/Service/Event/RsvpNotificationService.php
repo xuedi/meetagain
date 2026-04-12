@@ -13,21 +13,15 @@ use App\Service\Email\EmailService;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class RsvpNotificationService implements CronTaskInterface
 {
-    private const int THIRTY_DAYS = 2592000;
-
     public function __construct(
         private EventRepository $eventRepo,
         private EmailService $emailService,
-        private TagAwareCacheInterface $appCache,
         private ConfigService $configService,
         private LoggerInterface $logger,
         private EntityManagerInterface $entityManager,
@@ -130,10 +124,6 @@ readonly class RsvpNotificationService implements CronTaskInterface
             $followedAttendees = $data['attendees'];
 
             $this->emailService->prepareAggregatedRsvpNotification($recipient, $followedAttendees, $event);
-
-            foreach ($followedAttendees as $attendee) {
-                $this->markNotificationSent($recipient, $attendee, $event);
-            }
             ++$sentCount;
         }
 
@@ -154,39 +144,6 @@ readonly class RsvpNotificationService implements CronTaskInterface
             return false;
         }
 
-        return !$this->wasNotificationSent($recipient, $attendee, $event);
-    }
-
-    private function wasNotificationSent(User $recipient, User $attendee, Event $event): bool
-    {
-        $key = $this->getCacheKey($recipient, $attendee, $event);
-        try {
-            return (bool) $this->appCache->get($key, static fn(ItemInterface $item) => false);
-        } catch (InvalidArgumentException) {
-            return false;
-        }
-    }
-
-    private function markNotificationSent(User $recipient, User $attendee, Event $event): void
-    {
-        $key = $this->getCacheKey($recipient, $attendee, $event);
-        try {
-            $this->appCache->get(
-                $key,
-                static function (ItemInterface $item) {
-                    $item->expiresAfter(self::THIRTY_DAYS);
-
-                    return true;
-                },
-                beta: INF,
-            ); // beta: INF forces the callback to run and save the new value
-        } catch (InvalidArgumentException $e) {
-            $this->logger->debug('Cache write failure for RSVP notification tracking - non-critical', ['exception' => $e]);
-        }
-    }
-
-    private function getCacheKey(User $recipient, User $attendee, Event $event): string
-    {
-        return sprintf('rsvp_following_notif_%s_%s_%s', $recipient->getId(), $attendee->getId(), $event->getId());
+        return true;
     }
 }
