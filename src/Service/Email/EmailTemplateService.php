@@ -25,6 +25,8 @@ readonly class EmailTemplateService
             EmailType::Announcement->value => '{{title}}',
             EmailType::SupportNotification->value => 'New Support Request from {{name}}',
             EmailType::AdminNotification->value => 'Admin: Items require your attention',
+            EmailType::EventReminder->value => 'Reminder: {{eventTitle}} is today',
+            EmailType::UpcomingEvents->value => 'Upcoming events this week',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -36,6 +38,8 @@ readonly class EmailTemplateService
             EmailType::Announcement->value => '{{title}}',
             EmailType::SupportNotification->value => 'Neue Supportanfrage von {{name}}',
             EmailType::AdminNotification->value => 'Admin: Es gibt Punkte, die deine Aufmerksamkeit erfordern',
+            EmailType::EventReminder->value => 'Erinnerung: {{eventTitle}} ist heute',
+            EmailType::UpcomingEvents->value => 'Deine Veranstaltungen diese Woche',
         ],
         'zh' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -47,6 +51,8 @@ readonly class EmailTemplateService
             EmailType::Announcement->value => '{{title}}',
             EmailType::SupportNotification->value => '{{name}} 的新支持请求',
             EmailType::AdminNotification->value => '管理员：有事项需要您处理',
+            EmailType::EventReminder->value => '提醒：{{eventTitle}} 就在今天',
+            EmailType::UpcomingEvents->value => '本周即将举行的活动',
         ],
     ];
 
@@ -98,6 +104,12 @@ readonly class EmailTemplateService
             'host',
             'lang',
             'greeting',
+        ],
+        EmailType::EventReminder->value => [
+            'username', 'eventTitle', 'eventLocation', 'eventDate', 'eventTime', 'eventId', 'host', 'lang', 'greeting',
+        ],
+        EmailType::UpcomingEvents->value => [
+            'username', 'eventsHtml', 'host', 'lang', 'greeting',
         ],
     ];
 
@@ -200,6 +212,16 @@ readonly class EmailTemplateService
                 'subject' => $subjects[EmailType::AdminNotification->value],
                 'body' => $this->loadTemplateBody(EmailType::AdminNotification, $language),
                 'variables' => self::VARIABLES[EmailType::AdminNotification->value],
+            ],
+            EmailType::EventReminder->value => [
+                'subject' => $subjects[EmailType::EventReminder->value],
+                'body' => $this->loadTemplateBody(EmailType::EventReminder, $language),
+                'variables' => self::VARIABLES[EmailType::EventReminder->value],
+            ],
+            EmailType::UpcomingEvents->value => [
+                'subject' => $subjects[EmailType::UpcomingEvents->value],
+                'body' => $this->loadTemplateBody(EmailType::UpcomingEvents, $language),
+                'variables' => self::VARIABLES[EmailType::UpcomingEvents->value],
             ],
         ];
     }

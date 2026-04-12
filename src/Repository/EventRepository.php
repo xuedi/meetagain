@@ -133,6 +133,63 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Find events starting within $from to $to that have RSVP attendees
+     * and have not yet had a reminder sent.
+     *
+     * @return array<Event>
+     */
+    public function findEventsNeedingReminder(DateTimeInterface $from, DateTimeInterface $to): array
+    {
+        return $this
+            ->createQueryBuilder('e')
+            ->innerJoin('e.rsvp', 'r')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.start BETWEEN :from AND :to')
+            ->andWhere('e.eventReminderSentAt IS NULL')
+            ->andWhere('e.canceled = :notCanceled')
+            ->andWhere('e.status IN (:statuses)')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setParameter('notCanceled', false)
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->groupBy('e.id')
+            ->orderBy('e.start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find upcoming events within a date range that the given user has NOT RSVP'd to.
+     *
+     * @return array<Event>
+     */
+    public function findUpcomingEventsNotRsvpdByUser(
+        DateTimeInterface $from,
+        DateTimeInterface $to,
+        User $user,
+    ): array {
+        return $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l')
+            ->where('e.start BETWEEN :from AND :to')
+            ->andWhere('e.canceled = :notCanceled')
+            ->andWhere('e.status IN (:statuses)')
+            ->andWhere(':user NOT MEMBER OF e.rsvp')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setParameter('notCanceled', false)
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->setParameter('user', $user)
+            ->orderBy('e.start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getEventNameList(string $language): array
     {
         $events = $this

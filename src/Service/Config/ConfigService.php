@@ -132,6 +132,16 @@ readonly class ConfigService
         return $this->getBoolean('email_delivery_sync_enabled', false);
     }
 
+    public function isEventRemindersEnabled(): bool
+    {
+        return $this->getBoolean('send_event_reminders', true);
+    }
+
+    public function isUpcomingDigestEnabled(): bool
+    {
+        return $this->getBoolean('send_upcoming_digest', true);
+    }
+
     public function getDateFormat(): string
     {
         return $this->getString('date_format', 'Y-m-d H:i');
