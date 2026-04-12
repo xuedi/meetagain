@@ -21,7 +21,7 @@
     <div class="buttons has-addons mb-1">
         <span class="button {{ methodColors[method] }} is-light is-static api-method">{{ method }}</span>
         {% if route %}
-            <a class="button is-light api-path" href="{{ path(route) }}">{{ apiPath }}</a>
+            <a class="button is-light api-path" href="{{ path(route) }}" rel="nofollow">{{ apiPath }}</a>
         {% else %}
             <span class="button is-light is-static api-path">{{ apiPath }}</span>
         {% endif %}
