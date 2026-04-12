@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ "event"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
-{% block meta_description %}{{ event.description(app.locale)|striptags|slice(0, 160) ?: (event.title(app.locale) ~ ' - ' ~ event.start|date(get_date_format())) }}{% endblock %}
+{% block meta_description %}{{ event.metaDescription(app.locale, 'meta_description_event_meeting_at'|trans) }}{% endblock %}
 {% block og_type %}event{% endblock %}
 {% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
 {% block twitter_image %}{% if event.previewImage %}<meta name="twitter:image" content="{{ json_ld.image[0]|default('') }}"/>{% endif %}{% endblock %}
