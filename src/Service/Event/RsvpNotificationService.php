@@ -3,7 +3,9 @@
 namespace App\Service\Event;
 
 use App\CronTaskInterface;
+use App\Enum\CronTaskStatus;
 use App\Entity\Event;
+use App\ValueObject\CronTaskResult;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
@@ -32,18 +34,32 @@ readonly class RsvpNotificationService implements CronTaskInterface
         private ClockInterface $clock,
     ) {}
 
-    public function runCronTask(OutputInterface $output): void
+    public function getIdentifier(): string
     {
-        $currentHour = (int) $this->clock->now()->format('H');
-        if ($currentHour < 7 || $currentHour >= 22) {
-            $output->writeln('RSVP notifications skipped: outside allowed hours (07:00-22:00)');
+        return 'rsvp-notifications';
+    }
 
-            return;
+    public function runCronTask(OutputInterface $output): CronTaskResult
+    {
+        try {
+            $currentHour = (int) $this->clock->now()->format('H');
+            if ($currentHour < 7 || $currentHour >= 22) {
+                $message = 'skipped: outside allowed hours (07:00-22:00)';
+                $output->writeln('RSVP notifications ' . $message);
+
+                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+            }
+
+            $result = $this->processUpcomingEvents();
+            $output->writeln('Send RSVP notifications: ' . $result);
+            $this->logger->info('RSVP notifications processed', ['result' => $result]);
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $result);
+        } catch (\Throwable $e) {
+            $output->writeln('RsvpNotificationService exception: ' . $e->getMessage());
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
         }
-
-        $result = $this->processUpcomingEvents();
-        $output->writeln('Send RSVP notifications: ' . $result);
-        $this->logger->info('RSVP notifications processed', ['result' => $result]);
     }
 
     public function processUpcomingEvents(): string

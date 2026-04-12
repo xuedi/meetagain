@@ -4,6 +4,8 @@ namespace App\Service\Email;
 
 use App\CronTaskInterface;
 use App\EmailContextEnricherInterface;
+use App\Enum\CronTaskStatus;
+use App\ValueObject\CronTaskResult;
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
 use App\Entity\Event;
@@ -307,10 +309,24 @@ readonly class EmailService implements CronTaskInterface
         ];
     }
 
-    public function runCronTask(OutputInterface $output): void
+    public function getIdentifier(): string
     {
-        $count = $this->sendQueue();
-        $output->writeln('EmailService: ' . $count);
+        return 'email-queue';
+    }
+
+    public function runCronTask(OutputInterface $output): CronTaskResult
+    {
+        try {
+            $result = $this->sendQueue();
+            $output->writeln('EmailService: ' . $result);
+            $status = str_contains($result, '(Failed:') ? CronTaskStatus::warning : CronTaskStatus::ok;
+
+            return new CronTaskResult($this->getIdentifier(), $status, $result);
+        } catch (\Throwable $e) {
+            $output->writeln('EmailService exception: ' . $e->getMessage());
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+        }
     }
 
     public function sendQueue(): string
