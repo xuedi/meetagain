@@ -67,12 +67,12 @@ class NotificationSettings implements JsonSerializable
             [
                 'key' => 'eventReminder',
                 'value' => $this->eventReminder,
-                'label' => 'Event day reminder',
+                'label' => '--> Event day reminder',
             ],
             [
                 'key' => 'upcomingEvents',
                 'value' => $this->upcomingEvents,
-                'label' => 'Weekly upcoming events',
+                'label' => '--> Weekly upcoming events',
             ],
         ];
     }
