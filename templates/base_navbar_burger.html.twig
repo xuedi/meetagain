@@ -8,7 +8,14 @@
 
     <div class="navbar-start">
         <a class="navbar-item" href="{{ path('app_default') }}">{{ "menu_default" | trans }}</a>
-        <a class="navbar-item" href="/{{ app.locale }}/about">{{ "menu_about" | trans }}</a>
+        {% for menu in get_menu('top') %}
+            {% if menu.slug != 'index' %}
+                <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name }}</a>
+            {% endif %}
+        {% endfor %}
+        {% for pluginLink in get_plugins_links() %}
+            <a class="navbar-item" href="{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
+        {% endfor %}
         <a class="navbar-item" href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a>
         <a class="navbar-item" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
 
