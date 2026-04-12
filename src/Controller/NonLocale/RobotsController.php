@@ -15,7 +15,7 @@ final class RobotsController extends AbstractController
         $sitemapUrl = $request->getSchemeAndHttpHost() . '/sitemap.xml';
 
         return new Response(
-            "User-agent: *\nSitemap: {$sitemapUrl}\n",
+            "User-agent: *\nDisallow: /api/\nSitemap: {$sitemapUrl}\n",
             Response::HTTP_OK,
             ['Content-Type' => 'text/plain'],
         );
