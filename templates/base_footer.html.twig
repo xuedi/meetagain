@@ -54,6 +54,11 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    {% for link in get_plugin_footer_links('col3') %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ link.slug }}"{% if link.slug starts with 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.name | trans }}</a>
+                        </li>
+                    {% endfor %}
                 </ul>
             </div>
             <div class="column is-6-mobile">
