@@ -6,6 +6,7 @@ use App\Entity\Config;
 use App\Enum\ConfigType;
 use App\Enum\ImageType;
 use App\Repository\ConfigRepository;
+use App\Service\AppStateService;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -24,6 +25,7 @@ readonly class ConfigService
         private EntityManagerInterface $em,
         private CacheInterface $cache,
         private KernelInterface $kernel,
+        private AppStateService $appState,
     ) {}
 
     /**
@@ -177,7 +179,7 @@ readonly class ConfigService
 
     public function getFooterColumnTitle(string $column): string
     {
-        return $this->getString('multisite_footer_' . $column . '_title', '');
+        return $this->appState->get('footer_' . $column . '_title') ?? '';
     }
 
     public function saveForm(array $formData): void
@@ -188,10 +190,10 @@ readonly class ConfigService
         $this->setString('email_sender_mail', $formData['senderEmail']);
         $this->setInt('system_user_id', $formData['systemUser']);
         $this->setString('date_format', $formData['dateFormat']);
-        $this->setString('multisite_footer_col1_title', $formData['footerCol1Title'] ?? '');
-        $this->setString('multisite_footer_col2_title', $formData['footerCol2Title'] ?? '');
-        $this->setString('multisite_footer_col3_title', $formData['footerCol3Title'] ?? '');
-        $this->setString('multisite_footer_col4_title', $formData['footerCol4Title'] ?? '');
+        $this->appState->set('footer_col1_title', $formData['footerCol1Title'] ?? '');
+        $this->appState->set('footer_col2_title', $formData['footerCol2Title'] ?? '');
+        $this->appState->set('footer_col3_title', $formData['footerCol3Title'] ?? '');
+        $this->appState->set('footer_col4_title', $formData['footerCol4Title'] ?? '');
     }
 
     public function saveSeoForm(array $formData): void
