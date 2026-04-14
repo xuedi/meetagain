@@ -6,6 +6,7 @@ use App\Entity\Config;
 use App\Enum\ConfigType;
 use App\Enum\ImageType;
 use App\Repository\ConfigRepository;
+use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Generator;
@@ -43,6 +44,7 @@ class ConfigServiceTest extends TestCase
             em: $this->entityManagerStub,
             cache: $this->cacheStub,
             kernel: $this->kernelStub,
+            appState: $this->createStub(AppStateService::class),
         );
     }
 
@@ -235,12 +237,12 @@ class ConfigServiceTest extends TestCase
         $configRepoStub->method('findOneBy')->willReturn(null);
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock->expects($this->exactly(10))->method('persist')->with(static::isInstanceOf(Config::class));
-        $entityManagerMock->expects($this->exactly(10))->method('flush');
+        $entityManagerMock->expects($this->exactly(6))->method('persist')->with(static::isInstanceOf(Config::class));
+        $entityManagerMock->expects($this->exactly(6))->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         $subject->saveForm([
             'url' => 'example.com',
@@ -262,12 +264,12 @@ class ConfigServiceTest extends TestCase
         $configRepoStub->method('findOneBy')->willReturn($existingConfig);
 
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock->expects($this->exactly(10))->method('persist')->with(static::isInstanceOf(Config::class));
-        $entityManagerMock->expects($this->exactly(10))->method('flush');
+        $entityManagerMock->expects($this->exactly(6))->method('persist')->with(static::isInstanceOf(Config::class));
+        $entityManagerMock->expects($this->exactly(6))->method('flush');
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         $subject->saveForm([
             'url' => 'new-example.com',
@@ -370,20 +372,38 @@ class ConfigServiceTest extends TestCase
 
     public function testGetFooterColumnTitleReturnsConfiguredValue(): void
     {
-        // Arrange
-        $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('News'));
+        // Arrange — footer titles are stored in AppStateService, not the config repo
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn('News');
+
+        $subject = new ConfigService(
+            repo: $this->configRepoStub,
+            em: $this->entityManagerStub,
+            cache: $this->cacheStub,
+            kernel: $this->kernelStub,
+            appState: $appStateStub,
+        );
 
         // Act & Assert
-        static::assertSame('News', $this->subject->getFooterColumnTitle('col1'));
+        static::assertSame('News', $subject->getFooterColumnTitle('col1'));
     }
 
     public function testGetFooterColumnTitleReturnsEmptyStringWhenNotConfigured(): void
     {
-        // Arrange
-        $this->configRepoStub->method('findOneBy')->willReturn(null);
+        // Arrange — AppStateService returns null when not set
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn(null);
+
+        $subject = new ConfigService(
+            repo: $this->configRepoStub,
+            em: $this->entityManagerStub,
+            cache: $this->cacheStub,
+            kernel: $this->kernelStub,
+            appState: $appStateStub,
+        );
 
         // Act & Assert
-        static::assertSame('', $this->subject->getFooterColumnTitle('col2'));
+        static::assertSame('', $subject->getFooterColumnTitle('col2'));
     }
 
     // ---- toggleBoolean ----
@@ -405,7 +425,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_some_feature');
 
-        $subject = new ConfigService(repo: $repoMock, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $repoMock, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         // Act
         $result = $subject->toggleBoolean('some_feature');
@@ -430,7 +450,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_some_feature');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         // Act
         $result = $subject->toggleBoolean('some_feature');
@@ -451,6 +471,7 @@ class ConfigServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             cache: $this->createStub(CacheInterface::class),
             kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
         );
 
         // Act & Assert
@@ -475,6 +496,7 @@ class ConfigServiceTest extends TestCase
             em: $emMock,
             cache: $this->createStub(CacheInterface::class),
             kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
         );
 
         // Act
@@ -524,7 +546,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_new_key');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         // Act
         $subject->setString('new_key', 'hello');
@@ -544,7 +566,7 @@ class ConfigServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($existing);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $this->createStub(CacheInterface::class), kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $this->createStub(CacheInterface::class), kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         // Act
         $subject->setString('existing_key', 'new_value');
@@ -570,7 +592,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_count_key');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         // Act
         $subject->setInt('count_key', 7);
@@ -590,7 +612,7 @@ class ConfigServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($existing);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $this->createStub(CacheInterface::class), kernel: $this->createStub(KernelInterface::class));
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $this->createStub(CacheInterface::class), kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class));
 
         // Act
         $subject->setInt('count_key', 99);
@@ -615,6 +637,7 @@ class ConfigServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             cache: $this->createStub(CacheInterface::class),
             kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
         );
 
         // Act
