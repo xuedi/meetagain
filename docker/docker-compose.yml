@@ -52,7 +52,7 @@ services:
   # Redis-compatible cache server
   valkey:
     container_name: "ma-valkey"
-    image: valkey/valkey:latest@sha256:546304417feac0874c3dd576e0952c6bb8f06bb4093ea0c9ca303c73cf458f63
+    image: valkey/valkey:latest@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
     command: valkey-server --save 60 1 --loglevel warning
     volumes:
       - ma-valkey-data:/data
