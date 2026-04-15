@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:9.5@sha256:c9f0c66a87356518d4b30dbc065eb4567e4a04aff4d0ff194dea0973e5985b57
+        image: mysql:9.6@sha256:9b69d1776846f437243ef5b6599e31ef11b317b60babbf37de21dfb38932dbc3
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: meetAgain_test
