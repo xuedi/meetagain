@@ -5,6 +5,8 @@ namespace App\Security;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
+use DateInterval;
+use DateTimeImmutable;
 use Override;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +20,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiTokenAuthenticator extends AbstractAuthenticator
 {
+    private const int TOKEN_MAX_AGE_DAYS = 90;
+
     public function __construct(
         private UserRepository $userRepository,
     ) {}
@@ -47,6 +51,16 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
 
             if ($user->getStatus() !== UserStatus::Active) {
                 throw new AuthenticationException('User account is not active.');
+            }
+
+            $createdAt = $user->getApiTokenCreatedAt();
+            if ($createdAt === null) {
+                throw new AuthenticationException('Invalid API token.');
+            }
+
+            $expiresAt = $createdAt->add(new DateInterval(sprintf('P%dD', self::TOKEN_MAX_AGE_DAYS)));
+            if (new DateTimeImmutable() > $expiresAt) {
+                throw new AuthenticationException('API token expired.');
             }
 
             return $user;
