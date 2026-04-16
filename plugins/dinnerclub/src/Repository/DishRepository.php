@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Plugin\Dinnerclub\Repository;
 
@@ -64,9 +66,11 @@ class DishRepository extends ServiceEntityRepository
 
         foreach ($dishes as $dish) {
             foreach ($dish->getSuggestionObjects() as $suggestion) {
-                if ($latest === null || $suggestion->createdAt > $latest) {
-                    $latest = $suggestion->createdAt;
+                if (!($latest === null || $suggestion->createdAt > $latest)) {
+                    continue;
                 }
+
+                $latest = $suggestion->createdAt;
             }
         }
 

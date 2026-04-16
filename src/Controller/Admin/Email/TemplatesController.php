@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller\Admin\Email;
 
@@ -92,8 +94,8 @@ final class TemplatesController extends AbstractAdminController
                 $translation = $this->getOrCreateTranslation($languageCode, $template->getId());
                 $translation->setEmailTemplate($template);
                 $translation->setLanguage($languageCode);
-                $translation->setSubject($form->get("subject-$languageCode")->getData());
-                $translation->setBody($form->get("body-$languageCode")->getData());
+                $translation->setSubject($form->get("subject-{$languageCode}")->getData());
+                $translation->setBody($form->get("body-{$languageCode}")->getData());
                 $translation->setUpdatedAt(new DateTimeImmutable());
 
                 $this->em->persist($translation);

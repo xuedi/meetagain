@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service\Seo;
 
@@ -62,7 +64,8 @@ class IndexNowServiceTest extends TestCase
         // Arrange
         $configMock = $this->createMock(ConfigService::class);
         $configMock->method('getString')->willReturn('');
-        $configMock->expects($this->once())
+        $configMock
+            ->expects($this->once())
             ->method('setString')
             ->with('indexnow_key', static::matchesRegularExpression('/^[a-f0-9]{32}$/'));
 
@@ -80,12 +83,14 @@ class IndexNowServiceTest extends TestCase
         // Arrange: first call returns empty (key generated), subsequent calls return the generated key
         $generatedKey = null;
         $configStub = $this->createStub(ConfigService::class);
-        $configStub->method('getString')
-            ->willReturnCallback(function () use (&$generatedKey): string {
+        $configStub
+            ->method('getString')
+            ->willReturnCallback(static function () use (&$generatedKey): string {
                 return $generatedKey ?? '';
             });
-        $configStub->method('setString')
-            ->willReturnCallback(function (string $name, string $value) use (&$generatedKey): void {
+        $configStub
+            ->method('setString')
+            ->willReturnCallback(static function (string $name, string $value) use (&$generatedKey): void {
                 $generatedKey = $value;
             });
 
@@ -117,16 +122,16 @@ class IndexNowServiceTest extends TestCase
 
         // Arrange: URL generator returns distinct URLs per route
         $urlGeneratorStub = $this->createStub(UrlGeneratorInterface::class);
-        $urlGeneratorStub->method('generate')->willReturnCallback(
-            static fn(string $route, array $params): string => match ($route) {
+        $urlGeneratorStub
+            ->method('generate')
+            ->willReturnCallback(static fn(string $route, array $params): string => match ($route) {
                 'app_default' => 'https://example.com/en/',
                 'app_event' => 'https://example.com/en/events',
                 'app_member' => 'https://example.com/en/members',
                 'app_catch_all' => 'https://example.com/en/about',
                 'app_event_details' => 'https://example.com/en/events/42',
                 default => 'https://example.com/unknown',
-            }
-        );
+            });
 
         $service = $this->makeService(
             urlGenerator: $urlGeneratorStub,
@@ -213,17 +218,20 @@ class IndexNowServiceTest extends TestCase
         $responseMock->method('getStatusCode')->willReturn(200);
 
         $httpClientMock = $this->createMock(HttpClientInterface::class);
-        $httpClientMock->expects($this->once())
+        $httpClientMock
+            ->expects($this->once())
             ->method('request')
             ->with(
                 'POST',
                 'https://api.indexnow.org/IndexNow',
-                static::callback(static function (array $options): bool {
-                    return $options['json']['host'] === 'example.com'
+                static::callback(
+                    static fn(array $options): bool => (
+                        $options['json']['host'] === 'example.com'
                         && $options['json']['key'] === 'abc123def456abc1'
                         && str_contains($options['json']['keyLocation'], 'abc123def456abc1.txt')
-                        && is_array($options['json']['urlList']);
-                }),
+                        && is_array($options['json']['urlList'])
+                    ),
+                ),
             )
             ->willReturn($responseMock);
 
@@ -288,7 +296,8 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         $appStateMock = $this->createMock(AppStateService::class);
-        $appStateMock->expects($this->once())
+        $appStateMock
+            ->expects($this->once())
             ->method('set')
             ->with(
                 'seo_indexnow_last_submit',

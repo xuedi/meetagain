@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Command;
 
@@ -52,24 +54,24 @@ final class MediaCompileCommand extends Command
             $rawExt = pathinfo($asset->logicalPath, PATHINFO_EXTENSION) ?: 'bin';
             $ext = match ($rawExt) {
                 'scss', 'sass' => 'css',
-                'mjs'          => 'js',
-                default        => $rawExt,
+                'mjs' => 'js',
+                default => $rawExt,
             };
             $hash = OpaqueMediaPathResolver::hashLogicalPath($asset->logicalPath);
-            $filename = "$hash.$ext";
+            $filename = "{$hash}.{$ext}";
 
             if (isset($seen[$filename])) {
-                throw new \RuntimeException("Hash collision detected: $filename");
+                throw new \RuntimeException("Hash collision detected: {$filename}");
             }
             $seen[$filename] = true;
 
             $content = $asset->content ?? file_get_contents($asset->sourcePath);
             $content = $this->minify($content, $ext);
-            file_put_contents("$target/$filename", $content);
+            file_put_contents("{$target}/{$filename}", $content);
             $count++;
         }
 
-        $output->writeln("Wrote $count media files to $target");
+        $output->writeln("Wrote {$count} media files to {$target}");
 
         $this->bundleGlobalJs($target, $output);
 
@@ -83,21 +85,21 @@ final class MediaCompileCommand extends Command
         foreach (self::GLOBAL_JS_BUNDLE as $logicalPath) {
             $asset = $this->assetMapper->getAsset($logicalPath);
             if ($asset === null) {
-                throw new \RuntimeException("Global JS bundle: asset '$logicalPath' not found in AssetMapper.");
+                throw new \RuntimeException("Global JS bundle: asset '{$logicalPath}' not found in AssetMapper.");
             }
             $content = $asset->content ?? file_get_contents($asset->sourcePath);
             $minifier->add($content);
         }
 
         $filename = basename(OpaqueMediaPathResolver::appBundlePath());
-        file_put_contents("$target/$filename", $minifier->minify());
-        $output->writeln("Wrote global JS bundle to public/media/$filename");
+        file_put_contents("{$target}/{$filename}", $minifier->minify());
+        $output->writeln("Wrote global JS bundle to public/media/{$filename}");
     }
 
     private function minify(string $content, string $ext): string
     {
         return match ($ext) {
-            'js'    => (new JS())->add($content)->minify(),
+            'js' => new JS()->add($content)->minify(),
             default => $content,
         };
     }

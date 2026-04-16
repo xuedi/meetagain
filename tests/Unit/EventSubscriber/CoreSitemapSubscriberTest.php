@@ -3,7 +3,6 @@
 namespace Tests\Unit\EventSubscriber;
 
 use App\EventSubscriber\CoreSitemapSubscriber;
-use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;

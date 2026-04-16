@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Command;
 
@@ -56,15 +58,12 @@ class CronCommand extends LoggedCommand
             $aggregated = $aggregated->worst($entry['result']->status);
         }
 
-        $tasks = array_map(
-            fn(array $entry) => [
-                'identifier'  => $entry['result']->identifier,
-                'status'      => $entry['result']->status->value,
-                'message'     => $entry['result']->message,
-                'duration_ms' => $entry['duration_ms'],
-            ],
-            $timed,
-        );
+        $tasks = array_map(static fn(array $entry) => [
+            'identifier' => $entry['result']->identifier,
+            'status' => $entry['result']->status->value,
+            'message' => $entry['result']->message,
+            'duration_ms' => $entry['duration_ms'],
+        ], $timed);
 
         $log = new CronLog(
             runAt: new DateTimeImmutable(),

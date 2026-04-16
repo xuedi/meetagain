@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -62,7 +64,7 @@ class CaptchaServiceTest extends TestCase
                     str_contains($key, 'captcha_refresh') => $this->assertCount(1, $value),
                     str_contains($key, 'captcha_text') => $this->assertSame(4, strlen($value)),
                     str_contains($key, 'captcha_image') => $this->assertValidBase64Image($value),
-                    default => $this->fail("Unexpected session key: $key"),
+                    default => $this->fail("Unexpected session key: {$key}"),
                 };
             });
 
@@ -78,9 +80,7 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
         $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
-        $this->sessionMock
-            ->method('get')
-            ->willReturn('hgfw');
+        $this->sessionMock->method('get')->willReturn('hgfw');
         $this->sessionMock
             ->expects($this->once())
             ->method('remove')

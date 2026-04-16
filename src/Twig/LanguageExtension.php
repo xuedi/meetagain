@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Twig;
 
@@ -77,7 +79,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
                 $altLangList = $this->languageService->getAltLangList($currentLocale, $currentUri);
                 $host = rtrim($this->configService->getHost(), '/');
 
-                return array_map(fn(string $path) => $host . $path, $altLangList);
+                return array_map(static fn(string $path) => $host . $path, $altLangList);
             }
         }
 
@@ -123,22 +125,26 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         foreach ($this->organizationProviders as $provider) {
             $schema = $provider->getOrganizationSchema();
             if ($schema !== null) {
-                return json_encode(
-                    ['@context' => 'https://schema.org', ...$schema],
-                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
-                ) ?: '';
+                return (
+                    json_encode([
+                        '@context' => 'https://schema.org',
+                        ...$schema,
+                    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''
+                );
             }
         }
 
         $host = rtrim($this->configService->getHost(), '/');
 
-        return json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'Organization',
-            '@id' => $host . '/#organization',
-            'name' => 'MeetAgain',
-            'url' => $host,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
+        return (
+            json_encode([
+                '@context' => 'https://schema.org',
+                '@type' => 'Organization',
+                '@id' => $host . '/#organization',
+                'name' => 'MeetAgain',
+                'url' => $host,
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''
+        );
     }
 
     public function routeExists(string $name): bool

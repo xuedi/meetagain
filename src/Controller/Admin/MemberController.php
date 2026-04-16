@@ -5,7 +5,6 @@ namespace App\Controller\Admin;
 use App\Activity\ActivityService;
 use App\Activity\Messages\AdminMemberApproved;
 use App\Activity\Messages\AdminMemberDenied;
-use App\Activity\Messages\AdminMemberPromoted;
 use App\Entity\AdminLink;
 use App\Entity\User;
 use App\EntityActionDispatcher;

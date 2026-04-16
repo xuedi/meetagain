@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -17,27 +19,20 @@ final class MediaController extends AbstractController
         requirements: ['hash' => '[a-f0-9]{16}', 'ext' => '[a-z0-9]+'],
         methods: ['GET'],
     )]
-    public function serve(
-        string $hash,
-        string $ext,
-        MediaMap $mediaMap,
-        AssetMapperInterface $assetMapper,
-    ): Response {
+    public function serve(string $hash, string $ext, MediaMap $mediaMap, AssetMapperInterface $assetMapper): Response
+    {
         $map = $mediaMap->build();
-        $logicalPath = $map[$hash] ?? throw new NotFoundHttpException("Unknown media hash: $hash");
+        $logicalPath = $map[$hash] ?? throw new NotFoundHttpException("Unknown media hash: {$hash}");
 
-        $asset = $assetMapper->getAsset($logicalPath)
-            ?? throw new NotFoundHttpException("Asset disappeared: $logicalPath");
+        $asset = $assetMapper->getAsset($logicalPath) ?? throw new NotFoundHttpException(
+            "Asset disappeared: {$logicalPath}",
+        );
 
         if ($asset->content !== null) {
-            return new Response(
-                $asset->content,
-                200,
-                [
-                    'Content-Type' => $this->guessMime($ext),
-                    'Cache-Control' => 'public, max-age=5',
-                ],
-            );
+            return new Response($asset->content, 200, [
+                'Content-Type' => $this->guessMime($ext),
+                'Cache-Control' => 'public, max-age=5',
+            ]);
         }
 
         $response = new BinaryFileResponse($asset->sourcePath);
@@ -51,8 +46,7 @@ final class MediaController extends AbstractController
     {
         return match ($ext) {
             'png' => 'image/png',
-            'jpg',
-            'jpeg' => 'image/jpeg',
+            'jpg', 'jpeg' => 'image/jpeg',
             'webp' => 'image/webp',
             'gif' => 'image/gif',
             'svg' => 'image/svg+xml',

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -6,10 +8,9 @@ use App\EmailContextEnricherInterface;
 use App\Entity\EmailQueue;
 use App\Entity\EventTranslation;
 use App\Entity\SupportRequest;
+use App\Entity\User;
 use App\Enum\ContactType;
 use App\Enum\EmailQueueStatus;
-use App\Enum\EmailType;
-use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Email\EmailService;
@@ -279,16 +280,11 @@ final class EmailServiceTest extends TestCase
     // ---- prepareAggregatedRsvpNotification ----
 
     #[DataProvider('aggregatedRsvpProvider')]
-    public function testPrepareAggregatedRsvpNotification(
-        array $attendeeNames,
-        string $expectedAttendeeNames,
-    ): void {
+    public function testPrepareAggregatedRsvpNotification(array $attendeeNames, string $expectedAttendeeNames): void
+    {
         // Arrange
         $recipient = $this->makeUser('host@example.com', 'Host', 'de');
-        $attendees = array_map(
-            fn(string $name) => $this->makeUser($name . '@example.com', $name),
-            $attendeeNames,
-        );
+        $attendees = array_map(fn(string $name) => $this->makeUser($name . '@example.com', $name), $attendeeNames);
 
         $translation = new EventTranslation();
         $translation->setLanguage('de');
@@ -301,8 +297,10 @@ final class EmailServiceTest extends TestCase
 
         $capturedContext = null;
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')
-            ->with(static::callback(function (EmailQueue $q) use (&$capturedContext) {
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedContext) {
                 $capturedContext = $q->getContext();
                 return true;
             }));
@@ -321,9 +319,9 @@ final class EmailServiceTest extends TestCase
 
     public static function aggregatedRsvpProvider(): iterable
     {
-        yield 'single attendee — attendeeNames is their name'       => [['Alice'], 'Alice'];
-        yield 'two attendees — attendeeNames is comma-separated'    => [['Alice', 'Bob'], 'Alice, Bob'];
-        yield 'three attendees — attendeeNames lists all three'     => [['Alice', 'Bob', 'Carol'], 'Alice, Bob, Carol'];
+        yield 'single attendee — attendeeNames is their name' => [['Alice'], 'Alice'];
+        yield 'two attendees — attendeeNames is comma-separated' => [['Alice', 'Bob'], 'Alice, Bob'];
+        yield 'three attendees — attendeeNames lists all three' => [['Alice', 'Bob', 'Carol'], 'Alice, Bob, Carol'];
     }
 
     // ---- prepareAnnouncementEmail ----
@@ -382,8 +380,10 @@ final class EmailServiceTest extends TestCase
 
         $capturedQueue = null;
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')
-            ->with(static::callback(function (EmailQueue $q) use (&$capturedQueue) {
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
                 $capturedQueue = $q;
                 return true;
             }));
@@ -416,8 +416,10 @@ final class EmailServiceTest extends TestCase
 
         $capturedQueue = null;
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')
-            ->with(static::callback(function (EmailQueue $q) use (&$capturedQueue) {
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
                 $capturedQueue = $q;
                 return true;
             }));
@@ -456,7 +458,11 @@ final class EmailServiceTest extends TestCase
         $mailRepoStub->method('findBy')->willReturn([$queued]);
 
         $exception = new class('Connection refused') extends \RuntimeException implements TransportExceptionInterface {
-            public function getDebug(): string { return ''; }
+            public function getDebug(): string
+            {
+                return '';
+            }
+
             public function appendDebug(string $debug): void {}
         };
 
@@ -503,7 +509,11 @@ final class EmailServiceTest extends TestCase
         $sentMessage->method('getMessageId')->willReturn('ok-id');
 
         $exception = new class('Timeout') extends \RuntimeException implements TransportExceptionInterface {
-            public function getDebug(): string { return ''; }
+            public function getDebug(): string
+            {
+                return '';
+            }
+
             public function appendDebug(string $debug): void {}
         };
 
@@ -511,7 +521,9 @@ final class EmailServiceTest extends TestCase
         $mailerStub->method('send')->willReturnOnConsecutiveCalls($sentMessage, $this->throwException($exception));
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('warning')
+        $loggerMock
+            ->expects($this->once())
+            ->method('warning')
             ->with('Email queue processed with failures', ['sent' => 1, 'failed' => 1]);
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, logger: $loggerMock);
@@ -555,8 +567,10 @@ final class EmailServiceTest extends TestCase
 
         $capturedQueue = null;
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')
-            ->with(static::callback(function (EmailQueue $q) use (&$capturedQueue) {
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
                 $capturedQueue = $q;
                 return true;
             }));

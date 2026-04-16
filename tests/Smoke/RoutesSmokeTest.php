@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Smoke;
 
@@ -63,9 +65,11 @@ class RoutesSmokeTest extends WebTestCase
     public static function adminUrlProvider(): iterable
     {
         foreach (self::resolveUrls() as $url) {
-            if (str_contains($url, '/admin/')) {
-                yield $url => [$url];
+            if (!str_contains($url, '/admin/')) {
+                continue;
             }
+
+            yield $url => [$url];
         }
     }
 
@@ -80,7 +84,7 @@ class RoutesSmokeTest extends WebTestCase
         $client->request('GET', $url);
 
         $status = $client->getResponse()->getStatusCode();
-        self::assertLessThan(500, $status, "Route $url returned HTTP $status");
+        self::assertLessThan(500, $status, "Route {$url} returned HTTP {$status}");
     }
 
     #[DataProvider('adminUrlProvider')]
@@ -91,7 +95,7 @@ class RoutesSmokeTest extends WebTestCase
         $client->request('GET', $url);
 
         $status = $client->getResponse()->getStatusCode();
-        self::assertLessThan(500, $status, "Admin route $url returned HTTP $status for authenticated admin");
+        self::assertLessThan(500, $status, "Admin route {$url} returned HTTP {$status} for authenticated admin");
     }
 
     // -------------------------------------------------------------------------
@@ -124,9 +128,9 @@ class RoutesSmokeTest extends WebTestCase
             try {
                 $urls[] = $router->generate($name, $params);
             } catch (MissingMandatoryParametersException) {
-                // Route needs a parameter not in our map — silently skip
+                continue; // Route needs a parameter not in our map - silently skip
             } catch (\Exception) {
-                // Any other generation failure — skip
+                continue; // Any other generation failure - skip
             }
         }
 
@@ -164,21 +168,23 @@ class RoutesSmokeTest extends WebTestCase
 
         return [
             '_locale' => 'en',
-            'id'      => $event?->getId() ?? 1,
-            'userId'  => $user?->getId() ?? 1,
-            'page'    => 1,
-            'year'    => (int) date('Y'),
-            'week'    => (int) date('W'),
+            'id' => $event?->getId() ?? 1,
+            'userId' => $user?->getId() ?? 1,
+            'page' => 1,
+            'year' => (int) date('Y'),
+            'week' => (int) date('W'),
         ];
     }
 
     private function loginAsAdmin(KernelBrowser $client): void
     {
         $crawler = $client->request('GET', '/en/login');
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
         $client->submit($form);
         $client->followRedirect();
     }
