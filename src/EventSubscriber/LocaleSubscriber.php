@@ -33,7 +33,8 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
         }
 
         // save explicit session, if not available restore from session
-        if ($locale = $request->attributes->get('_locale')) {
+        $locale = $request->attributes->get('_locale');
+        if ($locale) {
             $request->getSession()->set('_locale', $locale);
         } else {
             $filteredDefault = $this->languageService->getFilteredDefaultLocale();

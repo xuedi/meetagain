@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -57,10 +59,15 @@ class AppStateServiceTest extends TestCase
 
         /** @var EntityManagerInterface&MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())->method('persist')
-            ->with(static::callback(static function (AppState $state): bool {
-                return $state->getKeyName() === 'new_key' && $state->getValue() === 'new_value';
-            }));
+        $em
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(
+                static fn(AppState $state): bool => (
+                    $state->getKeyName() === 'new_key'
+                    && $state->getValue() === 'new_value'
+                ),
+            ));
         $em->expects($this->once())->method('flush');
 
         // Act

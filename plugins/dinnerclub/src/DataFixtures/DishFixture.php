@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Plugin\Dinnerclub\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
-use App\Enum\ImageType;
 use App\Entity\User;
+use App\Enum\ImageType;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
@@ -48,7 +50,7 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
             }
 
             // upload file & thumbnails if exists
-            $imagePath = __DIR__ . "/dinnerclub/$imageFile";
+            $imagePath = __DIR__ . "/dinnerclub/{$imageFile}";
             if (file_exists($imagePath)) {
                 $uploadedImage = new UploadedFile($imagePath, $imageFile);
                 $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::PluginDish);
@@ -70,9 +72,12 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 'Chengdu, Sichuan',
                 'má po tofu',
                 [
-                    'zh' => ['name' => '麻婆豆腐',      'description' => 'Spicy tofu in chili and bean-based sauce. Originated in Chengdu.'],
-                    'en' => ['name' => 'Mapo Tofu',     'description' => 'Spicy tofu in chili and bean-based sauce.'],
-                    'de' => ['name' => 'Mapo Tofu',     'description' => 'Würziger Tofu in Chili- und Bohnensauce.'],
+                    'zh' => [
+                        'name' => '麻婆豆腐',
+                        'description' => 'Spicy tofu in chili and bean-based sauce. Originated in Chengdu.',
+                    ],
+                    'en' => ['name' => 'Mapo Tofu', 'description' => 'Spicy tofu in chili and bean-based sauce.'],
+                    'de' => ['name' => 'Mapo Tofu', 'description' => 'Würziger Tofu in Chili- und Bohnensauce.'],
                 ],
             ],
             [
@@ -80,9 +85,18 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 'Guizhou, China',
                 'gōng bǎo jī dīng',
                 [
-                    'zh' => ['name' => '宫保鸡丁',         'description' => 'Diced chicken stir-fried with vegetables, peanuts, dried chilis and soy sauce.'],
-                    'en' => ['name' => 'Kung Pao Chicken', 'description' => 'Diced chicken stir-fried with peanuts and chilis.'],
-                    'de' => ['name' => 'Kung Pao Hühnchen','description' => 'Gehacktes Hähnchen mit Erdnüssen und Chilis angebraten.'],
+                    'zh' => [
+                        'name' => '宫保鸡丁',
+                        'description' => 'Diced chicken stir-fried with vegetables, peanuts, dried chilis and soy sauce.',
+                    ],
+                    'en' => [
+                        'name' => 'Kung Pao Chicken',
+                        'description' => 'Diced chicken stir-fried with peanuts and chilis.',
+                    ],
+                    'de' => [
+                        'name' => 'Kung Pao Hühnchen',
+                        'description' => 'Gehacktes Hähnchen mit Erdnüssen und Chilis angebraten.',
+                    ],
                 ],
             ],
             [
@@ -90,9 +104,18 @@ class DishFixture extends AbstractFixture implements FixtureGroupInterface
                 'Shanghai, China',
                 'hóng shāo ròu',
                 [
-                    'zh' => ['name' => '红烧肉',                   'description' => 'Braised pork belly in soy sauce, a classic Chinese comfort food.'],
-                    'en' => ['name' => 'Braised Pork Belly',       'description' => 'Tender pork belly braised in soy sauce.'],
-                    'de' => ['name' => 'Geschmorter Schweinebauch','description' => 'Zarter Schweinebauch geschmort in Sojasauce.'],
+                    'zh' => [
+                        'name' => '红烧肉',
+                        'description' => 'Braised pork belly in soy sauce, a classic Chinese comfort food.',
+                    ],
+                    'en' => [
+                        'name' => 'Braised Pork Belly',
+                        'description' => 'Tender pork belly braised in soy sauce.',
+                    ],
+                    'de' => [
+                        'name' => 'Geschmorter Schweinebauch',
+                        'description' => 'Zarter Schweinebauch geschmort in Sojasauce.',
+                    ],
                 ],
             ],
         ];

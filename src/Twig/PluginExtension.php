@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Twig;
 
@@ -75,12 +77,10 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginStylesheets(): array
     {
-        return $this->collectFromPlugins(static function (Plugin $plugin) {
-            return array_map(
-                static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
-                $plugin->getStylesheets()
-            );
-        });
+        return $this->collectFromPlugins(static fn(Plugin $plugin) => array_map(
+            static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
+            $plugin->getStylesheets(),
+        ));
     }
 
     /**
@@ -90,12 +90,10 @@ final class PluginExtension extends AbstractExtension
      */
     public function getPluginJavascripts(): array
     {
-        return $this->collectFromPlugins(static function (Plugin $plugin) {
-            return array_map(
-                static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
-                $plugin->getJavascripts()
-            );
-        });
+        return $this->collectFromPlugins(static fn(Plugin $plugin) => array_map(
+            static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
+            $plugin->getJavascripts(),
+        ));
     }
 
     /**

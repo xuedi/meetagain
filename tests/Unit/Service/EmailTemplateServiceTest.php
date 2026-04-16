@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -202,10 +204,10 @@ class EmailTemplateServiceTest extends TestCase
 
         // Assert
         foreach ($templates as $identifier => $template) {
-            static::assertArrayHasKey('subject', $template, "Template '$identifier' missing 'subject'");
-            static::assertArrayHasKey('body', $template, "Template '$identifier' missing 'body'");
-            static::assertArrayHasKey('variables', $template, "Template '$identifier' missing 'variables'");
-            static::assertIsArray($template['variables'], "Template '$identifier' variables should be array");
+            static::assertArrayHasKey('subject', $template, "Template '{$identifier}' missing 'subject'");
+            static::assertArrayHasKey('body', $template, "Template '{$identifier}' missing 'body'");
+            static::assertArrayHasKey('variables', $template, "Template '{$identifier}' missing 'variables'");
+            static::assertIsArray($template['variables'], "Template '{$identifier}' variables should be array");
         }
     }
 

@@ -2,7 +2,6 @@
 
 namespace App;
 
-use App\EntityActionInterface;
 use App\Enum\EntityAction;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 

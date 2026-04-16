@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Service\Admin;
 
@@ -36,25 +38,25 @@ readonly class PermissionInspectorService
                 continue;
             }
 
-            $classRef  = new ReflectionClass($fqcn);
+            $classRef = new ReflectionClass($fqcn);
             $methodRef = new ReflectionMethod($fqcn, $methodName);
 
-            $classRoleIds  = $this->collectRoleIds($classRef->getAttributes(IsGranted::class));
+            $classRoleIds = $this->collectRoleIds($classRef->getAttributes(IsGranted::class));
             $methodRoleIds = $this->collectRoleIds($methodRef->getAttributes(IsGranted::class));
 
-            $effective       = $methodRoleIds !== [] ? $methodRoleIds : $classRoleIds;
+            $effective = $methodRoleIds !== [] ? $methodRoleIds : $classRoleIds;
             $resolvedMinRole = $effective[0] ?? null;
 
             $entries[] = new PermissionEntry(
-                routeName:         $routeName,
-                routePath:         $route->getPath(),
-                httpMethods:       $route->getMethods(),
-                controllerClass:   $classRef->getShortName(),
-                controllerFqcn:    $fqcn,
-                methodName:        $methodName,
-                classPermissions:  $classRoleIds,
+                routeName: $routeName,
+                routePath: $route->getPath(),
+                httpMethods: $route->getMethods(),
+                controllerClass: $classRef->getShortName(),
+                controllerFqcn: $fqcn,
+                methodName: $methodName,
+                classPermissions: $classRoleIds,
                 methodPermissions: $methodRoleIds,
-                resolvedMinRole:   $resolvedMinRole,
+                resolvedMinRole: $resolvedMinRole,
             );
         }
 
@@ -67,7 +69,7 @@ readonly class PermissionInspectorService
         $groups = [];
 
         foreach ($this->getEntries() as $entry) {
-            $key           = $entry->resolvedMinRole ?? self::ANONYMOUS;
+            $key = $entry->resolvedMinRole ?? self::ANONYMOUS;
             $groups[$key][] = $entry;
         }
 
@@ -81,9 +83,11 @@ readonly class PermissionInspectorService
         $groups = $this->getEntriesGroupedByRole();
 
         foreach (array_keys($groups) as $role) {
-            if ($role !== self::ANONYMOUS && !in_array($role, $known, true)) {
-                $known[] = $role;
+            if (!($role !== self::ANONYMOUS && !in_array($role, $known, true))) {
+                continue;
             }
+
+            $known[] = $role;
         }
 
         $known[] = self::ANONYMOUS;
@@ -94,9 +98,6 @@ readonly class PermissionInspectorService
     /** @param \ReflectionAttribute[] $attributes */
     private function collectRoleIds(array $attributes): array
     {
-        return array_map(
-            static fn(\ReflectionAttribute $attr) => $attr->newInstance()->attribute,
-            $attributes,
-        );
+        return array_map(static fn(\ReflectionAttribute $attr) => $attr->newInstance()->attribute, $attributes);
     }
 }

@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Service\Cms;
 
 use App\Entity\Announcement;
-use App\Enum\AnnouncementStatus;
 use App\Entity\BlockType\Gallery as GalleryType;
 use App\Entity\BlockType\Text as TextType;
 use App\Entity\Cms;
-use App\Enum\CmsBlock\CmsBlockType;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
+use App\Enum\AnnouncementStatus;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
@@ -89,7 +91,7 @@ readonly class AnnouncementService
      */
     private function renderContent(Cms $cmsPage, string $locale): array
     {
-        $title = $cmsPage->getPageTitle($locale) ?? "ERROR: The CMS page has no title for the language [$locale]";
+        $title = $cmsPage->getPageTitle($locale) ?? "ERROR: The CMS page has no title for the language [{$locale}]";
         $contentParts = [];
 
         foreach ($cmsPage->getBlocks() as $block) {
@@ -98,16 +100,16 @@ readonly class AnnouncementService
             }
 
             match ($block->getType()) {
-                CmsBlockType::Text => $contentParts[] =
-                    '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
-                CmsBlockType::Gallery
-                    => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson())),
+                CmsBlockType::Text => $contentParts[] = '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
+                CmsBlockType::Gallery => $contentParts[] = $this->renderGalleryBlock(
+                    GalleryType::fromJson($block->getJson()),
+                ),
                 default => null,
             };
         }
 
         if ($contentParts === []) {
-            $contentParts[] = "ERROR: The CMS page has no content for the language [$locale]";
+            $contentParts[] = "ERROR: The CMS page has no content for the language [{$locale}]";
         }
 
         return [

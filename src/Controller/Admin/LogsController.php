@@ -112,7 +112,7 @@ final class LogsController extends AbstractAdminController
                 try {
                     $logList[] = LogEntry::fromString($line);
                 } catch (\Throwable) {
-                    // skip malformed log lines
+                    continue; // skip malformed log lines
                 }
             }
         }

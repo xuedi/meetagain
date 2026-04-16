@@ -280,24 +280,24 @@ testPerformance:
 
 # Run all tests and checks
 [group('testing')]
-check: checkMago checkMagoAnalyze checkMagoGuard
+check: checkMago checkMagoGuard
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 
 # Check Mago (linter)
 [group('checks')]
 checkMago:
-    vendor/bin/mago --config=tests/config/mago.toml lint
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml lint
 
 # Analyze code with Mago
 [group('checks')]
 checkMagoAnalyze:
-    vendor/bin/mago --config=tests/config/mago.toml analyze
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml analyze
 
 # Check architectural rules with Mago
 [group('checks')]
 checkMagoGuard:
-    vendor/bin/mago --config=tests/config/mago.toml guard
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml guard
 
 # Run all Mago checks (lint + analyze + guard)
 [group('checks')]

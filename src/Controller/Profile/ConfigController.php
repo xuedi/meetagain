@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller\Profile;
 
@@ -67,7 +69,7 @@ final class ConfigController extends AbstractController
             'tagging' => $user->setTagging(!$user->isTagging())->isTagging(),
             'notification' => $user->setNotification(!$user->isNotification())->isNotification(),
             'public' => $user->setPublic(!$user->isPublic())->isPublic(),
-            default => throw new Exception("Invalid toggle type: $type"),
+            default => throw new Exception("Invalid toggle type: {$type}"),
         };
         $this->em->persist($user);
         $this->em->flush();

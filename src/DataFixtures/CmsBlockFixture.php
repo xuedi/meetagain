@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\DataFixtures;
 
@@ -31,7 +33,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
 
             $manager->persist($block);
             if ($imageName !== null) {
-                $imageFile = __DIR__ . "/CmsBlock/$imageName";
+                $imageFile = __DIR__ . "/CmsBlock/{$imageName}";
                 $uploadedImage = new UploadedFile($imageFile, $block->getId() . '.jpg');
 
                 if ($type === CmsBlockType::Gallery) {

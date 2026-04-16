@@ -21,9 +21,9 @@ use-tabs = false
 [linter]
 integrations = ["symfony", "php-unit"]
 
-# Raised from default 12 — controllers and services legitimately accumulate methods
+# Raised from default 12 — controllers, services and test classes legitimately accumulate methods
 [linter.rules.too-many-methods]
-threshold = 40
+threshold = 45
 
 # Raised from default 5 — Symfony forms and commands commonly exceed 5 params
 [linter.rules.excessive-parameter-list]
@@ -91,6 +91,10 @@ enabled = false
 
 # Disabled — assert descriptions not required in this project
 [linter.rules.assert-description]
+enabled = false
+
+# Disabled — test files commonly contain inline helper stubs alongside the test class
+[linter.rules.single-class-per-file]
 enabled = false
 
 [analyzer]
