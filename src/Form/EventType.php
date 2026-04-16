@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Form;
 
 use App\Entity\Event;
+use App\Entity\Host;
+use App\Entity\Location;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
 use App\Enum\EventType as EventTypeEnum;
-use App\Entity\Host;
-use App\Entity\Location;
 use App\Filter\Admin\Host\AdminHostListFilterService;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Repository\EventTranslationRepository;
@@ -133,21 +135,21 @@ class EventType extends AbstractType
         if (null !== $eventId) { // not for new events
             foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
-                $builder->add("title-$languageCode", TextType::class, [
-                    'label' => "title ($languageCode)",
+                $builder->add("title-{$languageCode}", TextType::class, [
+                    'label' => "title ({$languageCode})",
                     'data' => $translation?->getTitle() ?? '',
                     'mapped' => false,
                     'required' => false,
                 ]);
-                $builder->add("description-$languageCode", TextareaType::class, [
-                    'label' => "description ($languageCode)",
+                $builder->add("description-{$languageCode}", TextareaType::class, [
+                    'label' => "description ({$languageCode})",
                     'data' => $translation?->getDescription() ?? '',
                     'mapped' => false,
                     'required' => false,
                     'attr' => ['rows' => 15],
                 ]);
-                $builder->add("teaser-$languageCode", TextareaType::class, [
-                    'label' => "Teaser ($languageCode)",
+                $builder->add("teaser-{$languageCode}", TextareaType::class, [
+                    'label' => "Teaser ({$languageCode})",
                     'data' => $translation?->getTeaser() ?? '',
                     'mapped' => false,
                     'required' => false,

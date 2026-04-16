@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
@@ -138,9 +140,9 @@ final class EventController extends AbstractAdminController
                 $translation = $this->getTranslation($languageCode, $event->getId());
                 $translation->setEvent($event);
                 $translation->setLanguage($languageCode);
-                $translation->setTitle($form->get("title-$languageCode")->getData() ?? '');
-                $translation->setTeaser($form->get("teaser-$languageCode")->getData() ?? '');
-                $translation->setDescription($form->get("description-$languageCode")->getData() ?? '');
+                $translation->setTitle($form->get("title-{$languageCode}")->getData() ?? '');
+                $translation->setTeaser($form->get("teaser-{$languageCode}")->getData() ?? '');
+                $translation->setDescription($form->get("description-{$languageCode}")->getData() ?? '');
 
                 $this->entityManager->persist($translation);
             }
@@ -163,7 +165,7 @@ final class EventController extends AbstractAdminController
             $followUp = '';
             if ($form->get('allFollowing')->getData() === true) {
                 $cnt = $this->eventService->updateRecurringEvents($event);
-                $followUp = " & updated $cnt follow-up events.";
+                $followUp = " & updated {$cnt} follow-up events.";
             }
 
             $this->addFlash('success', 'Event saved' . $followUp);
@@ -194,7 +196,7 @@ final class EventController extends AbstractAdminController
         $this->eventService->cancelEvent($event);
         $this->activityService->log(AdminEventCancelled::TYPE, $user, ['event_id' => $event->getId()]);
         if ($rsvpCount > 0) {
-            $this->addFlash('success', "Event canceled. $rsvpCount user(s) have been notified.");
+            $this->addFlash('success', "Event canceled. {$rsvpCount} user(s) have been notified.");
         }
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Service\Config;
 
@@ -67,7 +69,7 @@ readonly class ConfigService
     public function isValidThumbnailSize(ImageType $type, int $checkWidth, int $checkHeight): bool
     {
         foreach ($this->getThumbnailSizes($type) as [$width, $height]) {
-            if (!($checkWidth == $width && $checkHeight == $height)) {
+            if (!($checkWidth === $width && $checkHeight === $height)) {
                 continue;
             }
 
@@ -218,13 +220,13 @@ readonly class ConfigService
         $content = file_get_contents($path);
 
         $scssToKey = [
-            'primary'         => 'color_primary',
-            'link'            => 'color_link',
-            'info'            => 'color_info',
-            'success'         => 'color_success',
-            'warning'         => 'color_warning',
-            'danger'          => 'color_danger',
-            'text-grey'       => 'color_text_grey',
+            'primary' => 'color_primary',
+            'link' => 'color_link',
+            'info' => 'color_info',
+            'success' => 'color_success',
+            'warning' => 'color_warning',
+            'danger' => 'color_danger',
+            'text-grey' => 'color_text_grey',
             'text-grey-light' => 'color_text_grey_light',
         ];
 
@@ -241,7 +243,7 @@ readonly class ConfigService
             $content = preg_replace(
                 '/(\$' . preg_quote($scssVar, '/') . '\s*:\s*)#[0-9a-fA-F]{3,6}(\s*;)/',
                 '${1}' . $value . '${2}',
-                $content
+                $content,
             );
         }
 
@@ -255,21 +257,23 @@ readonly class ConfigService
         $content = file_get_contents($path);
 
         $scssToKey = [
-            'primary'         => 'color_primary',
-            'link'            => 'color_link',
-            'info'            => 'color_info',
-            'success'         => 'color_success',
-            'warning'         => 'color_warning',
-            'danger'          => 'color_danger',
-            'text-grey'       => 'color_text_grey',
+            'primary' => 'color_primary',
+            'link' => 'color_link',
+            'info' => 'color_info',
+            'success' => 'color_success',
+            'warning' => 'color_warning',
+            'danger' => 'color_danger',
+            'text-grey' => 'color_text_grey',
             'text-grey-light' => 'color_text_grey_light',
         ];
 
         $map = [];
         foreach ($scssToKey as $scssVar => $key) {
-            if (preg_match('/\$' . preg_quote($scssVar, '/') . '\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/', $content, $m)) {
-                $map[$key] = $m[1];
+            if (!preg_match('/\$' . preg_quote($scssVar, '/') . '\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/', $content, $m)) {
+                continue;
             }
+
+            $map[$key] = $m[1];
         }
 
         return $map;
