@@ -1,6 +1,8 @@
 twig:
     form_themes: ['_form/bulma.html.twig']
     file_name_pattern: '*.twig'
+    date:
+        timezone: 'Europe/Berlin'
     globals:
         admin_navigation: '@App\Service\Admin\AdminNavigationService'
 
