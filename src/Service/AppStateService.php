@@ -33,4 +33,16 @@ readonly class AppStateService
 
         $this->entityManager->flush();
     }
+
+    public function remove(string $key): void
+    {
+        $entry = $this->repository->findByKey($key);
+
+        if ($entry === null) {
+            return;
+        }
+
+        $this->entityManager->remove($entry);
+        $this->entityManager->flush();
+    }
 }
