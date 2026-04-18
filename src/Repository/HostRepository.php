@@ -38,7 +38,9 @@ class HostRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('h');
         if ($restrictToHostIds === []) {
             $qb->where('1 = 0');
-        } elseif ($restrictToHostIds !== null) {
+            return $qb->orderBy('h.name', 'ASC');
+        }
+        if ($restrictToHostIds !== null) {
             $qb->where('h.id IN (:hostIds)')->setParameter('hostIds', $restrictToHostIds);
         }
 

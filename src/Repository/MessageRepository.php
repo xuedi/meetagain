@@ -58,11 +58,11 @@ class MessageRepository extends ServiceEntityRepository
                     'lastMessage' => $message->getCreatedAt(),
                     'user' => $partner,
                 ];
-            } else {
-                ++$list[$partnerId]['messages'];
-                if ($message->isWasRead() === false) {
-                    ++$list[$partnerId]['unread'];
-                }
+                continue;
+            }
+            ++$list[$partnerId]['messages'];
+            if ($message->isWasRead() === false) {
+                ++$list[$partnerId]['unread'];
             }
         }
 

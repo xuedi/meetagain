@@ -62,7 +62,8 @@ final class ImageUploadController extends AbstractController
             $uploadUrl = $this->generateUrl('app_event_image_upload', ['id' => $id]);
             $form = $this->createForm(EventUploadType::class, null, ['action' => $uploadUrl]);
             $templateVars['uploadForm'] = $form->createView();
-        } else {
+        }
+        if ($entity !== 'event') {
             $templateVars['uploadUrl'] = $this->generateUrl('app_replace_image_upload', [
                 'entity' => $entity,
                 'id' => $id,

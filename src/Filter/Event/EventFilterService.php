@@ -46,12 +46,12 @@ readonly class EventFilterService
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
-            } else {
-                // Intersect: event must pass ALL filters
-                $resultSet = array_values(array_intersect($resultSet, $filterResult));
-                if ($resultSet === []) {
-                    return EventFilterResult::emptyResult();
-                }
+                continue;
+            }
+            // Intersect: event must pass ALL filters
+            $resultSet = array_values(array_intersect($resultSet, $filterResult));
+            if ($resultSet === []) {
+                return EventFilterResult::emptyResult();
             }
         }
 
@@ -84,11 +84,11 @@ readonly class EventFilterService
 
             if ($userResultSet === null) {
                 $userResultSet = $filterResult;
-            } else {
-                $userResultSet = array_values(array_intersect($userResultSet, $filterResult));
-                if ($userResultSet === []) {
-                    return EventFilterResult::emptyResult();
-                }
+                continue;
+            }
+            $userResultSet = array_values(array_intersect($userResultSet, $filterResult));
+            if ($userResultSet === []) {
+                return EventFilterResult::emptyResult();
             }
         }
 

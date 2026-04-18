@@ -43,11 +43,7 @@ readonly class CommandExecutionService
         $log->setOutput($output);
         $log->setErrorOutput($errorOutput);
 
-        if ($exitCode === 0) {
-            $log->setStatus(CommandExecutionStatus::Success);
-        } else {
-            $log->setStatus(CommandExecutionStatus::Failed);
-        }
+        $log->setStatus($exitCode === 0 ? CommandExecutionStatus::Success : CommandExecutionStatus::Failed);
 
         $this->em->flush();
     }

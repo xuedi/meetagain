@@ -319,12 +319,13 @@ class Event
 
     public function getMetaDescription(string $language, string $meetingAtLabel = 'meeting at'): string
     {
+        $base = $this->getTitle($language);
+        $description = strip_tags($this->getDescription($language));
+        if ($description !== '') {
+            $base = mb_substr($description, 0, 140);
+        }
         if ($this->getTeaser($language) !== '') {
             $base = $this->getTeaser($language);
-        } elseif (($description = strip_tags($this->getDescription($language))) !== '') {
-            $base = mb_substr($description, 0, 140);
-        } else {
-            $base = $this->getTitle($language);
         }
 
         return $base . ' - ' . $meetingAtLabel . ' ' . $this->start->format('Y-m-d H:i');

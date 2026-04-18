@@ -13,13 +13,13 @@ class ConsentServiceTest extends TestCase
 {
     private function makeService(?SessionInterface $session): ConsentService
     {
+        $requestStack = $this->createStub(RequestStack::class);
         if ($session === null) {
-            $requestStack = $this->createStub(RequestStack::class);
             $requestStack->method('getCurrentRequest')->willReturn(null);
-        } else {
+        }
+        if ($session !== null) {
             $request = $this->createStub(Request::class);
             $request->method('getSession')->willReturn($session);
-            $requestStack = $this->createStub(RequestStack::class);
             $requestStack->method('getCurrentRequest')->willReturn($request);
         }
 

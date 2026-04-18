@@ -211,11 +211,9 @@ final class SecurityController extends AbstractController
                 return $this->render('security/reset_email_send.html.twig');
             }
 
-            $this->captchaService->reset();
-        } else {
-            $this->captchaService->reset();
         }
 
+        $this->captchaService->reset();
         return $this->render('security/reset.html.twig', [
             'captcha' => $this->captchaService->generate(),
             'refreshCount' => $this->captchaService->getRefreshCount(),

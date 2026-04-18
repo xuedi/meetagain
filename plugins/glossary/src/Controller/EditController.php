@@ -42,7 +42,9 @@ final class EditController extends AbstractGlossaryController
             if ($this->isGranted('ROLE_ORGANIZER')) {
                 // Managers can update directly
                 $this->service->update($newGlossary, $id);
-            } else {
+            }
+
+            if (!$this->isGranted('ROLE_ORGANIZER')) {
                 // Regular users create suggestions
                 $this->service->generateSuggestions($newGlossary, $id, $this->getUser()->getId());
 

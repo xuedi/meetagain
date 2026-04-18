@@ -93,18 +93,14 @@ readonly class PollService
 
         $existingVote = $this->voteRepo->findUserVote($poll, $userId);
 
-        if ($existingVote !== null) {
-            $existingVote->setSuggestion($suggestion);
-            $existingVote->setVotedAt(new DateTimeImmutable());
-            $this->em->persist($existingVote);
-        } else {
-            $vote = new BookPollVote();
+        $vote = $existingVote ?? new BookPollVote();
+        if ($existingVote === null) {
             $vote->setPoll($poll);
             $vote->setUserId($userId);
-            $vote->setSuggestion($suggestion);
-            $vote->setVotedAt(new DateTimeImmutable());
-            $this->em->persist($vote);
         }
+        $vote->setSuggestion($suggestion);
+        $vote->setVotedAt(new DateTimeImmutable());
+        $this->em->persist($vote);
 
         $this->em->flush();
     }
@@ -131,10 +127,8 @@ readonly class PollService
         $poll->setEndDate(new DateTimeImmutable());
 
         foreach ($poll->getSuggestions() as $suggestion) {
-            if ($suggestion->getId() === $winner->getId()) {
-                $suggestion->setStatus(SuggestionStatus::Selected);
-            } else {
-                $suggestion->setStatus(SuggestionStatus::Pending);
+            $suggestion->setStatus($suggestion->getId() === $winner->getId() ? SuggestionStatus::Selected : SuggestionStatus::Pending);
+            if ($suggestion->getId() !== $winner->getId()) {
                 $suggestion->setPoll(null);
                 $suggestion->setResubmitCount($suggestion->getResubmitCount() + 1);
             }

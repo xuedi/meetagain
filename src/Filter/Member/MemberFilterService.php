@@ -42,12 +42,12 @@ readonly class MemberFilterService
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
-            } else {
-                // Intersect: member must pass ALL filters
-                $resultSet = array_values(array_intersect($resultSet, $filterResult));
-                if ($resultSet === []) {
-                    return MemberFilterResult::emptyResult();
-                }
+                continue;
+            }
+            // Intersect: member must pass ALL filters
+            $resultSet = array_values(array_intersect($resultSet, $filterResult));
+            if ($resultSet === []) {
+                return MemberFilterResult::emptyResult();
             }
         }
 

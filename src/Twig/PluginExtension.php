@@ -190,9 +190,9 @@ new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_
                 if ($result !== null) {
                     if (is_array($result)) {
                         array_push($results, ...$result);
-                    } else {
-                        $results[] = $result;
+                        continue;
                     }
+                    $results[] = $result;
                 }
             } catch (Throwable) {
                 continue;

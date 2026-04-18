@@ -59,7 +59,8 @@ class AbstractImageLocationProviderTest extends TestCase
             $repoMock->expects($this->once())
                 ->method('insertForType')
                 ->with(ImageType::EventTeaser, $expectedToInsert);
-        } else {
+        }
+        if ($expectedToInsert === []) {
             $repoMock->expects($this->never())->method('insertForType');
         }
 
@@ -67,7 +68,8 @@ class AbstractImageLocationProviderTest extends TestCase
             $repoMock->expects($this->once())
                 ->method('deleteByTypeAndPairs')
                 ->with(ImageType::EventTeaser, $expectedToDelete);
-        } else {
+        }
+        if ($expectedToDelete === []) {
             $repoMock->expects($this->never())->method('deleteByTypeAndPairs');
         }
 

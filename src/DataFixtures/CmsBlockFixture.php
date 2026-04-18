@@ -46,7 +46,9 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                     $json['images'][] = ['id' => $image->getId(), 'hash' => $image->getHash()];
                     $block->setJson($json);
                     $manager->persist($block);
-                } else {
+                }
+
+                if ($type !== CmsBlockType::Gallery) {
                     // Other block types use the associated Image entity field
                     $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
                     $this->imageService->createThumbnails($image, ImageType::CmsBlock);

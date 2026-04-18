@@ -106,7 +106,7 @@ readonly class SuggestionService
 
         $suggestedAt = $suggestion->getSuggestedAt();
         $daysSinceSuggested = $suggestedAt !== null ? $suggestedAt->diff(new DateTimeImmutable())->days : 0;
-        $timeBonus = $daysSinceSuggested * 1;
+        $timeBonus = $daysSinceSuggested;
 
         return $resubmitBonus + $timeBonus;
     }

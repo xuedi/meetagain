@@ -443,9 +443,9 @@ readonly class ImportService
             $path = $dir . '/' . $file;
             if (is_dir($path)) {
                 $this->removeDirectory($path);
-            } else {
-                unlink($path);
+                continue;
             }
+            unlink($path);
         }
 
         rmdir($dir);

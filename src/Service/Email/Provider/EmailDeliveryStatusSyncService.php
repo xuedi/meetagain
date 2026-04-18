@@ -32,15 +32,15 @@ final readonly class EmailDeliveryStatusSyncService implements CronTaskInterface
 
         foreach ($emails as $email) {
             $log = $this->provider->getLogByMessageId((string) $email->getProviderMessageId());
-            if ($log !== null) {
-                $email->setProviderStatus($log->status);
-                $updated++;
-            } else {
+            if ($log === null) {
                 $this->logger->warning('EmailDeliveryStatusSync: no provider log found for message', [
                     'email_queue_id' => $email->getId(),
                     'provider_message_id' => $email->getProviderMessageId(),
                 ]);
+                continue;
             }
+            $email->setProviderStatus($log->status);
+            $updated++;
         }
 
         $this->em->flush();

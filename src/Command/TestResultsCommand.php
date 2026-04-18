@@ -124,7 +124,8 @@ class TestResultsCommand extends Command
                     $output->writeln("   {$f['diff']}");
                 }
             }
-        } elseif (!$failuresOnly) {
+        }
+        if ($failures === [] && !$failuresOnly) {
             $output->writeln('All tests passed.');
         }
 
@@ -170,12 +171,11 @@ class TestResultsCommand extends Command
             if (str_starts_with($line, '@@ @@')) {
                 continue;
             }
-            if ($inDiff) {
-                if (str_starts_with($line, '-')) {
-                    $expected = trim(substr($line, 1));
-                } elseif (str_starts_with($line, '+')) {
-                    $actual = trim(substr($line, 1));
-                }
+            if ($inDiff && str_starts_with($line, '-')) {
+                $expected = trim(substr($line, 1));
+            }
+            if ($inDiff && str_starts_with($line, '+')) {
+                $actual = trim(substr($line, 1));
             }
         }
 
