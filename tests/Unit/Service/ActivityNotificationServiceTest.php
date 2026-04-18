@@ -6,11 +6,10 @@ use App\Activity\Messages\Login;
 use App\Activity\Messages\RsvpYes;
 use App\Activity\Messages\SendMessage;
 use App\Activity\NotificationService as ActivityNotificationService;
+use App\Emails\Types\NotificationMessageEmail;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -37,7 +36,7 @@ final class ActivityNotificationServiceTest extends TestCase
             ->willReturn(new EventStub()->setId(42));
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoMock,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $this->createStub(TagAwareCacheInterface::class),
@@ -67,7 +66,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $cacheMock->expects($this->once())->method('get');
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoMock,
             appCache: $cacheMock,
@@ -94,7 +93,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoMock->expects($this->never())->method('findOneBy');
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoMock,
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
@@ -118,7 +117,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $cacheMock->expects($this->never())->method('get');
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
@@ -158,7 +157,7 @@ final class ActivityNotificationServiceTest extends TestCase
             });
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
@@ -195,7 +194,7 @@ final class ActivityNotificationServiceTest extends TestCase
             });
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
@@ -214,7 +213,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoMock->expects($this->never())->method('findOneBy');
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
@@ -239,7 +238,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $cacheMock->expects($this->never())->method('get');
 
         $service = new ActivityNotificationService(
-            emailService: $this->createStub(EmailService::class),
+            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoStub,
             appCache: $cacheMock,
@@ -258,7 +257,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $sender = new UserStub()->setId(1);
         $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
-        $recipient->setLastLogin(new DateTime('-3 hours'));
+        $recipient->setLastLogin(new \DateTime('-3 hours'));
 
         $notificationSettings = new \App\Entity\NotificationSettings(['receivedMessage' => true]);
         $recipient->setNotificationSettings($notificationSettings);
@@ -266,9 +265,9 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoStub = $this->createStub(UserRepository::class);
         $userRepoStub->method('findOneBy')->willReturn($recipient);
 
-        $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->once())->method('prepareMessageNotification');
-        $emailServiceMock->expects($this->once())->method('sendQueue');
+        $emailMock = $this->createMock(NotificationMessageEmail::class);
+        $emailMock->method('guardCheck')->willReturn(true);
+        $emailMock->expects($this->once())->method('send');
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock
@@ -281,7 +280,7 @@ final class ActivityNotificationServiceTest extends TestCase
             });
 
         $service = new ActivityNotificationService(
-            emailService: $emailServiceMock,
+            notificationMessageEmail: $emailMock,
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoStub,
             appCache: $cacheMock,
@@ -300,7 +299,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $sender = new UserStub()->setId(1);
         $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
-        $recipient->setLastLogin(new DateTime('-1 hour'));
+        $recipient->setLastLogin(new \DateTime('-1 hour'));
 
         $notificationSettings = new \App\Entity\NotificationSettings(['receivedMessage' => true]);
         $recipient->setNotificationSettings($notificationSettings);
@@ -308,8 +307,9 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoStub = $this->createStub(UserRepository::class);
         $userRepoStub->method('findOneBy')->willReturn($recipient);
 
-        $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->never())->method('prepareMessageNotification');
+        $emailMock = $this->createMock(NotificationMessageEmail::class);
+        $emailMock->method('guardCheck')->willReturn(false);
+        $emailMock->expects($this->never())->method('send');
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock
@@ -322,7 +322,7 @@ final class ActivityNotificationServiceTest extends TestCase
             });
 
         $service = new ActivityNotificationService(
-            emailService: $emailServiceMock,
+            notificationMessageEmail: $emailMock,
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoStub,
             appCache: $cacheMock,

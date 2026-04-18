@@ -3,6 +3,7 @@
 namespace Tests\Plugin\Bookclub\Unit\Notification;
 
 use App\Entity\User;
+use App\Activity\ActivityService;
 use App\Repository\UserRepository;
 use App\Service\Notification\User\ReviewNotificationItem;
 use PHPUnit\Framework\TestCase;
@@ -41,6 +42,7 @@ class BookclubNotificationProviderTest extends TestCase
             bookService: $this->createStub(BookService::class),
             userRepository: $this->createStub(UserRepository::class),
             pollService: $this->createStub(PollService::class),
+            activityService: $this->createStub(ActivityService::class),
             security: $security,
         );
     }

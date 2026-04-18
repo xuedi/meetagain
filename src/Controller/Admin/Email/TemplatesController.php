@@ -6,16 +6,17 @@ namespace App\Controller\Admin\Email;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Emails\EmailInterface;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
 use App\Form\EmailTemplateType;
 use App\Repository\EmailTemplateRepository;
 use App\Repository\EmailTemplateTranslationRepository;
 use App\Service\Config\LanguageService;
-use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,8 +30,12 @@ final class TemplatesController extends AbstractAdminController
         return null;
     }
 
+    /**
+     * @param iterable<EmailInterface> $emailTypes
+     */
     public function __construct(
-        private readonly EmailService $emailService,
+        #[AutowireIterator(EmailInterface::class)]
+        private readonly iterable $emailTypes,
         private readonly EmailTemplateRepository $templateRepo,
         private readonly EmailTemplateService $templateService,
         private readonly EntityManagerInterface $em,
@@ -43,10 +48,11 @@ final class TemplatesController extends AbstractAdminController
     {
         $templates = $this->templateRepo->findAll();
         $templatesByIdentifier = $this->buildTemplatesByMockKey($templates);
-        $mockList = $this->emailService->getMockEmailList();
 
         $emails = [];
-        foreach ($mockList as $identifier => $mockData) {
+        foreach ($this->emailTypes as $emailType) {
+            $identifier = $emailType->getIdentifier();
+            $mockData = $emailType->getDisplayMockData();
             $dbTemplate = $templatesByIdentifier[$identifier] ?? null;
             $emails[$identifier] = [
                 'subject' => $mockData['subject'],
@@ -121,8 +127,7 @@ final class TemplatesController extends AbstractAdminController
     public function templatesPreview(Request $request, EmailTemplate $template): Response
     {
         $language = $request->query->getString('lang', $this->languageService->getAdminFilteredEnabledCodes()[0]);
-        $mockList = $this->emailService->getMockEmailList();
-        $mockContext = $this->getMockContextForTemplate($template->getIdentifier(), $mockList);
+        $mockContext = $this->getMockContextForTemplate($template->getIdentifier());
 
         $renderedSubject = $this->templateService->renderContent($template->getSubject($language), $mockContext);
         $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
@@ -169,9 +174,15 @@ final class TemplatesController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_email_templates_edit', ['id' => $template->getId()]);
     }
 
-    private function getMockContextForTemplate(string $identifier, array $mockList): array
+    private function getMockContextForTemplate(string $identifier): array
     {
-        return $mockList[$identifier]['context'] ?? [];
+        foreach ($this->emailTypes as $emailType) {
+            if ($emailType->getIdentifier() === $identifier) {
+                return $emailType->getDisplayMockData()['context'];
+            }
+        }
+
+        return [];
     }
 
     private function getOrCreateTranslation(string $languageCode, ?int $templateId): EmailTemplateTranslation

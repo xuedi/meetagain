@@ -15,7 +15,7 @@ use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailService;
+use App\Emails\Types\AnnouncementEmail;
 use App\Service\Email\EmailTemplateService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +28,7 @@ readonly class AnnouncementService
         private UserRepository $userRepo,
         private ConfigService $configService,
         private EmailTemplateService $templateService,
-        private EmailService $emailService,
+        private AnnouncementEmail $announcementEmail,
     ) {}
 
     public function send(Announcement $announcement): int
@@ -50,12 +50,11 @@ readonly class AnnouncementService
 
         foreach ($subscribers as $subscriber) {
             $renderedContent = $this->renderContent($cmsPage, $subscriber->getLocale());
-            $this->emailService->prepareAnnouncementEmail(
-                $subscriber,
-                $renderedContent,
-                $announcementUrl,
-                flush: false,
-            );
+            $this->announcementEmail->send([
+                'user' => $subscriber,
+                'renderedContent' => $renderedContent,
+                'announcementUrl' => $announcementUrl,
+            ]);
             ++$recipientCount;
         }
 

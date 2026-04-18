@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Service;
 
+use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
@@ -9,7 +10,6 @@ use App\Enum\EventInterval;
 use App\Enum\EventType;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
-use App\Service\Email\EmailService;
 use App\Service\Event\EventService;
 use App\Service\Event\RecurringEventService;
 use DateTime;
@@ -48,7 +48,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
@@ -90,7 +90,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $repoMock,
             em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
@@ -129,14 +129,13 @@ class EventServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($event);
         $emMock->expects($this->once())->method('flush');
 
-        $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->exactly(2))->method('prepareEventCanceledNotification')->willReturn(true);
-        $emailServiceMock->expects($this->once())->method('sendQueue');
+        $emailMock = $this->createMock(NotificationEventCanceledEmail::class);
+        $emailMock->expects($this->exactly(2))->method('send');
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
-            emailService: $emailServiceMock,
+            notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
@@ -160,14 +159,13 @@ class EventServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($event);
         $emMock->expects($this->once())->method('flush');
 
-        $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->never())->method('prepareEventCanceledNotification');
-        $emailServiceMock->expects($this->once())->method('sendQueue');
+        $emailMock = $this->createMock(NotificationEventCanceledEmail::class);
+        $emailMock->expects($this->never())->method('send');
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
-            emailService: $emailServiceMock,
+            notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
@@ -193,14 +191,13 @@ class EventServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($event);
         $emMock->expects($this->once())->method('flush');
 
-        $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->never())->method('prepareEventCanceledNotification');
-        $emailServiceMock->expects($this->never())->method('sendQueue');
+        $emailMock = $this->createMock(NotificationEventCanceledEmail::class);
+        $emailMock->expects($this->never())->method('send');
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
-            emailService: $emailServiceMock,
+            notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
@@ -226,7 +223,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
-            emailService: $this->createStub(EmailService::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
@@ -250,7 +247,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
             plugins: [],
@@ -274,7 +271,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
             plugins: [],
@@ -299,14 +296,13 @@ class EventServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($event);
         $emMock->expects($this->once())->method('flush');
 
-        $emailMock = $this->createMock(EmailService::class);
-        $emailMock->expects($this->once())->method('prepareEventCanceledNotification')->with($user, $event);
-        $emailMock->expects($this->once())->method('sendQueue');
+        $emailMock = $this->createMock(NotificationEventCanceledEmail::class);
+        $emailMock->expects($this->once())->method('send')->with(['user' => $user, 'event' => $event]);
 
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $emMock,
-            emailService: $emailMock,
+            notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
             plugins: [],
@@ -331,7 +327,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
             plugins: [],
@@ -355,7 +351,7 @@ class EventServiceTest extends TestCase
         $subject = new EventService(
             repo: $this->createStub(EventRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
             plugins: [],

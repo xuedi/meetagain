@@ -1,0 +1,36 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'planned'} %}
+
+        {% if items is empty %}
+            <p class="has-text-grey">No scheduled emails planned in the next 14 days.</p>
+        {% else %}
+            <table class="table is-fullwidth" id="filteredTable">
+                <thead>
+                    <tr>
+                        <th>Expected Time</th>
+                        <th>Mail Type</th>
+                        <th>Description</th>
+                        <th>Expected Recipients</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.expectedTime|date('Y-m-d H:i') }}</td>
+                            <td>{{ item.mailType }}</td>
+                            <td>{{ item.label }}</td>
+                            <td>{{ item.expectedRecipients }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
