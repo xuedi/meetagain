@@ -13,10 +13,6 @@ readonly class UserNotificationProvider implements NotificationProviderInterface
         private MessageRepository $messageRepo,
     ) {}
 
-    public function getPriority(): int
-    {
-        return 200;
-    }
 
     public function getNotifications(User $user): array
     {

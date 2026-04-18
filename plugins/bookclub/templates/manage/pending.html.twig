@@ -39,18 +39,10 @@
                             <td>{{ get_user_name(book.createdBy) }}</td>
                             <td>{{ book.createdAt|date('Y-m-d H:i') }}</td>
                             <td>
-                                <div class="buttons are-small">
-                                    <form action="{{ path('app_plugin_bookclub_approve', {id: book.id}) }}" method="post" style="display: inline;">
-                                        <button type="submit" class="button is-success is-small">
-                                            <span class="icon"><i class="fas fa-check"></i></span>
-                                        </button>
-                                    </form>
-                                    <form action="{{ path('app_plugin_bookclub_reject', {id: book.id}) }}" method="post" style="display: inline;">
-                                        <button type="submit" class="button is-danger is-small" onclick="return confirm('Reject and delete this book?')">
-                                            <span class="icon"><i class="fas fa-times"></i></span>
-                                        </button>
-                                    </form>
-                                </div>
+                                <a href="{{ path('app_profile_review') }}" class="button is-small is-info is-outlined">
+                                    <span class="icon"><i class="fas fa-check-double"></i></span>
+                                    <span>Review</span>
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

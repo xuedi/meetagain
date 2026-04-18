@@ -183,10 +183,6 @@ class Kernel implements Plugin
     {
     }
 
-    public function getMemberPageTop(): ?string
-    {
-        return null;
-    }
 
     public function getStylesheets(): array
     {

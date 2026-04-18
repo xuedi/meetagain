@@ -1,3 +1,16 @@
+# Review notification system
+'notification.review.pending_count': '%count% Element wartet auf Ihre Ueberpruefung|%count% Elemente warten auf Ihre Ueberpruefung'
+'profile.review.title': 'Ausstehende Ueberpruefungen'
+'profile.review.empty': 'Keine Elemente zur Ueberpruefung vorhanden.'
+'profile.review.approve': 'Genehmigen'
+'profile.review.deny': 'Ablehnen'
+'review.core.member_pending': 'Nutzer %name% wartet auf Genehmigung'
+'review.core.image_reported': 'Bild von %reporter% gemeldet'
+'review.bookclub.book_pending': 'Buch "%title%" von %user% wartet auf Genehmigung'
+'review.dinnerclub.dish_suggestion_pending': 'Gerichtvorschlag "%name%" von %user%'
+'review.dinnerclub.image_suggestion_pending': 'Bildvorschlag fuer "%dish%" von Nutzer #%user%'
+'review.multisite.group_application': 'Gruppenantrag fuer "%groupName%"'
+'review.multisite.member_join_request': '%user% moechte der Gruppe "%groupName%" beitreten'
 page_title_default: Willkommen
 menu_about: 'Über Uns'
 menu_books: Bücher

@@ -55,15 +55,11 @@
                                 <footer class="card-footer">
                                     <a href="{{ path('plugin_dinnerclub_approval_view', {'id': dish.id}) }}" class="card-footer-item">
                                         <span class="icon"><i class="fa-solid fa-eye"></i></span>
+                                        <span>View</span>
+                                    </a>
+                                    <a href="{{ path('app_profile_review') }}" class="card-footer-item has-text-info">
+                                        <span class="icon"><i class="fa-solid fa-check-double"></i></span>
                                         <span>Review</span>
-                                    </a>
-                                    <a href="{{ path('plugin_dinnerclub_approval_approve', {'id': dish.id}) }}" class="card-footer-item has-text-success">
-                                        <span class="icon"><i class="fa-solid fa-check"></i></span>
-                                        <span>Approve</span>
-                                    </a>
-                                    <a href="{{ path('plugin_dinnerclub_approval_reject', {'id': dish.id}) }}" class="card-footer-item has-text-danger">
-                                        <span class="icon"><i class="fa-solid fa-times"></i></span>
-                                        <span>Reject</span>
                                     </a>
                                 </footer>
                             </div>

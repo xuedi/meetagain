@@ -41,8 +41,7 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
             new TwigFunction('get_plugin_footer_links', $this->getPluginFooterLinks(...)),
             new TwigFunction('get_plugin_profile_dropdown_links', $this->getPluginProfileDropdownLinks(...)),
-            new TwigFunction('get_member_page_top', $this->getMemberPageTop(...), ['is_safe' => ['html']]),
-            new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
+new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
             new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),
         ];
@@ -122,14 +121,6 @@ final class PluginExtension extends AbstractExtension
         usort($links, static fn($a, $b) => $a->getPriority() <=> $b->getPriority());
 
         return $links;
-    }
-
-    /**
-     * Returns rendered HTML for member page top section from first plugin that provides it.
-     */
-    public function getMemberPageTop(): ?string
-    {
-        return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getMemberPageTop());
     }
 
     /**
