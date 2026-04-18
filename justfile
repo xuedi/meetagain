@@ -317,7 +317,7 @@ checkA11y url='http://meetagain.local/':
 # Format code with Mago
 [group('fixing')]
 fixMago:
-    vendor/bin/mago --config=tests/config/mago.toml format
+    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml lint --fix --format-after-fix
 
 # Generate coverage badge (CI)
 [group('fixing')]
