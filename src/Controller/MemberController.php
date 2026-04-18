@@ -12,9 +12,11 @@ use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MemberController extends AbstractController
 {
@@ -65,9 +67,13 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/view/{id}', name: 'app_member_view')]
-    #[IsGranted('ROLE_USER')]
-    public function view(int $id): Response
+    public function view(int $id, Request $request): Response
     {
+        if (!$this->getUser() instanceof UserInterface) {
+            $request->getSession()->set('redirectUrl', $request->getRequestUri());
+            return $this->redirectToRoute('app_login');
+        }
+
         $response = $this->getResponse();
         try {
             $currentUser = $this->getAuthedUser();
