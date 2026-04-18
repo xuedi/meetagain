@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\ImageReportStatus;
 use App\Repository\ImageReportRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -55,7 +56,7 @@ readonly class CoreImageReportProvider implements ReviewNotificationProviderInte
 
         $report = $this->imageReportRepo->find((int) $itemId);
         if ($report === null) {
-            throw new \InvalidArgumentException('Image report not found.');
+            throw new InvalidArgumentException('Image report not found.');
         }
 
         $report->setStatus(ImageReportStatus::Resolved);
@@ -71,7 +72,7 @@ readonly class CoreImageReportProvider implements ReviewNotificationProviderInte
 
         $report = $this->imageReportRepo->find((int) $itemId);
         if ($report === null) {
-            throw new \InvalidArgumentException('Image report not found.');
+            throw new InvalidArgumentException('Image report not found.');
         }
 
         $report->setStatus(ImageReportStatus::Resolved);

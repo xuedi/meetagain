@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Entity\User;
 use App\Service\Notification\User\ReviewNotificationService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use App\Entity\User;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Throwable;
 
 #[IsGranted('ROLE_USER')]
 final class ReviewController extends AbstractController
@@ -41,7 +42,7 @@ final class ReviewController extends AbstractController
 
         try {
             $this->service->getProviderByIdentifier($providerIdentifier)->approveItem($user, $itemId);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }
 
@@ -59,7 +60,7 @@ final class ReviewController extends AbstractController
 
         try {
             $this->service->getProviderByIdentifier($providerIdentifier)->denyItem($user, $itemId);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }
 
