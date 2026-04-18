@@ -79,10 +79,6 @@ readonly class NavigationPlugin implements Plugin
     {
     }
 
-    public function getMemberPageTop(): ?string
-    {
-        return null;
-    }
 
     public function getStylesheets(): array
     {

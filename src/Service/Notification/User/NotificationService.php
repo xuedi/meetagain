@@ -17,11 +17,8 @@ readonly class NotificationService
     public function getNotifications(User $user): NotificationSummary
     {
         $allItems = [];
-        $providers = iterator_to_array($this->providers);
 
-        usort($providers, static fn($a, $b) => $b->getPriority() <=> $a->getPriority());
-
-        foreach ($providers as $provider) {
+        foreach ($this->providers as $provider) {
             $items = $provider->getNotifications($user);
             $allItems = [...$allItems, ...$items];
         }

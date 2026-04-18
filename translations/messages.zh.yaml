@@ -1,3 +1,16 @@
+# Review notification system
+'notification.review.pending_count': '有 %count% 个项目等待您的审核'
+'profile.review.title': '待审核项目'
+'profile.review.empty': '暂无待审核项目。'
+'profile.review.approve': '批准'
+'profile.review.deny': '拒绝'
+'review.core.member_pending': '用户 %name% 正在等待审批'
+'review.core.image_reported': '图片被 %reporter% 举报'
+'review.bookclub.book_pending': '图书《%title%》由 %user% 提交，待审核'
+'review.dinnerclub.dish_suggestion_pending': '%user% 建议的菜品《%name%》'
+'review.dinnerclub.image_suggestion_pending': '用户 #%user% 为《%dish%》提交的图片建议'
+'review.multisite.group_application': '"%groupName%" 的小组申请'
+'review.multisite.member_join_request': '%user% 想加入小组 "%groupName%"'
 page_title_default: 欢迎
 menu_about: 关于
 menu_books: 书籍

@@ -66,12 +66,6 @@ interface Plugin
     public function warmCache(WarmCacheType $type, array $ids): void;
 
     /**
-     * Returns rendered HTML to display at the top of the admin member list page.
-     * Return null if the plugin doesn't provide content for this section.
-     */
-    public function getMemberPageTop(): ?string;
-
-    /**
      * Returns logical asset paths for stylesheets this plugin contributes.
      * Paths are relative to the plugin's assets/ directory.
      * Example: ['styles/filmclub.css']
