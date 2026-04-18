@@ -443,3 +443,16 @@ language_fy: Frisian
 meta_description_cookie: 'Manage your cookie preferences for this site. Control which optional features are enabled.'
 meta_description_events_featured: 'Handpicked special events and highlights from our community. Discover featured meetups worth attending.'
 meta_description_event_meeting_at: 'meeting at'
+# Review notification system
+'notification.review.pending_count': '{%count%} item pending your review|{%count%} items pending your review'
+'profile.review.title': 'Pending Reviews'
+'profile.review.empty': 'No items pending your review.'
+'profile.review.approve': 'Approve'
+'profile.review.deny': 'Deny'
+'review.core.member_pending': 'User %name% is waiting for approval'
+'review.core.image_reported': 'Image reported by %reporter%'
+'review.bookclub.book_pending': "Book '%title%' suggested by %user% is pending approval"
+'review.dinnerclub.dish_suggestion_pending': "Dish suggestion '%name%' by %user%"
+'review.dinnerclub.image_suggestion_pending': "Image suggestion for '%dish%' by user #%user%"
+'review.multisite.group_application': "Group application for '%groupName%'"
+'review.multisite.member_join_request': '%user% wants to join group ''%groupName%'''

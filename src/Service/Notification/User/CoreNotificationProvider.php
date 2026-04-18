@@ -6,25 +6,17 @@ namespace App\Service\Notification\User;
 
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
-use App\Repository\ImageReportRepository;
 use App\Repository\SupportRequestRepository;
-use App\Repository\UserRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class CoreNotificationProvider implements NotificationProviderInterface
 {
     public function __construct(
-        private ImageReportRepository $imageReportRepo,
         private EmailQueueRepository $emailRepo,
-        private UserRepository $userRepo,
         private SupportRequestRepository $supportRequestRepo,
         private Security $security,
     ) {}
 
-    public function getPriority(): int
-    {
-        return 0;
-    }
 
     public function getNotifications(User $user): array
     {
@@ -33,29 +25,11 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
             return $items; // only Admin from here on
         }
 
-        $openReports = $this->imageReportRepo->getOpenCount();
-        if ($openReports > 0) {
-            $items[] = new NotificationItem(
-                label: $openReports . ' Reported Image' . ($openReports > 1 ? 's' : ''),
-                icon: 'fa-flag',
-                route: 'app_admin_support_reports',
-            );
-        }
-
         $staleEmails = $this->emailRepo->getStaleCount(60);
         if ($staleEmails > 0) {
             $items[] = new NotificationItem(
                 label: $staleEmails . ' Stale Email' . ($staleEmails > 1 ? 's' : ''),
                 icon: 'fa-envelope',
-            );
-        }
-
-        $pendingApproval = $this->userRepo->getUnverifiedCount();
-        if ($pendingApproval > 0) {
-            $items[] = new NotificationItem(
-                label: $pendingApproval . ' Pending Approval',
-                icon: 'fa-user-clock',
-                route: 'app_admin_member',
             );
         }
 

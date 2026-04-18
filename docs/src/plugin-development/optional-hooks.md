@@ -16,7 +16,8 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `CmsFilterInterface`                          | Control which CMS pages are visible                  | `getCmsPageSlugs()`                   |
 | `MemberFilterInterface`                       | Filter which members appear in lists                 | `getUserIds()`                        |
 | `EventFilterFormContributorInterface`         | Add fields to the event filter form                  | `addFields()`                         |
-| `NotificationProviderInterface`               | Add counts to the notification bell                  | `getNotifications()`                  |
+| `NotificationProviderInterface`               | Add informational items to the notification bell     | `getNotifications()`                  |
+| `ReviewNotificationProviderInterface`         | Add approve/deny items to the review page            | `getReviewItems()`, `approveItem()`, `denyItem()` |
 | `EntityActionInterface`                       | React to core entity lifecycle events                | `handleEntityAction()`                |
 | `ActivityMetaEnricherInterface`               | Enrich metadata on all activity types                | `enrich()`                            |
 | `MessageInterface`                            | Define a new activity type with display rendering    | `getType()`, `validate()`, `render()` |
@@ -348,43 +349,105 @@ readonly class CategoryFilterContributor implements EventFilterFormContributorIn
 
 ### NotificationProviderInterface
 
-**Purpose:** Contribute counts to the notification bell in the header.
+**Purpose:** Contribute informational items to the notification bell - items that link to a page but need no approve/deny action (e.g. open polls, unread messages).
 
-**File:** `src/Notification/NotificationProviderInterface.php`
-
-**Tag:** `#[AutoconfigureTag('app.notification_provider')]`
+**File:** `src/Service/Notification/User/NotificationProviderInterface.php`
 
 **When called:** When rendering the notification menu.
 
 ```php
 namespace Plugin\YourPlugin\Notification;
 
+use App\Entity\User;
+use App\Service\Notification\User\NotificationItem;
 use App\Service\Notification\User\NotificationProviderInterface;
-use App\ValueObject\NotificationCount;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('app.notification_provider')]
-readonly class PendingApprovalsNotification implements NotificationProviderInterface
+readonly class MyNotificationProvider implements NotificationProviderInterface
 {
-    public function getNotifications(): array
+    public function getNotifications(User $user): array
     {
-        $count = $this->pendingRepository->count();
-
-        if ($count === 0) {
+        $activePoll = $this->pollService->getActivePoll();
+        if ($activePoll === null) {
             return [];
         }
 
         return [
-            new NotificationCount(
-                label: 'Pending Approvals',
-                count: $count,
-                url: $this->urlGenerator->generate('app_admin_pending'),
-                icon: 'fa fa-clock',
+            new NotificationItem(
+                label: 'Open poll - cast your vote!',
+                icon: 'fa-vote-yea',
+                route: 'app_plugin_myplugin_poll',
             ),
         ];
     }
 }
 ```
+
+---
+
+### ReviewNotificationProviderInterface
+
+**Purpose:** Surface approve/deny items on the central review page at `/profile/review`. The navbar shows a single
+consolidated count entry for all pending review items; the review page renders each item with Approve and Deny buttons.
+
+**File:** `src/Service/Notification/User/ReviewNotificationProviderInterface.php`
+
+**When called:** When the navbar count is computed and when the review page renders.
+
+```php
+namespace Plugin\YourPlugin\Notification;
+
+use App\Entity\User;
+use App\Service\Notification\User\ReviewNotificationItem;
+use App\Service\Notification\User\ReviewNotificationProviderInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+readonly class MyReviewProvider implements ReviewNotificationProviderInterface
+{
+    public function getIdentifier(): string
+    {
+        return 'myplugin.pending_items'; // stable forever - never change after deployment
+    }
+
+    /** @return ReviewNotificationItem[] */
+    public function getReviewItems(User $user): array
+    {
+        if (!$this->security->isGranted('ROLE_ORGANIZER')) {
+            return [];
+        }
+
+        return array_map(
+            static fn($item) => new ReviewNotificationItem(
+                id: (string) $item->getId(),
+                description: sprintf("Item '%s' pending approval", $item->getName()),
+                canDeny: true,
+                icon: 'check',
+            ),
+            $this->repository->findPending(),
+        );
+    }
+
+    public function approveItem(User $user, string $itemId): void
+    {
+        if (!$this->security->isGranted('ROLE_ORGANIZER')) {
+            throw new AccessDeniedException();
+        }
+        $this->myService->approve((int) $itemId);
+    }
+
+    public function denyItem(User $user, string $itemId): void
+    {
+        if (!$this->security->isGranted('ROLE_ORGANIZER')) {
+            throw new AccessDeniedException();
+        }
+        $this->myService->reject((int) $itemId);
+    }
+}
+```
+
+**Key rules:**
+- `getIdentifier()` is embedded in form action URLs - never change it once deployed
+- Both `approveItem()` and `denyItem()` must check authorisation themselves and throw `AccessDeniedException` if denied
+- `itemId` is always cast to/from string; use `(int) $itemId` to recover the DB id
 
 ---
 

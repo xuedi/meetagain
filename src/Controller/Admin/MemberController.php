@@ -2,9 +2,6 @@
 
 namespace App\Controller\Admin;
 
-use App\Activity\ActivityService;
-use App\Activity\Messages\AdminMemberApproved;
-use App\Activity\Messages\AdminMemberDenied;
 use App\Entity\AdminLink;
 use App\Entity\User;
 use App\EntityActionDispatcher;
@@ -14,7 +11,6 @@ use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Form\UserType;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,10 +24,8 @@ final class MemberController extends AbstractAdminController
 {
     public function __construct(
         private readonly UserRepository $repo,
-        private readonly EmailService $emailService,
         private readonly AdminMemberListFilterService $filterService,
         private readonly EntityManagerInterface $em,
-        private readonly ActivityService $activityService,
         private readonly EntityActionDispatcher $dispatcher,
         private readonly Security $security,
     ) {}
@@ -55,16 +49,9 @@ final class MemberController extends AbstractAdminController
         $filterResult = $this->filterService->getUserIdFilter();
         $users = $this->repo->findAllForAdmin($filterResult->getUserIds());
 
-        // Get pending users (EmailVerified status) for approval section
-        $pendingUsers = [];
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            $pendingUsers = $this->repo->findByStatus(UserStatus::EmailVerified);
-        }
-
         return $this->render('admin/member/list.html.twig', [
             'active' => 'member',
             'users' => $users,
-            'pendingUsers' => $pendingUsers,
         ]);
     }
 
@@ -115,55 +102,6 @@ final class MemberController extends AbstractAdminController
             'active' => 'member',
             'user' => $user,
         ]);
-    }
-
-    #[Route('/admin/member/approve/{id}', name: 'app_admin_member_approve', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function approve(Request $request, User $user): Response
-    {
-        if (!$this->isCsrfTokenValid('approve_user', $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        if ($user->getStatus() !== UserStatus::EmailVerified) {
-            throw $this->createNotFoundException('Only pending users can be approved.');
-        }
-
-        $user->setStatus(UserStatus::Active);
-
-        $this->emailService->prepareWelcome($user);
-        $this->emailService->sendQueue();
-
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $admin = $this->getAuthedUser();
-        $this->activityService->log(AdminMemberApproved::TYPE, $admin, ['user_id' => $user->getId()]);
-
-        return $this->redirectToRoute('app_admin_member');
-    }
-
-    #[Route('/admin/member/deny/{id}', name: 'app_admin_member_deny', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function deny(Request $request, User $user): Response
-    {
-        if (!$this->isCsrfTokenValid('deny_user', $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        if ($user->getStatus() !== UserStatus::EmailVerified) {
-            throw $this->createNotFoundException('Only pending users can be denied.');
-        }
-
-        $user->setStatus(UserStatus::Denied);
-
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $admin = $this->getAuthedUser();
-        $this->activityService->log(AdminMemberDenied::TYPE, $admin, ['user_id' => $user->getId()]);
-
-        return $this->redirectToRoute('app_admin_member');
     }
 
     #[Route('/admin/member/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]

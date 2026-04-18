@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'profile.review.title'|trans }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="title">{{ 'profile.review.title'|trans }}</h1>
+
+    {% for flash in app.flashes('success') %}
+        <div class="notification is-success">{{ flash }}</div>
+    {% endfor %}
+    {% for flash in app.flashes('error') %}
+        <div class="notification is-danger">{{ flash }}</div>
+    {% endfor %}
+
+    {% if providers is empty %}
+        <p class="has-text-grey">{{ 'profile.review.empty'|trans }}</p>
+    {% else %}
+        {% for entry in providers %}
+            {% set providerIdentifier = entry.provider.identifier %}
+            {% for item in entry.items %}
+                {{ include('profile/review/_item.html.twig', {item: item, providerIdentifier: providerIdentifier}) }}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

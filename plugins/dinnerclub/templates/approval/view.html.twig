@@ -48,15 +48,11 @@
                         <hr>
 
                         <div class="buttons">
-                            <a href="{{ path('plugin_dinnerclub_approval_approve', {'id': dish.id}) }}" class="button is-success is-medium">
-                                <span class="icon"><i class="fa-solid fa-check"></i></span>
-                                <span>Approve Dish</span>
+                            <a href="{{ path('app_profile_review') }}" class="button is-info is-medium">
+                                <span class="icon"><i class="fa-solid fa-check-double"></i></span>
+                                <span>Go to Review Page</span>
                             </a>
-                            <a href="{{ path('plugin_dinnerclub_approval_reject', {'id': dish.id}) }}" class="button is-danger is-medium">
-                                <span class="icon"><i class="fa-solid fa-times"></i></span>
-                                <span>Reject Dish</span>
-                            </a>
-                            <a href="{{ path('plugin_dinnerclub_approval_pending') }}" class="button">Cancel</a>
+                            <a href="{{ path('plugin_dinnerclub_approval_pending') }}" class="button">Back</a>
                         </div>
                     </div>
                 </div>

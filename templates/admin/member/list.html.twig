@@ -4,44 +4,6 @@
 
     <div class="container">
 
-        {# Plugin hook for content at top of member page (e.g., pending join requests) #}
-        {% set memberPageTop = get_member_page_top() %}
-        {% if memberPageTop %}
-            {{ memberPageTop | raw }}
-        {% endif %}
-
-        {# Core pending user approvals (EmailVerified status) #}
-        {% if pendingUsers is defined and pendingUsers|length > 0 %}
-            <div class="box">
-            <p class="subtitle">Pending User Approvals ({{ pendingUsers|length }})</p>
-                <table class="table is-fullwidth mb-5">
-                    <tbody>
-                        {% for user in pendingUsers %}
-                        <tr>
-                            <td>{{ user.name }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.createdAt|date('Y-m-d H:i') }}</td>
-                            <td>
-                                <form action="{{ path('app_admin_member_approve', {id: user.id}) }}" method="post" class="is-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('approve_user') }}">
-                                    <button type="submit" class="LinkLikeButton" title="Approve">
-                                        <span class="icon has-text-success"><i class="fa fa-check"></i></span>
-                                    </button>
-                                </form>
-                                <form action="{{ path('app_admin_member_deny', {id: user.id}) }}" method="post" class="is-inline" onsubmit="return confirm('Deny this user?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('deny_user') }}">
-                                    <button type="submit" class="LinkLikeButton" title="Deny">
-                                        <span class="icon has-text-danger"><i class="fa fa-times"></i></span>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
-
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
