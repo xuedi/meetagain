@@ -15,8 +15,9 @@ use App\Enum\UserStatus;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
+use App\Emails\Types\VerificationRequestEmail;
+use App\Emails\Types\WelcomeEmail;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailService;
 use App\Service\Member\CaptchaService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
@@ -38,7 +39,8 @@ final class SecurityController extends AbstractController
 
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly EmailService $emailService,
+        private readonly VerificationRequestEmail $verificationRequestEmail,
+        private readonly WelcomeEmail $welcomeEmail,
         private readonly AuthenticationUtils $authenticationUtils,
         private readonly Security $security,
         private readonly UserPasswordHasherInterface $hasher,
@@ -132,8 +134,7 @@ final class SecurityController extends AbstractController
             $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
 
             $this->activityService->log(Registered::TYPE, $user, []);
-            $this->emailService->prepareVerificationRequest($user);
-            $this->emailService->sendQueue(); // TODO: use cron instead
+            $this->verificationRequestEmail->send(['user' => $user]);
 
             return $this->render('security/register_email_send.html.twig');
         }
@@ -164,8 +165,7 @@ final class SecurityController extends AbstractController
             $em->flush();
 
             // Send welcome email
-            $this->emailService->prepareWelcome($user);
-            $this->emailService->sendQueue();
+            $this->welcomeEmail->send(['user' => $user]);
 
             // Redirect to events page
             return $this->render('security/approved.html.twig');

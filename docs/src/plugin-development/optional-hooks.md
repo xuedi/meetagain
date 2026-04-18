@@ -589,3 +589,80 @@ readonly class GroupContextEnricher implements ActivityMetaEnricherInterface
 - Return only the keys to **add**. The original caller's keys always win.
 - Use a `_<plugin_key>_` prefix to avoid collisions with other plugins.
 - Must not throw — enrichment is best-effort. Failures are logged as warnings.
+
+---
+
+## Email Types
+
+### Adding a custom email type
+
+Implement `EmailInterface` (or `ScheduledEmailInterface` for cron-driven emails) to add a new email type
+that automatically appears in the admin template preview and debugging pages.
+
+**File:** `src/Emails/EmailInterface.php` / `src/Emails/ScheduledEmailInterface.php`
+
+```php
+namespace Plugin\YourPlugin\Email;
+
+use App\Emails\EmailInterface;
+use App\Emails\EmailQueueInterface;
+use App\Enum\EmailType;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+
+readonly class MyPluginEmail implements EmailInterface
+{
+    public function __construct(
+        private EmailQueueInterface $queue,
+        private ConfigService $config,
+    ) {}
+
+    public function getIdentifier(): string
+    {
+        return 'myplugin_custom_email'; // must match EmailType::* value if using core enum
+    }
+
+    public function getDisplayMockData(): array
+    {
+        return [
+            'subject' => 'My Plugin Notification',
+            'context' => ['username' => 'John Doe', 'host' => 'https://localhost'],
+        ];
+    }
+
+    public function guardCheck(array $context): bool
+    {
+        return true; // or implement recipient eligibility checks
+    }
+
+    public function send(array $context): void
+    {
+        $user = $context['user'];
+
+        $email = new TemplatedEmail();
+        $email->from($this->config->getMailerAddress());
+        $email->to((string) $user->getEmail());
+        $email->locale($user->getLocale());
+        $email->context([/* template variables */]);
+
+        $this->queue->enqueue($email, EmailType::MyPluginType);
+    }
+}
+```
+
+Call it by injecting the class directly wherever you need to send it:
+
+```php
+$this->myPluginEmail->send(['user' => $user, ...]);
+```
+
+For **scheduled emails** (cron-driven), implement `ScheduledEmailInterface` additionally:
+- `getDueContexts(DateTimeImmutable $now): DueContext[]` — return what is due now; return `[]` to skip
+- `markContextSent(DueContext $context): void` — persist the "sent" state after processing
+- `getPlannedItems(DateTimeImmutable $from, DateTimeImmutable $to): ScheduledMailItem[]` — shown on `/admin/email/planned`
+
+`SendScheduledEmailsService` picks up all `ScheduledEmailInterface` implementations automatically via `#[AutowireIterator]`.
+
+!!! note
+Plugin email identifiers must not collide with core `EmailType` enum values. If your email type
+does not have a corresponding `EmailType` entry, you will need to add one or use a string identifier
+and implement the template system separately.

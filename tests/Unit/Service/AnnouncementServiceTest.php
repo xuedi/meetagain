@@ -14,7 +14,7 @@ use App\Enum\EmailType;
 use App\Repository\UserRepository;
 use App\Service\Cms\AnnouncementService;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailService;
+use App\Emails\Types\AnnouncementEmail;
 use App\Service\Email\EmailTemplateService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +34,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $this->createStub(ConfigService::class),
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Assert: expect exception
@@ -57,7 +57,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $this->createStub(ConfigService::class),
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Assert: expect exception
@@ -115,9 +115,9 @@ class AnnouncementServiceTest extends TestCase
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
-        // Arrange: email service should be called for each subscriber
-        $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->exactly(2))->method('prepareAnnouncementEmail');
+        // Arrange: email class should be called for each subscriber
+        $announcementEmailMock = $this->createMock(AnnouncementEmail::class);
+        $announcementEmailMock->expects($this->exactly(2))->method('send');
 
         // Arrange: entity manager should persist and flush
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -129,7 +129,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $userRepoMock,
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $emailServiceMock,
+            announcementEmail: $announcementEmailMock,
         );
 
         // Act: send announcement
@@ -174,9 +174,9 @@ class AnnouncementServiceTest extends TestCase
             ->method('findAnnouncementSubscribers')
             ->willReturn([$enabledSubscriber, $disabledSubscriber]);
 
-        // Arrange: email service should only be called once (for enabled subscriber)
-        $emailServiceMock = $this->createMock(EmailService::class);
-        $emailServiceMock->expects($this->once())->method('prepareAnnouncementEmail');
+        // Arrange: email class should only be called once (for enabled subscriber)
+        $announcementEmailMock = $this->createMock(AnnouncementEmail::class);
+        $announcementEmailMock->expects($this->once())->method('send');
 
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
@@ -186,7 +186,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $userRepoMock,
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $emailServiceMock,
+            announcementEmail: $announcementEmailMock,
         );
 
         // Act: send announcement
@@ -225,7 +225,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Act: get preview context
@@ -257,7 +257,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Act: get preview context
@@ -284,7 +284,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Act: get preview context
@@ -313,7 +313,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $this->createStub(ConfigService::class),
             templateService: $templateServiceMock,
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Assert: expect exception
@@ -367,7 +367,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
             templateService: $templateServiceMock,
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Act: render preview
@@ -410,7 +410,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Act: get preview context to trigger renderContent
@@ -455,7 +455,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Act: get preview context for English
@@ -494,7 +494,7 @@ class AnnouncementServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
-            emailService: $this->createStub(EmailService::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
         );
 
         // Act: get preview context for English (which has no content)

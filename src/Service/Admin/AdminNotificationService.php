@@ -7,7 +7,7 @@ use App\Enum\CronTaskStatus;
 use App\Repository\UserRepository;
 use App\ValueObject\CronTaskResult;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailService;
+use App\Emails\Types\AdminNotificationEmail;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use App\Service\Notification\Admin\AdminNotificationSection;
 use DateTimeImmutable;
@@ -30,7 +30,7 @@ readonly class AdminNotificationService implements CronTaskInterface
     public function __construct(
         #[AutowireIterator(AdminNotificationProviderInterface::class)]
         private iterable $providers,
-        private EmailService $emailService,
+        private AdminNotificationEmail $adminNotificationEmail,
         private UserRepository $userRepository,
         private TagAwareCacheInterface $appCache,
         private ConfigService $configService,
@@ -91,7 +91,7 @@ readonly class AdminNotificationService implements CronTaskInterface
         $recipients = $this->userRepository->findAdminUsers();
 
         foreach ($recipients as $recipient) {
-            $this->emailService->prepareAdminNotification($recipient, $sectionsHtml);
+            $this->adminNotificationEmail->send(['user' => $recipient, 'sectionsHtml' => $sectionsHtml]);
         }
 
         $this->updateLastSentAt();

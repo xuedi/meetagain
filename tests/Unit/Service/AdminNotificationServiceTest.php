@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
+use App\Emails\Types\AdminNotificationEmail;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Admin\AdminNotificationService;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailService;
 use App\Service\Notification\Admin\AdminNotificationItem;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use DateTimeImmutable;
@@ -19,14 +21,14 @@ class AdminNotificationServiceTest extends TestCase
 {
     private function buildService(
         array $providers,
-        EmailService $emailService,
+        AdminNotificationEmail $adminNotificationEmail,
         UserRepository $userRepository,
         TagAwareCacheInterface $cache,
         ConfigService $configService,
     ): AdminNotificationService {
         return new AdminNotificationService(
             providers: $providers,
-            emailService: $emailService,
+            adminNotificationEmail: $adminNotificationEmail,
             userRepository: $userRepository,
             appCache: $cache,
             configService: $configService,
@@ -43,7 +45,7 @@ class AdminNotificationServiceTest extends TestCase
 
         $service = $this->buildService(
             providers: [],
-            emailService: $this->createStub(EmailService::class),
+            adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
             userRepository: $this->createStub(UserRepository::class),
             cache: $this->createStub(TagAwareCacheInterface::class),
             configService: $config,
@@ -64,7 +66,7 @@ class AdminNotificationServiceTest extends TestCase
 
         $service = $this->buildService(
             providers: [],
-            emailService: $this->createStub(EmailService::class),
+            adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
             userRepository: $this->createStub(UserRepository::class),
             cache: $this->createStub(TagAwareCacheInterface::class),
             configService: $config,
@@ -94,7 +96,7 @@ class AdminNotificationServiceTest extends TestCase
 
         $service = $this->buildService(
             providers: [$provider],
-            emailService: $this->createStub(EmailService::class),
+            adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
             userRepository: $this->createStub(UserRepository::class),
             cache: $cache,
             configService: $config,
@@ -135,15 +137,17 @@ class AdminNotificationServiceTest extends TestCase
         $userRepository = $this->createStub(UserRepository::class);
         $userRepository->method('findAdminUsers')->willReturn([$adminUser]);
 
-        $emailService = $this->createMock(EmailService::class);
-        $emailService
+        $emailMock = $this->createMock(AdminNotificationEmail::class);
+        $emailMock
             ->expects($this->once())
-            ->method('prepareAdminNotification')
-            ->with($adminUser, static::stringContains('Jane Smith'));
+            ->method('send')
+            ->with(static::callback(
+                static fn($ctx) => $ctx['user'] === $adminUser && str_contains($ctx['sectionsHtml'], 'Jane Smith'),
+            ));
 
         $service = $this->buildService(
             providers: [$provider],
-            emailService: $emailService,
+            adminNotificationEmail: $emailMock,
             userRepository: $userRepository,
             cache: $cache,
             configService: $config,
@@ -173,7 +177,7 @@ class AdminNotificationServiceTest extends TestCase
 
         $service = $this->buildService(
             providers: [$provider],
-            emailService: $this->createStub(EmailService::class),
+            adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
             userRepository: $this->createStub(UserRepository::class),
             cache: $cache,
             configService: $config,
