@@ -47,9 +47,8 @@ final class SuggestionController extends AbstractGlossaryController
 
         if ($leftOver === 0) {
             return $this->redirectToRoute('app_plugin_glossary');
-        } else {
-            return $this->redirectToRoute('app_plugin_glossary_suggestion_list', ['id' => $id]);
         }
+        return $this->redirectToRoute('app_plugin_glossary_suggestion_list', ['id' => $id]);
     }
 
     #[Route('/delete/{id}/{hash}', name: 'app_plugin_glossary_suggestion_delete', methods: ['GET'])]
@@ -59,8 +58,7 @@ final class SuggestionController extends AbstractGlossaryController
 
         if ($leftOver === 0) {
             return $this->redirectToRoute('app_plugin_glossary');
-        } else {
-            return $this->redirectToRoute('app_plugin_glossary_suggestion_list', ['id' => $id]);
         }
+        return $this->redirectToRoute('app_plugin_glossary_suggestion_list', ['id' => $id]);
     }
 }

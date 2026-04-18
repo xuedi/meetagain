@@ -77,11 +77,7 @@ final class BookController extends AbstractController
                     return $this->redirectToRoute('app_plugin_bookclub_book_add');
                 }
 
-                if ($isManager) {
-                    $this->addFlash('success', 'Book added successfully.');
-                } else {
-                    $this->addFlash('success', 'Book submitted for approval.');
-                }
+                $this->addFlash('success', $isManager ? 'Book added successfully.' : 'Book submitted for approval.');
 
                 return $this->redirectToRoute('app_plugin_bookclub_book_show', ['id' => $book->getId()]);
             } catch (RuntimeException $e) {

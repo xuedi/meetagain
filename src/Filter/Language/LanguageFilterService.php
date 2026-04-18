@@ -43,11 +43,11 @@ readonly class LanguageFilterService
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
-            } else {
-                $resultSet = array_values(array_intersect($resultSet, $filterResult));
-                if ($resultSet === []) {
-                    return LanguageFilterResult::emptyResult();
-                }
+                continue;
+            }
+            $resultSet = array_values(array_intersect($resultSet, $filterResult));
+            if ($resultSet === []) {
+                return LanguageFilterResult::emptyResult();
             }
         }
 

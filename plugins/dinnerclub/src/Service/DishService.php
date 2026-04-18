@@ -147,7 +147,8 @@ readonly class DishService
 
         if ($suggestion->field === DishSuggestionField::Origin) {
             $dish->setOrigin($suggestion->value);
-        } else {
+        }
+        if ($suggestion->field !== DishSuggestionField::Origin) {
             $translation = $dish->findTranslation($suggestion->language);
             if ($translation === null) {
                 $translation = new DishTranslation();
@@ -413,7 +414,8 @@ readonly class DishService
 
         if ($suggestion->getType() === DishImageSuggestionType::AddImage) {
             $this->addGalleryImage($dish, $image);
-        } else {
+        }
+        if ($suggestion->getType() !== DishImageSuggestionType::AddImage) {
             $oldPreviewId = $dish->getPreviewImage()?->getId();
             $dish->setPreviewImage($image);
             $this->em->persist($dish);

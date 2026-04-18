@@ -20,13 +20,15 @@ readonly class NoteService
     public function saveNote(Book $book, int $userId, string $content): BookNote
     {
         $note = $this->noteRepo->findUserNote($book, $userId);
+        $isNew = $note === null;
 
-        if ($note === null) {
+        if ($isNew) {
             $note = new BookNote();
             $note->setBook($book);
             $note->setUserId($userId);
             $note->setCreatedAt(new DateTimeImmutable());
-        } else {
+        }
+        if (!$isNew) {
             $note->setUpdatedAt(new DateTimeImmutable());
         }
 

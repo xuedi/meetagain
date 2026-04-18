@@ -59,7 +59,8 @@ final class SeoController extends AbstractAdminController
         if ($status === 200 || $status === 202) {
             $this->indexNowService->recordSubmission();
             $this->addFlash('success', sprintf('Submitted to IndexNow (HTTP %d)', $status));
-        } else {
+        }
+        if ($status !== 200 && $status !== 202) {
             $this->addFlash('danger', sprintf('IndexNow submission failed (HTTP %d)', $status));
         }
 

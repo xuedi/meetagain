@@ -44,11 +44,11 @@ readonly class AdminLocationListFilterService
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
-            } else {
-                $resultSet = array_values(array_intersect($resultSet, $filterResult));
-                if ($resultSet === []) {
-                    return LocationFilterResult::emptyResult();
-                }
+                continue;
+            }
+            $resultSet = array_values(array_intersect($resultSet, $filterResult));
+            if ($resultSet === []) {
+                return LocationFilterResult::emptyResult();
             }
         }
 

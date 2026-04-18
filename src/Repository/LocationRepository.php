@@ -48,9 +48,10 @@ class LocationRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('l');
 
         if ($restrictToLocationIds === []) {
-            // Empty filter means no locations should be shown
             $qb->where('1 = 0');
-        } elseif ($restrictToLocationIds !== null) {
+            return $qb->orderBy('l.name', 'ASC');
+        }
+        if ($restrictToLocationIds !== null) {
             $qb->where('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);
         }
 

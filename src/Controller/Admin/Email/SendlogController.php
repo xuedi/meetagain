@@ -63,7 +63,8 @@ final class SendlogController extends AbstractAdminController
                 $result->updated,
                 $result->checked,
             ));
-        } else {
+        }
+        if (!$result->available) {
             $this->addFlash('warning', 'Email delivery provider is not configured.');
         }
 

@@ -25,13 +25,8 @@ final class CookieController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
-            if ($data['cookies']) {
-                $consent->setCookies(ConsentType::Granted);
-                $consent->setOsm($data['osm'] ? ConsentType::Granted : ConsentType::Denied);
-            } else {
-                $consent->setCookies(ConsentType::Denied);
-                $consent->setOsm(ConsentType::Denied);
-            }
+            $consent->setCookies($data['cookies'] ? ConsentType::Granted : ConsentType::Denied);
+            $consent->setOsm($data['cookies'] && $data['osm'] ? ConsentType::Granted : ConsentType::Denied);
 
             $consent->save($request->getSession());
 
@@ -41,7 +36,8 @@ final class CookieController extends AbstractController
                 foreach ($consent->getHtmlCookies() as $cookie) {
                     $response->headers->setCookie($cookie);
                 }
-            } else {
+            }
+            if ($consent->getCookies() !== ConsentType::Granted) {
                 $response->headers->clearCookie(Consent::TYPE_COOKIES);
                 $response->headers->clearCookie(Consent::TYPE_OSM);
             }

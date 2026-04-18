@@ -65,17 +65,15 @@ readonly class RecurringEventService implements CronTaskInterface
 
     public function updateRecurringEvents(Event $event): int
     {
-        if ($event->getRecurringRule() instanceof EventInterval) {
-            // is recurring, must be the parent
-            $parent = clone $event;
-        } elseif ($event->getRecurringOf() !== null) {
-            // has parent, load parent
-            $parent = $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
-            if ($parent === null) {
-                // Parent event was deleted, cannot update recurring events
-                return 0;
-            }
-        } else { // no parent, no recurring, nothing to do
+        if (!$event->getRecurringRule() instanceof EventInterval && $event->getRecurringOf() === null) {
+            return 0; // no parent, no recurring, nothing to do
+        }
+
+        $parent = $event->getRecurringRule() instanceof EventInterval
+            ? clone $event
+            : $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
+
+        if ($parent === null) {
             return 0;
         }
 

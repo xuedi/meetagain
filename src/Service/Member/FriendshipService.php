@@ -44,10 +44,12 @@ readonly class FriendshipService
             return new RedirectResponse($route);
         }
 
-        if ($currentUser->getFollowing()->contains($targetUser)) {
+        $isFollowing = $currentUser->getFollowing()->contains($targetUser);
+        if ($isFollowing) {
             $currentUser->removeFollowing($targetUser);
             $activityType = UnFollowedUser::TYPE;
-        } else {
+        }
+        if (!$isFollowing) {
             $currentUser->addFollowing($targetUser);
             $activityType = FollowedUser::TYPE;
         }

@@ -42,12 +42,12 @@ readonly class CmsFilterService
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
-            } else {
-                // Intersect: CMS page must pass ALL filters
-                $resultSet = array_values(array_intersect($resultSet, $filterResult));
-                if ($resultSet === []) {
-                    return CmsFilterResult::emptyResult();
-                }
+                continue;
+            }
+            // Intersect: CMS page must pass ALL filters
+            $resultSet = array_values(array_intersect($resultSet, $filterResult));
+            if ($resultSet === []) {
+                return CmsFilterResult::emptyResult();
             }
         }
 

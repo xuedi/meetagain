@@ -87,10 +87,9 @@ final class SupportController extends AbstractController
 
                 return $this->redirectToRoute('app_contact');
             }
-        } else {
-            $this->captchaService->reset();
         }
 
+        $this->captchaService->reset();
         return $this->render('support/index.html.twig', [
             'form' => $form,
             'captcha' => $this->captchaService->generate(),

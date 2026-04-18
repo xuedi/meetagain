@@ -44,11 +44,11 @@ readonly class AdminMemberListFilterService
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
-            } else {
-                $resultSet = array_values(array_intersect($resultSet, $filterResult));
-                if ($resultSet === []) {
-                    return MemberFilterResult::emptyResult();
-                }
+                continue;
+            }
+            $resultSet = array_values(array_intersect($resultSet, $filterResult));
+            if ($resultSet === []) {
+                return MemberFilterResult::emptyResult();
             }
         }
 

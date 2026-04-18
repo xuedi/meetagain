@@ -36,10 +36,10 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
         $locale = $request->attributes->get('_locale');
         if ($locale) {
             $request->getSession()->set('_locale', $locale);
-        } else {
-            $filteredDefault = $this->languageService->getFilteredDefaultLocale();
-            $locale = $request->getSession()->get('_locale', $filteredDefault);
-            $request->setLocale($locale);
+            return;
         }
+        $filteredDefault = $this->languageService->getFilteredDefaultLocale();
+        $locale = $request->getSession()->get('_locale', $filteredDefault);
+        $request->setLocale($locale);
     }
 }

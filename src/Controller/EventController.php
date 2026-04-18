@@ -157,19 +157,12 @@ final class EventController extends AbstractController
         // Check if any plugin provides custom featured events list
         $featuredEvents = $this->getProvidedFeaturedEvents();
 
+        $filterResult = $this->eventFilterService->getEventIdFilter();
+        $allowedEventIds = $filterResult->getEventIds();
+        $lastEvents = $this->repo->getPastEvents(3, $allowedEventIds);
+
         if ($featuredEvents === null) {
-            // No custom provider, use default logic with filtering
-            $filterResult = $this->eventFilterService->getEventIdFilter();
-            $allowedEventIds = $filterResult->getEventIds();
-
             $featuredEvents = $this->repo->findFeatured($allowedEventIds);
-
-            $lastEvents = $this->repo->getPastEvents(3, $allowedEventIds);
-        } else {
-            // Provider handles filtering, just get past events with same filter
-            $filterResult = $this->eventFilterService->getEventIdFilter();
-            $allowedEventIds = $filterResult->getEventIds();
-            $lastEvents = $this->repo->getPastEvents(3, $allowedEventIds);
         }
 
         return $this->render(
