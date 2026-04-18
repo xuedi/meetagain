@@ -73,6 +73,10 @@ enabled = false
 [linter.rules.assertion-style]
 enabled = false
 
+# Disabled — entity setters, test data providers, and service flags with bool params are idiomatic
+[linter.rules.no-boolean-flag-parameter]
+enabled = false
+
 # Disabled — strict assertions debatable for this test suite
 [linter.rules.strict-assertions]
 enabled = false

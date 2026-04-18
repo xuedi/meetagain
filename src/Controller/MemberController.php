@@ -44,14 +44,13 @@ final class MemberController extends AbstractController
         $filterResult = $this->memberFilterService->getUserIdFilter();
         $restrictToUserIds = $filterResult->getUserIds();
 
-        if ($currentUser instanceof User) {
-            $excludeIds = $this->blockingService->getExcludedUserIds($currentUser);
-            $userTotal = $this->repo->getNumberOfActiveMembers($excludeIds, $restrictToUserIds);
-            $users = $this->repo->findActiveMembers(self::PAGE_SIZE, $offset, $excludeIds, $restrictToUserIds);
-        } else {
-            $userTotal = $this->repo->getNumberOfActivePublicMembers($restrictToUserIds);
-            $users = $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset, $restrictToUserIds);
-        }
+        $excludeIds = $currentUser instanceof User ? $this->blockingService->getExcludedUserIds($currentUser) : [];
+        $userTotal = $currentUser instanceof User
+            ? $this->repo->getNumberOfActiveMembers($excludeIds, $restrictToUserIds)
+            : $this->repo->getNumberOfActivePublicMembers($restrictToUserIds);
+        $users = $currentUser instanceof User
+            ? $this->repo->findActiveMembers(self::PAGE_SIZE, $offset, $excludeIds, $restrictToUserIds)
+            : $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset, $restrictToUserIds);
 
         return $this->render(
             'member/index.html.twig',

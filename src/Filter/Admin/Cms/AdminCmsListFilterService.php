@@ -44,11 +44,11 @@ readonly class AdminCmsListFilterService
 
             if ($resultSet === null) {
                 $resultSet = $filterResult;
-            } else {
-                $resultSet = array_values(array_intersect($resultSet, $filterResult));
-                if ($resultSet === []) {
-                    return CmsFilterResult::emptyResult();
-                }
+                continue;
+            }
+            $resultSet = array_values(array_intersect($resultSet, $filterResult));
+            if ($resultSet === []) {
+                return CmsFilterResult::emptyResult();
             }
         }
 

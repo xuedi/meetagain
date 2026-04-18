@@ -114,11 +114,10 @@ class TestCoverageReportCommand extends Command
         }
 
         // Sort
-        if ($sortBy === 'uncovered') {
-            usort($files, static fn($a, $b) => $b['uncovered'] <=> $a['uncovered']);
-        } else {
-            usort($files, static fn($a, $b) => $a['percentage'] <=> $b['percentage']);
-        }
+        $sortFn = $sortBy === 'uncovered'
+            ? static fn($a, $b) => $b['uncovered'] <=> $a['uncovered']
+            : static fn($a, $b) => $a['percentage'] <=> $b['percentage'];
+        usort($files, $sortFn);
 
         // Get total metrics
         $totalMetrics = $xml->xpath('//project/metrics')[0] ?? null;
@@ -133,29 +132,30 @@ class TestCoverageReportCommand extends Command
 
         if ($files === []) {
             $output->writeln("All files above {$threshold}% threshold");
-        } else {
-            // Only show files below 80% (needs attention)
-            $needsWork = array_filter($files, static fn($f) => $f['percentage'] < 80);
+            return Command::SUCCESS;
+        }
 
-            if ($needsWork !== []) {
-                $output->writeln('NEEDS ATTENTION:');
-                foreach ($needsWork as $file) {
-                    $impact = $file['uncovered'] > 50 ? 'HIGH' : ($file['uncovered'] > 20 ? 'MED' : 'LOW');
-                    $output->writeln(sprintf(
-                        '  %3d%% %s (%d uncov) - %s',
-                        $file['percentage'],
-                        $file['name'],
-                        $file['uncovered'],
-                        $impact,
-                    ));
-                }
-            }
+        // Only show files below 80% (needs attention)
+        $needsWork = array_filter($files, static fn($f) => $f['percentage'] < 80);
 
-            // Show count of good files
-            $goodFiles = count($files) - count($needsWork);
-            if ($goodFiles > 0) {
-                $output->writeln("\n{$goodFiles} files with 80%+ coverage (not shown)");
+        if ($needsWork !== []) {
+            $output->writeln('NEEDS ATTENTION:');
+            foreach ($needsWork as $file) {
+                $impact = $file['uncovered'] > 50 ? 'HIGH' : ($file['uncovered'] > 20 ? 'MED' : 'LOW');
+                $output->writeln(sprintf(
+                    '  %3d%% %s (%d uncov) - %s',
+                    $file['percentage'],
+                    $file['name'],
+                    $file['uncovered'],
+                    $impact,
+                ));
             }
+        }
+
+        // Show count of good files
+        $goodFiles = count($files) - count($needsWork);
+        if ($goodFiles > 0) {
+            $output->writeln("\n{$goodFiles} files with 80%+ coverage (not shown)");
         }
 
         return Command::SUCCESS;

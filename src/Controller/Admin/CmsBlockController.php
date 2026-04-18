@@ -252,28 +252,29 @@ final class CmsBlockController extends AbstractAdminController
             $file = reset($files);
             if ($file instanceof UploadedFile) {
                 $violations = $this->validator->validate($file, $fileConstraint);
-                if (count($violations) === 0) {
-                    $image = $this->imageService->upload($file, $user, ImageType::CmsCardImage);
-                    $image->setUploader($user);
-                    $image->setUpdatedAt(new DateTimeImmutable());
-                    $this->em->persist($image);
-                    $this->em->flush();
-                    $this->imageService->createThumbnails($image, ImageType::CmsCardImage);
-
-                    $json = $block->getJson();
-                    $oldCardImageId = $json['cards'][$slot]['image']['id'] ?? null;
-                    $json['cards'][$slot]['image'] = ['id' => $image->getId(), 'hash' => $image->getHash()];
-                    $block->setJson($json);
-                    $this->em->persist($block);
-                    $this->em->flush();
-
-                    if ($oldCardImageId !== null) {
-                        $this->imageLocationService->removeLocation((int) $oldCardImageId, ImageType::CmsCardImage, $blockId);
-                    }
-                    $this->imageLocationService->addLocation($image->getId(), ImageType::CmsCardImage, $blockId);
-                } else {
+                if (count($violations) > 0) {
                     $this->addFlash('danger', 'Invalid file: ' . $violations->get(0)->getMessage());
+                    return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
                 }
+
+                $image = $this->imageService->upload($file, $user, ImageType::CmsCardImage);
+                $image->setUploader($user);
+                $image->setUpdatedAt(new DateTimeImmutable());
+                $this->em->persist($image);
+                $this->em->flush();
+                $this->imageService->createThumbnails($image, ImageType::CmsCardImage);
+
+                $json = $block->getJson();
+                $oldCardImageId = $json['cards'][$slot]['image']['id'] ?? null;
+                $json['cards'][$slot]['image'] = ['id' => $image->getId(), 'hash' => $image->getHash()];
+                $block->setJson($json);
+                $this->em->persist($block);
+                $this->em->flush();
+
+                if ($oldCardImageId !== null) {
+                    $this->imageLocationService->removeLocation((int) $oldCardImageId, ImageType::CmsCardImage, $blockId);
+                }
+                $this->imageLocationService->addLocation($image->getId(), ImageType::CmsCardImage, $blockId);
             }
         }
 

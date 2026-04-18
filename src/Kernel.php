@@ -26,12 +26,13 @@ class Kernel extends BaseKernel
     {
         // Check for environment-specific plugins config first (e.g., plugins_test.php)
         $envPluginsFile = $this->getProjectDir() . '/config/plugins_' . $this->environment . '.php';
+        $plugins = [];
+        $pluginsFile = $this->getProjectDir() . '/config/plugins.php';
+        if (file_exists($pluginsFile)) {
+            $plugins = require $pluginsFile;
+        }
         if (file_exists($envPluginsFile)) {
             $plugins = require $envPluginsFile;
-        } else {
-            // Fall back to default plugins.php
-            $pluginsFile = $this->getProjectDir() . '/config/plugins.php';
-            $plugins = file_exists($pluginsFile) ? require $pluginsFile : [];
         }
 
         foreach ($plugins as $pluginName => $pluginEnabled) {
@@ -67,9 +68,9 @@ class Kernel extends BaseKernel
         if (is_file($configDir . '/services.yaml')) {
             $container->import($configDir . '/services.yaml');
             $container->import($configDir . '/{services}_' . $this->environment . '.yaml');
-        } else {
-            $container->import($configDir . '/{services}.php');
+            return;
         }
+        $container->import($configDir . '/{services}.php');
     }
 
     private function doConfigureRoutes(RoutingConfigurator $routes, string $configDir): void
@@ -77,11 +78,7 @@ class Kernel extends BaseKernel
         $routes->import($configDir . '/{routes}/' . $this->environment . '/*.{php,yaml}');
         $routes->import($configDir . '/{routes}/*.{php,yaml}');
 
-        if (is_file($configDir . '/routes.yaml')) {
-            $routes->import($configDir . '/routes.yaml');
-        } else {
-            $routes->import($configDir . '/{routes}.php');
-        }
+        $routes->import(is_file($configDir . '/routes.yaml') ? $configDir . '/routes.yaml' : $configDir . '/{routes}.php');
 
         $reflection = new ReflectionObject($this);
         if (false !== ($fileName = $reflection->getFileName())) {

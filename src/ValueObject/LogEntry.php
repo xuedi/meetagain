@@ -25,10 +25,10 @@ class LogEntry
 
         if (!str_contains($line, '{')) {
             $this->message = $line;
-        } else {
-            $this->message = trim(substr($line, 0, strpos($line, '{')));
-            $this->json = trim(substr($line, strpos($line, '{') - 1));
+            return;
         }
+        $this->message = trim(substr($line, 0, strpos($line, '{')));
+        $this->json = trim(substr($line, strpos($line, '{') - 1));
     }
 
     public static function fromString(string $line): self

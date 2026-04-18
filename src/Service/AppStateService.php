@@ -26,10 +26,11 @@ readonly class AppStateService
         if ($entry === null) {
             $entry = new AppState($key, $value, new DateTimeImmutable('now'));
             $this->entityManager->persist($entry);
-        } else {
-            $entry->setValue($value);
-            $entry->setUpdatedAt(new DateTimeImmutable('now'));
+            $this->entityManager->flush();
+            return;
         }
+        $entry->setValue($value);
+        $entry->setUpdatedAt(new DateTimeImmutable('now'));
 
         $this->entityManager->flush();
     }

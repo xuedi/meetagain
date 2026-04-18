@@ -160,16 +160,15 @@ class CmsType extends AbstractType
             }
 
             if ($titleText !== null && $titleText !== '') {
-                if ($existingTitle) {
-                    $existingTitle->setTitle($titleText);
-                } else {
-                    $newTitle = new CmsTitle();
-                    $newTitle->setCms($cms);
-                    $newTitle->setLanguage($locale);
-                    $newTitle->setTitle($titleText);
-                    $cms->addTitle($newTitle);
+                if ($existingTitle === null) {
+                    $existingTitle = new CmsTitle();
+                    $existingTitle->setCms($cms);
+                    $existingTitle->setLanguage($locale);
+                    $cms->addTitle($existingTitle);
                 }
-            } elseif ($existingTitle) {
+                $existingTitle->setTitle($titleText);
+            }
+            if (($titleText === null || $titleText === '') && $existingTitle !== null) {
                 $cms->removeTitle($existingTitle);
             }
 
@@ -186,16 +185,15 @@ class CmsType extends AbstractType
             }
 
             if ($linkNameText !== null && $linkNameText !== '') {
-                if ($existingLinkName) {
-                    $existingLinkName->setName($linkNameText);
-                } else {
-                    $newLinkName = new CmsLinkName();
-                    $newLinkName->setCms($cms);
-                    $newLinkName->setLanguage($locale);
-                    $newLinkName->setName($linkNameText);
-                    $cms->addLinkName($newLinkName);
+                if ($existingLinkName === null) {
+                    $existingLinkName = new CmsLinkName();
+                    $existingLinkName->setCms($cms);
+                    $existingLinkName->setLanguage($locale);
+                    $cms->addLinkName($existingLinkName);
                 }
-            } elseif ($existingLinkName) {
+                $existingLinkName->setName($linkNameText);
+            }
+            if (($linkNameText === null || $linkNameText === '') && $existingLinkName !== null) {
                 $cms->removeLinkName($existingLinkName);
             }
         });

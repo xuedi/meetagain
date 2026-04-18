@@ -35,7 +35,8 @@ final class ConfigController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getAuthedUser();
-            if ($this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData())) {
+            $oldPasswordValid = $this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData());
+            if ($oldPasswordValid) {
                 $user->setPassword($this->hasher->hashPassword($user, $form->get('newPassword')->getData()));
 
                 $this->em->persist($user);
@@ -44,7 +45,8 @@ final class ConfigController extends AbstractController
                 $this->activityService->log(PasswordChanged::TYPE, $user);
 
                 $this->addFlash('success', 'Password was changed, please verify by logging in again');
-            } else {
+            }
+            if (!$oldPasswordValid) {
                 $this->addFlash('error', 'The old password is not correct');
             }
         }

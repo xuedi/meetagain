@@ -338,13 +338,13 @@ final class CmsCrudApiController extends AbstractController
             $lang = (string) $lang;
             if (isset($existing[$lang])) {
                 $existing[$lang]->setTitle((string) $titleText);
-            } else {
-                $title = new CmsTitle();
-                $title->setLanguage($lang);
-                $title->setTitle((string) $titleText);
-                $cms->addTitle($title);
-                $this->em->persist($title);
+                continue;
             }
+            $title = new CmsTitle();
+            $title->setLanguage($lang);
+            $title->setTitle((string) $titleText);
+            $cms->addTitle($title);
+            $this->em->persist($title);
         }
     }
 
@@ -359,13 +359,13 @@ final class CmsCrudApiController extends AbstractController
             $lang = (string) $lang;
             if (isset($existing[$lang])) {
                 $existing[$lang]->setName((string) $nameText);
-            } else {
-                $linkName = new CmsLinkName();
-                $linkName->setLanguage($lang);
-                $linkName->setName((string) $nameText);
-                $cms->addLinkName($linkName);
-                $this->em->persist($linkName);
+                continue;
             }
+            $linkName = new CmsLinkName();
+            $linkName->setLanguage($lang);
+            $linkName->setName((string) $nameText);
+            $cms->addLinkName($linkName);
+            $this->em->persist($linkName);
         }
     }
 
