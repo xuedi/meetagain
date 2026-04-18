@@ -21,9 +21,11 @@
                     {% if not app.user %}
                         <div class="field">
                             <label class="label">Captcha</label>
-                            <img src="data:image/png;base64, {{ captcha }}" alt="captcha" class="mb-2">
-                            <div class="control">
-                                {{ form_widget(form.captcha) }}
+                            <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+                                <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
+                                <div class="control is-flex-grow-1">
+                                    {{ form_widget(form.captcha) }}
+                                </div>
                             </div>
                         </div>
 
