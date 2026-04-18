@@ -30,14 +30,14 @@ class DishImageSuggestionFixture extends Fixture implements FixtureGroupInterfac
         echo 'Creating pending dish image suggestion ... ';
 
         $dishes = $this->dishRepository->findApproved();
-        if (empty($dishes)) {
+        if ($dishes === []) {
             echo 'SKIP (no approved dishes found)' . PHP_EOL;
 
             return;
         }
 
         $images = $this->imageRepository->findBy([], ['id' => 'ASC'], 1);
-        if (empty($images)) {
+        if ($images === []) {
             echo 'SKIP (no images found)' . PHP_EOL;
 
             return;

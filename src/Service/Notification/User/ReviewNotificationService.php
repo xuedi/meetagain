@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Notification\User;
 
 use App\Entity\User;
+use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class ReviewNotificationService
@@ -51,6 +52,6 @@ readonly class ReviewNotificationService
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('No review provider found with identifier "%s"', $identifier));
+        throw new InvalidArgumentException(sprintf('No review provider found with identifier "%s"', $identifier));
     }
 }

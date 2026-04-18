@@ -34,7 +34,7 @@ class ImageReportFixture extends Fixture implements FixtureGroupInterface
         }
 
         $images = $this->imageRepository->findBy([], ['id' => 'ASC'], 1);
-        if (empty($images)) {
+        if ($images === []) {
             echo 'SKIP (no images found)' . PHP_EOL;
 
             return;

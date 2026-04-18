@@ -6,6 +6,8 @@ use App\Entity\User;
 use App\Service\Notification\User\ReviewNotificationItem;
 use App\Service\Notification\User\ReviewNotificationProviderInterface;
 use App\Service\Notification\User\ReviewNotificationService;
+use ArrayObject;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ReviewNotificationServiceTest extends TestCase
@@ -27,7 +29,7 @@ class ReviewNotificationServiceTest extends TestCase
     public function testEmptyProvidersReturnsZeroCount(): void
     {
         // Arrange
-        $service = new ReviewNotificationService(providers: new \ArrayObject([]));
+        $service = new ReviewNotificationService(providers: new ArrayObject([]));
         $user = $this->createStub(User::class);
 
         // Act
@@ -45,7 +47,7 @@ class ReviewNotificationServiceTest extends TestCase
             $this->makeProvider('a', [$this->makeItem('1'), $this->makeItem('2')]),
             $this->makeProvider('b', [$this->makeItem('3')]),
         ];
-        $service = new ReviewNotificationService(providers: new \ArrayObject($providers));
+        $service = new ReviewNotificationService(providers: new ArrayObject($providers));
 
         // Act
         $count = $service->countForUser($user);
@@ -60,7 +62,7 @@ class ReviewNotificationServiceTest extends TestCase
         $user = $this->createStub(User::class);
         $withItems = $this->makeProvider('with', [$this->makeItem()]);
         $empty = $this->makeProvider('empty', []);
-        $service = new ReviewNotificationService(providers: new \ArrayObject([$withItems, $empty]));
+        $service = new ReviewNotificationService(providers: new ArrayObject([$withItems, $empty]));
 
         // Act
         $result = $service->getProvidersForUser($user);
@@ -75,7 +77,7 @@ class ReviewNotificationServiceTest extends TestCase
         // Arrange
         $providerA = $this->makeProvider('alpha', []);
         $providerB = $this->makeProvider('beta', []);
-        $service = new ReviewNotificationService(providers: new \ArrayObject([$providerA, $providerB]));
+        $service = new ReviewNotificationService(providers: new ArrayObject([$providerA, $providerB]));
 
         // Act
         $found = $service->getProviderByIdentifier('beta');
@@ -87,10 +89,10 @@ class ReviewNotificationServiceTest extends TestCase
     public function testGetProviderByIdentifierThrowsOnUnknown(): void
     {
         // Arrange
-        $service = new ReviewNotificationService(providers: new \ArrayObject([]));
+        $service = new ReviewNotificationService(providers: new ArrayObject([]));
 
         // Assert
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         // Act
         $service->getProviderByIdentifier('nonexistent');
