@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Email\Provider;
+namespace App\Service\Email\Delivery;
 
 use App\CronTaskInterface;
 use App\Enum\CronTaskStatus;

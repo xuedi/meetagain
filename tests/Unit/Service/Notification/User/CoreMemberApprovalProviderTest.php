@@ -6,7 +6,7 @@ use App\Activity\ActivityService;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
+use App\Emails\Types\WelcomeEmail;
 use App\Service\Notification\User\CoreMemberApprovalProvider;
 use App\Service\Notification\User\ReviewNotificationItem;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,7 +41,7 @@ class CoreMemberApprovalProviderTest extends TestCase
         return new CoreMemberApprovalProvider(
             userRepo: $repo,
             em: $this->createStub(EntityManagerInterface::class),
-            emailService: $this->createStub(EmailService::class),
+            welcomeEmail: $this->createStub(WelcomeEmail::class),
             activityService: $this->createStub(ActivityService::class),
             security: $security,
         );

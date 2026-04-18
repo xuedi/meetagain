@@ -10,7 +10,7 @@ use App\Activity\Messages\AdminMemberDenied;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
+use App\Emails\Types\WelcomeEmail;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -21,7 +21,7 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
     public function __construct(
         private UserRepository $userRepo,
         private EntityManagerInterface $em,
-        private EmailService $emailService,
+        private WelcomeEmail $welcomeEmail,
         private ActivityService $activityService,
         private Security $security,
     ) {}
@@ -65,8 +65,7 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
         }
 
         $pendingUser->setStatus(UserStatus::Active);
-        $this->emailService->prepareWelcome($pendingUser);
-        $this->emailService->sendQueue();
+        $this->welcomeEmail->send(['user' => $pendingUser]);
         $this->em->persist($pendingUser);
         $this->em->flush();
 

@@ -8,8 +8,7 @@ use App\Entity\Activity;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
-use DateTime;
+use App\Emails\Types\NotificationMessageEmail;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -20,7 +19,7 @@ readonly class NotificationService
     private const int EIGHT_HOURS = 28800;
 
     public function __construct(
-        private EmailService $emailService,
+        private NotificationMessageEmail $notificationMessageEmail,
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
@@ -89,17 +88,11 @@ readonly class NotificationService
         $key = sprintf('message_send_%s_%s', $user->getId(), $recipient->getId());
         $this->appCache->get($key, function (ItemInterface $item) use ($user, $recipient): string {
             $item->expiresAfter(self::EIGHT_HOURS);
-            if (!$recipient->isNotification()) {
+            $ctx = ['sender' => $user, 'recipient' => $recipient];
+            if (!$this->notificationMessageEmail->guardCheck($ctx)) {
                 return 'skip';
             }
-            if (!$recipient->getNotificationSettings()->receivedMessage) {
-                return 'skip';
-            }
-            if ($recipient->getLastLogin() > new DateTime('-2 hours')) {
-                return 'skip';
-            }
-            $this->emailService->prepareMessageNotification(sender: $user, recipient: $recipient);
-            $this->emailService->sendQueue(); // TODO: use cron instead
+            $this->notificationMessageEmail->send($ctx);
 
             return 'send';
         });

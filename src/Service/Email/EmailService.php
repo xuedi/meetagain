@@ -4,13 +4,11 @@ namespace App\Service\Email;
 
 use App\CronTaskInterface;
 use App\EmailContextEnricherInterface;
+use App\Emails\EmailQueueInterface;
 use App\Enum\CronTaskStatus;
 use App\ValueObject\CronTaskResult;
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
-use App\Entity\Event;
-use App\Entity\SupportRequest;
-use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
 use App\Service\Config\ConfigService;
@@ -25,7 +23,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
-readonly class EmailService implements CronTaskInterface
+readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 {
     /**
      * @param iterable<EmailContextEnricherInterface> $enrichers
@@ -42,333 +40,34 @@ readonly class EmailService implements CronTaskInterface
         private iterable $enrichers,
     ) {}
 
-    public function prepareVerificationRequest(User $user): bool
+    public function enqueue(TemplatedEmail $email, EmailType $type, bool $flush = true): bool
     {
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $user->getEmail());
-        $email->locale($user->getLocale());
-        $email->context([
-            'host' => $this->config->getHost(),
-            'token' => $user->getRegcode(),
-            'url' => $this->config->getUrl(),
-            'username' => $user->getName(),
-            'lang' => $user->getLocale(),
-        ]);
+        $locale = $email->getLocale() ?? 'en';
+        $templateContent = $this->templateService->getTemplateContent($type, $locale);
 
-        return $this->addToEmailQueue($email, EmailType::VerificationRequest);
-    }
+        $context = array_merge(['greeting' => ''], $email->getContext());
 
-    public function prepareWelcome(User $user): bool
-    {
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $user->getEmail());
-        $email->locale($user->getLocale());
-        $email->context([
-            'url' => $this->config->getUrl(),
-            'host' => $this->config->getHost(),
-            'lang' => $user->getLocale(),
-        ]);
+        foreach ($this->enrichers as $enricher) {
+            $context = $enricher->enrich($context, $locale);
+        }
 
-        return $this->addToEmailQueue($email, EmailType::Welcome);
-    }
+        $emailQueue = new EmailQueue();
+        $emailQueue->setSender($email->getFrom()[0]->toString());
+        $emailQueue->setRecipient($email->getTo()[0]->toString());
+        $emailQueue->setLang($locale);
+        $emailQueue->setContext($context);
+        $emailQueue->setCreatedAt(new DateTimeImmutable());
+        $emailQueue->setSendAt(null);
+        $emailQueue->setTemplate($type);
+        $emailQueue->setSubject($this->templateService->renderContent($templateContent['subject'], $context));
+        $emailQueue->setRenderedBody($this->templateService->renderContent($templateContent['body'], $context));
 
-    public function prepareResetPassword(User $user): bool
-    {
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $user->getEmail());
-        $email->locale($user->getLocale());
-        $email->context([
-            'host' => $this->config->getHost(),
-            'token' => $user->getRegcode(),
-            'lang' => $user->getLocale(),
-            'username' => $user->getName(),
-        ]);
+        $this->em->persist($emailQueue);
+        if ($flush) {
+            $this->em->flush();
+        }
 
-        return $this->addToEmailQueue($email, EmailType::PasswordResetRequest);
-    }
-
-    public function prepareAggregatedRsvpNotification(User $recipient, array $attendees, Event $event): bool
-    {
-        $language = $recipient->getLocale();
-        $attendeeNames = implode(', ', array_map(static fn(User $user) => $user->getName(), $attendees));
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $recipient->getEmail());
-        $email->locale($language);
-        $email->context([
-            'username' => $recipient->getName(),
-            'attendeeNames' => $attendeeNames,
-            'eventLocation' => $event->getLocation()?->getName() ?? '',
-            'eventDate' => $event->getStart()->format('Y-m-d'),
-            'eventId' => $event->getId(),
-            'eventTitle' => $event->getTitle($language),
-            'host' => $this->config->getHost(),
-            'lang' => $language,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::NotificationRsvpAggregated);
-    }
-
-    public function prepareMessageNotification(User $sender, User $recipient): bool
-    {
-        $language = $recipient->getLocale();
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $recipient->getEmail());
-        $email->locale($language);
-        $email->context([
-            'username' => $recipient->getName(),
-            'sender' => $sender->getName(),
-            'senderId' => $sender->getId(),
-            'host' => $this->config->getHost(),
-            'lang' => $language,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::NotificationMessage);
-    }
-
-    public function prepareEventCanceledNotification(User $recipient, Event $event): bool
-    {
-        $language = $recipient->getLocale();
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $recipient->getEmail());
-        $email->locale($language);
-        $email->context([
-            'username' => $recipient->getName(),
-            'eventLocation' => $event->getLocation()?->getName() ?? '',
-            'eventDate' => $event->getStart()->format('Y-m-d'),
-            'eventId' => $event->getId(),
-            'eventTitle' => $event->getTitle($language),
-            'host' => $this->config->getHost(),
-            'lang' => $language,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::NotificationEventCanceled);
-    }
-
-    public function prepareAnnouncementEmail(
-        User $recipient,
-        array $renderedContent,
-        string $announcementUrl,
-        bool $flush = true,
-    ): bool {
-        $locale = $recipient->getLocale();
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $recipient->getEmail());
-        $email->locale($locale);
-        $email->context([
-            'title' => $renderedContent['title'],
-            'content' => $renderedContent['content'],
-            'announcementUrl' => $announcementUrl,
-            'username' => $recipient->getName(),
-            'host' => $this->config->getHost(),
-            'lang' => $locale,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::Announcement, $flush);
-    }
-
-    public function prepareAdminNotification(User $recipient, string $sectionsHtml): bool
-    {
-        $language = $recipient->getLocale();
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $recipient->getEmail());
-        $email->locale($language);
-        $email->context([
-            'username' => $recipient->getName(),
-            'sections' => $sectionsHtml,
-            'host' => $this->config->getHost(),
-            'lang' => $language,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::AdminNotification);
-    }
-
-    public function prepareSupportNotification(SupportRequest $request): bool
-    {
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to($this->config->getMailerAddress());
-        $email->locale('en');
-        $email->context([
-            'contactType' => $request->getContactType()->label(),
-            'name' => $request->getName(),
-            'email' => $request->getEmail(),
-            'message' => $request->getMessage(),
-            'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::SupportNotification);
-    }
-
-    public function prepareEventReminder(User $recipient, Event $event): bool
-    {
-        $language = $recipient->getLocale();
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $recipient->getEmail());
-        $email->locale($language);
-        $email->context([
-            'username' => $recipient->getName(),
-            'eventTitle' => $event->getTitle($language),
-            'eventLocation' => $event->getLocation()?->getName() ?? '',
-            'eventDate' => $event->getStart()->format('Y-m-d'),
-            'eventTime' => $event->getStart()->format('H:i'),
-            'eventId' => $event->getId(),
-            'host' => $this->config->getHost(),
-            'lang' => $language,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::EventReminder);
-    }
-
-    public function prepareUpcomingEvents(User $recipient, string $eventsHtml): bool
-    {
-        $language = $recipient->getLocale();
-
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to((string) $recipient->getEmail());
-        $email->locale($language);
-        $email->context([
-            'username' => $recipient->getName(),
-            'eventsHtml' => $eventsHtml,
-            'host' => $this->config->getHost(),
-            'lang' => $language,
-        ]);
-
-        return $this->addToEmailQueue($email, EmailType::UpcomingEvents);
-    }
-
-    public function getMockEmailList(): array
-    {
-        return [
-            EmailType::NotificationMessage->value => [
-                'subject' => 'You received a message from %senderName%',
-                'context' => [
-                    'username' => 'John Doe',
-                    'sender' => 'john.doe@example.org',
-                    'senderId' => 1,
-                    'host' => 'https://localhost/en',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::NotificationRsvpAggregated->value => [
-                'subject' => 'People you follow plan to attend an event',
-                'context' => [
-                    'username' => 'John Doe',
-                    'attendeeNames' => 'Denis Matrens, Jane Smith',
-                    'eventLocation' => 'NightBar 64',
-                    'eventDate' => '2025-01-01',
-                    'eventId' => 1,
-                    'eventTitle' => 'Go tournament afterparty',
-                    'host' => 'https://localhost/en',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::Welcome->value => [
-                'subject' => 'Welcome!',
-                'context' => [
-                    'host' => 'https://localhost/en',
-                    'url' => 'https://localhost/en',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::VerificationRequest->value => [
-                'subject' => 'Please Confirm your Email',
-                'context' => [
-                    'host' => 'https://localhost/en',
-                    'token' => '1234567890',
-                    'username' => 'John Doe',
-                    'url' => 'https://localhost/en',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::PasswordResetRequest->value => [
-                'subject' => 'Password reset request',
-                'context' => [
-                    'host' => 'https://localhost/en',
-                    'token' => '1234567890',
-                    'lang' => 'en',
-                    'username' => 'John Doe',
-                ],
-            ],
-            EmailType::NotificationEventCanceled->value => [
-                'subject' => 'Event canceled: Go tournament afterparty',
-                'context' => [
-                    'username' => 'John Doe',
-                    'eventLocation' => 'NightBar 64',
-                    'eventDate' => '2025-01-01',
-                    'eventId' => 1,
-                    'eventTitle' => 'Go tournament afterparty',
-                    'host' => 'https://localhost/en',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::Announcement->value => [
-                'subject' => 'Important Community Update',
-                'context' => [
-                    'title' => 'Important Community Update',
-                    'content' => '<p>We are excited to announce some upcoming changes to our community platform.</p><p>Stay tuned for more details!</p>',
-                    'announcementUrl' => 'https://localhost/announcement/abc123def456',
-                    'username' => 'John Doe',
-                    'host' => 'https://localhost',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::SupportNotification->value => [
-                'subject' => 'New Support Request from John Doe',
-                'context' => [
-                    'name' => 'John Doe',
-                    'email' => 'john.doe@example.org',
-                    'message' => 'I need help with my account.',
-                    'createdAt' => '2025-01-01 12:00:00',
-                ],
-            ],
-            EmailType::AdminNotification->value => [
-                'subject' => 'Admin: Items require your attention',
-                'context' => [
-                    'username' => 'Admin User',
-                    'sections' => '<h3>Users Pending Approval</h3><ul><li>Jane Smith (jane@example.org)</li></ul>',
-                    'host' => 'https://localhost',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::EventReminder->value => [
-                'subject' => 'Reminder: Go tournament afterparty is today',
-                'context' => [
-                    'username' => 'John Doe',
-                    'eventTitle' => 'Go tournament afterparty',
-                    'eventLocation' => 'NightBar 64',
-                    'eventDate' => '2025-01-01',
-                    'eventTime' => '19:00',
-                    'eventId' => 1,
-                    'host' => 'https://localhost',
-                    'lang' => 'en',
-                ],
-            ],
-            EmailType::UpcomingEvents->value => [
-                'subject' => 'Upcoming events this week',
-                'context' => [
-                    'username' => 'John Doe',
-                    'eventsHtml' => '<div style="margin-bottom:16px;padding:12px;border:1px solid #ddd;"><p><b>Go tournament afterparty</b></p><p>2025-01-01 19:00 - NightBar 64</p><p><a href="https://localhost/en/event/1">More Info</a> &nbsp; <a href="https://localhost/en/event/1#rsvp">I Want to Go</a></p></div>',
-                    'host' => 'https://localhost',
-                    'lang' => 'en',
-                ],
-            ],
-        ];
+        return true;
     }
 
     public function getIdentifier(): string
@@ -421,36 +120,6 @@ readonly class EmailService implements CronTaskInterface
 
         $this->logger->info('Email queue processed', ['sent' => $send]);
         return sprintf('%d', $send);
-    }
-
-    private function addToEmailQueue(TemplatedEmail $email, EmailType $identifier, bool $flush = true): bool
-    {
-        $locale = $email->getLocale() ?? 'en';
-        $templateContent = $this->templateService->getTemplateContent($identifier, $locale);
-
-        $context = array_merge(['greeting' => ''], $email->getContext());
-
-        foreach ($this->enrichers as $enricher) {
-            $context = $enricher->enrich($context, $locale);
-        }
-
-        $emailQueue = new EmailQueue();
-        $emailQueue->setSender($email->getFrom()[0]->toString());
-        $emailQueue->setRecipient($email->getTo()[0]->toString());
-        $emailQueue->setLang($locale);
-        $emailQueue->setContext($context);
-        $emailQueue->setCreatedAt(new DateTimeImmutable());
-        $emailQueue->setSendAt(null);
-        $emailQueue->setTemplate($identifier);
-        $emailQueue->setSubject($this->templateService->renderContent($templateContent['subject'], $context));
-        $emailQueue->setRenderedBody($this->templateService->renderContent($templateContent['body'], $context));
-
-        $this->em->persist($emailQueue);
-        if ($flush) {
-            $this->em->flush();
-        }
-
-        return true;
     }
 
     private function queueToTemplate(EmailQueue $mail): TemplatedEmail

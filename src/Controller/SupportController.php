@@ -6,7 +6,7 @@ use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
-use App\Service\Email\EmailService;
+use App\Emails\Types\SupportNotificationEmail;
 use App\Service\Member\CaptchaService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class SupportController extends AbstractController
 {
     public function __construct(
-        private readonly EmailService $emailService,
+        private readonly SupportNotificationEmail $supportNotificationEmail,
         private readonly CaptchaService $captchaService,
         #[Autowire(service: 'limiter.support')]
         private readonly RateLimiterFactory $supportLimiter,
@@ -80,8 +80,7 @@ final class SupportController extends AbstractController
                 $em->persist($supportRequest);
                 $em->flush();
 
-                $this->emailService->prepareSupportNotification($supportRequest);
-                $this->emailService->sendQueue();
+                $this->supportNotificationEmail->send(['request' => $supportRequest]);
 
                 $this->addFlash('success', 'Your message has been sent. We will get back to you shortly.');
 

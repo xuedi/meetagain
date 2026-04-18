@@ -5,9 +5,9 @@ namespace Tests\Unit\Service;
 use App\Activity\ActivityService;
 use App\Activity\Messages\PasswordReset;
 use App\Activity\Messages\PasswordResetRequest;
+use App\Emails\Types\PasswordResetEmail;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
 use App\Service\Member\PasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -20,14 +20,14 @@ class PasswordResetServiceTest extends TestCase
         ?EntityManagerInterface $em = null,
         ?UserPasswordHasherInterface $hasher = null,
         ?ActivityService $activityService = null,
-        ?EmailService $emailService = null,
+        ?PasswordResetEmail $passwordResetEmail = null,
     ): PasswordResetService {
         return new PasswordResetService(
             $userRepo ?? $this->createStub(UserRepository::class),
             $em ?? $this->createStub(EntityManagerInterface::class),
             $hasher ?? $this->createStub(UserPasswordHasherInterface::class),
             $activityService ?? $this->createStub(ActivityService::class),
-            $emailService ?? $this->createStub(EmailService::class),
+            $passwordResetEmail ?? $this->createStub(PasswordResetEmail::class),
         );
     }
 
@@ -75,14 +75,13 @@ class PasswordResetServiceTest extends TestCase
         $activityMock = $this->createMock(ActivityService::class);
         $activityMock->expects($this->once())->method('log')->with(PasswordResetRequest::TYPE, $user);
 
-        $emailMock = $this->createMock(EmailService::class);
-        $emailMock->expects($this->once())->method('prepareResetPassword')->with($user);
-        $emailMock->expects($this->once())->method('sendQueue');
+        $emailMock = $this->createMock(PasswordResetEmail::class);
+        $emailMock->expects($this->once())->method('send')->with(['user' => $user]);
 
         $service = $this->createService(
             userRepo: $userRepoStub,
             activityService: $activityMock,
-            emailService: $emailMock,
+            passwordResetEmail: $emailMock,
         );
 
         $service->requestReset('test@example.com');

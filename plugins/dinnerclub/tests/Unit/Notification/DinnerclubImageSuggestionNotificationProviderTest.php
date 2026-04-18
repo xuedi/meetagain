@@ -2,6 +2,7 @@
 
 namespace Tests\Plugin\Dinnerclub\Unit\Notification;
 
+use App\Activity\ActivityService;
 use App\Entity\User;
 use App\Service\Notification\User\ReviewNotificationItem;
 use PHPUnit\Framework\TestCase;
@@ -35,6 +36,7 @@ class DinnerclubImageSuggestionNotificationProviderTest extends TestCase
         return new DinnerclubImageSuggestionNotificationProvider(
             repository: $repo,
             dishService: $this->createStub(DishService::class),
+            activityService: $this->createStub(ActivityService::class),
             security: $security,
         );
     }

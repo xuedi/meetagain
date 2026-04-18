@@ -4,11 +4,12 @@ namespace App\Controller\Admin\Email;
 
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
+use App\Emails\EmailInterface;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -21,8 +22,12 @@ use Throwable;
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/debugging')]
 final class DebuggingController extends AbstractAdminController
 {
+    /**
+     * @param iterable<EmailInterface> $emailTypes
+     */
     public function __construct(
-        private readonly EmailService $emailService,
+        #[AutowireIterator(EmailInterface::class)]
+        private readonly iterable $emailTypes,
         private readonly EmailTemplateService $templateService,
         private readonly MailerInterface $mailer,
         private readonly ConfigService $config,
@@ -37,14 +42,17 @@ final class DebuggingController extends AbstractAdminController
     #[Route('', name: 'app_admin_email_debugging')]
     public function debugging(): Response
     {
-        $mockData = $this->emailService->getMockEmailList();
-
-        foreach ($mockData as $type => $data) {
-            if (array_key_exists('greeting', $mockData[$type]['context'])) {
-                continue;
+        $mockData = [];
+        foreach ($this->emailTypes as $emailType) {
+            $data = $emailType->getDisplayMockData();
+            $context = $data['context'];
+            if (!array_key_exists('greeting', $context)) {
+                $context['greeting'] = '';
             }
-
-            $mockData[$type]['context']['greeting'] = '';
+            $mockData[$emailType->getIdentifier()] = [
+                'subject' => $data['subject'],
+                'context' => $context,
+            ];
         }
 
         return $this->render('admin/email/debugging/index.html.twig', [

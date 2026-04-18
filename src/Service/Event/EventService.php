@@ -10,7 +10,7 @@ use App\Enum\EventType;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
-use App\Service\Email\EmailService;
+use App\Emails\Types\NotificationEventCanceledEmail;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -21,7 +21,7 @@ readonly class EventService
     public function __construct(
         private EventRepository $repo,
         private EntityManagerInterface $em,
-        private EmailService $emailService,
+        private NotificationEventCanceledEmail $notificationEventCanceledEmail,
         private PluginService $pluginService,
         private RecurringEventService $recurringEventService,
         #[AutowireIterator(Plugin::class)]
@@ -57,9 +57,8 @@ readonly class EventService
 
         if ($event->getStart() > new DateTime()) {
             foreach ($event->getRsvp() as $user) {
-                $this->emailService->prepareEventCanceledNotification($user, $event);
+                $this->notificationEventCanceledEmail->send(['user' => $user, 'event' => $event]);
             }
-            $this->emailService->sendQueue();
         }
     }
 

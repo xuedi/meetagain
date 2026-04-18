@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Email\Provider\Dummy;
+namespace App\Service\Email\Delivery\Provider;
 
-use App\Service\Email\Provider\EmailDeliveryLog;
-use App\Service\Email\Provider\EmailDeliveryLogCollection;
-use App\Service\Email\Provider\EmailDeliveryLogFilter;
-use App\Service\Email\Provider\EmailDeliveryProviderInterface;
+use App\Service\Email\Delivery\EmailDeliveryLog;
+use App\Service\Email\Delivery\EmailDeliveryLogCollection;
+use App\Service\Email\Delivery\EmailDeliveryLogFilter;
+use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 
 final readonly class DummyEmailDeliveryProvider implements EmailDeliveryProviderInterface
 {

@@ -129,6 +129,19 @@ class AdminEmailTest extends WebTestCase
         static::assertSame($originalSubject, $reset->getSubject('en'));
     }
 
+    public function testPlannedEmailsPageLoadsForAdmin(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $client->request('GET', '/en/admin/email/planned');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+    }
+
     private function loginAsAdmin($client): void
     {
         $crawler = $client->request('GET', '/en/login');

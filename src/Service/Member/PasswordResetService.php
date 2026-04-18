@@ -7,7 +7,7 @@ use App\Activity\Messages\PasswordReset;
 use App\Activity\Messages\PasswordResetRequest;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
+use App\Emails\Types\PasswordResetEmail;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use SensitiveParameter;
@@ -20,7 +20,7 @@ readonly class PasswordResetService
         private EntityManagerInterface $em,
         private UserPasswordHasherInterface $hasher,
         private ActivityService $activityService,
-        private EmailService $emailService,
+        private PasswordResetEmail $passwordResetEmail,
     ) {}
 
     public function requestReset(string $email): ?User
@@ -36,8 +36,7 @@ readonly class PasswordResetService
         $this->em->flush();
 
         $this->activityService->log(PasswordResetRequest::TYPE, $user);
-        $this->emailService->prepareResetPassword($user);
-        $this->emailService->sendQueue();
+        $this->passwordResetEmail->send(['user' => $user]);
 
         return $user;
     }
