@@ -12,6 +12,7 @@ use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use App\Service\Email\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -60,7 +61,7 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
 
         $pendingUser = $this->userRepo->find((int) $itemId);
         if ($pendingUser === null || $pendingUser->getStatus() !== UserStatus::EmailVerified) {
-            throw new \InvalidArgumentException('User not found or not pending approval.');
+            throw new InvalidArgumentException('User not found or not pending approval.');
         }
 
         $pendingUser->setStatus(UserStatus::Active);
@@ -80,7 +81,7 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
 
         $pendingUser = $this->userRepo->find((int) $itemId);
         if ($pendingUser === null || $pendingUser->getStatus() !== UserStatus::EmailVerified) {
-            throw new \InvalidArgumentException('User not found or not pending approval.');
+            throw new InvalidArgumentException('User not found or not pending approval.');
         }
 
         $pendingUser->setStatus(UserStatus::Denied);
