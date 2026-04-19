@@ -152,7 +152,7 @@ readonly class RsvpAggregatedEmail implements ScheduledEmailInterface
 
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::NotificationRsvpAggregated->value,
-                label: 'Event: ' . ($event->getTitle('en') ?: $event->getTranslation()->first()?->getTitle() ?? ''),
+                label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
                 expectedTime: $expectedTime,
                 expectedRecipients: $eligibleCount,
             );

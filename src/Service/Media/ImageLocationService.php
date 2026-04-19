@@ -88,7 +88,7 @@ readonly class ImageLocationService
             $event = $image->getEvent();
 
             return [
-                'label' => sprintf('Event upload: %s', $event->getName()),
+                'label' => sprintf('Event upload: %s', $event->getTitle('en')),
                 'route' => 'app_admin_event_edit',
                 'params' => ['id' => $event->getId()],
             ];
@@ -124,7 +124,7 @@ readonly class ImageLocationService
         }
 
         return [
-            'label' => sprintf('Event preview: %s', $event->getName()),
+            'label' => sprintf('Event preview: %s', $event->getTitle('en')),
             'route' => 'app_admin_event_edit',
             'params' => ['id' => $event->getId()],
         ];

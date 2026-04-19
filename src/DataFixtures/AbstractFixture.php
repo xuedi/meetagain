@@ -63,7 +63,7 @@ abstract class AbstractFixture extends Fixture implements FixtureGroupInterface
                             $params[0],
                             $exception->getMessage(),
                         ),
-                        $exception->getCode(),
+                        (int) $exception->getCode(),
                         $exception,
                     );
                 }

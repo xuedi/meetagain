@@ -11,7 +11,6 @@ use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
 use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
-use App\Service\Config\ConfigService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,7 +30,6 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
     public function __construct(
         #[Autowire(service: 'mailer.transports')]
         private TransportInterface $transport,
-        private ConfigService $config,
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
         private EmailTemplateService $templateService,

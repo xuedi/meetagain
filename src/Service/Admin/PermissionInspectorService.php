@@ -7,7 +7,6 @@ namespace App\Service\Admin;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 readonly class PermissionInspectorService
@@ -17,7 +16,6 @@ readonly class PermissionInspectorService
 
     public function __construct(
         private RouterInterface $router,
-        private RoleHierarchyInterface $roleHierarchy,
     ) {}
 
     /** @return PermissionEntry[] */

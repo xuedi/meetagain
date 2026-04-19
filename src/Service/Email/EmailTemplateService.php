@@ -231,13 +231,13 @@ readonly class EmailTemplateService
         // Try language-specific file first
         $langPath = $this->projectDir . self::TEMPLATE_PATH . $language . '/' . $type->value . '.html';
         if (file_exists($langPath)) {
-            return file_get_contents($langPath);
+            return file_get_contents($langPath) ?: '';
         }
 
         // Fall back to default (English) template
         $defaultPath = $this->projectDir . self::TEMPLATE_PATH . $type->value . '.html';
         if (file_exists($defaultPath)) {
-            return file_get_contents($defaultPath);
+            return file_get_contents($defaultPath) ?: '';
         }
 
         throw new RuntimeException(sprintf('Email template file not found: %s', $defaultPath));

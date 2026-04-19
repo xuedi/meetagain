@@ -158,7 +158,6 @@ readonly class DishService
                 $dish->addTranslation($translation);
             }
 
-            /** @var DishSuggestionField::Name|DishSuggestionField::Phonetic|DishSuggestionField::Description|DishSuggestionField::Recipe $field */
             $field = $suggestion->field;
             match ($field) {
                 DishSuggestionField::Name => $translation->setName($suggestion->value),

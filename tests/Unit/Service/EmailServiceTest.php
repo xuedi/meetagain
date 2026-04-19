@@ -10,7 +10,6 @@ use App\Entity\User;
 use App\Enum\EmailQueueStatus;
 use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
-use App\Service\Config\ConfigService;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
 use DateTime;
@@ -286,20 +285,12 @@ final class EmailServiceTest extends TestCase
 
     private function createService(
         ?TransportInterface $mailer = null,
-        ?ConfigService $config = null,
         ?EmailQueueRepository $mailRepo = null,
         ?EntityManagerInterface $em = null,
         ?EmailTemplateService $templateService = null,
         ?LoggerInterface $logger = null,
         iterable $enrichers = [],
     ): EmailService {
-        if ($config === null) {
-            $config = $this->createStub(ConfigService::class);
-            $config->method('getMailerAddress')->willReturn(new Address('sender@email.com', 'email sender'));
-            $config->method('getHost')->willReturn('https://example.com');
-            $config->method('getUrl')->willReturn('example.com');
-        }
-
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
             $templateService
@@ -315,7 +306,6 @@ final class EmailServiceTest extends TestCase
 
         return new EmailService(
             transport: $mailer ?? $this->createStub(TransportInterface::class),
-            config: $config,
             mailRepo: $mailRepo ?? $this->createStub(EmailQueueRepository::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             templateService: $templateService,

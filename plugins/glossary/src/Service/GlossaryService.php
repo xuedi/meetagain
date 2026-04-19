@@ -99,7 +99,7 @@ readonly class GlossaryService
                 createdBy: $userId,
                 createdAt: $timestamp,
                 field: SuggestionField::Category,
-                value: (string) $newGlossary->getCategory()->value,
+                value: (string) $newGlossary->getCategory()?->value,
             ));
         }
 

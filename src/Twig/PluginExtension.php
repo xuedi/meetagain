@@ -6,6 +6,7 @@ namespace App\Twig;
 
 use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
+use App\Entity\Link;
 use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\Service\Config\PluginService;
@@ -28,7 +29,8 @@ final class PluginExtension extends AbstractExtension
         private readonly iterable $plugins,
         private readonly PluginService $pluginService,
         private readonly Environment $twig,
-    ) {}
+    ) {
+    }
 
     #[Override]
     public function getFunctions(): array
@@ -41,7 +43,7 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
             new TwigFunction('get_plugin_footer_links', $this->getPluginFooterLinks(...)),
             new TwigFunction('get_plugin_profile_dropdown_links', $this->getPluginProfileDropdownLinks(...)),
-new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
+            new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
             new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),
         ];
@@ -49,9 +51,10 @@ new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_
 
     public function getPluginsLinks(): array
     {
+        /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getNavLinks());
 
-        usort($links, static fn($a, $b) => $a->getPriority() <=> $b->getPriority());
+        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
 
         return $links;
     }
@@ -116,9 +119,10 @@ new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_
      */
     public function getPluginProfileDropdownLinks(): array
     {
+        /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileDropdownLinks());
 
-        usort($links, static fn($a, $b) => $a->getPriority() <=> $b->getPriority());
+        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
 
         return $links;
     }
@@ -151,13 +155,10 @@ new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_
             return $this->renderTags($this->tagCache[$eventId]);
         }
 
+        /** @var list<EventListItemTag> $tags */
         $tags = $this->collectFromPlugins(static function (Plugin $plugin) use ($eventId) {
             $validTags = [];
             foreach ($plugin->getEventListItemTags($eventId) as $tag) {
-                if (!$tag instanceof EventListItemTag) {
-                    continue;
-                }
-
                 $validTags[] = $tag;
             }
             return $validTags;
@@ -189,7 +190,9 @@ new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_
                 $result = $callback($plugin);
                 if ($result !== null) {
                     if (is_array($result)) {
-                        array_push($results, ...$result);
+                        foreach ($result as $item) {
+                            $results[] = $item;
+                        }
                         continue;
                     }
                     $results[] = $result;

@@ -29,7 +29,7 @@ class UnknownActivityMessage implements MessageInterface
     public function render(bool $asHtml = false): string
     {
         $parts = explode('.', $this->type, 2);
-        $namespace = $parts[0] ?? $this->type;
+        $namespace = $parts[0] ;
         $action = $parts[1] ?? '';
 
         return $action !== ''

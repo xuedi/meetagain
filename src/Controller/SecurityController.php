@@ -76,7 +76,7 @@ final class SecurityController extends AbstractController
     #[Route(path: '/logout', name: 'app_security_logout', methods: ['POST'])]
     public function logout(Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('logout', $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('logout', $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 

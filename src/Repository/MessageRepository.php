@@ -62,7 +62,7 @@ class MessageRepository extends ServiceEntityRepository
             }
             ++$list[$partnerId]['messages'];
             if ($message->isWasRead() === false) {
-                ++$list[$partnerId]['unread'];
+                $list[$partnerId]['unread'] = ($list[$partnerId]['unread'] ?? 0) + 1;
             }
         }
 

@@ -90,7 +90,8 @@ readonly class LogReaderService
 
         $file->seek($startLine);
         while (!$file->eof()) {
-            $line = rtrim((string) $file->current(), "\n\r");
+            $current = $file->current();
+            $line = rtrim(is_string($current) ? $current : '', "\n\r");
             if ($line !== '') {
                 $lines[] = $line;
             }

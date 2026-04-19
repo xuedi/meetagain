@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class NotificationService
 {
+    /**
+     * @param iterable<NotificationProviderInterface> $providers
+     */
     public function __construct(
         #[AutowireIterator(NotificationProviderInterface::class)]
         private iterable $providers,

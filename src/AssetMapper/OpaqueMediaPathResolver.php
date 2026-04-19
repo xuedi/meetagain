@@ -35,11 +35,6 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
         };
     }
 
-    public function getPublicFilesystemPath(): string
-    {
-        return $this->inner->getPublicFilesystemPath();
-    }
-
     public static function hashLogicalPath(string $logicalPath): string
     {
         return substr(

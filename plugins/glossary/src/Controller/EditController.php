@@ -46,7 +46,7 @@ final class EditController extends AbstractGlossaryController
 
             if (!$this->isGranted('ROLE_ORGANIZER')) {
                 // Regular users create suggestions
-                $this->service->generateSuggestions($newGlossary, $id, $this->getUser()->getId());
+                $this->service->generateSuggestions($newGlossary, $id, $this->getAuthedUser()->getId());
 
                 $item = $this->service->get($id);
                 if ($item !== null) {

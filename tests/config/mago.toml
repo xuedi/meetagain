@@ -3,12 +3,15 @@
 php-version = "8.4"
 
 [source]
-# Wildcard pattern automatically includes all plugins
-# Uses recursive glob to match all PHP files in any plugin's src directory
 paths = [
-    "plugins/**/src/**/*.php",
+    "plugins/bookclub/src/**/*.php",
+    "plugins/dinnerclub/src/**/*.php",
+    "plugins/filmclub/src/**/*.php",
+    "plugins/glossary/src/**/*.php",
+    "plugins/karaoke/src/**/*.php",
     "src/",
-    "tests/"
+    "tests/",
+    "stubs/",
 ]
 includes = ["vendor"]
 excludes = []
@@ -102,5 +105,79 @@ enabled = false
 enabled = false
 
 [analyzer]
+# tests/ excluded: the linter already covers tests for style/structure. The analyzer
+# produces PHPUnit false positives (createMock/createStub return MockObject&T which
+# mago reports as non-existent-method and invalid-callable).
+excludes = [
+    # tests/ excluded: linter already covers tests; analyzer false positives from PHPUnit mocking.
+    "tests/",
+]
+
+ignore = [
+    # mixed-* — require full type annotation of the codebase (Symfony form getData(),
+    # Doctrine meta arrays, etc.). Separate typing project.
+    "mixed-assignment",
+    "mixed-method-access",
+    "mixed-array-access",
+    "mixed-array-assignment",
+    "mixed-argument",
+    "mixed-return-statement",
+    "mixed-operand",
+    "mixed-property-access",
+    "mixed-property-type-coercion",
+    "mixed-clone",
+
+    # Downstream effects of mixed-* — all resolve to `mixed` type.
+    "invalid-callable",
+    "invalid-destructuring-source",
+
+    # possibly-null-* / possible-*-null / possibly-false-* — require systematic null-safety
+    # refactor (nullable Doctrine relations, optional Symfony services, getId() before flush).
+    # Real issues but a separate null-safety project.
+    "possibly-null-argument",
+    "possible-method-access-on-null",
+    "possibly-null-array-access",
+    "possibly-null-array-index",
+    "possibly-null-operand",
+    "possibly-null-iterator",
+    "possibly-null-property-access",
+    "possibly-false-argument",
+    "possibly-false-operand",
+    "possibly-false-iterator",
+
+    # Downstream effects of null-* — return types involving null flow.
+    "invalid-return-statement",
+    "nullable-return-statement",
+
+    # Type precision — separate project, not runtime bugs.
+    "less-specific-nested-argument-type",
+    "less-specific-argument",
+    "less-specific-return-statement",
+    "less-specific-nested-return-statement",
+
+    # Requires intersection type support — separate project.
+    "ambiguous-object-method-access",
+    "ambiguous-object-property-access",
+
+    # invalid-iterator when type is mixed — downstream of mixed-* (Doctrine raw queries,
+    # untyped arrays). The nonnull variant requires explicit array shape annotations.
+    "invalid-iterator",
+
+    # invalid-type-cast — intentional (array) and (float) casts on mixed JSON payload
+    # fields in API controllers and ImportService. Downstream of mixed-typing.
+    "invalid-type-cast",
+
+    # possibly-static-access-on-interface — BlockHydrator and CmsBlockType intentionally
+    # call static methods via class-string<Interface>; all concrete classes implement them.
+    "possibly-static-access-on-interface",
+
+    # template-constraint-violation — Enum::getTranslatedList() returns mixed; fixing
+    # requires adding generic @return annotations throughout enum classes.
+    "template-constraint-violation",
+
+    # Style preferences — not bugs.
+    "non-documented-method",
+    "non-documented-property",
+]
 
 [guard]

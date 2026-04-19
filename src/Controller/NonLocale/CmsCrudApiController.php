@@ -68,7 +68,7 @@ final class CmsCrudApiController extends AbstractController
     #[Route('/', name: 'app_api_cms_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $data = json_decode((string) $request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
         $slug = (string) ($data['slug'] ?? '');
 
         if ($slug === '') {
@@ -126,7 +126,7 @@ final class CmsCrudApiController extends AbstractController
             return new JsonResponse(['error' => 'Page not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode((string) $request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
 
         if (isset($data['slug'])) {
             $cms->setSlug((string) $data['slug']);
@@ -195,7 +195,7 @@ final class CmsCrudApiController extends AbstractController
             return new JsonResponse(['error' => 'Page not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode((string) $request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
         $language = (string) ($data['language'] ?? '');
         $typeValue = (int) ($data['type'] ?? 0);
         $priority = (float) ($data['priority'] ?? ($this->blockRepository->getMaxPriority() + 1));
@@ -240,7 +240,7 @@ final class CmsCrudApiController extends AbstractController
             return new JsonResponse(['error' => 'Block not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode((string) $request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
 
         if (isset($data['json'])) {
             $block->setJson((array) $data['json']);
