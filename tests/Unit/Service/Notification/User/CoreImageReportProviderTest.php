@@ -22,7 +22,7 @@ class CoreImageReportProviderTest extends TestCase
             $reporter->method('getName')->willReturn($reporterName);
         }
 
-        $report = $this->createMock(ImageReport::class);
+        $report = $this->createStub(ImageReport::class);
         $report->method('getId')->willReturn($id);
         $report->method('getReporter')->willReturn($reporter);
 
@@ -31,7 +31,7 @@ class CoreImageReportProviderTest extends TestCase
 
     private function makeProvider(array $openReports = [], bool $isAdmin = true): CoreImageReportProvider
     {
-        $repo = $this->createMock(ImageReportRepository::class);
+        $repo = $this->createStub(ImageReportRepository::class);
         $repo->method('getOpen')->willReturn($openReports);
 
         $security = $this->createStub(Security::class);

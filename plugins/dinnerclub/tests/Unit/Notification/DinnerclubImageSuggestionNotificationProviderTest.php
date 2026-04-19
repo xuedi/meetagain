@@ -17,7 +17,7 @@ class DinnerclubImageSuggestionNotificationProviderTest extends TestCase
 {
     private function makeSuggestion(int $id = 1): DishImageSuggestion
     {
-        $suggestion = $this->createMock(DishImageSuggestion::class);
+        $suggestion = $this->createStub(DishImageSuggestion::class);
         $suggestion->method('getId')->willReturn($id);
         $suggestion->method('getDish')->willReturn(null);
         $suggestion->method('getSuggestedBy')->willReturn(42);
@@ -27,7 +27,7 @@ class DinnerclubImageSuggestionNotificationProviderTest extends TestCase
 
     private function makeProvider(array $suggestions = [], bool $isOrganizer = true): DinnerclubImageSuggestionNotificationProvider
     {
-        $repo = $this->createMock(DishImageSuggestionRepository::class);
+        $repo = $this->createStub(DishImageSuggestionRepository::class);
         $repo->method('findAll')->willReturn($suggestions);
 
         $security = $this->createStub(Security::class);

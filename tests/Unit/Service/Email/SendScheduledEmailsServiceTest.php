@@ -53,7 +53,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
     {
         // Arrange
         $clock = new MockClock(new DateTimeImmutable('2026-04-12 10:00:00'));
-        $email = $this->createMock(ScheduledEmailInterface::class);
+        $email = $this->createStub(ScheduledEmailInterface::class);
         $email->method('getDueContexts')->willReturn([]);
 
         $service = new SendScheduledEmailsService([$email], $clock);
@@ -104,7 +104,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
 
         $callOrder = [];
 
-        $email = $this->createMock(ScheduledEmailInterface::class);
+        $email = $this->createStub(ScheduledEmailInterface::class);
         $email->method('getDueContexts')->willReturn([$dueContext]);
         $email->method('guardCheck')->willReturn(true);
         $email

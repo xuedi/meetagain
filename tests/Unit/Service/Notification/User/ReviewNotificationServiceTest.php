@@ -14,7 +14,7 @@ class ReviewNotificationServiceTest extends TestCase
 {
     private function makeProvider(string $identifier, array $items): ReviewNotificationProviderInterface
     {
-        $mock = $this->createMock(ReviewNotificationProviderInterface::class);
+        $mock = $this->createStub(ReviewNotificationProviderInterface::class);
         $mock->method('getIdentifier')->willReturn($identifier);
         $mock->method('getReviewItems')->willReturn($items);
 

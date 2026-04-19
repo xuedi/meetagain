@@ -18,7 +18,7 @@ class CoreMemberApprovalProviderTest extends TestCase
 {
     private function makeUser(int $id = 1, string $name = 'John', UserStatus $status = UserStatus::EmailVerified): User
     {
-        $user = $this->createMock(User::class);
+        $user = $this->createStub(User::class);
         $user->method('getId')->willReturn($id);
         $user->method('getName')->willReturn($name);
         $user->method('getStatus')->willReturn($status);
@@ -31,7 +31,7 @@ class CoreMemberApprovalProviderTest extends TestCase
         bool $isAdmin = true,
         ?User $findResult = null,
     ): CoreMemberApprovalProvider {
-        $repo = $this->createMock(UserRepository::class);
+        $repo = $this->createStub(UserRepository::class);
         $repo->method('findByStatus')->willReturn($pendingUsers);
         $repo->method('find')->willReturn($findResult);
 
