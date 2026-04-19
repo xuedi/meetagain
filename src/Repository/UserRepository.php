@@ -430,13 +430,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->findOneBy(['apiTokenHash' => $hash]);
     }
 
-    /**
-     * Find all users for admin interface with optional ID filtering.
-     * Orders pending approvals first, then by creation date.
-     *
-     * @param array<int>|null $restrictToUserIds Optional user ID filter
-     * @return User[]
-     */
     public function getLatestPendingCreatedAt(): ?DateTimeImmutable
     {
         $result = $this
@@ -447,7 +440,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getQuery()
             ->getSingleScalarResult();
 
-        return $result !== null ? new DateTimeImmutable($result) : null;
+        return $result !== null ? new DateTimeImmutable((string) $result) : null;
     }
 
     /**

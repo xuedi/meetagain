@@ -7,6 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Dinnerclub\Entity\Dish;
 use Plugin\Dinnerclub\Entity\DishImage;
 
+/** @extends ServiceEntityRepository<DishImage> */
 class DishImageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)

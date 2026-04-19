@@ -89,7 +89,7 @@ class Dinner
 
     public function getPricePerPerson(): ?float
     {
-        return $this->pricePerPerson !== null ? (float) $this->pricePerPerson : null;
+        return $this->pricePerPerson !== null ? $this->pricePerPerson : null;
     }
 
     public function setPricePerPerson(?float $pricePerPerson): static

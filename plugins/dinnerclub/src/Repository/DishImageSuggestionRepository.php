@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Dinnerclub\Entity\Dish;
 use Plugin\Dinnerclub\Entity\DishImageSuggestion;
 
+/** @extends ServiceEntityRepository<DishImageSuggestion> */
 class DishImageSuggestionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -32,7 +33,7 @@ class DishImageSuggestionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
-        return $result !== null ? new DateTimeImmutable($result) : null;
+        return $result !== null ? new DateTimeImmutable((string) $result) : null;
     }
 
     /** @return Dish[] */

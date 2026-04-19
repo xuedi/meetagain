@@ -7,6 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Dinnerclub\Entity\Dish;
 use Plugin\Dinnerclub\Entity\DishLike;
 
+/** @extends ServiceEntityRepository<DishLike> */
 class DishLikeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -19,12 +20,10 @@ class DishLikeRepository extends ServiceEntityRepository
         return $this->findOneBy(['dish' => $dish, 'userId' => $userId]);
     }
 
-    /** @return int[] */
+    /** @return list<int> */
     public function findDishIdsByUser(int $userId): array
     {
-        return array_map(
-            static fn(DishLike $like) => $like->getDish()->getId(),
-            $this->findBy(['userId' => $userId]),
-        );
+        $likes = $this->findBy(['userId' => $userId]);
+        return array_values(array_map(static fn(DishLike $like) => (int) $like->getDish()->getId(), $likes));
     }
 }

@@ -39,7 +39,7 @@ final class AuthApiController extends AbstractController
             ], Response::HTTP_TOO_MANY_REQUESTS);
         }
 
-        $data = json_decode((string) $request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
         $email = (string) ($data['email'] ?? '');
         $password = (string) ($data['password'] ?? '');
 

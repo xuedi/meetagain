@@ -12,7 +12,6 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LanguageService $languageService,
-        private string $defaultLocale = 'en',
     ) {}
 
     #[Override]

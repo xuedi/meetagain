@@ -76,7 +76,7 @@ final class VoteController extends AbstractController
                 return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);
             }
 
-            $closesAt = \DateTimeImmutable::createFromFormat($this->configService->getDateFormat(), $closesAtString);
+            $closesAt = \DateTimeImmutable::createFromFormat($this->configService->getDateFormat(), (string) $closesAtString);
             if (!$closesAt) {
                 $this->addFlash('error', 'Invalid date format');
                 return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);

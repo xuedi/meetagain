@@ -1,23 +1,25 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Service\System;
 
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlock\CmsBlockType;
 use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
 use App\Entity\Event;
+use App\Entity\EventTranslation;
+use App\Entity\Image;
+use App\Entity\Location;
+use App\Entity\User;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
-use App\Entity\EventTranslation;
 use App\Enum\EventType;
-use App\Entity\Image;
 use App\Enum\ImageType;
-use App\Entity\Location;
 use App\Enum\MenuLocation;
-use App\Entity\User;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Repository\LocationRepository;
@@ -363,7 +365,7 @@ readonly class ImportService
         }
 
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = (string) ($finfo->buffer($content) ?: 'application/octet-stream');
+        $mimeType = $finfo->buffer($content) ?: 'application/octet-stream';
 
         $targetDir = $this->projectDir . '/data/images/';
         if (!is_dir($targetDir)) {

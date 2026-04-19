@@ -133,7 +133,7 @@ final class MemberController extends AbstractAdminController
         }
 
         // Prevent self-promotion
-        if ($user->getId() === $this->getUser()->getId()) {
+        if ($user->getId() === $this->getAuthedUser()->getId()) {
             $this->addFlash('error', 'You cannot promote yourself.');
 
             return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);

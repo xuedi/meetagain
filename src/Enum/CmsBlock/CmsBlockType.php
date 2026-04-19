@@ -11,6 +11,7 @@ use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
 use App\Entity\BlockType\TrioCards;
+use LogicException;
 
 enum CmsBlockType: int
 {
@@ -33,6 +34,7 @@ enum CmsBlockType: int
             self::Hero        => Hero::class,
             self::EventTeaser => EventTeaser::class,
             self::TrioCards   => TrioCards::class,
+            default           => throw new LogicException(sprintf('CmsBlockType::%s is not yet implemented.', $this->name)),
         };
     }
 

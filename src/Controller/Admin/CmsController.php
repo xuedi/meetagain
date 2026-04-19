@@ -216,7 +216,7 @@ final class CmsController extends AbstractAdminController
             'cms_slug' => $cms->getSlug(),
             'request_uri' => $request->getUri(),
             'request_host' => $request->getHost(),
-            'user_id' => $this->getUser()?->getId(),
+            'user_id' => $this->getAuthedUser()->getId(),
             'allowed_cms_ids' => $allowedIds !== null ? array_slice($allowedIds, 0, 20) : 'all',
             'total_allowed' => $allowedIds !== null ? count($allowedIds) : null,
         ];

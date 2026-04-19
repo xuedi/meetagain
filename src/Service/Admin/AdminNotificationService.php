@@ -148,6 +148,7 @@ readonly class AdminNotificationService implements CronTaskInterface
     private function getLastSentAt(): ?DateTimeImmutable
     {
         try {
+            /** @var string|null $value */
             $value = $this->appCache->get(self::CACHE_KEY, static fn(ItemInterface $item) => null);
 
             return $value !== null ? new DateTimeImmutable($value) : null;

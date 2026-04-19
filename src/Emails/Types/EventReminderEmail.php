@@ -133,7 +133,7 @@ readonly class EventReminderEmail implements ScheduledEmailInterface
 
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::EventReminder->value,
-                label: 'Event: ' . ($event->getTitle('en') ?: $event->getTranslation()->first()?->getTitle() ?? ''),
+                label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
                 expectedTime: DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT5H')),
                 expectedRecipients: $eligibleCount,
             );
