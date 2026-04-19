@@ -3,6 +3,7 @@
 namespace Plugin\Bookclub;
 
 use App\Entity\Link;
+use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\ValueObject\LinkCollection;
@@ -34,7 +35,7 @@ class Kernel implements Plugin
         ]);
     }
 
-    public function getEventTile(int $eventId): ?string
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string
     {
         $selection = $this->selectionRepository->findByEventId($eventId);
         $poll = $this->pollRepository->findByEventId($eventId);

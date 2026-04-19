@@ -11,6 +11,7 @@ use App\Entity\Event;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
+use App\Enum\EventTileLocation;
 use App\Enum\EventType;
 use App\FeaturedEventProviderInterface;
 use App\Filter\Event\EventFilterService;
@@ -134,7 +135,8 @@ final class EventController extends AbstractController
             'events/details.html.twig',
             [
                 'commentForm' => $form,
-                'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id) : [],
+                'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
+                'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],
                 'comments' => $this->comments->findByEventWithUser($id),
                 'event' => $event,
                 'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,

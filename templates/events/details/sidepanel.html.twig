@@ -42,3 +42,6 @@
              data-marker-shadow="{{ asset('images/leaflet/marker-shadow.png') }}"></div>
     {% endif %}
 </div>
+{% for tile in pluginBottomSidebarTiles %}
+    {{ tile|raw }}
+{% endfor %}
