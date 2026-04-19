@@ -35,3 +35,7 @@ api_logs:
 robots:
     type: attribute
     resource: ../src/Controller/NonLocale/RobotsController.php
+
+sitemap:
+    type: attribute
+    resource: ../src/Controller/NonLocale/SitemapController.php

@@ -1,8 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service\ImageLocations;
 
-use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
 use App\Service\Media\ImageLocations\CmsBlockLocationProvider;
@@ -48,13 +49,16 @@ class ImageLocationProvidersTest extends TestCase
         ]);
 
         // Act
-        $result = (new ProfilePictureLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new ProfilePictureLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
-        static::assertSame([
-            ['imageId' => 10, 'locationId' => 1],
-            ['imageId' => 20, 'locationId' => 2],
-        ], $result);
+        static::assertSame(
+            [
+                ['imageId' => 10, 'locationId' => 1],
+                ['imageId' => 20, 'locationId' => 2],
+            ],
+            $result,
+        );
     }
 
     // =========================================================================
@@ -82,7 +86,7 @@ class ImageLocationProvidersTest extends TestCase
         ]);
 
         // Act
-        $result = (new EventTeaserLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new EventTeaserLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
         static::assertSame([['imageId' => 3, 'locationId' => 99]], $result);
@@ -113,7 +117,7 @@ class ImageLocationProvidersTest extends TestCase
         ]);
 
         // Act
-        $result = (new EventUploadLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new EventUploadLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
         static::assertSame([['imageId' => 55, 'locationId' => 8]], $result);
@@ -132,7 +136,10 @@ class ImageLocationProvidersTest extends TestCase
     public function testCmsBlockGetEditLink(): void
     {
         $provider = new CmsBlockLocationProvider($this->makeRepo(), $this->createStub(Connection::class));
-        static::assertSame(['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 3]], $provider->getEditLink(3));
+        static::assertSame(
+            ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 3]],
+            $provider->getEditLink(3),
+        );
     }
 
     public function testCmsBlockDiscoverImageIds(): void
@@ -144,7 +151,7 @@ class ImageLocationProvidersTest extends TestCase
         ]);
 
         // Act
-        $result = (new CmsBlockLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new CmsBlockLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
         static::assertSame([['imageId' => 4, 'locationId' => 11]], $result);
@@ -175,7 +182,7 @@ class ImageLocationProvidersTest extends TestCase
         ]);
 
         // Act
-        $result = (new LanguageTileLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new LanguageTileLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
         static::assertSame([['imageId' => 6, 'locationId' => 2]], $result);
@@ -194,7 +201,10 @@ class ImageLocationProvidersTest extends TestCase
     public function testCmsGalleryGetEditLink(): void
     {
         $provider = new CmsGalleryLocationProvider($this->makeRepo(), $this->createStub(Connection::class));
-        static::assertSame(['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 4]], $provider->getEditLink(4));
+        static::assertSame(
+            ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 4]],
+            $provider->getEditLink(4),
+        );
     }
 
     public function testCmsGalleryDiscoverImageIdsExtractsFromJson(): void
@@ -207,13 +217,16 @@ class ImageLocationProvidersTest extends TestCase
         ]);
 
         // Act
-        $result = (new CmsGalleryLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new CmsGalleryLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
-        static::assertSame([
-            ['imageId' => 10, 'locationId' => 7],
-            ['imageId' => 11, 'locationId' => 7],
-        ], $result);
+        static::assertSame(
+            [
+                ['imageId' => 10, 'locationId' => 7],
+                ['imageId' => 11, 'locationId' => 7],
+            ],
+            $result,
+        );
     }
 
     public function testCmsGalleryDiscoverImageIdsSkipsItemsWithoutId(): void
@@ -225,7 +238,7 @@ class ImageLocationProvidersTest extends TestCase
         ]);
 
         // Act
-        $result = (new CmsGalleryLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new CmsGalleryLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
         static::assertSame([], $result);
@@ -244,7 +257,10 @@ class ImageLocationProvidersTest extends TestCase
     public function testCmsCardImageGetEditLink(): void
     {
         $provider = new CmsCardImageLocationProvider($this->makeRepo(), $this->createStub(Connection::class));
-        static::assertSame(['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 6]], $provider->getEditLink(6));
+        static::assertSame(
+            ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 6]],
+            $provider->getEditLink(6),
+        );
     }
 
     public function testCmsCardImageDiscoverImageIdsExtractsFromCards(): void
@@ -252,20 +268,26 @@ class ImageLocationProvidersTest extends TestCase
         // Arrange
         $conn = $this->createStub(Connection::class);
         $conn->method('fetchAllAssociative')->willReturn([
-            ['id' => '3', 'json' => json_encode(['cards' => [
-                ['image' => ['id' => 20]],
-                ['image' => ['id' => 21]],
-            ]])],
+            [
+                'id' => '3',
+                'json' => json_encode(['cards' => [
+                    ['image' => ['id' => 20]],
+                    ['image' => ['id' => 21]],
+                ]]),
+            ],
         ]);
 
         // Act
-        $result = (new CmsCardImageLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new CmsCardImageLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
-        static::assertSame([
-            ['imageId' => 20, 'locationId' => 3],
-            ['imageId' => 21, 'locationId' => 3],
-        ], $result);
+        static::assertSame(
+            [
+                ['imageId' => 20, 'locationId' => 3],
+                ['imageId' => 21, 'locationId' => 3],
+            ],
+            $result,
+        );
     }
 
     public function testCmsCardImageDiscoverImageIdsSkipsCardsMissingImageId(): void
@@ -273,15 +295,18 @@ class ImageLocationProvidersTest extends TestCase
         // Arrange
         $conn = $this->createStub(Connection::class);
         $conn->method('fetchAllAssociative')->willReturn([
-            ['id' => '2', 'json' => json_encode(['cards' => [
-                ['image' => null],
-                ['image' => ['no_id' => true]],
-                [],
-            ]])],
+            [
+                'id' => '2',
+                'json' => json_encode(['cards' => [
+                    ['image' => null],
+                    ['image' => ['no_id' => true]],
+                    [],
+                ]]),
+            ],
         ]);
 
         // Act
-        $result = (new CmsCardImageLocationProvider($this->makeRepo(), $conn))->discoverImageIds();
+        $result = new CmsCardImageLocationProvider($this->makeRepo(), $conn)->discoverImageIds();
 
         // Assert
         static::assertSame([], $result);

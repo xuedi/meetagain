@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Filter;
+namespace App\Publisher\CanonicalUrl;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
