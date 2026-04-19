@@ -80,7 +80,7 @@ class CmsType extends AbstractType
             // Populate menuLocations
             $values = [];
             foreach ($cms->getMenuLocations() as $ml) {
-                $values[] = $ml->getLocation()->value;
+                $values[] = $ml->getLocation()?->value;
             }
             $form->get('menuLocations')->setData($values);
 
@@ -121,7 +121,7 @@ class CmsType extends AbstractType
                 // Get current location values
                 $existingValues = [];
                 foreach ($cms->getMenuLocations() as $ml) {
-                    $existingValues[$ml->getLocation()->value] = $ml;
+                    $existingValues[$ml->getLocation()?->value] = $ml;
                 }
 
                 // Remove locations that are no longer selected

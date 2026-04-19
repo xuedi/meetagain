@@ -138,7 +138,7 @@ final class CmsBlockController extends AbstractAdminController
             throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
         }
 
-        $locale = $request->request->get('editLocale');
+        $locale = $request->request->getString('editLocale');
         $blockType = CmsBlockType::from((int) $request->request->get('blockType'));
 
         try {
@@ -253,7 +253,7 @@ final class CmsBlockController extends AbstractAdminController
             if ($file instanceof UploadedFile) {
                 $violations = $this->validator->validate($file, $fileConstraint);
                 if (count($violations) > 0) {
-                    $this->addFlash('danger', 'Invalid file: ' . $violations->get(0)->getMessage());
+                    $this->addFlash('danger', 'Invalid file: ' . (string) $violations->get(0)->getMessage());
                     return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
                 }
 

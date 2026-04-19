@@ -26,6 +26,6 @@ class DinnerCourseItemRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
-        return ($result ?? -1) + 1;
+        return ((int) ($result ?? -1)) + 1;
     }
 }

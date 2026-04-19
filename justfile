@@ -280,7 +280,7 @@ testPerformance:
 
 # Run all tests and checks
 [group('testing')]
-check: checkMago checkMagoGuard
+check: checkMago checkMagoAnalyze checkMagoGuard
     {{PHP}} composer validate --strict
     echo "All tests and checks passed successfully"
 

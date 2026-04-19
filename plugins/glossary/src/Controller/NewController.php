@@ -36,7 +36,7 @@ final class NewController extends AbstractGlossaryController
             if (!$this->getUser() instanceof User) {
                 throw new AuthenticationException('Only for logged in users');
             }
-            $this->service->createNew($glossary, $this->getUser()->getId(), $this->isGranted('ROLE_ORGANIZER'));
+            $this->service->create($glossary, $this->getAuthedUser()->getId(), $this->isGranted('ROLE_ORGANIZER'));
 
             $this->activityService->log(EntryCreated::TYPE, $this->getUser(), [
                 'glossary_id' => $glossary->getId(),

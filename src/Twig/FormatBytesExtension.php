@@ -16,7 +16,7 @@ final class FormatBytesExtension extends AbstractExtension
         ];
     }
 
-    public function formatBytes($bytes): string
+    public function formatBytes(int|float $bytes): string
     {
         $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
         $bytes = max($bytes, 0);

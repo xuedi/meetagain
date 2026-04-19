@@ -87,6 +87,7 @@ readonly class OpenLibraryIsbnLookup implements IsbnLookupInterface
             return null;
         }
 
+        $matches = [];
         if (preg_match('/\d{4}/', $data['publish_date'], $matches)) {
             return (int) $matches[0];
         }

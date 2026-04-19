@@ -269,6 +269,7 @@ readonly class ConfigService
 
         $map = [];
         foreach ($scssToKey as $scssVar => $key) {
+            $m = [];
             if (!preg_match('/\$' . preg_quote($scssVar, '/') . '\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/', $content, $m)) {
                 continue;
             }

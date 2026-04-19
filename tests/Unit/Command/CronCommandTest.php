@@ -6,19 +6,17 @@ use App\Command\CronCommand;
 use App\Service\Admin\CommandExecutionService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 
 class CronCommandTest extends TestCase
 {
     public function testCommandHasCorrectName(): void
     {
         // Arrange
-        $loggerStub = $this->createStub(LoggerInterface::class);
         $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
 
         // Act
         $emStub = $this->createStub(EntityManagerInterface::class);
-        $command = new CronCommand($loggerStub, $emStub, $commandExecServiceStub);
+        $command = new CronCommand($emStub, $commandExecServiceStub);
 
         // Assert
         static::assertSame('app:cron', $command->getName());
@@ -27,12 +25,11 @@ class CronCommandTest extends TestCase
     public function testCommandHasCorrectDescription(): void
     {
         // Arrange
-        $loggerStub = $this->createStub(LoggerInterface::class);
         $commandExecServiceStub = $this->createStub(CommandExecutionService::class);
 
         // Act
         $emStub = $this->createStub(EntityManagerInterface::class);
-        $command = new CronCommand($loggerStub, $emStub, $commandExecServiceStub);
+        $command = new CronCommand($emStub, $commandExecServiceStub);
 
         // Assert
         static::assertSame('cron manager to be called often, maybe every 5 min or so', $command->getDescription());

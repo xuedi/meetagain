@@ -47,7 +47,7 @@ final class SeoController extends AbstractAdminController
     #[Route('/seo/indexnow-submit', name: 'app_admin_system_seo_indexnow_submit', methods: ['POST'])]
     public function indexNowSubmit(Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('indexnow_submit', $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('indexnow_submit', $request->request->getString('_token'))) {
             $this->addFlash('danger', 'Invalid CSRF token');
 
             return $this->redirectToRoute('app_admin_system_seo');

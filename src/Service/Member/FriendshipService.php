@@ -48,8 +48,7 @@ readonly class FriendshipService
         if ($isFollowing) {
             $currentUser->removeFollowing($targetUser);
             $activityType = UnFollowedUser::TYPE;
-        }
-        if (!$isFollowing) {
+        } else {
             $currentUser->addFollowing($targetUser);
             $activityType = FollowedUser::TYPE;
         }

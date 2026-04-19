@@ -62,7 +62,7 @@ class DinnerFixture extends AbstractFixture implements FixtureGroupInterface
                 $manager->persist($course);
 
                 // Primary dish
-                $primaryDish = $dishes[($eventIndex * 3 + $sortOrder) % count($dishes)];
+                $primaryDish = $dishes[((int) $eventIndex * 3 + $sortOrder) % count($dishes)];
                 $primary = new DinnerCourseItem();
                 $primary->setCourse($course);
                 $primary->setDish($primaryDish);
@@ -72,7 +72,7 @@ class DinnerFixture extends AbstractFixture implements FixtureGroupInterface
 
                 // Alternative dish (if there are enough dishes and it's not Dessert)
                 if ($courseName !== 'Dessert' && count($dishes) > 1) {
-                    $altDish = $dishes[($eventIndex * 3 + $sortOrder + 1) % count($dishes)];
+                    $altDish = $dishes[((int) $eventIndex * 3 + $sortOrder + 1) % count($dishes)];
                     if ($altDish->getId() !== $primaryDish->getId()) {
                         $alt = new DinnerCourseItem();
                         $alt->setCourse($course);

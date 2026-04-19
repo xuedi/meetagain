@@ -186,7 +186,7 @@ class ImageLocationServiceTest extends TestCase
         // Arrange: Image linked to an Event; Event::getName() doesn't exist on entity,
         // so we mock the Event via the Image mock
         $eventStub = new class extends EventStub {
-            public function getName(): string { return 'Summer Party'; }
+            public function getTitle(string $language): string { return 'Summer Party'; }
         };
         $eventStub->setId(7);
 
@@ -272,7 +272,7 @@ class ImageLocationServiceTest extends TestCase
         $image->method('getType')->willReturn(ImageType::EventTeaser);
 
         $event = new class extends EventStub {
-            public function getName(): string { return 'Go Tournament'; }
+            public function getTitle(string $language): string { return 'Go Tournament'; }
         };
         $event->setId(11);
 
