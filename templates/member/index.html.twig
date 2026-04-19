@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_member"|trans }}{% endblock %}
+{% block title %}{% if pageCurrent > 1 %}{{ "page_title_member_page"|trans({'%page%': pageCurrent}) }}{% else %}{{ "page_title_member"|trans }}{% endif %}{% endblock %}
 {% block meta_description %}{{ get_meta_description('members') }}{% endblock %}
 
 {% block body %}

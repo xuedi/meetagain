@@ -96,7 +96,8 @@ page_title_admin: Admin
 page_title_event: Events
 page_title_login: Login
 page_title_manage: Verwalten
-page_title_member: Mitglieder
+page_title_member: Mitgliederverzeichnis
+page_title_member_page: 'Mitgliederverzeichnis - Seite %page%'
 page_title_profile: Profil
 role_admin: Administrator
 role_manager: Manager
@@ -261,7 +262,7 @@ menu_admin_language: Sprachen
 canceled: abgesagt
 'this event has been canceled.': 'Diese Veranstaltung wurde abgesagt.'
 'event canceled': 'Veranstaltung abgesagt'
-page_title_cookie: Cookies
+page_title_cookie: Cookie-Einstellungen
 cookie_consent_cookies_text: 'Wir speichern lediglich die Information, ob Sie Cookies akzeptiert haben oder nicht. Dadurch wird das Cookie-Popup-Fenster bei Ihrem nächsten Besuch unnoetig.'
 cookie_consent_current_status: 'Jetziger Status'
 cookie_consent_cookies: 'Cookies erlauben'
