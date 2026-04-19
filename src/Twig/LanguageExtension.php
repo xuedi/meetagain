@@ -53,7 +53,8 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('get_enabled_locales', $this->languageService->getFilteredEnabledCodes(...)),
             new TwigFunction('get_all_languages', $this->languageService->getAllLanguages(...)),
             new TwigFunction('current_locale', $this->getCurrentLocale(...)),
-            new TwigFunction('get_alternative_languages', $this->getAlternativeLanguageCodes(...)),
+            new TwigFunction('get_alternative_languages', $this->getLanguageSwitcherOptions(...)),
+            new TwigFunction('get_hreflang_languages', $this->getHreflangLanguageCodes(...)),
             new TwigFunction('get_language_codes', $this->languageService->getFilteredEnabledCodes(...)),
             new TwigFunction('get_admin_language_codes', $this->languageService->getAdminFilteredEnabledCodes(...)),
             new TwigFunction('route_exists', $this->routeExists(...)),
@@ -72,22 +73,47 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         );
     }
 
-    public function getAlternativeLanguageCodes(): array
+    public function getLanguageSwitcherOptions(): array
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request instanceof Request) {
-            $currentUri = $request->getRequestUri();
-            $currentLocale = $request->getLocale();
-            if (!str_starts_with($currentUri, '/_profiler')) {
-                $altLangList = $this->languageService->getAltLangList($currentLocale, $currentUri);
-                $altLangList = $this->applyAlternateLinkFilters($altLangList, $request);
-                $host = rtrim($this->configService->getHost(), '/');
-
-                return array_map(static fn(string $path) => $host . $path, $altLangList);
-            }
+        if (!$request instanceof Request) {
+            return [];
         }
 
-        return [];
+        $currentUri = $request->getRequestUri();
+        if (str_starts_with($currentUri, '/_profiler')) {
+            return [];
+        }
+
+        $allAltLangList = $this->languageService->getAltLangList($request->getLocale(), $currentUri);
+        $supportedLocales = array_flip(array_keys($this->applyAlternateLinkFilters($allAltLangList, $request)));
+        $host = rtrim($this->configService->getHost(), '/');
+
+        $result = [];
+        foreach ($allAltLangList as $locale => $path) {
+            $result[$locale] = $host . (isset($supportedLocales[$locale]) ? $path : '/' . $locale . '/');
+        }
+
+        return $result;
+    }
+
+    public function getHreflangLanguageCodes(): array
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request instanceof Request) {
+            return [];
+        }
+
+        $currentUri = $request->getRequestUri();
+        if (str_starts_with($currentUri, '/_profiler')) {
+            return [];
+        }
+
+        $altLangList = $this->languageService->getAltLangList($request->getLocale(), $currentUri);
+        $altLangList = $this->applyAlternateLinkFilters($altLangList, $request);
+        $host = rtrim($this->configService->getHost(), '/');
+
+        return array_map(static fn(string $path) => $host . $path, $altLangList);
     }
 
     /**
