@@ -19,7 +19,7 @@ class BookclubNotificationProviderTest extends TestCase
 {
     private function makeBook(int $id, string $title = 'Test Book', ?int $createdBy = null): Book
     {
-        $book = $this->createMock(Book::class);
+        $book = $this->createStub(Book::class);
         $book->method('getId')->willReturn($id);
         $book->method('getTitle')->willReturn($title);
         $book->method('getCreatedBy')->willReturn($createdBy);
@@ -31,7 +31,7 @@ class BookclubNotificationProviderTest extends TestCase
         array $pendingBooks = [],
         bool $isOrganizer = true,
     ): BookclubNotificationProvider {
-        $bookRepo = $this->createMock(BookRepository::class);
+        $bookRepo = $this->createStub(BookRepository::class);
         $bookRepo->method('findBy')->willReturn($pendingBooks);
 
         $security = $this->createStub(Security::class);

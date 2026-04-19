@@ -13,7 +13,7 @@ class ReviewNotificationProviderTest extends TestCase
 {
     private function makeService(int $count): ReviewNotificationService
     {
-        $mock = $this->createMock(ReviewNotificationService::class);
+        $mock = $this->createStub(ReviewNotificationService::class);
         $mock->method('countForUser')->willReturn($count);
 
         return $mock;

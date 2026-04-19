@@ -17,7 +17,7 @@ class DinnerclubSuggestionNotificationProviderTest extends TestCase
 {
     private function makeDish(int $id = 1, string $name = 'Peking Duck'): Dish
     {
-        $dish = $this->createMock(Dish::class);
+        $dish = $this->createStub(Dish::class);
         $dish->method('getId')->willReturn($id);
         $dish->method('getAnyTranslatedName')->willReturn($name);
         $dish->method('getCreatedBy')->willReturn(null);
@@ -27,7 +27,7 @@ class DinnerclubSuggestionNotificationProviderTest extends TestCase
 
     private function makeProvider(array $pendingDishes = [], bool $isOrganizer = true): DinnerclubSuggestionNotificationProvider
     {
-        $dishService = $this->createMock(DishService::class);
+        $dishService = $this->createStub(DishService::class);
         $dishService->method('getPendingDishes')->willReturn($pendingDishes);
 
         $security = $this->createStub(Security::class);
