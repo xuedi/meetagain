@@ -39,11 +39,14 @@ security:
         allow_if_all_abstain: true
 
     access_control:
-        - { path: "^/api/auth",   roles: PUBLIC_ACCESS }
-        - { path: "^/api/$",      roles: PUBLIC_ACCESS }
-        - { path: "^/api/status", roles: PUBLIC_ACCESS }
-        - { path: "^/api/cms",    roles: ROLE_ADMIN }
-        - { path: "^/api/logs",   roles: ROLE_ADMIN }
+        - { path: "^/api/auth",          roles: PUBLIC_ACCESS }
+        - { path: "^/api/$",             roles: PUBLIC_ACCESS }
+        - { path: "^/api/status",        roles: PUBLIC_ACCESS }
+        - { path: "^/api/events",        roles: PUBLIC_ACCESS }
+        - { path: "^/api/groups",        roles: PUBLIC_ACCESS }
+        - { path: "^/api/openapi\\.json", roles: PUBLIC_ACCESS }
+        - { path: "^/api/cms",           roles: ROLE_ADMIN }
+        - { path: "^/api/logs",          roles: ROLE_ADMIN }
         - { path: "^/[a-z]{2}/profile/notifications", roles: PUBLIC_ACCESS } # allows guests to reach the controller so it can save redirectUrl and redirect to login (jump-back pattern)
         - { path: "^/[a-z]{2}/profile", roles: ROLE_USER }
         - { path: "^/[a-z]{2}/translation", roles: ROLE_USER }

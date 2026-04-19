@@ -8,29 +8,19 @@ controllers:
         namespace: App\Controller
     exclude: ../src/Controller/NonLocale/
 
+api:
+    type: attribute
+    resource:
+        path: ../src/Controller/NonLocale/Api/
+        namespace: App\Controller\NonLocale\Api
+
 frontpage:
     type: attribute
     resource: ../src/Controller/NonLocale/FrontpageController.php
 
-api:
-    type: attribute
-    resource: ../src/Controller/NonLocale/ApiController.php
-
 ajax:
     type: attribute
     resource: ../src/Controller/NonLocale/AjaxController.php
-
-api_auth:
-    type: attribute
-    resource: ../src/Controller/NonLocale/AuthApiController.php
-
-api_cms:
-    type: attribute
-    resource: ../src/Controller/NonLocale/CmsCrudApiController.php
-
-api_logs:
-    type: attribute
-    resource: ../src/Controller/NonLocale/LogsApiController.php
 
 robots:
     type: attribute
