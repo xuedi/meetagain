@@ -2,7 +2,7 @@
 
 namespace App\Service\Seo;
 
-use App\Filter\CanonicalUrlProviderInterface;
+use App\Publisher\CanonicalUrl\CanonicalUrlProviderInterface;
 use App\Service\Config\ConfigService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Emails\Types;
 
@@ -41,15 +43,15 @@ class EmailTypesTest extends TestCase
         $em = $this->createStub(EntityManagerInterface::class);
 
         return [
-            'AdminNotification'       => new AdminNotificationEmail($this->queue, $this->config),
-            'Announcement'            => new AnnouncementEmail($this->queue, $this->config),
-            'EventReminder'           => new EventReminderEmail($this->queue, $this->config, $eventRepo, $em),
+            'AdminNotification' => new AdminNotificationEmail($this->queue, $this->config),
+            'Announcement' => new AnnouncementEmail($this->queue, $this->config),
+            'EventReminder' => new EventReminderEmail($this->queue, $this->config, $eventRepo, $em),
             'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->queue, $this->config),
-            'NotificationMessage'     => new NotificationMessageEmail($this->queue, $this->config),
-            'PasswordReset'           => new PasswordResetEmail($this->queue, $this->config),
-            'RsvpAggregated'          => new RsvpAggregatedEmail($this->queue, $this->config, $eventRepo, $em),
-            'SupportNotification'     => new SupportNotificationEmail($this->queue, $this->config),
-            'UpcomingDigest'          => new UpcomingDigestEmail(
+            'NotificationMessage' => new NotificationMessageEmail($this->queue, $this->config),
+            'PasswordReset' => new PasswordResetEmail($this->queue, $this->config),
+            'RsvpAggregated' => new RsvpAggregatedEmail($this->queue, $this->config, $eventRepo, $em),
+            'SupportNotification' => new SupportNotificationEmail($this->queue, $this->config),
+            'UpcomingDigest' => new UpcomingDigestEmail(
                 $this->queue,
                 $this->config,
                 $eventRepo,
@@ -57,8 +59,8 @@ class EmailTypesTest extends TestCase
                 $this->createStub(AppStateService::class),
                 [],
             ),
-            'VerificationRequest'     => new VerificationRequestEmail($this->queue, $this->config),
-            'Welcome'                 => new WelcomeEmail($this->queue, $this->config),
+            'VerificationRequest' => new VerificationRequestEmail($this->queue, $this->config),
+            'Welcome' => new WelcomeEmail($this->queue, $this->config),
         ];
     }
 
@@ -66,17 +68,17 @@ class EmailTypesTest extends TestCase
     {
         // Keys must match what allTypes() returns; instances are built in the test body
         // because setUp() hasn't run yet when the provider executes.
-        yield 'AdminNotification'         => ['AdminNotification'];
-        yield 'Announcement'              => ['Announcement'];
-        yield 'EventReminder'             => ['EventReminder'];
+        yield 'AdminNotification' => ['AdminNotification'];
+        yield 'Announcement' => ['Announcement'];
+        yield 'EventReminder' => ['EventReminder'];
         yield 'NotificationEventCanceled' => ['NotificationEventCanceled'];
-        yield 'NotificationMessage'       => ['NotificationMessage'];
-        yield 'PasswordReset'             => ['PasswordReset'];
-        yield 'RsvpAggregated'            => ['RsvpAggregated'];
-        yield 'SupportNotification'       => ['SupportNotification'];
-        yield 'UpcomingDigest'            => ['UpcomingDigest'];
-        yield 'VerificationRequest'       => ['VerificationRequest'];
-        yield 'Welcome'                   => ['Welcome'];
+        yield 'NotificationMessage' => ['NotificationMessage'];
+        yield 'PasswordReset' => ['PasswordReset'];
+        yield 'RsvpAggregated' => ['RsvpAggregated'];
+        yield 'SupportNotification' => ['SupportNotification'];
+        yield 'UpcomingDigest' => ['UpcomingDigest'];
+        yield 'VerificationRequest' => ['VerificationRequest'];
+        yield 'Welcome' => ['Welcome'];
     }
 
     #[DataProvider('emailTypeProvider')]
@@ -89,11 +91,11 @@ class EmailTypesTest extends TestCase
         $data = $email->getDisplayMockData();
 
         // Assert
-        static::assertArrayHasKey('subject', $data, "$key: missing 'subject'");
-        static::assertArrayHasKey('context', $data, "$key: missing 'context'");
-        static::assertIsString($data['subject'], "$key: 'subject' must be a string");
-        static::assertNotEmpty($data['subject'], "$key: 'subject' must not be empty");
-        static::assertIsArray($data['context'], "$key: 'context' must be an array");
+        static::assertArrayHasKey('subject', $data, "{$key}: missing 'subject'");
+        static::assertArrayHasKey('context', $data, "{$key}: missing 'context'");
+        static::assertIsString($data['subject'], "{$key}: 'subject' must be a string");
+        static::assertNotEmpty($data['subject'], "{$key}: 'subject' must not be empty");
+        static::assertIsArray($data['context'], "{$key}: 'context' must be an array");
     }
 
     #[DataProvider('emailTypeProvider')]
@@ -107,7 +109,7 @@ class EmailTypesTest extends TestCase
 
         // Assert
         $validValues = array_map(static fn(EmailType $t) => $t->value, EmailType::cases());
-        static::assertContains($identifier, $validValues, "$key: identifier '$identifier' not in EmailType enum");
+        static::assertContains($identifier, $validValues, "{$key}: identifier '{$identifier}' not in EmailType enum");
     }
 
     #[DataProvider('emailTypeProvider')]
@@ -118,31 +120,31 @@ class EmailTypesTest extends TestCase
 
     public function testAdminNotificationGuardCheckAlwaysTrue(): void
     {
-        static::assertTrue((new AdminNotificationEmail($this->queue, $this->config))->guardCheck([]));
+        static::assertTrue(new AdminNotificationEmail($this->queue, $this->config)->guardCheck([]));
     }
 
     public function testNotificationEventCanceledGuardCheckAlwaysTrue(): void
     {
-        static::assertTrue((new NotificationEventCanceledEmail($this->queue, $this->config))->guardCheck([]));
+        static::assertTrue(new NotificationEventCanceledEmail($this->queue, $this->config)->guardCheck([]));
     }
 
     public function testPasswordResetGuardCheckAlwaysTrue(): void
     {
-        static::assertTrue((new PasswordResetEmail($this->queue, $this->config))->guardCheck([]));
+        static::assertTrue(new PasswordResetEmail($this->queue, $this->config)->guardCheck([]));
     }
 
     public function testSupportNotificationGuardCheckAlwaysTrue(): void
     {
-        static::assertTrue((new SupportNotificationEmail($this->queue, $this->config))->guardCheck([]));
+        static::assertTrue(new SupportNotificationEmail($this->queue, $this->config)->guardCheck([]));
     }
 
     public function testVerificationRequestGuardCheckAlwaysTrue(): void
     {
-        static::assertTrue((new VerificationRequestEmail($this->queue, $this->config))->guardCheck([]));
+        static::assertTrue(new VerificationRequestEmail($this->queue, $this->config)->guardCheck([]));
     }
 
     public function testWelcomeGuardCheckAlwaysTrue(): void
     {
-        static::assertTrue((new WelcomeEmail($this->queue, $this->config))->guardCheck([]));
+        static::assertTrue(new WelcomeEmail($this->queue, $this->config)->guardCheck([]));
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Service\Seo;
 
-use App\Filter\CanonicalUrlProviderInterface;
+use App\Publisher\CanonicalUrl\CanonicalUrlProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Seo\CanonicalUrlService;
 use PHPUnit\Framework\TestCase;
