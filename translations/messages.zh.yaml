@@ -96,7 +96,8 @@ page_title_admin: 管理
 page_title_event: 活动
 page_title_login: 登录
 page_title_manage: 管理
-page_title_member: 成员
+page_title_member: 成员目录
+page_title_member_page: '成员目录 - 第 %page% 页'
 page_title_profile: 概况
 role_admin: 管理
 role_manager: 经理

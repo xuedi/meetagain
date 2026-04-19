@@ -83,7 +83,8 @@ page_title_admin: Admin
 page_title_event: Events
 page_title_login: Login
 page_title_manage: Manage
-page_title_member: Members
+page_title_member: Member Directory
+page_title_member_page: 'Member Directory - Page %page%'
 page_title_profile: Profile
 role_admin: Admin
 role_manager: Manager
@@ -248,7 +249,7 @@ menu_admin_language: Languages
 canceled: canceled
 'this event has been canceled.': 'this event has been canceled.'
 'event canceled': 'event canceled'
-page_title_cookie: Cookies
+page_title_cookie: Cookie Settings
 cookie_consent_cookies_text: 'We just store the information if you accepted cookies or not. This prevents the cookie popup window on your next visit'
 cookie_consent_current_status: 'Current Status'
 cookie_consent_cookies: 'Accept cookies'
