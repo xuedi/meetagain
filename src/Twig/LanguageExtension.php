@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Twig;
 
+use App\Filter\Language\AlternateLinkFilterInterface;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
@@ -32,6 +33,8 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly iterable $metaDescriptionProviders = [],
         #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
         private readonly iterable $organizationProviders = [],
+        #[AutowireIterator(AlternateLinkFilterInterface::class)]
+        private readonly iterable $alternateLinkFilters = [],
     ) {}
 
     #[Override]
@@ -77,6 +80,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             $currentLocale = $request->getLocale();
             if (!str_starts_with($currentUri, '/_profiler')) {
                 $altLangList = $this->languageService->getAltLangList($currentLocale, $currentUri);
+                $altLangList = $this->applyAlternateLinkFilters($altLangList, $request);
                 $host = rtrim($this->configService->getHost(), '/');
 
                 return array_map(static fn(string $path) => $host . $path, $altLangList);
@@ -84,6 +88,22 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         }
 
         return [];
+    }
+
+    /**
+     * @param array<string, string> $altLangList locale => path
+     * @return array<string, string>
+     */
+    private function applyAlternateLinkFilters(array $altLangList, Request $request): array
+    {
+        foreach ($this->alternateLinkFilters as $filter) {
+            $allowed = $filter->getAllowedAlternateLocaleCodes($request);
+            if ($allowed !== null) {
+                $altLangList = array_intersect_key($altLangList, array_flip($allowed));
+            }
+        }
+
+        return $altLangList;
     }
 
     public function getMetaDescription(string $context = 'default'): string
