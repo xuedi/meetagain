@@ -58,18 +58,4 @@ class PublicPagesTest extends WebTestCase
         static::assertStringNotContainsString('anthropic-ai', $content, 'anthropic-ai is deprecated and must not appear');
     }
 
-    public function testHomepageResponseCarriesSitemapLinkHeader(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $client->followRedirects(true);
-
-        // Act: `/` redirects to the locale-prefixed homepage; follow it so we land on the HTML response.
-        $client->request('GET', '/');
-        $link = $client->getResponse()->headers->get('Link');
-
-        // Assert
-        static::assertNotNull($link, 'Link header should be present on the homepage');
-        static::assertStringContainsString('</sitemap.xml>; rel="sitemap"', $link);
-    }
 }

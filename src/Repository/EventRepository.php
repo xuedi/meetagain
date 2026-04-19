@@ -588,6 +588,57 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Paginated public upcoming events for the JSON API.
+     * Returns `[items, total]`. `items` respects $restrictToEventIds; $total is the
+     * full matching row count (pre-limit/offset) so callers can render pagination.
+     *
+     * @param array<int>|null $restrictToEventIds null = no restriction, [] = empty result
+     * @return array{items: Event[], total: int}
+     */
+    public function findPublicUpcoming(
+        DateTimeInterface $from,
+        ?DateTimeInterface $to,
+        int $limit,
+        int $offset,
+        ?array $restrictToEventIds,
+    ): array {
+        if ($restrictToEventIds === []) {
+            return ['items' => [], 'total' => 0];
+        }
+
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->where('e.start >= :from')
+            ->andWhere('e.canceled = :notCanceled')
+            ->andWhere('e.status IN (:statuses)')
+            ->setParameter('from', $from)
+            ->setParameter('notCanceled', false)
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
+
+        if ($to !== null) {
+            $qb->andWhere('e.start <= :to')->setParameter('to', $to);
+        }
+
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        $countQb = clone $qb;
+        $total = (int) $countQb->select('COUNT(DISTINCT e.id)')->getQuery()->getSingleScalarResult();
+
+        $items = $qb
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->orderBy('e.start', 'ASC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
+
+        return ['items' => $items, 'total' => $total];
+    }
+
+    /**
      * Find all published events for sitemap generation.
      *
      * @return Event[]

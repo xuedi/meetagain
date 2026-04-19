@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\NonLocale;
+namespace App\Controller\NonLocale\Api;
 
 use App\Controller\AbstractController;
 use App\Entity\Cms;

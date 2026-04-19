@@ -38,7 +38,9 @@ final class RobotsController extends AbstractController
 
         $lines = [
             'User-agent: *',
-            'Disallow: /api/',
+            'Disallow: /api/cms',
+            'Disallow: /api/logs',
+            'Disallow: /api/auth',
             'Content-Signal: ' . self::CONTENT_SIGNAL,
             '',
         ];
