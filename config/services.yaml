@@ -17,6 +17,7 @@ services:
         resource: '../src/'
         exclude:
             - '../src/Kernel.php'
+            - '../src/Activity/UnknownActivityMessage.php'
 
     Doctrine\Migrations\DependencyFactory:
         alias: 'doctrine.migrations.dependency_factory'

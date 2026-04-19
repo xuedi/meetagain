@@ -3,6 +3,7 @@
 namespace Plugin\Filmclub;
 
 use App\Entity\Link;
+use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\ValueObject\LinkCollection;
@@ -43,8 +44,12 @@ class Kernel implements Plugin
         ]);
     }
 
-    public function getEventTile(int $eventId): ?string
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string
     {
+        if ($location !== EventTileLocation::Sidebar) {
+            return null;
+        }
+
         $vote = $this->voteRepository->findByEventId($eventId);
 
         return $this->twig->render('@Filmclub/tile/event.html.twig', [

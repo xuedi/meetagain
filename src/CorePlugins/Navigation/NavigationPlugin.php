@@ -3,6 +3,7 @@
 namespace App\CorePlugins\Navigation;
 
 use App\Entity\Link;
+use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\ValueObject\LinkCollection;
@@ -44,7 +45,7 @@ readonly class NavigationPlugin implements Plugin
         return LinkCollection::empty()->withNavLinks($links);
     }
 
-    public function getEventTile(int $eventId): ?string
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string
     {
         return null;
     }
