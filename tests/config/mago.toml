@@ -11,7 +11,6 @@ paths = [
     "plugins/karaoke/src/**/*.php",
     "src/",
     "tests/",
-    "stubs/",
 ]
 includes = ["vendor"]
 excludes = []
@@ -100,17 +99,26 @@ enabled = false
 [linter.rules.assert-description]
 enabled = false
 
+# Disabled — `else` after a terminating branch is sometimes the clearer form
+# (symmetric pair of actions like follow/unfollow), rule is purely stylistic.
+[linter.rules.no-else-clause]
+enabled = false
+
 # Disabled — test files commonly contain inline helper stubs alongside the test class
 [linter.rules.single-class-per-file]
 enabled = false
 
 [analyzer]
-# tests/ excluded: the linter already covers tests for style/structure. The analyzer
-# produces PHPUnit false positives (createMock/createStub return MockObject&T which
-# mago reports as non-existent-method and invalid-callable).
+# tests/ test suites excluded: the linter already covers tests for style/structure.
+# The analyzer produces PHPUnit false positives (createMock/createStub return
+# MockObject&T which mago reports as non-existent-method and invalid-callable).
+# tests/stubs/ is intentionally NOT excluded so extension stubs (e.g. Imagick) are
+# visible to the analyzer.
 excludes = [
-    # tests/ excluded: linter already covers tests; analyzer false positives from PHPUnit mocking.
-    "tests/",
+    "tests/Unit/",
+    "tests/Functional/",
+    "tests/Smoke/",
+    "tests/bootstrap.php",
 ]
 
 ignore = [
