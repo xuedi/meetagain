@@ -12,6 +12,9 @@
                 {% endif %}
                 <div class="media-content">
                     <p>{{ item.description }}</p>
+                    {% if item.longDescription is not null %}
+                        <p class="has-text-grey-dark mt-2">{{ item.longDescription|nl2br }}</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
