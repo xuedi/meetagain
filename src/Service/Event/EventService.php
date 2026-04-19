@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
+use App\Enum\EventTileLocation;
 use App\Enum\EventType;
 use App\Plugin;
 use App\Repository\EventRepository;
@@ -87,7 +88,7 @@ readonly class EventService
         return $structuredList;
     }
 
-    public function getPluginEventTiles(int $id): array
+    public function getPluginEventTiles(int $id, EventTileLocation $location): array
     {
         $enabledPlugins = $this->pluginService->getActiveList();
         $tiles = [];
@@ -95,7 +96,7 @@ readonly class EventService
             if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
                 continue;
             }
-            $tile = $plugin->getEventTile($id);
+            $tile = $plugin->getEventTile($id, $location);
             if ($tile !== null) {
                 $tiles[] = $tile;
             }

@@ -2,6 +2,7 @@
 
 namespace Plugin\Glossary;
 
+use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\ValueObject\LinkCollection;
@@ -19,7 +20,7 @@ class Kernel implements Plugin
         return LinkCollection::empty();
     }
 
-    public function getEventTile(int $eventId): ?string
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string
     {
         return null;
     }

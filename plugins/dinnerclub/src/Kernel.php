@@ -3,6 +3,7 @@
 namespace Plugin\Dinnerclub;
 
 use App\Entity\Link;
+use App\Enum\EventTileLocation;
 use App\Enum\EventType;
 use App\Enum\WarmCacheType;
 use App\Plugin;
@@ -34,8 +35,12 @@ class Kernel implements Plugin
         ]);
     }
 
-    public function getEventTile(int $eventId): ?string
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string
     {
+        if ($location !== EventTileLocation::Sidebar) {
+            return null;
+        }
+
         $event = $this->eventRepository->find($eventId);
         if ($event === null || $event->getType() !== EventType::Dinner) {
             return null;

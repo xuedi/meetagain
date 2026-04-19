@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Entity\EventListItemTag;
+use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\ValueObject\LinkCollection;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,9 +23,10 @@ interface Plugin
     public function getLinkCollection(): LinkCollection;
 
     /**
-     * Returns a rendered tile to be displayed as a box on the event details page.
+     * Returns a rendered tile for the given location on the event details page.
+     * Return null to contribute nothing for that location.
      */
-    public function getEventTile(int $eventId): ?string;
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string;
 
     /**
      * Runs fixture data creation after events have been extended.
