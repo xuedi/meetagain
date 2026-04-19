@@ -155,6 +155,7 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('notCanceled', false)
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
             ->groupBy('e.id')
+            ->addGroupBy('t.id')
             ->orderBy('e.start', 'ASC')
             ->getQuery()
             ->getResult();
