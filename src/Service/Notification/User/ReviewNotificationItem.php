@@ -11,5 +11,6 @@ readonly class ReviewNotificationItem
         public string $description,
         public bool $canDeny = true,
         public ?string $icon = null,
+        public ?string $longDescription = null,
     ) {}
 }
