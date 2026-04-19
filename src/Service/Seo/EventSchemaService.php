@@ -3,7 +3,7 @@
 namespace App\Service\Seo;
 
 use App\Entity\Event;
-use App\Filter\OrganizationSchemaProviderInterface;
+use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 

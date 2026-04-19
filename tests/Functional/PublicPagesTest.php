@@ -20,10 +20,10 @@ class PublicPagesTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful('Sitemap should return HTTP 200');
-        $this->assertResponseHeaderSame('content-type', 'text/xml; charset=UTF-8');
+        $this->assertResponseHeaderSame('content-type', 'application/xml; charset=UTF-8');
     }
 
-    public function testSitemapContainsExpectedXmlStructure(): void
+    public function testSitemapContainsFlatUrlsetRoot(): void
     {
         // Arrange
         $client = static::createClient();
@@ -34,7 +34,42 @@ class PublicPagesTest extends WebTestCase
 
         // Assert
         static::assertStringContainsString('<?xml', $content, 'Sitemap should be valid XML');
-        static::assertStringContainsString('<sitemapindex', $content, 'Sitemap root should be a sitemap index');
-        static::assertStringContainsString('<loc>', $content, 'Sitemap index should contain at least one sitemap URL');
+        static::assertStringContainsString('<urlset', $content, 'Sitemap root should be a flat urlset');
+        static::assertStringNotContainsString('<sitemapindex', $content, 'Flat sitemap must not emit a sitemap index');
+        static::assertStringContainsString('<loc>', $content, 'Sitemap should contain at least one URL');
+    }
+
+    public function testRobotsTxtContainsAiCrawlerBlocksAndContentSignal(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/robots.txt');
+        $content = $client->getResponse()->getContent();
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertStringContainsString('User-agent: GPTBot', $content);
+        static::assertStringContainsString('User-agent: ClaudeBot', $content);
+        static::assertStringContainsString('User-agent: Google-Extended', $content);
+        static::assertStringContainsString('Content-Signal: search=yes, ai-train=no, ai-input=no', $content);
+        static::assertStringNotContainsString('Claude-Web', $content, 'Claude-Web is deprecated and must not appear');
+        static::assertStringNotContainsString('anthropic-ai', $content, 'anthropic-ai is deprecated and must not appear');
+    }
+
+    public function testHomepageResponseCarriesSitemapLinkHeader(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $client->followRedirects(true);
+
+        // Act: `/` redirects to the locale-prefixed homepage; follow it so we land on the HTML response.
+        $client->request('GET', '/');
+        $link = $client->getResponse()->headers->get('Link');
+
+        // Assert
+        static::assertNotNull($link, 'Link header should be present on the homepage');
+        static::assertStringContainsString('</sitemap.xml>; rel="sitemap"', $link);
     }
 }

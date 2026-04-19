@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Filter;
+namespace App\Publisher\OrganizationSchema;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 

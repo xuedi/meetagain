@@ -21,6 +21,8 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `EntityActionInterface`                       | React to core entity lifecycle events                | `handleEntityAction()`                |
 | `ActivityMetaEnricherInterface`               | Enrich metadata on all activity types                | `enrich()`                            |
 | `MessageInterface`                            | Define a new activity type with display rendering    | `getType()`, `validate()`, `render()` |
+| `SitemapPublisherInterface`                   | Contribute URLs to `/sitemap.xml`                    | `getPriority()`, `getSitemapUrls()`   |
+| `SitemapEventVisibilityFilterInterface`       | Suppress event URLs on specific tenants              | `shouldEmitEvents()`                  |
 
 ---
 
@@ -292,6 +294,82 @@ readonly class GroupMemberFilter implements MemberFilterInterface
         // Return IDs of users that SHOULD be visible.
         // Empty array = no filtering.
         return $this->getVisibleUserIds();
+    }
+}
+```
+
+---
+
+### SitemapPublisherInterface
+
+**Purpose:** Contribute URL entries to the sitemap served at `/sitemap.xml`.
+
+**File:** `src/Publisher/Sitemap/SitemapPublisherInterface.php`
+
+**Tag:** Auto-tagged via `#[AutoconfigureTag]` on the interface.
+
+**When called:** On each `/sitemap.xml` request. The core `SitemapService` collects all publishers in
+priority order (higher first) and writes their URLs into a single flat `<urlset>`.
+
+```php
+namespace Plugin\YourPlugin\Publisher\Sitemap;
+
+use App\Publisher\Sitemap\SitemapPublisherInterface;
+use App\Publisher\Sitemap\SitemapUrl;
+use DateTimeImmutable;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+readonly class YourPluginSitemapPublisher implements SitemapPublisherInterface
+{
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+    ) {}
+
+    public function getPriority(): int
+    {
+        return 10;
+    }
+
+    public function getSitemapUrls(): array
+    {
+        return [
+            new SitemapUrl(
+                loc: $this->urlGenerator->generate('your_plugin_page', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                lastmod: new DateTimeImmutable(),
+                priority: 0.7,
+            ),
+        ];
+    }
+}
+```
+
+Return an empty array to skip on the current request (e.g. a marketing-route publisher that only
+emits on the platform host).
+
+---
+
+### SitemapEventVisibilityFilterInterface
+
+**Purpose:** Suppress event URLs from `/sitemap.xml` in specific contexts. Core emits events by default;
+any registered filter returning `false` vetoes that.
+
+**File:** `src/Filter/Sitemap/SitemapEventVisibilityFilterInterface.php`
+
+**Tag:** Auto-tagged via `#[AutoconfigureTag]` on the interface.
+
+**Example:** The multisite plugin uses this to hide events on whitelabel hosts because events are
+platform-canonical.
+
+```php
+namespace Plugin\YourPlugin\Filter\Sitemap;
+
+use App\Filter\Sitemap\SitemapEventVisibilityFilterInterface;
+
+readonly class HideEventsOnSomeTenants implements SitemapEventVisibilityFilterInterface
+{
+    public function shouldEmitEvents(): bool
+    {
+        return $this->currentContextAllowsEvents();
     }
 }
 ```

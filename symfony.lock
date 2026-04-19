@@ -82,9 +82,6 @@
             "tests/bootstrap.php"
         ]
     },
-    "presta/sitemap-bundle": {
-        "version": "v4.3.0"
-    },
     "sensiolabs/ansi-to-html": {
         "version": "2.0",
         "recipe": {
