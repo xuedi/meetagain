@@ -89,7 +89,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::AdminNotification);
+            ->with($this->anything(), $this->anything(), EmailType::AdminNotification, $this->anything());
 
         (new AdminNotificationEmail($queue, $this->config))->send([
             'user' => $this->makeUser(),
@@ -101,7 +101,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::Announcement, false);
+            ->with($this->anything(), $this->anything(), EmailType::Announcement, $this->anything(), false);
 
         (new AnnouncementEmail($queue, $this->config))->send([
             'user' => $this->makeUser(),
@@ -114,7 +114,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::NotificationEventCanceled);
+            ->with($this->anything(), $this->anything(), EmailType::NotificationEventCanceled, $this->anything());
 
         (new NotificationEventCanceledEmail($queue, $this->config))->send([
             'user' => $this->makeUser(),
@@ -126,7 +126,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::NotificationMessage);
+            ->with($this->anything(), $this->anything(), EmailType::NotificationMessage, $this->anything());
 
         $sender = $this->makeUser('sender@example.com', 'Bob', 'en', null, true, null, 2);
 
@@ -140,7 +140,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::PasswordResetRequest);
+            ->with($this->anything(), $this->anything(), EmailType::PasswordResetRequest, $this->anything());
 
         (new PasswordResetEmail($queue, $this->config))->send([
             'user' => $this->makeUser(),
@@ -151,7 +151,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::SupportNotification);
+            ->with($this->anything(), $this->anything(), EmailType::SupportNotification, $this->anything());
 
         $request = $this->createStub(SupportRequest::class);
         $request->method('getContactType')->willReturn(ContactType::General);
@@ -169,7 +169,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::VerificationRequest);
+            ->with($this->anything(), $this->anything(), EmailType::VerificationRequest, $this->anything());
 
         (new VerificationRequestEmail($queue, $this->config))->send([
             'user' => $this->makeUser(),
@@ -180,7 +180,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::Welcome);
+            ->with($this->anything(), $this->anything(), EmailType::Welcome, $this->anything());
 
         (new WelcomeEmail($queue, $this->config))->send([
             'user' => $this->makeUser(),
@@ -191,7 +191,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::EventReminder);
+            ->with($this->anything(), $this->anything(), EmailType::EventReminder, $this->anything());
 
         (new EventReminderEmail(
             $queue,
@@ -208,7 +208,7 @@ class EmailTypeSendTest extends TestCase
     {
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->once())->method('enqueue')
-            ->with($this->anything(), EmailType::NotificationRsvpAggregated);
+            ->with($this->anything(), $this->anything(), EmailType::NotificationRsvpAggregated, $this->anything());
 
         $recipient = $this->makeUser(id: 5);
         $attendee = $this->makeUser('a@a.com', 'Eve', 'en', null, true, null, 6);

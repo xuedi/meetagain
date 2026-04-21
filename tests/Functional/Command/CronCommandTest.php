@@ -25,7 +25,6 @@ class CronCommandTest extends KernelTestCase
         $email->setCreatedAt(new DateTimeImmutable());
         $email->setRenderedBody('Test Body');
         $email->setStatus(EmailQueueStatus::Pending);
-        $email->setSendAt(null);
 
         $em->persist($email);
         $em->flush();
@@ -46,6 +45,6 @@ class CronCommandTest extends KernelTestCase
         $em->clear();
         $updatedEmail = $em->getRepository(EmailQueue::class)->find($emailId);
         static::assertSame(EmailQueueStatus::Sent, $updatedEmail->getStatus(), 'Email status should be sent');
-        static::assertNotNull($updatedEmail->getSendAt(), 'Email should have a send date');
+        static::assertNotNull($updatedEmail->getProviderDispatchedAt(), 'Email should have a dispatched date');
     }
 }

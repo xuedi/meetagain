@@ -90,7 +90,20 @@ readonly class EventReminderEmail implements ScheduledEmailInterface
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($email, EmailType::EventReminder);
+        $this->queue->enqueue($this, $email, EmailType::EventReminder, $context);
+    }
+
+    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        $event = $context['event'] ?? null;
+        if (!$event instanceof Event) {
+            return null;
+        }
+
+        $budgetCutoff = $now->add(new DateInterval('PT3H'));
+        $eventStart = DateTimeImmutable::createFromMutable($event->getStart());
+
+        return $budgetCutoff < $eventStart ? $budgetCutoff : $eventStart;
     }
 
     public function getDueContexts(DateTimeImmutable $now): array
