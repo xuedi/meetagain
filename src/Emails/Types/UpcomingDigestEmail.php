@@ -3,6 +3,7 @@
 namespace App\Emails\Types;
 
 use App\Emails\DueContext;
+use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
@@ -19,7 +20,7 @@ use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-readonly class UpcomingDigestEmail implements ScheduledEmailInterface
+readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEmailInterface
 {
     private const string STATE_KEY_LAST_WEEK = 'upcoming_events_digest_last_week';
 
@@ -56,6 +57,10 @@ readonly class UpcomingDigestEmail implements ScheduledEmailInterface
 
     public function guardCheck(array $context): bool
     {
+        $this->ensureInstanceOf($context, 'user', User::class);
+        $this->ensureHasKey($context, 'weekStart');
+        $this->ensureHasKey($context, 'weekEnd');
+
         /** @var User $user */
         $user = $context['user'];
 

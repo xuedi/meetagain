@@ -9,7 +9,9 @@ use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Emails\Types\NotificationMessageEmail;
-use Psr\Cache\InvalidArgumentException;
+use InvalidArgumentException;
+use Psr\Cache\InvalidArgumentException as CacheInvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -23,6 +25,7 @@ readonly class NotificationService
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
+        private LoggerInterface $logger,
     ) {}
 
     public function notify(Activity $activity): void
@@ -70,7 +73,7 @@ readonly class NotificationService
                     // );
                     return 'send';
                 });
-            } catch (InvalidArgumentException) {
+            } catch (CacheInvalidArgumentException) {
                 continue; // Cache write failure for RSVP notification tracking - non-critical, continue without cache
             }
         }
@@ -86,10 +89,24 @@ readonly class NotificationService
             return;
         }
         $key = sprintf('message_send_%s_%s', $user->getId(), $recipient->getId());
-        $this->appCache->get($key, function (ItemInterface $item) use ($user, $recipient): string {
+        $logger = $this->logger;
+        $this->appCache->get($key, function (ItemInterface $item) use ($user, $recipient, $logger): string {
             $item->expiresAfter(self::EIGHT_HOURS);
             $ctx = ['sender' => $user, 'recipient' => $recipient];
-            if (!$this->notificationMessageEmail->guardCheck($ctx)) {
+            try {
+                $shouldSend = $this->notificationMessageEmail->guardCheck($ctx);
+            } catch (InvalidArgumentException $e) {
+                $logger->error('guardCheck contract violation - email skipped', [
+                    'email' => $this->notificationMessageEmail->getIdentifier(),
+                    'caller' => 'NotificationService::sendMessage',
+                    'context_keys' => array_keys($ctx),
+                    'exception' => $e->getMessage(),
+                ]);
+
+                return 'skip';
+            }
+
+            if (!$shouldSend) {
                 return 'skip';
             }
             $this->notificationMessageEmail->send($ctx);
