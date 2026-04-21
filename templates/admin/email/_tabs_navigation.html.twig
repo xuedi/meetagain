@@ -30,5 +30,11 @@
                 <span>{{ 'email_tab_debugging'|trans }}</span>
             </a>
         </li>
+        <li class="{% if activeSection == 'blocklist' %}is-active{% endif %}">
+            <a href="{{ path('app_admin_email_blocklist') }}">
+                <span class="icon is-small"><i class="fa fa-ban" aria-hidden="true"></i></span>
+                <span>{{ 'email_tab_blocklist'|trans }}</span>
+            </a>
+        </li>
     </ul>
 </div>

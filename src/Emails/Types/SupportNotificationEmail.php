@@ -7,14 +7,18 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class SupportNotificationEmail extends EmailAbstract
 {
     public function __construct(
+        BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-    ) {}
+    ) {
+        parent::__construct($blocklist);
+    }
 
     public function getIdentifier(): string
     {
@@ -37,6 +41,10 @@ readonly class SupportNotificationEmail extends EmailAbstract
     public function guardCheck(array $context): bool
     {
         $this->ensureInstanceOf($context, 'request', SupportRequest::class);
+
+        if ($this->isBlocked($this->config->getMailerAddress()->getAddress())) {
+            return false;
+        }
 
         return true;
     }
