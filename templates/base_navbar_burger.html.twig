@@ -19,6 +19,33 @@
         <a class="navbar-item" href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a>
         <a class="navbar-item" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
 
+        <div class="navbar-item">
+            <details class="navbar-burger-submenu">
+                <summary>{{ 'menu_more'|trans }}</summary>
+                <aside class="menu pl-3 mt-2">
+                    <p class="menu-label">{{ get_footer_column_title('col2') ?: ('footer_col2' | trans) }}</p>
+                    <ul class="menu-list">
+                        {% for menu in get_menu('col2') %}
+                            {% if menu.slug != 'index' %}
+                                <li><a href="{{ menu.slug }}">{{ menu.name }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for link in get_plugin_footer_links('col2') %}
+                            <li><a href="{{ link.slug }}"{% if link.slug starts with 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.name | trans }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    <p class="menu-label">{{ get_footer_column_title('col4') ?: ('footer_col4' | trans) }}</p>
+                    <ul class="menu-list">
+                        {% for menu in get_menu('col4') %}
+                            {% if menu.slug != 'index' %}
+                                <li><a href="{{ menu.slug }}">{{ menu.name }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </aside>
+            </details>
+        </div>
+
         {% if is_granted('ROLE_USER') %}
             <hr class="dropdown-divider"/>
             <div class="navbar-item">
