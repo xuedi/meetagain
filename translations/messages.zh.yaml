@@ -105,6 +105,7 @@ role_system: 系统
 role_user: 用户
 menu_default: 主页
 menu_login: 登录
+menu_more: 更多
 'p: please sign in': 请登录
 'p: please register': 请注册
 page_title_register: 注册

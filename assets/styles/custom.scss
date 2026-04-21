@@ -68,6 +68,18 @@ input[type="color"] {
     border-bottom: 1px solid lightgray;
 }
 
+#navBurgenMenu details.navbar-burger-submenu {
+    width: 100%;
+    > summary {
+        display: block;
+        list-style: none;
+        cursor: pointer;
+        &::-webkit-details-marker { display: none; }
+        &::after { content: '\25BE'; float: right; }
+    }
+    &[open] > summary::after { content: '\25B4'; }
+}
+
 .is-flag      { height: 24px; }
 .is-flag-mini { height: 20px; }
 .flag-icon              { width: 32px; height: 24px; flex-shrink: 0; overflow: hidden; }

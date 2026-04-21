@@ -92,6 +92,7 @@ role_system: System
 role_user: User
 menu_default: Homepage
 menu_login: Login
+menu_more: More
 'p: please sign in': 'Please sign in'
 'p: please register': 'Please register'
 page_title_register: Register
