@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Service;
 
 use App\EmailContextEnricherInterface;
+use App\Emails\EmailInterface;
 use App\Entity\EmailQueue;
 use App\Entity\User;
 use App\Enum\EmailQueueStatus;
@@ -12,7 +13,7 @@ use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -48,7 +49,8 @@ final class EmailServiceTest extends TestCase
                 $this->assertSame('user@example.com', $entity->getRecipient());
                 $this->assertSame('en', $entity->getLang());
                 $this->assertNotNull($entity->getCreatedAt());
-                $this->assertNull($entity->getSendAt());
+                $this->assertNull($entity->getProviderDispatchedAt());
+                $this->assertNull($entity->getMaxSendBy());
 
                 return true;
             }));
@@ -66,10 +68,42 @@ final class EmailServiceTest extends TestCase
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
         // Act
-        $ok = $service->enqueue($email, EmailType::VerificationRequest);
+        $ok = $service->enqueue($this->nullCapSource(), $email, EmailType::VerificationRequest, []);
 
         // Assert
         static::assertTrue($ok);
+    }
+
+    public function testEnqueueCapturesMaxSendByFromSource(): void
+    {
+        // Arrange
+        $email = new TemplatedEmail();
+        $email->from(new Address('sender@email.com', 'Sender'));
+        $email->to('user@example.com');
+        $email->locale('en');
+        $email->context([]);
+
+        $cutoff = new DateTimeImmutable('2026-06-01 12:00:00');
+        $source = $this->createStub(EmailInterface::class);
+        $source->method('getMaxSendBy')->willReturn($cutoff);
+
+        $capturedQueue = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
+                $capturedQueue = $q;
+                return true;
+            }));
+
+        $service = $this->createService(em: $emMock);
+
+        // Act
+        $service->enqueue($source, $email, EmailType::EventReminder, ['event' => 'stub']);
+
+        // Assert
+        static::assertSame($cutoff, $capturedQueue->getMaxSendBy());
     }
 
     public function testEnqueueWithFlushFalsePersistsButDoesNotFlush(): void
@@ -88,7 +122,7 @@ final class EmailServiceTest extends TestCase
         $service = $this->createService(em: $emMock);
 
         // Act
-        $service->enqueue($email, EmailType::Announcement, false);
+        $service->enqueue($this->nullCapSource(), $email, EmailType::Announcement, [], false);
     }
 
     public function testEnricherContextKeyAppearsInPersistedEmailQueue(): void
@@ -121,7 +155,7 @@ final class EmailServiceTest extends TestCase
         $email->context([]);
 
         // Act
-        $service->enqueue($email, EmailType::Welcome);
+        $service->enqueue($this->nullCapSource(), $email, EmailType::Welcome, []);
 
         // Assert
         static::assertSame('enriched_value', $capturedQueue->getContext()['custom_key']);
@@ -163,7 +197,7 @@ final class EmailServiceTest extends TestCase
             ->method('persist')
             ->with(static::callback(function ($entity) use ($queued) {
                 $this->assertSame($queued, $entity);
-                $this->assertInstanceOf(DateTime::class, $queued->getSendAt());
+                $this->assertInstanceOf(DateTimeImmutable::class, $queued->getProviderDispatchedAt());
                 $this->assertSame(EmailQueueStatus::Sent, $queued->getStatus());
 
                 return true;
@@ -174,6 +208,73 @@ final class EmailServiceTest extends TestCase
 
         // Act: send queue
         $service->sendQueue();
+    }
+
+    public function testSendQueueSkipsRowPastMaxSendByAndMarksLate(): void
+    {
+        // Arrange: a pending row whose cutoff is in the past
+        $queued = new EmailQueue()
+            ->setSender('"email sender" <sender@email.com>')
+            ->setRecipient('user@example.com')
+            ->setSubject('Subject')
+            ->setRenderedBody('<p>body</p>')
+            ->setLang('en')
+            ->setContext([])
+            ->setMaxSendBy(new DateTimeImmutable('-1 hour'));
+
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturn([$queued]);
+
+        // Transport MUST NOT be called
+        $mailerMock = $this->createMock(TransportInterface::class);
+        $mailerMock->expects($this->never())->method('send');
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())->method('error')
+            ->with('Email dispatch skipped: past max_send_by cutoff', static::anything());
+        $loggerMock->expects($this->once())->method('warning');
+
+        $service = $this->createService(mailer: $mailerMock, mailRepo: $mailRepoStub, logger: $loggerMock);
+
+        // Act
+        $result = $service->sendQueue();
+
+        // Assert
+        static::assertSame(EmailQueueStatus::Late, $queued->getStatus());
+        static::assertNotNull($queued->getErrorMessage());
+        static::assertStringContainsString('Dispatch cutoff passed', $queued->getErrorMessage());
+        static::assertSame('0 (Late: 1)', $result);
+    }
+
+    public function testSendQueueDispatchesWhenMaxSendByInFuture(): void
+    {
+        // Arrange: cutoff is ahead, dispatch proceeds normally
+        $queued = new EmailQueue()
+            ->setSender('"email sender" <sender@email.com>')
+            ->setRecipient('user@example.com')
+            ->setSubject('Subject')
+            ->setRenderedBody('<p>body</p>')
+            ->setLang('en')
+            ->setContext([])
+            ->setMaxSendBy(new DateTimeImmutable('+1 hour'));
+
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturn([$queued]);
+
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('id');
+
+        $mailerMock = $this->createMock(TransportInterface::class);
+        $mailerMock->expects($this->once())->method('send')->willReturn($sentMessage);
+
+        $service = $this->createService(mailer: $mailerMock, mailRepo: $mailRepoStub);
+
+        // Act
+        $service->sendQueue();
+
+        // Assert
+        static::assertSame(EmailQueueStatus::Sent, $queued->getStatus());
+        static::assertInstanceOf(DateTimeImmutable::class, $queued->getProviderDispatchedAt());
     }
 
     public function testSendQueueTransportExceptionSetsFailedStatusAndReturnsFailedCount(): void
@@ -257,7 +358,7 @@ final class EmailServiceTest extends TestCase
         $loggerMock
             ->expects($this->once())
             ->method('warning')
-            ->with('Email queue processed with failures', ['sent' => 1, 'failed' => 1]);
+            ->with('Email queue processed with issues', ['sent' => 1, 'failed' => 1, 'late' => 0]);
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, logger: $loggerMock);
 
@@ -281,6 +382,13 @@ final class EmailServiceTest extends TestCase
 
         // Act
         $service->runCronTask($outputMock);
+    }
+
+    private function nullCapSource(): EmailInterface
+    {
+        $source = $this->createStub(EmailInterface::class);
+        $source->method('getMaxSendBy')->willReturn(null);
+        return $source;
     }
 
     private function createService(

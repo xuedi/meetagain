@@ -8,6 +8,8 @@ use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use DateInterval;
+use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class NotificationEventCanceledEmail implements EmailInterface
@@ -66,6 +68,19 @@ readonly class NotificationEventCanceledEmail implements EmailInterface
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($email, EmailType::NotificationEventCanceled);
+        $this->queue->enqueue($this, $email, EmailType::NotificationEventCanceled, $context);
+    }
+
+    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        $event = $context['event'] ?? null;
+        if (!$event instanceof Event) {
+            return null;
+        }
+
+        $budgetCutoff = $now->add(new DateInterval('PT6H'));
+        $eventStart = DateTimeImmutable::createFromMutable($event->getStart());
+
+        return $budgetCutoff < $eventStart ? $budgetCutoff : $eventStart;
     }
 }

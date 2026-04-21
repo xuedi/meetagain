@@ -5,9 +5,12 @@ namespace App\Controller\Admin\Email;
 use App\Controller\Admin\AbstractAdminController;
 use App\Controller\Admin\AdminNavigationConfig;
 use App\Entity\EmailQueue;
+use App\Enum\EmailQueueStatus;
 use App\Repository\EmailQueueRepository;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 use App\Service\Email\Delivery\EmailDeliveryStatusSyncService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -24,6 +27,7 @@ final class SendlogController extends AbstractAdminController
         private readonly EmailQueueRepository $emailQueueRepo,
         private readonly EmailDeliveryProviderInterface $provider,
         private readonly EmailDeliveryStatusSyncService $syncService,
+        private readonly EntityManagerInterface $em,
     ) {}
 
     #[Route('', name: 'app_admin_email_sendlog')]
@@ -50,6 +54,23 @@ final class SendlogController extends AbstractAdminController
             'active' => 'email',
             'email' => $email,
         ]);
+    }
+
+    #[Route('/{id}/clear-cap', name: 'app_admin_email_sendlog_clear_cap', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function clearCap(EmailQueue $email, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('clear_cap_' . $email->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $email->setMaxSendBy(null);
+        $email->setStatus(EmailQueueStatus::Pending);
+        $email->setErrorMessage(null);
+        $this->em->flush();
+
+        $this->addFlash('success', 'Max-send-by cap cleared. The email will be dispatched on the next cron tick.');
+
+        return $this->redirectToRoute('app_admin_email_sendlog_show', ['id' => $email->getId()]);
     }
 
     #[Route('/sync', name: 'app_admin_email_sendlog_sync', methods: ['POST'])]

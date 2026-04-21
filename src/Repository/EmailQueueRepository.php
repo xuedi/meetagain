@@ -82,7 +82,7 @@ class EmailQueueRepository extends ServiceEntityRepository
                 'SUM(CASE WHEN eq.status = :sent THEN 1 ELSE 0 END) as sent',
                 'SUM(CASE WHEN eq.status = :failed THEN 1 ELSE 0 END) as failed',
             )
-            ->where('eq.sendAt IS NOT NULL OR eq.status = :failed')
+            ->where('eq.providerDispatchedAt IS NOT NULL OR eq.status = :failed')
             ->andWhere('eq.createdAt > :since')
             ->setParameter('sent', EmailQueueStatus::Sent)
             ->setParameter('failed', EmailQueueStatus::Failed)

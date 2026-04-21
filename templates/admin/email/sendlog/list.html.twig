@@ -23,9 +23,10 @@
             <tr>
                 <th>Created</th>
                 <th>Recipient</th>
+                <th>Status</th>
                 <th>Provider Status</th>
                 <th>Template</th>
-                <th>Sent At</th>
+                <th>Dispatched</th>
                 <th></th>
             </tr>
             </thead>
@@ -37,6 +38,13 @@
                         <small class="has-text-grey">{{ email.createdAt|date('H:i:s') }}</small>
                     </td>
                     <td>{{ email.recipient }}</td>
+                    <td>
+                        {% if email.status.value == 'late' or email.status.value == 'failed' %}
+                            <span class="has-text-danger">{{ email.status.value }}</span>
+                        {% else %}
+                            {{ email.status.value }}
+                        {% endif %}
+                    </td>
                     <td>
                         {% set ps = email.providerStatus %}
                         {% if ps == 'delivered' %}
@@ -61,8 +69,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if email.sendAt %}
-                            {{ email.sendAt|date('Y-m-d H:i:s') }}
+                        {% if email.providerDispatchedAt %}
+                            {{ email.providerDispatchedAt|date('Y-m-d H:i:s') }}
                         {% else %}
                             <span class="has-text-grey">-</span>
                         {% endif %}
@@ -75,7 +83,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="has-text-centered has-text-grey">
+                    <td colspan="7" class="has-text-centered has-text-grey">
                         No email entries found.
                     </td>
                 </tr>
