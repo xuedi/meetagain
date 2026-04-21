@@ -2,14 +2,24 @@
 
 namespace App\Emails;
 
+use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
 use InvalidArgumentException;
 
 abstract readonly class EmailAbstract implements EmailInterface
 {
+    public function __construct(
+        protected BlocklistCheckerInterface $blocklist,
+    ) {}
+
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
     {
         return null;
+    }
+
+    protected function isBlocked(string $email): bool
+    {
+        return $this->blocklist->isBlocked($email);
     }
 
     protected function ensureHasKey(array $context, string $key): void

@@ -351,6 +351,7 @@ email_tab_templates: Vorlagen
 email_tab_sendlog: Sendeprotokoll
 email_tab_announcements: Ankündigungen
 email_tab_debugging: Debugging
+email_tab_blocklist: Sperrliste
 support_tab_requests: 'Support-Anfragen'
 support_tab_reports: 'Bildmeldungen'
 logs_tab_activity: Aktivität
@@ -448,6 +449,11 @@ language_fy: Friesisch
 'reset_error.heading': 'Link abgelaufen oder ungültig'
 'reset_error.description': 'Dieser Link ist nicht mehr gültig. Bitte fordere einen neuen an.'
 'reset_error.cta': 'Neuen Link anfordern'
+'reset_blocked.title': 'Passwort-Zurücksetzen gesperrt'
+'reset_blocked.heading': 'Diese E-Mail-Adresse steht auf unserer Sperrliste'
+'reset_blocked.description': 'Wir können an diese Adresse keine E-Mails zum Zurücksetzen senden.'
+'reset_blocked.reason_label': 'Grund'
+'reset_blocked.cta': 'Support kontaktieren'
 # Support-Seite Sidebar
 'support.sidebar.title': 'Wie wir helfen können'
 'support.sidebar.intro': 'Schick uns eine Nachricht und wir melden uns so schnell wie möglich.'

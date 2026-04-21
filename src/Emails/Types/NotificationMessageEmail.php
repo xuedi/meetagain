@@ -7,6 +7,7 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -15,9 +16,12 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 readonly class NotificationMessageEmail extends EmailAbstract
 {
     public function __construct(
+        BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-    ) {}
+    ) {
+        parent::__construct($blocklist);
+    }
 
     public function getIdentifier(): string
     {
@@ -46,6 +50,9 @@ readonly class NotificationMessageEmail extends EmailAbstract
         /** @var User $recipient */
         $recipient = $context['recipient'];
 
+        if ($this->isBlocked((string) $recipient->getEmail())) {
+            return false;
+        }
         if (!$recipient->isNotification()) {
             return false;
         }

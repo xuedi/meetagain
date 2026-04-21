@@ -7,6 +7,7 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -14,9 +15,12 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 readonly class AdminNotificationEmail extends EmailAbstract
 {
     public function __construct(
+        BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-    ) {}
+    ) {
+        parent::__construct($blocklist);
+    }
 
     public function getIdentifier(): string
     {
@@ -40,6 +44,12 @@ readonly class AdminNotificationEmail extends EmailAbstract
     {
         $this->ensureInstanceOf($context, 'user', User::class);
         $this->ensureHasKey($context, 'sectionsHtml');
+
+        /** @var User $user */
+        $user = $context['user'];
+        if ($this->isBlocked((string) $user->getEmail())) {
+            return false;
+        }
 
         return true;
     }

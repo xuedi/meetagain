@@ -22,6 +22,7 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -30,11 +31,13 @@ class EmailTypesTest extends TestCase
 {
     private EmailQueueInterface $queue;
     private ConfigService $config;
+    private BlocklistCheckerInterface $blocklist;
 
     protected function setUp(): void
     {
         $this->queue = $this->createStub(EmailQueueInterface::class);
         $this->config = $this->createStub(ConfigService::class);
+        $this->blocklist = $this->createStub(BlocklistCheckerInterface::class);
     }
 
     private function allTypes(): array
@@ -43,15 +46,16 @@ class EmailTypesTest extends TestCase
         $em = $this->createStub(EntityManagerInterface::class);
 
         return [
-            'AdminNotification' => new AdminNotificationEmail($this->queue, $this->config),
-            'Announcement' => new AnnouncementEmail($this->queue, $this->config),
-            'EventReminder' => new EventReminderEmail($this->queue, $this->config, $eventRepo, $em),
-            'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->queue, $this->config),
-            'NotificationMessage' => new NotificationMessageEmail($this->queue, $this->config),
-            'PasswordReset' => new PasswordResetEmail($this->queue, $this->config),
-            'RsvpAggregated' => new RsvpAggregatedEmail($this->queue, $this->config, $eventRepo, $em),
-            'SupportNotification' => new SupportNotificationEmail($this->queue, $this->config),
+            'AdminNotification' => new AdminNotificationEmail($this->blocklist, $this->queue, $this->config),
+            'Announcement' => new AnnouncementEmail($this->blocklist, $this->queue, $this->config),
+            'EventReminder' => new EventReminderEmail($this->blocklist, $this->queue, $this->config, $eventRepo, $em),
+            'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->blocklist, $this->queue, $this->config),
+            'NotificationMessage' => new NotificationMessageEmail($this->blocklist, $this->queue, $this->config),
+            'PasswordReset' => new PasswordResetEmail($this->blocklist, $this->queue, $this->config),
+            'RsvpAggregated' => new RsvpAggregatedEmail($this->blocklist, $this->queue, $this->config, $eventRepo, $em),
+            'SupportNotification' => new SupportNotificationEmail($this->blocklist, $this->queue, $this->config),
             'UpcomingDigest' => new UpcomingDigestEmail(
+                $this->blocklist,
                 $this->queue,
                 $this->config,
                 $eventRepo,
@@ -59,8 +63,8 @@ class EmailTypesTest extends TestCase
                 $this->createStub(AppStateService::class),
                 [],
             ),
-            'VerificationRequest' => new VerificationRequestEmail($this->queue, $this->config),
-            'Welcome' => new WelcomeEmail($this->queue, $this->config),
+            'VerificationRequest' => new VerificationRequestEmail($this->blocklist, $this->queue, $this->config),
+            'Welcome' => new WelcomeEmail($this->blocklist, $this->queue, $this->config),
         ];
     }
 
@@ -121,36 +125,36 @@ class EmailTypesTest extends TestCase
     public function testAdminNotificationGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new AdminNotificationEmail($this->queue, $this->config)->guardCheck([]);
+        new AdminNotificationEmail($this->blocklist, $this->queue, $this->config)->guardCheck([]);
     }
 
     public function testNotificationEventCanceledGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new NotificationEventCanceledEmail($this->queue, $this->config)->guardCheck([]);
+        new NotificationEventCanceledEmail($this->blocklist, $this->queue, $this->config)->guardCheck([]);
     }
 
     public function testPasswordResetGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new PasswordResetEmail($this->queue, $this->config)->guardCheck([]);
+        new PasswordResetEmail($this->blocklist, $this->queue, $this->config)->guardCheck([]);
     }
 
     public function testSupportNotificationGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new SupportNotificationEmail($this->queue, $this->config)->guardCheck([]);
+        new SupportNotificationEmail($this->blocklist, $this->queue, $this->config)->guardCheck([]);
     }
 
     public function testVerificationRequestGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new VerificationRequestEmail($this->queue, $this->config)->guardCheck([]);
+        new VerificationRequestEmail($this->blocklist, $this->queue, $this->config)->guardCheck([]);
     }
 
     public function testWelcomeGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new WelcomeEmail($this->queue, $this->config)->guardCheck([]);
+        new WelcomeEmail($this->blocklist, $this->queue, $this->config)->guardCheck([]);
     }
 }

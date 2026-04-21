@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'reset_blocked.title'|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered mt-6">
+                <div class="column is-6-tablet is-5-desktop has-text-centered">
+                    <span class="icon is-large has-text-danger">
+                        <i class="fas fa-ban fa-4x"></i>
+                    </span>
+                    <h1 class="title is-3 mt-5">{{ 'reset_blocked.heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'reset_blocked.description'|trans }}</p>
+                    {% if reason %}
+                        <p class="mt-3"><strong>{{ 'reset_blocked.reason_label'|trans }}:</strong> {{ reason }}</p>
+                    {% endif %}
+                    <div class="mt-5">
+                        <a href="{{ supportPath }}" class="button is-primary">
+                            <span class="icon"><i class="fas fa-life-ring"></i></span>
+                            <span>{{ 'reset_blocked.cta'|trans }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

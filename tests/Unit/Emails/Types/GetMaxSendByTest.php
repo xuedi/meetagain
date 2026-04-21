@@ -19,6 +19,7 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -53,6 +54,7 @@ final class GetMaxSendByTest extends TestCase
     public function testEventReminderCap(string $eventStart, string $expected): void
     {
         $email = new EventReminderEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
@@ -69,6 +71,7 @@ final class GetMaxSendByTest extends TestCase
     public function testEventReminderCapReturnsNullWhenContextMissesEvent(): void
     {
         $email = new EventReminderEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
@@ -93,6 +96,7 @@ final class GetMaxSendByTest extends TestCase
     public function testNotificationEventCanceledCap(string $eventStart, string $expected): void
     {
         $email = new NotificationEventCanceledEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -119,6 +123,7 @@ final class GetMaxSendByTest extends TestCase
     public function testRsvpAggregatedCap(string $eventStart, string $expected): void
     {
         $email = new RsvpAggregatedEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
@@ -139,6 +144,7 @@ final class GetMaxSendByTest extends TestCase
     public function testUpcomingDigestCapIsFourHours(): void
     {
         $email = new UpcomingDigestEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
@@ -156,6 +162,7 @@ final class GetMaxSendByTest extends TestCase
     public function testNotificationMessageCapIsSixHours(): void
     {
         $email = new NotificationMessageEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -168,6 +175,7 @@ final class GetMaxSendByTest extends TestCase
     public function testAdminNotificationCapIsTwelveHours(): void
     {
         $email = new AdminNotificationEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -180,6 +188,7 @@ final class GetMaxSendByTest extends TestCase
     public function testWelcomeCapIsTwelveHours(): void
     {
         $email = new WelcomeEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -192,6 +201,7 @@ final class GetMaxSendByTest extends TestCase
     public function testAnnouncementCapIsTwentyFourHours(): void
     {
         $email = new AnnouncementEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -208,6 +218,7 @@ final class GetMaxSendByTest extends TestCase
     public function testSupportNotificationHasNoCap(): void
     {
         $email = new SupportNotificationEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -218,6 +229,7 @@ final class GetMaxSendByTest extends TestCase
     public function testPasswordResetHasNoCap(): void
     {
         $email = new PasswordResetEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -228,6 +240,7 @@ final class GetMaxSendByTest extends TestCase
     public function testVerificationRequestHasNoCap(): void
     {
         $email = new VerificationRequestEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );

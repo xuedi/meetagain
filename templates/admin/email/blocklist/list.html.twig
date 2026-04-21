@@ -1,0 +1,60 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'blocklist'} %}
+
+        <div class="mb-4">
+            <a href="{{ path('app_admin_email_blocklist_add') }}" class="button is-small is-primary">
+                <span class="icon"><i class="fa fa-plus"></i></span>
+                <span>Add entry</span>
+            </a>
+        </div>
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>Reason</th>
+                <th>Added by</th>
+                <th>Added at</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.email }}</td>
+                    <td>{{ entry.reason }}</td>
+                    <td>
+                        {% if entry.addedBy %}
+                            {{ entry.addedBy.name }}
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ entry.addedAt|date('Y-m-d H:i:s') }}</td>
+                    <td>
+                        <form method="post" action="{{ path('app_admin_email_blocklist_delete', {'id': entry.id}) }}" style="display:inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('blocklist_delete_' ~ entry.id) }}">
+                            <button type="submit" class="button is-small is-danger is-outlined" aria-label="Delete">
+                                <span class="icon"><i class="fa fa-trash"></i></span>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="has-text-centered has-text-grey">
+                        No blocklist entries.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
