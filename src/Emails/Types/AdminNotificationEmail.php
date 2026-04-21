@@ -2,7 +2,7 @@
 
 namespace App\Emails\Types;
 
-use App\Emails\EmailInterface;
+use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -11,7 +11,7 @@ use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class AdminNotificationEmail implements EmailInterface
+readonly class AdminNotificationEmail extends EmailAbstract
 {
     public function __construct(
         private EmailQueueInterface $queue,
@@ -38,6 +38,9 @@ readonly class AdminNotificationEmail implements EmailInterface
 
     public function guardCheck(array $context): bool
     {
+        $this->ensureInstanceOf($context, 'user', User::class);
+        $this->ensureHasKey($context, 'sectionsHtml');
+
         return true;
     }
 

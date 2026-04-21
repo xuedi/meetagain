@@ -6,6 +6,8 @@ use App\CronTaskInterface;
 use App\Emails\ScheduledEmailInterface;
 use App\Enum\CronTaskStatus;
 use App\ValueObject\CronTaskResult;
+use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -19,6 +21,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
         #[AutowireIterator(ScheduledEmailInterface::class)]
         private iterable $scheduledEmails,
         private ClockInterface $clock,
+        private LoggerInterface $logger,
     ) {}
 
     public function getIdentifier(): string
@@ -40,13 +43,30 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
             }
 
             $totalSent = 0;
+            $loggedGuardErrors = [];
 
             foreach ($this->scheduledEmails as $email) {
                 foreach ($email->getDueContexts($now) as $dueContext) {
                     $sent = 0;
                     foreach ($dueContext->potentialRecipients as $user) {
                         $ctx = array_merge($dueContext->data, ['user' => $user]);
-                        if ($email->guardCheck($ctx)) {
+                        try {
+                            $shouldSend = $email->guardCheck($ctx);
+                        } catch (InvalidArgumentException $e) {
+                            $dedupKey = $email->getIdentifier() . ':' . $e->getMessage();
+                            if (!isset($loggedGuardErrors[$dedupKey])) {
+                                $loggedGuardErrors[$dedupKey] = true;
+                                $this->logger->error('guardCheck contract violation - email skipped', [
+                                    'email' => $email->getIdentifier(),
+                                    'caller' => 'SendScheduledEmailsService::runCronTask',
+                                    'context_keys' => array_keys($ctx),
+                                    'exception' => $e->getMessage(),
+                                ]);
+                            }
+                            continue;
+                        }
+
+                        if ($shouldSend) {
                             $email->send($ctx);
                             $sent++;
                         }

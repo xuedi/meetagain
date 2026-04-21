@@ -118,33 +118,39 @@ class EmailTypesTest extends TestCase
         static::assertInstanceOf(EmailInterface::class, $this->allTypes()[$key]);
     }
 
-    public function testAdminNotificationGuardCheckAlwaysTrue(): void
+    public function testAdminNotificationGuardCheckThrowsOnEmptyContext(): void
     {
-        static::assertTrue(new AdminNotificationEmail($this->queue, $this->config)->guardCheck([]));
+        $this->expectException(\InvalidArgumentException::class);
+        new AdminNotificationEmail($this->queue, $this->config)->guardCheck([]);
     }
 
-    public function testNotificationEventCanceledGuardCheckAlwaysTrue(): void
+    public function testNotificationEventCanceledGuardCheckThrowsOnEmptyContext(): void
     {
-        static::assertTrue(new NotificationEventCanceledEmail($this->queue, $this->config)->guardCheck([]));
+        $this->expectException(\InvalidArgumentException::class);
+        new NotificationEventCanceledEmail($this->queue, $this->config)->guardCheck([]);
     }
 
-    public function testPasswordResetGuardCheckAlwaysTrue(): void
+    public function testPasswordResetGuardCheckThrowsOnEmptyContext(): void
     {
-        static::assertTrue(new PasswordResetEmail($this->queue, $this->config)->guardCheck([]));
+        $this->expectException(\InvalidArgumentException::class);
+        new PasswordResetEmail($this->queue, $this->config)->guardCheck([]);
     }
 
-    public function testSupportNotificationGuardCheckAlwaysTrue(): void
+    public function testSupportNotificationGuardCheckThrowsOnEmptyContext(): void
     {
-        static::assertTrue(new SupportNotificationEmail($this->queue, $this->config)->guardCheck([]));
+        $this->expectException(\InvalidArgumentException::class);
+        new SupportNotificationEmail($this->queue, $this->config)->guardCheck([]);
     }
 
-    public function testVerificationRequestGuardCheckAlwaysTrue(): void
+    public function testVerificationRequestGuardCheckThrowsOnEmptyContext(): void
     {
-        static::assertTrue(new VerificationRequestEmail($this->queue, $this->config)->guardCheck([]));
+        $this->expectException(\InvalidArgumentException::class);
+        new VerificationRequestEmail($this->queue, $this->config)->guardCheck([]);
     }
 
-    public function testWelcomeGuardCheckAlwaysTrue(): void
+    public function testWelcomeGuardCheckThrowsOnEmptyContext(): void
     {
-        static::assertTrue(new WelcomeEmail($this->queue, $this->config)->guardCheck([]));
+        $this->expectException(\InvalidArgumentException::class);
+        new WelcomeEmail($this->queue, $this->config)->guardCheck([]);
     }
 }
