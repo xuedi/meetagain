@@ -8,9 +8,12 @@ use App\Activity\Messages\PasswordResetRequest;
 use App\Emails\Types\PasswordResetEmail;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Member\PasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PasswordResetServiceTest extends TestCase
@@ -21,6 +24,8 @@ class PasswordResetServiceTest extends TestCase
         ?UserPasswordHasherInterface $hasher = null,
         ?ActivityService $activityService = null,
         ?PasswordResetEmail $passwordResetEmail = null,
+        ?BlocklistCheckerInterface $blocklist = null,
+        ?LoggerInterface $logger = null,
     ): PasswordResetService {
         return new PasswordResetService(
             $userRepo ?? $this->createStub(UserRepository::class),
@@ -28,6 +33,8 @@ class PasswordResetServiceTest extends TestCase
             $hasher ?? $this->createStub(UserPasswordHasherInterface::class),
             $activityService ?? $this->createStub(ActivityService::class),
             $passwordResetEmail ?? $this->createStub(PasswordResetEmail::class),
+            $blocklist ?? $this->createStub(BlocklistCheckerInterface::class),
+            $logger ?? new NullLogger(),
         );
     }
 
@@ -133,7 +140,7 @@ class PasswordResetServiceTest extends TestCase
 
         $service = $this->createService(em: $emMock, hasher: $hasherMock);
 
-        $service->resetPassword($user, 'newPassword123');
+        static::assertTrue($service->resetPassword($user, 'newPassword123'));
 
         static::assertSame('new-hashed-password', $user->getPassword());
         static::assertNull($user->getRegcode());
@@ -151,6 +158,56 @@ class PasswordResetServiceTest extends TestCase
 
         $service = $this->createService(hasher: $hasherStub, activityService: $activityMock);
 
-        $service->resetPassword($user, 'newPassword');
+        static::assertTrue($service->resetPassword($user, 'newPassword'));
+    }
+
+    public function testRequestResetReturnsNullWhenEmailBlocklisted(): void
+    {
+        $blocklistStub = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklistStub->method('isBlocked')->willReturn(true);
+
+        $userRepoMock = $this->createMock(UserRepository::class);
+        $userRepoMock->expects($this->never())->method('findOneBy');
+
+        $emailMock = $this->createMock(PasswordResetEmail::class);
+        $emailMock->expects($this->never())->method('send');
+
+        $service = $this->createService(
+            userRepo: $userRepoMock,
+            passwordResetEmail: $emailMock,
+            blocklist: $blocklistStub,
+        );
+
+        static::assertNull($service->requestReset('blocked@example.com'));
+    }
+
+    public function testResetPasswordReturnsFalseAndDoesNotPersistWhenBlocklisted(): void
+    {
+        $user = new User();
+        $user->setEmail('blocked@example.com');
+        $user->setPassword('old-hashed-password');
+
+        $blocklistStub = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklistStub->method('isBlocked')->willReturn(true);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->never())->method('persist');
+        $emMock->expects($this->never())->method('flush');
+
+        $hasherMock = $this->createMock(UserPasswordHasherInterface::class);
+        $hasherMock->expects($this->never())->method('hashPassword');
+
+        $activityMock = $this->createMock(ActivityService::class);
+        $activityMock->expects($this->never())->method('log');
+
+        $service = $this->createService(
+            em: $emMock,
+            hasher: $hasherMock,
+            activityService: $activityMock,
+            blocklist: $blocklistStub,
+        );
+
+        static::assertFalse($service->resetPassword($user, 'newPassword'));
+        static::assertSame('old-hashed-password', $user->getPassword());
     }
 }

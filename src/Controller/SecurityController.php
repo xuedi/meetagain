@@ -17,6 +17,7 @@ use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
 use App\Emails\Types\VerificationRequestEmail;
 use App\Emails\Types\WelcomeEmail;
+use App\Repository\EmailBlocklistRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Member\CaptchaService;
 use App\Service\Member\ConsentService;
@@ -49,6 +50,7 @@ final class SecurityController extends AbstractController
         private readonly PasswordResetService $passwordResetService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ConfigService $configService,
+        private readonly EmailBlocklistRepository $emailBlocklistRepository,
         #[Target('passwordReset')]
         private readonly RateLimiterFactory $passwordResetLimiter,
         #[Target('registration')]
@@ -206,6 +208,14 @@ final class SecurityController extends AbstractController
             $email = $form->get('email')->getData();
 
             if ($form->getErrors(true)->count() === 0) {
+                $blocklistEntry = $this->emailBlocklistRepository->findByEmail($email);
+                if ($blocklistEntry !== null) {
+                    return $this->render('security/reset_blocked.html.twig', [
+                        'reason' => $blocklistEntry->getReason(),
+                        'supportPath' => $this->generateUrl('app_contact'),
+                    ]);
+                }
+
                 $this->passwordResetService->requestReset($email);
 
                 return $this->render('security/reset_email_send.html.twig');
@@ -234,7 +244,15 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->passwordResetService->resetPassword($user, $form->get('password')->getData());
+            $finalized = $this->passwordResetService->resetPassword($user, $form->get('password')->getData());
+            if (!$finalized) {
+                $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
+
+                return $this->render('security/reset_blocked.html.twig', [
+                    'reason' => $blocklistEntry?->getReason() ?? '',
+                    'supportPath' => $this->generateUrl('app_contact'),
+                ]);
+            }
 
             return $this->render('security/reset_success.html.twig');
         }

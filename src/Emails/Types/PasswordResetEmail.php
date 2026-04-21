@@ -7,14 +7,18 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class PasswordResetEmail extends EmailAbstract
 {
     public function __construct(
+        BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-    ) {}
+    ) {
+        parent::__construct($blocklist);
+    }
 
     public function getIdentifier(): string
     {
@@ -37,6 +41,12 @@ readonly class PasswordResetEmail extends EmailAbstract
     public function guardCheck(array $context): bool
     {
         $this->ensureInstanceOf($context, 'user', User::class);
+
+        /** @var User $user */
+        $user = $context['user'];
+        if ($this->isBlocked((string) $user->getEmail())) {
+            return false;
+        }
 
         return true;
     }

@@ -351,6 +351,7 @@ email_tab_templates: 模板
 email_tab_sendlog: 发送日志
 email_tab_announcements: 公告
 email_tab_debugging: 调试
+email_tab_blocklist: 黑名单
 support_tab_requests: 'Support Requests'
 support_tab_reports: 'Image Reports'
 logs_tab_activity: 活动日志
@@ -447,6 +448,11 @@ language_fy: 弗里西语
 'reset_error.heading': '链接已过期或无效'
 'reset_error.description': '此重置链接已不再有效。请申请新的链接。'
 'reset_error.cta': '申请新链接'
+'reset_blocked.title': '密码重置被阻止'
+'reset_blocked.heading': '此邮箱地址在我们的黑名单上'
+'reset_blocked.description': '我们无法向此地址发送密码重置邮件。'
+'reset_blocked.reason_label': '原因'
+'reset_blocked.cta': '联系支持'
 # 支持页面侧边栏
 'support.sidebar.title': '我们如何帮助您'
 'support.sidebar.intro': '给我们发送消息，我们会尽快回复您。'

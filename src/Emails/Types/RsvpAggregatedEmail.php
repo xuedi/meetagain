@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,11 +22,14 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEmailInterface
 {
     public function __construct(
+        BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private EventRepository $eventRepo,
         private EntityManagerInterface $em,
-    ) {}
+    ) {
+        parent::__construct($blocklist);
+    }
 
     public function getIdentifier(): string
     {
@@ -60,6 +64,9 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         /** @var Event $event */
         $event = $context['event'];
 
+        if ($this->isBlocked((string) $recipient->getEmail())) {
+            return false;
+        }
         if (!$recipient->isNotification()) {
             return false;
         }

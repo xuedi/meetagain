@@ -15,6 +15,7 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
+use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -28,6 +29,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
      * @param iterable<UserEventDigestFilterInterface> $digestFilters
      */
     public function __construct(
+        BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private EventRepository $eventRepo,
@@ -35,7 +37,9 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         private AppStateService $appStateService,
         #[AutowireIterator(UserEventDigestFilterInterface::class)]
         private iterable $digestFilters,
-    ) {}
+    ) {
+        parent::__construct($blocklist);
+    }
 
     public function getIdentifier(): string
     {
@@ -63,6 +67,9 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
 
         /** @var User $user */
         $user = $context['user'];
+        if ($this->isBlocked((string) $user->getEmail())) {
+            return false;
+        }
 
         return $user->getNotificationSettings()->upcomingEvents;
     }

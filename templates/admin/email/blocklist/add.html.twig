@@ -1,0 +1,28 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'blocklist'} %}
+
+        <div class="mb-4">
+            <a href="{{ path('app_admin_email_blocklist') }}" class="button is-small">
+                <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                <span>Back</span>
+            </a>
+        </div>
+
+        <div class="columns is-centered">
+            <div class="column is-8-tablet is-6-desktop">
+                {{ form_start(form) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.reason) }}
+                {{ form_row(form.submit) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
