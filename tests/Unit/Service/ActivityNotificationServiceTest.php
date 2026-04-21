@@ -11,6 +11,7 @@ use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use ReflectionMethod;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -40,6 +41,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $eventRepoMock,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $this->createStub(TagAwareCacheInterface::class),
+            logger: new NullLogger(),
         );
 
         // Act: notify
@@ -70,6 +72,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoMock,
             appCache: $cacheMock,
+            logger: new NullLogger(),
         );
 
         // Act: notify
@@ -97,6 +100,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $eventRepoMock,
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
+            logger: new NullLogger(),
         );
 
         // Act: notify
@@ -121,6 +125,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
+            logger: new NullLogger(),
         );
 
         // Act: send RSVP notification
@@ -161,6 +166,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
+            logger: new NullLogger(),
         );
 
         // Act: send RSVP notification
@@ -198,6 +204,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
+            logger: new NullLogger(),
         );
 
         // Act: send RSVP notification
@@ -217,6 +224,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
+            logger: new NullLogger(),
         );
 
         // Act: send message notification with null user (via reflection)
@@ -242,6 +250,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoStub,
             appCache: $cacheMock,
+            logger: new NullLogger(),
         );
 
         // Act: send message notification (via reflection)
@@ -284,6 +293,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoStub,
             appCache: $cacheMock,
+            logger: new NullLogger(),
         );
 
         // Act: send message notification (via reflection)
@@ -326,6 +336,7 @@ final class ActivityNotificationServiceTest extends TestCase
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoStub,
             appCache: $cacheMock,
+            logger: new NullLogger(),
         );
 
         // Act: send message notification (via reflection)

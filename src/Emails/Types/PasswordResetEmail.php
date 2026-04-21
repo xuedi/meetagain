@@ -2,15 +2,14 @@
 
 namespace App\Emails\Types;
 
-use App\Emails\EmailInterface;
+use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class PasswordResetEmail implements EmailInterface
+readonly class PasswordResetEmail extends EmailAbstract
 {
     public function __construct(
         private EmailQueueInterface $queue,
@@ -37,6 +36,8 @@ readonly class PasswordResetEmail implements EmailInterface
 
     public function guardCheck(array $context): bool
     {
+        $this->ensureInstanceOf($context, 'user', User::class);
+
         return true;
     }
 
@@ -57,10 +58,5 @@ readonly class PasswordResetEmail implements EmailInterface
         ]);
 
         $this->queue->enqueue($this, $email, EmailType::PasswordResetRequest, $context);
-    }
-
-    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
-    {
-        return null;
     }
 }

@@ -252,7 +252,11 @@ class EmailTypeSendTest extends TestCase
 
         static::assertTrue(
             (new AnnouncementEmail($this->createStub(EmailQueueInterface::class), $this->config))
-                ->guardCheck(['user' => $user])
+                ->guardCheck([
+                    'user' => $user,
+                    'renderedContent' => ['title' => 't', 'content' => 'c'],
+                    'announcementUrl' => 'https://example.com/a/1',
+                ])
         );
     }
 
@@ -262,7 +266,11 @@ class EmailTypeSendTest extends TestCase
 
         static::assertFalse(
             (new AnnouncementEmail($this->createStub(EmailQueueInterface::class), $this->config))
-                ->guardCheck(['user' => $user])
+                ->guardCheck([
+                    'user' => $user,
+                    'renderedContent' => ['title' => 't', 'content' => 'c'],
+                    'announcementUrl' => 'https://example.com/a/1',
+                ])
         );
     }
 
@@ -272,7 +280,7 @@ class EmailTypeSendTest extends TestCase
 
         static::assertFalse(
             (new NotificationMessageEmail($this->createStub(EmailQueueInterface::class), $this->config))
-                ->guardCheck(['recipient' => $user])
+                ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
 
@@ -282,7 +290,7 @@ class EmailTypeSendTest extends TestCase
 
         static::assertFalse(
             (new NotificationMessageEmail($this->createStub(EmailQueueInterface::class), $this->config))
-                ->guardCheck(['recipient' => $user])
+                ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
 
@@ -295,7 +303,7 @@ class EmailTypeSendTest extends TestCase
 
         static::assertFalse(
             (new NotificationMessageEmail($this->createStub(EmailQueueInterface::class), $this->config))
-                ->guardCheck(['recipient' => $user])
+                ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
 
@@ -308,11 +316,11 @@ class EmailTypeSendTest extends TestCase
 
         static::assertTrue(
             (new NotificationMessageEmail($this->createStub(EmailQueueInterface::class), $this->config))
-                ->guardCheck(['recipient' => $user])
+                ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
 
-    public function testEventReminderGuardCheckReturnsFalseForNonUserObject(): void
+    public function testEventReminderGuardCheckThrowsForNonUserObject(): void
     {
         $email = new EventReminderEmail(
             $this->createStub(EmailQueueInterface::class), $this->config,
@@ -320,7 +328,8 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(EntityManagerInterface::class),
         );
 
-        static::assertFalse($email->guardCheck(['user' => 'not-a-user']));
+        $this->expectException(\InvalidArgumentException::class);
+        $email->guardCheck(['user' => 'not-a-user', 'event' => $this->makeEvent()]);
     }
 
     public function testEventReminderGuardCheckReturnsFalseWhenNotificationsOff(): void
@@ -331,7 +340,10 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(EntityManagerInterface::class),
         );
 
-        static::assertFalse($email->guardCheck(['user' => $this->makeUser(isNotification: false)]));
+        static::assertFalse($email->guardCheck([
+            'user' => $this->makeUser(isNotification: false),
+            'event' => $this->makeEvent(),
+        ]));
     }
 
     public function testEventReminderGuardCheckReturnsFalseWhenReminderSettingOff(): void
@@ -343,7 +355,7 @@ class EmailTypeSendTest extends TestCase
         );
         $user = $this->makeUser(settings: new NotificationSettings(['eventReminder' => false]));
 
-        static::assertFalse($email->guardCheck(['user' => $user]));
+        static::assertFalse($email->guardCheck(['user' => $user, 'event' => $this->makeEvent()]));
     }
 
     public function testEventReminderGuardCheckReturnsTrueWhenAllPass(): void
@@ -355,7 +367,7 @@ class EmailTypeSendTest extends TestCase
         );
         $user = $this->makeUser(settings: new NotificationSettings(['eventReminder' => true]));
 
-        static::assertTrue($email->guardCheck(['user' => $user]));
+        static::assertTrue($email->guardCheck(['user' => $user, 'event' => $this->makeEvent()]));
     }
 
     public function testRsvpAggregatedGuardCheckReturnsFalseWhenNotificationsOff(): void
@@ -366,7 +378,11 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(EntityManagerInterface::class),
         );
 
-        static::assertFalse($email->guardCheck(['user' => $this->makeUser(isNotification: false), 'event' => $this->makeEvent()]));
+        static::assertFalse($email->guardCheck([
+            'user' => $this->makeUser(isNotification: false),
+            'event' => $this->makeEvent(),
+            'attendeeMap' => [],
+        ]));
     }
 
     public function testRsvpAggregatedGuardCheckReturnsFalseWhenFollowingUpdatesOff(): void
@@ -378,7 +394,7 @@ class EmailTypeSendTest extends TestCase
         );
         $user = $this->makeUser(settings: new NotificationSettings(['followingUpdates' => false]));
 
-        static::assertFalse($email->guardCheck(['user' => $user, 'event' => $this->makeEvent()]));
+        static::assertFalse($email->guardCheck(['user' => $user, 'event' => $this->makeEvent(), 'attendeeMap' => []]));
     }
 
     public function testRsvpAggregatedGuardCheckReturnsFalseWhenUserAlreadyRsvpd(): void
@@ -390,7 +406,11 @@ class EmailTypeSendTest extends TestCase
         );
         $user = $this->makeUser(settings: new NotificationSettings(['followingUpdates' => true]));
 
-        static::assertFalse($email->guardCheck(['user' => $user, 'event' => $this->makeEvent(hasRsvp: true)]));
+        static::assertFalse($email->guardCheck([
+            'user' => $user,
+            'event' => $this->makeEvent(hasRsvp: true),
+            'attendeeMap' => [],
+        ]));
     }
 
     public function testRsvpAggregatedGuardCheckReturnsTrueWhenAllPass(): void
@@ -402,7 +422,7 @@ class EmailTypeSendTest extends TestCase
         );
         $user = $this->makeUser(settings: new NotificationSettings(['followingUpdates' => true]));
 
-        static::assertTrue($email->guardCheck(['user' => $user, 'event' => $this->makeEvent()]));
+        static::assertTrue($email->guardCheck(['user' => $user, 'event' => $this->makeEvent(), 'attendeeMap' => []]));
     }
 
     public function testUpcomingDigestGuardCheckReturnsTrueWhenSettingOn(): void
@@ -416,7 +436,11 @@ class EmailTypeSendTest extends TestCase
         );
         $user = $this->makeUser(settings: new NotificationSettings(['upcomingEvents' => true]));
 
-        static::assertTrue($email->guardCheck(['user' => $user]));
+        static::assertTrue($email->guardCheck([
+            'user' => $user,
+            'weekStart' => new DateTimeImmutable('2026-01-01'),
+            'weekEnd' => new DateTimeImmutable('2026-01-08'),
+        ]));
     }
 
     public function testUpcomingDigestGuardCheckReturnsFalseWhenSettingOff(): void
@@ -430,6 +454,10 @@ class EmailTypeSendTest extends TestCase
         );
         $user = $this->makeUser(settings: new NotificationSettings(['upcomingEvents' => false]));
 
-        static::assertFalse($email->guardCheck(['user' => $user]));
+        static::assertFalse($email->guardCheck([
+            'user' => $user,
+            'weekStart' => new DateTimeImmutable('2026-01-01'),
+            'weekEnd' => new DateTimeImmutable('2026-01-08'),
+        ]));
     }
 }

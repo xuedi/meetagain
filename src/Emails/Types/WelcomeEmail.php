@@ -2,7 +2,7 @@
 
 namespace App\Emails\Types;
 
-use App\Emails\EmailInterface;
+use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -11,7 +11,7 @@ use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class WelcomeEmail implements EmailInterface
+readonly class WelcomeEmail extends EmailAbstract
 {
     public function __construct(
         private EmailQueueInterface $queue,
@@ -37,6 +37,8 @@ readonly class WelcomeEmail implements EmailInterface
 
     public function guardCheck(array $context): bool
     {
+        $this->ensureInstanceOf($context, 'user', User::class);
+
         return true;
     }
 

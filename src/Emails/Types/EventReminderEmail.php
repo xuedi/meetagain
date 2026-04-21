@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Emails\Types;
 
 use App\Emails\DueContext;
+use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
@@ -16,9 +17,10 @@ use App\Service\Config\ConfigService;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class EventReminderEmail implements ScheduledEmailInterface
+readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmailInterface
 {
     public function __construct(
         private EmailQueueInterface $queue,
@@ -51,11 +53,12 @@ readonly class EventReminderEmail implements ScheduledEmailInterface
 
     public function guardCheck(array $context): bool
     {
+        $this->ensureInstanceOf($context, 'user', User::class);
+        $this->ensureInstanceOf($context, 'event', Event::class);
+
+        /** @var User $user */
         $user = $context['user'];
 
-        if (!$user instanceof User) {
-            return false;
-        }
         if (!$user->isNotification()) {
             return false;
         }
@@ -137,11 +140,14 @@ readonly class EventReminderEmail implements ScheduledEmailInterface
         foreach ($events as $event) {
             $eligibleCount = 0;
             foreach ($event->getRsvp()->toArray() as $user) {
-                if (!$this->guardCheck(['user' => $user, 'event' => $event])) {
+                try {
+                    $eligible = $this->guardCheck(['user' => $user, 'event' => $event]);
+                } catch (InvalidArgumentException) {
                     continue;
                 }
-
-                $eligibleCount++;
+                if ($eligible) {
+                    $eligibleCount++;
+                }
             }
 
             $items[] = new ScheduledMailItem(

@@ -2,15 +2,14 @@
 
 namespace App\Emails\Types;
 
-use App\Emails\EmailInterface;
+use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class SupportNotificationEmail implements EmailInterface
+readonly class SupportNotificationEmail extends EmailAbstract
 {
     public function __construct(
         private EmailQueueInterface $queue,
@@ -37,6 +36,8 @@ readonly class SupportNotificationEmail implements EmailInterface
 
     public function guardCheck(array $context): bool
     {
+        $this->ensureInstanceOf($context, 'request', SupportRequest::class);
+
         return true;
     }
 
@@ -58,10 +59,5 @@ readonly class SupportNotificationEmail implements EmailInterface
         ]);
 
         $this->queue->enqueue($this, $email, EmailType::SupportNotification, $context);
-    }
-
-    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
-    {
-        return null;
     }
 }

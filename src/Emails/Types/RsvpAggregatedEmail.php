@@ -3,6 +3,7 @@
 namespace App\Emails\Types;
 
 use App\Emails\DueContext;
+use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
@@ -14,9 +15,10 @@ use App\Service\Config\ConfigService;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class RsvpAggregatedEmail implements ScheduledEmailInterface
+readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEmailInterface
 {
     public function __construct(
         private EmailQueueInterface $queue,
@@ -49,6 +51,10 @@ readonly class RsvpAggregatedEmail implements ScheduledEmailInterface
 
     public function guardCheck(array $context): bool
     {
+        $this->ensureInstanceOf($context, 'user', User::class);
+        $this->ensureInstanceOf($context, 'event', Event::class);
+        $this->ensureHasKey($context, 'attendeeMap');
+
         /** @var User $recipient */
         $recipient = $context['user'];
         /** @var Event $event */
@@ -156,7 +162,12 @@ readonly class RsvpAggregatedEmail implements ScheduledEmailInterface
             $eligibleCount = 0;
             foreach ($attendeeMap as $data) {
                 $ctx = ['user' => $data['recipient'], 'event' => $event, 'attendeeMap' => $attendeeMap];
-                if ($this->guardCheck($ctx)) {
+                try {
+                    $eligible = $this->guardCheck($ctx);
+                } catch (InvalidArgumentException) {
+                    continue;
+                }
+                if ($eligible) {
                     $eligibleCount++;
                 }
             }
