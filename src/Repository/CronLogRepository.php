@@ -29,6 +29,15 @@ class CronLogRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findMostRecent(): ?CronLog
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.runAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function deleteOlderThan(DateTimeImmutable $cutoff): int
     {
         return $this->createQueryBuilder('c')
