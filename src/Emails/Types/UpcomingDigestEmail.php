@@ -14,6 +14,7 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
+use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -89,7 +90,12 @@ readonly class UpcomingDigestEmail implements ScheduledEmailInterface
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($email, EmailType::UpcomingEvents);
+        $this->queue->enqueue($this, $email, EmailType::UpcomingEvents, $context);
+    }
+
+    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        return $now->add(new DateInterval('PT4H'));
     }
 
     public function getDueContexts(DateTimeImmutable $now): array

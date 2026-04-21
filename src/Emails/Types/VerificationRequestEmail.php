@@ -7,6 +7,7 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class VerificationRequestEmail implements EmailInterface
@@ -57,6 +58,11 @@ readonly class VerificationRequestEmail implements EmailInterface
             'lang' => $user->getLocale(),
         ]);
 
-        $this->queue->enqueue($email, EmailType::VerificationRequest);
+        $this->queue->enqueue($this, $email, EmailType::VerificationRequest, $context);
+    }
+
+    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        return null;
     }
 }

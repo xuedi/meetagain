@@ -99,7 +99,20 @@ readonly class RsvpAggregatedEmail implements ScheduledEmailInterface
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($email, EmailType::NotificationRsvpAggregated);
+        $this->queue->enqueue($this, $email, EmailType::NotificationRsvpAggregated, $context);
+    }
+
+    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        $event = $context['event'] ?? null;
+        if (!$event instanceof Event) {
+            return null;
+        }
+
+        $budgetCutoff = $now->add(new DateInterval('PT12H'));
+        $eventStart = DateTimeImmutable::createFromMutable($event->getStart());
+
+        return $budgetCutoff < $eventStart ? $budgetCutoff : $eventStart;
     }
 
     public function getDueContexts(DateTimeImmutable $now): array

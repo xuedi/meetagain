@@ -11,6 +11,15 @@
                 <span class="icon"><i class="fa fa-arrow-left"></i></span>
                 <span>Back</span>
             </a>
+            {% if email.status.value == 'late' or (email.maxSendBy and email.status.value == 'pending' and email.maxSendBy|date('U') < 'now'|date('U')) %}
+                <form method="post" action="{{ path('app_admin_email_sendlog_clear_cap', {id: email.id}) }}" style="display:inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('clear_cap_' ~ email.id) }}">
+                    <button type="submit" class="button is-small is-warning">
+                        <span class="icon"><i class="fa fa-redo"></i></span>
+                        <span>Clear cap &amp; retry</span>
+                    </button>
+                </form>
+            {% endif %}
         </div>
 
         <table class="table is-fullwidth">
@@ -46,14 +55,49 @@
                     <td>{{ email.lang }}</td>
                 </tr>
                 <tr>
+                    <th>Status</th>
+                    <td>
+                        {% if email.status.value == 'late' or email.status.value == 'failed' %}
+                            <span class="has-text-danger">{{ email.status.value }}</span>
+                        {% else %}
+                            {{ email.status.value }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
                     <th>Created At</th>
                     <td>{{ email.createdAt|date('Y-m-d H:i:s') }}</td>
                 </tr>
                 <tr>
-                    <th>Sent At</th>
+                    <th>Provider Dispatched At</th>
                     <td>
-                        {% if email.sendAt %}
-                            {{ email.sendAt|date('Y-m-d H:i:s') }}
+                        {% if email.providerDispatchedAt %}
+                            {{ email.providerDispatchedAt|date('Y-m-d H:i:s') }}
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Queue Latency</th>
+                    <td>
+                        {% if email.providerDispatchedAt and email.createdAt %}
+                            {{ (email.providerDispatchedAt|date('U') - email.createdAt|date('U'))|format_duration }}
+                        {% elseif email.status.value == 'late' and email.createdAt %}
+                            <span class="has-text-danger">
+                                {{ ('now'|date('U') - email.createdAt|date('U'))|format_duration }}
+                                (still in queue, past cutoff)
+                            </span>
+                        {% else %}
+                            <span class="has-text-grey">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Max Send By</th>
+                    <td>
+                        {% if email.maxSendBy %}
+                            {{ email.maxSendBy|date('Y-m-d H:i:s') }}
                         {% else %}
                             <span class="has-text-grey">-</span>
                         {% endif %}

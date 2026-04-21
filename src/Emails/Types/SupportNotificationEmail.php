@@ -7,6 +7,7 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class SupportNotificationEmail implements EmailInterface
@@ -56,6 +57,11 @@ readonly class SupportNotificationEmail implements EmailInterface
             'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
         ]);
 
-        $this->queue->enqueue($email, EmailType::SupportNotification);
+        $this->queue->enqueue($this, $email, EmailType::SupportNotification, $context);
+    }
+
+    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        return null;
     }
 }

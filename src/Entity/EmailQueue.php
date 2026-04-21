@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Enum\EmailQueueStatus;
 use App\Enum\EmailType;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,7 +22,10 @@ class EmailQueue
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?DateTime $sendAt = null;
+    private ?DateTimeImmutable $maxSendBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $providerDispatchedAt = null;
 
     #[ORM\Column(length: 20, enumType: EmailQueueStatus::class)]
     private EmailQueueStatus $status = EmailQueueStatus::Pending;
@@ -75,14 +77,26 @@ class EmailQueue
         return $this;
     }
 
-    public function getSendAt(): ?DateTime
+    public function getMaxSendBy(): ?DateTimeImmutable
     {
-        return $this->sendAt;
+        return $this->maxSendBy;
     }
 
-    public function setSendAt(?DateTime $sendAt): static
+    public function setMaxSendBy(?DateTimeImmutable $maxSendBy): static
     {
-        $this->sendAt = $sendAt;
+        $this->maxSendBy = $maxSendBy;
+
+        return $this;
+    }
+
+    public function getProviderDispatchedAt(): ?DateTimeImmutable
+    {
+        return $this->providerDispatchedAt;
+    }
+
+    public function setProviderDispatchedAt(?DateTimeImmutable $providerDispatchedAt): static
+    {
+        $this->providerDispatchedAt = $providerDispatchedAt;
 
         return $this;
     }
@@ -208,6 +222,11 @@ class EmailQueue
     public function isFailed(): bool
     {
         return $this->status === EmailQueueStatus::Failed;
+    }
+
+    public function isLate(): bool
+    {
+        return $this->status === EmailQueueStatus::Late;
     }
 
     public function getProviderMessageId(): ?string

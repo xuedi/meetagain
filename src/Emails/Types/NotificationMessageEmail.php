@@ -7,7 +7,9 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
+use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class NotificationMessageEmail implements EmailInterface
@@ -75,6 +77,11 @@ readonly class NotificationMessageEmail implements EmailInterface
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($email, EmailType::NotificationMessage);
+        $this->queue->enqueue($this, $email, EmailType::NotificationMessage, $context);
+    }
+
+    public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
+    {
+        return $now->add(new DateInterval('PT6H'));
     }
 }
