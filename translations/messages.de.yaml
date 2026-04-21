@@ -105,6 +105,7 @@ role_system: System
 role_user: Benutzer
 menu_default: Startseite
 menu_login: Anmelden
+menu_more: Mehr
 'p: please sign in': Anmeldung
 'p: please register': Registrierung
 page_title_register: Registrierung
