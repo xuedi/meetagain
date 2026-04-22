@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_image_title"|trans }}{% endblock %}
+{% block title %}{{ "cms.page_title_languages_index"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -17,7 +17,7 @@
                                     {% if language.tileImage %}
                                         {% include '_components/image.html.twig' with {'image': language.tileImage, 'size': '600x400'} %}
                                     {% else %}
-                                        <img src="/images/locations/default.jpg" alt="Image for {{ language.name }}">
+                                        <img src="/images/locations/default.jpg" alt="{{ 'cms.languages_tile_alt'|trans({'%language%': language.name}) }}">
                                     {% endif %}
                                 </figure>
                             </a>
@@ -34,7 +34,7 @@
                     </div>
                 {% else %}
                     <div class="column has-text-centered">
-                        <p class="has-text-grey">No languages available</p>
+                        <p class="has-text-grey">{{ 'cms.languages_empty'|trans }}</p>
                     </div>
                 {% endfor %}
             </div>

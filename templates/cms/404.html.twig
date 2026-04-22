@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_error"|trans }}{% endblock %}
+{% block title %}{{ "cms.page_title_error"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -10,7 +10,7 @@
             <div class="columns">
                 <div class="column is-6">
 
-                    <h1 class="title">Error: Page not found</h1>
+                    <h1 class="title">{{ 'cms.error_404_heading'|trans }}</h1>
                     <p>{{ message|trans }}</p>
 
                 </div>
@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <p>If you are really, really curious, have a look at the <a href="/sitemap.xml">sitemap</a></p>
+            <p>{{ 'cms.error_404_sitemap_hint'|trans({'%sitemap_link%': '<a href="/sitemap.xml">' ~ ('cms.error_404_sitemap_link_label'|trans) ~ '</a>'})|raw }}</p>
 
         </div>
     </section>

@@ -25,6 +25,8 @@ class TranslationRenameCommand extends Command
 
     private const string OPT_DRY_RUN = 'dry-run';
 
+    private const string OPT_STRICT = 'strict';
+
     #[Override]
     protected function configure(): void
     {
@@ -46,6 +48,12 @@ class TranslationRenameCommand extends Command
             InputOption::VALUE_NONE,
             'Print actions without writing files',
         );
+        $this->addOption(
+            self::OPT_STRICT,
+            null,
+            InputOption::VALUE_NONE,
+            'Fail if any mapping key is missing from a locale (default: skip with warning)',
+        );
     }
 
     #[Override]
@@ -56,6 +64,7 @@ class TranslationRenameCommand extends Command
         $mappingPath = (string) $input->getArgument(self::ARG_MAPPING);
         $locales = array_filter(array_map('trim', explode(',', (string) $input->getOption(self::OPT_LOCALES))));
         $dryRun = (bool) $input->getOption(self::OPT_DRY_RUN);
+        $strict = (bool) $input->getOption(self::OPT_STRICT);
 
         if (!is_file($mappingPath)) {
             $io->error('Mapping file not found: ' . $mappingPath);
@@ -109,14 +118,18 @@ class TranslationRenameCommand extends Command
             }
 
             if ($unknown !== []) {
-                $io->error(sprintf(
+                $message = sprintf(
                     'Unknown keys in %s (not present as old or new): %s',
                     $locale,
                     implode(', ', $unknown),
-                ));
-                $exitCode = Command::FAILURE;
+                );
+                if ($strict) {
+                    $io->error($message);
+                    $exitCode = Command::FAILURE;
 
-                continue;
+                    continue;
+                }
+                $io->warning($message . ' - skipping these (likely missing translations, will fall back to canonical locale)');
             }
 
             $yaml = $this->dump($data);
