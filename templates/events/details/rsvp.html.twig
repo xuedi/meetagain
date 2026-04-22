@@ -6,16 +6,16 @@
     </div>
     <div class="level-right">
         {% if event.canceled %}
-            <span class="tag is-danger is-light">{{ "Event canceled"|trans }}</span>
+            <span class="tag is-danger is-light">{{ "events.tag_event_canceled"|trans }}</span>
         {% elseif is_granted('ROLE_USER') %}
             {% set link = path('app_event_toggle_rsvp', {'event': event.id}) %}
             {% if event.rsvp.contains(app.user) %}
                 <a href="{{ link }}" class="button is-danger is-small ml-4">
-                    <span class="icon"><i class="fa fa-minus"></i></span><span>Remove me</span>
+                    <span class="icon"><i class="fa fa-minus"></i></span><span>{{ 'events.button_rsvp_remove'|trans }}</span>
                 </a>
             {% else %}
                 <a href="{{ link }}" class="button is-success is-small ml-4">
-                    <span class="icon"><i class="fa fa-plus"></i></span><span>Add me</span>
+                    <span class="icon"><i class="fa fa-plus"></i></span><span>{{ 'events.button_rsvp_add'|trans }}</span>
                 </a>
             {% endif %}
         {% endif %}

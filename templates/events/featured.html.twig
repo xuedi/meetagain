@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_events_featured"|trans }}{% endblock %}
-{% block meta_description %}{{ "meta_description_events_featured"|trans }}{% endblock %}
+{% block title %}{{ "events.page_title_featured"|trans }}{% endblock %}
+{% block meta_description %}{{ "events.meta_description_featured"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -9,9 +9,9 @@
     <section class="section">
         <div class="container">
 
-            <h1 class="title">Memorable Events</h1>
+            <h1 class="title">{{ 'events.featured_heading'|trans }}</h1>
             <p>
-                A selection of a few past events that we thought were memorable.{% if featured is empty %} No Event featured at the moment{% endif %}
+                {{ 'events.featured_intro'|trans }}{% if featured is empty %} {{ 'events.featured_empty'|trans }}{% endif %}
             </p>
 
             <div class="columns is-multiline mt-5">
@@ -32,9 +32,9 @@
                 {% endfor %}
             </div>
 
-            <h1 class="title mt-5">The last 3 Events</h1>
+            <h1 class="title mt-5">{{ 'events.featured_recent_heading'|trans }}</h1>
             <p>
-                If you want to reconnect to people on a recent event. To see more events, check out the filter on our <a href="{{ path('app_event') }}">Events</a> page.
+                {{ 'events.featured_recent_intro'|trans({'%events_link%': '<a href="' ~ path('app_event') ~ '">' ~ ('events.featured_recent_link_label'|trans) ~ '</a>'})|raw }}
             </p>
             <div class="columns is-multiline mt-5">
                 {% for event in last %}

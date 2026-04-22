@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_event"|trans }}{% endblock %}
+{% block title %}{{ "events.page_title_event"|trans }}{% endblock %}
 {% block meta_description %}{{ get_meta_description('events') }}{% endblock %}
 
 {% block body %}
@@ -11,7 +11,7 @@
                         <span class="icon has-text-warning">
                             <i class="fa-regular fa-star"></i>
                         </span>
-            <span>{{ "events_featured_button" | trans }}</span>
+            <span>{{ "events.button_featured" | trans }}</span>
         </a>
     </section>
     {% endif %}
@@ -46,7 +46,7 @@
                         <span class="icon has-text-warning">
                             <i class="fa-regular fa-star"></i>
                         </span>
-                        <span>{{ "events_featured_button" | trans }}</span>
+                        <span>{{ "events.button_featured" | trans }}</span>
                     </a>
                     {% endif %}
                 </div>
@@ -102,7 +102,7 @@
                             {{ event_list_item_tags(event.id) }}
 
                             {% if event.canceled %}
-                                <span class="tag is-danger ml-2">{{ "Canceled"|trans }}</span>
+                                <span class="tag is-danger ml-2">{{ "events.tag_canceled"|trans }}</span>
                             {% endif %}
                             <p class="mt-3">
                                 {% if event.teaser(app.locale) is not null and event.teaser(app.locale) is not empty %}

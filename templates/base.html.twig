@@ -61,19 +61,19 @@
 {% for message in app.flashes('success') %}
     <div class="notification is-success flashNotification">
         <button class="delete"></button>
-        {{ message }}
+        {{ message|trans }}
     </div>
 {% endfor %}
 {% for message in app.flashes('warning') %}
     <div class="notification is-warning flashNotification">
         <button class="delete"></button>
-        {{ message }}
+        {{ message|trans }}
     </div>
 {% endfor %}
 {% for message in app.flashes('error') %}
     <div class="notification is-danger flashNotification">
         <button class="delete"></button>
-        {{ message }}
+        {{ message|trans }}
     </div>
 {% endfor %}
 {% include 'base_footer.html.twig' %}

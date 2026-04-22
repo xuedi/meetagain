@@ -9,7 +9,7 @@
             <a href="#"
                class="button is-success is-small ml-4 modalTrigger"
                data-modal-url="{{ path('app_image_modal', {'entity': 'event', 'id': event.id}) }}">
-                <span class="icon"><i class="fa fa-plus"></i></span><span>Upload photo</span>
+                <span class="icon"><i class="fa fa-plus"></i></span><span>{{ 'events.button_upload_photo'|trans }}</span>
             </a>
         {% endif %}
     </div>
@@ -19,7 +19,7 @@
     {% for image in event.images %}
         {% if image.reported is null %}
             {% set href = '/images/thumbnails/' ~ image.hash ~ '_1024x768.webp' %}
-            {% set Caption = 'You can <a href=' ~ path('app_report_image', {'id': image.id}) ~ '>report</a> an image if there is something wrong.' %}
+            {% set Caption = 'events.image_report_caption'|trans({'%url%': path('app_report_image', {'id': image.id})}) %}
             <div class="column is-2">
                 <a data-fancybox="gallery" data-caption="{{ Caption }}" href="{{ href }}">
                     {% include '_components/image.html.twig' with {'image': image, 'size': '210x140'} %}
