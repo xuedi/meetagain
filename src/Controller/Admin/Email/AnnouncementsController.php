@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/announcements')]
 final class AnnouncementsController extends AbstractAdminController
@@ -34,6 +35,7 @@ final class AnnouncementsController extends AbstractAdminController
         private readonly EntityManagerInterface $em,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly LanguageService $languageService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_email_announcements')]
@@ -109,14 +111,14 @@ final class AnnouncementsController extends AbstractAdminController
     public function announcementsSend(Announcement $announcement): Response
     {
         if (!$announcement->isDraft()) {
-            $this->addFlash('error', 'announcement_already_sent');
+            $this->addFlash('error', 'admin_cms.flash_error_already_sent');
 
             return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
         }
 
         $recipientCount = $this->announcementService->send($announcement);
 
-        $this->addFlash('success', sprintf('announcement_sent_success: %d', $recipientCount));
+        $this->addFlash('success', $this->translator->trans('admin_cms.flash_success_sent', ['%count%' => $recipientCount]));
 
         return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
     }
@@ -125,7 +127,7 @@ final class AnnouncementsController extends AbstractAdminController
     public function announcementsDelete(Announcement $announcement): Response
     {
         if (!$announcement->isDraft()) {
-            $this->addFlash('error', 'announcement_cannot_delete_sent');
+            $this->addFlash('error', 'admin_cms.flash_error_cannot_delete_sent');
 
             return $this->redirectToRoute('app_admin_email_announcements');
         }
