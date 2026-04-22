@@ -251,7 +251,21 @@ profile_images:
 profile_messages: {}
 profile_notifications: {}
 profile_review: {}
-profile_image: {}
+profile_image:
+    reported_notice_intro: 'Dieses Bild wurde aus folgendem Grund gemeldet:'
+    reported_notice_outro: 'Vorerst ist das Bild für andere Nutzer nicht sichtbar, bis es überprüft wurde.'
+    section_details: 'Details'
+    detail_uploaded: 'hochgeladen:'
+    detail_type: 'Typ:'
+    detail_size: 'Größe:'
+    detail_location: 'Quelle:'
+    detail_location_value: '%link% in Events'
+    detail_location_link_label: 'anzeigen'
+    detail_reported: 'gemeldet:'
+    detail_reported_yes: 'ja'
+    detail_reported_no: 'nein'
+    flash_image_changed: 'Bild wurde geändert.'
+    flash_upload_error: 'Beim Hochladen der Datei ist ein Fehler aufgetreten.'
 support: {}
 report: {}
 cookie:

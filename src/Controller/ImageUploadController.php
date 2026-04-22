@@ -137,13 +137,13 @@ final class ImageUploadController extends AbstractController
                 $this->imageLocationService->addLocation($entity->getImage()->getId(), $imageType, $id);
 
                 $this->logActivity($entityName, $previousImage, $entity->getImage()->getId());
-                $this->addFlash('success', 'Changed Image');
+                $this->addFlash('success', 'profile_image.flash_image_changed');
 
                 return $this->returnBackToImage($entityName, $id);
             }
         }
 
-        $this->addFlash('error', 'There was an error uploading the file.');
+        $this->addFlash('error', 'profile_image.flash_upload_error');
 
         return $this->returnBackToImage($entityName, $id);
     }
@@ -164,7 +164,7 @@ final class ImageUploadController extends AbstractController
         }
 
         if (!$this->isGranted('event.upload', $event)) {
-            $this->addFlash('warning', 'This event is for group members only.');
+            $this->addFlash('warning', 'events.flash_group_only');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }

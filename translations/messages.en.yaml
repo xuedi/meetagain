@@ -265,7 +265,21 @@ profile_images:
 profile_messages: {}
 profile_notifications: {}
 profile_review: {}
-profile_image: {}
+profile_image:
+    reported_notice_intro: 'This image was reported for the reason:'
+    reported_notice_outro: 'For now the image is not visible to other users until it is reviewed.'
+    section_details: 'Details'
+    detail_uploaded: 'uploaded:'
+    detail_type: 'type:'
+    detail_size: 'size:'
+    detail_location: 'location:'
+    detail_location_value: '%link% in events'
+    detail_location_link_label: 'show'
+    detail_reported: 'reported:'
+    detail_reported_yes: 'yes'
+    detail_reported_no: 'no'
+    flash_image_changed: 'Image was changed.'
+    flash_upload_error: 'There was an error uploading the file.'
 support: {}
 report: {}
 cookie:
