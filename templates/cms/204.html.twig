@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_error"|trans }}{% endblock %}
+{% block title %}{{ "cms.page_title_error"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            <h1 class="title">Error: No content</h1>
+            <h1 class="title">{{ 'cms.error_204_heading'|trans }}</h1>
             <p class="mb-5">
                 {{ message|trans }}
             </p>

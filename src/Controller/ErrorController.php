@@ -23,7 +23,7 @@ final class ErrorController extends AbstractController
         if ($exception instanceof NotFoundHttpException) {
             return new Response($this->twig->render('cms/404.html.twig', [
                 '_locale' => $request->getLocale(),
-                'message' => "These aren't the droids you're looking for!",
+                'message' => 'cms.error_404_default_message',
             ]), Response::HTTP_NOT_FOUND);
         }
 
