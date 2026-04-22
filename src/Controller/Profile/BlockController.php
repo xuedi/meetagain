@@ -30,7 +30,7 @@ final class BlockController extends AbstractController
         }
 
         if ($currentUser->getId() === $targetUser->getId()) {
-            $this->addFlash('warning', 'You cannot block yourself.');
+            $this->addFlash('warning', 'profile.flash_block_self');
 
             return $this->redirectToRoute('app_member', [
                 '_locale' => $request->getLocale(),
@@ -44,7 +44,7 @@ final class BlockController extends AbstractController
             return new JsonResponse(['success' => true]);
         }
 
-        $this->addFlash('success', 'User has been blocked.');
+        $this->addFlash('success', 'profile.flash_user_blocked');
 
         // Redirect based on context
         $referer = $request->headers->get('referer');
@@ -78,7 +78,7 @@ final class BlockController extends AbstractController
             return new JsonResponse(['success' => true]);
         }
 
-        $this->addFlash('success', 'User has been unblocked.');
+        $this->addFlash('success', 'profile.flash_user_unblocked');
 
         return $this->redirectToRoute('app_profile_blocked_users', [
             '_locale' => $request->getLocale(),
