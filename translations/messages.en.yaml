@@ -107,6 +107,22 @@ button_discard: Discard
 menu_imprint: Imprint
 menu_privacy: Privacy
 page_title_error: Error
+'error.500.headline': 'Something went wrong'
+'error.500.intro': 'A problem on our side stopped this page from loading. The incident has been logged and our team will look into it.'
+'error.500.id_label': 'Error reference'
+'error.500.id_help': 'Please include this reference if you contact us so we can find the exact incident.'
+'error.500.time_label': 'Time'
+'error.500.copy': 'Copy reference'
+'error.500.copy_done': 'Copied'
+'error.500.report': 'Report this error'
+'error.500.back_home': 'Back to home'
+'error.500.message_template': "Error reference: %errorId%\nTime: %time% UTC\n\nWhat were you trying to do when this happened?\n\n"
+'error.500.sidebar.title': 'What happens next'
+'error.500.sidebar.intro': 'Our error tracker received this incident automatically. You can speed things up by sharing what you were doing.'
+'error.500.sidebar.bullet1': 'Click "Report this error" to send us details. The reference is filled in for you.'
+'error.500.sidebar.bullet2': 'A short description of the steps that led here helps us reproduce it.'
+'error.500.sidebar.bullet3': 'You will hear back from us once we have looked into it.'
+'error.500.sidebar.link': 'Back to home'
 page_title_cmd: CMS
 button_change_password: 'Change password'
 terms: Terms

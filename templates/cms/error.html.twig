@@ -1,22 +1,129 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_error"|trans }}{% endblock %}
+{% block title %}{{ 'page_title_error'|trans }}{% endblock %}
 
 {% block body %}
+
+    {% set prefilledMessage = 'error.500.message_template'|trans({
+        '%errorId%': errorId,
+        '%time%': occurredAt|date('Y-m-d H:i'),
+    }) %}
+    {% set reportUrl = path('app_contact', {
+        contactType: 'bug',
+        message: prefilledMessage,
+    }) %}
 
     <section class="section">
         <div class="container">
 
-            <div class="columns">
-                <div class="column is-6">
+            <div class="columns is-centered mt-5">
+                <div class="column is-6-tablet is-5-desktop">
 
-                    <h1 class="title">Error: Something really broken</h1>
-                    <p>CorrelationID: {{ CorrelationID }}</p>
+                    <h1 class="title is-5">
+                        <span class="icon-text">
+                            <span class="icon has-text-danger"><i class="fas fa-triangle-exclamation"></i></span>
+                            <span>{{ 'error.500.headline'|trans }}</span>
+                        </span>
+                    </h1>
 
+                    <p class="mb-5">{{ 'error.500.intro'|trans }}</p>
+
+                    <div class="box">
+                        <div class="field">
+                            <label class="label is-small has-text-grey">{{ 'error.500.id_label'|trans }}</label>
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input id="error-id-input"
+                                           type="text"
+                                           class="input is-family-monospace"
+                                           value="{{ errorId }}"
+                                           readonly>
+                                </div>
+                                <div class="control">
+                                    <button id="error-id-copy"
+                                            type="button"
+                                            class="button is-light"
+                                            data-copy-label="{{ 'error.500.copy'|trans }}"
+                                            data-copied-label="{{ 'error.500.copy_done'|trans }}"
+                                            aria-label="{{ 'error.500.copy'|trans }}">
+                                        <span class="icon"><i class="fas fa-copy"></i></span>
+                                        <span class="js-label is-hidden-mobile">{{ 'error.500.copy'|trans }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="help">{{ 'error.500.id_help'|trans }}</p>
+                        </div>
+
+                        <div class="field">
+                            <label class="label is-small has-text-grey">{{ 'error.500.time_label'|trans }}</label>
+                            <p class="is-family-monospace">{{ occurredAt|date('Y-m-d H:i') }} UTC</p>
+                        </div>
+                    </div>
+
+                    <div class="field is-grouped mt-5">
+                        <div class="control">
+                            <a href="{{ reportUrl }}" class="button is-primary">
+                                <span class="icon"><i class="fas fa-paper-plane"></i></span>
+                                <span>{{ 'error.500.report'|trans }}</span>
+                            </a>
+                        </div>
+                        <div class="control">
+                            <a href="{{ path('app_default') }}" class="button is-light">
+                                <span class="icon"><i class="fas fa-house"></i></span>
+                                <span>{{ 'error.500.back_home'|trans }}</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="column is-5-tablet is-4-desktop">
+                    {% include '_components/info_sidebar.html.twig' with {
+                        title: 'error.500.sidebar.title'|trans,
+                        intro: 'error.500.sidebar.intro'|trans,
+                        bullets: [
+                            'error.500.sidebar.bullet1'|trans,
+                            'error.500.sidebar.bullet2'|trans,
+                            'error.500.sidebar.bullet3'|trans,
+                        ],
+                        link_url: path('app_default'),
+                        link_text: 'error.500.sidebar.link'|trans,
+                        link_icon: 'arrow-left',
+                    } only %}
                 </div>
             </div>
 
         </div>
     </section>
 
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        (function () {
+            var button = document.getElementById('error-id-copy');
+            var input = document.getElementById('error-id-input');
+            if (!button || !input || !navigator.clipboard) {
+                return;
+            }
+            var label = button.querySelector('.js-label');
+            var icon = button.querySelector('.icon i');
+            var copyText = button.dataset.copyLabel;
+            var doneText = button.dataset.copiedLabel;
+            button.addEventListener('click', function () {
+                navigator.clipboard.writeText(input.value).then(function () {
+                    if (label) { label.textContent = doneText; }
+                    if (icon) { icon.className = 'fas fa-check'; }
+                    button.classList.add('is-success');
+                    button.classList.remove('is-light');
+                    setTimeout(function () {
+                        if (label) { label.textContent = copyText; }
+                        if (icon) { icon.className = 'fas fa-copy'; }
+                        button.classList.remove('is-success');
+                        button.classList.add('is-light');
+                    }, 1800);
+                });
+            });
+        })();
+    </script>
 {% endblock %}
