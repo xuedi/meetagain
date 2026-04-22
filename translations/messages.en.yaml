@@ -245,7 +245,16 @@ profile_config:
     blocked_view_all: 'View all blocked users'
     flash_password_changed: 'Password was changed, please verify by logging in again.'
     flash_password_old_invalid: 'The old password is not correct.'
-profile_social: {}
+profile_social:
+    section_heading: 'Activities'
+    section_intro: 'This is your personal activity stream. You can see your activities and the ones of the people you follow. Like RSVPs, image uploads, comments, etc.'
+    list_friends_title: 'We follow each other'
+    list_following_title: 'People I follow'
+    list_followers_title: 'People who follow me'
+    list_show_more: 'show more'
+    button_unfollow: 'Unfollow'
+    button_follow_back: 'Follow back'
+    find_more_hint: 'Find more people to follow at the member page or ask for their username at the next meetup.'
 profile_images: {}
 profile_messages: {}
 profile_notifications: {}
