@@ -255,7 +255,13 @@ profile_social:
     button_unfollow: 'Unfollow'
     button_follow_back: 'Follow back'
     find_more_hint: 'Find more people to follow at the member page or ask for their username at the next meetup.'
-profile_images: {}
+profile_images:
+    page_heading: 'Images'
+    sidebar_general: 'General'
+    sidebar_events: 'Events'
+    sidebar_profile_picture: 'Profile picture'
+    profile_change_hint: 'Your profile picture can be changed by uploading a new image %profile_link%.'
+    profile_change_link_label: 'here'
 profile_messages: {}
 profile_notifications: {}
 profile_review: {}

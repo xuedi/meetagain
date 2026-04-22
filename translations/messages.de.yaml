@@ -241,7 +241,13 @@ profile_social:
     button_unfollow: 'Nicht mehr folgen'
     button_follow_back: 'Zurück folgen'
     find_more_hint: 'Finde mehr Leute zum Folgen auf der Mitgliederseite oder frage beim nächsten Treffen nach ihrem Nutzernamen.'
-profile_images: {}
+profile_images:
+    page_heading: 'Bilder'
+    sidebar_general: 'Allgemein'
+    sidebar_events: 'Events'
+    sidebar_profile_picture: 'Profilbild'
+    profile_change_hint: 'Du kannst dein Profilbild ändern, indem du %profile_link% ein neues Bild hochlädst.'
+    profile_change_link_label: 'hier'
 profile_messages: {}
 profile_notifications: {}
 profile_review: {}

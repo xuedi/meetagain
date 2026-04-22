@@ -9,11 +9,11 @@
             <div class="columns">
                 <div class="column is-2">
                     <aside class="menu">
-                        <p class="menu-label">General</p>
+                        <p class="menu-label">{{ 'profile_images.sidebar_general'|trans }}</p>
                         <ul class="menu-list">
-                            <li><a class="{% if action == 'profile' %}is-active{% endif %}" href="{{ path('app_profile_images') }}">Profile picture</a></li>
+                            <li><a class="{% if action == 'profile' %}is-active{% endif %}" href="{{ path('app_profile_images') }}">{{ 'profile_images.sidebar_profile_picture'|trans }}</a></li>
                         </ul>
-                        <p class="menu-label">Events</p>
+                        <p class="menu-label">{{ 'profile_images.sidebar_events'|trans }}</p>
                         <ul class="menu-list">
                             {% for event in eventList %}
                                 {% set link = path('app_profile_images', {'action': 'event', 'id': event.id}) %}
@@ -30,11 +30,11 @@
                     </aside>
                 </div>
                 <div class="column is-10">
-                    <h1 class="title is-6">Images</h1>
+                    <h1 class="title is-6">{{ 'profile_images.page_heading'|trans }}</h1>
 
                     {% if action == 'profile' %}
                         <p class="notification has-text-centered">
-                            Your profile can be changed by uploading a new image. <a href="{{ path('app_profile') }}">here</a>
+                            {{ 'profile_images.profile_change_hint'|trans({'%profile_link%': '<a href="' ~ path('app_profile') ~ '">' ~ ('profile_images.profile_change_link_label'|trans) ~ '</a>'})|raw }}
                         </p>
                         {% include 'profile/image/image_details.html.twig' with {'image': image, 'size': '400x400'} %}
                     {% endif %}
