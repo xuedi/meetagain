@@ -262,7 +262,14 @@ profile_images:
     sidebar_profile_picture: 'Profile picture'
     profile_change_hint: 'Your profile picture can be changed by uploading a new image %profile_link%.'
     profile_change_link_label: 'here'
-profile_messages: {}
+profile_messages:
+    section_heading: 'Messages'
+    welcome_heading: 'Hello,'
+    welcome_intro: 'This is your message overview. On the left are the people you have exchanged messages with.'
+    welcome_rule: 'You can only message people you are friends with, or people who allow messages from everyone.'
+    welcome_addressbook_hint: 'Have a look at the members page; on the detail view of each member you have a message button.'
+    cannot_message: 'You cannot message this user.'
+    input_placeholder: 'Message'
 profile_notifications: {}
 profile_review: {}
 profile_image:

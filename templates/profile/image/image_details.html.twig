@@ -1,8 +1,8 @@
 
 {% if image.reported is not null %}
     <div class="notification is-danger has-text-centered">
-        This image was reported for the reason: <strong>{{ image.reported.name }}</strong>.
-        For now the image is not visible to other users until it is reviewed
+        {{ 'profile_image.reported_notice_intro'|trans }} <strong>{{ image.reported.name }}</strong>.
+        {{ 'profile_image.reported_notice_outro'|trans }}
     </div>
 {% endif %}
 
@@ -11,30 +11,30 @@
         {% include '_components/image.html.twig' with {'image': image, 'size': size} %}
     </div>
     <div class="column is-half">
-        <h2 class="title is-5">Details</h2>
+        <h2 class="title is-5">{{ 'profile_image.section_details'|trans }}</h2>
         <table class="table">
             <tbody>
             <tr>
-                <td>uploaded:</td>
+                <td>{{ 'profile_image.detail_uploaded'|trans }}</td>
                 <td>{{ image.createdAt | time_diff }}</td>
             </tr>
             <tr>
-                <td>type:</td>
+                <td>{{ 'profile_image.detail_type'|trans }}</td>
                 <td>{{ image.mimeType }}</td>
             </tr>
             <tr>
-                <td>size:</td>
+                <td>{{ 'profile_image.detail_size'|trans }}</td>
                 <td>{{ image.size | format_bytes }}</td>
             </tr>
             {% if image.event is defined and image.event %}{# TODO: open links for every source #}
             <tr>
-                <td>location:</td>
-                <td><a target="_blank" href="{{ path('app_event_details', {'id': image.event.id}) }}">show</a> in events</td>
+                <td>{{ 'profile_image.detail_location'|trans }}</td>
+                <td>{{ 'profile_image.detail_location_value'|trans({'%link%': '<a target="_blank" href="' ~ path('app_event_details', {'id': image.event.id}) ~ '">' ~ ('profile_image.detail_location_link_label'|trans) ~ '</a>'})|raw }}</td>
             </tr>
             {% endif %}
             <tr>
-                <td>reported:</td>
-                <td>{% if image.reported is null %}no{% else %}yes{% endif %}</td>
+                <td>{{ 'profile_image.detail_reported'|trans }}</td>
+                <td>{% if image.reported is null %}{{ 'profile_image.detail_reported_no'|trans }}{% else %}{{ 'profile_image.detail_reported_yes'|trans }}{% endif %}</td>
             </tr>
             </tbody>
         </table>
