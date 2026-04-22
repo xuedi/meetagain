@@ -191,3 +191,11 @@ Error: Error
 'security.validator_password_blank': 'Please enter a password.'
 'security.validator_password_min': 'Your password should be at least {{ limit }} characters.'
 'security.validator_agree_terms': 'You should agree to our terms.'
+
+# Support namespace - phase 18 (page-scoped validator messages)
+'support.validator_name_blank': 'Please enter your name.'
+'support.validator_name_max': 'Name cannot be longer than {{ limit }} characters.'
+'support.validator_email_blank': 'Please enter your email address.'
+'support.validator_email_format': 'Please enter a valid email address.'
+'support.validator_message_blank': 'Please enter a message.'
+'support.validator_message_max': 'Message cannot be longer than {{ limit }} characters.'
