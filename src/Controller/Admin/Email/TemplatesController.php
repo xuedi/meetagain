@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/templates')]
 final class TemplatesController extends AbstractAdminController
@@ -41,6 +42,7 @@ final class TemplatesController extends AbstractAdminController
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
         private readonly EmailTemplateTranslationRepository $translationRepo,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_email_templates')]
@@ -110,7 +112,7 @@ final class TemplatesController extends AbstractAdminController
             $template->setUpdatedAt(new DateTimeImmutable());
             $this->em->flush();
 
-            $this->addFlash('success', 'Email template updated successfully.');
+            $this->addFlash('success', $this->translator->trans('admin_email.flash_success_template_saved'));
 
             return $this->redirectToRoute('app_admin_email_templates');
         }
@@ -169,7 +171,7 @@ final class TemplatesController extends AbstractAdminController
         $template->setUpdatedAt(new DateTimeImmutable());
         $this->em->flush();
 
-        $this->addFlash('success', 'Email template reset to default for all languages.');
+        $this->addFlash('success', $this->translator->trans('admin_email.flash_success_template_reset'));
 
         return $this->redirectToRoute('app_admin_email_templates_edit', ['id' => $template->getId()]);
     }

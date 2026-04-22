@@ -13,12 +13,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateType extends AbstractType
 {
     public function __construct(
         private readonly LanguageService $languageService,
         private readonly EmailTemplateTranslationRepository $translationRepo,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Override]
@@ -35,12 +37,12 @@ class EmailTemplateType extends AbstractType
                     'language' => $languageCode,
                 ]);
                 $builder->add("subject-{$languageCode}", TextType::class, [
-                    'label' => "Subject ({$languageCode})",
+                    'label' => $this->translator->trans('admin_email.field_subject_locale', ['%locale%' => $languageCode]),
                     'data' => $translation?->getSubject() ?? '',
                     'mapped' => false,
                 ]);
                 $builder->add("body-{$languageCode}", TextareaType::class, [
-                    'label' => "Body ({$languageCode})",
+                    'label' => $this->translator->trans('admin_email.field_body_locale', ['%locale%' => $languageCode]),
                     'data' => $translation?->getBody() ?? '',
                     'mapped' => false,
                     'attr' => ['rows' => 15],
