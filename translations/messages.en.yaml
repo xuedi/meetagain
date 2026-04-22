@@ -10,67 +10,6 @@ menu_profile_messages: 'My messages'
 menu_profile_view_profile: 'My profile'
 menu_profile_config: 'Settings & Privacy'
 menu_profile_logout: Logout
-language_de: German
-language_en: English
-language_zh: Chinese
-language_fr: French
-language_es: Spanish
-language_it: Italian
-language_pt: Portuguese
-language_nl: Dutch
-language_pl: Polish
-language_ru: Russian
-language_ja: Japanese
-language_ko: Korean
-language_ar: Arabic
-language_tr: Turkish
-language_sv: Swedish
-language_no: Norwegian
-language_da: Danish
-language_fi: Finnish
-language_uk: Ukrainian
-language_cs: Czech
-language_hu: Hungarian
-language_ro: Romanian
-language_el: Greek
-language_bg: Bulgarian
-language_hr: Croatian
-language_sk: Slovak
-language_hi: Hindi
-language_vi: Vietnamese
-language_id: Indonesian
-language_th: Thai
-language_ms: Malay
-language_he: Hebrew
-language_fa: Persian
-language_sr: Serbian
-language_sl: Slovenian
-language_lt: Lithuanian
-language_lv: Latvian
-language_et: Estonian
-language_is: Icelandic
-language_af: Afrikaans
-language_sw: Swahili
-language_bn: Bengali
-language_ur: Urdu
-language_ta: Tamil
-language_my: Burmese
-language_km: Khmer
-language_ka: Georgian
-language_hy: Armenian
-language_az: Azerbaijani
-language_be: Belarusian
-language_mk: Macedonian
-language_sq: Albanian
-language_mn: Mongolian
-language_si: Sinhala
-language_lo: Lao
-language_ga: Irish
-language_cy: Welsh
-language_mt: Maltese
-language_ca: Catalan
-language_eu: Basque
-language_gl: Galician
 button_save: Save
 menu_admin_cms: Pages
 menu_admin_config: Configuration
@@ -393,10 +332,6 @@ nav_support: Support
 nav_contact: Contact
 nav_api: API
 config_option_send_admin_notification: 'Admin Notifications'
-language_lb: Luxembourgish
-language_rm: Romansh
-language_fo: Faroese
-language_fy: Frisian
 # Login page sidebar
 'login.sidebar.title': 'New to meetAgain?'
 'login.sidebar.intro': 'Join a friendly community and never miss an event you care about.'
