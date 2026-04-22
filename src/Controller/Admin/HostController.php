@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/hosts')]
 final class HostController extends AbstractAdminController
@@ -40,6 +41,7 @@ final class HostController extends AbstractAdminController
         private readonly EventRepository $eventRepo,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly AdminHostListFilterService $hostFilterService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_host')]
@@ -67,7 +69,7 @@ final class HostController extends AbstractAdminController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            $this->addFlash('success', 'Host updated successfully');
+            $this->addFlash('success', $this->translator->trans('admin_host.flash_updated'));
 
             return $this->redirectToRoute('app_admin_host');
         }
@@ -93,7 +95,7 @@ final class HostController extends AbstractAdminController
         if (count($eventsUsingHost) > 0) {
             $this->addFlash(
                 'error',
-                'Cannot delete host. It is currently used in ' . count($eventsUsingHost) . ' event(s).',
+                $this->translator->trans('admin_host.flash_delete_blocked', ['%count%' => count($eventsUsingHost)]),
             );
 
             return $this->redirectToRoute('app_admin_host_edit', ['id' => $host->getId()]);
@@ -105,7 +107,7 @@ final class HostController extends AbstractAdminController
 
         $this->entityActionDispatcher->dispatch(EntityAction::DeleteHost, $hostId);
 
-        $this->addFlash('success', 'Host deleted successfully');
+        $this->addFlash('success', $this->translator->trans('admin_host.flash_deleted'));
 
         return $this->redirectToRoute('app_admin_host');
     }
@@ -123,7 +125,7 @@ final class HostController extends AbstractAdminController
 
             $this->entityActionDispatcher->dispatch(EntityAction::CreateHost, $host->getId());
 
-            $this->addFlash('success', 'Host created successfully');
+            $this->addFlash('success', $this->translator->trans('admin_host.flash_created'));
 
             return $this->redirectToRoute('app_admin_host');
         }
