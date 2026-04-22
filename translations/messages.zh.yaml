@@ -231,7 +231,16 @@ profile_config:
     blocked_view_all: '查看所有已屏蔽用户'
     flash_password_changed: '密码已修改，请重新登录以确认。'
     flash_password_old_invalid: '旧密码不正确。'
-profile_social: {}
+profile_social:
+    section_heading: '动态'
+    section_intro: '这是你的个人动态流。可以看到你自己的动态以及你关注的人的动态，例如报名、图片上传、评论等。'
+    list_friends_title: '互相关注'
+    list_following_title: '我关注的人'
+    list_followers_title: '关注我的人'
+    list_show_more: '显示更多'
+    button_unfollow: '取消关注'
+    button_follow_back: '回关'
+    find_more_hint: '在成员页面寻找更多可关注的人，或在下次聚会时询问他们的用户名。'
 profile_images: {}
 profile_messages: {}
 profile_notifications: {}
