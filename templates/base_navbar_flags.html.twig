@@ -1,7 +1,7 @@
 {% if app.request.attributes.get('_route_params') is not null and get_alternative_languages()  is not empty %}
     <div class="navbar-item dropdown is-hoverable pl-0">
         <div class="dropdown-trigger is-hoverable">
-            <button class="button" aria-haspopup="menu" aria-label="Select language">
+            <button class="button" aria-haspopup="menu" aria-label="{{ 'chrome.aria_select_language'|trans }}">
                 <span class="icon">
                     <img class="is-flag" src="{{ asset('images/flags/' ~ app.request.locale ~ '.svg') }}" width="32" height="24"
                          alt="Current locale flag: {{ app.request.locale }}"/>
