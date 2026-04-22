@@ -80,13 +80,9 @@ final class BlocklistController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_admin_email_blocklist_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function delete(EmailBlocklistEntry $entry, Request $request): Response
+    #[Route('/{id}/delete', name: 'app_admin_email_blocklist_delete', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function delete(EmailBlocklistEntry $entry): Response
     {
-        if (!$this->isCsrfTokenValid('blocklist_delete_' . $entry->getId(), (string) $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException();
-        }
-
         $removed = $entry->getEmail();
         $this->em->remove($entry);
         $this->em->flush();
