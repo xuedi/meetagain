@@ -36,6 +36,7 @@ class RoutesSmokeTest extends WebTestCase
         '_wdt',
         '_profiler',
         '_error',
+        'exception',
         'app_install',
         'delete',
         '_up',

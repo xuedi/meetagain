@@ -83,4 +83,15 @@ interface Plugin
      */
     public function getJavascripts(): array;
 
+    /**
+     * Returns this plugin's OpenAPI 3.1 fragment - the slice of paths, components, and tags
+     * the plugin contributes to the public spec at /api/openapi.json. Return `[]` if the
+     * plugin does not expose any API endpoints.
+     *
+     * Shape: ['paths' => [...], 'components' => ['schemas' => [...]], 'tags' => [...]]
+     *
+     * @return array<string, mixed>
+     */
+    public function getOpenApiFragment(): array;
+
 }
