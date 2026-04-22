@@ -231,7 +231,16 @@ profile_config:
     blocked_view_all: 'Alle blockierten Nutzer anzeigen'
     flash_password_changed: 'Passwort wurde geändert, bitte melde dich zur Bestätigung erneut an.'
     flash_password_old_invalid: 'Das alte Passwort ist nicht korrekt.'
-profile_social: {}
+profile_social:
+    section_heading: 'Aktivitäten'
+    section_intro: 'Dies ist dein persönlicher Aktivitätsstream. Du siehst deine eigenen Aktivitäten und die der Personen, denen du folgst. Z.B. Zusagen, Bild-Uploads, Kommentare usw.'
+    list_friends_title: 'Wir folgen uns gegenseitig'
+    list_following_title: 'Leute, denen ich folge'
+    list_followers_title: 'Leute, die mir folgen'
+    list_show_more: 'mehr anzeigen'
+    button_unfollow: 'Nicht mehr folgen'
+    button_follow_back: 'Zurück folgen'
+    find_more_hint: 'Finde mehr Leute zum Folgen auf der Mitgliederseite oder frage beim nächsten Treffen nach ihrem Nutzernamen.'
 profile_images: {}
 profile_messages: {}
 profile_notifications: {}

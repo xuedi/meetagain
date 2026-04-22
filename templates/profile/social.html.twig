@@ -9,10 +9,9 @@
 
             <div class="columns">
                 <div class="column is-7">
-                    <h2 class="title is-5">Activities</h2>
+                    <h2 class="title is-5">{{ 'profile_social.section_heading'|trans }}</h2>
                     <p>
-                        This is your personal activity stream. You can see your activities and the ones of the people
-                        you follow. Like Rsvp's, image uploads, comments, etc.
+                        {{ 'profile_social.section_intro'|trans }}
                     </p>
                     <div class="mt-5">
                         {% for activity in activities %}
@@ -29,8 +28,8 @@
                         include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': friends,
-                        'title': 'We follow each other',
-                            'buttonTitle': 'Unfollow',
+                            'title': 'profile_social.list_friends_title'|trans,
+                            'buttonTitle': 'profile_social.button_unfollow'|trans,
                             'buttonColor': 'is-danger'
                         }
                     %}
@@ -39,8 +38,8 @@
                         include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': following,
-                            'title': 'People i follow',
-                            'buttonTitle': 'Unfollow',
+                            'title': 'profile_social.list_following_title'|trans,
+                            'buttonTitle': 'profile_social.button_unfollow'|trans,
                             'buttonColor': 'is-danger'
                         }
                     %}
@@ -49,14 +48,14 @@
                         include 'profile/_partials/social_list.html.twig'
                         with {
                             'userlist': followers,
-                            'title': 'People who follow me',
-                            'buttonTitle': 'Follow back',
+                            'title': 'profile_social.list_followers_title'|trans,
+                            'buttonTitle': 'profile_social.button_follow_back'|trans,
                             'buttonColor': 'is-success'
                         }
                     %}
 
                     <p class="mt-4">
-                        Find more people to follow at the member page or ask for their username at the next meetup.
+                        {{ 'profile_social.find_more_hint'|trans }}
                     </p>
 
                 </div>
