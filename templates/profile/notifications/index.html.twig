@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Notifications{% endblock %}
+{% block title %}{{ 'profile_notifications.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="container mt-5">
     {% if notifications.totalCount == 0 %}
-        <p class="has-text-grey">No new notifications</p>
+        <p class="has-text-grey">{{ 'profile_notifications.empty_state'|trans }}</p>
     {% else %}
         <table class="table is-fullwidth">
             <thead>
                 <tr>
                     <th></th>
-                    <th>Notification</th>
+                    <th>{{ 'profile_notifications.table_header_notification'|trans }}</th>
                     <th></th>
                 </tr>
             </thead>
