@@ -9,12 +9,12 @@
         <div class="mb-4 is-flex is-gap-3">
             <a href="{{ path('app_admin_support_reports') }}" class="button is-small">
                 <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                <span>Back</span>
+                <span>{{ 'admin_support.button_back'|trans }}</span>
             </a>
             {% if report.image %}
                 <a href="{{ path('app_admin_system_images_show', {'id': report.image.id}) }}" class="button is-small">
                     <span class="icon"><i class="fa fa-eye"></i></span>
-                    <span>Image details</span>
+                    <span>{{ 'admin_support.button_image_details'|trans }}</span>
                 </a>
             {% endif %}
         </div>
@@ -24,42 +24,42 @@
                 {% if report.image %}
                     {% include '_components/image.html.twig' with {'image': report.image, 'size': '100x100'} %}
                 {% else %}
-                    <span class="has-text-grey">Image deleted</span>
+                    <span class="has-text-grey">{{ 'admin_support.image_deleted'|trans }}</span>
                 {% endif %}
             </div>
             <div class="column">
                 <table class="table is-fullwidth">
                     <tbody>
                         <tr>
-                            <th>ID</th>
+                            <th>{{ 'admin_support.label_id'|trans }}</th>
                             <td><code>{{ report.id }}</code></td>
                         </tr>
                         <tr>
-                            <th>Date</th>
+                            <th>{{ 'admin_support.col_date'|trans }}</th>
                             <td>{{ report.createdAt|date('Y-m-d H:i:s') }}</td>
                         </tr>
                         <tr>
-                            <th>Reporter</th>
+                            <th>{{ 'admin_support.col_reporter'|trans }}</th>
                             <td>
                                 {% if report.reporter %}
                                     <a href="{{ path('app_admin_member_edit', {'id': report.reporter.id}) }}">
                                         {{ report.reporter.name }} ({{ report.reporter.email }})
                                     </a>
                                 {% else %}
-                                    <span class="has-text-grey">deleted</span>
+                                    <span class="has-text-grey">{{ 'admin_support.label_deleted'|trans }}</span>
                                 {% endif %}
                             </td>
                         </tr>
                         <tr>
-                            <th>Reason</th>
+                            <th>{{ 'admin_support.col_reason'|trans }}</th>
                             <td><span class="tag is-warning">{{ report.reason.name }}</span></td>
                         </tr>
                         <tr>
-                            <th>Remarks</th>
+                            <th>{{ 'admin_support.col_remarks'|trans }}</th>
                             <td>{{ report.remarks|default('-') }}</td>
                         </tr>
                         <tr>
-                            <th>Location</th>
+                            <th>{{ 'admin_support.col_location'|trans }}</th>
                             <td>
                                 {% if location %}
                                     {% if location.route %}
@@ -71,17 +71,17 @@
                                         {{ location.label }}
                                     {% endif %}
                                 {% else %}
-                                    <span class="has-text-grey">Unknown (plugin image)</span>
+                                    <span class="has-text-grey">{{ 'admin_support.location_unknown'|trans }}</span>
                                 {% endif %}
                             </td>
                         </tr>
                         <tr>
-                            <th>Status</th>
+                            <th>{{ 'admin_support.col_status'|trans }}</th>
                             <td>
                                 {% if report.isOpen() %}
-                                    <span class="tag is-warning">Open</span>
+                                    <span class="tag is-warning">{{ 'admin_support.status_open'|trans }}</span>
                                 {% else %}
-                                    <span class="tag is-light">Resolved</span>
+                                    <span class="tag is-light">{{ 'admin_support.status_resolved'|trans }}</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -91,7 +91,7 @@
                             <td>
                                 <form method="post" action="{{ path('app_admin_support_report_resolve', {id: report.id}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('resolve_report_' ~ report.id) }}">
-                                    <button type="submit" class="button is-light">Mark resolved</button>
+                                    <button type="submit" class="button is-light">{{ 'admin_support.button_mark_resolved'|trans }}</button>
                                 </form>
                             </td>
                         </tr>

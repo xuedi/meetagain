@@ -6,59 +6,52 @@
 
     {% if summary is defined %}
         <div class="notification is-success">
-            <h2 class="title is-5">Import complete</h2>
+            <h2 class="title is-5">{{ 'admin_system.import_success_title'|trans }}</h2>
             <table class="table is-narrow">
                 <tbody>
                     <tr>
-                        <td>Users created</td>
+                        <td>{{ 'admin_system.import_users_created'|trans }}</td>
                         <td>{{ summary.usersCreated }}</td>
                     </tr>
                     <tr>
-                        <td>Users skipped (already exist)</td>
+                        <td>{{ 'admin_system.import_users_skipped'|trans }}</td>
                         <td>{{ summary.usersSkipped }}</td>
                     </tr>
                     <tr>
-                        <td>Locations created</td>
+                        <td>{{ 'admin_system.import_locations_created'|trans }}</td>
                         <td>{{ summary.locationsCreated }}</td>
                     </tr>
                     <tr>
-                        <td>Events created</td>
+                        <td>{{ 'admin_system.import_events_created'|trans }}</td>
                         <td>{{ summary.eventsCreated }}</td>
                     </tr>
                     <tr>
-                        <td>CMS pages created</td>
+                        <td>{{ 'admin_system.import_cms_created'|trans }}</td>
                         <td>{{ summary.cmsPagesCreated }}</td>
                     </tr>
                     <tr>
-                        <td>CMS pages skipped (slug already exists)</td>
+                        <td>{{ 'admin_system.import_cms_skipped'|trans }}</td>
                         <td>{{ summary.cmsPagesSkipped }}</td>
                     </tr>
                 </tbody>
             </table>
-            <p class="mt-3">
-                <strong>Note:</strong> Imported users have no password set and must use
-                <em>Forgot password</em> to activate their account.
-            </p>
+            <p class="mt-3">{{ 'admin_system.import_note'|trans }}</p>
         </div>
     {% endif %}
 
     {% if error is defined %}
         <div class="notification is-danger">
-            <strong>Import failed:</strong> {{ error }}
+            <strong>{{ 'admin_system.import_failed'|trans }}</strong> {{ error }}
         </div>
     {% endif %}
 
     <div class="box">
-        <h2 class="title is-5">Import Group Data</h2>
-        <p class="content">
-            Upload a meetagain.org export ZIP file to import group data into this instance.
-            Duplicate users (same email) and CMS pages (same slug) will be skipped.
-            Events are always imported.
-        </p>
+        <h2 class="title is-5">{{ 'admin_system.heading_import'|trans }}</h2>
+        <p class="content">{{ 'admin_system.help_import'|trans }}</p>
 
         <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
             <div class="field">
-                <label class="label">Export ZIP file</label>
+                <label class="label">{{ 'admin_system.label_zip_file'|trans }}</label>
                 <div class="control">
                     <input class="input" type="file" name="import_file" accept=".zip" required>
                 </div>
@@ -66,7 +59,7 @@
             <div class="field">
                 <button type="submit" class="button is-link">
                     <span class="icon"><i class="fas fa-file-import"></i></span>
-                    <span>Import</span>
+                    <span>{{ 'admin_system.button_import'|trans }}</span>
                 </button>
             </div>
         </form>

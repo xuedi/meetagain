@@ -4,12 +4,8 @@
     {% include 'admin/system/_tabs_navigation.html.twig' %}
 
     <div class="box">
-        <h2 class="title is-5">Permission Overview</h2>
-        <p class="content is-size-7 mb-5">
-            All routes decorated with <code>#[IsGranted]</code>, grouped by the minimum role required.
-            Method-level permissions (⬤) take precedence over class-level ones.
-            Routes with no <code>#[IsGranted]</code> are publicly accessible and grouped under <strong>Anonymous</strong>.
-        </p>
+        <h2 class="title is-5">{{ 'admin_system.heading_permissions'|trans }}</h2>
+        <p class="content is-size-7 mb-5">{{ 'admin_system.help_permissions'|trans }}</p>
 
         {% for roleId in roleOrder %}
             {% if groups[roleId] is defined %}
@@ -22,9 +18,9 @@
 
                     <span class="has-text-grey is-size-7 ml-3 mr-auto flex-shrink-0">
                         {% if roleId == 'Anonymous' %}
-                            no authentication required
+                            {{ 'admin_system.anon_no_auth'|trans }}
                         {% else %}
-                            minimum required role
+                            {{ 'admin_system.anon_min_role'|trans }}
                         {% endif %}
                     </span>
 
@@ -49,7 +45,7 @@
                                 <th class="is-size-7">Methods</th>
                                 <th class="is-size-7">Controller</th>
                                 <th class="is-size-7">Action</th>
-                                <th class="is-size-7">Permissions</th>
+                                <th class="is-size-7">{{ 'admin_system.tab_permissions'|trans }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,7 +54,7 @@
                                     <td class="is-size-7 is-family-monospace">{{ entry.routeName }}</td>
                                     <td>
                                         {% if entry.httpMethods is empty %}
-                                            <span class="tag is-light is-size-7">ANY</span>
+                                            <span class="tag is-light is-size-7">{{ 'admin_system.perm_any'|trans }}</span>
                                         {% else %}
                                             {% for method in entry.httpMethods %}
                                                 <span class="tag is-light is-size-7">{{ method }}</span>
@@ -69,13 +65,13 @@
                                     <td class="is-size-7">{{ entry.methodName }}</td>
                                     <td>
                                         {% for perm in entry.classPermissions %}
-                                            <span class="tag is-light is-size-7" title="class-level">{{ perm }}</span>
+                                            <span class="tag is-light is-size-7" title="{{ 'admin_system.perm_class_level'|trans }}">{{ perm }}</span>
                                         {% endfor %}
                                         {% for perm in entry.methodPermissions %}
-                                            <span class="tag is-light is-size-7" title="method-level">{{ perm }} ⬤</span>
+                                            <span class="tag is-light is-size-7" title="{{ 'admin_system.perm_method_level'|trans }}">{{ perm }} ⬤</span>
                                         {% endfor %}
                                         {% if entry.classPermissions is empty and entry.methodPermissions is empty %}
-                                            <span class="tag is-light is-size-7">public</span>
+                                            <span class="tag is-light is-size-7">{{ 'admin_system.perm_public'|trans }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>

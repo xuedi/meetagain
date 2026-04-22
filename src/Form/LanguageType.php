@@ -22,7 +22,7 @@ class LanguageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('code', TextType::class, [
-            'label' => 'Language Code',
+            'label' => 'admin_system.col_code',
             'constraints' => [
                 new NotBlank(),
                 new Length(exactly: 2),
@@ -34,20 +34,20 @@ class LanguageType extends AbstractType
             'disabled' => $options['is_edit'],
             'attr' => ['maxlength' => 2],
         ])->add('name', TextType::class, [
-            'label' => 'Language Name',
+            'label' => 'admin_system.col_name',
             'constraints' => [
                 new NotBlank(),
                 new Length(max: 64),
             ],
         ])->add('enabled', CheckboxType::class, [
-            'label' => 'Enabled',
+            'label' => 'admin_system.status_enabled',
             'required' => false,
         ])->add('sortOrder', IntegerType::class, [
-            'label' => 'Sort Order',
+            'label' => 'admin_system.col_sort_order',
         ])->add('tileImage', FileType::class, [
             'mapped' => false,
             'required' => false,
-            'label' => 'Tile Image (for frontpage)',
+            'label' => 'admin_system.heading_tile_image',
             'constraints' => [
                 new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'Please upload a valid image'),
             ],

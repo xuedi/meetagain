@@ -9,12 +9,12 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ 'Flag'|trans }}</th>
-                <th>{{ 'Code'|trans }}</th>
-                <th>{{ 'Name'|trans }}</th>
-                <th>{{ 'Has Tile'|trans }}</th>
-                <th>{{ 'Status'|trans }}</th>
-                <th>{{ 'Sort Order'|trans }}</th>
+                <th>{{ 'admin_system.col_flag'|trans }}</th>
+                <th>{{ 'admin_system.col_code'|trans }}</th>
+                <th>{{ 'admin_system.col_name'|trans }}</th>
+                <th>{{ 'admin_system.col_has_tile'|trans }}</th>
+                <th>{{ 'admin_system.col_status'|trans }}</th>
+                <th>{{ 'admin_system.col_sort_order'|trans }}</th>
                 <th>
                     <a href="{{ path('app_admin_language_add') }}">
                         <span class="icon"><i class="fa fa-add"></i></span>
@@ -39,11 +39,11 @@
                     </td>
                     <td>
                         <a href="{{ path('app_admin_language_toggle', {'id': language.id}) }}"
-                           title="{{ language.enabled ? 'Disable'|trans : 'Enable'|trans }}">
+                           title="{{ language.enabled ? 'admin_system.button_disable'|trans : 'admin_system.button_enable'|trans }}">
                             {% if language.enabled %}
-                                <span class="tag is-success">{{ 'Enabled'|trans }}</span>
+                                <span class="tag is-success">{{ 'admin_system.status_enabled'|trans }}</span>
                             {% else %}
-                                <span class="tag">{{ 'Disabled'|trans }}</span>
+                                <span class="tag">{{ 'admin_system.status_disabled'|trans }}</span>
                             {% endif %}
                         </a>
                     </td>

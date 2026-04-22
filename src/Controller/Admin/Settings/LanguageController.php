@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/language')]
 final class LanguageController extends AbstractAdminController
@@ -33,6 +34,7 @@ final class LanguageController extends AbstractAdminController
         private readonly LanguageService $languageService,
         private readonly ImageService $imageService,
         private readonly ImageLocationService $imageLocationService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_language')]
@@ -64,7 +66,7 @@ final class LanguageController extends AbstractAdminController
 
             $this->languageService->invalidateCache();
 
-            $this->addFlash('success', 'Language added successfully');
+            $this->addFlash('success', $this->translator->trans('admin_system.flash_language_added'));
 
             return $this->redirectToRoute('app_admin_language');
         }
@@ -99,7 +101,7 @@ final class LanguageController extends AbstractAdminController
 
             $this->languageService->invalidateCache();
 
-            $this->addFlash('success', 'Language updated successfully');
+            $this->addFlash('success', $this->translator->trans('admin_system.flash_language_updated'));
 
             return $this->redirectToRoute('app_admin_language');
         }
