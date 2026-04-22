@@ -39,7 +39,7 @@ final class SupportController extends AbstractController
             return $this->render(
                 'rate_limited.html.twig',
                 [
-                    'message' => 'Too many support requests. Please try again later.',
+                    'message' => 'support.rate_limited_message',
                 ],
                 new Response('', 429),
             );
@@ -82,7 +82,7 @@ final class SupportController extends AbstractController
 
                 $this->supportNotificationEmail->send(['request' => $supportRequest]);
 
-                $this->addFlash('success', 'Your message has been sent. We will get back to you shortly.');
+                $this->addFlash('success', 'support.flash_message_sent');
 
                 return $this->redirectToRoute('app_contact');
             }

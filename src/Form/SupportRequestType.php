@@ -27,26 +27,26 @@ class SupportRequestType extends AbstractType
 
         $builder->add('contactType', ChoiceType::class, [
             'choices' => $choices,
-            'label' => 'Contact type',
+            'label' => 'support.form_label_contact_type',
             'constraints' => [new NotBlank()],
         ])->add('name', TextType::class, [
             'constraints' => [
-                new NotBlank(message: 'Please enter your name.'),
-                new Length(max: 100, maxMessage: 'Name cannot be longer than {{ limit }} characters.'),
+                new NotBlank(message: 'support.validator_name_blank'),
+                new Length(max: 100, maxMessage: 'support.validator_name_max'),
             ],
         ])->add('email', EmailType::class, [
             'constraints' => [
-                new NotBlank(message: 'Please enter your email address.'),
-                new Email(message: 'Please enter a valid email address.'),
+                new NotBlank(message: 'support.validator_email_blank'),
+                new Email(message: 'support.validator_email_format'),
             ],
         ])->add('message', TextareaType::class, [
             'constraints' => [
-                new NotBlank(message: 'Please enter a message.'),
-                new Length(max: 2000, maxMessage: 'Message cannot be longer than {{ limit }} characters.'),
+                new NotBlank(message: 'support.validator_message_blank'),
+                new Length(max: 2000, maxMessage: 'support.validator_message_max'),
             ],
         ])->add('captcha', TextType::class, [
             'mapped' => false,
-            'label' => 'Enter captcha code',
+            'label' => 'support.form_label_captcha_input',
             'required' => false,
         ]);
     }

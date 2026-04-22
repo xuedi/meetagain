@@ -14,12 +14,12 @@ enum ContactType: string
     public function label(): string
     {
         return match ($this) {
-            self::General => 'General inquiry',
-            self::Bug     => 'Report a bug',
-            self::Feature => 'Feature request',
-            self::Legal   => 'Legal message',
-            self::Billing => 'Billing question',
-            self::Other   => 'Other',
+            self::General => 'support.contact_type_general',
+            self::Bug     => 'support.contact_type_bug',
+            self::Feature => 'support.contact_type_feature',
+            self::Legal   => 'support.contact_type_legal',
+            self::Billing => 'support.contact_type_billing',
+            self::Other   => 'support.contact_type_other',
         };
     }
 }

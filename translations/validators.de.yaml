@@ -191,3 +191,11 @@ Error: Fehler
 'security.validator_password_blank': 'Bitte gib ein Passwort ein.'
 'security.validator_password_min': 'Dein Passwort sollte mindestens {{ limit }} Zeichen lang sein.'
 'security.validator_agree_terms': 'Du musst unseren Bedingungen zustimmen.'
+
+# Support namespace - phase 18 (page-scoped validator messages)
+'support.validator_name_blank': 'Bitte gib deinen Namen ein.'
+'support.validator_name_max': 'Der Name darf nicht länger als {{ limit }} Zeichen sein.'
+'support.validator_email_blank': 'Bitte gib deine E-Mail-Adresse ein.'
+'support.validator_email_format': 'Bitte gib eine gültige E-Mail-Adresse ein.'
+'support.validator_message_blank': 'Bitte gib eine Nachricht ein.'
+'support.validator_message_max': 'Die Nachricht darf nicht länger als {{ limit }} Zeichen sein.'
