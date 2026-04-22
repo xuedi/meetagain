@@ -248,8 +248,18 @@ profile_images:
     sidebar_profile_picture: 'Profilbild'
     profile_change_hint: 'Du kannst dein Profilbild ändern, indem du %profile_link% ein neues Bild hochlädst.'
     profile_change_link_label: 'hier'
-profile_messages: {}
-profile_notifications: {}
+profile_messages:
+    section_heading: 'Nachrichten'
+    welcome_heading: 'Hallo,'
+    welcome_intro: 'Dies ist deine Nachrichtenübersicht. Links siehst du Personen, mit denen du Nachrichten ausgetauscht hast.'
+    welcome_rule: 'Du kannst nur Personen Nachrichten senden, mit denen du befreundet bist, oder die Nachrichten von allen zulassen.'
+    welcome_addressbook_hint: 'Schau auf der Mitgliederseite vorbei; in der Detailansicht jedes Mitglieds findest du einen Nachrichten-Button.'
+    cannot_message: 'Du kannst diesen Nutzer nicht anschreiben.'
+    input_placeholder: 'Nachricht'
+profile_notifications:
+    page_title: 'Benachrichtigungen'
+    empty_state: 'Keine neuen Benachrichtigungen'
+    table_header_notification: 'Benachrichtigung'
 profile_review: {}
 profile_image:
     reported_notice_intro: 'Dieses Bild wurde aus folgendem Grund gemeldet:'
