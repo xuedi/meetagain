@@ -10,9 +10,9 @@
         <div class="control">
             {% if isPast %}
                 {% if event.rsvp.contains(user) %}
-                    <span class="tag is-small is-success is-light">{{ "toggle_yes"|trans }}</span>
+                    <span class="tag is-small is-success is-light">{{ "shared.toggle_yes"|trans }}</span>
                 {% else %}
-                    <span class="tag is-small is-danger is-light">{{ "toggle_no"|trans }}</span>
+                    <span class="tag is-small is-danger is-light">{{ "shared.toggle_no"|trans }}</span>
                 {% endif %}
             {% else %}
                 {% include '_components/toggle.html.twig' with {

@@ -1,17 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Public Data API{% endblock %}
+{% block title %}{{ 'shared.api_page_title'|trans }}{% endblock %}
 {% block meta_description %}REST API documentation for meetAgain. Access events, CMS pages, translations and more via authenticated endpoints.{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
-            <h1 class="title is-3">API Documentation</h1>
+            <h1 class="title is-3">{{ 'shared.api_page_heading'|trans }}</h1>
             <p class="mb-5">
-                All available endpoints. Some endpoints require a token obtained via the auth endpoint. If you can't automate
-                some of your workflows via API, feel free to request more end points. They will be then implemented if they
-                make sense for the greater good.
+                {{ 'shared.api_page_intro'|trans }}
             </p>
 
             <div class="columns">

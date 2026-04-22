@@ -23,7 +23,7 @@
 <article class="message is-{{ type|default('danger') }} is-hidden" id="{{ id }}">
     <div class="message-header">
         <p>{{ title }}</p>
-        <button class="delete toggleTrigger" data-id="{{ id }}" aria-label="delete"></button>
+        <button class="delete toggleTrigger" data-id="{{ id }}" aria-label="{{ 'shared.image_upload_aria_delete'|trans }}"></button>
     </div>
     <div class="message-body has-text-black has-background-white">
         {{ content|raw }}
