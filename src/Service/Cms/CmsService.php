@@ -8,6 +8,7 @@ use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 readonly class CmsService
@@ -20,6 +21,7 @@ readonly class CmsService
         private CmsFilterService $cmsFilterService,
         private CmsPageCacheService $cmsPageCacheService,
         private Security $security,
+        private TranslatorInterface $translator,
     ) {}
 
     public function getSites(): array
@@ -41,7 +43,7 @@ readonly class CmsService
         $blocks = $cms->getLanguageFilteredBlockJsonList($locale);
         if ($blocks->count() === 0) {
             return new Response($this->twig->render('cms/204.html.twig', [
-                'message' => 'page was found but is has no content in this language',
+                'message' => 'cms.error_204_default_message',
             ]), Response::HTTP_NO_CONTENT);
         }
 
@@ -66,7 +68,7 @@ readonly class CmsService
         }
 
         $content = $this->twig->render('cms/index.html.twig', [
-            'title' => $cms->getPageTitle($locale) ?? 'No Title set',
+            'title' => $cms->getPageTitle($locale) ?? $this->translator->trans('cms.page_no_title_fallback'),
             'blocks' => $blocks,
             'events' => $this->eventRepo->getUpcomingEvents(3, $eventIds),
         ]);
@@ -84,7 +86,7 @@ readonly class CmsService
     public function createNotFoundPage(): Response
     {
         return new Response($this->twig->render('cms/404.html.twig', [
-            'message' => "These aren't the droids you're looking for!",
+            'message' => 'cms.error_404_default_message',
         ]), Response::HTTP_NOT_FOUND);
     }
 }

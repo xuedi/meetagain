@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'page_title_error'|trans }}{% endblock %}
+{% block title %}{{ 'cms.page_title_error'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -13,15 +13,15 @@
                     <h1 class="title is-5">
                         <span class="icon-text">
                             <span class="icon has-text-danger"><i class="fas fa-triangle-exclamation"></i></span>
-                            <span>{{ 'error.500.headline'|trans }}</span>
+                            <span>{{ 'cms.error_500_headline'|trans }}</span>
                         </span>
                     </h1>
 
-                    <p class="mb-5">{{ 'error.500.intro'|trans }}</p>
+                    <p class="mb-5">{{ 'cms.error_500_intro'|trans }}</p>
 
                     <div class="box">
                         <div class="field">
-                            <label class="label is-small has-text-grey">{{ 'error.500.id_label'|trans }}</label>
+                            <label class="label is-small has-text-grey">{{ 'cms.error_500_id_label'|trans }}</label>
                             <div class="field has-addons">
                                 <div class="control is-expanded">
                                     <input id="error-id-input"
@@ -34,19 +34,19 @@
                                     <button id="error-id-copy"
                                             type="button"
                                             class="button is-light"
-                                            data-copy-label="{{ 'error.500.copy'|trans }}"
-                                            data-copied-label="{{ 'error.500.copy_done'|trans }}"
-                                            aria-label="{{ 'error.500.copy'|trans }}">
+                                            data-copy-label="{{ 'cms.error_500_copy'|trans }}"
+                                            data-copied-label="{{ 'cms.error_500_copy_done'|trans }}"
+                                            aria-label="{{ 'cms.error_500_copy'|trans }}">
                                         <span class="icon"><i class="fas fa-copy"></i></span>
-                                        <span class="js-label is-hidden-mobile">{{ 'error.500.copy'|trans }}</span>
+                                        <span class="js-label is-hidden-mobile">{{ 'cms.error_500_copy'|trans }}</span>
                                     </button>
                                 </div>
                             </div>
-                            <p class="help">{{ 'error.500.id_help'|trans }}</p>
+                            <p class="help">{{ 'cms.error_500_id_help'|trans }}</p>
                         </div>
 
                         <div class="field">
-                            <label class="label is-small has-text-grey">{{ 'error.500.time_label'|trans }}</label>
+                            <label class="label is-small has-text-grey">{{ 'cms.error_500_time_label'|trans }}</label>
                             <p class="is-family-monospace">{{ occurredAt|date('Y-m-d H:i') }} UTC</p>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                         <div class="control">
                             <a href="{{ path('app_default') }}" class="button is-light">
                                 <span class="icon"><i class="fas fa-house"></i></span>
-                                <span>{{ 'error.500.back_home'|trans }}</span>
+                                <span>{{ 'cms.error_500_back_home'|trans }}</span>
                             </a>
                         </div>
                     </div>
@@ -64,15 +64,15 @@
 
                 <div class="column is-5-tablet is-4-desktop">
                     {% include '_components/info_sidebar.html.twig' with {
-                        title: 'error.500.sidebar.title'|trans,
-                        intro: 'error.500.sidebar.intro'|trans,
+                        title: 'cms.error_500_sidebar_title'|trans,
+                        intro: 'cms.error_500_sidebar_intro'|trans,
                         bullets: [
-                            'error.500.sidebar.bullet1'|trans,
-                            'error.500.sidebar.bullet2'|trans,
-                            'error.500.sidebar.bullet3'|trans,
+                            'cms.error_500_sidebar_bullet1'|trans,
+                            'cms.error_500_sidebar_bullet2'|trans,
+                            'cms.error_500_sidebar_bullet3'|trans,
                         ],
                         link_url: path('app_default'),
-                        link_text: 'error.500.sidebar.link'|trans,
+                        link_text: 'cms.error_500_sidebar_link'|trans,
                         link_icon: 'arrow-left',
                     } only %}
                 </div>
