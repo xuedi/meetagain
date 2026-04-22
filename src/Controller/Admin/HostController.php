@@ -22,10 +22,10 @@ final class HostController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'Content',
+            section: 'admin_shell.section_content',
             links: [
                 new AdminLink(
-                    label: 'Hosts',
+                    label: 'admin_shell.menu_host',
                     route: 'app_admin_host',
                     active: 'host',
                     role: 'ROLE_ORGANIZER',

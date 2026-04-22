@@ -11,10 +11,10 @@ final class LinkController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'System',
+            section: 'admin_shell.section_system',
             links: [
                 new AdminLink(
-                    label: 'menu_admin_email',
+                    label: 'admin_shell.menu_email',
                     route: 'app_admin_email_templates',
                     active: 'email',
                     role: 'ROLE_ADMIN',

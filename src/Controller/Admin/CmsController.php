@@ -38,9 +38,9 @@ final class CmsController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'Content',
+            section: 'admin_shell.section_content',
             links: [
-                new AdminLink(label: 'CMS', route: 'app_admin_cms', active: 'cms', role: 'ROLE_ORGANIZER'),
+                new AdminLink(label: 'admin_shell.menu_cms', route: 'app_admin_cms', active: 'cms', role: 'ROLE_ORGANIZER'),
             ],
             sectionPriority: 50,
         );

@@ -32,6 +32,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/events')]
 final class EventController extends AbstractAdminController
@@ -39,10 +40,10 @@ final class EventController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'Content',
+            section: 'admin_shell.section_content',
             links: [
                 new AdminLink(
-                    label: 'menu_admin_event',
+                    label: 'admin_shell.menu_event',
                     route: 'app_admin_event',
                     active: 'event',
                     role: 'ROLE_ORGANIZER',
@@ -63,6 +64,7 @@ final class EventController extends AbstractAdminController
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ActivityService $activityService,
         private readonly ImageLocationService $imageLocationService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_event')]
@@ -162,13 +164,12 @@ final class EventController extends AbstractAdminController
                 $this->imageLocationService->addLocation($image->getId(), ImageType::EventTeaser, $event->getId());
             }
 
-            $followUp = '';
             if ($form->get('allFollowing')->getData() === true) {
                 $cnt = $this->eventService->updateRecurringEvents($event);
-                $followUp = " & updated {$cnt} follow-up events.";
+                $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_followup', ['%count%' => $cnt]));
+            } else {
+                $this->addFlash('success', $this->translator->trans('admin_event.flash_saved'));
             }
-
-            $this->addFlash('success', 'Event saved' . $followUp);
 
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
         }
@@ -183,7 +184,7 @@ final class EventController extends AbstractAdminController
     #[Route('/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
     public function delete(Event $event): Response
     {
-        $this->addFlash('error', 'Event deletion is not yet implemented.');
+        $this->addFlash('error', $this->translator->trans('admin_event.flash_delete_not_implemented'));
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
@@ -196,7 +197,7 @@ final class EventController extends AbstractAdminController
         $this->eventService->cancelEvent($event);
         $this->activityService->log(AdminEventCancelled::TYPE, $user, ['event_id' => $event->getId()]);
         if ($rsvpCount > 0) {
-            $this->addFlash('success', "Event canceled. {$rsvpCount} user(s) have been notified.");
+            $this->addFlash('success', $this->translator->trans('admin_event.flash_canceled', ['%count%' => $rsvpCount]));
         }
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);

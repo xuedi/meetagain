@@ -21,7 +21,7 @@ enum MenuLocation: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('menu_location_' . strtolower($case->name));
+            $choices[$case->value] = $translator->trans('admin_cms.menu_location_' . strtolower($case->name));
         }
 
         return $choices;

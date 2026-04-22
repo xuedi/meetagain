@@ -6,37 +6,37 @@
         <article class="message is-success is-hidden" id="cms-add">
             {{ form_start(form) }}
             <div class="message-header">
-                <p>Add new cms page</p>
+                <p>{{ 'admin_cms.add_page_header' | trans }}</p>
                 <button class="delete toggleTrigger" data-id="cms-add" aria-label="delete"></button>
             </div>
             <div class="message-body">
                 <p>
-                    Please enter the URL slug for the new page. You can add content blocks in the next step.
+                    {{ 'admin_cms.add_page_intro' | trans }}
                 </p>
                 <p>
                     {{ form_row(form.slug) }}
                 </p>
                 <div class="has-text-right">
-                    <button class="button">{{ "button_add" | trans }}</button>
+                    <button class="button">{{ 'button_add' | trans }}</button>
                 </div>
             </div>
             {{ form_end(form, {'render_rest': false}) }}
         </article>
 
         {% if cms|length == 0 %}
-            <p class="has-text-grey-light">No pages created yet. Click the + icon to create your first page!</p>
+            <p class="has-text-grey-light">{{ 'admin_cms.empty_state' | trans }}</p>
         {% endif %}
 
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>Slug</th>
-                <th>CreatedBy</th>
-                <th>CreatedAt</th>
-                <th>Status</th>
+                <th>{{ 'admin_cms.col_slug' | trans }}</th>
+                <th>{{ 'admin_cms.col_created_by' | trans }}</th>
+                <th>{{ 'admin_cms.col_created_at' | trans }}</th>
+                <th>{{ 'admin_cms.col_status' | trans }}</th>
                 <th></th>
-                <th>Blocks</th>
-                <th>Translations</th>
+                <th>{{ 'admin_cms.col_blocks' | trans }}</th>
+                <th>{{ 'admin_cms.col_translations' | trans }}</th>
                 <th><a class="toggleTrigger" data-id="cms-add" href="#"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
             </tr>
             </thead>
@@ -48,25 +48,25 @@
                     <td>{{ page.createdAt|date('Y-m-d') }}</td>
                     <td>
                         {% if page.published %}
-                            <span class="has-text-success">{{ 'published' | trans }}</span>
+                            <span class="has-text-success">{{ 'admin_cms.published' | trans }}</span>
                         {% else %}
-                            <span class="has-text-grey-light">{{ 'draft' | trans }}</span>
+                            <span class="has-text-grey-light">{{ 'admin_cms.draft' | trans }}</span>
                         {% endif %}
                     </td>
                     <td>
                         <span class="icon-text">
                             {% if page.slug == 'index' %}
-                                <span class="icon has-text-grey-light" title="{{ 'Home page' | trans }}">
+                                <span class="icon has-text-grey-light" title="{{ 'admin_cms.icon_title_home_page' | trans }}">
                                     <i class="fa fa-home"></i>
                                 </span>
                             {% endif %}
                             {% if page.locked %}
-                                <span class="icon has-text-grey-light" title="{{ 'Locked (visible on all groups)' | trans }}">
+                                <span class="icon has-text-grey-light" title="{{ 'admin_cms.status_locked' | trans }}">
                                     <i class="fa fa-lock"></i>
                                 </span>
                             {% endif %}
                             {% if page.id in cms_with_announcements %}
-                                <span class="icon has-text-grey-light" title="{{ 'Has linked announcement' | trans }}">
+                                <span class="icon has-text-grey-light" title="{{ 'admin_cms.icon_title_has_announcement' | trans }}">
                                     <i class="fa fa-bullhorn"></i>
                                 </span>
                             {% endif %}
@@ -87,15 +87,15 @@
         <div class="mt-4 has-text-centered">
             <span class="icon-text">
                 <span class="icon has-text-grey-light"><i class="fas fa-home"></i></span>
-                <span class="has-text-grey-light">Home page</span>
+                <span class="has-text-grey-light">{{ 'admin_cms.icon_title_home_page' | trans }}</span>
             </span>
             <span class="icon-text ml-4">
                 <span class="icon has-text-grey-light"><i class="fas fa-lock"></i></span>
-                <span class="has-text-grey-light">Locked (visible on all groups)</span>
+                <span class="has-text-grey-light">{{ 'admin_cms.status_locked' | trans }}</span>
             </span>
             <span class="icon-text ml-4">
                 <span class="icon has-text-grey-light"><i class="fas fa-bullhorn"></i></span>
-                <span class="has-text-grey-light">Has linked announcement</span>
+                <span class="has-text-grey-light">{{ 'admin_cms.icon_title_has_announcement' | trans }}</span>
             </span>
         </div>
 

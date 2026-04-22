@@ -2,7 +2,7 @@
     <a class="toggleTrigger" data-id="new-block-{{ newBlock.name }}" href="#">
         <button class="button">
             <span class="icon"><i class="fa fa-plus"></i></span>
-            <span>{{ ("block_" ~ newBlock.name) | lower | trans }}</span>
+            <span>{{ ("admin_cms.block_" ~ newBlock.name) | lower | trans }}</span>
         </button>
     </a>
 {% endfor %}
@@ -17,7 +17,7 @@
         <input type="hidden" name="editLocale" value="{{ editLocale }}"/>
         <input type="hidden" name="blockType" value="{{ newBlock.value }}"/>
         <div class="message-header">
-            <p>Add new {{ ("block_" ~ newBlock.name) | lower | trans }} block</p>
+            <p>{{ 'admin_cms.add_new_block' | trans({'%type%': ("admin_cms.block_" ~ newBlock.name) | lower | trans}) }}</p>
             <button class="delete toggleTrigger" data-id="new-block-{{ newBlock.name }}" aria-label="delete"></button>
         </div>
         <div class="message-body">
@@ -25,10 +25,9 @@
                 {% include 'cms/blocks/_edit/' ~ newBlock.name ~ '.html.twig' %}
             </p>
             <div class="has-text-right">
-                <button class="button">{{ "button_add" | trans }}</button>
+                <button class="button">{{ 'button_add' | trans }}</button>
             </div>
         </div>
         </form>
     </article>
 {% endfor %}
-
