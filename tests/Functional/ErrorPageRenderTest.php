@@ -18,7 +18,7 @@ use Twig\Environment;
  */
 class ErrorPageRenderTest extends KernelTestCase
 {
-    public function test500PageRendersWithErrorIdAndReportLink(): void
+    public function test500PageRendersErrorIdAndBackHomeLink(): void
     {
         // Arrange
         self::bootKernel();
@@ -41,12 +41,8 @@ class ErrorPageRenderTest extends KernelTestCase
         static::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
         static::assertStringContainsString('Something went wrong', $html);
         static::assertStringContainsString('Error reference', $html);
-        static::assertStringContainsString('Report this error', $html);
         static::assertStringContainsString('Back to home', $html);
-        // Contact link prefilled with the error id (URL-encoded "Error reference: <id>")
-        static::assertMatchesRegularExpression(
-            '#href="/[a-z]{2}/contact\?[^"]*contactType=bug[^"]*message=Error%20reference:%20[0-9a-f]{32}#',
-            $html,
-        );
+        // The 32-char hex error id appears in the readonly input.
+        static::assertMatchesRegularExpression('#value="[0-9a-f]{32}"#', $html);
     }
 }
