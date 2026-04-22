@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\SupportRequest;
 use App\Entity\User;
-use App\Enum\ContactType;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
 use App\Emails\Types\SupportNotificationEmail;
@@ -48,16 +47,6 @@ final class SupportController extends AbstractController
 
         $user = $this->getUser();
         $defaultData = $user instanceof User ? ['name' => $user->getName(), 'email' => $user->getEmail()] : [];
-
-        $prefillMessage = $request->query->get('message');
-        if (is_string($prefillMessage) && $prefillMessage !== '') {
-            $defaultData['message'] = $prefillMessage;
-        }
-
-        $prefillContactType = ContactType::tryFrom((string) $request->query->get('contactType', ''));
-        if ($prefillContactType !== null) {
-            $defaultData['contactType'] = $prefillContactType;
-        }
 
         $form = $this->createForm(SupportRequestType::class, $defaultData);
         $form->handleRequest($request);

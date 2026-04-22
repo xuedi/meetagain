@@ -4,15 +4,6 @@
 
 {% block body %}
 
-    {% set prefilledMessage = 'error.500.message_template'|trans({
-        '%errorId%': errorId,
-        '%time%': occurredAt|date('Y-m-d H:i'),
-    }) %}
-    {% set reportUrl = path('app_contact', {
-        contactType: 'bug',
-        message: prefilledMessage,
-    }) %}
-
     <section class="section">
         <div class="container">
 
@@ -61,12 +52,6 @@
                     </div>
 
                     <div class="field is-grouped mt-5">
-                        <div class="control">
-                            <a href="{{ reportUrl }}" class="button is-primary">
-                                <span class="icon"><i class="fas fa-paper-plane"></i></span>
-                                <span>{{ 'error.500.report'|trans }}</span>
-                            </a>
-                        </div>
                         <div class="control">
                             <a href="{{ path('app_default') }}" class="button is-light">
                                 <span class="icon"><i class="fas fa-house"></i></span>

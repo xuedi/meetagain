@@ -29,7 +29,3 @@ robots:
 sitemap:
     type: attribute
     resource: ../src/Controller/NonLocale/SitemapController.php
-
-exception_test:
-    type: attribute
-    resource: ../src/Controller/NonLocale/ErrorTestController.php
