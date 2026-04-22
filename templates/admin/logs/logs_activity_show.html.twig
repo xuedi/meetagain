@@ -29,7 +29,7 @@
                     <div class="level-item">
                         <a href="{{ path('app_admin_activity_log') }}" class="button is-small">
                             <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
-                            <span>Back</span>
+                            <span>{{ 'admin_logs.back'|trans }}</span>
                         </a>
                     </div>
                 </div>
@@ -39,11 +39,11 @@
         <table class="table is-fullwidth">
             <tbody>
                 <tr>
-                    <th>ID</th>
+                    <th>{{ 'admin_logs.col_id'|trans }}</th>
                     <td><code>{{ activity.id }}</code></td>
                 </tr>
                 <tr>
-                    <th>User</th>
+                    <th>{{ 'admin_logs.col_user'|trans }}</th>
                     <td>
                         {% if activity.user %}
                             <a href="{{ path('app_admin_member_edit', {'id': activity.user.id}) }}">
@@ -55,19 +55,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Date</th>
+                    <th>{{ 'admin_logs.col_date'|trans }}</th>
                     <td>{{ activity.createdAt|date('Y-m-d H:i:s') }}</td>
                 </tr>
                 <tr>
-                    <th>Type</th>
+                    <th>{{ 'admin_logs.col_type'|trans }}</th>
                     <td><span class="tag is-light">{{ activity.type }}</span></td>
                 </tr>
                 <tr>
-                    <th>Message</th>
+                    <th>{{ 'admin_logs.col_message'|trans }}</th>
                     <td>{{ activity.message|raw }}</td>
                 </tr>
                 <tr>
-                    <th>Meta</th>
+                    <th>{{ 'admin_logs.col_meta'|trans }}</th>
                     <td>
                         {% if activity.meta is not empty %}
                             <table class="table is-narrow is-bordered">
@@ -86,7 +86,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Related</th>
+                    <th>{{ 'admin_logs.col_related'|trans }}</th>
                     <td>
                         {% set meta = activity.meta %}
                         {% set typeName = activity.type %}
@@ -95,7 +95,7 @@
                             {% if meta.event_id is defined %}
                                 {% if typeName == 'core.admin_event_deleted' %}
                                     {{ meta.event_name|default('Event') }}
-                                    <span class="tag is-danger is-light ml-1">deleted</span>
+                                    <span class="tag is-danger is-light ml-1">{{ 'admin_logs.tag_deleted'|trans }}</span>
                                 {% else %}
                                     <a href="{{ path('app_admin_event_edit', {'id': meta.event_id}) }}" class="button is-small">
                                         <span class="icon"><i class="fa fa-calendar"></i></span>
@@ -108,7 +108,7 @@
                             {% if meta.cms_id is defined %}
                                 {% if typeName == 'core.admin_cms_page_deleted' %}
                                     {{ meta.cms_slug|default('Page') }}
-                                    <span class="tag is-danger is-light ml-1">deleted</span>
+                                    <span class="tag is-danger is-light ml-1">{{ 'admin_logs.tag_deleted'|trans }}</span>
                                 {% else %}
                                     <a href="{{ path('app_admin_cms_edit', {'id': meta.cms_id}) }}" class="button is-small">
                                         <span class="icon"><i class="fa fa-file-text"></i></span>
