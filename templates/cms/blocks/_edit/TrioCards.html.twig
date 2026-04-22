@@ -1,5 +1,5 @@
 <div class="field">
-    <label class="label">{{ "trio_cards_headline"|trans }}</label>
+    <label class="label">{{ 'admin_cms.trio_cards_headline' | trans }}</label>
     <div class="control">
         <input class="input" name="headline" type="text"
                value="{{ block is defined ? block.headline : '' }}">
@@ -11,10 +11,10 @@
     {% set card = block is defined ? block.cards[i] : null %}
     <div class="column is-4">
         <div class="box is-full-height">
-            <p class="has-text-weight-bold mb-3">{{ "trio_cards_card"|trans }} {{ i + 1 }}</p>
+            <p class="has-text-weight-bold mb-3">{{ 'admin_cms.trio_cards_card' | trans }} {{ i + 1 }}</p>
 
             {% if blockId is defined %}
-                {# Card image management — only available when editing existing block #}
+                {# Card image management - only available when editing existing block #}
                 <div class="columns is-vcentered mb-3">
                     <div class="column is-narrow">
                         {% if card and card.image %}
@@ -31,14 +31,14 @@
                                class="button is-small is-fullwidth modalTrigger"
                                data-modal-url="{{ path('app_admin_cms_card_image_modal', {'blockId': blockId, 'slot': i}) }}">
                                 <span class="icon"><i class="fa fa-exchange"></i></span>
-                                <span>{{ "trio_cards_replace_image"|trans }}</span>
+                                <span>{{ 'admin_cms.trio_cards_replace_image' | trans }}</span>
                             </a>
                         {% else %}
                             <a href="#"
                                class="button is-small is-success is-fullwidth modalTrigger"
                                data-modal-url="{{ path('app_admin_cms_card_image_modal', {'blockId': blockId, 'slot': i}) }}">
                                 <span class="icon"><i class="fa fa-image"></i></span>
-                                <span>{{ "trio_cards_add_image"|trans }}</span>
+                                <span>{{ 'admin_cms.trio_cards_add_image' | trans }}</span>
                             </a>
                         {% endif %}
                     </div>
@@ -46,7 +46,7 @@
             {% endif %}
 
             <div class="field">
-                <label class="label">{{ "trio_cards_sub_headline"|trans }}</label>
+                <label class="label">{{ 'admin_cms.trio_cards_sub_headline' | trans }}</label>
                 <div class="control">
                     <input class="input" name="cards[{{ i }}][subHeadline]" type="text"
                            value="{{ card ? card.subHeadline : '' }}">
@@ -54,14 +54,14 @@
             </div>
 
             <div class="field">
-                <label class="label">{{ "trio_cards_text"|trans }}</label>
+                <label class="label">{{ 'admin_cms.trio_cards_text' | trans }}</label>
                 <div class="control">
                     <textarea class="textarea" name="cards[{{ i }}][text]" rows="3">{{ card ? card.text : '' }}</textarea>
                 </div>
             </div>
 
             <div class="field">
-                <label class="label">{{ "trio_cards_button_text"|trans }}</label>
+                <label class="label">{{ 'admin_cms.trio_cards_button_text' | trans }}</label>
                 <div class="control">
                     <input class="input" name="cards[{{ i }}][buttonText]" type="text"
                            value="{{ card ? card.buttonText : '' }}">
@@ -69,7 +69,7 @@
             </div>
 
             <div class="field">
-                <label class="label">{{ "trio_cards_button_link"|trans }}</label>
+                <label class="label">{{ 'admin_cms.trio_cards_button_link' | trans }}</label>
                 <div class="control">
                     <input class="input" name="cards[{{ i }}][buttonLink]" type="text"
                            value="{{ card ? card.buttonLink : '' }}">

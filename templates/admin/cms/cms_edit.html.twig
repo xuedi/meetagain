@@ -38,12 +38,12 @@
                     {% if linkedAnnouncement %}
                         <a class="button is-info" href="{{ path('app_admin_email_announcements_view', {'id': linkedAnnouncement.id}) }}">
                             <span class="icon"><i class="fa fa-bullhorn"></i></span>
-                            <span>open</span>
+                            <span>{{ 'admin_cms.button_open_announcement' | trans }}</span>
                         </a>
                     {% else %}
                         <a class="button is-info" href="{{ path('app_admin_email_announcements_from_cms', {'id': cms.id}) }}">
                             <span class="icon"><i class="fa fa-bullhorn"></i></span>
-                            <span>Create</span>
+                            <span>{{ 'admin_cms.button_create_announcement' | trans }}</span>
                         </a>
                     {% endif %}
                 </div>

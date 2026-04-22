@@ -9,11 +9,11 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ 'announcement_cms_page' | trans }}</th>
-                <th>{{ 'announcement_status' | trans }}</th>
-                <th>{{ 'announcement_created' | trans }}</th>
-                <th>{{ 'announcement_sent_at' | trans }}</th>
-                <th>{{ 'announcement_recipients' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_cms_page' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_status' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_created' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_sent_at' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_recipients' | trans }}</th>
                 <th><a href="{{ path('app_admin_email_announcements_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
             </tr>
             </thead>
@@ -23,9 +23,9 @@
                     <td>{{ announcement.cmsPage ? announcement.cmsPage.slug : '-' }}</td>
                     <td>
                         {% if announcement.draft %}
-                            <span class="tag is-warning">{{ 'draft' | trans }}</span>
+                            <span class="tag is-warning">{{ 'admin_cms.draft' | trans }}</span>
                         {% else %}
-                            <span class="tag is-success">{{ 'sent' | trans }}</span>
+                            <span class="tag is-success">{{ 'admin_cms.sent' | trans }}</span>
                         {% endif %}
                     </td>
                     <td>{{ announcement.createdAt|date('Y-m-d H:i') }}</td>
@@ -35,7 +35,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="has-text-centered">{{ 'no_announcements' | trans }}</td>
+                    <td colspan="6" class="has-text-centered">{{ 'admin_cms.no_announcements' | trans }}</td>
                 </tr>
             {% endfor %}
             </tbody>

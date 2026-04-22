@@ -31,8 +31,8 @@ class CmsType extends AbstractType
         ])->add('published', ChoiceType::class, [
             'label' => false,
             'choices' => [
-                $this->translator->trans('Published') => 1,
-                $this->translator->trans('Draft') => 0,
+                $this->translator->trans('admin_cms.status_published') => 1,
+                $this->translator->trans('admin_cms.status_draft') => 0,
             ],
         ]);
 
@@ -40,27 +40,27 @@ class CmsType extends AbstractType
             $builder->add('locked', ChoiceType::class, [
                 'label' => false,
                 'choices' => [
-                    $this->translator->trans('Locked (visible on all groups)') => 1,
-                    $this->translator->trans('Normal') => 0,
+                    $this->translator->trans('admin_cms.status_locked') => 1,
+                    $this->translator->trans('admin_cms.status_normal') => 0,
                 ],
-                'help' => 'Locked pages are visible on all multisite groups (e.g., imprint, privacy)',
+                'help' => $this->translator->trans('admin_cms.status_locked_help'),
             ]);
         }
 
         $builder->add('pageTitle', TextType::class, [
-            'label' => 'Page Title',
+            'label' => $this->translator->trans('admin_cms.field_page_title'),
             'required' => false,
             'mapped' => false,
-            'help' => 'Title shown in browser and page content',
+            'help' => $this->translator->trans('admin_cms.field_page_title_help'),
         ])->add('linkName', TextType::class, [
-            'label' => 'Menu Link Name',
+            'label' => $this->translator->trans('admin_cms.field_link_name'),
             'required' => false,
             'mapped' => false,
-            'help' => 'Name shown in menus (no need if no menu like index)',
+            'help' => $this->translator->trans('admin_cms.field_link_name_help'),
         ]);
 
         $builder->add('menuLocations', ChoiceType::class, [
-            'label' => 'Menu Locations',
+            'label' => $this->translator->trans('admin_cms.field_menu_locations'),
             'choices' => MenuLocation::getChoices($this->translator),
             'multiple' => true,
             'expanded' => true,

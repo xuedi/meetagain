@@ -7,14 +7,14 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>Title</th>
-                <th>Created at</th>
-                <th>Event time</th>
-                <th>Recurring</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Rsvp</th>
-                <th>Type</th>
+                <th>{{ 'admin_event.col_title'|trans }}</th>
+                <th>{{ 'admin_event.col_created_at'|trans }}</th>
+                <th>{{ 'admin_event.col_event_time'|trans }}</th>
+                <th>{{ 'admin_event.col_recurring'|trans }}</th>
+                <th>{{ 'admin_event.col_location'|trans }}</th>
+                <th>{{ 'admin_event.col_status'|trans }}</th>
+                <th>{{ 'admin_event.col_rsvp'|trans }}</th>
+                <th>{{ 'admin_event.col_type'|trans }}</th>
                 <th><a href="{{ path('app_admin_event_add') }}"><span class="icon"><i class="fa fa-add"></i></span></a></th>
             </tr>
             </thead>
@@ -34,7 +34,7 @@
                     <td>{{ event.start|date('Y-m-d') }}</td>
                     <td>
                         {% if event.recurringOf is not null %}
-                            auto
+                            {{ 'admin_event.recurring_auto'|trans }}
                         {% else %}
                             {% if event.recurringRule is null %}{{ 'No'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}
                         {% endif %}
@@ -42,11 +42,11 @@
                     <td>{{ event.location ? event.location.name : '-' }}</td>
                     <td>
                         {% if event.status.value == 'locked' %}
-                            <span class="icon has-text-warning" title="locked"><i class="fa fa-lock"></i></span>
+                            <span class="icon has-text-warning" title="{{ 'events.status_locked'|trans }}"><i class="fa fa-lock"></i></span>
                         {% elseif event.status.value == 'published' %}
-                            <span class="icon has-text-success" title="published"><i class="fa fa-eye"></i></span>
+                            <span class="icon has-text-success" title="{{ 'events.status_published'|trans }}"><i class="fa fa-eye"></i></span>
                         {% else %}
-                            <span class="icon has-text-grey-light" title="draft"><i class="fa fa-eye-slash"></i></span>
+                            <span class="icon has-text-grey-light" title="{{ 'events.status_draft'|trans }}"><i class="fa fa-eye-slash"></i></span>
                         {% endif %}
                     </td>
                     <td>{{ rsvpCounts[event.id] ?? 0 }}</td>
@@ -66,19 +66,19 @@
 
         <div class="mt-4 has-text-centered">
             <span class="tag has-background-info-light">
-                <span>Recurring events</span>
+                <span>{{ 'admin_event.legend_recurring_events'|trans }}</span>
             </span>
             <span class="tag is-white">
-                <span class="">One time events</span>
+                <span class="">{{ 'admin_event.legend_one_time_events'|trans }}</span>
             </span>
             <span class="tag has-text-grey-light is-white">
-                <span>Automatic generated from a recurring event</span>
+                <span>{{ 'admin_event.legend_auto_generated'|trans }}</span>
             </span>
             <span class="tag has-background-warning-light">
-                <span>The next event</span>
+                <span>{{ 'admin_event.legend_next_event'|trans }}</span>
             </span>
             <span class="tag has-background-danger-light">
-                <span>Canceled events</span>
+                <span>{{ 'admin_event.legend_canceled_events'|trans }}</span>
             </span>
         </div>
 

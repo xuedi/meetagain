@@ -13,9 +13,9 @@
                 </div>
                 <div class="level-item">
                     {% if announcement.draft %}
-                        <span class="tag is-warning is-medium">{{ 'draft' | trans }}</span>
+                        <span class="tag is-warning is-medium">{{ 'admin_cms.draft' | trans }}</span>
                     {% else %}
-                        <span class="tag is-success is-medium">{{ 'sent' | trans }}</span>
+                        <span class="tag is-success is-medium">{{ 'admin_cms.sent' | trans }}</span>
                     {% endif %}
                 </div>
             </div>
@@ -33,29 +33,29 @@
             <div class="column is-8">
 
                 <div class="box">
-                    <h2 class="subtitle">{{ 'announcement_details' | trans }}</h2>
+                    <h2 class="subtitle">{{ 'admin_cms.announcement_details' | trans }}</h2>
 
                     <table class="table is-fullwidth">
                         <tbody>
                         <tr>
-                            <th class="col-medium">{{ 'announcement_cms_page' | trans }}</th>
+                            <th class="col-medium">{{ 'admin_cms.announcement_cms_page' | trans }}</th>
                             <td>{{ announcement.cmsPage.slug }}</td>
                         </tr>
                         <tr>
-                            <th>{{ 'announcement_created' | trans }}</th>
+                            <th>{{ 'admin_cms.announcement_created' | trans }}</th>
                             <td>{{ announcement.createdAt|date('Y-m-d H:i') }}</td>
                         </tr>
                         <tr>
-                            <th>{{ 'announcement_created_by' | trans }}</th>
+                            <th>{{ 'admin_cms.announcement_created_by' | trans }}</th>
                             <td>{{ announcement.createdBy.name }}</td>
                         </tr>
                         {% if announcement.sent %}
                         <tr>
-                            <th>{{ 'announcement_sent_at' | trans }}</th>
+                            <th>{{ 'admin_cms.announcement_sent_at' | trans }}</th>
                             <td>{{ announcement.sentAt|date('Y-m-d H:i') }}</td>
                         </tr>
                         <tr>
-                            <th>{{ 'announcement_recipients' | trans }}</th>
+                            <th>{{ 'admin_cms.announcement_recipients' | trans }}</th>
                             <td>{{ announcement.recipientCount }}</td>
                         </tr>
                         {% endif %}
@@ -67,7 +67,7 @@
                 <div class="box">
                     <div class="level">
                         <div class="level-left">
-                            <h2 class="subtitle">{{ 'announcement_email_preview' | trans }}</h2>
+                            <h2 class="subtitle">{{ 'admin_cms.announcement_email_preview' | trans }}</h2>
                         </div>
                         <div class="level-right">
                             <div class="buttons has-addons">
@@ -80,7 +80,7 @@
                             </div>
                         </div>
                     </div>
-                    <p><strong>{{ 'email_subject' | trans }}:</strong> {{ preview.subject }}</p>
+                    <p><strong>{{ 'admin_cms.email_subject' | trans }}:</strong> {{ preview.subject }}</p>
                     <hr>
                     <div class="content">
                         {{ preview.body | raw }}
@@ -92,25 +92,25 @@
 
             <div class="column is-4">
                 <div class="box">
-                    <h2 class="subtitle">{{ 'actions' | trans }}</h2>
+                    <h2 class="subtitle">{{ 'admin_cms.actions' | trans }}</h2>
 
                     {% if announcement.draft %}
                         <form action="{{ path('app_admin_email_announcements_send', {'id': announcement.id}) }}" method="post" class="mb-3">
-                            <button type="submit" class="button is-success is-fullwidth" onclick="return confirm('{{ 'confirm_send_announcement' | trans }}');">
+                            <button type="submit" class="button is-success is-fullwidth" onclick="return confirm('{{ 'admin_cms.confirm_send_announcement' | trans | e('js') }}');">
                                 <span class="icon"><i class="fa fa-paper-plane"></i></span>
-                                <span>{{ 'button_send_announcement' | trans }}</span>
+                                <span>{{ 'admin_cms.button_send_announcement' | trans }}</span>
                             </button>
                         </form>
 
                         {% if announcement.cmsPage %}
                         <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}" class="button is-info is-fullwidth mb-3">
                             <span class="icon"><i class="fa fa-edit"></i></span>
-                            <span>{{ 'button_edit_cms_page' | trans }}</span>
+                            <span>{{ 'admin_cms.button_edit_cms_page' | trans }}</span>
                         </a>
                         {% endif %}
 
                         <form action="{{ path('app_admin_email_announcements_delete', {'id': announcement.id}) }}" method="post">
-                            <button type="submit" class="button is-danger is-fullwidth" onclick="return confirm('{{ 'confirm_delete_announcement' | trans }}');">
+                            <button type="submit" class="button is-danger is-fullwidth" onclick="return confirm('{{ 'admin_cms.confirm_delete_announcement' | trans | e('js') }}');">
                                 <span class="icon"><i class="fa fa-trash"></i></span>
                                 <span>{{ 'button_delete' | trans }}</span>
                             </button>
@@ -119,7 +119,7 @@
                         {% if announcement.cmsPage %}
                         <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}" class="button is-info is-fullwidth">
                             <span class="icon"><i class="fa fa-edit"></i></span>
-                            <span>{{ 'button_edit_cms_page' | trans }}</span>
+                            <span>{{ 'admin_cms.button_edit_cms_page' | trans }}</span>
                         </a>
                         {% endif %}
                     {% endif %}

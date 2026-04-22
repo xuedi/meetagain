@@ -34,9 +34,9 @@ final class MemberController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'Content',
+            section: 'admin_shell.section_content',
             links: [
-                new AdminLink(label: 'Members', route: 'app_admin_member', active: 'member', role: 'ROLE_ORGANIZER'),
+                new AdminLink(label: 'admin_shell.menu_member', route: 'app_admin_member', active: 'member', role: 'ROLE_ORGANIZER'),
             ],
             sectionPriority: 50,
         );
