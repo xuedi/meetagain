@@ -251,7 +251,21 @@ profile_images:
 profile_messages: {}
 profile_notifications: {}
 profile_review: {}
-profile_image: {}
+profile_image:
+    reported_notice_intro: '此图片因以下原因被举报：'
+    reported_notice_outro: '在审核完成前，此图片暂不对其他用户显示。'
+    section_details: '详情'
+    detail_uploaded: '上传时间：'
+    detail_type: '类型：'
+    detail_size: '大小：'
+    detail_location: '来源：'
+    detail_location_value: '%link% 于活动中'
+    detail_location_link_label: '查看'
+    detail_reported: '被举报：'
+    detail_reported_yes: '是'
+    detail_reported_no: '否'
+    flash_image_changed: '图片已更换。'
+    flash_upload_error: '上传文件时出错。'
 support: {}
 report: {}
 cookie:
