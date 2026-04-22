@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_login"|trans }}{% endblock %}
+{% block title %}{{ "security.page_title_login"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -10,7 +10,7 @@
             <div class="columns is-centered mt-5">
                 <div class="column is-6-tablet is-5-desktop">
 
-                    <h1 class="title is-5">{{ "page_login_headline"|trans }}</h1>
+                    <h1 class="title is-5">{{ "security.headline_login"|trans }}</h1>
 
                     <form method="post">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -38,28 +38,28 @@
                         <div class="field is-grouped mt-5">
                             <div class="control">
                                 <button type="submit" class="button is-primary">{{ 'chrome.menu_login'|trans }}</button>
-                                <a href="{{ path('app_register') }}" class="button is-light">{{ 'button_Register'|trans }}</a>
+                                <a href="{{ path('app_register') }}" class="button is-light">{{ 'security.button_register'|trans }}</a>
                             </div>
                         </div>
                     </form>
 
                     <p class="mt-4 is-size-7">
-                        {{ "page_login_reset"|trans }} <a href="{{ path('app_reset') }}">{{ 'link_here' | trans }}</a>
+                        {{ "security.intro_reset_link"|trans }} <a href="{{ path('app_reset') }}">{{ 'security.link_here' | trans }}</a>
                     </p>
 
                 </div>
 
                 <div class="column is-5-tablet is-4-desktop">
                     {% include '_components/info_sidebar.html.twig' with {
-                        title: 'login.sidebar.title'|trans,
-                        intro: 'login.sidebar.intro'|trans,
+                        title: 'security.login_sidebar_title'|trans,
+                        intro: 'security.login_sidebar_intro'|trans,
                         bullets: [
-                            'login.sidebar.bullet1'|trans,
-                            'login.sidebar.bullet2'|trans,
-                            'login.sidebar.bullet3'|trans,
+                            'security.login_sidebar_bullet1'|trans,
+                            'security.login_sidebar_bullet2'|trans,
+                            'security.login_sidebar_bullet3'|trans,
                         ],
                         link_url: path('app_register'),
-                        link_text: 'login.sidebar.link'|trans,
+                        link_text: 'security.login_sidebar_link'|trans,
                         link_icon: 'arrow-right',
                     } only %}
                 </div>

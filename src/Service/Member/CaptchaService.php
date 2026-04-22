@@ -66,7 +66,7 @@ readonly class CaptchaService
                 $session->remove('captcha_attempts');
             }
 
-            return 'Wrong captcha code, please try again.';
+            return 'security.captcha_wrong';
         }
 
         $session->remove('captcha_attempts');

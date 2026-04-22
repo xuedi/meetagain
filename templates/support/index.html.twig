@@ -29,10 +29,10 @@
                             </div>
                         </div>
 
-                        <p class="is-size-7 has-text-grey mt-2">{{ 'captcha.limit_text'|trans }}</p>
+                        <p class="is-size-7 has-text-grey mt-2">{{ 'security.captcha_limit_text'|trans }}</p>
                         <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
                             <p class="mb-4 is-size-7 has-text-grey">
-                                {{ 'captcha.tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'captcha.tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'captcha.tries_post'|trans }}
+                                {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
                             </p>
                         </div>
                     {% else %}

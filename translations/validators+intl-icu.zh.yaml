@@ -12,3 +12,13 @@
 'Please upload a valid image, preferable 16x9 format': '请上传有效的图片，建议使用16:9格式'
 'Please upload a valid image, preferable a 4:3 format': '请上传有效的图片，建议使用4:3格式'
 Error: 错误
+
+# Security namespace - i18n hardening plan, phase 3 (page-scoped validator messages)
+'security.validator_username_max': '用户名不能超过64个字符（中文更短）。'
+'security.validator_email_max': '电子邮件地址不能超过180个字符。'
+'security.validator_email_unique': '该电子邮件地址已被注册。'
+'security.validator_email_blank': '请输入您的电子邮件地址。'
+'security.validator_email_format': '请输入有效的电子邮件地址。'
+'security.validator_password_blank': '请输入密码。'
+'security.validator_password_min': '您的密码至少应为 {{ limit }} 个字符。'
+'security.validator_agree_terms': '您需要同意我们的条款。'

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_reset_headline"|trans }}{% endblock %}
+{% block title %}{{ "security.page_title_reset"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -10,14 +10,14 @@
             <div class="columns is-centered mt-5">
                 <div class="column is-6-tablet is-5-desktop">
 
-                    <h1 class="title is-5">{{ "page_reset_headline"|trans }}</h1>
+                    <h1 class="title is-5">{{ "security.page_title_reset"|trans }}</h1>
 
                     {{ form_start(form) }}
 
                     {{ form_row(form.email) }}
 
                     <div class="field">
-                        <label class="label">Captcha</label>
+                        <label class="label">{{ 'security.label_captcha'|trans }}</label>
                         <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
                             <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
                             <div class="control is-flex-grow-1">
@@ -28,29 +28,29 @@
 
                     {{ form_widget(form) }}
 
-                    <p class="is-size-7 has-text-grey mt-2">{{ 'captcha.limit_text'|trans }}</p>
+                    <p class="is-size-7 has-text-grey mt-2">{{ 'security.captcha_limit_text'|trans }}</p>
                     <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
                         <p class="mb-4 is-size-7 has-text-grey">
-                            {{ 'captcha.tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'captcha.tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'captcha.tries_post'|trans }}
+                            {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
                         </p>
                     </div>
 
-                    <button class="button is-primary">{{ "button_send_reset_link" | trans }}</button>
+                    <button class="button is-primary">{{ "security.button_send_reset_link" | trans }}</button>
                     {{ form_end(form) }}
 
                 </div>
 
                 <div class="column is-5-tablet is-4-desktop">
                     {% include '_components/info_sidebar.html.twig' with {
-                        title: 'reset.sidebar.title'|trans,
-                        intro: 'reset.sidebar.intro'|trans,
+                        title: 'security.reset_sidebar_title'|trans,
+                        intro: 'security.reset_sidebar_intro'|trans,
                         bullets: [
-                            'reset.sidebar.bullet1'|trans,
-                            'reset.sidebar.bullet2'|trans,
-                            'reset.sidebar.bullet3'|trans,
+                            'security.reset_sidebar_bullet1'|trans,
+                            'security.reset_sidebar_bullet2'|trans,
+                            'security.reset_sidebar_bullet3'|trans,
                         ],
                         link_url: path('app_login'),
-                        link_text: 'reset.sidebar.link'|trans,
+                        link_text: 'security.reset_sidebar_link'|trans,
                         link_icon: 'arrow-left',
                     } only %}
                 </div>
