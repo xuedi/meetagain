@@ -260,7 +260,12 @@ profile_notifications:
     page_title: '通知'
     empty_state: '暂无新通知'
     table_header_notification: '通知'
-profile_review: {}
+profile_review:
+    page_title: '待审核项目'
+    empty_state: '暂无待审核项目。'
+    button_approve: '批准'
+    button_deny: '拒绝'
+    flash_invalid_csrf: '无效的 CSRF 令牌。'
 profile_image:
     reported_notice_intro: '此图片因以下原因被举报：'
     reported_notice_outro: '在审核完成前，此图片暂不对其他用户显示。'
@@ -311,10 +316,6 @@ admin_support: {}
 admin_system: {}
 global: {}
 'notification.review.pending_count': '有 %count% 个项目等待您的审核'
-'profile.review.title': '待审核项目'
-'profile.review.empty': '暂无待审核项目。'
-'profile.review.approve': '批准'
-'profile.review.deny': '拒绝'
 'review.core.member_pending': '用户 %name% 正在等待审批'
 'review.core.image_reported': '图片被 %reporter% 举报'
 'review.bookclub.book_pending': '图书《%title%》由 %user% 提交，待审核'
