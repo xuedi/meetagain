@@ -248,7 +248,14 @@ profile_images:
     sidebar_profile_picture: '头像'
     profile_change_hint: '你可以通过 %profile_link% 上传新图片来更换头像。'
     profile_change_link_label: '点击这里'
-profile_messages: {}
+profile_messages:
+    section_heading: '消息'
+    welcome_heading: '你好，'
+    welcome_intro: '这是你的消息概览。左侧列出了你曾互发消息的成员。'
+    welcome_rule: '你只能给好友发送消息，或给允许任何人发消息的成员。'
+    welcome_addressbook_hint: '请到成员页面查看，在每个成员的详情视图中可以找到发消息按钮。'
+    cannot_message: '你无法向此用户发送消息。'
+    input_placeholder: '消息'
 profile_notifications: {}
 profile_review: {}
 profile_image:
