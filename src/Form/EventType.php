@@ -54,14 +54,14 @@ class EventType extends AbstractType
             ])
             ->add('status', EnumType::class, [
                 'class' => EventStatus::class,
-                'label' => 'Status',
+                'label' => $this->translator->trans('admin_event.form_label_status'),
                 'choices' => EventStatus::getChoices($this->translator),
             ])
             ->add('featured', ChoiceType::class, [
-                'label' => 'Featured',
+                'label' => $this->translator->trans('admin_event.form_label_featured'),
                 'choices' => [
-                    $this->translator->trans('yes') => true,
-                    $this->translator->trans('no') => false,
+                    $this->translator->trans('shared.toggle_yes') => true,
+                    $this->translator->trans('shared.toggle_no') => false,
                 ],
             ])
             ->add('start', DateTimeType::class, [
@@ -72,8 +72,8 @@ class EventType extends AbstractType
             ])
             ->add('recurringRule', EnumType::class, [
                 'class' => EventInterval::class,
-                'label' => 'Recurring',
-                'placeholder' => 'NonRecurring',
+                'label' => $this->translator->trans('admin_event.form_label_recurring'),
+                'placeholder' => $this->translator->trans('admin_event.form_placeholder_non_recurring'),
                 'required' => false,
                 'expanded' => false,
                 'multiple' => false,
@@ -81,8 +81,8 @@ class EventType extends AbstractType
             ])
             ->add('type', EnumType::class, [
                 'class' => EventTypeEnum::class,
-                'label' => 'Type',
-                'placeholder' => 'Types',
+                'label' => $this->translator->trans('admin_event.form_label_type'),
+                'placeholder' => $this->translator->trans('admin_event.form_placeholder_types'),
                 'required' => false,
                 'expanded' => false,
                 'multiple' => false,
@@ -102,7 +102,7 @@ class EventType extends AbstractType
             ->add('host', EntityType::class, [
                 'class' => Host::class,
                 'choice_label' => 'name',
-                'label' => 'Hosts',
+                'label' => $this->translator->trans('admin_event.form_label_hosts'),
                 'expanded' => true,
                 'multiple' => true,
                 'mapped' => false,
@@ -115,12 +115,12 @@ class EventType extends AbstractType
             ->add('image', FileType::class, [
                 'mapped' => false,
                 'required' => false,
-                'label' => 'Preview Image',
+                'label' => $this->translator->trans('admin_event.form_label_preview_image'),
                 'constraints' => [
                     new File(
                         maxSize: '5000k',
                         mimeTypes: ['image/*'],
-                        mimeTypesMessage: 'Please upload a valid image, preferable 16x9 format',
+                        mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error'),
                     ),
                 ],
             ])
@@ -136,20 +136,20 @@ class EventType extends AbstractType
             foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
                 $builder->add("title-{$languageCode}", TextType::class, [
-                    'label' => "title ({$languageCode})",
+                    'label' => $this->translator->trans('admin_event.form_label_title', ['%locale%' => $languageCode]),
                     'data' => $translation?->getTitle() ?? '',
                     'mapped' => false,
                     'required' => false,
                 ]);
                 $builder->add("description-{$languageCode}", TextareaType::class, [
-                    'label' => "description ({$languageCode})",
+                    'label' => $this->translator->trans('admin_event.form_label_description', ['%locale%' => $languageCode]),
                     'data' => $translation?->getDescription() ?? '',
                     'mapped' => false,
                     'required' => false,
                     'attr' => ['rows' => 15],
                 ]);
                 $builder->add("teaser-{$languageCode}", TextareaType::class, [
-                    'label' => "Teaser ({$languageCode})",
+                    'label' => $this->translator->trans('admin_event.form_label_teaser', ['%locale%' => $languageCode]),
                     'data' => $translation?->getTeaser() ?? '',
                     'mapped' => false,
                     'required' => false,

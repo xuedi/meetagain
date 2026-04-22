@@ -13,9 +13,9 @@ enum EventStatus: string
     public static function getChoices(TranslatorInterface $translator): array
     {
         return [
-            $translator->trans('published') => self::Published,
-            $translator->trans('locked') => self::Locked,
-            $translator->trans('draft') => self::Draft,
+            $translator->trans('events.status_published') => self::Published,
+            $translator->trans('events.status_locked') => self::Locked,
+            $translator->trans('events.status_draft') => self::Draft,
         ];
     }
 }

@@ -16,10 +16,10 @@ final class LogsController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'System',
+            section: 'admin_shell.section_system',
             links: [
                 new AdminLink(
-                    label: 'menu_admin_logs',
+                    label: 'admin_shell.menu_logs',
                     route: 'app_admin_activity_log',
                     active: 'logs',
                     role: 'ROLE_ADMIN',

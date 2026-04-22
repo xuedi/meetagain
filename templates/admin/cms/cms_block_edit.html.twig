@@ -62,21 +62,21 @@
                     <a class="button is-small is-fullwidth mt-2" href="{{ toggleSideUrl }}">
                         {% if imageOnRight %}
                             <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                            <span>Move left</span>
+                            <span>{{ 'admin_cms.button_move_left' | trans }}</span>
                         {% else %}
                             <span class="icon"><i class="fa fa-arrow-right"></i></span>
-                            <span>Move right</span>
+                            <span>{{ 'admin_cms.button_move_right' | trans }}</span>
                         {% endif %}
                     </a>
                 {% endif %}
                 {% if blockImage is null %}
-                    <p class="help has-text-grey mt-2">If no image is uploaded, none will be shown on the page. The other content will be full width.</p>
+                    <p class="help has-text-grey mt-2">{{ 'admin_cms.no_image_help' | trans }}</p>
                 {% endif %}
                 <div id="cms-image-overlay" style="display:none; position:absolute; inset:0;
                      background:rgba(0,0,0,0.75); z-index:10; border-radius:4px;
                      flex-direction:column; align-items:center; justify-content:center; gap:.5rem;">
                     <span class="icon has-text-warning is-large"><i class="fa fa-2x fa-save"></i></span>
-                    <p class="has-text-weight-semibold has-text-centered has-text-white">Please save your changes first</p>
+                    <p class="has-text-weight-semibold has-text-centered has-text-white">{{ 'admin_cms.save_changes_first' | trans }}</p>
                 </div>
             </div>
         {% endset %}

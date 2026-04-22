@@ -7,10 +7,7 @@
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
 
         <div class="content">
-            <p>
-                Configure email templates sent by the website. Use <code>{{ '{{' }}variable{{ '}}' }}</code> placeholders
-                in subject and body fields. Click edit to customize a template.
-            </p>
+            <p>{{ 'admin_email.templates_intro'|trans }}</p>
         </div>
 
         {% for name,email in emails %}
@@ -18,14 +15,14 @@
                 <span>{{ name | lower | trans }}</span>
                 {% if email.template %}
                     <a href="{{ path('app_admin_email_templates_edit', {id: email.template.id}) }}" class="button is-small is-info">
-                        Edit
+                        <span class="icon"><i class="fa fa-edit"></i></span>
                     </a>
                 {% endif %}
             </div>
             <div class="columns">
                 <div class="column is-7">
                     <div class="box">
-                        <p>Subject: <b>{{ email.subject }}</b></p>
+                        <p>{{ 'admin_email.col_subject'|trans }}: <b>{{ email.subject }}</b></p>
                         <br>
                         <div>
                             {{ email.renderedBody|raw }}

@@ -23,10 +23,10 @@ final class LocationController extends AbstractAdminController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
-            section: 'Content',
+            section: 'admin_shell.section_content',
             links: [
                 new AdminLink(
-                    label: 'Locations',
+                    label: 'admin_shell.menu_location',
                     route: 'app_admin_location',
                     active: 'location',
                     role: 'ROLE_ORGANIZER',

@@ -7,15 +7,15 @@
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'planned'} %}
 
         {% if items is empty %}
-            <p class="has-text-grey">No scheduled emails planned in the next 14 days.</p>
+            <p class="has-text-grey">{{ 'admin_email.planned_empty'|trans }}</p>
         {% else %}
             <table class="table is-fullwidth" id="filteredTable">
                 <thead>
                     <tr>
-                        <th>Expected Time</th>
-                        <th>Mail Type</th>
-                        <th>Description</th>
-                        <th>Expected Recipients</th>
+                        <th>{{ 'admin_email.col_expected_time'|trans }}</th>
+                        <th>{{ 'admin_email.col_mail_type'|trans }}</th>
+                        <th>{{ 'admin_email.col_description'|trans }}</th>
+                        <th>{{ 'admin_email.col_expected_recipients'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>

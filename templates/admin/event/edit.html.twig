@@ -4,27 +4,27 @@
 
     {% include '_components/warning_box.html.twig' with {
         'id': 'event-delete-warning',
-        'title': 'Delete the Event',
-        'content': '<p>If you delete this event, all recurring events are deleted as well, also all related data like rsvp\'s, comments, event images and so on. Please consider deactivating the event instead.</p>',
-        'buttonLabel': 'Yes, Delete',
+        'title': 'admin_event.warning_delete_title'|trans,
+        'content': 'admin_event.warning_delete_content'|trans,
+        'buttonLabel': 'admin_event.warning_delete_button'|trans,
         'buttonUrl': path('app_admin_event_delete', {'id': event.id}),
         'type': 'danger'
     } %}
 
     {% include '_components/warning_box.html.twig' with {
         'id': 'event-cancel-warning',
-        'title': 'Cancel Event',
-        'content': '<p>Are you sure you want to cancel this event? All RSVPd users will be notified.</p>',
-        'buttonLabel': 'Yes, Cancel Event',
+        'title': 'admin_event.warning_cancel_title'|trans,
+        'content': 'admin_event.warning_cancel_content'|trans,
+        'buttonLabel': 'admin_event.warning_cancel_button'|trans,
         'buttonUrl': path('app_admin_event_cancel', {'id': event.id}),
         'type': 'warning'
     } %}
 
     {% include '_components/warning_box.html.twig' with {
         'id': 'event-uncancel-warning',
-        'title': 'Uncancel Event',
-        'content': '<p>Are you sure you want to uncancel this event?</p>',
-        'buttonLabel': 'Yes, Uncancel Event',
+        'title': 'admin_event.warning_uncancel_title'|trans,
+        'content': 'admin_event.warning_uncancel_content'|trans,
+        'buttonLabel': 'admin_event.warning_uncancel_button'|trans,
         'buttonUrl': path('app_admin_event_uncancel', {'id': event.id}),
         'type': 'warning'
     } %}
@@ -58,7 +58,7 @@
 
                     <div class="columns">
                         <div class="column is-6">
-                            <p class="has-text-grey">Dont forget the other languages</p>
+                            <p class="has-text-grey">{{ 'admin_event.hint_other_languages'|trans }}</p>
                         </div>
                         <div class="column is-6">
                             <div class="buttons has-addons is-pulled-right">
@@ -116,31 +116,31 @@
                 </div>
 
                 <fieldset class="mt-5 p-4 fieldset-warning">
-                    <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">Danger Zone</legend>
+                    <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">{{ 'admin_event.danger_zone'|trans }}</legend>
 
                     <div class="field mb-2">
                         <label class="button is-light is-fullwidth is-justify-content-flex-start">
                             {{ form_widget(form.allFollowing, {'attr': {'style': 'margin-right: 0.5rem;'}}) }}
-                            <span>Update all following</span>
+                            <span>{{ 'admin_event.danger_update_all_following'|trans }}</span>
                         </label>
                     </div>
                     {% if event.canceled %}
                         <a class="button is-light is-fullwidth mb-2 toggleTrigger" data-id="event-uncancel-warning"
                            href="{{ path('app_admin_event_uncancel', {'id': event.id}) }}">
                             <span class="icon"><i class="fa fa-check"></i></span>
-                            <span>Uncancel Event</span>
+                            <span>{{ 'admin_event.danger_uncancel_event'|trans }}</span>
                         </a>
                     {% else %}
                         <a class="button is-light is-fullwidth mb-2 toggleTrigger" data-id="event-cancel-warning"
                            href="{{ path('app_admin_event_cancel', {'id': event.id}) }}">
                             <span class="icon"><i class="fa fa-ban"></i></span>
-                            <span>Cancel Event</span>
+                            <span>{{ 'admin_event.danger_cancel_event'|trans }}</span>
                         </a>
                     {% endif %}
                     <a class="button is-light is-fullwidth toggleTrigger" data-id="event-delete-warning"
                        href="{{ path('app_admin_event_delete', {'id': event.id}) }}">
                         <span class="icon"><i class="fa fa-trash"></i></span>
-                        <span>Delete Event</span>
+                        <span>{{ 'admin_event.danger_delete_event'|trans }}</span>
                     </a>
                 </fieldset>
             </div>
