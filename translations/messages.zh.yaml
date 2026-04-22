@@ -1,3 +1,78 @@
+# =============================================================================
+# Namespace skeleton - established by the i18n hardening plan.
+# Each per-page phase moves its flat keys into one of these namespaces.
+# Empty namespaces ({}) are placeholders; they fill up as phases progress.
+# See .claude/plans/2026-04-22_core-i18n-hardening-and-prefix-restructure.md
+# =============================================================================
+
+# chrome: top navbar, footer, burger menu, notification popover, flag switcher
+chrome: {}
+# security: login, register, password reset, rate limiting
+security: {}
+# events: event list, featured, details
+events: {}
+# cms: CMS frontend (frontpage, plugin pages, 404, 204, error, blocks)
+cms: {}
+# cms_showcase: CMS showcase pages
+cms_showcase: {}
+# member: public member directory
+member: {}
+# profile: profile landing pages
+profile: {}
+# profile_config: profile settings and privacy
+profile_config: {}
+# profile_social: profile activity feed
+profile_social: {}
+# profile_images: profile images list
+profile_images: {}
+# profile_messages: profile direct messages
+profile_messages: {}
+# profile_notifications: profile notification center
+profile_notifications: {}
+# profile_review: profile review queue (moderator view)
+profile_review: {}
+# profile_image: profile single image / upload
+profile_image: {}
+# support: support page (contact form)
+support: {}
+# report: report image / content flow
+report: {}
+# cookie: cookie consent page
+cookie: {}
+# email: transactional email templates - placeholder deferred until the flat
+# `email` field-label key (line below) is migrated; YAML cannot have both at
+# the same level. The namespace will be introduced when phase 20 starts.
+# shared: shared partials (_components, _form, _non_locale, image)
+shared: {}
+# admin_shell: admin layout, sidebar, dashboard
+admin_shell: {}
+# admin_cms: admin CMS management (pages, menus, announcements)
+admin_cms: {}
+# admin_email: admin email templates and blocklist
+admin_email: {}
+# admin_event: admin events list and editor
+admin_event: {}
+# admin_host: admin hosts list and editor
+admin_host: {}
+# admin_location: admin locations / venues
+admin_location: {}
+# admin_logs: admin logs (system, activity, 404, cron)
+admin_logs: {}
+# admin_member: admin members list and editor
+admin_member: {}
+# admin_static_link: admin static links
+admin_static_link: {}
+# admin_support: admin support tickets
+admin_support: {}
+# admin_system: admin system / settings
+admin_system: {}
+# global: cross-cutting labels (save, cancel, delete, status words, pagination)
+global: {}
+
+# =============================================================================
+# Legacy flat keys - migrated into namespaces above by per-page phases.
+# =============================================================================
+
 # Review notification system
 'notification.review.pending_count': '有 %count% 个项目等待您的审核'
 'profile.review.title': '待审核项目'
