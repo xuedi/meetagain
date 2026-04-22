@@ -27,6 +27,26 @@ class SitemapServiceTest extends TestCase
         self::assertSame('https://example.com/low', $urls[1]->loc);
     }
 
+    public function testMergesMultiplePluginPublishersInPriorityOrder(): void
+    {
+        // Arrange: simulate the real shape - core (priority 0) + multiple plugin publishers (priority 10).
+        $core = $this->makePublisher(priority: 0, urls: [new SitemapUrl(loc: 'https://example.com/core')]);
+        $pluginA = $this->makePublisher(priority: 10, urls: [new SitemapUrl(loc: 'https://example.com/plugin-a')]);
+        $pluginB = $this->makePublisher(priority: 10, urls: [new SitemapUrl(loc: 'https://example.com/plugin-b')]);
+
+        $service = new SitemapService([$core, $pluginA, $pluginB]);
+
+        // Act
+        $urls = $service->getUrls();
+
+        // Assert: plugin URLs come first (any order between them), core last.
+        self::assertCount(3, $urls);
+        self::assertSame('https://example.com/core', end($urls)->loc);
+        $pluginLocs = [$urls[0]->loc, $urls[1]->loc];
+        self::assertContains('https://example.com/plugin-a', $pluginLocs);
+        self::assertContains('https://example.com/plugin-b', $pluginLocs);
+    }
+
     public function testRenderXmlProducesWellFormedUrlsetWithAlternates(): void
     {
         // Arrange

@@ -3,10 +3,12 @@
 namespace App\Publisher\Sitemap;
 
 use App\Filter\Cms\CmsFilterService;
+use App\Filter\Member\MemberFilterService;
 use App\Filter\Sitemap\SitemapEventLocaleFilterInterface;
 use App\Filter\Sitemap\SitemapEventVisibilityService;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
+use App\Repository\UserRepository;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Override;
@@ -22,12 +24,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
 {
+    private const int MEMBER_PAGE_SIZE = 24;
+    private const int MEMBER_PAGE_CAP = 50;
+
     public function __construct(
         private EventRepository $eventRepository,
         private CmsRepository $cmsRepository,
+        private UserRepository $userRepository,
         private LanguageService $languageService,
         private UrlGeneratorInterface $urlGenerator,
         private CmsFilterService $cmsFilterService,
+        private MemberFilterService $memberFilterService,
         private SitemapEventVisibilityService $eventVisibilityService,
         #[AutowireIterator(SitemapEventLocaleFilterInterface::class)]
         private iterable $eventLocaleFilters = [],
@@ -49,6 +56,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
 
         return [
             ...$this->collectStaticRoutes($locales),
+            ...$this->collectMemberPages($locales),
             ...$this->collectCmsPages($locales),
             ...($this->eventVisibilityService->shouldEmitEvents() ? $this->collectEvents($locales) : []),
         ];
@@ -61,9 +69,18 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
     private function collectStaticRoutes(array $locales): array
     {
         $staticRoutes = [
-            ['route' => 'app_default', 'params' => [], 'priority' => 1.0],
-            ['route' => 'app_event', 'params' => [], 'priority' => 0.9],
-            ['route' => 'app_member', 'params' => ['page' => 1], 'priority' => 0.7],
+            // Content entry points
+            ['route' => 'app_default', 'params' => [], 'priority' => 1.0, 'changefreq' => 'daily'],
+            ['route' => 'app_event', 'params' => [], 'priority' => 0.9, 'changefreq' => 'daily'],
+            ['route' => 'app_event_featured', 'params' => [], 'priority' => 0.7, 'changefreq' => 'weekly'],
+            // Static utility / docs
+            ['route' => 'app_contact', 'params' => [], 'priority' => 0.5, 'changefreq' => 'yearly'],
+            ['route' => 'app_api', 'params' => [], 'priority' => 0.6, 'changefreq' => 'weekly'],
+            ['route' => 'app_cookie', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
+            // Auth entry points - low priority so they don't steal crawl budget from content
+            ['route' => 'app_login', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
+            ['route' => 'app_register', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
+            ['route' => 'app_reset', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
         ];
 
         $urls = [];
@@ -81,7 +98,52 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             foreach ($locales as $locale) {
                 $urls[] = new SitemapUrl(
                     loc: $localeUrls[$locale],
+                    changefreq: $routeConfig['changefreq'],
                     priority: $routeConfig['priority'],
+                    alternates: $localeUrls,
+                );
+            }
+        }
+
+        return $urls;
+    }
+
+    /**
+     * Emit one entry per page of the public member directory, mirroring the
+     * controller's PAGE_SIZE and the same MemberFilterService restrictions
+     * anonymous visitors would see (so whitelabel tenants do not over-emit).
+     *
+     * @param array<string> $locales
+     * @return array<SitemapUrl>
+     */
+    private function collectMemberPages(array $locales): array
+    {
+        $filterResult = $this->memberFilterService->getUserIdFilter();
+        $restrictToUserIds = $filterResult->getUserIds();
+
+        $total = $this->userRepository->getNumberOfActivePublicMembers($restrictToUserIds);
+        if ($total <= 0) {
+            return [];
+        }
+
+        $pageCount = (int) min(self::MEMBER_PAGE_CAP, ceil($total / self::MEMBER_PAGE_SIZE));
+
+        $urls = [];
+        for ($page = 1; $page <= $pageCount; $page++) {
+            $localeUrls = [];
+            foreach ($locales as $locale) {
+                $localeUrls[$locale] = $this->urlGenerator->generate(
+                    'app_member',
+                    ['_locale' => $locale, 'page' => $page],
+                    UrlGeneratorInterface::ABSOLUTE_URL,
+                );
+            }
+
+            foreach ($locales as $locale) {
+                $urls[] = new SitemapUrl(
+                    loc: $localeUrls[$locale],
+                    changefreq: 'weekly',
+                    priority: 0.7,
                     alternates: $localeUrls,
                 );
             }
