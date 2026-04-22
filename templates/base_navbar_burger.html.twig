@@ -7,23 +7,23 @@
 <div id="navBurgenMenu" class="navbar-menu is-hidden-desktop">
 
     <div class="navbar-start">
-        <a class="navbar-item" href="{{ path('app_default') }}">{{ "menu_default" | trans }}</a>
+        <a class="navbar-item" href="{{ path('app_default') }}">{{ "chrome.menu_default" | trans }}</a>
         {% for menu in get_menu('top') %}
             {% if menu.slug != 'index' %}
                 <a class="navbar-item" href="{{ menu.slug }}">{{ menu.name }}</a>
             {% endif %}
         {% endfor %}
         {% for pluginLink in get_plugins_links() %}
-            <a class="navbar-item" href="{{ pluginLink.slug }}">{{ ("menu_" ~ pluginLink.name) | trans }}</a>
+            <a class="navbar-item" href="{{ pluginLink.slug }}">{{ pluginLink.name | trans }}</a>
         {% endfor %}
-        <a class="navbar-item" href="{{ path('app_event') }}">{{ "menu_events" | trans }}</a>
-        <a class="navbar-item" href="{{ path('app_member') }}">{{ "menu_members" | trans }}</a>
+        <a class="navbar-item" href="{{ path('app_event') }}">{{ "chrome.menu_events" | trans }}</a>
+        <a class="navbar-item" href="{{ path('app_member') }}">{{ "chrome.menu_members" | trans }}</a>
 
         <div class="navbar-item">
             <details class="navbar-burger-submenu">
-                <summary>{{ 'menu_more'|trans }}</summary>
+                <summary>{{ 'chrome.menu_more'|trans }}</summary>
                 <aside class="menu pl-3 mt-2">
-                    <p class="menu-label">{{ get_footer_column_title('col2') ?: ('footer_col2' | trans) }}</p>
+                    <p class="menu-label">{{ get_footer_column_title('col2') ?: ('chrome.footer_col_platform' | trans) }}</p>
                     <ul class="menu-list">
                         {% for menu in get_menu('col2') %}
                             {% if menu.slug != 'index' %}
@@ -34,7 +34,7 @@
                             <li><a href="{{ link.slug }}"{% if link.slug starts with 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.name | trans }}</a></li>
                         {% endfor %}
                     </ul>
-                    <p class="menu-label">{{ get_footer_column_title('col4') ?: ('footer_col4' | trans) }}</p>
+                    <p class="menu-label">{{ get_footer_column_title('col4') ?: ('chrome.footer_col_legal' | trans) }}</p>
                     <ul class="menu-list">
                         {% for menu in get_menu('col4') %}
                             {% if menu.slug != 'index' %}
@@ -50,18 +50,18 @@
             <hr class="dropdown-divider"/>
             <div class="navbar-item">
                 <aside class="menu">
-                    <p class="menu-label">Loggedin: {{ app.user.name }}</p>
+                    <p class="menu-label">{{ 'chrome.burger_logged_in_label'|trans({'%name%': app.user.name}) }}</p>
                     <ul class="menu-list pl-3">
-                        <li><a href="{{ path('app_profile') }}">{{ "menu_profile_view_profile" | trans }}</a></li>
-                        <li><a href="{{ path('app_profile_messages') }}">{{ "menu_profile_messages" | trans }}</a></li>
-                        <li><a href="{{ path('app_profile_social') }}">{{ "menu_profile_social" | trans }}</a></li>
-                        <li><a href="{{ path('app_profile_config') }}">{{ "menu_profile_config" | trans }}</a></li>
+                        <li><a href="{{ path('app_profile') }}">{{ "chrome.menu_profile_view_profile" | trans }}</a></li>
+                        <li><a href="{{ path('app_profile_messages') }}">{{ "chrome.menu_profile_messages" | trans }}</a></li>
+                        <li><a href="{{ path('app_profile_social') }}">{{ "chrome.menu_profile_social" | trans }}</a></li>
+                        <li><a href="{{ path('app_profile_config') }}">{{ "chrome.menu_profile_config" | trans }}</a></li>
                     </ul>
 
                     {% if is_granted('ROLE_ORGANIZER') %}
-                        <p class="menu-label">Admin</p>
+                        <p class="menu-label">{{ 'chrome.burger_admin_section'|trans }}</p>
                         <ul class="menu-list pl-3">
-                            <li><a href="{{ path('app_admin') }}">{{ "menu_admin" | trans }}</a></li>
+                            <li><a href="{{ path('app_admin') }}">{{ "chrome.menu_admin" | trans }}</a></li>
                         </ul>
                     {% endif %}
 
@@ -74,12 +74,12 @@
         {% if is_granted('ROLE_USER') %}
             <a class="navbar-item" href="/logout">
                 <span class="icon mr-2"><i class="fa fa-sign-out"></i></span>
-                {{ "menu_profile_logout" | trans }}
+                {{ "chrome.menu_profile_logout" | trans }}
             </a>
         {% else %}
             <a class="navbar-item" href="{{ path('app_login') }}">
                 <span class="icon mr-2"><i class="fa fa-sign-in"></i></span>
-                {{ "menu_login" | trans }}
+                {{ "chrome.menu_login" | trans }}
             </a>
         {% endif %}
 

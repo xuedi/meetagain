@@ -39,8 +39,8 @@ class Kernel implements Plugin
     public function getLinkCollection(): LinkCollection
     {
         return LinkCollection::empty()->withNavLinks([
-            new Link(slug: $this->urlGenerator->generate('app_filmclub_filmlist'), name: 'Filme'),
-            new Link(slug: $this->urlGenerator->generate('app_filmclub_vote'), name: 'Vote'),
+            new Link(slug: $this->urlGenerator->generate('app_filmclub_filmlist'), name: 'menu_Filme'),
+            new Link(slug: $this->urlGenerator->generate('app_filmclub_vote'), name: 'menu_Vote'),
         ]);
     }
 

@@ -31,7 +31,7 @@ class Kernel implements Plugin
     public function getLinkCollection(): LinkCollection
     {
         return LinkCollection::empty()->withNavLinks([
-            new Link(slug: $this->urlGenerator->generate('app_plugin_bookclub'), name: 'books'),
+            new Link(slug: $this->urlGenerator->generate('app_plugin_bookclub'), name: 'menu_books'),
         ]);
     }
 

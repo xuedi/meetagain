@@ -6,11 +6,11 @@
                 {% if pluginFooterAbout %}
                     {{ pluginFooterAbout | raw }}
                 {% else %}
-                    <span>powered by</span> <a target="_blank" href="https://github.com/xuedi/meetAgain">meetAgain</a>
+                    <span>{{ 'chrome.footer_powered_by'|trans }}</span> <a target="_blank" href="https://github.com/xuedi/meetAgain">meetAgain</a>
                 {% endif %}
             </div>
             <div class="column is-6-mobile">
-                <p>{{ get_footer_column_title('col1') ?: ('footer_col1' | trans) }}</p>
+                <p>{{ get_footer_column_title('col1') ?: ('chrome.footer_col_help' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col1') %}
                         {% if menu.slug != 'index' %}
@@ -20,15 +20,15 @@
                         {% endif %}
                     {% endfor %}
                     <li>
-                        <a class="is-size-5-mobile" href="{{ path('app_contact') }}">{{ 'nav_contact' | trans }}</a>
+                        <a class="is-size-5-mobile" href="{{ path('app_contact') }}">{{ 'chrome.nav_contact' | trans }}</a>
                     </li>
                     <li>
-                        <a class="is-size-5-mobile" href="{{ path('app_api') }}">{{ 'nav_api' | trans }}</a>
+                        <a class="is-size-5-mobile" href="{{ path('app_api') }}">{{ 'chrome.nav_api' | trans }}</a>
                     </li>
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>{{ get_footer_column_title('col2') ?: ('footer_col2' | trans) }}</p>
+                <p>{{ get_footer_column_title('col2') ?: ('chrome.footer_col_platform' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col2') %}
                         {% if menu.slug != 'index' %}
@@ -45,7 +45,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>{{ get_footer_column_title('col3') ?: ('footer_col3' | trans) }}</p>
+                <p>{{ get_footer_column_title('col3') ?: ('chrome.footer_col_social' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col3') %}
                         {% if menu.slug != 'index' %}
@@ -62,7 +62,7 @@
                 </ul>
             </div>
             <div class="column is-6-mobile">
-                <p>{{ get_footer_column_title('col4') ?: ('footer_col4' | trans) }}</p>
+                <p>{{ get_footer_column_title('col4') ?: ('chrome.footer_col_legal' | trans) }}</p>
                 <ul>
                     {% for menu in get_menu('col4') %}
                         {% if menu.slug != 'index' %}

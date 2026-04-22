@@ -220,6 +220,14 @@ class TranslationRenameCommand extends Command
 
     private function formatKey(string $key): string
     {
+        $reservedLiterals = [
+            'true', 'false', 'null', '~',
+            'yes', 'no', 'on', 'off',
+            'y', 'n',
+        ];
+        if (in_array(strtolower($key), $reservedLiterals, true)) {
+            return "'" . $key . "'";
+        }
         if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key) === 1) {
             return $key;
         }

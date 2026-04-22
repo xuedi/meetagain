@@ -30,16 +30,16 @@ readonly class NavigationPlugin implements Plugin
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';
 
         $links = [
-            new Link(slug: $this->router->generate('app_event', ['_locale' => $locale]), name: 'events', priority: 100),
+            new Link(slug: $this->router->generate('app_event', ['_locale' => $locale]), name: 'chrome.menu_events', priority: 100),
             new Link(
                 slug: $this->router->generate('app_member', ['_locale' => $locale, 'page' => 1]),
-                name: 'members',
+                name: 'chrome.menu_members',
                 priority: 200,
             ),
         ];
 
         if ($this->security->isGranted('ROLE_ORGANIZER')) {
-            $links[] = new Link(slug: $this->router->generate('app_admin'), name: 'admin', priority: 300);
+            $links[] = new Link(slug: $this->router->generate('app_admin'), name: 'chrome.menu_admin', priority: 300);
         }
 
         return LinkCollection::empty()->withNavLinks($links);
