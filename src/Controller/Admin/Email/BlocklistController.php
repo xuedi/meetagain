@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/blocklist')]
 final class BlocklistController extends AbstractAdminController
@@ -28,6 +29,7 @@ final class BlocklistController extends AbstractAdminController
     public function __construct(
         private readonly EmailBlocklistRepository $repo,
         private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_email_blocklist')]
@@ -49,11 +51,10 @@ final class BlocklistController extends AbstractAdminController
         if ($form->isSubmitted() && $form->isValid()) {
             $existing = $this->repo->findByEmail((string) $entry->getEmail());
             if ($existing !== null) {
-                $this->addFlash('warning', sprintf(
-                    '"%s" is already on the blocklist (reason: %s).',
-                    $existing->getEmail(),
-                    $existing->getReason(),
-                ));
+                $this->addFlash('warning', $this->translator->trans('admin_email.flash_warning_already_blocklisted', [
+                    '%email%' => $existing->getEmail(),
+                    '%reason%' => $existing->getReason(),
+                ]));
 
                 return $this->render('admin/email/blocklist/add.html.twig', [
                     'active' => 'email',
@@ -69,7 +70,9 @@ final class BlocklistController extends AbstractAdminController
             $this->em->persist($entry);
             $this->em->flush();
 
-            $this->addFlash('success', sprintf('Added "%s" to the blocklist.', $entry->getEmail()));
+            $this->addFlash('success', $this->translator->trans('admin_email.flash_success_added_blocklist', [
+                '%email%' => $entry->getEmail(),
+            ]));
 
             return $this->redirectToRoute('app_admin_email_blocklist');
         }
@@ -87,7 +90,9 @@ final class BlocklistController extends AbstractAdminController
         $this->em->remove($entry);
         $this->em->flush();
 
-        $this->addFlash('success', sprintf('Removed "%s" from the blocklist.', $removed));
+        $this->addFlash('success', $this->translator->trans('admin_email.flash_success_removed_blocklist', [
+            '%email%' => $removed,
+        ]));
 
         return $this->redirectToRoute('app_admin_email_blocklist');
     }

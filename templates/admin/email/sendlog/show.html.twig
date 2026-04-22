@@ -9,14 +9,14 @@
         <div class="mb-4">
             <a href="{{ path('app_admin_email_sendlog') }}" class="button is-small">
                 <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                <span>Back</span>
+                <span>{{ 'button_back'|trans }}</span>
             </a>
             {% if email.status.value == 'late' or (email.maxSendBy and email.status.value == 'pending' and email.maxSendBy|date('U') < 'now'|date('U')) %}
                 <form method="post" action="{{ path('app_admin_email_sendlog_clear_cap', {id: email.id}) }}" style="display:inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('clear_cap_' ~ email.id) }}">
                     <button type="submit" class="button is-small is-warning">
                         <span class="icon"><i class="fa fa-redo"></i></span>
-                        <span>Clear cap &amp; retry</span>
+                        <span>{{ 'admin_email.button_clear_cap_retry'|trans }}</span>
                     </button>
                 </form>
             {% endif %}
@@ -29,7 +29,7 @@
                     <td>{{ email.id }}</td>
                 </tr>
                 <tr>
-                    <th>Template</th>
+                    <th>{{ 'admin_email.col_template'|trans }}</th>
                     <td>
                         {% if email.template %}
                             <span class="tag is-light">{{ email.template.value }}</span>
@@ -39,23 +39,23 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Sender</th>
+                    <th>{{ 'admin_email.col_sender'|trans }}</th>
                     <td>{{ email.sender }}</td>
                 </tr>
                 <tr>
-                    <th>Recipient</th>
+                    <th>{{ 'admin_email.col_recipient'|trans }}</th>
                     <td>{{ email.recipient }}</td>
                 </tr>
                 <tr>
-                    <th>Subject</th>
+                    <th>{{ 'admin_email.col_subject'|trans }}</th>
                     <td>{{ email.subject }}</td>
                 </tr>
                 <tr>
-                    <th>Language</th>
+                    <th>{{ 'admin_email.col_language'|trans }}</th>
                     <td>{{ email.lang }}</td>
                 </tr>
                 <tr>
-                    <th>Status</th>
+                    <th>{{ 'admin_email.col_status'|trans }}</th>
                     <td>
                         {% if email.status.value == 'late' or email.status.value == 'failed' %}
                             <span class="has-text-danger">{{ email.status.value }}</span>
@@ -65,11 +65,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Created At</th>
+                    <th>{{ 'admin_email.col_created_at'|trans }}</th>
                     <td>{{ email.createdAt|date('Y-m-d H:i:s') }}</td>
                 </tr>
                 <tr>
-                    <th>Provider Dispatched At</th>
+                    <th>{{ 'admin_email.col_provider_dispatched_at'|trans }}</th>
                     <td>
                         {% if email.providerDispatchedAt %}
                             {{ email.providerDispatchedAt|date('Y-m-d H:i:s') }}
@@ -79,14 +79,14 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Queue Latency</th>
+                    <th>{{ 'admin_email.col_queue_latency'|trans }}</th>
                     <td>
                         {% if email.providerDispatchedAt and email.createdAt %}
                             {{ (email.providerDispatchedAt|date('U') - email.createdAt|date('U'))|format_duration }}
                         {% elseif email.status.value == 'late' and email.createdAt %}
                             <span class="has-text-danger">
                                 {{ ('now'|date('U') - email.createdAt|date('U'))|format_duration }}
-                                (still in queue, past cutoff)
+                                {{ 'admin_email.status_still_in_queue'|trans }}
                             </span>
                         {% else %}
                             <span class="has-text-grey">-</span>
@@ -94,7 +94,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Max Send By</th>
+                    <th>{{ 'admin_email.col_max_send_by'|trans }}</th>
                     <td>
                         {% if email.maxSendBy %}
                             {{ email.maxSendBy|date('Y-m-d H:i:s') }}
@@ -104,7 +104,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Provider Message ID</th>
+                    <th>{{ 'admin_email.col_provider_message_id'|trans }}</th>
                     <td>
                         {% if email.providerMessageId %}
                             <code>{{ email.providerMessageId }}</code>
@@ -114,7 +114,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Provider Status</th>
+                    <th>{{ 'admin_email.col_provider_status'|trans }}</th>
                     <td>
                         {% set ps = email.providerStatus %}
                         {% if ps == 'delivered' %}
@@ -132,12 +132,12 @@
                 </tr>
                 {% if email.errorMessage %}
                     <tr>
-                        <th>Error</th>
+                        <th>{{ 'admin_email.col_error'|trans }}</th>
                         <td class="has-text-danger">{{ email.errorMessage }}</td>
                     </tr>
                 {% endif %}
                 <tr>
-                    <th>Context</th>
+                    <th>{{ 'admin_email.col_context'|trans }}</th>
                     <td>
                         <table class="table is-narrow is-bordered">
                             <tbody>
