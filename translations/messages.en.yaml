@@ -224,7 +224,27 @@ profile:
     label_messages: 'Messages'
     label_rsvp: 'RSVP'
     label_blocked: 'Blocked'
-profile_config: {}
+    form_label_username: 'Username'
+    form_label_public_profile: 'Public profile:'
+    form_label_language_after_login: 'Language after login:'
+    form_label_bio: 'Bio:'
+    form_choice_yes: 'Yes'
+    form_choice_no: 'No'
+profile_config:
+    section_settings: 'Settings'
+    section_privacy: 'Privacy'
+    section_change_password: 'Change Password'
+    section_blocked_users: 'Blocked Users'
+    toggle_email_notification: 'Enable email notification'
+    toggle_public_profile: 'Show me on the members page for website guests'
+    toggle_tagging: 'Can be tagged by others in photos'
+    toggle_osm: 'Enable OpenStreetMap maps on the event page'
+    password_reset_hint: 'If you ever forget your password, you can reset it by using the password %reset_link% function.'
+    password_reset_link_label: 'reset'
+    blocked_empty: 'You have not blocked any users.'
+    blocked_view_all: 'View all blocked users'
+    flash_password_changed: 'Password was changed, please verify by logging in again.'
+    flash_password_old_invalid: 'The old password is not correct.'
 profile_social: {}
 profile_images: {}
 profile_messages: {}

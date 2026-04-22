@@ -44,10 +44,10 @@ final class ConfigController extends AbstractController
 
                 $this->activityService->log(PasswordChanged::TYPE, $user);
 
-                $this->addFlash('success', 'Password was changed, please verify by logging in again');
+                $this->addFlash('success', 'profile_config.flash_password_changed');
             }
             if (!$oldPasswordValid) {
-                $this->addFlash('error', 'The old password is not correct');
+                $this->addFlash('error', 'profile_config.flash_password_old_invalid');
             }
         }
 

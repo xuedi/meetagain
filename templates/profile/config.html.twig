@@ -11,10 +11,10 @@
                 <div class="column">
 
                     <div class="box">
-                        <h1 class="title is-5">Settings</h1>
+                        <h1 class="title is-5">{{ 'profile_config.section_settings'|trans }}</h1>
                         <div class="field is-grouped">
                             <div class="control is-expanded">
-                                Enable eMail notification
+                                {{ 'profile_config.toggle_email_notification'|trans }}
                             </div>
                             <div class="control">
                                 {% include '_components/toggle.html.twig' with {
@@ -40,9 +40,9 @@
                     </div>
 
                     <div class="box">
-                        <h2 class="title is-5">Privacy</h2>
+                        <h2 class="title is-5">{{ 'profile_config.section_privacy'|trans }}</h2>
                         <div class="field is-grouped">
-                            <div class="control is-expanded">Show me on the members page for website guests</div>
+                            <div class="control is-expanded">{{ 'profile_config.toggle_public_profile'|trans }}</div>
                             <div class="control">
                                 {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'public'}),
@@ -51,7 +51,7 @@
                             </div>
                         </div>
                         <div class="field is-grouped">
-                            <div class="control is-expanded">Can be tagged by others in photos</div>
+                            <div class="control is-expanded">{{ 'profile_config.toggle_tagging'|trans }}</div>
                             <div class="control">
                                 {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'tagging'}),
@@ -60,7 +60,7 @@
                             </div>
                         </div>
                         <div class="field is-grouped">
-                            <div class="control is-expanded">Enable osm maps on the event page</div>
+                            <div class="control is-expanded">{{ 'profile_config.toggle_osm'|trans }}</div>
                             <div class="control">
                                 {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'osm'}),
@@ -74,7 +74,7 @@
                 <div class="column">
 
                     <div class="box">
-                        <h2 class="title is-5">Change Password</h2>
+                        <h2 class="title is-5">{{ 'profile_config.section_change_password'|trans }}</h2>
                         {{ form_start(form) }}
                         {% for flash_error in app.flashes('error') %}
                             <div class="notification is-danger">
@@ -93,14 +93,14 @@
                         {{ form_end(form) }}
 
                         <p class="mt-4">
-                            If you ever forget your password, you can reset it by using the password <a href="{{ path('app_reset') }}">reset</a> function.
+                            {{ 'profile_config.password_reset_hint'|trans({'%reset_link%': '<a href="' ~ path('app_reset') ~ '">' ~ ('profile_config.password_reset_link_label'|trans) ~ '</a>'})|raw }}
                         </p>
                     </div>
 
                     <div class="box">
-                        <h2 class="title is-5">Blocked Users</h2>
+                        <h2 class="title is-5">{{ 'profile_config.section_blocked_users'|trans }}</h2>
                         {% if blockedUsers|length == 0 %}
-                            <p>You have not blocked any users.</p>
+                            <p>{{ 'profile_config.blocked_empty'|trans }}</p>
                         {% else %}
                             <table class="table is-fullwidth">
                                 <tbody>
@@ -125,7 +125,7 @@
                                 </tbody>
                             </table>
                             <p class="mt-2">
-                                <a href="{{ path('app_profile_blocked_users') }}">View all blocked users</a>
+                                <a href="{{ path('app_profile_blocked_users') }}">{{ 'profile_config.blocked_view_all'|trans }}</a>
                             </p>
                         {% endif %}
                     </div>

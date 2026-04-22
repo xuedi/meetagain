@@ -210,7 +210,27 @@ profile:
     label_messages: 'Nachrichten'
     label_rsvp: 'Zusagen'
     label_blocked: 'Blockiert'
-profile_config: {}
+    form_label_username: 'Benutzername'
+    form_label_public_profile: 'Öffentliches Profil:'
+    form_label_language_after_login: 'Sprache nach der Anmeldung:'
+    form_label_bio: 'Bio:'
+    form_choice_yes: 'Ja'
+    form_choice_no: 'Nein'
+profile_config:
+    section_settings: 'Einstellungen'
+    section_privacy: 'Privatsphäre'
+    section_change_password: 'Passwort ändern'
+    section_blocked_users: 'Blockierte Nutzer'
+    toggle_email_notification: 'E-Mail-Benachrichtigungen aktivieren'
+    toggle_public_profile: 'Auf der Mitgliederseite für Besucher anzeigen'
+    toggle_tagging: 'Kann von anderen in Fotos markiert werden'
+    toggle_osm: 'OpenStreetMap-Karten auf der Event-Seite aktivieren'
+    password_reset_hint: 'Falls du dein Passwort vergisst, kannst du es über die Passwort-%reset_link%-Funktion zurücksetzen.'
+    password_reset_link_label: 'Zurücksetzen'
+    blocked_empty: 'Du hast keine Nutzer blockiert.'
+    blocked_view_all: 'Alle blockierten Nutzer anzeigen'
+    flash_password_changed: 'Passwort wurde geändert, bitte melde dich zur Bestätigung erneut an.'
+    flash_password_old_invalid: 'Das alte Passwort ist nicht korrekt.'
 profile_social: {}
 profile_images: {}
 profile_messages: {}
