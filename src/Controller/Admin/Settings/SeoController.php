@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
 final class SeoController extends AbstractAdminController
@@ -23,6 +24,7 @@ final class SeoController extends AbstractAdminController
     public function __construct(
         private readonly ConfigService $configService,
         private readonly IndexNowService $indexNowService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/seo', name: 'app_admin_system_seo', methods: ['GET', 'POST'])]
@@ -33,7 +35,7 @@ final class SeoController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->configService->saveSeoForm($form->getData());
-            $this->addFlash('success', 'SEO settings saved');
+            $this->addFlash('success', $this->translator->trans('admin_system.flash_seo_saved'));
         }
 
         return $this->render('admin/system/seo/index.html.twig', [
@@ -48,7 +50,7 @@ final class SeoController extends AbstractAdminController
     public function indexNowSubmit(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('indexnow_submit', $request->request->getString('_token'))) {
-            $this->addFlash('danger', 'Invalid CSRF token');
+            $this->addFlash('danger', $this->translator->trans('admin_system.flash_invalid_csrf'));
 
             return $this->redirectToRoute('app_admin_system_seo');
         }
@@ -58,10 +60,10 @@ final class SeoController extends AbstractAdminController
 
         if ($status === 200 || $status === 202) {
             $this->indexNowService->recordSubmission();
-            $this->addFlash('success', sprintf('Submitted to IndexNow (HTTP %d)', $status));
+            $this->addFlash('success', $this->translator->trans('admin_system.flash_indexnow_submitted', ['%status%' => $status]));
         }
         if ($status !== 200 && $status !== 202) {
-            $this->addFlash('danger', sprintf('IndexNow submission failed (HTTP %d)', $status));
+            $this->addFlash('danger', $this->translator->trans('admin_system.flash_indexnow_failed', ['%status%' => $status]));
         }
 
         return $this->redirectToRoute('app_admin_system_seo');

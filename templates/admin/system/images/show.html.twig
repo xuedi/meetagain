@@ -25,7 +25,7 @@
                     <div class="level-item">
                         <a href="{{ path('app_admin_system_images') }}" class="button is-small">
                             <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
-                            <span>Back</span>
+                            <span>{{ 'admin_system.button_back'|trans }}</span>
                         </a>
                     </div>
                 </div>
@@ -35,31 +35,31 @@
         <table class="table is-fullwidth">
             <tbody>
                 <tr>
-                    <th>ID</th>
+                    <th>{{ 'admin_system.label_id'|trans }}</th>
                     <td><code>{{ image.id }}</code></td>
                 </tr>
                 <tr>
-                    <th>Hash</th>
+                    <th>{{ 'admin_system.label_hash'|trans }}</th>
                     <td><code>{{ image.hash }}</code></td>
                 </tr>
                 <tr>
-                    <th>Type</th>
+                    <th>{{ 'admin_system.col_type'|trans }}</th>
                     <td><span class="tag is-light">{{ image.type.name }}</span></td>
                 </tr>
                 <tr>
-                    <th>MimeType</th>
+                    <th>{{ 'admin_system.col_mime_type'|trans }}</th>
                     <td>{{ image.mimeType }}</td>
                 </tr>
                 <tr>
-                    <th>Extension</th>
+                    <th>{{ 'admin_system.label_extension'|trans }}</th>
                     <td>{{ image.extension }}</td>
                 </tr>
                 <tr>
-                    <th>File size</th>
+                    <th>{{ 'admin_system.label_file_size'|trans }}</th>
                     <td>{{ image.size | format_bytes }}</td>
                 </tr>
                 <tr>
-                    <th>Uploader</th>
+                    <th>{{ 'admin_system.col_uploader'|trans }}</th>
                     <td>
                         <a href="{{ path('app_admin_member_edit', {'id': image.uploader.id}) }}">
                             {{ image.uploader.email }}
@@ -67,11 +67,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Created at</th>
+                    <th>{{ 'admin_system.col_created_at'|trans }}</th>
                     <td>{{ image.createdAt | date('Y-m-d H:i:s') }}</td>
                 </tr>
                 <tr>
-                    <th>Updated at</th>
+                    <th>{{ 'admin_system.label_updated_at'|trans }}</th>
                     <td>
                         {% if image.updatedAt %}
                             {{ image.updatedAt | date('Y-m-d H:i:s') }}
@@ -81,7 +81,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Reported</th>
+                    <th>{{ 'admin_system.label_reported'|trans }}</th>
                     <td>
                         {% if image.reported %}
                             <span class="tag is-danger is-light">{{ image.reported.name }}</span>
@@ -93,20 +93,20 @@
             </tbody>
         </table>
 
-        <h2 class="subtitle mt-5">Preview</h2>
+        <h2 class="subtitle mt-5">{{ 'admin_system.heading_preview'|trans }}</h2>
         {% include '_components/image.html.twig' with {'image': image} %}
 
-        <h2 class="subtitle mt-5">Locations</h2>
+        <h2 class="subtitle mt-5">{{ 'admin_system.heading_locations'|trans }}</h2>
         {% if locations is empty %}
             <div class="notification is-info is-light">
-                No locations indexed yet &mdash; run the nightly discovery.
+                {{ 'admin_system.empty_locations'|trans }}
             </div>
         {% else %}
             <table class="table is-fullwidth is-narrow">
                 <thead>
                     <tr>
-                        <th>Type</th>
-                        <th>Location ID</th>
+                        <th>{{ 'admin_system.col_type'|trans }}</th>
+                        <th>{{ 'admin_system.col_location_id'|trans }}</th>
                         <th></th>
                     </tr>
                 </thead>

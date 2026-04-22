@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
 final class ConfigController extends AbstractAdminController
@@ -22,6 +23,7 @@ final class ConfigController extends AbstractAdminController
 
     public function __construct(
         private readonly ConfigService $configService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_system')]
@@ -38,7 +40,7 @@ final class ConfigController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->configService->saveForm($form->getData());
-            $this->addFlash('success', 'Settings saved');
+            $this->addFlash('success', $this->translator->trans('admin_system.flash_settings_saved'));
         }
 
         return $this->render('admin/system/config/index.html.twig', [
