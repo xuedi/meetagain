@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "event"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
-{% block meta_description %}{{ event.metaDescription(app.locale, 'meta_description_event_meeting_at'|trans) }}{% endblock %}
+{% block title %}{{ "events.page_title_label"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
+{% block meta_description %}{{ event.metaDescription(app.locale, 'events.meta_description_meeting_at'|trans) }}{% endblock %}
 {% block og_type %}event{% endblock %}
 {% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
 {% block twitter_image %}{% if event.previewImage %}<meta name="twitter:image" content="{{ json_ld.image[0]|default('') }}"/>{% endif %}{% endblock %}
@@ -26,12 +26,12 @@
             <h1 class="title">
                 {{ event.title(app.locale) }}
                 {% if event.canceled %}
-                    <span class="tag is-danger is-medium ml-2">{{ "Canceled"|trans }}</span>
+                    <span class="tag is-danger is-medium ml-2">{{ "events.tag_canceled"|trans }}</span>
                 {% endif %}
             </h1>
             {% if event.canceled %}
                 <div class="notification is-danger is-light mb-5">
-                    <strong>{{ "This event has been canceled."|trans }}</strong>
+                    <strong>{{ "events.notification_event_canceled"|trans }}</strong>
                 </div>
             {% endif %}
             <div class="columns">
@@ -60,10 +60,10 @@
                         </div>
                         <div class="notification has-text-centered mt-6 is-warning">
                             <p>
-                                Please <a class="is-bold" href="{{ path('app_login') }}">login</a> to see and post, comments and pictures.
+                                {{ 'events.guest_login_prompt'|trans({'%login_link%': '<a class="is-bold" href="' ~ path('app_login') ~ '">' ~ ('events.guest_login_link'|trans) ~ '</a>'})|raw }}
                             </p>
                             <p class="mt-2">
-                                If you have not registered yet, please <a href="{{ path('app_register') }}">register</a>.
+                                {{ 'events.guest_register_prompt'|trans({'%register_link%': '<a href="' ~ path('app_register') ~ '">' ~ ('events.guest_register_link'|trans) ~ '</a>'})|raw }}
                             </p>
                         </div>
                     {% endif %}

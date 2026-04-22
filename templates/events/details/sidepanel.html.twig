@@ -10,12 +10,12 @@
     <p>
         {{ event.start|date('H:i') }} to {{ event.start|date('H:i') }}<br>
         {% if event.recurringRule is defined and event.recurringRule.name is defined %}
-            Recurring: {{ event.recurringRule.name }}
+            {{ 'events.label_recurring'|trans }} {{ event.recurringRule.name }}
         {% endif %}
     </p>
 </div>
 <div class="box mt-5">
-    <h2 class="title is-4">Hosts</h2>
+    <h2 class="title is-4">{{ 'events.label_hosts'|trans }}</h2>
     <div class="columns is-multiline">
         {% for host in event.host %}
             <div class="tag is-large m-1">{{ host.user ? host.user.name : host.name }}</div>
@@ -23,7 +23,7 @@
     </div>
 </div>
 <div class="box mt-5">
-    <h2 class="title is-4">Location</h2>
+    <h2 class="title is-4">{{ 'events.label_location'|trans }}</h2>
     <strong>{{ event.location.name }}</strong>
     <p>
         {{ event.location.street }}<br>
