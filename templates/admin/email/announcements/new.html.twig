@@ -6,7 +6,7 @@
 
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'announcements'} %}
 
-        <h1 class="title">{{ 'announcement_new' | trans }}</h1>
+        <h1 class="title">{{ 'admin_cms.announcement_new' | trans }}</h1>
 
         {{ form_start(form) }}
 
@@ -14,7 +14,7 @@
             <div class="column is-8">
 
                 <p class="mb-3">
-                    Please select a CMS page you want to create an announcement from, this page will generate the content, and the announcement will link to this page for a web view.
+                    {{ 'admin_cms.announcement_new_intro' | trans }}
                 </p>
                 {{ form_widget(form.cmsPage) }}
 
