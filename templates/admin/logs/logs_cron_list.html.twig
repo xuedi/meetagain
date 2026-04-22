@@ -9,10 +9,10 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>Run At</th>
-                <th>Status</th>
-                <th>Tasks</th>
-                <th>Duration</th>
+                <th>{{ 'admin_logs.col_run_at'|trans }}</th>
+                <th>{{ 'admin_logs.col_status'|trans }}</th>
+                <th>{{ 'admin_logs.col_tasks'|trans }}</th>
+                <th>{{ 'admin_logs.col_duration'|trans }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -22,13 +22,13 @@
                     <td>{{ log.runAt | date('Y-m-d H:i:s') }}</td>
                     <td>
                         {% if log.status.value == 'ok' %}
-                            <span class="tag is-success">ok</span>
+                            <span class="tag is-success">{{ 'admin_logs.status_ok'|trans }}</span>
                         {% elseif log.status.value == 'warning' %}
-                            <span class="tag is-warning">warning</span>
+                            <span class="tag is-warning">{{ 'admin_logs.status_warning'|trans }}</span>
                         {% elseif log.status.value == 'error' %}
-                            <span class="tag is-danger">error</span>
+                            <span class="tag is-danger">{{ 'admin_logs.status_error'|trans }}</span>
                         {% else %}
-                            <span class="tag is-danger is-dark">exception</span>
+                            <span class="tag is-danger is-dark">{{ 'admin_logs.status_exception'|trans }}</span>
                         {% endif %}
                     </td>
                     <td>{{ log.tasks | length }}</td>
@@ -41,7 +41,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5" class="has-text-grey has-text-centered">No cron logs yet.</td>
+                    <td colspan="5" class="has-text-grey has-text-centered">{{ 'admin_logs.empty_cron'|trans }}</td>
                 </tr>
             {% endfor %}
             </tbody>
