@@ -1,23 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_cookie"|trans }}{% endblock %}
-{% block meta_description %}{{ "meta_description_cookie"|trans }}{% endblock %}
+{% block title %}{{ "cookie.page_title"|trans }}{% endblock %}
+{% block meta_description %}{{ "cookie.meta_description"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
-            <h1 class="title is-3">{{ "page_title_cookie" | trans }}</h1>
+            <h1 class="title is-3">{{ "cookie.page_title" | trans }}</h1>
 
             <div class="columns">
                 <div class="column is-8">
                     {{ form_start(form, {'attr': {'class': 'box'}}) }}
-                        <p class="mb-4">{{ "menu_cookie_consent_text" | trans }}</p>
+                        <p class="mb-4">{{ "cookie.consent_text" | trans }}</p>
 
                         <div class="field">
                             <label class="checkbox">
                                 {{ form_widget(form.cookies) }}
-                                <p class="help has-text-grey">{{ "cookie_consent_cookies_text" | trans }}</p>
+                                <p class="help has-text-grey">{{ "cookie.cookies_text" | trans }}</p>
                             </label>
                         </div>
 
@@ -25,7 +25,7 @@
                             <label class="checkbox">
                                 {{ form_widget(form.osm) }}
                             </label>
-                            <p class="help has-text-grey">{{ "menu_cookie_consent_option_osm_text" | trans }}</p>
+                            <p class="help has-text-grey">{{ "cookie.option_osm_text" | trans }}</p>
                         </div>
 
                         <div class="field mt-4">
@@ -36,26 +36,26 @@
 
                 <div class="column is-4">
                     <div class="box">
-                        <p class="has-text-weight-bold mb-2">{{ "cookie_consent_current_status"|trans }}</p>
+                        <p class="has-text-weight-bold mb-2">{{ "cookie.current_status"|trans }}</p>
                         <ul>
                             <li>
-                                {{ "cookie_consent_cookies"|trans }}:
+                                {{ "cookie.cookies_label"|trans }}:
                                 {% if consent.cookies.value == 'granted' %}
-                                    <span class="tag is-success">{{ "cookie_consent_status_granted"|trans }}</span>
+                                    <span class="tag is-success">{{ "cookie.status_granted"|trans }}</span>
                                 {% elseif consent.cookies.value == 'denied' %}
-                                    <span class="tag is-danger">{{ "cookie_consent_status_denied"|trans }}</span>
+                                    <span class="tag is-danger">{{ "cookie.status_denied"|trans }}</span>
                                 {% else %}
-                                    <span class="tag is-warning">{{ "cookie_consent_status_unknown"|trans }}</span>
+                                    <span class="tag is-warning">{{ "cookie.status_unknown"|trans }}</span>
                                 {% endif %}
                             </li>
                             <li>
-                                {{ "menu_cookie_consent_option_osm"|trans }}:
+                                {{ "cookie.option_osm"|trans }}:
                                 {% if consent.osm.value == 'granted' %}
-                                    <span class="tag is-success">{{ "cookie_consent_status_granted"|trans }}</span>
+                                    <span class="tag is-success">{{ "cookie.status_granted"|trans }}</span>
                                 {% elseif consent.osm.value == 'denied' %}
-                                    <span class="tag is-danger">{{ "cookie_consent_status_denied"|trans }}</span>
+                                    <span class="tag is-danger">{{ "cookie.status_denied"|trans }}</span>
                                 {% else %}
-                                    <span class="tag is-warning">{{ "cookie_consent_status_unknown"|trans }}</span>
+                                    <span class="tag is-warning">{{ "cookie.status_unknown"|trans }}</span>
                                 {% endif %}
                             </li>
                         </ul>
