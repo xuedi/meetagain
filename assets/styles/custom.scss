@@ -157,9 +157,21 @@ input[type="color"] {
 }
 
 // API documentation
-.api-endpoint .buttons.has-addons { display: inline-flex; }
-.api-method { min-width: 6.5rem; justify-content: center; }
-.api-path   { font-family: monospace; min-width: 20rem; justify-content: flex-start; }
+.api-endpoint                     { width: fit-content; border-left: 4px solid transparent; padding: 0.35rem 0.5rem; border-radius: 4px; margin-bottom: 0.25rem; }
+.api-endpoint .buttons.has-addons { display: inline-flex; margin-bottom: 0; }
+.api-method                       { min-width: 6.5rem; justify-content: center; font-weight: 700; }
+.api-path                         { font-family: monospace; min-width: 20rem; justify-content: flex-start; }
+
+.api-endpoint--get    { background-color: #eaf3fb; border-left-color: #3e8ed0; }
+.api-endpoint--post   { background-color: #ecf6ee; border-left-color: #48c78e; }
+.api-endpoint--put    { background-color: #fbf3e3; border-left-color: #ffe08a; }
+.api-endpoint--patch  { background-color: #ecf0fb; border-left-color: #485fc7; }
+.api-endpoint--delete { background-color: #fbecec; border-left-color: #f14668; }
+
+.api-toolbox-sidebar           { position: sticky; top: 5rem; }
+.api-toolbox-sidebar pre,
+.api-toolbox-sidebar code      { font-size: 0.85rem; word-break: break-all; padding: 0.5rem 0.75rem; }
+.api-toolbox-sidebar .buttons  { margin-top: 0.5rem; }
 
 // Floating action menu — absolute top-right overlay on image/card containers.
 .float-box-menu {

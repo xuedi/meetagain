@@ -15,11 +15,11 @@
         - route       (string|null, optional)  — Symfony route name; makes the path a clickable link
     Depends on: assets/js/admin/debug.js (.api-toggle, .api-example)
 #}
-{% set methodColors = {'GET': 'is-success', 'POST': 'is-info', 'PUT': 'is-warning', 'DELETE': 'is-danger'} %}
+{% set methodColors = {'GET': 'is-info', 'POST': 'is-success', 'PUT': 'is-warning', 'PATCH': 'is-link', 'DELETE': 'is-danger'} %}
 
-<div class="api-endpoint">
+<div class="api-endpoint api-endpoint--{{ method|lower }}">
     <div class="buttons has-addons mb-1">
-        <span class="button {{ methodColors[method] }} is-light is-static api-method">{{ method }}</span>
+        <span class="button {{ methodColors[method] }} is-static api-method">{{ method }}</span>
         {% if route %}
             <a class="button is-light api-path" href="{{ path(route) }}" rel="nofollow">{{ apiPath }}</a>
         {% else %}
