@@ -639,7 +639,29 @@ admin_host:
     flash_deleted: '主机删除成功'
     flash_created: '主机创建成功'
     flash_delete_blocked: '无法删除主机。它目前已被 %count% 个活动使用。'
-admin_location: {}
+admin_location:
+    col_name: '名称'
+    col_address: '地址'
+    col_created_by: '创建者'
+    page_title_edit: '编辑场地'
+    page_title_create: '创建场地'
+    warning_delete_title: '删除场地'
+    warning_delete_used: '无法删除此场地！它目前已被 %count% 个活动使用。'
+    warning_delete_confirm: '您确定要删除此场地吗？此操作无法撤销。'
+    warning_delete_button: '是的，删除'
+    danger_zone: '危险区域'
+    danger_delete_location: '删除场地'
+    form_label_name: '名称'
+    form_label_description: '描述'
+    form_label_street: '街道'
+    form_label_city: '城市'
+    form_label_postcode: '邮编'
+    form_label_longitude: '经度'
+    form_label_latitude: '纬度'
+    flash_updated: '场地更新成功'
+    flash_deleted: '场地删除成功'
+    flash_created: '场地创建成功'
+    flash_delete_blocked: '无法删除场地。它目前已被 %count% 个活动使用。'
 admin_logs: {}
 admin_member: {}
 admin_static_link: {}
