@@ -15,15 +15,15 @@ class CookieConsentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('cookies', CheckboxType::class, [
-            'label' => 'cookie_consent_cookies',
+            'label' => 'cookie.cookies_label',
             'required' => false,
             'data' => $options['cookies_granted'],
         ])->add('osm', CheckboxType::class, [
-            'label' => 'menu_cookie_consent_option_osm',
+            'label' => 'cookie.option_osm',
             'required' => false,
             'data' => $options['osm_granted'],
         ])->add('save', SubmitType::class, [
-            'label' => 'save',
+            'label' => 'cookie.button_save',
             'attr' => ['class' => 'button is-primary'],
         ]);
     }
