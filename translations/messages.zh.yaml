@@ -241,7 +241,13 @@ profile_social:
     button_unfollow: '取消关注'
     button_follow_back: '回关'
     find_more_hint: '在成员页面寻找更多可关注的人，或在下次聚会时询问他们的用户名。'
-profile_images: {}
+profile_images:
+    page_heading: '图片'
+    sidebar_general: '常规'
+    sidebar_events: '活动'
+    sidebar_profile_picture: '头像'
+    profile_change_hint: '你可以通过 %profile_link% 上传新图片来更换头像。'
+    profile_change_link_label: '点击这里'
 profile_messages: {}
 profile_notifications: {}
 profile_review: {}
