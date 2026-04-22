@@ -7,8 +7,8 @@
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
 
         <div class="content">
-            <h1 class="title">Preview: {{ template.identifier }}</h1>
-            <p>This is a preview using mock data. The actual email will use real values.</p>
+            <h1 class="title">{{ 'admin_email.button_preview'|trans }}: {{ template.identifier }}</h1>
+            <p>{{ 'admin_email.preview_mock_notice'|trans }}</p>
         </div>
 
         <div class="mb-4">
@@ -25,7 +25,7 @@
         <div class="columns">
             <div class="column is-8">
                 <div class="box">
-                    <p class="mb-4"><strong>Subject:</strong> {{ renderedSubject }}</p>
+                    <p class="mb-4"><strong>{{ 'admin_email.col_subject'|trans }}:</strong> {{ renderedSubject }}</p>
                     <hr>
                     <div class="content">
                         {{ renderedBody|raw }}
@@ -34,7 +34,7 @@
             </div>
             <div class="column">
                 <div class="box">
-                    <h3 class="subtitle">Mock Context Variables</h3>
+                    <h3 class="subtitle">{{ 'admin_email.context_variables'|trans }}</h3>
                     <table class="table is-narrow is-fullwidth">
                         {% for key, value in context %}
                             <tr>
@@ -48,8 +48,10 @@
         </div>
 
         <div class="buttons">
-            <a href="{{ path('app_admin_email_templates_edit', {id: template.id}) }}" class="button is-info">Edit Template</a>
-            <a href="{{ path('app_admin_email_templates') }}" class="button">Back to List</a>
+            <a href="{{ path('app_admin_email_templates_edit', {id: template.id}) }}" class="button is-info">
+                <span class="icon"><i class="fa fa-edit"></i></span>
+            </a>
+            <a href="{{ path('app_admin_email_templates') }}" class="button">{{ 'button_back'|trans }}</a>
         </div>
 
     </div>

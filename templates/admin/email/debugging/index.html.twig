@@ -11,7 +11,7 @@
             <div class="columns">
                 <div class="column is-4">
                     <div class="field">
-                        <label class="label">Email Type</label>
+                        <label class="label">{{ 'admin_email.field_email_type'|trans }}</label>
                         <div class="control">
                             <div class="select is-fullwidth">
                                 <select id="emailType" name="emailType">
@@ -29,7 +29,7 @@
 
                 <div class="column is-2">
                     <div class="field">
-                        <label class="label">Language</label>
+                        <label class="label">{{ 'admin_email.field_language'|trans }}</label>
                         <div class="control">
                             <div class="select is-fullwidth">
                                 <select name="language">
@@ -44,7 +44,7 @@
 
                 <div class="column">
                     <div class="field">
-                        <label class="label">Recipient Email</label>
+                        <label class="label">{{ 'admin_email.field_recipient'|trans }}</label>
                         <div class="control">
                             <input class="input" type="email" name="recipient" placeholder="test@example.com" required>
                         </div>
@@ -53,7 +53,7 @@
             </div>
 
             <div class="box">
-                <h3 class="subtitle">Context Variables</h3>
+                <h3 class="subtitle">{{ 'admin_email.context_variables'|trans }}</h3>
                 <div id="contextFields"></div>
             </div>
 
@@ -61,7 +61,7 @@
                 <div class="control">
                     <button type="submit" class="button is-primary">
                         <span class="icon"><i class="fa fa-paper-plane"></i></span>
-                        <span>Send Test Email</span>
+                        <span>{{ 'admin_email.button_send_test'|trans }}</span>
                     </button>
                 </div>
             </div>
