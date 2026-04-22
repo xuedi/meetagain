@@ -15,15 +15,16 @@ class LocationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
+            ->add('name', options: ['label' => 'admin_location.form_label_name'])
             ->add('description', TextareaType::class, [
+                'label' => 'admin_location.form_label_description',
                 'attr' => ['rows' => 3],
             ])
-            ->add('street')
-            ->add('city')
-            ->add('postcode')
-            ->add('longitude')
-            ->add('latitude');
+            ->add('street', options: ['label' => 'admin_location.form_label_street'])
+            ->add('city', options: ['label' => 'admin_location.form_label_city'])
+            ->add('postcode', options: ['label' => 'admin_location.form_label_postcode'])
+            ->add('longitude', options: ['label' => 'admin_location.form_label_longitude'])
+            ->add('latitude', options: ['label' => 'admin_location.form_label_latitude']);
     }
 
     #[Override]

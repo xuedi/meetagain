@@ -639,7 +639,29 @@ admin_host:
     flash_deleted: 'Gastgeber erfolgreich gelöscht'
     flash_created: 'Gastgeber erfolgreich erstellt'
     flash_delete_blocked: 'Gastgeber kann nicht gelöscht werden. Er wird derzeit in %count% Veranstaltung(en) verwendet.'
-admin_location: {}
+admin_location:
+    col_name: 'Name'
+    col_address: 'Adresse'
+    col_created_by: 'Erstellt von'
+    page_title_edit: 'Veranstaltungsort bearbeiten'
+    page_title_create: 'Veranstaltungsort erstellen'
+    warning_delete_title: 'Veranstaltungsort löschen'
+    warning_delete_used: 'Dieser Veranstaltungsort kann nicht gelöscht werden! Er wird derzeit in %count% Veranstaltung(en) verwendet.'
+    warning_delete_confirm: 'Möchten Sie diesen Veranstaltungsort wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'
+    warning_delete_button: 'Ja, löschen'
+    danger_zone: 'Gefahrenzone'
+    danger_delete_location: 'Veranstaltungsort löschen'
+    form_label_name: 'Name'
+    form_label_description: 'Beschreibung'
+    form_label_street: 'Straße'
+    form_label_city: 'Stadt'
+    form_label_postcode: 'Postleitzahl'
+    form_label_longitude: 'Längengrad'
+    form_label_latitude: 'Breitengrad'
+    flash_updated: 'Veranstaltungsort erfolgreich aktualisiert'
+    flash_deleted: 'Veranstaltungsort erfolgreich gelöscht'
+    flash_created: 'Veranstaltungsort erfolgreich erstellt'
+    flash_delete_blocked: 'Veranstaltungsort kann nicht gelöscht werden. Er wird derzeit in %count% Veranstaltung(en) verwendet.'
 admin_logs: {}
 admin_member: {}
 admin_static_link: {}

@@ -663,7 +663,29 @@ admin_host:
     flash_deleted: 'Host deleted successfully'
     flash_created: 'Host created successfully'
     flash_delete_blocked: 'Cannot delete host. It is currently used in %count% event(s).'
-admin_location: {}
+admin_location:
+    col_name: 'Name'
+    col_address: 'Address'
+    col_created_by: 'Created By'
+    page_title_edit: 'Edit Location'
+    page_title_create: 'Create Location'
+    warning_delete_title: 'Delete Location'
+    warning_delete_used: 'Cannot delete this location! It is currently used in %count% event(s).'
+    warning_delete_confirm: 'Are you sure you want to delete this location? This action cannot be undone.'
+    warning_delete_button: 'Yes, Delete'
+    danger_zone: 'Danger Zone'
+    danger_delete_location: 'Delete Location'
+    form_label_name: 'Name'
+    form_label_description: 'Description'
+    form_label_street: 'Street'
+    form_label_city: 'City'
+    form_label_postcode: 'Postcode'
+    form_label_longitude: 'Longitude'
+    form_label_latitude: 'Latitude'
+    flash_updated: 'Location updated successfully'
+    flash_deleted: 'Location deleted successfully'
+    flash_created: 'Location created successfully'
+    flash_delete_blocked: 'Cannot delete location. It is currently used in %count% event(s).'
 admin_logs: {}
 admin_member: {}
 admin_static_link: {}
