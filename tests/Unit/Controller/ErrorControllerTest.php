@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Tests\Unit\Controller;
 
@@ -24,12 +26,11 @@ final class ErrorControllerTest extends TestCase
         $request->setLocale('de');
 
         $twig = $this->createMock(Environment::class);
-        $twig->expects(static::once())
+        $twig
+            ->expects(static::once())
             ->method('render')
-            ->with('cms/404.html.twig', static::callback(function (array $context) {
-                return $context['_locale'] === 'de'
-                    && is_string($context['message'])
-                    && $context['message'] !== '';
+            ->with('cms/404.html.twig', static::callback(static function (array $context) {
+                return $context['_locale'] === 'de' && is_string($context['message']) && $context['message'] !== '';
             }))
             ->willReturn('<html>404</html>');
 
@@ -50,9 +51,10 @@ final class ErrorControllerTest extends TestCase
 
         $capturedContext = null;
         $twig = $this->createMock(Environment::class);
-        $twig->expects(static::once())
+        $twig
+            ->expects(static::once())
             ->method('render')
-            ->with('cms/error.html.twig', static::callback(function (array $context) use (&$capturedContext) {
+            ->with('cms/error.html.twig', static::callback(static function (array $context) use (&$capturedContext) {
                 $capturedContext = $context;
                 return true;
             }))
@@ -84,12 +86,12 @@ final class ErrorControllerTest extends TestCase
 
         $capturedContext = null;
         $twig = $this->createMock(Environment::class);
-        $twig->method('render')->willReturnCallback(
-            function (string $template, array $context) use (&$capturedContext) {
-                $capturedContext = $context;
-                return '';
-            },
-        );
+        $twig->method('render')->willReturnCallback(static function (string $template, array $context) use (
+            &$capturedContext,
+        ) {
+            $capturedContext = $context;
+            return '';
+        });
 
         $controller = new ErrorController($twig);
 
@@ -97,9 +99,6 @@ final class ErrorControllerTest extends TestCase
         $controller->show(new RuntimeException('boom'), $request);
 
         // Assert
-        static::assertMatchesRegularExpression(
-            '/^[0-9a-f]{32}$/',
-            $capturedContext['errorId'],
-        );
+        static::assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $capturedContext['errorId']);
     }
 }

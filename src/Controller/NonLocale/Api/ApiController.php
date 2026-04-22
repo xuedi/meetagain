@@ -3,7 +3,7 @@
 namespace App\Controller\NonLocale\Api;
 
 use App\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use App\Service\Api\OpenApiSpecBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
@@ -11,32 +11,22 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ApiController extends AbstractController
 {
-    private const string SPEC_RELATIVE_PATH = '/config/api/openapi.json';
-
     public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string $projectDir,
+        private readonly OpenApiSpecBuilder $specBuilder,
     ) {}
 
     #[Route('/api/', name: 'app_api')]
     public function index(): Response
     {
         return $this->render('_non_locale/api.html.twig', [
-            'sections' => $this->buildSectionsFromSpec($this->loadSpec()),
+            'sections' => $this->buildSectionsFromSpec($this->specBuilder->build()),
         ]);
     }
 
     #[Route('/api/openapi.json', name: 'app_api_openapi', methods: ['GET'])]
     public function spec(): Response
     {
-        $path = $this->projectDir . self::SPEC_RELATIVE_PATH;
-        if (!is_file($path)) {
-            return new JsonResponse(['error' => 'Spec not found'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $response = new Response((string) file_get_contents($path), Response::HTTP_OK, [
-            'Content-Type' => 'application/json',
-        ]);
+        $response = new JsonResponse($this->specBuilder->build());
         // Opt out of Symfony's automatic private/no-cache downgrade; this endpoint
         // is session-agnostic and worth caching at the edge.
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
@@ -62,20 +52,6 @@ final class ApiController extends AbstractController
     public function translationsIndex(): Response
     {
         return new JsonResponse('translations');
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function loadSpec(): array
-    {
-        $path = $this->projectDir . self::SPEC_RELATIVE_PATH;
-        if (!is_file($path)) {
-            return [];
-        }
-        $decoded = json_decode((string) file_get_contents($path), true);
-
-        return is_array($decoded) ? $decoded : [];
     }
 
     /**
