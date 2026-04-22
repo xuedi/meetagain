@@ -646,7 +646,23 @@ admin_event:
     flash_saved_with_followup: 'Event saved & updated %count% follow-up events.'
     flash_delete_not_implemented: 'Event deletion is not yet implemented.'
     flash_canceled: 'Event canceled. %count% user(s) have been notified.'
-admin_host: {}
+admin_host:
+    col_name: 'Name'
+    col_user: 'User'
+    page_title_edit: 'Edit Host'
+    page_title_create: 'Create Host'
+    warning_delete_title: 'Delete Host'
+    warning_delete_used: 'Cannot delete this host! It is currently used in %count% event(s).'
+    warning_delete_confirm: 'Are you sure you want to delete this host? This action cannot be undone.'
+    warning_delete_button: 'Yes, Delete'
+    danger_zone: 'Danger Zone'
+    danger_delete_host: 'Delete Host'
+    form_label_name: 'Name'
+    form_label_user: 'User'
+    flash_updated: 'Host updated successfully'
+    flash_deleted: 'Host deleted successfully'
+    flash_created: 'Host created successfully'
+    flash_delete_blocked: 'Cannot delete host. It is currently used in %count% event(s).'
 admin_location: {}
 admin_logs: {}
 admin_member: {}

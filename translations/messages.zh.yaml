@@ -622,7 +622,23 @@ admin_event:
     flash_saved_with_followup: '活动已保存，并更新了 %count% 个后续活动。'
     flash_delete_not_implemented: '活动删除功能尚未实现。'
     flash_canceled: '活动已取消。%count% 名用户已收到通知。'
-admin_host: {}
+admin_host:
+    col_name: '名称'
+    col_user: '用户'
+    page_title_edit: '编辑主机'
+    page_title_create: '创建主机'
+    warning_delete_title: '删除主机'
+    warning_delete_used: '无法删除此主机！它目前已被 %count% 个活动使用。'
+    warning_delete_confirm: '您确定要删除此主机吗？此操作无法撤销。'
+    warning_delete_button: '是的，删除'
+    danger_zone: '危险区域'
+    danger_delete_host: '删除主机'
+    form_label_name: '名称'
+    form_label_user: '用户'
+    flash_updated: '主机更新成功'
+    flash_deleted: '主机删除成功'
+    flash_created: '主机创建成功'
+    flash_delete_blocked: '无法删除主机。它目前已被 %count% 个活动使用。'
 admin_location: {}
 admin_logs: {}
 admin_member: {}
