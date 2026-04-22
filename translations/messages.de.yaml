@@ -622,7 +622,23 @@ admin_event:
     flash_saved_with_followup: 'Event gespeichert & %count% Folge-Events aktualisiert.'
     flash_delete_not_implemented: 'Löschen von Events ist noch nicht implementiert.'
     flash_canceled: 'Event abgesagt. %count% Benutzer wurden benachrichtigt.'
-admin_host: {}
+admin_host:
+    col_name: 'Name'
+    col_user: 'Benutzer'
+    page_title_edit: 'Gastgeber bearbeiten'
+    page_title_create: 'Gastgeber erstellen'
+    warning_delete_title: 'Gastgeber löschen'
+    warning_delete_used: 'Dieser Gastgeber kann nicht gelöscht werden! Er wird derzeit in %count% Veranstaltung(en) verwendet.'
+    warning_delete_confirm: 'Möchten Sie diesen Gastgeber wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'
+    warning_delete_button: 'Ja, löschen'
+    danger_zone: 'Gefahrenzone'
+    danger_delete_host: 'Gastgeber löschen'
+    form_label_name: 'Name'
+    form_label_user: 'Benutzer'
+    flash_updated: 'Gastgeber erfolgreich aktualisiert'
+    flash_deleted: 'Gastgeber erfolgreich gelöscht'
+    flash_created: 'Gastgeber erfolgreich erstellt'
+    flash_delete_blocked: 'Gastgeber kann nicht gelöscht werden. Er wird derzeit in %count% Veranstaltung(en) verwendet.'
 admin_location: {}
 admin_logs: {}
 admin_member: {}

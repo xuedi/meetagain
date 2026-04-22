@@ -2,27 +2,27 @@
 
 {% block content %}
     <div class="container">
-        <h1 class="title">{{ host.id ? 'Edit Host' : 'Create Host' }}</h1>
+        <h1 class="title">{{ host.id ? 'admin_host.page_title_edit'|trans : 'admin_host.page_title_create'|trans }}</h1>
 
         {% if host.id %}
             {% set warningContent %}
                 {% if events_using_host|length > 0 %}
                     <p>
                         <span class="icon"><i class="fa fa-exclamation-triangle"></i></span>
-                        Cannot delete this host! It is currently used in {{ events_using_host|length }} event(s).
+                        {{ 'admin_host.warning_delete_used'|trans({'%count%': events_using_host|length}) }}
                     </p>
                 {% else %}
                     <p>
-                        Are you sure you want to delete this host? This action cannot be undone.
+                        {{ 'admin_host.warning_delete_confirm'|trans }}
                     </p>
                 {% endif %}
             {% endset %}
 
             {% include '_components/warning_box.html.twig' with {
                 'id': 'host-delete-warning',
-                'title': 'Delete Host',
+                'title': 'admin_host.warning_delete_title'|trans,
                 'content': warningContent,
-                'buttonLabel': 'Yes, Delete',
+                'buttonLabel': 'admin_host.warning_delete_button'|trans,
                 'buttonUrl': path('app_admin_host_delete', {'id': host.id}),
                 'showButton': events_using_host|length == 0,
                 'type': 'danger'
@@ -40,12 +40,12 @@
             <div class="column is-4">
                 {% if host.id %}
                     <fieldset class="mt-5 p-4 fieldset-warning">
-                        <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">Danger Zone</legend>
+                        <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">{{ 'admin_host.danger_zone'|trans }}</legend>
 
                         <a class="button is-light is-fullwidth toggleTrigger" data-id="host-delete-warning"
                            href="{{ path('app_admin_host_delete', {'id': host.id}) }}">
                             <span class="icon"><i class="fa fa-trash"></i></span>
-                            <span>Delete Host</span>
+                            <span>{{ 'admin_host.danger_delete_host'|trans }}</span>
                         </a>
                     </fieldset>
                 {% endif %}
