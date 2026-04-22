@@ -107,7 +107,7 @@ final class EventController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$this->isGranted('event.comment', $event)) {
-                $this->addFlash('warning', 'This event is for group members only.');
+                $this->addFlash('warning', 'events.flash_group_only');
 
                 return $this->redirectToRoute('app_event_details', ['id' => $id]);
             }
@@ -211,18 +211,18 @@ final class EventController extends AbstractController
     public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
     {
         if ($event->isCanceled()) {
-            $this->addFlash('error', 'You cannot RSVP to a canceled event.');
+            $this->addFlash('error', 'events.flash_rsvp_canceled');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
         if ($event->getStart() < new DateTimeImmutable()) {
-            $this->addFlash('error', 'You cannot RSVP to an event that has already happened.');
+            $this->addFlash('error', 'events.flash_rsvp_past');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
         $user = $this->getAuthedUser();
         if (!$this->isGranted('event.rsvp', $event)) {
-            $this->addFlash('warning', 'This event is for group members only.');
+            $this->addFlash('warning', 'events.flash_group_only');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }

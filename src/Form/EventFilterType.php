@@ -29,33 +29,33 @@ class EventFilterType extends AbstractType
             'data' => EventTimeFilter::Future,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_time_all') => EventTimeFilter::All,
-                $this->translator->trans('event_filter_time_past') => EventTimeFilter::Past,
-                $this->translator->trans('event_filter_time_future') => EventTimeFilter::Future,
+                $this->translator->trans('events.filter_time_all') => EventTimeFilter::All,
+                $this->translator->trans('events.filter_time_past') => EventTimeFilter::Past,
+                $this->translator->trans('events.filter_time_future') => EventTimeFilter::Future,
             ],
         ])->add('sort', ChoiceType::class, [
             'data' => EventSortFilter::OldToNew,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_sort_past') => EventSortFilter::OldToNew,
-                $this->translator->trans('event_filter_sort_future') => EventSortFilter::NewToOld,
+                $this->translator->trans('events.filter_sort_past') => EventSortFilter::OldToNew,
+                $this->translator->trans('events.filter_sort_future') => EventSortFilter::NewToOld,
             ],
         ])->add('type', ChoiceType::class, [
             'data' => EventType::All,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_type_all') => EventType::All,
-                $this->translator->trans('event_filter_type_regular') => EventType::Regular,
-                $this->translator->trans('event_filter_type_outdoor') => EventType::Outdoor,
-                $this->translator->trans('event_filter_type_dinner') => EventType::Dinner,
+                $this->translator->trans('events.filter_type_all') => EventType::All,
+                $this->translator->trans('events.filter_type_regular') => EventType::Regular,
+                $this->translator->trans('events.filter_type_outdoor') => EventType::Outdoor,
+                $this->translator->trans('events.filter_type_dinner') => EventType::Dinner,
             ],
         ])->add('rsvp', ChoiceType::class, [
             'data' => EventRsvpFilter::All,
             'label' => false,
             'choices' => [
-                $this->translator->trans('event_filter_who_all') => EventRsvpFilter::All,
-                $this->translator->trans('event_filter_who_my') => EventRsvpFilter::My,
-                $this->translator->trans('event_filter_who_my_friends') => EventRsvpFilter::Friends,
+                $this->translator->trans('events.filter_who_all') => EventRsvpFilter::All,
+                $this->translator->trans('events.filter_who_my') => EventRsvpFilter::My,
+                $this->translator->trans('events.filter_who_my_friends') => EventRsvpFilter::Friends,
             ],
         ]);
 
