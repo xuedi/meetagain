@@ -14,24 +14,24 @@
                     </div>
                     <div class="level-item">
                         {% if log.status.value == 'ok' %}
-                            <span class="tag is-success is-medium">ok</span>
+                            <span class="tag is-success is-medium">{{ 'admin_logs.status_ok'|trans }}</span>
                         {% elseif log.status.value == 'warning' %}
-                            <span class="tag is-warning is-medium">warning</span>
+                            <span class="tag is-warning is-medium">{{ 'admin_logs.status_warning'|trans }}</span>
                         {% elseif log.status.value == 'error' %}
-                            <span class="tag is-danger is-medium">error</span>
+                            <span class="tag is-danger is-medium">{{ 'admin_logs.status_error'|trans }}</span>
                         {% else %}
-                            <span class="tag is-danger is-dark is-medium">exception</span>
+                            <span class="tag is-danger is-dark is-medium">{{ 'admin_logs.status_exception'|trans }}</span>
                         {% endif %}
                     </div>
                     <div class="level-item has-text-grey">
-                        {{ log.durationMs }} ms total
+                        {{ log.durationMs }} {{ 'admin_logs.duration_ms_total'|trans }}
                     </div>
                 </div>
                 <div class="level-right">
                     <div class="level-item">
                         <a href="{{ path('app_admin_cron_log') }}" class="button is-small">
                             <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
-                            <span>Back</span>
+                            <span>{{ 'admin_logs.back'|trans }}</span>
                         </a>
                     </div>
                 </div>
@@ -41,10 +41,10 @@
         <table class="table is-fullwidth">
             <thead>
             <tr>
-                <th>Task</th>
-                <th>Status</th>
-                <th>Duration</th>
-                <th>Message</th>
+                <th>{{ 'admin_logs.col_task'|trans }}</th>
+                <th>{{ 'admin_logs.col_status'|trans }}</th>
+                <th>{{ 'admin_logs.col_duration'|trans }}</th>
+                <th>{{ 'admin_logs.col_message'|trans }}</th>
             </tr>
             </thead>
             <tbody>
@@ -53,13 +53,13 @@
                     <td><code>{{ task.identifier }}</code></td>
                     <td>
                         {% if task.status == 'ok' %}
-                            <span class="tag is-success">ok</span>
+                            <span class="tag is-success">{{ 'admin_logs.status_ok'|trans }}</span>
                         {% elseif task.status == 'warning' %}
-                            <span class="tag is-warning">warning</span>
+                            <span class="tag is-warning">{{ 'admin_logs.status_warning'|trans }}</span>
                         {% elseif task.status == 'error' %}
-                            <span class="tag is-danger">error</span>
+                            <span class="tag is-danger">{{ 'admin_logs.status_error'|trans }}</span>
                         {% else %}
-                            <span class="tag is-danger is-dark">exception</span>
+                            <span class="tag is-danger is-dark">{{ 'admin_logs.status_exception'|trans }}</span>
                         {% endif %}
                     </td>
                     <td class="has-text-grey">{{ task.duration_ms }} ms</td>

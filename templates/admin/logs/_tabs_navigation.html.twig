@@ -3,25 +3,25 @@
         <li class="{% if activeLog == 'activity' %}is-active{% endif %}">
             <a href="{{ path('app_admin_activity_log') }}">
                 <span class="icon is-small"><i class="fa fa-list" aria-hidden="true"></i></span>
-                <span>{{ 'logs_tab_activity'|trans }}</span>
+                <span>{{ 'admin_logs.tab_activity'|trans }}</span>
             </a>
         </li>
         <li class="{% if activeLog == 'logs' %}is-active{% endif %}">
             <a href="{{ path('app_admin_system_log') }}">
                 <span class="icon is-small"><i class="fa fa-file-alt" aria-hidden="true"></i></span>
-                <span>{{ 'logs_tab_system'|trans }}</span>
+                <span>{{ 'admin_logs.tab_system'|trans }}</span>
             </a>
         </li>
         <li class="{% if activeLog == '404' %}is-active{% endif %}">
             <a href="{{ path('app_admin_not_found_log') }}">
                 <span class="icon is-small"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
-                <span>{{ 'logs_tab_404'|trans }}</span>
+                <span>{{ 'admin_logs.tab_404'|trans }}</span>
             </a>
         </li>
         <li class="{% if activeLog == 'cron' %}is-active{% endif %}">
             <a href="{{ path('app_admin_cron_log') }}">
                 <span class="icon is-small"><i class="fa fa-clock" aria-hidden="true"></i></span>
-                <span>{{ 'logs_tab_cron'|trans }}</span>
+                <span>{{ 'admin_logs.tab_cron'|trans }}</span>
             </a>
         </li>
     </ul>
