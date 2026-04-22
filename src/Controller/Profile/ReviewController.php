@@ -35,7 +35,7 @@ final class ReviewController extends AbstractController
     public function approve(Request $request, string $providerIdentifier, string $itemId, #[CurrentUser] User $user): Response
     {
         if (!$this->isCsrfTokenValid('review_action', $request->request->getString('_token'))) {
-            $this->addFlash('error', 'Invalid CSRF token.');
+            $this->addFlash('error', 'profile_review.flash_invalid_csrf');
 
             return $this->redirectToRoute('app_profile_review');
         }
@@ -53,7 +53,7 @@ final class ReviewController extends AbstractController
     public function deny(Request $request, string $providerIdentifier, string $itemId, #[CurrentUser] User $user): Response
     {
         if (!$this->isCsrfTokenValid('review_action', $request->request->getString('_token'))) {
-            $this->addFlash('error', 'Invalid CSRF token.');
+            $this->addFlash('error', 'profile_review.flash_invalid_csrf');
 
             return $this->redirectToRoute('app_profile_review');
         }

@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'profile.review.title'|trans }}{% endblock %}
+{% block title %}{{ 'profile_review.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="container mt-5">
-    <h1 class="title">{{ 'profile.review.title'|trans }}</h1>
+    <h1 class="title">{{ 'profile_review.page_title'|trans }}</h1>
 
     {% for flash in app.flashes('success') %}
         <div class="notification is-success">{{ flash }}</div>
@@ -14,7 +14,7 @@
     {% endfor %}
 
     {% if providers is empty %}
-        <p class="has-text-grey">{{ 'profile.review.empty'|trans }}</p>
+        <p class="has-text-grey">{{ 'profile_review.empty_state'|trans }}</p>
     {% else %}
         {% for entry in providers %}
             {% set providerIdentifier = entry.provider.identifier %}
