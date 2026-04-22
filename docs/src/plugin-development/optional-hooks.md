@@ -346,6 +346,18 @@ readonly class YourPluginSitemapPublisher implements SitemapPublisherInterface
 Return an empty array to skip on the current request (e.g. a marketing-route publisher that only
 emits on the platform host).
 
+**What belongs in a sitemap:**
+
+- Public pages only - skip anything behind `IsGranted` stronger than `PUBLIC_ACCESS`. Crawlers cannot
+  follow auth-gated routes; emitting them just bounces them off your login page.
+- Skip token/POST flows (`/register/verify/{code}`, password-reset confirms, redirect handlers).
+- Auth utility pages (login, register, reset, cookie) belong in core's publisher only - plugins should
+  not duplicate them. Use a low priority (`0.3`) so they don't steal crawl budget from content pages.
+- Detail pages should carry a `lastmod` (use the entity's `updatedAt` or `createdAt`); index pages
+  rarely need one.
+- Respect tenant filters: if your plugin has a multisite group filter (e.g. `getApprovedList()` already
+  applies one), reuse that path so whitelabel sitemaps only list content the tenant can actually serve.
+
 ---
 
 ### SitemapEventVisibilityFilterInterface
