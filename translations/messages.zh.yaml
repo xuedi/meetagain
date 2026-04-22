@@ -351,7 +351,21 @@ cookie:
     status_denied: '被拒绝'
     status_unknown: '未设置'
     button_save: '保存'
-shared: {}
+shared:
+    toggle_yes: '是'
+    toggle_no: '否'
+    image_upload_default_label: '更换图片'
+    image_upload_remove_title: '移除图片'
+    image_upload_aria_delete: '删除'
+    image_upload_aria_toggle_example: '展开示例'
+    image_modal_choose_existing_heading: '从已有图片中选择'
+    image_modal_upload_heading: '上传新图片'
+    image_modal_upload_button: '上传'
+    image_modal_upload_label: '上传图片'
+    image_modal_upload_hint: '选中的图片会立即上传并使用，无需确认。'
+    api_page_title: '公开数据 API'
+    api_page_heading: 'API 文档'
+    api_page_intro: '所有可用接口。部分接口需要通过 auth 接口获取的令牌。如果你的工作流无法通过 API 自动化，欢迎请求新增接口。'
 admin_shell: {}
 admin_cms: {}
 admin_email: {}
@@ -441,8 +455,6 @@ button_send: '发送'
 menu_admin_redo_thumbnails: '重新生成缩略图'
 menu_admin_logs_404: '404 错误'
 button_upload: '上传'
-toggle_yes: '在'
-toggle_no: '关掉'
 page_plugin_glossary_new_title: '新条目'
 page_plugin_glossary_delete_title: '删除条目'
 page_plugin_glossary_title: '术语表'

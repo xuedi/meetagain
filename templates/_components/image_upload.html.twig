@@ -19,7 +19,7 @@
 #}
 {% if image is not null or (showWhenEmpty is defined and showWhenEmpty) %}
     {% set modalUrl = path('app_image_modal', {'entity': entity, 'id': id}) %}
-    {% set label = label is defined ? label : 'Change Image' %}
+    {% set label = label is defined ? label : ('shared.image_upload_default_label'|trans) %}
     {% set rotate = rotate is defined ? rotate : false %}
 
     <div class="card">
@@ -46,7 +46,7 @@
             {% if removeImageUrl is defined and removeImageUrl is not null %}
                 <a class="button is-danger"
                    href="{{ removeImageUrl }}"
-                   title="Remove image">
+                   title="{{ 'shared.image_upload_remove_title'|trans }}">
                     <span class="icon">
                         <i class="fa fa-times"></i>
                     </span>
