@@ -1,15 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_member"|trans }}{% endblock %}
+{% block title %}{{ "member.page_title"|trans }}{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
-            <h1 class="title">Access denied</h1>
+            <h1 class="title">{{ 'member.access_denied_heading'|trans }}</h1>
             <p class="mb-5">
-                This area is restricted to members only. Please login or register.
+                {{ 'member.access_denied_intro'|trans }}
             </p>
 
         </div>

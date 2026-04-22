@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{% if pageCurrent > 1 %}{{ "page_title_member_page"|trans({'%page%': pageCurrent}) }}{% else %}{{ "page_title_member"|trans }}{% endif %}{% endblock %}
+{% block title %}{% if pageCurrent > 1 %}{{ "member.page_title_paginated"|trans({'%page%': pageCurrent}) }}{% else %}{{ "member.page_title"|trans }}{% endif %}{% endblock %}
 {% block meta_description %}{{ get_meta_description('members') }}{% endblock %}
 
 {% block body %}
     <section class="section">
         <div class="container">
-            <h1 class="title is-3">{{ 'page_title_member' | trans }}</h1>
+            <h1 class="title is-3">{{ 'member.page_title' | trans }}</h1>
 
             <div class="columns is-multiline">
                 {% for user in users %}
@@ -20,12 +20,12 @@
                 <nav class="pagination is-centered" role="navigation" aria-label="pagination">
                     {% if pageCurrent > 1 %}
                         <a href="{{ path('app_member', {'page': pageCurrent - 1}) }}"
-                           class="pagination-previous">Previous</a>
+                           class="pagination-previous">{{ 'member.pagination_previous'|trans }}</a>
                     {% endif %}
-                    
+
                     {% if pageCurrent < pageTotal %}
                         <a href="{{ path('app_member', {'page': pageCurrent + 1}) }}"
-                           class="pagination-next">Next</a>
+                           class="pagination-next">{{ 'member.pagination_next'|trans }}</a>
                     {% endif %}
 
                     <ul class="pagination-list">
@@ -33,7 +33,7 @@
                             <li>
                                 <a href="{{ path('app_member', {'page': i}) }}"
                                    class="pagination-link {% if i == pageCurrent %}is-current{% endif %}"
-                                   aria-label="Page {{ i }}"
+                                   aria-label="{{ 'member.pagination_aria_label'|trans({'%page%': i}) }}"
                                    aria-current="{% if i == pageCurrent %}page{% endif %}">
                                     {{ i }}
                                 </a>
@@ -44,7 +44,7 @@
 
                 <div class="has-text-centered mt-4">
                     <p class="help">
-                        {{ 'member_pageview_information' | trans ({
+                        {{ 'member.pageview_information' | trans ({
                             '%pageCurrent%': pageCurrent,
                             '%pageTotal%': pageTotal,
                             '%userTotal%': userTotal
