@@ -1,11 +1,11 @@
-<div class="navbar-item dropdown is-hoverable" id="cookie-consent-dropdown" role="region" aria-label="{{ "menu_cookie_consent_headline" | trans }}">
+<div class="navbar-item dropdown is-hoverable" id="cookie-consent-dropdown" role="region" aria-label="{{ "cookie.consent_headline" | trans }}">
     <div class="dropdown-trigger">
         <button
             class="button cookie-button"
             aria-haspopup="dialog"
             aria-expanded="false"
         >
-            <span class="cookie-consent-label is-hidden">{{ "menu_cookie_consent_button" | trans }}</span>
+            <span class="cookie-consent-label is-hidden">{{ "cookie.consent_button" | trans }}</span>
             <span class="icon is-small">
                 <i class="fas fa-angle-down" aria-hidden="true"></i>
             </span>
@@ -14,11 +14,11 @@
     <div class="dropdown-menu" id="dropdown-cookie">
         <div class="dropdown-content" role="dialog" aria-labelledby="cookie-form-title" aria-describedby="cookie-form-description">
             <form action="{{ path('app_cookie') }}" method="post" aria-labelledby="cookie-form-title">
-                <h2 id="cookie-form-title" class="navbar-item title is-5 mb-0">{{ "menu_cookie_consent_headline" | trans }}</h2>
+                <h2 id="cookie-form-title" class="navbar-item title is-5 mb-0">{{ "cookie.consent_headline" | trans }}</h2>
                 <p id="cookie-form-description" class="navbar-item is-6">
-                    {{ "menu_cookie_consent_text" | trans }}
+                    {{ "cookie.consent_text" | trans }}
                 </p>
-                <h3 id="cookie-options-title" class="navbar-item title mt-5 mb-0 is-size-6">{{ "menu_cookie_consent_options" | trans }}</h3>
+                <h3 id="cookie-options-title" class="navbar-item title mt-5 mb-0 is-size-6">{{ "cookie.options" | trans }}</h3>
                 <div class="navbar-item">
                     <div class="list" role="group" aria-labelledby="cookie-options-title">
                         <div class="list-item mt-0">
@@ -32,11 +32,11 @@
                                             id="osm_consent_checkbox"
                                             aria-describedby="osm-description"
                                         />
-                                        <strong>{{ "menu_cookie_consent_option_osm" | trans }}</strong>
+                                        <strong>{{ "cookie.option_osm" | trans }}</strong>
                                     </label>
                                 </div>
                                 <div id="osm-description" class="list-item-description has-text-grey is-size-7">
-                                    {{ "menu_cookie_consent_option_osm_text" | trans }}
+                                    {{ "cookie.option_osm_text" | trans }}
                                 </div>
                             </div>
                         </div>
@@ -47,19 +47,19 @@
                         type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_accept') }}"
-                        aria-label="{{ "menu_cookie_consent_button_accept" | trans }}"
-                    >{{ "menu_cookie_consent_button_accept" | trans }}</button>
+                        aria-label="{{ "cookie.button_accept" | trans }}"
+                    >{{ "cookie.button_accept" | trans }}</button>
                     <button
                         type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_deny') }}"
-                        aria-label="{{ "menu_cookie_consent_button_deny" | trans }}"
-                    >{{ "menu_cookie_consent_button_deny" | trans }}</button>
+                        aria-label="{{ "cookie.button_deny" | trans }}"
+                    >{{ "cookie.button_deny" | trans }}</button>
                     <a
                         href="{{ path('app_cookie') }}"
                         class="button"
-                        aria-label="{{ "menu_cookie_consent_button_status" | trans }}"
-                    >{{ "menu_cookie_consent_button_status" | trans }}</a>
+                        aria-label="{{ "cookie.button_status" | trans }}"
+                    >{{ "cookie.button_status" | trans }}</a>
                 </div>
             </form>
         </div>
