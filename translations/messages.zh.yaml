@@ -256,7 +256,10 @@ profile_messages:
     welcome_addressbook_hint: '请到成员页面查看，在每个成员的详情视图中可以找到发消息按钮。'
     cannot_message: '你无法向此用户发送消息。'
     input_placeholder: '消息'
-profile_notifications: {}
+profile_notifications:
+    page_title: '通知'
+    empty_state: '暂无新通知'
+    table_header_notification: '通知'
 profile_review: {}
 profile_image:
     reported_notice_intro: '此图片因以下原因被举报：'

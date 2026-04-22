@@ -270,7 +270,10 @@ profile_messages:
     welcome_addressbook_hint: 'Have a look at the members page; on the detail view of each member you have a message button.'
     cannot_message: 'You cannot message this user.'
     input_placeholder: 'Message'
-profile_notifications: {}
+profile_notifications:
+    page_title: 'Notifications'
+    empty_state: 'No new notifications'
+    table_header_notification: 'Notification'
 profile_review: {}
 profile_image:
     reported_notice_intro: 'This image was reported for the reason:'
