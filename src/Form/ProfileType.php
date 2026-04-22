@@ -47,25 +47,28 @@ class ProfileType extends AbstractType
                 ),
             ],
         ])->add('name', TextType::class, [
-            'label' => 'Username',
+            'label' => 'profile.form_label_username',
             'constraints' => [
-                new Length(max: 64, maxMessage: 'usernames cant be longer than 64 characters (less with chinese)'),
+                new Length(max: 64, maxMessage: 'security.validator_username_max'),
             ],
         ])->add('public', ChoiceType::class, [
             'data' => $user->isPublic(),
             'mapped' => false,
-            'label' => 'Public profile:',
-            'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+            'label' => 'profile.form_label_public_profile',
+            'choices' => [
+                $this->translator->trans('profile.form_choice_yes') => true,
+                $this->translator->trans('profile.form_choice_no') => false,
+            ],
         ])->add('languages', ChoiceType::class, [
             'data' => $user->getLocale(),
             'mapped' => false,
-            'label' => 'Language after login:',
+            'label' => 'profile.form_label_language_after_login',
             'choices' => $languageList,
         ])->add('bio', TextareaType::class, [
             'data' => $user->getBio(),
             'required' => false,
             'mapped' => false,
-            'label' => 'Bio:',
+            'label' => 'profile.form_label_bio',
         ]);
     }
 
