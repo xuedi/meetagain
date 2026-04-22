@@ -22,3 +22,11 @@ Error: 错误
 'security.validator_password_blank': '请输入密码。'
 'security.validator_password_min': '您的密码至少应为 {{ limit }} 个字符。'
 'security.validator_agree_terms': '您需要同意我们的条款。'
+
+# Support namespace - phase 18 (page-scoped validator messages)
+'support.validator_name_blank': '请输入你的姓名。'
+'support.validator_name_max': '姓名不能超过 {{ limit }} 个字符。'
+'support.validator_email_blank': '请输入你的电子邮件地址。'
+'support.validator_email_format': '请输入有效的电子邮件地址。'
+'support.validator_message_blank': '请输入消息内容。'
+'support.validator_message_max': '消息不能超过 {{ limit }} 个字符。'
