@@ -22,15 +22,15 @@ class ReportImageType extends AbstractType
     {
         $builder
             ->add('reported', ChoiceType::class, [
-                'label' => $this->translator->trans('report_image_reason'),
+                'label' => $this->translator->trans('report.label_reason'),
                 'choices' => ImageReportReason::getChoices($this->translator),
             ])
             ->add('remarks', TextareaType::class, [
-                'label' => $this->translator->trans('report_image_remarks'),
+                'label' => $this->translator->trans('report.label_remarks'),
                 'required' => false,
                 'attr' => [
                     'rows' => 4,
-                    'placeholder' => $this->translator->trans('report_image_remarks_placeholder'),
+                    'placeholder' => $this->translator->trans('report.placeholder_remarks'),
                 ],
             ]);
     }

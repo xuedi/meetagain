@@ -15,7 +15,7 @@ enum ImageReportReason: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$translator->trans('image_report_reason_' . strtolower($case->name))] = $case;
+            $choices[$translator->trans('report.reason_' . strtolower($case->name))] = $case;
         }
 
         return $choices;
@@ -25,7 +25,7 @@ enum ImageReportReason: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('image_report_reason_' . strtolower($case->name));
+            $choices[$case->value] = $translator->trans('report.reason_' . strtolower($case->name));
         }
 
         return $choices;
