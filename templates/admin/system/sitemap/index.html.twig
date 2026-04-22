@@ -8,8 +8,7 @@
     <div class="level mb-4">
         <div class="level-left">
             <div class="notification is-info is-light mb-0">
-                <strong>{{ total }}</strong> URLs across 3 sections will be included in the sitemap.
-                Each URL is expanded to all enabled locales in the sitemap XML.
+                {{ 'admin_system.sitemap_info'|trans({'%total%': total}) }}
             </div>
         </div>
         <div class="level-right">
@@ -22,19 +21,19 @@
     {% set warnings_total = urls|filter(u => u.warnings|length > 0)|length %}
     {% if warnings_total > 0 %}
     <div class="notification is-warning is-light mb-4">
-        <strong>{{ warnings_total }}</strong> URL(s) have warnings - check the table below.
+        {{ 'admin_system.sitemap_warnings'|trans({'%count%': warnings_total}) }}
     </div>
     {% endif %}
 
     <table class="table is-fullwidth is-striped is-hoverable">
         <thead>
             <tr>
-                <th>Section</th>
-                <th>Label</th>
-                <th>URL</th>
-                <th>Locales</th>
-                <th>Last Mod</th>
-                <th>Warnings</th>
+                <th>{{ 'admin_system.col_section'|trans }}</th>
+                <th>{{ 'admin_system.col_label'|trans }}</th>
+                <th>{{ 'admin_system.col_url'|trans }}</th>
+                <th>{{ 'admin_system.col_locales'|trans }}</th>
+                <th>{{ 'admin_system.col_last_mod'|trans }}</th>
+                <th>{{ 'admin_system.col_warnings'|trans }}</th>
             </tr>
         </thead>
         <tbody>

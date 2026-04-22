@@ -9,12 +9,12 @@
         <table class="table is-fullwidth">
             <thead>
             <tr>
-                <th>Date</th>
-                <th>Image</th>
-                <th>Reporter</th>
-                <th>Reason</th>
-                <th>Remarks</th>
-                <th>Status</th>
+                <th>{{ 'admin_support.col_date'|trans }}</th>
+                <th>{{ 'admin_support.col_image'|trans }}</th>
+                <th>{{ 'admin_support.col_reporter'|trans }}</th>
+                <th>{{ 'admin_support.col_reason'|trans }}</th>
+                <th>{{ 'admin_support.col_remarks'|trans }}</th>
+                <th>{{ 'admin_support.col_status'|trans }}</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -30,30 +30,30 @@
                         {% if report.image %}
                             {% include '_components/image.html.twig' with {'image': report.image, 'size': '50x50'} %}
                         {% else %}
-                            <span class="has-text-grey">deleted</span>
+                            <span class="has-text-grey">{{ 'admin_support.label_deleted'|trans }}</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if report.reporter %}
                             {{ report.reporter.name }}
                         {% else %}
-                            <span class="has-text-grey">deleted</span>
+                            <span class="has-text-grey">{{ 'admin_support.label_deleted'|trans }}</span>
                         {% endif %}
                     </td>
                     <td><span class="tag is-light">{{ report.reason.name }}</span></td>
                     <td>{{ report.remarks|default('')|u.truncate(100) }}</td>
                     <td>
                         {% if report.isOpen() %}
-                            <span class="tag is-warning">Open</span>
+                            <span class="tag is-warning">{{ 'admin_support.status_open'|trans }}</span>
                         {% else %}
-                            <span class="tag is-light">Resolved</span>
+                            <span class="tag is-light">{{ 'admin_support.status_resolved'|trans }}</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if report.isOpen() %}
                             <form method="post" action="{{ path('app_admin_support_report_resolve', {id: report.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('resolve_report_' ~ report.id) }}">
-                                <button type="submit" class="button is-small is-light">Mark resolved</button>
+                                <button type="submit" class="button is-small is-light">{{ 'admin_support.button_mark_resolved'|trans }}</button>
                             </form>
                         {% endif %}
                     </td>
@@ -66,7 +66,7 @@
             {% else %}
                 <tr>
                     <td colspan="8" class="has-text-centered has-text-grey">
-                        No image reports found.
+                        {{ 'admin_support.empty_reports'|trans }}
                     </td>
                 </tr>
             {% endfor %}

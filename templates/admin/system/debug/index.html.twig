@@ -8,15 +8,14 @@
     {% include 'admin/system/_tabs_navigation.html.twig' %}
 
     <div class="box">
-        <h2 class="title is-5">Error Tracker</h2>
-        <p class="mb-4">Trigger a test exception to verify that Bugsink is capturing
-        errors and sending notification emails correctly.</p>
+        <h2 class="title is-5">{{ 'admin_system.heading_debug'|trans }}</h2>
+        <p class="mb-4">{{ 'admin_system.help_debug'|trans }}</p>
 
         <button id="debugTriggerException"
                 class="button is-warning"
                 data-url="{{ path('app_admin_system_debug_trigger') }}">
             <span class="icon"><i class="fas fa-bug"></i></span>
-            <span>Trigger Test Exception</span>
+            <span>{{ 'admin_system.button_trigger_exception'|trans }}</span>
         </button>
 
         <p id="debugTriggerResult" class="mt-3 is-hidden"></p>

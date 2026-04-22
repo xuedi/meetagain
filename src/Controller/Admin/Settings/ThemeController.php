@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system/theme')]
 final class ThemeController extends AbstractAdminController
@@ -23,6 +24,7 @@ final class ThemeController extends AbstractAdminController
     public function __construct(
         private readonly ConfigService $configService,
         private readonly CommandService $commandService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_system_theme', methods: ['GET', 'POST'])]
@@ -34,7 +36,7 @@ final class ThemeController extends AbstractAdminController
         if ($colorsForm->isSubmitted() && $colorsForm->isValid()) {
             $this->configService->saveColors($colorsForm->getData());
             $this->commandService->rebuildTheme();
-            $this->addFlash('success', 'Theme colors saved and CSS rebuilt');
+            $this->addFlash('success', $this->translator->trans('admin_system.flash_theme_saved'));
         }
 
         return $this->render('admin/system/theme/index.html.twig', [

@@ -9,12 +9,12 @@
         <table class="table is-fullwidth">
             <thead>
             <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Message</th>
-                <th>Status</th>
+                <th>{{ 'admin_support.col_date'|trans }}</th>
+                <th>{{ 'admin_support.col_type'|trans }}</th>
+                <th>{{ 'admin_support.col_name'|trans }}</th>
+                <th>{{ 'admin_support.col_email'|trans }}</th>
+                <th>{{ 'admin_support.col_message'|trans }}</th>
+                <th>{{ 'admin_support.col_status'|trans }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -35,16 +35,16 @@
                     <td>{{ request.message|u.truncate(100) }}</td>
                     <td>
                         {% if request.isNew() %}
-                            <span class="tag is-warning">New</span>
+                            <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
                         {% else %}
-                            <span class="tag is-light">Read</span>
+                            <span class="tag is-light">{{ 'admin_support.status_read'|trans }}</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if request.isNew() %}
                             <form method="post" action="{{ path('app_admin_support_mark_read', {id: request.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('mark_read_' ~ request.id) }}">
-                                <button type="submit" class="button is-small is-light">Mark as read</button>
+                                <button type="submit" class="button is-small is-light">{{ 'admin_support.button_mark_read'|trans }}</button>
                             </form>
                         {% endif %}
                     </td>
@@ -52,7 +52,7 @@
             {% else %}
                 <tr>
                     <td colspan="6" class="has-text-centered has-text-grey">
-                        No support requests found.
+                        {{ 'admin_support.empty_requests'|trans }}
                     </td>
                 </tr>
             {% endfor %}
