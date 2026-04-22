@@ -181,3 +181,13 @@ Error: Fehler
 'Please upload a valid image, preferable a square format': 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im quadratischen Format'
 'Please upload a valid image, preferable 16x9 format': 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im 16:9-Format'
 'Please upload a valid image, preferable a 4:3 format': 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im 4:3-Format'
+
+# Security namespace - i18n hardening plan, phase 3 (page-scoped validator messages)
+'security.validator_username_max': 'Benutzernamen dürfen nicht länger als 64 Zeichen sein (weniger bei Chinesisch).'
+'security.validator_email_max': 'E-Mail-Adressen dürfen nicht länger als 180 Zeichen sein.'
+'security.validator_email_unique': 'Es existiert bereits ein Konto mit dieser E-Mail-Adresse.'
+'security.validator_email_blank': 'Bitte gib deine E-Mail-Adresse ein.'
+'security.validator_email_format': 'Bitte gib eine gültige E-Mail-Adresse ein.'
+'security.validator_password_blank': 'Bitte gib ein Passwort ein.'
+'security.validator_password_min': 'Dein Passwort sollte mindestens {{ limit }} Zeichen lang sein.'
+'security.validator_agree_terms': 'Du musst unseren Bedingungen zustimmen.'

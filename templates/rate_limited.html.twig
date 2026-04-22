@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Too Many Requests{% endblock %}
+{% block title %}{{ 'security.rate_limited_title'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -9,9 +9,9 @@
             <div class="columns">
                 <div class="column is-5">
 
-                    <h1 class="title is-4">Too many attempts</h1>
+                    <h1 class="title is-4">{{ 'security.rate_limited_heading'|trans }}</h1>
                     <p class="mb-4">{{ message }}</p>
-                    <a class="button" href="{{ path('app_default') }}">Back to homepage</a>
+                    <a class="button" href="{{ path('app_default') }}">{{ 'security.rate_limited_back_home'|trans }}</a>
 
                 </div>
             </div>

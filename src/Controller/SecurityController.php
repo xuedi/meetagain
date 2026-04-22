@@ -34,6 +34,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 final class SecurityController extends AbstractController
 {
     public const string LOGIN_ROUTE = 'app_login';
@@ -51,6 +52,7 @@ final class SecurityController extends AbstractController
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ConfigService $configService,
         private readonly EmailBlocklistRepository $emailBlocklistRepository,
+        private readonly TranslatorInterface $translator,
         #[Target('passwordReset')]
         private readonly RateLimiterFactory $passwordResetLimiter,
         #[Target('registration')]
@@ -103,7 +105,7 @@ final class SecurityController extends AbstractController
             return $this->render(
                 'rate_limited.html.twig',
                 [
-                    'message' => 'Too many registration attempts. Please try again later.',
+                    'message' => $this->translator->trans('security.rate_limited_register_message'),
                 ],
                 new Response('', 429),
             );
@@ -189,7 +191,7 @@ final class SecurityController extends AbstractController
             return $this->render(
                 'rate_limited.html.twig',
                 [
-                    'message' => 'Too many password reset attempts. Please try again later.',
+                    'message' => $this->translator->trans('security.rate_limited_reset_message'),
                 ],
                 new Response('', 429),
             );
@@ -202,7 +204,7 @@ final class SecurityController extends AbstractController
             $captcha = $form->get('captcha')->getData();
             $captchaError = $this->captchaService->isValid($captcha);
             if ($captchaError !== null) {
-                $form->get('captcha')->addError(new FormError($captchaError));
+                $form->get('captcha')->addError(new FormError($this->translator->trans($captchaError)));
             }
 
             $email = $form->get('email')->getData();

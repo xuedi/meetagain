@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_register"|trans }}{% endblock %}
+{% block title %}{{ "security.page_title_register"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -11,12 +11,12 @@
                     <span class="icon is-large has-text-primary">
                         <i class="fas fa-envelope fa-4x"></i>
                     </span>
-                    <h1 class="title is-3 mt-5">{{ 'register_email_send.heading'|trans }}</h1>
-                    <p class="subtitle is-5 mt-3">{{ 'register_email_send.description'|trans }}</p>
+                    <h1 class="title is-3 mt-5">{{ 'security.register_email_send_heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'security.register_email_send_description'|trans }}</p>
                     <div class="mt-5">
                         <a href="{{ path('app_login') }}" class="button is-primary">
                             <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
-                            <span>{{ 'register_email_send.cta'|trans }}</span>
+                            <span>{{ 'security.register_email_send_cta'|trans }}</span>
                         </a>
                     </div>
                 </div>

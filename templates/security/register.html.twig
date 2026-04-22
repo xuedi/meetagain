@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_register"|trans }}{% endblock %}
+{% block title %}{{ "security.page_title_register"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -10,7 +10,7 @@
             <div class="columns is-centered mt-5">
                 <div class="column is-6-tablet is-5-desktop">
 
-                    <h1 class="title is-5">{{ "page_register_headline"|trans }}</h1>
+                    <h1 class="title is-5">{{ "security.headline_register"|trans }}</h1>
 
                     {{ form_start(form) }}
 
@@ -29,8 +29,8 @@
 
                     <div class="field is-grouped mt-4">
                         <div class="control">
-                            <button class="button is-primary">{{ "button_Register" | trans }}</button>
-                            <a class="button is-light" href="/{{ app.request.locale }}/terms" target="_blank" rel="noopener">{{ "terms" | trans }}</a>
+                            <button class="button is-primary">{{ "security.button_register" | trans }}</button>
+                            <a class="button is-light" href="/{{ app.request.locale }}/terms" target="_blank" rel="noopener">{{ "security.button_terms" | trans }}</a>
                         </div>
                     </div>
                     {{ form_end(form) }}
@@ -39,15 +39,15 @@
 
                 <div class="column is-5-tablet is-4-desktop">
                     {% include '_components/info_sidebar.html.twig' with {
-                        title: 'register.sidebar.title'|trans,
-                        intro: 'register.sidebar.intro'|trans,
+                        title: 'security.register_sidebar_title'|trans,
+                        intro: 'security.register_sidebar_intro'|trans,
                         bullets: [
-                            'register.sidebar.bullet1'|trans,
-                            'register.sidebar.bullet2'|trans,
-                            'register.sidebar.bullet3'|trans,
+                            'security.register_sidebar_bullet1'|trans,
+                            'security.register_sidebar_bullet2'|trans,
+                            'security.register_sidebar_bullet3'|trans,
                         ],
                         link_url: path('app_login'),
-                        link_text: 'register.sidebar.link'|trans,
+                        link_text: 'security.register_sidebar_link'|trans,
                         link_icon: 'sign-in-alt',
                     } only %}
                 </div>

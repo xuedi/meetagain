@@ -21,25 +21,25 @@ class RegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('name', TextType::class, [
-            'label' => 'Username',
+            'label' => 'security.label_username',
             'constraints' => [
-                new Length(max: 64, maxMessage: 'usernames cant be longer than 64 characters (less with chinese)'),
+                new Length(max: 64, maxMessage: 'security.validator_username_max'),
             ],
         ])->add('email', EmailType::class, [
             'constraints' => [
-                new Length(max: 180, maxMessage: 'emails cant be longer than 180 characters'),
+                new Length(max: 180, maxMessage: 'security.validator_email_max'),
             ],
         ])->add('agreeTerms', CheckboxType::class, [
             'mapped' => false,
             'constraints' => [
-                new IsTrue(message: 'You should agree to our terms.'),
+                new IsTrue(message: 'security.validator_agree_terms'),
             ],
         ])->add('plainPassword', PasswordType::class, [
             'mapped' => false,
             'attr' => ['autocomplete' => 'new-password'],
             'constraints' => [
-                new NotBlank(message: 'Please enter a password'),
-                new Length(min: 6, max: 254, minMessage: 'Your password should be at least {{ limit }} characters'),
+                new NotBlank(message: 'security.validator_password_blank'),
+                new Length(min: 6, max: 254, minMessage: 'security.validator_password_min'),
             ],
         ]);
     }
