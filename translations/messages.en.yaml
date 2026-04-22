@@ -211,7 +211,19 @@ member:
     admin_action_restrict_user: 'Restrict user'
     admin_action_verify_user: 'Verify user'
     admin_action_takeover_user: 'Takeover user'
-profile: {}
+profile:
+    page_title: 'Profile'
+    section_info: 'Info'
+    section_upcoming_events: 'Upcoming events'
+    section_past_events: 'My past events'
+    label_joined: 'Joined'
+    label_last_login: 'Last login'
+    label_email: 'Email'
+    label_following: 'Following'
+    label_followers: 'Followers'
+    label_messages: 'Messages'
+    label_rsvp: 'RSVP'
+    label_blocked: 'Blocked'
 profile_config: {}
 profile_social: {}
 profile_images: {}
@@ -266,7 +278,6 @@ menu_admin_location: 'Venue'
 menu_admin_user: 'Members'
 page_title_admin: 'Admin'
 page_title_manage: 'Manage'
-page_title_profile: 'Profile'
 role_admin: 'Admin'
 role_manager: 'Manager'
 role_system: 'System'

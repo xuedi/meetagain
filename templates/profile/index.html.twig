@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_profile"|trans }}{% endblock %}
+{% block title %}{{ "profile.page_title"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -35,16 +35,16 @@
                     </div>
 
                     <div class="box">
-                        <h2 class="title is-5">Infos</h2>
-                        <p>Joined: {{ user.createdAt|date('Y-m-d') }}</p>
-                        <p>LastLogin: {{ lastLogin|date('Y-m-d') }}</p>
-                        <p>Email: {{ user.email }}</p>
-                        <p>Following: {{ socialCounts.following }}</p>
-                        <p>Followers: {{ socialCounts.followers }}</p>
-                        <p>Messages: {{ messageCount }}</p>
-                        <p>RSVP: {{ socialCounts.rsvp }}</p>
+                        <h2 class="title is-5">{{ 'profile.section_info'|trans }}</h2>
+                        <p>{{ 'profile.label_joined'|trans }}: {{ user.createdAt|date('Y-m-d') }}</p>
+                        <p>{{ 'profile.label_last_login'|trans }}: {{ lastLogin|date('Y-m-d') }}</p>
+                        <p>{{ 'profile.label_email'|trans }}: {{ user.email }}</p>
+                        <p>{{ 'profile.label_following'|trans }}: {{ socialCounts.following }}</p>
+                        <p>{{ 'profile.label_followers'|trans }}: {{ socialCounts.followers }}</p>
+                        <p>{{ 'profile.label_messages'|trans }}: {{ messageCount }}</p>
+                        <p>{{ 'profile.label_rsvp'|trans }}: {{ socialCounts.rsvp }}</p>
                         {% if blockedCount > 0 %}
-                            <p>Blocked: <a href="{{ path('app_profile_blocked_users') }}">{{ blockedCount }}</a></p>
+                            <p>{{ 'profile.label_blocked'|trans }}: <a href="{{ path('app_profile_blocked_users') }}">{{ blockedCount }}</a></p>
                         {% endif %}
                     </div>
 
@@ -54,13 +54,13 @@
                 <div class="column is-6">
 
                     <div class="box">
-                        <h2 class="title is-5">Upcoming events</h2>
+                        <h2 class="title is-5">{{ 'profile.section_upcoming_events'|trans }}</h2>
                         {% include 'profile/_partials/rsvp_list.html.twig' with {'user': user, 'list': upcoming, 'isPast': false} %}
                     </div>
 
                     <div class="card is-fullwidth">
                         <header class="card-header">
-                            <p class="card-header-title">My past events</p>
+                            <p class="card-header-title">{{ 'profile.section_past_events'|trans }}</p>
                             <a class="card-header-icon card-toggle">
                                 <i class="fa fa-angle-down"></i>
                             </a>

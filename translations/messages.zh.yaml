@@ -197,7 +197,19 @@ member:
     admin_action_restrict_user: '限制用户'
     admin_action_verify_user: '验证用户'
     admin_action_takeover_user: '接管用户'
-profile: {}
+profile:
+    page_title: '概况'
+    section_info: '信息'
+    section_upcoming_events: '即将举行的活动'
+    section_past_events: '我的过往活动'
+    label_joined: '加入时间'
+    label_last_login: '最后登录'
+    label_email: '电子邮件'
+    label_following: '关注中'
+    label_followers: '粉丝'
+    label_messages: '消息'
+    label_rsvp: '报名'
+    label_blocked: '已屏蔽'
 profile_config: {}
 profile_social: {}
 profile_images: {}
@@ -264,7 +276,6 @@ menu_admin_location: '会场'
 menu_admin_user: '成员'
 page_title_admin: '管理'
 page_title_manage: '管理'
-page_title_profile: '概况'
 role_admin: '管理'
 role_manager: '经理'
 role_system: '系统'
