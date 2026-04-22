@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_title_member"|trans }}{% endblock %}
+{% block title %}{{ "member.page_title"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -21,11 +21,11 @@
                                 {% set followLink = path('app_member_toggle_follow', {'id': userDetails.id}) %}
                                 {% if isFollow %}
                                     <a href="{{ followLink }}" class="button is-danger is-small ml-4 mt-1">
-                                        <span class="icon"><i class="fa fa-minus"></i></span><span>Unfollow</span>
+                                        <span class="icon"><i class="fa fa-minus"></i></span><span>{{ 'member.button_unfollow'|trans }}</span>
                                     </a>
                                 {% else %}
                                     <a href="{{ followLink }}" class="button is-success is-small ml-4 mt-1">
-                                        <span class="icon"><i class="fa fa-plus"></i></span><span>Follow</span>
+                                        <span class="icon"><i class="fa fa-plus"></i></span><span>{{ 'member.button_follow'|trans }}</span>
                                     </a>
                                 {% endif %}
                             {% endif %}
@@ -34,20 +34,20 @@
                             {% if isBlocked %}
                                 <form action="{{ path('app_profile_unblock_user', {'id': userDetails.id}) }}" method="post" class="is-inline">
                                     <button type="submit" class="button is-warning is-small ml-2 mt-1">
-                                        <span class="icon"><i class="fa fa-unlock"></i></span><span>Unblock</span>
+                                        <span class="icon"><i class="fa fa-unlock"></i></span><span>{{ 'member.button_unblock'|trans }}</span>
                                     </button>
                                 </form>
                             {% else %}
                                 <form action="{{ path('app_profile_block_user', {'id': userDetails.id}) }}" method="post" class="is-inline"
-                                      onsubmit="return confirm('Block this user? They will not be able to see your profile or message you.')">
+                                      onsubmit="return confirm('{{ 'member.button_block_confirm'|trans|e('js') }}')">
                                     <button type="submit" class="button is-dark is-small ml-2 mt-1">
-                                        <span class="icon"><i class="fa fa-ban"></i></span><span>Block</span>
+                                        <span class="icon"><i class="fa fa-ban"></i></span><span>{{ 'member.button_block'|trans }}</span>
                                     </button>
                                 </form>
                             {% endif %}
                         {% else %}
                             <div class="button is-warning is-small ml-4 mt-1">
-                                <span class="icon"><i class="fa fa-circle-exclamation"></i></span><span>follow</span>
+                                <span class="icon"><i class="fa fa-circle-exclamation"></i></span><span>{{ 'member.button_follow_self_hint'|trans }}</span>
                             </div>
                         {% endif %}
                     </div>
@@ -56,7 +56,7 @@
 
                     {% if userDetails.id != currentUser.id and not isBlocked %}
                         <a href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-small mt-4">
-                            <span class="icon"><i class="fa fa-envelope"></i></span><span>Message</span>
+                            <span class="icon"><i class="fa fa-envelope"></i></span><span>{{ 'member.button_message'|trans }}</span>
                         </a>
                     {% endif %}
                 </div>
@@ -67,24 +67,24 @@
                     <div class="column is-2">
 
                         <nav class="panel">
-                            <p class="panel-heading p-2">Admin</p>
+                            <p class="panel-heading p-2">{{ 'member.admin_panel_heading'|trans }}</p>
                             <a class="panel-block" href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
                                 <span class="panel-icon">
                                     <i class="fas fa-rotate-right"></i>
                                 </span>
-                                Rotate image
+                                {{ 'member.admin_action_rotate_avatar'|trans }}
                             </a>
                             <a class="panel-block" href="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}">
                                 <span class="panel-icon">
                                     <i class="fas fa-trash"></i>
                                 </span>
-                                Remove image
+                                {{ 'member.admin_action_remove_avatar'|trans }}
                             </a>
                             <a class="panel-block" href="{{ path('app_member_restrict', {'id': userDetails.id}) }}">
                                 <span class="panel-icon">
                                     <i class="fas fa-ban {% if userDetails.restricted %}has-text-danger{% endif %}"></i>
                                 </span>
-                                Restrict user
+                                {{ 'member.admin_action_restrict_user'|trans }}
                                 {% if userDetails.restricted %}
                                     <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
                                 {% endif %}
@@ -93,7 +93,7 @@
                                 <span class="panel-icon">
                                     <i class="fa-regular fa-user-check {% if userDetails.verified %}has-text-success{% endif %}"></i>
                                 </span>
-                                Verify user
+                                {{ 'member.admin_action_verify_user'|trans }}
                                 {% if userDetails.verified %}
                                     <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
                                 {% endif %}
@@ -103,7 +103,7 @@
                                 <span class="panel-icon">
                                     <i class="fas fa-person-walking-dashed-line-arrow-right"></i>
                                 </span>
-                                Takeover user
+                                {{ 'member.admin_action_takeover_user'|trans }}
                             </a>
                             {% endif %}
                         </nav>
