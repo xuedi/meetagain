@@ -1,12 +1,12 @@
 <aside class="menu">
     {% for section in admin_navigation.sidebarSections %}
-        <p class="menu-label">{{ section.section }}</p>
+        <p class="menu-label">{{ section.section|trans }}</p>
         <ul class="menu-list">
             {% for link in section.links %}
                 <li><a class="{% if active == link.active %}is-active{% endif %}" href="{{ path(link.route) }}">{{ link.label | trans }}</a></li>
             {% endfor %}
         </ul>
     {% endfor %}
-    <p class="menu-label">Information</p>
+    <p class="menu-label">{{ 'admin_shell.sidebar_info'|trans }}</p>
     <p class="has-text-grey px-3 is-size-7">Time: {{ "now"|date("H:i:s") }}</p>
 </aside>
