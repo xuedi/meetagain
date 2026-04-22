@@ -181,3 +181,13 @@ Error: Error
 'Please upload a valid image, preferable a square format': 'Please upload a valid image, preferably in square format'
 'Please upload a valid image, preferable 16x9 format': 'Please upload a valid image, preferably in 16:9 format'
 'Please upload a valid image, preferable a 4:3 format': 'Please upload a valid image, preferably in 4:3 format'
+
+# Security namespace - i18n hardening plan, phase 3 (page-scoped validator messages)
+'security.validator_username_max': 'Usernames cannot be longer than 64 characters (less with Chinese).'
+'security.validator_email_max': 'Emails cannot be longer than 180 characters.'
+'security.validator_email_unique': 'There is already an account with this email.'
+'security.validator_email_blank': 'Please enter your email address.'
+'security.validator_email_format': 'Please enter a valid email address.'
+'security.validator_password_blank': 'Please enter a password.'
+'security.validator_password_min': 'Your password should be at least {{ limit }} characters.'
+'security.validator_agree_terms': 'You should agree to our terms.'

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_reset_success_title"|trans }}{% endblock %}
+{% block title %}{{ "security.page_title_reset_success"|trans }}{% endblock %}
 
 {% block body %}
 
@@ -11,12 +11,12 @@
                     <span class="icon is-large has-text-success">
                         <i class="fas fa-check-circle fa-4x"></i>
                     </span>
-                    <h1 class="title is-3 mt-5">{{ 'reset_success.heading'|trans }}</h1>
-                    <p class="subtitle is-5 mt-3">{{ 'reset_success.description'|trans }}</p>
+                    <h1 class="title is-3 mt-5">{{ 'security.reset_success_heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'security.reset_success_description'|trans }}</p>
                     <div class="mt-5">
                         <a href="{{ path('app_login') }}" class="button is-primary">
                             <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
-                            <span>{{ 'reset_success.cta'|trans }}</span>
+                            <span>{{ 'security.reset_success_cta'|trans }}</span>
                         </a>
                     </div>
                 </div>

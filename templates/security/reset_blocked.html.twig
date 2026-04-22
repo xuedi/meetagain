@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'reset_blocked.title'|trans }}{% endblock %}
+{% block title %}{{ 'security.reset_blocked_title'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -11,15 +11,15 @@
                     <span class="icon is-large has-text-danger">
                         <i class="fas fa-ban fa-4x"></i>
                     </span>
-                    <h1 class="title is-3 mt-5">{{ 'reset_blocked.heading'|trans }}</h1>
-                    <p class="subtitle is-5 mt-3">{{ 'reset_blocked.description'|trans }}</p>
+                    <h1 class="title is-3 mt-5">{{ 'security.reset_blocked_heading'|trans }}</h1>
+                    <p class="subtitle is-5 mt-3">{{ 'security.reset_blocked_description'|trans }}</p>
                     {% if reason %}
-                        <p class="mt-3"><strong>{{ 'reset_blocked.reason_label'|trans }}:</strong> {{ reason }}</p>
+                        <p class="mt-3"><strong>{{ 'security.reset_blocked_reason_label'|trans }}:</strong> {{ reason }}</p>
                     {% endif %}
                     <div class="mt-5">
                         <a href="{{ supportPath }}" class="button is-primary">
                             <span class="icon"><i class="fas fa-life-ring"></i></span>
-                            <span>{{ 'reset_blocked.cta'|trans }}</span>
+                            <span>{{ 'security.reset_blocked_cta'|trans }}</span>
                         </a>
                     </div>
                 </div>
