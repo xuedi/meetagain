@@ -17,12 +17,12 @@ enum UserStatus: int
     public static function getChoices(TranslatorInterface $translator): array
     {
         return [
-            $translator->trans('Registered') => self::Registered,
-            $translator->trans('EmailVerified') => self::EmailVerified,
-            $translator->trans('Active') => self::Active,
-            $translator->trans('Blocked') => self::Blocked,
-            $translator->trans('Deleted') => self::Deleted,
-            $translator->trans('Denied') => self::Denied,
+            $translator->trans('admin_member.status_registered') => self::Registered,
+            $translator->trans('admin_member.status_email_verified') => self::EmailVerified,
+            $translator->trans('admin_member.status_active') => self::Active,
+            $translator->trans('admin_member.status_blocked') => self::Blocked,
+            $translator->trans('admin_member.status_deleted') => self::Deleted,
+            $translator->trans('admin_member.status_denied') => self::Denied,
         ];
     }
 }

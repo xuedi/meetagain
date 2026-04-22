@@ -6,23 +6,23 @@
 
         {# Member Summary #}
         <div class="box">
-            <h2 class="subtitle">Member Information</h2>
+            <h2 class="subtitle">{{ 'admin_member.info_member'|trans }}</h2>
             <table class="table is-fullwidth">
                 <tbody>
                     <tr>
-                        <th class="col-medium">Email</th>
+                        <th class="col-medium">{{ 'admin_member.col_email'|trans }}</th>
                         <td>{{ user.email }}</td>
                     </tr>
                     <tr>
-                        <th>Bio</th>
+                        <th>{{ 'admin_member.col_bio'|trans }}</th>
                         <td>{{ user.bio ?: '-' }}</td>
                     </tr>
                     <tr>
-                        <th>Language</th>
+                        <th>{{ 'admin_member.col_language'|trans }}</th>
                         <td>{{ user.locale }}</td>
                     </tr>
                     <tr>
-                        <th>Status</th>
+                        <th>{{ 'admin_member.col_status'|trans }}</th>
                         <td>
                             {% set statusClass = 'is-warning' %}
                             {% if user.status.value == 2 %}
@@ -36,7 +36,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>Roles</th>
+                        <th>{{ 'admin_member.col_roles'|trans }}</th>
                         <td>
                             {% for role in user.roles %}
                                 <span class="tag is-info">{{ role }}</span>
@@ -44,24 +44,24 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>Verified</th>
+                        <th>{{ 'admin_member.col_verified'|trans }}</th>
                         <td>
                             <span class="tag {{ user.verified ? 'is-success' : 'is-warning' }}">
-                                {{ user.verified ? 'Yes' : 'No' }}
+                                {{ user.verified ? 'admin_member.choice_yes'|trans : 'admin_member.choice_no'|trans }}
                             </span>
                         </td>
                     </tr>
                     <tr>
-                        <th>Created</th>
+                        <th>{{ 'admin_member.col_created'|trans }}</th>
                         <td>{{ user.createdAt|date('Y-m-d H:i') }}</td>
                     </tr>
                     <tr>
-                        <th>Last Login</th>
+                        <th>{{ 'admin_member.col_last_login'|trans }}</th>
                         <td>
                             {% if user.lastLogin %}
                                 {{ user.lastLogin|date('Y-m-d H:i') }}
                             {% else %}
-                                <span class="has-text-grey-light">Never</span>
+                                <span class="has-text-grey-light">{{ 'admin_member.legend_never'|trans }}</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -71,7 +71,7 @@
 
         {# Organizer Actions #}
         <div class="box">
-            <h2 class="subtitle">Actions</h2>
+            <h2 class="subtitle">{{ 'admin_member.section_actions'|trans }}</h2>
             <div class="buttons">
                 {# Promote to Organizer (only if not already organizer and not current user) #}
                 {% if 'ROLE_ORGANIZER' not in user.roles and user.id != app.user.id %}
@@ -79,13 +79,13 @@
                         <input type="hidden" name="_token" value="{{ csrf_token('promote_organizer' ~ user.id) }}">
                         <button type="submit" class="button is-info">
                             <span class="icon"><i class="fa fa-arrow-up"></i></span>
-                            <span>Promote to Organizer</span>
+                            <span>{{ 'admin_member.button_promote_organizer'|trans }}</span>
                         </button>
                     </form>
                 {% elseif 'ROLE_ORGANIZER' in user.roles %}
                     <button class="button is-static" disabled>
                         <span class="icon"><i class="fa fa-check"></i></span>
-                        <span>Already Organizer</span>
+                        <span>{{ 'admin_member.button_already_organizer'|trans }}</span>
                     </button>
                 {% endif %}
 
@@ -94,7 +94,7 @@
                     <input type="hidden" name="_token" value="{{ csrf_token('toggle_verified' ~ user.id) }}">
                     <button type="submit" class="button {{ user.verified ? 'is-warning' : 'is-success' }}">
                         <span class="icon"><i class="fa fa-{{ user.verified ? 'times' : 'check' }}"></i></span>
-                        <span>{{ user.verified ? 'Mark as Unverified' : 'Mark as Verified' }}</span>
+                        <span>{{ user.verified ? 'admin_member.button_mark_unverified'|trans : 'admin_member.button_mark_verified'|trans }}</span>
                     </button>
                 </form>
             </div>
@@ -103,7 +103,7 @@
         {# Back button #}
         <a href="{{ path('app_admin_member') }}" class="button">
             <span class="icon"><i class="fa fa-arrow-left"></i></span>
-            <span>Back to Members</span>
+            <span>{{ 'admin_member.button_back'|trans }}</span>
         </a>
     </div>
 {% endblock %}

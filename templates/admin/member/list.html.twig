@@ -7,13 +7,13 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Lang</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Last Login</th>
+                <th>{{ 'admin_member.col_name'|trans }}</th>
+                <th>{{ 'admin_member.col_email'|trans }}</th>
+                <th>{{ 'admin_member.col_lang'|trans }}</th>
+                <th>{{ 'admin_member.col_role'|trans }}</th>
+                <th>{{ 'admin_member.col_status'|trans }}</th>
+                <th>{{ 'admin_member.col_created'|trans }}</th>
+                <th>{{ 'admin_member.col_last_login'|trans }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -44,7 +44,7 @@
                         {% if user.lastLogin %}
                             {{ user.lastLogin|date('Y-m-d') }}
                         {% else %}
-                            <span class="has-text-grey-light">Never</span>
+                            <span class="has-text-grey-light">{{ 'admin_member.legend_never'|trans }}</span>
                         {% endif %}
                     </td>
                     <td>
@@ -60,19 +60,19 @@
         <div class="mt-4 has-text-centered">
             <span class="icon-text">
                 <span class="icon has-text-grey"><i class="fas fa-user"></i></span>
-                <span class="has-text-grey">Member</span>
+                <span class="has-text-grey">{{ 'admin_member.legend_member'|trans }}</span>
             </span>
             <span class="icon-text">
                 <span class="icon has-text-info"><i class="fas fa-user"></i></span>
-                <span class="has-text-info">Organizer</span>
+                <span class="has-text-info">{{ 'admin_member.legend_organizer'|trans }}</span>
             </span>
             <span class="icon-text">
                 <span class="icon has-text-warning"><i class="fas fa-user"></i></span>
-                <span class="has-text-warning">Founder</span>
+                <span class="has-text-warning">{{ 'admin_member.legend_founder'|trans }}</span>
             </span>
             <span class="icon-text">
                 <span class="icon has-text-success"><i class="fas fa-user"></i></span>
-                <span class="has-text-success">Admin</span>
+                <span class="has-text-success">{{ 'admin_member.legend_admin'|trans }}</span>
             </span>
         </div>
 

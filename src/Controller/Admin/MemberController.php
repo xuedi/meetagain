@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER')]
 final class MemberController extends AbstractAdminController
@@ -28,6 +29,7 @@ final class MemberController extends AbstractAdminController
         private readonly EntityManagerInterface $em,
         private readonly EntityActionDispatcher $dispatcher,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Override]
@@ -134,7 +136,7 @@ final class MemberController extends AbstractAdminController
 
         // Prevent self-promotion
         if ($user->getId() === $this->getAuthedUser()->getId()) {
-            $this->addFlash('error', 'You cannot promote yourself.');
+            $this->addFlash('error', $this->translator->trans('admin_member.flash_cannot_promote_self'));
 
             return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
         }
@@ -163,7 +165,9 @@ final class MemberController extends AbstractAdminController
         $user->setVerified(!$user->isVerified());
         $this->em->flush();
 
-        $this->addFlash('success', $user->isVerified() ? 'Member verified.' : 'Member unverified.');
+        $this->addFlash('success', $this->translator->trans(
+            $user->isVerified() ? 'admin_member.flash_verified' : 'admin_member.flash_unverified'
+        ));
 
         return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
     }
