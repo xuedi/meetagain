@@ -23,14 +23,14 @@
                 <form method="post" action="{{ path('app_profile_review_approve', {providerIdentifier: providerIdentifier, itemId: item.id}) }}" style="display:inline">
                     <input type="hidden" name="_token" value="{{ csrfToken }}">
                     <button type="submit" class="button is-success">
-                        {{ 'profile.review.approve'|trans }}
+                        {{ 'profile_review.button_approve'|trans }}
                     </button>
                 </form>
                 {% if item.canDeny %}
                 <form method="post" action="{{ path('app_profile_review_deny', {providerIdentifier: providerIdentifier, itemId: item.id}) }}" style="display:inline">
                     <input type="hidden" name="_token" value="{{ csrfToken }}">
                     <button type="submit" class="button is-danger is-outlined">
-                        {{ 'profile.review.deny'|trans }}
+                        {{ 'profile_review.button_deny'|trans }}
                     </button>
                 </form>
                 {% endif %}

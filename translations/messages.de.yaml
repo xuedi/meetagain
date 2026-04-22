@@ -260,7 +260,12 @@ profile_notifications:
     page_title: 'Benachrichtigungen'
     empty_state: 'Keine neuen Benachrichtigungen'
     table_header_notification: 'Benachrichtigung'
-profile_review: {}
+profile_review:
+    page_title: 'Ausstehende Ueberpruefungen'
+    empty_state: 'Keine Elemente zur Ueberpruefung vorhanden.'
+    button_approve: 'Genehmigen'
+    button_deny: 'Ablehnen'
+    flash_invalid_csrf: 'Ungültiges CSRF-Token.'
 profile_image:
     reported_notice_intro: 'Dieses Bild wurde aus folgendem Grund gemeldet:'
     reported_notice_outro: 'Vorerst ist das Bild für andere Nutzer nicht sichtbar, bis es überprüft wurde.'
@@ -311,10 +316,6 @@ admin_support: {}
 admin_system: {}
 global: {}
 'notification.review.pending_count': '%count% Element wartet auf Ihre Ueberpruefung|%count% Elemente warten auf Ihre Ueberpruefung'
-'profile.review.title': 'Ausstehende Ueberpruefungen'
-'profile.review.empty': 'Keine Elemente zur Ueberpruefung vorhanden.'
-'profile.review.approve': 'Genehmigen'
-'profile.review.deny': 'Ablehnen'
 'review.core.member_pending': 'Nutzer %name% wartet auf Genehmigung'
 'review.core.image_reported': 'Bild von %reporter% gemeldet'
 'review.bookclub.book_pending': 'Buch "%title%" von %user% wartet auf Genehmigung'
