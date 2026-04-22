@@ -1,90 +1,61 @@
-# =============================================================================
-# Namespace skeleton - established by the i18n hardening plan.
-# Each per-page phase moves its flat keys into one of these namespaces.
-# Empty namespaces ({}) are placeholders; they fill up as phases progress.
-# See .claude/plans/2026-04-22_core-i18n-hardening-and-prefix-restructure.md
-# =============================================================================
-
-# chrome: top navbar, footer, burger menu, notification popover, flag switcher
-chrome: {}
-# security: login, register, password reset, rate limiting
+chrome:
+    menu_login: 'Login'
+    menu_default: 'Homepage'
+    menu_events: 'Events'
+    menu_members: 'Members'
+    menu_more: 'More'
+    menu_admin: 'Admin'
+    menu_profile_view_profile: 'My profile'
+    menu_profile_messages: 'My messages'
+    menu_profile_social: 'My activities'
+    menu_profile_images: 'My images'
+    menu_profile_config: 'Settings & Privacy'
+    menu_profile_logout: 'Logout'
+    footer_col_help: 'Help'
+    footer_col_platform: 'Platform'
+    footer_col_social: 'Social'
+    footer_col_legal: 'Legal'
+    nav_contact: 'Contact'
+    nav_api: 'API'
+    burger_logged_in_label: 'Logged in: %name%'
+    burger_admin_section: 'Admin'
+    notifications_view_all: 'View all'
+    footer_powered_by: 'powered by'
+    aria_select_language: 'Select language'
 security: {}
-# events: event list, featured, details
 events: {}
-# cms: CMS frontend (frontpage, plugin pages, 404, 204, error, blocks)
 cms: {}
-# cms_showcase: CMS showcase pages
 cms_showcase: {}
-# member: public member directory
 member: {}
-# profile: profile landing pages
 profile: {}
-# profile_config: profile settings and privacy
 profile_config: {}
-# profile_social: profile activity feed
 profile_social: {}
-# profile_images: profile images list
 profile_images: {}
-# profile_messages: profile direct messages
 profile_messages: {}
-# profile_notifications: profile notification center
 profile_notifications: {}
-# profile_review: profile review queue (moderator view)
 profile_review: {}
-# profile_image: profile single image / upload
 profile_image: {}
-# support: support page (contact form)
 support: {}
-# report: report image / content flow
 report: {}
-# cookie: cookie consent page
 cookie: {}
-# email: transactional email templates - placeholder deferred until the flat
-# `email` field-label key (line below) is migrated; YAML cannot have both at
-# the same level. The namespace will be introduced when phase 20 starts.
-# shared: shared partials (_components, _form, _non_locale, image)
 shared: {}
-# admin_shell: admin layout, sidebar, dashboard
 admin_shell: {}
-# admin_cms: admin CMS management (pages, menus, announcements)
 admin_cms: {}
-# admin_email: admin email templates and blocklist
 admin_email: {}
-# admin_event: admin events list and editor
 admin_event: {}
-# admin_host: admin hosts list and editor
 admin_host: {}
-# admin_location: admin locations / venues
 admin_location: {}
-# admin_logs: admin logs (system, activity, 404, cron)
 admin_logs: {}
-# admin_member: admin members list and editor
 admin_member: {}
-# admin_static_link: admin static links
 admin_static_link: {}
-# admin_support: admin support tickets
 admin_support: {}
-# admin_system: admin system / settings
 admin_system: {}
-# global: cross-cutting labels (save, cancel, delete, status words, pagination)
 global: {}
-
-# =============================================================================
-# Legacy flat keys - migrated into namespaces above by per-page phases.
-# =============================================================================
-
 page_title_default: 'Welcome'
 menu_about: 'About'
 menu_books: 'Books'
-menu_events: 'Events'
-menu_members: 'Members'
 menu_manage: 'Manage'
-menu_admin: 'Admin'
 menu_profile_events: 'My events'
-menu_profile_messages: 'My messages'
-menu_profile_view_profile: 'My profile'
-menu_profile_config: 'Settings & Privacy'
-menu_profile_logout: 'Logout'
 button_save: 'Save'
 menu_admin_cms: 'Pages'
 menu_admin_config: 'Configuration'
@@ -104,9 +75,6 @@ role_admin: 'Admin'
 role_manager: 'Manager'
 role_system: 'System'
 role_user: 'User'
-menu_default: 'Homepage'
-menu_login: 'Login'
-menu_more: 'More'
 'p: please sign in': 'Please sign in'
 'p: please register': 'Please register'
 page_title_register: 'Register'
@@ -165,10 +133,8 @@ menu_admin_logs_activity: 'Activity'
 button_filter: 'Filter'
 event_filter_who_my: 'My Events'
 event_filter_who_my_friends: 'My Friends'
-menu_profile_social: 'My activities'
 images: 'Images'
 comments: 'Comments'
-menu_profile_images: 'My images'
 menu_cookie_consent_button: 'Cookie consent'
 menu_cookie_consent_headline: 'This websites uses Cookies'
 menu_cookie_consent_text: 'This website itself does not use any tracking or cookies, just the GDPR-compliant and non-personalized session.'
@@ -254,10 +220,6 @@ page_plugin_dishes_title_index: 'Dishes'
 email: 'Email'
 password: 'Password'
 link_here: 'here'
-footer_col1: 'Help'
-footer_col2: 'Platform'
-footer_col3: 'Social'
-footer_col4: 'Legal'
 member_pageview_information: 'Showing page %pageCurrent% of %pageTotal% (%userTotal% total members)'
 page_plugin_dishes_title_details: 'Dish'
 page_plugin_dishes_title_new: 'New dish'
@@ -404,43 +366,35 @@ menu_admin_translation_publish: 'Publish'
 page_title_translation_edit: 'Edit translation'
 page_title_translation: 'Translation'
 nav_support: 'Support'
-nav_contact: 'Contact'
-nav_api: 'API'
 config_option_send_admin_notification: 'Admin Notifications'
-# Login page sidebar
 'login.sidebar.title': 'New to meetAgain?'
 'login.sidebar.intro': 'Join a friendly community and never miss an event you care about.'
 'login.sidebar.bullet1': 'Discover and RSVP to local events'
 'login.sidebar.bullet2': 'Connect with members who share your interests'
 'login.sidebar.bullet3': 'Manage your own profile and preferences'
 'login.sidebar.link': 'Create an account'
-# Register page sidebar
 'register.sidebar.title': 'Already a member?'
 'register.sidebar.intro': 'Log in to pick up where you left off.'
 'register.sidebar.bullet1': 'Free to join'
 'register.sidebar.bullet2': 'Your data stays yours'
 'register.sidebar.bullet3': 'Unsubscribe any time'
 'register.sidebar.link': 'Log in'
-# Reset page sidebar
 'reset.sidebar.title': 'What happens next?'
 'reset.sidebar.intro': 'Enter your email and we will send you a link to choose a new password.'
 'reset.sidebar.bullet1': 'The link is valid for one hour'
 'reset.sidebar.bullet2': 'Check your spam folder if it does not arrive'
 'reset.sidebar.bullet3': 'The captcha protects the form from abuse'
 'reset.sidebar.link': 'Back to login'
-# Reset password page sidebar
 'reset_password.sidebar.title': 'Almost done'
 'reset_password.sidebar.intro': 'Choose a strong password you will remember.'
 'reset_password.sidebar.bullet1': 'At least 8 characters'
 'reset_password.sidebar.bullet2': 'Mix letters and numbers'
 'reset_password.sidebar.bullet3': 'Avoid reusing old passwords'
 'reset_password.sidebar.link': 'Wrong page? Log in'
-# Shared captcha counter text
 'captcha.limit_text': 'You cannot get more than 7 new captcha per minute.'
 'captcha.tries_pre': 'You used'
 'captcha.tries_mid': 'tries so far. Next free try in'
 'captcha.tries_post': 'seconds.'
-# Register status pages
 'register_email_send.heading': 'Check your inbox'
 'register_email_send.description': 'We sent a confirmation link to your email address. Click the link to activate your account.'
 'register_email_send.cta': 'Back to login'
@@ -450,7 +404,6 @@ config_option_send_admin_notification: 'Admin Notifications'
 'register_error.heading': 'Something went wrong'
 'register_error.description': 'We could not complete your registration. The link may have expired.'
 'register_error.cta': 'Try again'
-# Reset password status pages
 'reset_email_send.heading': 'Check your inbox'
 'reset_email_send.description': 'If an account exists for that email, we sent a link to reset your password.'
 'reset_email_send.cta': 'Back to login'
@@ -465,7 +418,6 @@ config_option_send_admin_notification: 'Admin Notifications'
 'reset_blocked.description': 'We cannot send password reset emails to this address.'
 'reset_blocked.reason_label': 'Reason'
 'reset_blocked.cta': 'Contact support'
-# Support page sidebar
 'support.sidebar.title': 'How we can help'
 'support.sidebar.intro': 'Send us a message and we will get back to you as soon as we can.'
 'support.sidebar.bullet1': 'Questions about events or membership'
@@ -485,7 +437,6 @@ config_option_send_admin_notification: 'Admin Notifications'
 meta_description_cookie: 'Manage your cookie preferences for this site. Control which optional features are enabled.'
 meta_description_events_featured: 'Handpicked special events and highlights from our community. Discover featured meetups worth attending.'
 meta_description_event_meeting_at: 'meeting at'
-# Review notification system
 'notification.review.pending_count': '{%count%} item pending your review|{%count%} items pending your review'
 'profile.review.title': 'Pending Reviews'
 'profile.review.empty': 'No items pending your review.'

@@ -1,79 +1,56 @@
-# =============================================================================
-# Namespace skeleton - established by the i18n hardening plan.
-# Each per-page phase moves its flat keys into one of these namespaces.
-# Empty namespaces ({}) are placeholders; they fill up as phases progress.
-# See .claude/plans/2026-04-22_core-i18n-hardening-and-prefix-restructure.md
-# =============================================================================
-
-# chrome: top navbar, footer, burger menu, notification popover, flag switcher
-chrome: {}
-# security: login, register, password reset, rate limiting
+chrome:
+    menu_login: 'Anmelden'
+    menu_default: 'Startseite'
+    menu_events: 'Events'
+    menu_members: 'Mitglieder'
+    menu_more: 'Mehr'
+    menu_admin: 'Admin'
+    menu_profile_view_profile: 'Mein Profil'
+    menu_profile_messages: 'Meine Nachrichten'
+    menu_profile_social: 'Meine Aktivitäten'
+    menu_profile_images: 'Meine Bilder'
+    menu_profile_config: 'Einstellungen'
+    menu_profile_logout: 'Abmelden'
+    footer_col_help: 'Hilfe'
+    footer_col_platform: 'Plattform'
+    footer_col_social: 'Social'
+    footer_col_legal: 'Gesetzliches'
+    nav_contact: 'Kontakt'
+    nav_api: 'API'
+    burger_logged_in_label: 'Angemeldet: %name%'
+    burger_admin_section: 'Admin'
+    notifications_view_all: 'Alle anzeigen'
+    footer_powered_by: 'läuft mit'
+    aria_select_language: 'Sprache auswählen'
 security: {}
-# events: event list, featured, details
 events: {}
-# cms: CMS frontend (frontpage, plugin pages, 404, 204, error, blocks)
 cms: {}
-# cms_showcase: CMS showcase pages
 cms_showcase: {}
-# member: public member directory
 member: {}
-# profile: profile landing pages
 profile: {}
-# profile_config: profile settings and privacy
 profile_config: {}
-# profile_social: profile activity feed
 profile_social: {}
-# profile_images: profile images list
 profile_images: {}
-# profile_messages: profile direct messages
 profile_messages: {}
-# profile_notifications: profile notification center
 profile_notifications: {}
-# profile_review: profile review queue (moderator view)
 profile_review: {}
-# profile_image: profile single image / upload
 profile_image: {}
-# support: support page (contact form)
 support: {}
-# report: report image / content flow
 report: {}
-# cookie: cookie consent page
 cookie: {}
-# email: transactional email templates - placeholder deferred until the flat
-# `email` field-label key (line below) is migrated; YAML cannot have both at
-# the same level. The namespace will be introduced when phase 20 starts.
-# shared: shared partials (_components, _form, _non_locale, image)
 shared: {}
-# admin_shell: admin layout, sidebar, dashboard
 admin_shell: {}
-# admin_cms: admin CMS management (pages, menus, announcements)
 admin_cms: {}
-# admin_email: admin email templates and blocklist
 admin_email: {}
-# admin_event: admin events list and editor
 admin_event: {}
-# admin_host: admin hosts list and editor
 admin_host: {}
-# admin_location: admin locations / venues
 admin_location: {}
-# admin_logs: admin logs (system, activity, 404, cron)
 admin_logs: {}
-# admin_member: admin members list and editor
 admin_member: {}
-# admin_static_link: admin static links
 admin_static_link: {}
-# admin_support: admin support tickets
 admin_support: {}
-# admin_system: admin system / settings
 admin_system: {}
-# global: cross-cutting labels (save, cancel, delete, status words, pagination)
 global: {}
-
-# =============================================================================
-# Legacy flat keys - migrated into namespaces above by per-page phases.
-# =============================================================================
-
-# Review notification system
 'notification.review.pending_count': '%count% Element wartet auf Ihre Ueberpruefung|%count% Elemente warten auf Ihre Ueberpruefung'
 'profile.review.title': 'Ausstehende Ueberpruefungen'
 'profile.review.empty': 'Keine Elemente zur Ueberpruefung vorhanden.'
@@ -89,15 +66,8 @@ global: {}
 page_title_default: 'Willkommen'
 menu_about: 'Über Uns'
 menu_books: 'Bücher'
-menu_events: 'Events'
-menu_members: 'Mitglieder'
 menu_manage: 'Verwaltung'
-menu_admin: 'Admin'
 menu_profile_events: 'Meine Events'
-menu_profile_messages: 'Meine Nachrichten'
-menu_profile_view_profile: 'Mein Profil'
-menu_profile_config: 'Einstellungen'
-menu_profile_logout: 'Abmelden'
 button_save: 'Speichern'
 menu_admin_cms: 'Seiten'
 menu_admin_config: 'Konfiguration'
@@ -117,9 +87,6 @@ role_admin: 'Administrator'
 role_manager: 'Manager'
 role_system: 'System'
 role_user: 'Benutzer'
-menu_default: 'Startseite'
-menu_login: 'Anmelden'
-menu_more: 'Mehr'
 'p: please sign in': 'Anmeldung'
 'p: please register': 'Registrierung'
 page_title_register: 'Registrierung'
@@ -164,10 +131,8 @@ menu_admin_logs_activity: 'Aktivität'
 button_filter: 'Filtern'
 event_filter_who_my: 'Meine'
 event_filter_who_my_friends: 'Mit meinen Freunden'
-menu_profile_social: 'Meine Aktivitäten'
 images: 'Bilder'
 comments: 'Kommentare'
-menu_profile_images: 'Meine Bilder'
 menu_cookie_consent_button: 'Cookie Zustimmung'
 menu_cookie_consent_headline: 'Diese Webseite benutzt Cookies'
 menu_cookie_consent_text: 'Diese Webseite selber benutzt keinerlei Tracking oder cookies, nur die GDPR-konforme und nicht personenbezogene Session.'
@@ -253,10 +218,6 @@ page_plugin_dishes_title_index: 'Gerichte'
 email: 'Email'
 password: 'Passwort'
 link_here: 'hier'
-footer_col1: 'Hilfe'
-footer_col2: 'Plattform'
-footer_col3: 'Social'
-footer_col4: 'Gesetzliches'
 member_pageview_information: 'Anzeige von Seite %pageCurrent% von %pageTotal% (%userTotal% Mitglieder insgesamt)'
 page_plugin_dishes_title_details: 'Gericht'
 page_plugin_dishes_title_new: 'Neues Gericht'
@@ -403,43 +364,35 @@ menu_admin_translation_publish: 'Veröffentlichen'
 page_title_translation_edit: 'Übersetzung bearbeiten'
 page_title_translation: 'Übersetzung'
 nav_support: 'Support'
-nav_contact: 'Kontakt'
-nav_api: 'API'
 config_option_send_admin_notification: 'Admin Benachrichtigungen'
-# Login-Seite Sidebar
 'login.sidebar.title': 'Neu bei meetAgain?'
 'login.sidebar.intro': 'Werde Teil einer freundlichen Gemeinschaft und verpasse keine Veranstaltung mehr.'
 'login.sidebar.bullet1': 'Entdecke lokale Events und melde dich an'
 'login.sidebar.bullet2': 'Vernetze dich mit Mitgliedern mit gleichen Interessen'
 'login.sidebar.bullet3': 'Verwalte dein Profil und deine Einstellungen'
 'login.sidebar.link': 'Konto erstellen'
-# Registrierungs-Seite Sidebar
 'register.sidebar.title': 'Bereits Mitglied?'
 'register.sidebar.intro': 'Melde dich an und mach dort weiter, wo du aufgehört hast.'
 'register.sidebar.bullet1': 'Kostenlos beitreten'
 'register.sidebar.bullet2': 'Deine Daten gehören dir'
 'register.sidebar.bullet3': 'Jederzeit abmelden'
 'register.sidebar.link': 'Anmelden'
-# Passwort-Zurücksetzen Sidebar
 'reset.sidebar.title': 'Was passiert als nächstes?'
 'reset.sidebar.intro': 'Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen deines Passworts.'
 'reset.sidebar.bullet1': 'Der Link ist eine Stunde gültig'
 'reset.sidebar.bullet2': 'Prüfe deinen Spam-Ordner, falls die E-Mail nicht ankommt'
 'reset.sidebar.bullet3': 'Das Captcha schützt das Formular vor Missbrauch'
 'reset.sidebar.link': 'Zurück zur Anmeldung'
-# Neues Passwort Sidebar
 'reset_password.sidebar.title': 'Fast geschafft'
 'reset_password.sidebar.intro': 'Wähle ein starkes Passwort, das du dir merken kannst.'
 'reset_password.sidebar.bullet1': 'Mindestens 8 Zeichen'
 'reset_password.sidebar.bullet2': 'Buchstaben und Zahlen kombinieren'
 'reset_password.sidebar.bullet3': 'Kein altes Passwort wiederverwenden'
 'reset_password.sidebar.link': 'Falsche Seite? Anmelden'
-# Geteilter Captcha-Text
 'captcha.limit_text': 'Du kannst nicht mehr als 7 neue Captchas pro Minute anfordern.'
 'captcha.tries_pre': 'Du hast'
 'captcha.tries_mid': 'Versuche genutzt. Nächster freier Versuch in'
 'captcha.tries_post': 'Sekunden.'
-# Registrierungs-Statusseiten
 'register_email_send.heading': 'Posteingang prüfen'
 'register_email_send.description': 'Wir haben einen Bestätigungslink an deine E-Mail-Adresse gesendet. Klicke auf den Link, um dein Konto zu aktivieren.'
 'register_email_send.cta': 'Zurück zur Anmeldung'
@@ -449,7 +402,6 @@ config_option_send_admin_notification: 'Admin Benachrichtigungen'
 'register_error.heading': 'Etwas ist schiefgelaufen'
 'register_error.description': 'Wir konnten deine Registrierung nicht abschließen. Der Link ist möglicherweise abgelaufen.'
 'register_error.cta': 'Erneut versuchen'
-# Passwort-Zurücksetzen Statusseiten
 'reset_email_send.heading': 'Posteingang prüfen'
 'reset_email_send.description': 'Falls ein Konto mit dieser E-Mail existiert, haben wir einen Link zum Zurücksetzen des Passworts gesendet.'
 'reset_email_send.cta': 'Zurück zur Anmeldung'
@@ -464,7 +416,6 @@ config_option_send_admin_notification: 'Admin Benachrichtigungen'
 'reset_blocked.description': 'Wir können an diese Adresse keine E-Mails zum Zurücksetzen senden.'
 'reset_blocked.reason_label': 'Grund'
 'reset_blocked.cta': 'Support kontaktieren'
-# Support-Seite Sidebar
 'support.sidebar.title': 'Wie wir helfen können'
 'support.sidebar.intro': 'Schick uns eine Nachricht und wir melden uns so schnell wie möglich.'
 'support.sidebar.bullet1': 'Fragen zu Events oder Mitgliedschaft'

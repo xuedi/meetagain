@@ -10,19 +10,19 @@
     </div>
     <div class="dropdown-menu" id="dropdown-menu" role="menu">
         <div class="dropdown-content">
-            <a class="navbar-item" href="{{ path('app_profile') }}">{{ "menu_profile_view_profile" | trans }}</a>
-            <a class="navbar-item" href="{{ path('app_profile_social') }}">{{ "menu_profile_social" | trans }}</a>
-            <a class="navbar-item" href="{{ path('app_profile_messages') }}">{{ "menu_profile_messages" | trans }}</a>
-            <a class="navbar-item" href="{{ path('app_profile_images') }}">{{ "menu_profile_images" | trans }}</a>
+            <a class="navbar-item" href="{{ path('app_profile') }}">{{ "chrome.menu_profile_view_profile" | trans }}</a>
+            <a class="navbar-item" href="{{ path('app_profile_social') }}">{{ "chrome.menu_profile_social" | trans }}</a>
+            <a class="navbar-item" href="{{ path('app_profile_messages') }}">{{ "chrome.menu_profile_messages" | trans }}</a>
+            <a class="navbar-item" href="{{ path('app_profile_images') }}">{{ "chrome.menu_profile_images" | trans }}</a>
             {% for link in get_plugin_profile_dropdown_links() %}
                 <a class="navbar-item" href="{{ link.slug }}">{{ link.name | trans }}</a>
             {% endfor %}
             <hr class="dropdown-divider"/>
-            <a class="navbar-item" href="{{ path('app_profile_config') }}">{{ "menu_profile_config" | trans }}</a>
+            <a class="navbar-item" href="{{ path('app_profile_config') }}">{{ "chrome.menu_profile_config" | trans }}</a>
             <hr class="dropdown-divider"/>
             <form action="{{ path('app_security_logout') }}" method="post" class="is-contents">
                 <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
-                <button type="submit" class="navbar-item LinkLikeButton">{{ "menu_profile_logout" | trans }}</button>
+                <button type="submit" class="navbar-item LinkLikeButton">{{ "chrome.menu_profile_logout" | trans }}</button>
             </form>
         </div>
     </div>
