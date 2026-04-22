@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/locations')]
 final class LocationController extends AbstractAdminController
@@ -41,6 +42,7 @@ final class LocationController extends AbstractAdminController
         private readonly EventRepository $eventRepo,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly AdminLocationListFilterService $locationFilterService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_location')]
@@ -70,7 +72,7 @@ final class LocationController extends AbstractAdminController
 
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateLocation, $location->getId());
 
-            $this->addFlash('success', 'Location updated successfully');
+            $this->addFlash('success', $this->translator->trans('admin_location.flash_updated'));
 
             return $this->redirectToRoute('app_admin_location');
         }
@@ -98,7 +100,7 @@ final class LocationController extends AbstractAdminController
         if (count($eventsUsingLocation) > 0) {
             $this->addFlash(
                 'error',
-                'Cannot delete location. It is currently used in ' . count($eventsUsingLocation) . ' event(s).',
+                $this->translator->trans('admin_location.flash_delete_blocked', ['%count%' => count($eventsUsingLocation)]),
             );
 
             return $this->redirectToRoute('app_admin_location_edit', ['id' => $location->getId()]);
@@ -110,7 +112,7 @@ final class LocationController extends AbstractAdminController
 
         $this->entityActionDispatcher->dispatch(EntityAction::DeleteLocation, $locationId);
 
-        $this->addFlash('success', 'Location deleted successfully');
+        $this->addFlash('success', $this->translator->trans('admin_location.flash_deleted'));
 
         return $this->redirectToRoute('app_admin_location');
     }
@@ -133,7 +135,7 @@ final class LocationController extends AbstractAdminController
 
             $this->entityActionDispatcher->dispatch(EntityAction::CreateLocation, $location->getId());
 
-            $this->addFlash('success', 'Location created successfully');
+            $this->addFlash('success', $this->translator->trans('admin_location.flash_created'));
 
             return $this->redirectToRoute('app_admin_location');
         }
