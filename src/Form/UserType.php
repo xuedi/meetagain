@@ -35,21 +35,24 @@ class UserType extends AbstractType
             $languageList[$this->translator->trans('language_' . $locale)] = $locale;
         }
 
+        $yes = $this->translator->trans('admin_member.choice_yes');
+        $no = $this->translator->trans('admin_member.choice_no');
+
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Name',
+                'label' => 'admin_member.form_label_name',
                 'constraints' => [
                     new Length(max: 64, maxMessage: 'usernames cant be longer than 64 characters (less with chinese)'),
                 ],
             ])
             ->add('email', EmailType::class, [
-                'label' => 'Email',
+                'label' => 'admin_member.form_label_email',
                 'constraints' => [
                     new Length(max: 180, maxMessage: 'emails cant be longer than 180 characters'),
                 ],
             ])
             ->add('bio', TextareaType::class, [
-                'label' => 'Bio',
+                'label' => 'admin_member.form_label_bio',
             ])
             ->add('role', ChoiceType::class, [
                 'choices' => UserRole::getChoices(),
@@ -59,36 +62,36 @@ class UserType extends AbstractType
             ->add('verified', ChoiceType::class, [
                 'data' => $user->isVerified(),
                 'mapped' => false,
-                'label' => 'Verified Regular',
-                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+                'label' => 'admin_member.form_label_verified',
+                'choices' => [$yes => true, $no => false],
             ])
             ->add('restricted', ChoiceType::class, [
                 'data' => $user->isRestricted(),
                 'mapped' => false,
-                'label' => 'Restricted',
-                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+                'label' => 'admin_member.form_label_restricted',
+                'choices' => [$yes => true, $no => false],
             ])
             ->add('osmConsent', ChoiceType::class, [
                 'data' => $user->isOsmConsent(),
                 'mapped' => false,
-                'label' => 'show Maps',
-                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+                'label' => 'admin_member.form_label_osm_consent',
+                'choices' => [$yes => true, $no => false],
             ])
             ->add('public', ChoiceType::class, [
                 'data' => $user->isPublic(),
                 'mapped' => false,
-                'label' => 'isPublic',
-                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+                'label' => 'admin_member.form_label_is_public',
+                'choices' => [$yes => true, $no => false],
             ])
             ->add('tagging', ChoiceType::class, [
                 'data' => $user->isTagging(),
                 'mapped' => false,
-                'label' => 'allowTagging',
-                'choices' => [$this->translator->trans('Yes') => true, $this->translator->trans('No') => false],
+                'label' => 'admin_member.form_label_tagging',
+                'choices' => [$yes => true, $no => false],
             ])
             ->add('locale', ChoiceType::class, [
                 'data' => $user->getLocale(),
-                'label' => 'Locale',
+                'label' => 'admin_member.form_label_locale',
                 'choices' => $languageList,
             ])
             ->add('status', ChoiceType::class, [
