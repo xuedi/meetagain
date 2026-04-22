@@ -210,7 +210,27 @@ profile:
     label_messages: '消息'
     label_rsvp: '报名'
     label_blocked: '已屏蔽'
-profile_config: {}
+    form_label_username: '用户名'
+    form_label_public_profile: '公开个人资料：'
+    form_label_language_after_login: '登录后使用的语言：'
+    form_label_bio: '个人简介：'
+    form_choice_yes: '是'
+    form_choice_no: '否'
+profile_config:
+    section_settings: '设置'
+    section_privacy: '隐私'
+    section_change_password: '修改密码'
+    section_blocked_users: '已屏蔽用户'
+    toggle_email_notification: '启用电子邮件通知'
+    toggle_public_profile: '在网站访客的成员页面上显示我'
+    toggle_tagging: '允许他人在照片中标记我'
+    toggle_osm: '在活动页面启用 OpenStreetMap 地图'
+    password_reset_hint: '如果忘记密码，可以使用密码%reset_link%功能重新设置。'
+    password_reset_link_label: '重置'
+    blocked_empty: '你没有屏蔽任何用户。'
+    blocked_view_all: '查看所有已屏蔽用户'
+    flash_password_changed: '密码已修改，请重新登录以确认。'
+    flash_password_old_invalid: '旧密码不正确。'
 profile_social: {}
 profile_images: {}
 profile_messages: {}
