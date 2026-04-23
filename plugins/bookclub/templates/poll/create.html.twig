@@ -1,20 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create Poll - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_poll.page_title_create'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li><a href="{{ path('app_plugin_bookclub_poll') }}">Poll</a></li>
-                <li class="is-active"><a>Create Poll</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li><a href="{{ path('app_plugin_bookclub_poll') }}">{{ 'bookclub_poll.breadcrumb_poll'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_poll.breadcrumb_create'|trans }}</a></li>
             </ul>
         </nav>
 
-        <h1 class="title">Create New Poll</h1>
-        <p class="subtitle">Select member suggestions and/or add books directly to the poll.</p>
+        <h1 class="title">{{ 'bookclub_poll.heading_create'|trans }}</h1>
+        <p class="subtitle">{{ 'bookclub_poll.subtitle_create'|trans }}</p>
 
         {{ form_start(form) }}
             <div class="columns">
@@ -33,7 +33,7 @@
                         <div class="control">
                             <button type="submit" class="button is-primary">
                                 <span class="icon"><i class="fas fa-poll"></i></span>
-                                <span>Create Poll</span>
+                                <span>{{ 'bookclub_poll.button_create_submit'|trans }}</span>
                             </button>
                         </div>
                     </div>
@@ -41,18 +41,18 @@
 
                 <div class="column">
                     <div class="box mb-4">
-                        <h3 class="title is-5">Member Suggestions</h3>
-                        <p class="help mb-3">These are books suggested by members (sorted by priority).</p>
+                        <h3 class="title is-5">{{ 'bookclub_poll.heading_suggestions_box'|trans }}</h3>
+                        <p class="help mb-3">{{ 'bookclub_poll.help_suggestions_box'|trans }}</p>
                         {{ form_widget(form.suggestions) }}
                         {{ form_errors(form.suggestions) }}
                         {% if suggestions|length == 0 %}
-                            <p class="has-text-grey">No pending suggestions.</p>
+                            <p class="has-text-grey">{{ 'bookclub_poll.empty_suggestions'|trans }}</p>
                         {% endif %}
                     </div>
 
                     <div class="box">
-                        <h3 class="title is-5">Add Books Directly</h3>
-                        <p class="help mb-3">Add books from the catalog that weren't suggested by members.</p>
+                        <h3 class="title is-5">{{ 'bookclub_poll.heading_books_box'|trans }}</h3>
+                        <p class="help mb-3">{{ 'bookclub_poll.help_books_box'|trans }}</p>
                         {{ form_widget(form.books) }}
                         {{ form_errors(form.books) }}
                     </div>

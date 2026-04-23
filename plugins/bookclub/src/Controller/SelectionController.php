@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/bookclub/manage')]
 #[IsGranted('ROLE_ORGANIZER')]
@@ -26,6 +27,7 @@ final class SelectionController extends AbstractController
         private readonly BookPollRepository $pollRepository,
         private readonly PollService $pollService,
         private readonly UserRepository $userRepository,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/select/{eventId}', name: 'app_plugin_bookclub_select', methods: ['GET'])]
@@ -98,14 +100,14 @@ final class SelectionController extends AbstractController
 
         $poll = $this->pollRepository->findByEventId($eventId);
         if ($poll === null) {
-            $this->addFlash('danger', 'No poll found for this event.');
+            $this->addFlash('danger', $this->translator->trans('bookclub_manage.flash_no_poll'));
             return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
         }
 
         $results = $this->pollService->getResults($poll->getId());
         $winner = $results['winner'];
         if ($winner === null) {
-            $this->addFlash('danger', 'No winner found in the poll.');
+            $this->addFlash('danger', $this->translator->trans('bookclub_manage.flash_no_winner'));
             return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
         }
 

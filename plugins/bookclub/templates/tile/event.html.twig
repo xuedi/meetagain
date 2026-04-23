@@ -1,10 +1,10 @@
 <h3 class="title is-5">
     <span class="icon"><i class="fas fa-book"></i></span>
-    Book Club
+    {{ 'bookclub_tile.plugin_heading'|trans }}
 </h3>
 
 {% if selection %}
-    <p class="is-size-7 has-text-grey mb-2">We will be discussing:</p>
+    <p class="is-size-7 has-text-grey mb-2">{{ 'bookclub_tile.discussing_label'|trans }}</p>
     {% if selection.book.coverImage %}
         <a href="{{ path('app_plugin_bookclub_book_show', {id: selection.book.id}) }}" style="display: inline-block; border: 1px solid #666;">
             {% include '_components/image.html.twig' with {'image': selection.book.coverImage, 'size': '200x250'} %}
@@ -20,9 +20,9 @@
     {% endif %}
 {% else %}
     {% if activePoll %}
-        <p class="is-size-7 has-text-grey mb-2">Vote for the next book:</p>
+        <p class="is-size-7 has-text-grey mb-2">{{ 'bookclub_tile.vote_label'|trans }}</p>
         <p class="has-text-weight-bold mb-1">
-            <a href="{{ path('app_plugin_bookclub_poll') }}">{{ activePoll.title ?? 'Current Poll' }}</a>
+            <a href="{{ path('app_plugin_bookclub_poll') }}">{{ activePoll.title ?? 'bookclub_tile.current_poll_fallback'|trans }}</a>
         </p>
         <ul class="is-size-7 mb-3">
             {% for suggestion in activePoll.suggestions %}
@@ -31,22 +31,22 @@
         </ul>
         <a href="{{ path('app_plugin_bookclub_poll') }}" class="button is-small is-warning">
             <span class="icon"><i class="fas fa-poll"></i></span>
-            <span>Vote now</span>
+            <span>{{ 'bookclub_tile.button_vote_now'|trans }}</span>
         </a>
     {% else %}
-        <p class="has-text-grey">No book selected yet</p>
+        <p class="has-text-grey">{{ 'bookclub_tile.empty_no_selection'|trans }}</p>
     {% endif %}
 
     {% if is_granted('ROLE_ORGANIZER') %}
         <div class="buttons mt-2">
             <a href="{{ path('app_plugin_bookclub_select', {eventId: eventId}) }}" class="button is-small is-success">
                 <span class="icon"><i class="fas fa-plus"></i></span>
-                <span>Select book</span>
+                <span>{{ 'bookclub_tile.button_select_book'|trans }}</span>
             </a>
             {% if not activePoll %}
                 <a href="{{ path('app_plugin_bookclub_poll_create', {eventId: eventId}) }}" class="button is-small is-info">
                     <span class="icon"><i class="fas fa-poll"></i></span>
-                    <span>Create poll</span>
+                    <span>{{ 'bookclub_tile.button_create_poll'|trans }}</span>
                 </a>
             {% endif %}
         </div>

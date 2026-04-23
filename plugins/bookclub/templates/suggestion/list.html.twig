@@ -1,22 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Suggestions - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_suggestion.page_title'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li class="is-active"><a>Suggestions</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_suggestion.breadcrumb'|trans }}</a></li>
             </ul>
         </nav>
 
-        <h1 class="title">Book Suggestions</h1>
+        <h1 class="title">{{ 'bookclub_suggestion.heading'|trans }}</h1>
 
         {% if userSuggestions|length == 0 %}
             <div class="notification is-light">
-                You haven't suggested a book yet. Choose one below or from the <a href="{{ path('app_plugin_bookclub') }}">book catalog</a>.
+                {{ 'bookclub_suggestion.empty_hint'|trans({'%url%': path('app_plugin_bookclub')})|raw }}
             </div>
         {% endif %}
 
@@ -24,16 +24,16 @@
 
         <div class="columns">
             <div class="column is-8">
-                <h2 class="subtitle">Pending Suggestions (by priority)</h2>
+                <h2 class="subtitle">{{ 'bookclub_suggestion.heading_pending'|trans }}</h2>
 
                 {% if suggestions|length > 0 %}
                     <table class="table is-fullwidth is-striped">
                         <thead>
                             <tr>
-                                <th>Book</th>
-                                <th>Author</th>
-                                <th>Suggested By</th>
-                                <th>Priority</th>
+                                <th>{{ 'bookclub_suggestion.col_book'|trans }}</th>
+                                <th>{{ 'bookclub_suggestion.col_author'|trans }}</th>
+                                <th>{{ 'bookclub_suggestion.col_suggested_by'|trans }}</th>
+                                <th>{{ 'bookclub_suggestion.col_priority'|trans }}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -45,20 +45,20 @@
                                             {{ suggestion.book.title }}
                                         </a>
                                     </td>
-                                    <td>{{ suggestion.book.author ?? 'Unknown' }}</td>
+                                    <td>{{ suggestion.book.author ?? 'bookclub_suggestion.label_unknown'|trans }}</td>
                                     <td>{{ get_user_name(suggestion.suggestedBy) }}</td>
                                     <td>
                                         {% set r = suggestion.resubmitCount %}
                                         {% if r == 0 %}
-                                            <span class="icon" title="New"><i class="fa fa-thermometer-empty"></i></span>
+                                            <span class="icon" title="{{ 'bookclub_suggestion.priority_new'|trans }}"><i class="fa fa-thermometer-empty"></i></span>
                                         {% elseif r == 1 %}
-                                            <span class="icon" title="Skipped once"><i class="fa fa-thermometer-quarter"></i></span>
+                                            <span class="icon" title="{{ 'bookclub_suggestion.priority_skipped_once'|trans }}"><i class="fa fa-thermometer-quarter"></i></span>
                                         {% elseif r == 2 %}
-                                            <span class="icon" title="Skipped {{ r }} times"><i class="fa fa-thermometer-half"></i></span>
+                                            <span class="icon" title="{{ 'bookclub_suggestion.priority_skipped_times'|trans({'%count%': r}) }}"><i class="fa fa-thermometer-half"></i></span>
                                         {% elseif r == 3 %}
-                                            <span class="icon" title="Skipped {{ r }} times"><i class="fa fa-thermometer-three-quarters"></i></span>
+                                            <span class="icon" title="{{ 'bookclub_suggestion.priority_skipped_times'|trans({'%count%': r}) }}"><i class="fa fa-thermometer-three-quarters"></i></span>
                                         {% else %}
-                                            <span class="icon" title="Skipped {{ r }} times"><i class="fa fa-thermometer-full"></i></span>
+                                            <span class="icon" title="{{ 'bookclub_suggestion.priority_skipped_times'|trans({'%count%': r}) }}"><i class="fa fa-thermometer-full"></i></span>
                                         {% endif %}
                                     </td>
                                     <td class="has-text-right">
@@ -73,18 +73,16 @@
                         </tbody>
                     </table>
                 {% else %}
-                    <p class="has-text-grey">No pending suggestions.</p>
+                    <p class="has-text-grey">{{ 'bookclub_suggestion.empty_no_suggestions'|trans }}</p>
                 {% endif %}
 
-                <p class="help has-text-grey mt-2">
-                    Priority is based on how often a book has been skipped in previous polls and how long it has been waiting. Books that were not elected in a poll automatically move up in priority for the next one.
-                </p>
+                <p class="help has-text-grey mt-2">{{ 'bookclub_suggestion.priority_help'|trans }}</p>
 
                 {% if is_granted('ROLE_ORGANIZER') %}
                     <div class="box mt-4">
-                        <h3 class="title is-5">Manager Actions</h3>
+                        <h3 class="title is-5">{{ 'bookclub_suggestion.heading_manager_actions'|trans }}</h3>
                         <a href="{{ path('app_plugin_bookclub_poll_create') }}" class="button is-primary is-fullwidth">
-                            Create Poll from Suggestions
+                            {{ 'bookclub_suggestion.button_create_poll'|trans }}
                         </a>
                     </div>
                 {% endif %}
@@ -94,8 +92,8 @@
             <div class="column is-4">
                 {% if books|length > 0 %}
                     <div class="box">
-                        <h3 class="title is-5">Suggest a Book</h3>
-                        <p class="mb-3">Select a book to suggest for the next poll:</p>
+                        <h3 class="title is-5">{{ 'bookclub_suggestion.heading_suggest_box'|trans }}</h3>
+                        <p class="mb-3">{{ 'bookclub_suggestion.suggest_intro'|trans }}</p>
                         {% for book in books %}
                             <form action="{{ path('app_plugin_bookclub_suggest', {bookId: book.id}) }}" method="post" class="mb-2">
                                 <button type="submit" class="button is-small is-fullwidth is-outlined">

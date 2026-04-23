@@ -48,21 +48,21 @@ class PollCreateType extends AbstractType
         }
 
         $builder->add('event_id', ChoiceType::class, [
-            'label' => 'For Event',
+            'label' => 'bookclub_poll.field_event',
             'choices' => $eventChoices,
             'required' => true,
-            'placeholder' => '-- Select an event --',
+            'placeholder' => 'bookclub_poll.field_event_placeholder',
             'constraints' => [
                 new NotBlank(),
             ],
         ])->add('suggestions', ChoiceType::class, [
-            'label' => 'Member Suggestions',
+            'label' => 'bookclub_poll.field_suggestions',
             'choices' => $suggestionChoices,
             'multiple' => true,
             'expanded' => true,
             'required' => false,
         ])->add('books', ChoiceType::class, [
-            'label' => 'Add Books Directly',
+            'label' => 'bookclub_poll.field_books',
             'choices' => $bookChoices,
             'multiple' => true,
             'expanded' => true,

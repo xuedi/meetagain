@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/bookclub/poll')]
 #[IsGranted('ROLE_USER')]
@@ -30,6 +31,7 @@ final class PollController extends AbstractController
         private readonly BookService $bookService,
         private readonly EventRepository $eventRepository,
         private readonly ActivityService $activityService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/list', name: 'app_plugin_bookclub_poll_list', methods: ['GET'])]
@@ -107,7 +109,7 @@ final class PollController extends AbstractController
     {
         $activePoll = $this->pollService->getActivePoll();
         if ($activePoll === null) {
-            $this->addFlash('warning', 'No active poll.');
+            $this->addFlash('warning', $this->translator->trans('bookclub_poll.flash_no_active_poll'));
             return $this->redirectToRoute('app_plugin_bookclub_poll');
         }
 
@@ -169,7 +171,7 @@ final class PollController extends AbstractController
                     'poll_id' => $poll->getId(),
                     'event_id' => $poll->getEventId(),
                 ]);
-                $this->addFlash('success', 'Poll created. Members can now vote.');
+                $this->addFlash('success', $this->translator->trans('bookclub_poll.flash_created'));
 
                 return $this->redirectToRoute('app_plugin_bookclub_poll');
             } catch (RuntimeException $e) {
@@ -209,7 +211,7 @@ final class PollController extends AbstractController
 
         try {
             $winner = $this->pollService->close($id);
-            $this->addFlash('success', 'Poll closed. Winner: ' . $winner->getBook()->getTitle());
+            $this->addFlash('success', $this->translator->trans('bookclub_poll.flash_closed', ['%title%' => $winner->getBook()->getTitle()]));
             if ($poll !== null) {
                 $this->activityService->log(PollClosed::TYPE, $this->getAuthedUser(), [
                     'poll_id' => $id,

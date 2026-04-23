@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Select Book for Event - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_manage.page_title_select'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li class="is-active"><a>Select Book for Event</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_manage.breadcrumb_select'|trans }}</a></li>
             </ul>
         </nav>
 
-        <h1 class="title">Select Book for Event</h1>
+        <h1 class="title">{{ 'bookclub_manage.heading_select'|trans }}</h1>
         <p class="subtitle"><a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.getTitle(app.locale) }}</a>
         </p>
 
@@ -21,7 +21,7 @@
             {# Left column: current selection + manual pick #}
             <div class="column is-5">
                 {% if currentSelection %}
-                    <h2 class="title is-5">Current Selection</h2>
+                    <h2 class="title is-5">{{ 'bookclub_manage.heading_current_selection'|trans }}</h2>
 
                     <div class="notification">
                         <p class="has-text-weight-bold">
@@ -33,18 +33,18 @@
                             <p class="has-text-grey is-size-7">{{ currentSelection.book.author }}</p>
                         {% endif %}
                         <form action="{{ path('app_plugin_bookclub_unselect', {selectionId: currentSelection.id}) }}" method="post" class="mt-3">
-                            <button type="submit" class="button is-small is-warning">Remove selection</button>
+                            <button type="submit" class="button is-small is-warning">{{ 'bookclub_manage.button_remove_selection'|trans }}</button>
                         </form>
                     </div>
                 {% else %}
-                    <h2 class="title is-5">Choose a Book Manually</h2>
+                    <h2 class="title is-5">{{ 'bookclub_manage.heading_choose_manual'|trans }}</h2>
                     <form action="{{ path('app_plugin_bookclub_select_submit', {eventId: event.id}) }}" method="post">
                         <div class="field">
-                            <label class="label" for="book_id">Book</label>
+                            <label class="label" for="book_id">{{ 'bookclub_manage.field_book'|trans }}</label>
                             <div class="control">
                                 <div class="select is-fullwidth">
                                     <select id="book_id" name="book_id" required>
-                                        <option value="">-- Choose a book --</option>
+                                        <option value="">{{ 'bookclub_manage.field_book_placeholder'|trans }}</option>
                                         {% for book in books %}
                                             <option value="{{ book.id }}">{{ book.title }}{% if book.author %} - {{ book.author }}{% endif %}</option>
                                         {% endfor %}
@@ -54,7 +54,7 @@
                         </div>
                         <div class="field">
                             <div class="control">
-                                <button type="submit" class="button is-primary">Assign to event</button>
+                                <button type="submit" class="button is-primary">{{ 'bookclub_manage.button_assign'|trans }}</button>
                             </div>
                         </div>
                     </form>
@@ -64,14 +64,14 @@
 
             {# Right column: poll results #}
             <div class="column is-7">
-                <h2 class="title is-5">Poll Result</h2>
+                <h2 class="title is-5">{{ 'bookclub_manage.heading_poll_result'|trans }}</h2>
 
                 {% if poll %}
 
                     {% if pollResults.winner %}
                         <div class="notification mb-3">
                             <span class="icon"><i class="fas fa-trophy"></i></span>
-                            <strong>Winner: {{ pollResults.winner.book.title }}</strong>
+                            <strong>{{ 'bookclub_manage.result_winner_label'|trans }} {{ pollResults.winner.book.title }}</strong>
                             {% if pollResults.winner.book.author %}
                                 <span class="has-text-grey"> - {{ pollResults.winner.book.author }}</span>
                             {% endif %}
@@ -80,7 +80,7 @@
                                 <form action="{{ path('app_plugin_bookclub_select_winner', {eventId: event.id}) }}" method="post" class="mt-2">
                                     <button type="submit" class="button is-small is-success">
                                         <span class="icon"><i class="fas fa-check"></i></span>
-                                        <span>Select poll winner</span>
+                                        <span>{{ 'bookclub_manage.button_select_winner'|trans }}</span>
                                     </button>
                                 </form>
                             {% endif %}
@@ -90,9 +90,9 @@
                     <table class="table is-fullwidth is-striped is-size-7">
                         <thead>
                             <tr>
-                                <th>Book</th>
-                                <th>Votes</th>
-                                <th>Voted by</th>
+                                <th>{{ 'bookclub_manage.col_book'|trans }}</th>
+                                <th>{{ 'bookclub_manage.col_votes'|trans }}</th>
+                                <th>{{ 'bookclub_manage.col_voted_by'|trans }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -110,7 +110,7 @@
                         </tbody>
                     </table>
                 {% else %}
-                    <p class="has-text-grey">No poll is linked to this event.</p>
+                    <p class="has-text-grey">{{ 'bookclub_manage.empty_no_poll'|trans }}</p>
                 {% endif %}
             </div>
 

@@ -1,29 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Poll - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_poll.page_title_none'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li class="is-active"><a>Poll</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_poll.breadcrumb_poll'|trans }}</a></li>
             </ul>
         </nav>
 
-        <h1 class="title">Book Poll</h1>
+        <h1 class="title">{{ 'bookclub_poll.heading_book_poll'|trans }}</h1>
 
         <div class="notification is-info is-light">
-            <p>No active poll at the moment.</p>
-            <p>Check the <a href="{{ path('app_plugin_bookclub_suggestions') }}">suggestions page</a> to suggest a book for the next poll.</p>
+            <p>{{ 'bookclub_poll.empty_no_active'|trans }}</p>
+            <p>{{ 'bookclub_poll.empty_no_active_link'|trans({'%url%': path('app_plugin_bookclub_suggestions')})|raw }}</p>
         </div>
 
         {% if is_granted('ROLE_ORGANIZER') %}
             <div class="box">
-                <h3 class="title is-5">Manager Actions</h3>
+                <h3 class="title is-5">{{ 'bookclub_poll.heading_manager_actions'|trans }}</h3>
                 <a href="{{ path('app_plugin_bookclub_poll_create') }}" class="button is-primary">
-                    Create New Poll
+                    {{ 'bookclub_poll.button_create_new'|trans }}
                 </a>
             </div>
         {% endif %}
