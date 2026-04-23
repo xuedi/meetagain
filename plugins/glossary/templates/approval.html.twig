@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_glossary_new_title"|trans }}{% endblock %}
+{% block title %}{{ 'glossary.page_title_new'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -13,15 +13,15 @@
                 </div>
                 <div class="column is-3">
                     {% if is_granted('ROLE_USER') %}
-                        <h2 class="title is-5">Waiting for approval</h2>
+                        <h2 class="title is-5">{{ 'glossary.heading_waiting_approval'|trans }}</h2>
                         <div class="box">
                             <p class="mb-5">
-                                Phrase: <b>{{ editItem.phrase }}</b><br>
-                                Pinyin: <b>{{ editItem.pinyin }}</b><br>
-                                Explanation: <b>{{ editItem.explanation }}</b><br>
-                                Category: <b>{{ editItem.category.name }}</b><br>
-                                CreatedBy: <b>{{ get_user_name(editItem.createdBy) }}</b><br>
-                                CreatedAt: <b>{{ editItem.createdAt | time_diff }}</b><br>
+                                {{ 'glossary.label_phrase'|trans }}: <b>{{ editItem.phrase }}</b><br>
+                                {{ 'glossary.label_pinyin'|trans }}: <b>{{ editItem.pinyin }}</b><br>
+                                {{ 'glossary.label_explanation'|trans }}: <b>{{ editItem.explanation }}</b><br>
+                                {{ 'glossary.label_category'|trans }}: <b>{{ editItem.category.name }}</b><br>
+                                {{ 'glossary.label_created_by'|trans }}: <b>{{ get_user_name(editItem.createdBy) }}</b><br>
+                                {{ 'glossary.label_created_at'|trans }}: <b>{{ editItem.createdAt | time_diff }}</b><br>
                             </p>
                             <div class="has-text-right">
                                 <a class="button is-success" href="{{ path('app_plugin_glossary_approval_approve', {id: editItem.id}) }}">
@@ -41,4 +41,3 @@
     </section>
 
 {% endblock %}
-

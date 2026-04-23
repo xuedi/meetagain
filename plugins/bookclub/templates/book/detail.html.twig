@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ book.title }} - Book Club{% endblock %}
+{% block title %}{{ book.title }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
                 <li class="is-active"><a>{{ book.title }}</a></li>
             </ul>
         </nav>
@@ -28,40 +28,40 @@
             </div>
             <div class="column is-8">
                 <h1 class="title">{{ book.title }}</h1>
-                <h2 class="subtitle">{{ book.author ?? 'Unknown author' }}</h2>
+                <h2 class="subtitle">{{ book.author ?? 'bookclub_book.label_unknown_author'|trans }}</h2>
 
                 <div class="content">
                     <table class="table">
                         <tbody>
                             <tr>
-                                <th>ISBN</th>
+                                <th>{{ 'bookclub_book.label_isbn'|trans }}</th>
                                 <td>{{ book.isbn }}</td>
                             </tr>
                             {% if book.publishedYear %}
                             <tr>
-                                <th>Published</th>
+                                <th>{{ 'bookclub_book.label_published'|trans }}</th>
                                 <td>{{ book.publishedYear }}</td>
                             </tr>
                             {% endif %}
                             {% if book.pageCount %}
                             <tr>
-                                <th>Pages</th>
+                                <th>{{ 'bookclub_book.label_pages'|trans }}</th>
                                 <td>{{ book.pageCount }}</td>
                             </tr>
                             {% endif %}
                             {% if createdBy %}
                             <tr>
-                                <th>Added by</th>
+                                <th>{{ 'bookclub_book.label_added_by'|trans }}</th>
                                 <td>{{ createdBy.name }}</td>
                             </tr>
                             {% endif %}
                             <tr>
-                                <th>Status</th>
+                                <th>{{ 'bookclub_book.label_status'|trans }}</th>
                                 <td>
                                     {% if book.approved %}
-                                        <span class="tag is-success">Approved</span>
+                                        <span class="tag is-success">{{ 'bookclub_book.status_approved'|trans }}</span>
                                     {% else %}
-                                        <span class="tag is-warning">Pending Approval</span>
+                                        <span class="tag is-warning">{{ 'bookclub_book.status_pending'|trans }}</span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -69,7 +69,7 @@
                     </table>
 
                     {% if book.description %}
-                        <h3>Description</h3>
+                        <h3>{{ 'bookclub_book.heading_description'|trans }}</h3>
                         <p>{{ book.description|nl2br }}</p>
                     {% endif %}
                 </div>
@@ -78,13 +78,13 @@
                     {% if is_granted('ROLE_USER') %}
                         <a href="{{ path('app_plugin_bookclub_note_edit', {bookId: book.id}) }}" class="button is-primary">
                             <span class="icon"><i class="fas fa-sticky-note"></i></span>
-                            <span>My Notes</span>
+                            <span>{{ 'bookclub_book.button_my_notes'|trans }}</span>
                         </a>
                         {% if book.approved %}
                             <form action="{{ path('app_plugin_bookclub_suggest', {bookId: book.id}) }}" method="post" style="display: inline;">
                                 <button type="submit" class="button is-info">
                                     <span class="icon"><i class="fas fa-lightbulb"></i></span>
-                                    <span>Suggest for Next Poll</span>
+                                    <span>{{ 'bookclub_book.button_suggest_poll'|trans }}</span>
                                 </button>
                             </form>
                         {% endif %}

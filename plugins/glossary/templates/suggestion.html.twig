@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_glossary_new_title"|trans }}{% endblock %}
+{% block title %}{{ 'glossary.page_title_new'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -14,11 +14,11 @@
                 <div class="column is-3">
                     {% if is_granted('ROLE_USER') %}
 
-                        <h2 class="title is-5">Changes for approval</h2>
+                        <h2 class="title is-5">{{ 'glossary.heading_changes_approval'|trans }}</h2>
                         {% for suggestion in editItem.suggestions %}
                             {% set value = suggestion.value %}
                             {% if suggestion.field.value == categoryFieldValue %}
-                                {% set value = categoryNames[suggestion.value] %}
+                                {% set value = categoryNames[suggestion.value]|trans %}
                             {% endif %}
                         <div class="box">
                             <p>
@@ -46,4 +46,3 @@
     </section>
 
 {% endblock %}
-

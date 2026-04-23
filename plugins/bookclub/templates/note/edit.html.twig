@@ -1,22 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Notes: {{ book.title }} - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_note.page_title_edit'|trans({'%title%': book.title}) }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li><a href="{{ path('app_plugin_bookclub_notes') }}">My Notes</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li><a href="{{ path('app_plugin_bookclub_notes') }}">{{ 'bookclub_note.breadcrumb'|trans }}</a></li>
                 <li class="is-active"><a>{{ book.title }}</a></li>
             </ul>
         </nav>
 
         <div class="columns">
             <div class="column is-8">
-                <h1 class="title">Notes: {{ book.title }}</h1>
-                <p class="subtitle">by {{ book.author ?? 'Unknown' }}</p>
+                <h1 class="title">{{ 'bookclub_note.page_title_edit'|trans({'%title%': book.title}) }}</h1>
+                <p class="subtitle">{{ 'bookclub_note.subtitle_by_author'|trans({'%author%': book.author ?? 'bookclub_note.label_unknown'|trans}) }}</p>
 
                 {{ form_start(form) }}
                     <div class="field">
@@ -31,18 +31,18 @@
                         <div class="control">
                             <button type="submit" class="button is-primary">
                                 <span class="icon"><i class="fas fa-save"></i></span>
-                                <span>Save Notes</span>
+                                <span>{{ 'bookclub_note.button_save'|trans }}</span>
                             </button>
-                            <a href="{{ path('app_plugin_bookclub_notes') }}" class="button is-light">Cancel</a>
+                            <a href="{{ path('app_plugin_bookclub_notes') }}" class="button is-light">{{ 'global.cancel'|trans }}</a>
                         </div>
                     </div>
                 {{ form_end(form) }}
 
                 {% if existingNote %}
                     <p class="is-size-7 has-text-grey mt-4">
-                        Created: {{ existingNote.createdAt|date('Y-m-d H:i') }}
+                        {{ 'bookclub_note.label_created'|trans }} {{ existingNote.createdAt|date('Y-m-d H:i') }}
                         {% if existingNote.updatedAt %}
-                            | Last updated: {{ existingNote.updatedAt|date('Y-m-d H:i') }}
+                            | {{ 'bookclub_note.label_last_updated'|trans }} {{ existingNote.updatedAt|date('Y-m-d H:i') }}
                         {% endif %}
                     </p>
                 {% endif %}
@@ -50,7 +50,7 @@
 
             <div class="column is-4">
                 <div class="box">
-                    <h3 class="title is-5">Book Info</h3>
+                    <h3 class="title is-5">{{ 'bookclub_note.heading_book_info'|trans }}</h3>
                     {% if book.coverImage %}
                         <figure class="image mb-4">
                             {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250'} %}
