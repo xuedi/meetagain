@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/bookclub')]
 #[IsGranted('ROLE_USER')]
@@ -21,6 +22,7 @@ final class NoteController extends AbstractController
         private readonly NoteService $noteService,
         private readonly BookService $bookService,
         private readonly ActivityService $activityService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/notes', name: 'app_plugin_bookclub_notes', methods: ['GET'])]
@@ -56,7 +58,7 @@ final class NoteController extends AbstractController
                 'book_id' => $book->getId(),
                 'book_title' => $book->getTitle(),
             ]);
-            $this->addFlash('success', 'Note saved.');
+            $this->addFlash('success', $this->translator->trans('bookclub_note.flash_saved'));
 
             return $this->redirectToRoute('app_plugin_bookclub_notes');
         }

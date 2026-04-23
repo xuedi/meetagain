@@ -17,26 +17,26 @@ enum Category: int
     public static function getChoices(TranslatorInterface $translator): array
     {
         return [
-            $translator->trans('Greeting') => self::Greeting,
-            $translator->trans('Swearing') => self::Swearing,
-            $translator->trans('Flirting') => self::Flirting,
-            $translator->trans('Slang') => self::Slang,
-            $translator->trans('Abbreviation') => self::Abbreviation,
-            $translator->trans('Regular') => self::Regular,
-            $translator->trans('Idioms') => self::Idioms,
+            $translator->trans('glossary.category_greeting') => self::Greeting,
+            $translator->trans('glossary.category_swearing') => self::Swearing,
+            $translator->trans('glossary.category_flirting') => self::Flirting,
+            $translator->trans('glossary.category_slang') => self::Slang,
+            $translator->trans('glossary.category_abbreviation') => self::Abbreviation,
+            $translator->trans('glossary.category_regular') => self::Regular,
+            $translator->trans('glossary.category_idioms') => self::Idioms,
         ];
     }
 
     public static function getNames(): array
     {
         return [
-            self::Greeting->value => 'Greeting',
-            self::Swearing->value => 'Swearing',
-            self::Flirting->value => 'Flirting',
-            self::Slang->value => 'Slang',
-            self::Abbreviation->value => 'Abbreviation',
-            self::Regular->value => 'Regular',
-            self::Idioms->value => 'Idioms',
+            self::Greeting->value => 'glossary.category_greeting',
+            self::Swearing->value => 'glossary.category_swearing',
+            self::Flirting->value => 'glossary.category_flirting',
+            self::Slang->value => 'glossary.category_slang',
+            self::Abbreviation->value => 'glossary.category_abbreviation',
+            self::Regular->value => 'glossary.category_regular',
+            self::Idioms->value => 'glossary.category_idioms',
         ];
     }
 }

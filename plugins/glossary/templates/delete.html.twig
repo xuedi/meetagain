@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_glossary_delete_title"|trans }}{% endblock %}
+{% block title %}{{ 'glossary.page_title_delete'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -13,23 +13,23 @@
                 </div>
                 <div class="column is-3">
                     {% if is_granted('ROLE_ORGANIZER') %}
-                        <h2 class="title is-5">Delete this phrase?</h2>
+                        <h2 class="title is-5">{{ 'glossary.heading_delete_confirm'|trans }}</h2>
                         <div class="box has-background-danger-light">
 
                             <p class="mb-5">
-                                Phrase: <b>{{ editItem.phrase }}</b><br>
-                                Pinyin: <b>{{ editItem.pinyin }}</b><br>
-                                Explanation: <b>{{ editItem.explanation }}</b><br>
-                                Category: <b>{{ editItem.category.name }}</b><br>
-                                CreatedBy: <b>{{ editItem.createdBy }}</b><br>
-                                CreatedAt: <b>{{ editItem.createdAt | time_diff }}</b><br>
+                                {{ 'glossary.label_phrase'|trans }}: <b>{{ editItem.phrase }}</b><br>
+                                {{ 'glossary.label_pinyin'|trans }}: <b>{{ editItem.pinyin }}</b><br>
+                                {{ 'glossary.label_explanation'|trans }}: <b>{{ editItem.explanation }}</b><br>
+                                {{ 'glossary.label_category'|trans }}: <b>{{ editItem.category.name }}</b><br>
+                                {{ 'glossary.label_created_by'|trans }}: <b>{{ editItem.createdBy }}</b><br>
+                                {{ 'glossary.label_created_at'|trans }}: <b>{{ editItem.createdAt | time_diff }}</b><br>
                             </p>
                             <div class="has-text-right">
                                 <a class="button is-danger" href="{{ path('app_plugin_glossary_delete', {id: editItem.id}) }}">
                                     <span class="icon">
                                         <i class="fas fa-trash"></i>
                                     </span>
-                                    <span>Yes</span>
+                                    <span>{{ 'glossary.button_delete_yes'|trans }}</span>
                                 </a>
                             </div>
 
@@ -42,4 +42,3 @@
     </section>
 
 {% endblock %}
-

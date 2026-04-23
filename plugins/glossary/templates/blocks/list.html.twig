@@ -6,10 +6,10 @@
 <table id="filteredTable" class="table is-fullwidth">
     <thead>
     <tr>
-        <th>Phrases</th>
-        <th>PinYin</th>
-        <th>Explanation</th>
-        <th>Category</th>
+        <th>{{ 'glossary_blocks.col_phrase'|trans }}</th>
+        <th>{{ 'glossary_blocks.col_pinyin'|trans }}</th>
+        <th>{{ 'glossary_blocks.col_explanation'|trans }}</th>
+        <th>{{ 'glossary_blocks.col_category'|trans }}</th>
         {% if is_granted('ROLE_USER') %}
             <th>
                 <a href="{{ path('app_plugin_glossary_new') }}">

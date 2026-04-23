@@ -1,21 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Add Book - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_book.page_title_add'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li class="is-active"><a>Add Book</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_book.breadcrumb_add'|trans }}</a></li>
             </ul>
         </nav>
 
         <div class="columns">
             <div class="column is-6">
-                <h1 class="title">Add a Book</h1>
-                <p class="subtitle">Enter an ISBN and we'll look up the book details automatically.</p>
+                <h1 class="title">{{ 'bookclub_book.heading_add'|trans }}</h1>
+                <p class="subtitle">{{ 'bookclub_book.subtitle_add'|trans }}</p>
 
                 {{ form_start(form) }}
                     <div class="field">
@@ -24,14 +24,14 @@
                             {{ form_widget(form.isbn, {'attr': {'class': 'input'}}) }}
                         </div>
                         {{ form_errors(form.isbn) }}
-                        <p class="help">Enter ISBN-10 or ISBN-13 (with or without hyphens)</p>
+                        <p class="help">{{ 'bookclub_book.field_isbn_help'|trans }}</p>
                     </div>
 
                     <div class="field">
                         <div class="control">
                             <button type="submit" class="button is-primary">
                                 <span class="icon"><i class="fas fa-search"></i></span>
-                                <span>Look Up Book</span>
+                                <span>{{ 'bookclub_book.button_lookup'|trans }}</span>
                             </button>
                         </div>
                     </div>
@@ -40,12 +40,12 @@
 
             <div class="column is-6">
                 <div class="box">
-                    <h3 class="title is-5">How it works</h3>
+                    <h3 class="title is-5">{{ 'bookclub_book.how_it_works_heading'|trans }}</h3>
                     <div class="content">
                         <ol>
-                            <li>Enter the book's ISBN (found on the back cover or copyright page)</li>
-                            <li>We'll automatically fetch the title, author, and cover image</li>
-                            <li>{% if is_granted('ROLE_ORGANIZER') %}The book will be added immediately{% else %}A manager will review and approve the book{% endif %}</li>
+                            <li>{{ 'bookclub_book.how_it_works_step1'|trans }}</li>
+                            <li>{{ 'bookclub_book.how_it_works_step2'|trans }}</li>
+                            <li>{% if is_granted('ROLE_ORGANIZER') %}{{ 'bookclub_book.how_it_works_step3_manager'|trans }}{% else %}{{ 'bookclub_book.how_it_works_step3_user'|trans }}{% endif %}</li>
                         </ol>
                     </div>
                 </div>
