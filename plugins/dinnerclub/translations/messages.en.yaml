@@ -12,3 +12,10 @@ page_plugin_dinnerclub_title_details: 'Dish'
 'Edit List': 'Edit List'
 'Pending Dishes': 'Pending Dishes'
 'Review Dish': 'Review Dish'
+dinnerclub: {}
+dinnerclub_dinner: {}
+dinnerclub_suggestion: {}
+dinnerclub_approval: {}
+dinnerclub_lists: {}
+dinnerclub_views: {}
+dinnerclub_tile: {}
