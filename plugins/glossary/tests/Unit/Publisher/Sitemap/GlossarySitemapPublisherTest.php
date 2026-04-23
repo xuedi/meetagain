@@ -3,6 +3,7 @@
 namespace Plugin\Glossary\Tests\Unit\Publisher\Sitemap;
 
 use App\Service\Config\LanguageService;
+use App\Service\Config\PluginService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Publisher\Sitemap\GlossarySitemapPublisher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -39,10 +40,22 @@ class GlossarySitemapPublisherTest extends TestCase
         self::assertSame([], $urls);
     }
 
+    public function testReturnsEmptyWhenPluginInactive(): void
+    {
+        // Arrange
+        $publisher = $this->makePublisher(locales: ['en'], pluginActive: false);
+
+        // Act
+        $urls = $publisher->getSitemapUrls();
+
+        // Assert
+        self::assertSame([], $urls);
+    }
+
     /**
      * @param array<string> $locales
      */
-    private function makePublisher(array $locales): GlossarySitemapPublisher
+    private function makePublisher(array $locales, bool $pluginActive = true): GlossarySitemapPublisher
     {
         $language = $this->createStub(LanguageService::class);
         $language->method('getFilteredEnabledCodes')->willReturn($locales);
@@ -56,6 +69,9 @@ class GlossarySitemapPublisherTest extends TestCase
             },
         );
 
-        return new GlossarySitemapPublisher($language, $urlGenerator);
+        $pluginService = $this->createStub(PluginService::class);
+        $pluginService->method('getActiveList')->willReturn($pluginActive ? ['glossary'] : []);
+
+        return new GlossarySitemapPublisher($language, $urlGenerator, $pluginService);
     }
 }
