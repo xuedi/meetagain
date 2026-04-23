@@ -6,6 +6,7 @@ use App\Activity\ActivityService;
 use App\Entity\AdminLink;
 use App\Repository\NotFoundLogRepository;
 use App\ValueObject\LogEntry;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -32,6 +33,8 @@ final class LogsController extends AbstractAdminController
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly NotFoundLogRepository $foundLogRepo,
+        #[Autowire(param: 'kernel.environment')]
+        private readonly string $environment,
     ) {}
 
     #[Route('', name: 'app_admin_logs')]
@@ -86,17 +89,16 @@ final class LogsController extends AbstractAdminController
         ]);
     }
 
+    /**
+     * Only read the log file for the current environment. Mixing dev.log and test.log
+     * in the same admin view would surface DEBUG/INFO entries from tests even when the
+     * dev Monolog handler is capped at warning.
+     */
     private function getLogList(): array
     {
-        $list = [];
-        $logPath = dirname(__DIR__, 3) . '/var/log/';
-        $logFiles = glob($logPath . '/*.log');
+        $logFile = dirname(__DIR__, 3) . '/var/log/' . $this->environment . '.log';
 
-        foreach ($logFiles as $logFile) {
-            $list[] = $logFile;
-        }
-
-        return $list;
+        return is_file($logFile) ? [$logFile] : [];
     }
 
     private function getLogs(): array
