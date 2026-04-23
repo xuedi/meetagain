@@ -28,7 +28,7 @@ class LanguageType extends AbstractType
                 new Length(exactly: 2),
                 new Regex(
                     pattern: '/^[a-z]{2}$/',
-                    message: 'Language code must be 2 lowercase letters (e.g., en, de, zh)',
+                    message: 'admin_system.validator_language_code_pattern',
                 ),
             ],
             'disabled' => $options['is_edit'],
@@ -49,7 +49,7 @@ class LanguageType extends AbstractType
             'required' => false,
             'label' => 'admin_system.heading_tile_image',
             'constraints' => [
-                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'Please upload a valid image'),
+                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error'),
             ],
         ]);
     }

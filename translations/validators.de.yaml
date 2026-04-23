@@ -199,3 +199,8 @@ Error: Fehler
 'support.validator_email_format': 'Bitte gib eine gültige E-Mail-Adresse ein.'
 'support.validator_message_blank': 'Bitte gib eine Nachricht ein.'
 'support.validator_message_max': 'Die Nachricht darf nicht länger als {{ limit }} Zeichen sein.'
+
+# Shared + admin_system - phase 38 (validator-domain keys reused across forms)
+'shared.form_image_upload_mime_error': 'Bitte laden Sie ein gültiges Bild hoch.'
+'shared.form_image_upload_mime_error_square': 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im quadratischen Format.'
+'admin_system.validator_language_code_pattern': 'Sprachcode muss aus 2 Kleinbuchstaben bestehen (z. B. en, de, zh).'

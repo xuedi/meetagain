@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Translation\IdentityTranslator;
 use Twig\Environment;
 
 class CmsServiceTest extends TestCase
@@ -28,7 +29,7 @@ class CmsServiceTest extends TestCase
         $twigMock
             ->expects($this->once())
             ->method('render')
-            ->with('cms/404.html.twig', ['message' => "These aren't the droids you're looking for!"])
+            ->with('cms/404.html.twig', ['message' => 'cms.error_404_default_message'])
             ->willReturn($expectedContent);
 
         $subject = new CmsService(
@@ -39,6 +40,7 @@ class CmsServiceTest extends TestCase
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
             security: $this->createStub(Security::class),
+            translator: new IdentityTranslator(),
         );
 
         // Act: create not found page
@@ -68,6 +70,7 @@ class CmsServiceTest extends TestCase
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
             security: $this->createStub(Security::class),
+            translator: new IdentityTranslator(),
         );
 
         // Act: get all sites
@@ -108,6 +111,7 @@ class CmsServiceTest extends TestCase
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
             security: $this->createStub(Security::class),
+            translator: new IdentityTranslator(),
         );
 
         // Act: handle request for non-existent page
@@ -145,7 +149,7 @@ class CmsServiceTest extends TestCase
         $twigMock
             ->expects($this->once())
             ->method('render')
-            ->with('cms/204.html.twig', ['message' => 'page was found but is has no content in this language'])
+            ->with('cms/204.html.twig', ['message' => 'cms.error_204_default_message'])
             ->willReturn($expectedContent);
 
         $subject = new CmsService(
@@ -156,6 +160,7 @@ class CmsServiceTest extends TestCase
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
             security: $this->createStub(Security::class),
+            translator: new IdentityTranslator(),
         );
 
         // Act: handle request for page without content in requested language
@@ -222,6 +227,7 @@ class CmsServiceTest extends TestCase
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
             security: $this->createStub(Security::class),
+            translator: new IdentityTranslator(),
         );
 
         // Act: handle request for page with content
@@ -267,7 +273,7 @@ class CmsServiceTest extends TestCase
             ->expects($this->once())
             ->method('render')
             ->with('cms/index.html.twig', [
-                'title' => 'No Title set',
+                'title' => 'cms.page_no_title_fallback',
                 'blocks' => $blocks,
                 'events' => [],
             ])
@@ -281,12 +287,13 @@ class CmsServiceTest extends TestCase
             cmsFilterService: $cmsFilterServiceStub,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
             security: $this->createStub(Security::class),
+            translator: new IdentityTranslator(),
         );
 
         // Act: handle request for page without title
         $response = $subject->handle($locale, $slug, new Response());
 
-        // Assert: uses default title "No Title set"
+        // Assert: uses default title translation key 'cms.page_no_title_fallback'
         static::assertSame($expectedContent, $response->getContent());
     }
 }

@@ -9,6 +9,7 @@ use App\Service\Notification\User\CoreNotificationProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class CoreNotificationProviderTest extends TestCase
 {
@@ -30,6 +31,7 @@ class CoreNotificationProviderTest extends TestCase
             emailRepo: $emailRepoStub,
             supportRequestRepo: $supportRepoStub,
             security: $securityStub,
+            translator: new IdentityTranslator(),
         );
     }
 
@@ -74,40 +76,43 @@ class CoreNotificationProviderTest extends TestCase
             'expectedCount' => 0,
             'expectedLabelFragments' => [],
         ];
-        yield 'admin, 1 stale email → singular label' => [
+        yield 'admin, 1 stale email → stale-emails key' => [
             'isAdmin' => true,
             'staleEmails' => 1,
             'newSupportRequests' => 0,
             'expectedCount' => 1,
-            'expectedLabelFragments' => ['1 Stale Email'],
+            'expectedLabelFragments' => ['chrome.notification_stale_emails'],
         ];
-        yield 'admin, 2 stale emails → plural label' => [
+        yield 'admin, 2 stale emails → stale-emails key' => [
             'isAdmin' => true,
             'staleEmails' => 2,
             'newSupportRequests' => 0,
             'expectedCount' => 1,
-            'expectedLabelFragments' => ['2 Stale Emails'],
+            'expectedLabelFragments' => ['chrome.notification_stale_emails'],
         ];
-        yield 'admin, 1 new support request → singular label' => [
+        yield 'admin, 1 new support request → support-requests key' => [
             'isAdmin' => true,
             'staleEmails' => 0,
             'newSupportRequests' => 1,
             'expectedCount' => 1,
-            'expectedLabelFragments' => ['1 New Support Request'],
+            'expectedLabelFragments' => ['chrome.notification_new_support_requests'],
         ];
-        yield 'admin, 2 new support requests → plural label' => [
+        yield 'admin, 2 new support requests → support-requests key' => [
             'isAdmin' => true,
             'staleEmails' => 0,
             'newSupportRequests' => 2,
             'expectedCount' => 1,
-            'expectedLabelFragments' => ['2 New Support Requests'],
+            'expectedLabelFragments' => ['chrome.notification_new_support_requests'],
         ];
         yield 'admin, stale emails and support requests → 2 items' => [
             'isAdmin' => true,
             'staleEmails' => 1,
             'newSupportRequests' => 1,
             'expectedCount' => 2,
-            'expectedLabelFragments' => ['Stale Email', 'New Support Request'],
+            'expectedLabelFragments' => [
+                'chrome.notification_stale_emails',
+                'chrome.notification_new_support_requests',
+            ],
         ];
     }
 }

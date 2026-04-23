@@ -36,7 +36,7 @@
                         {% if event.recurringOf is not null %}
                             {{ 'admin_event.recurring_auto'|trans }}
                         {% else %}
-                            {% if event.recurringRule is null %}{{ 'No'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}
+                            {% if event.recurringRule is null %}{{ 'admin_event.recurring_no'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}
                         {% endif %}
                     </td>
                     <td>{{ event.location ? event.location.name : '-' }}</td>

@@ -78,7 +78,8 @@ class TranslationScanCommand extends Command
 
         foreach ($finder as $file) {
             $contents = $file->getContents();
-            $relPath = str_replace($projectRoot . '/', '', $file->getRealPath());
+            $realPath = $file->getRealPath();
+            $relPath = $realPath === false ? $file->getPathname() : str_replace($projectRoot . '/', '', $realPath);
             $lines = explode("\n", $contents);
 
             foreach ($lines as $i => $line) {

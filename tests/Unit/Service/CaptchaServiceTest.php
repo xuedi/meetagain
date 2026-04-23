@@ -116,7 +116,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->isValid('hgfw');
 
         // Assert: generic message does not reveal the expected code
-        static::assertSame('Wrong captcha code, please try again.', $result);
+        static::assertSame('security.captcha_wrong', $result);
     }
 
     public function testIsValidForcesResetAfterMaxAttempts(): void
@@ -141,7 +141,7 @@ class CaptchaServiceTest extends TestCase
         $result = $this->subject->isValid('hgfw');
 
         // Assert
-        static::assertSame('Wrong captcha code, please try again.', $result);
+        static::assertSame('security.captcha_wrong', $result);
     }
 
     public function testGetRefreshTimeReturnsZeroWhenNoRefreshHistory(): void
