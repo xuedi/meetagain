@@ -8,16 +8,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class AdminEventCancelledTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -29,23 +32,23 @@ class AdminEventCancelledTest extends TestCase
         $eventNames = [$eventId => $eventName];
 
         $subject = new AdminEventCancelled();
-        $subject->injectServices($this->router, $this->imageService, $meta, [], $eventNames);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, [], $eventNames);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(AdminEventCancelled::TYPE, $subject->getType());
-        static::assertEquals('Cancelled event: Test Event', $subject->render());
-        static::assertEquals('Cancelled event: Test Event', $subject->render(true));
+        static::assertEquals('profile_social.activity_admin_event_cancelled', $subject->render());
+        static::assertEquals('profile_social.activity_admin_event_cancelled', $subject->render(true));
     }
 
     public function testRendersDeletedEventGracefully(): void
     {
         // Arrange
         $subject = new AdminEventCancelled();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 99], [], []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 99], [], []);
 
         // Act & Assert
-        static::assertSame('Cancelled event: [deleted]', $subject->render());
+        static::assertSame('profile_social.activity_admin_event_cancelled_deleted', $subject->render());
     }
 
     public function testCanCatchMissingEventId(): void
@@ -54,7 +57,7 @@ class AdminEventCancelledTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_cancelled"));
 
         $subject = new AdminEventCancelled();
-        $subject->injectServices($this->router, $this->imageService, []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, []);
 
         // Act
         $subject->validate();
@@ -68,7 +71,7 @@ class AdminEventCancelledTest extends TestCase
         );
 
         $subject = new AdminEventCancelled();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);
 
         // Act
         $subject->validate();

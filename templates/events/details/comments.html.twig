@@ -1,4 +1,4 @@
-<h2 class="title is-4">{{ "Comments"|trans }}</h2>
+<h2 class="title is-4">{{ 'events.comments_heading'|trans }}</h2>
 <div class="columns">
     <div class="column is-four-fifths">
         {% for comment in comments %}
@@ -7,7 +7,7 @@
         {% if is_granted('ROLE_USER') %}
             {{ form_start(commentForm) }}
             {{ form_row(commentForm.comment, { 'id': 'replyInput' }) }}
-            <button class="button is-link">{{ "button_add" | trans }}</button>
+            <button class="button is-link">{{ 'global.add'|trans }}</button>
             {{ form_end(commentForm) }}
         {% endif %}
     </div>

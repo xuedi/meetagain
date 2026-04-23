@@ -8,16 +8,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class AdminEventCreatedTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -29,23 +32,23 @@ class AdminEventCreatedTest extends TestCase
         $eventNames = [$eventId => $eventName];
 
         $subject = new AdminEventCreated();
-        $subject->injectServices($this->router, $this->imageService, $meta, [], $eventNames);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, [], $eventNames);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(AdminEventCreated::TYPE, $subject->getType());
-        static::assertEquals('Created event: Test Event', $subject->render());
-        static::assertEquals('Created event: Test Event', $subject->render(true));
+        static::assertEquals('profile_social.activity_admin_event_created', $subject->render());
+        static::assertEquals('profile_social.activity_admin_event_created', $subject->render(true));
     }
 
     public function testRendersDeletedEventGracefully(): void
     {
         // Arrange
         $subject = new AdminEventCreated();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 99], [], []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 99], [], []);
 
         // Act & Assert
-        static::assertSame('Created event: [deleted]', $subject->render());
+        static::assertSame('profile_social.activity_admin_event_created_deleted', $subject->render());
     }
 
     public function testCanCatchMissingEventId(): void
@@ -54,7 +57,7 @@ class AdminEventCreatedTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_created"));
 
         $subject = new AdminEventCreated();
-        $subject->injectServices($this->router, $this->imageService, []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, []);
 
         // Act
         $subject->validate();
@@ -68,7 +71,7 @@ class AdminEventCreatedTest extends TestCase
         );
 
         $subject = new AdminEventCreated();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);
 
         // Act
         $subject->validate();

@@ -5,11 +5,13 @@ namespace App\Activity;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class MessageAbstract implements MessageInterface
 {
     protected RouterInterface $router;
     protected ImageHtmlRenderer $imageRenderer;
+    protected TranslatorInterface $translator;
     protected ?array $meta = [];
     protected array $userNames = [];
     protected array $eventNames = [];
@@ -17,12 +19,14 @@ abstract class MessageAbstract implements MessageInterface
     public function injectServices(
         RouterInterface $router,
         ImageHtmlRenderer $imageRenderer,
+        TranslatorInterface $translator,
         ?array $meta = [],
         array $userNames = [],
         array $eventNames = [],
     ): self {
         $this->router = $router;
         $this->imageRenderer = $imageRenderer;
+        $this->translator = $translator;
         $this->meta = $meta;
         $this->userNames = $userNames;
         $this->eventNames = $eventNames;

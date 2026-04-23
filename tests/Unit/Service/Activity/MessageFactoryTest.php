@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class MessageFactoryTest extends TestCase
 {
@@ -25,6 +26,7 @@ class MessageFactoryTest extends TestCase
     private MockObject|ImageHtmlRenderer $imageRenderer;
     private MockObject|Activity $activity;
     private array $messages;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
@@ -36,6 +38,7 @@ class MessageFactoryTest extends TestCase
         $this->activity = $this->createStub(Activity::class);
         $this->imageRenderer = $this->createStub(ImageHtmlRenderer::class);
         $this->messages = [$this->message];
+        $this->translator = new IdentityTranslator();
     }
 
     public function testBuildReturnsCorrectMessage(): void
@@ -66,6 +69,7 @@ class MessageFactoryTest extends TestCase
             $this->eventRepository,
             $this->requestStack,
             $this->imageRenderer,
+            $this->translator,
         );
 
         // Call the method under test
@@ -92,6 +96,7 @@ class MessageFactoryTest extends TestCase
             $this->eventRepository,
             $this->requestStack,
             $this->imageRenderer,
+            $this->translator,
         );
 
         // Call the method under test

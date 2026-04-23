@@ -8,38 +8,40 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SeoSettingsType extends AbstractType
 {
     public function __construct(
         private readonly ConfigService $configService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('seoDescriptionDefault', TextareaType::class, [
-            'label' => 'SEO: Default description',
+            'label' => 'admin_system.field_seo_default',
             'required' => false,
             'data' => $this->configService->getSeoDescription('default'),
-            'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => 'Site-wide meta description (max 160 chars)'],
+            'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => $this->translator->trans('admin_system.placeholder_seo_default')],
         ])->add('seoDescriptionEvents', TextareaType::class, [
-            'label' => 'SEO: Events page description',
+            'label' => 'admin_system.field_seo_events',
             'required' => false,
             'data' => $this->configService->getSeoDescription('events'),
             'attr' => [
                 'rows' => 3,
                 'maxlength' => 160,
-                'placeholder' => 'Meta description for the events listing (max 160 chars)',
+                'placeholder' => $this->translator->trans('admin_system.placeholder_seo_events'),
             ],
         ])->add('seoDescriptionMembers', TextareaType::class, [
-            'label' => 'SEO: Members page description',
+            'label' => 'admin_system.field_seo_members',
             'required' => false,
             'data' => $this->configService->getSeoDescription('members'),
             'attr' => [
                 'rows' => 3,
                 'maxlength' => 160,
-                'placeholder' => 'Meta description for the members listing (max 160 chars)',
+                'placeholder' => $this->translator->trans('admin_system.placeholder_seo_members'),
             ],
         ]);
     }

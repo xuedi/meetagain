@@ -8,16 +8,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class AdminMemberPromotedTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -29,23 +32,23 @@ class AdminMemberPromotedTest extends TestCase
         $userNames = [$userId => $userName];
 
         $subject = new AdminMemberPromoted();
-        $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, $userNames);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(AdminMemberPromoted::TYPE, $subject->getType());
-        static::assertEquals('Promoted member to organizer: JohnDoe', $subject->render());
-        static::assertEquals('Promoted member to organizer: JohnDoe', $subject->render(true));
+        static::assertEquals('profile_social.activity_admin_member_promoted', $subject->render());
+        static::assertEquals('profile_social.activity_admin_member_promoted', $subject->render(true));
     }
 
     public function testRendersDeletedUserGracefully(): void
     {
         // Arrange
         $subject = new AdminMemberPromoted();
-        $subject->injectServices($this->router, $this->imageService, ['user_id' => 99], []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => 99], []);
 
         // Act & Assert
-        static::assertSame('Promoted member to organizer: [deleted]', $subject->render());
+        static::assertSame('profile_social.activity_admin_member_promoted_deleted', $subject->render());
     }
 
     public function testCanCatchMissingUserId(): void
@@ -54,7 +57,7 @@ class AdminMemberPromotedTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_promoted"));
 
         $subject = new AdminMemberPromoted();
-        $subject->injectServices($this->router, $this->imageService, []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, []);
 
         // Act
         $subject->validate();
@@ -68,7 +71,7 @@ class AdminMemberPromotedTest extends TestCase
         );
 
         $subject = new AdminMemberPromoted();
-        $subject->injectServices($this->router, $this->imageService, ['user_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => 'not-a-number']);
 
         // Act
         $subject->validate();

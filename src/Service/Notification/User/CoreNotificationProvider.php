@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\EmailQueueRepository;
 use App\Repository\SupportRequestRepository;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class CoreNotificationProvider implements NotificationProviderInterface
 {
@@ -15,6 +16,7 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         private EmailQueueRepository $emailRepo,
         private SupportRequestRepository $supportRequestRepo,
         private Security $security,
+        private TranslatorInterface $translator,
     ) {}
 
 
@@ -28,7 +30,7 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         $staleEmails = $this->emailRepo->getStaleCount(60);
         if ($staleEmails > 0) {
             $items[] = new NotificationItem(
-                label: $staleEmails . ' Stale Email' . ($staleEmails > 1 ? 's' : ''),
+                label: $this->translator->trans('chrome.notification_stale_emails', ['%count%' => $staleEmails]),
                 icon: 'fa-envelope',
             );
         }
@@ -36,7 +38,7 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         $newSupportRequests = $this->supportRequestRepo->getNewCount();
         if ($newSupportRequests > 0) {
             $items[] = new NotificationItem(
-                label: $newSupportRequests . ' New Support Request' . ($newSupportRequests > 1 ? 's' : ''),
+                label: $this->translator->trans('chrome.notification_new_support_requests', ['%count%' => $newSupportRequests]),
                 icon: 'fa-life-ring',
                 route: 'app_admin_support_list',
             );

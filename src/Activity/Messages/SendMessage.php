@@ -24,16 +24,24 @@ class SendMessage extends MessageAbstract
     protected function renderText(): string
     {
         $userId = $this->meta['user_id'];
-        $userName = $this->userNames[$userId] ?? '[deleted]';
+        $userName = $this->userNames[$userId] ?? null;
+        if ($userName === null) {
+            return $this->translator->trans('profile_social.activity_send_message_deleted');
+        }
 
-        return sprintf('Send a message to: %s', $userName);
+        return $this->translator->trans('profile_social.activity_send_message', ['%user%' => $userName]);
     }
 
     protected function renderHtml(): string
     {
         $userId = $this->meta['user_id'];
-        $userName = $this->userNames[$userId] ?? '[deleted]';
+        $userName = $this->userNames[$userId] ?? null;
+        if ($userName === null) {
+            return $this->translator->trans('profile_social.activity_send_message_deleted');
+        }
 
-        return sprintf('Send a message to: %s', $this->escapeHtml($userName));
+        $link = sprintf('<a href="%s">%s</a>', $this->router->generate('app_member_view', ['id' => $userId]), $this->escapeHtml($userName));
+
+        return $this->translator->trans('profile_social.activity_send_message', ['%user%' => $link]);
     }
 }

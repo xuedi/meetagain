@@ -8,27 +8,30 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class ChangedUsernameTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
     {
-        $expectedText = 'Changed username from oldName to newName';
-        $expectedHtml = 'Changed username from <b>oldName</b> to <b>newName</b>';
+        $expectedText = 'profile_social.activity_changed_username';
+        $expectedHtml = 'profile_social.activity_changed_username';
 
         $meta = ['old' => 'oldName', 'new' => 'newName'];
 
         $subject = new ChangedUsername();
-        $subject->injectServices($this->router, $this->imageService, $meta);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta);
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
@@ -42,7 +45,7 @@ class ChangedUsernameTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'old' in meta in core.changed_username"));
 
         $subject = new ChangedUsername();
-        $subject->injectServices($this->router, $this->imageService, ['new' => 'newName']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['new' => 'newName']);
         $subject->validate();
     }
 
@@ -51,7 +54,7 @@ class ChangedUsernameTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'new' in meta in core.changed_username"));
 
         $subject = new ChangedUsername();
-        $subject->injectServices($this->router, $this->imageService, ['old' => 'oldName']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['old' => 'oldName']);
         $subject->validate();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Activity\Messages;
 
 use App\Activity\MessageAbstract;
 use App\Enum\ImageReportReason;
+use InvalidArgumentException;
 
 class ReportedImage extends MessageAbstract
 {
@@ -22,7 +23,7 @@ class ReportedImage extends MessageAbstract
         $this->ensureIsNumeric('reason');
 
         if (isset($this->meta['remarks']) && !is_string($this->meta['remarks'])) {
-            throw new \InvalidArgumentException("Value 'remarks' must be a string in '" . $this->getType() . "'");
+            throw new InvalidArgumentException("Value 'remarks' must be a string in '" . $this->getType() . "'");
         }
 
         return $this;
@@ -30,9 +31,10 @@ class ReportedImage extends MessageAbstract
 
     protected function renderText(): string
     {
-        $text = sprintf('Reported image for reason: %s', ImageReportReason::from($this->meta['reason'])->name);
+        $reasonName = ImageReportReason::from($this->meta['reason'])->name;
+        $text = $this->translator->trans('profile_social.activity_reported_image', ['%reason%' => $reasonName]);
         if (isset($this->meta['remarks']) && $this->meta['remarks'] !== '') {
-            $text .= sprintf(' - Remarks: %s', $this->meta['remarks']);
+            $text = $this->translator->trans('profile_social.activity_reported_image_remarks', ['%message%' => $text, '%remarks%' => $this->meta['remarks']]);
         }
 
         return $text;
@@ -40,9 +42,10 @@ class ReportedImage extends MessageAbstract
 
     protected function renderHtml(): string
     {
-        $text = sprintf('Reported image for reason: <b>%s</b>', ImageReportReason::from($this->meta['reason'])->name);
+        $reasonName = ImageReportReason::from($this->meta['reason'])->name;
+        $text = $this->translator->trans('profile_social.activity_reported_image', ['%reason%' => '<b>' . $this->escapeHtml($reasonName) . '</b>']);
         if (isset($this->meta['remarks']) && $this->meta['remarks'] !== '') {
-            $text .= sprintf(' &mdash; Remarks: %s', htmlspecialchars($this->meta['remarks']));
+            $text = $this->translator->trans('profile_social.activity_reported_image_remarks', ['%message%' => $text, '%remarks%' => $this->escapeHtml($this->meta['remarks'])]);
         }
 
         return $text;

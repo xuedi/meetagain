@@ -5,6 +5,7 @@ namespace App\Activity;
 use App\Service\Media\ImageHtmlRenderer;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AutoconfigureTag]
 interface MessageInterface
@@ -12,6 +13,7 @@ interface MessageInterface
     public function injectServices(
         RouterInterface $router,
         ImageHtmlRenderer $imageRenderer,
+        TranslatorInterface $translator,
         ?array $meta = [],
         array $userNames = [],
         array $eventNames = [],

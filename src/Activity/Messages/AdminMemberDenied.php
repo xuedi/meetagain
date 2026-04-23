@@ -24,9 +24,12 @@ class AdminMemberDenied extends MessageAbstract
     protected function renderText(): string
     {
         $userId = $this->meta['user_id'];
-        $userName = $this->userNames[$userId] ?? '[deleted]';
+        $userName = $this->userNames[$userId] ?? null;
+        if ($userName === null) {
+            return $this->translator->trans('profile_social.activity_admin_member_denied_deleted');
+        }
 
-        return sprintf('Denied member: %s', $userName);
+        return $this->translator->trans('profile_social.activity_admin_member_denied', ['%user%' => $userName]);
     }
 
     protected function renderHtml(): string

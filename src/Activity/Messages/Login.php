@@ -20,11 +20,11 @@ class Login extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'User logged in';
+        return $this->translator->trans('profile_social.activity_login');
     }
 
     protected function renderHtml(): string
     {
-        return 'User logged in';
+        return $this->translator->trans('profile_social.activity_login');
     }
 }

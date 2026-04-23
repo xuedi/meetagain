@@ -8,16 +8,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class RsvpYesTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -26,8 +29,8 @@ class RsvpYesTest extends TestCase
         $eventId = 42;
         $eventName = 'Test Event';
         $eventUrl = '/event/42';
-        $expectedText = 'Going to event: Test Event';
-        $expectedHtml = 'Going to event: <a href="/event/42">Test Event</a>';
+        $expectedText = 'profile_social.activity_rsvp_yes';
+        $expectedHtml = 'profile_social.activity_rsvp_yes';
 
         $meta = ['event_id' => $eventId];
         $eventNames = [$eventId => $eventName];
@@ -40,7 +43,7 @@ class RsvpYesTest extends TestCase
             ->willReturn($eventUrl);
 
         $subject = new RsvpYes();
-        $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
+        $subject->injectServices($router, $this->imageService, $this->translator, $meta, [], $eventNames);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
@@ -55,11 +58,11 @@ class RsvpYesTest extends TestCase
         $meta = ['event_id' => 99];
 
         $subject = new RsvpYes();
-        $subject->injectServices($this->router, $this->imageService, $meta, [], []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, [], []);
 
         // Act & Assert
-        static::assertSame('Going to event: [deleted]', $subject->render());
-        static::assertSame('Going to event [deleted]', $subject->render(true));
+        static::assertSame('profile_social.activity_rsvp_yes_deleted', $subject->render());
+        static::assertSame('profile_social.activity_rsvp_yes_deleted', $subject->render(true));
     }
 
     public function testCanCatchMissingEventId(): void
@@ -67,7 +70,7 @@ class RsvpYesTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.rsvp_yes"));
 
         $subject = new RsvpYes();
-        $subject->injectServices($this->router, $this->imageService, []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, []);
         $subject->validate();
     }
 
@@ -76,7 +79,7 @@ class RsvpYesTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.rsvp_yes'"));
 
         $subject = new RsvpYes();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);
         $subject->validate();
     }
 }

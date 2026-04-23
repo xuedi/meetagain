@@ -8,58 +8,61 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ThemeColorsType extends AbstractType
 {
     public function __construct(
         private readonly ConfigService $configService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $colors = $this->configService->getThemeColors();
+        $t = $this->translator;
 
         $builder
             ->add('color_primary', ColorType::class, [
-                'label' => 'Primary',
+                'label' => 'admin_system.field_color_primary',
                 'data' => $colors['color_primary'],
-                'attr' => ['title' => 'Buttons, highlights'],
+                'attr' => ['title' => $t->trans('admin_system.color_primary')],
             ])
             ->add('color_link', ColorType::class, [
-                'label' => 'Link',
+                'label' => 'admin_system.field_color_link',
                 'data' => $colors['color_link'],
-                'attr' => ['title' => 'Links, interactive elements'],
+                'attr' => ['title' => $t->trans('admin_system.color_link')],
             ])
             ->add('color_info', ColorType::class, [
-                'label' => 'Info',
+                'label' => 'admin_system.field_color_info',
                 'data' => $colors['color_info'],
-                'attr' => ['title' => 'Information messages'],
+                'attr' => ['title' => $t->trans('admin_system.color_info')],
             ])
             ->add('color_success', ColorType::class, [
-                'label' => 'Success',
+                'label' => 'admin_system.field_color_success',
                 'data' => $colors['color_success'],
-                'attr' => ['title' => 'Success messages'],
+                'attr' => ['title' => $t->trans('admin_system.color_success')],
             ])
             ->add('color_warning', ColorType::class, [
-                'label' => 'Warning',
+                'label' => 'admin_system.field_color_warning',
                 'data' => $colors['color_warning'],
-                'attr' => ['title' => 'Warning messages'],
+                'attr' => ['title' => $t->trans('admin_system.color_warning')],
             ])
             ->add('color_danger', ColorType::class, [
-                'label' => 'Danger',
+                'label' => 'admin_system.field_color_danger',
                 'data' => $colors['color_danger'],
-                'attr' => ['title' => 'Error messages, delete buttons'],
+                'attr' => ['title' => $t->trans('admin_system.color_danger')],
             ])
             ->add('color_text_grey', ColorType::class, [
-                'label' => 'Text Grey',
+                'label' => 'admin_system.field_color_text_grey',
                 'data' => $colors['color_text_grey'],
-                'attr' => ['title' => 'Secondary text (accessibility)'],
+                'attr' => ['title' => $t->trans('admin_system.color_text_grey')],
             ])
             ->add('color_text_grey_light', ColorType::class, [
-                'label' => 'Text Grey Light',
+                'label' => 'admin_system.field_color_text_grey_light',
                 'data' => $colors['color_text_grey_light'],
-                'attr' => ['title' => 'Subtle text (accessibility)'],
+                'attr' => ['title' => $t->trans('admin_system.color_text_grey_light')],
             ]);
     }
 

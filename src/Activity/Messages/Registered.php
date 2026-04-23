@@ -20,11 +20,11 @@ class Registered extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'User registered';
+        return $this->translator->trans('profile_social.activity_registered');
     }
 
     protected function renderHtml(): string
     {
-        return 'User registered';
+        return $this->translator->trans('profile_social.activity_registered');
     }
 }
