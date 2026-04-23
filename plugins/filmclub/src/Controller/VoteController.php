@@ -59,26 +59,26 @@ final class VoteController extends AbstractController
     {
         $event = $this->eventRepository->find($eventId);
         if (!$event) {
-            $this->addFlash('error', 'Event not found');
+            $this->addFlash('error', 'filmclub_vote.flash_event_not_found');
             return $this->redirectToRoute('app_filmclub_vote');
         }
 
         $existingVote = $this->voteRepository->findByEventId($eventId);
         if ($existingVote) {
-            $this->addFlash('error', 'A vote already exists for this event');
+            $this->addFlash('error', 'filmclub_vote.flash_vote_already_exists');
             return $this->redirectToRoute('app_filmclub_vote');
         }
 
         if ($request->isMethod('POST')) {
             $closesAtString = $request->request->get('closes_at');
             if (!$closesAtString) {
-                $this->addFlash('error', 'Please provide a closing date');
+                $this->addFlash('error', 'filmclub_vote.flash_no_closing_date');
                 return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);
             }
 
             $closesAt = \DateTimeImmutable::createFromFormat($this->configService->getDateFormat(), (string) $closesAtString);
             if (!$closesAt) {
-                $this->addFlash('error', 'Invalid date format');
+                $this->addFlash('error', 'filmclub_vote.flash_invalid_date');
                 return $this->redirectToRoute('app_filmclub_vote_create', ['eventId' => $eventId]);
             }
 
@@ -90,7 +90,7 @@ final class VoteController extends AbstractController
 
             $this->voteRepository->save($vote, true);
 
-            $this->addFlash('success', 'Vote created successfully');
+            $this->addFlash('success', 'filmclub_vote.flash_vote_created');
             return $this->redirectToRoute('app_filmclub_vote');
         }
 
@@ -122,7 +122,7 @@ final class VoteController extends AbstractController
     public function cast(Vote $vote, Request $request): Response
     {
         if (!$vote->isVotingOpen()) {
-            $this->addFlash('error', 'Voting is closed');
+            $this->addFlash('error', 'filmclub_vote.flash_voting_closed');
             return $this->redirectToRoute('app_filmclub_vote_show', ['id' => $vote->getId()]);
         }
 
@@ -130,7 +130,7 @@ final class VoteController extends AbstractController
         $existingBallot = $this->voteBallotRepository->findByVoteAndMember($vote, $user->getId());
 
         if ($existingBallot) {
-            $this->addFlash('error', 'You have already voted');
+            $this->addFlash('error', 'filmclub_vote.flash_already_voted');
             return $this->redirectToRoute('app_filmclub_vote_show', ['id' => $vote->getId()]);
         }
 
@@ -138,7 +138,7 @@ final class VoteController extends AbstractController
         $film = $this->filmRepository->find($filmId);
 
         if (!$film) {
-            $this->addFlash('error', 'Please select a valid film');
+            $this->addFlash('error', 'filmclub_vote.flash_invalid_film');
             return $this->redirectToRoute('app_filmclub_vote_show', ['id' => $vote->getId()]);
         }
 
@@ -156,7 +156,7 @@ final class VoteController extends AbstractController
             'event_id' => $vote->getEventId(),
         ]);
 
-        $this->addFlash('success', 'Your vote has been recorded');
+        $this->addFlash('success', 'filmclub_vote.flash_vote_recorded');
         return $this->redirectToRoute('app_filmclub_vote_show', ['id' => $vote->getId()]);
     }
 
@@ -167,7 +167,7 @@ final class VoteController extends AbstractController
         $vote->setIsClosed(true);
         $this->voteRepository->save($vote, true);
 
-        $this->addFlash('success', 'Vote has been closed');
+        $this->addFlash('success', 'filmclub_vote.flash_vote_closed');
         return $this->redirectToRoute('app_filmclub_vote_show', ['id' => $vote->getId()]);
     }
 

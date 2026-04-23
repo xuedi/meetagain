@@ -16,4 +16,9 @@ enum FilmGenre: string
     case Mystery = 'mystery';
     case Romance = 'romance';
     case Western = 'western';
+
+    public function label(): string
+    {
+        return 'filmclub_film.genre_' . $this->value;
+    }
 }

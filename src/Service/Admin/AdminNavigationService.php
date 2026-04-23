@@ -60,6 +60,7 @@ readonly class AdminNavigationService
             foreach ($config->links as $link) {
                 // Apply modifications if they exist for this route
                 $section = $config->section;
+                $sectionParams = $config->sectionParams ?? [];
                 $label = $link->getLabel();
                 $route = $link->getRoute();
                 $active = $link->getActive();
@@ -67,9 +68,12 @@ readonly class AdminNavigationService
 
                 if (isset($modifications[$route])) {
                     $mods = $modifications[$route];
-                    $section = $mods['section'] ?? $section;
-                    $label = $mods['label'] ?? $label;
-                    $active = $mods['active'] ?? $active;
+                    $section = isset($mods['section']) ? (string) $mods['section'] : $section;
+                    $label = isset($mods['label']) ? (string) $mods['label'] : $label;
+                    $active = isset($mods['active']) ? (string) $mods['active'] : $active;
+                    if (isset($mods['sectionParams']) && is_array($mods['sectionParams'])) {
+                        $sectionParams = $mods['sectionParams'];
+                    }
                 }
 
                 // Initialize section if new
@@ -77,6 +81,7 @@ readonly class AdminNavigationService
                     $sectionsMap[$section] = [
                         'role' => $config->sectionRole,
                         'priority' => $config->sectionPriority,
+                        'sectionParams' => $sectionParams,
                         'links' => [],
                     ];
                 }
@@ -126,6 +131,7 @@ readonly class AdminNavigationService
                 section: $sectionName,
                 links: array_values($visibleLinks),
                 role: $data['role'],
+                sectionParams: $data['sectionParams'] ?? [],
             );
         }
 

@@ -6,11 +6,13 @@ readonly class AdminSection
 {
     /**
      * @param list<AdminLink> $links
+     * @param array<string, string> $sectionParams Translator params for the section label
      */
     public function __construct(
         private string $section,
         private array $links,
         private ?string $role = null,
+        private array $sectionParams = [],
     ) {}
 
     public function getSection(): string
@@ -29,5 +31,13 @@ readonly class AdminSection
     public function getRole(): ?string
     {
         return $this->role;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getSectionParams(): array
+    {
+        return $this->sectionParams;
     }
 }

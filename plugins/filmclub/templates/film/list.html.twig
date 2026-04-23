@@ -1,20 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Filmlist"|trans }}{% endblock %}
+{% block title %}{{ 'filmclub_film.browser_title_list'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
-        <h1 class="title">{{ "Film list"|trans }}</h1>
+        <h1 class="title">{{ 'filmclub_film.page_title_list'|trans }}</h1>
 
         <table class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ "Title"|trans }}</th>
-                <th>{{ "Year"|trans }}</th>
-                <th>{{ "Runtime"|trans }}</th>
-                <th>{{ "Genres"|trans }}</th>
-                <th>{{ "Film was shown at this event"|trans }}</th>
+                <th>{{ 'filmclub_film.col_title'|trans }}</th>
+                <th>{{ 'filmclub_film.col_year'|trans }}</th>
+                <th>{{ 'filmclub_film.col_runtime'|trans }}</th>
+                <th>{{ 'filmclub_film.col_genres'|trans }}</th>
+                <th>{{ 'filmclub_film.col_event'|trans }}</th>
                 <th><a href="{{ path('app_filmclub_film_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
             </tr>
             </thead>
@@ -26,7 +26,7 @@
                     <td>{{ film.runtime }} min</td>
                     <td>
                         {% for genre in film.genres %}
-                            <span class="tag is-info">{{ genre.value|trans }}</span>
+                            <span class="tag is-info">{{ genre.label()|trans }}</span>
                         {% endfor %}
                     </td>
                     <td>
@@ -40,7 +40,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5">{{ "No films found"|trans }}</td>
+                    <td colspan="5">{{ 'filmclub_film.empty_state'|trans }}</td>
                 </tr>
             {% endfor %}
             </tbody>
