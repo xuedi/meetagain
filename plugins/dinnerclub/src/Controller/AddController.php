@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/dinnerclub')]
 #[IsGranted('ROLE_USER')]
@@ -19,6 +20,7 @@ final class AddController extends AbstractController
     public function __construct(
         private readonly DishService $dishService,
         private readonly ActivityService $activityService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/add', name: 'plugin_dinnerclub_add', methods: ['GET', 'POST'])]
@@ -48,7 +50,7 @@ final class AddController extends AbstractController
                 'dish_name' => $dishName,
             ]);
 
-            $this->addFlash('success', $isManager ? 'Dish has been added.' : 'Dish has been submitted for approval.');
+            $this->addFlash('success', $this->translator->trans($isManager ? 'dinnerclub.flash_added' : 'dinnerclub.flash_submitted'));
 
             return $this->redirectToRoute('app_plugin_dinnerclub');
         }

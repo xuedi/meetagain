@@ -22,9 +22,9 @@
                             {{ form_row(form.explanation) }}
                             {{ form_row(form.category) }}
                             <div class="has-text-right mt-6">
-                                <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.cancel'|trans }}</a>
+                                <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                                 {% if is_granted('ROLE_ORGANIZER') %}
-                                    <button type="submit" class="button is-link">{{ 'global.save'|trans }}</button>
+                                    <button type="submit" class="button is-link">{{ 'global.button_save'|trans }}</button>
                                 {% else %}
                                     <button type="submit" class="button is-link">{{ 'glossary.button_suggest_change'|trans }}</button>
                                 {% endif %}

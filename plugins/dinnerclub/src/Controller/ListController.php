@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/dinnerclub/lists')]
 #[IsGranted('ROLE_USER')]
@@ -19,6 +20,7 @@ final class ListController extends AbstractController
     public function __construct(
         private readonly DishListService $listService,
         private readonly DishRepository $dishRepo,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'plugin_dinnerclub_lists', methods: ['GET'])]
@@ -49,7 +51,7 @@ final class ListController extends AbstractController
                 isPublic: $data->isPublic(),
             );
 
-            $this->addFlash('success', 'List has been created.');
+            $this->addFlash('success', $this->translator->trans('dinnerclub_lists.flash_created'));
 
             return $this->redirectToRoute('plugin_dinnerclub_lists');
         }
@@ -84,7 +86,7 @@ final class ListController extends AbstractController
                 isPublic: $list->isPublic(),
             );
 
-            $this->addFlash('success', 'List has been updated.');
+            $this->addFlash('success', $this->translator->trans('dinnerclub_lists.flash_updated'));
 
             return $this->redirectToRoute('plugin_dinnerclub_lists_view', ['id' => $id]);
         }
@@ -124,7 +126,7 @@ final class ListController extends AbstractController
 
         try {
             $this->listService->deleteList($id, $user->getId());
-            $this->addFlash('success', 'List has been deleted.');
+            $this->addFlash('success', $this->translator->trans('dinnerclub_lists.flash_deleted'));
         } catch (\RuntimeException $e) {
             $this->addFlash('error', $e->getMessage());
         }

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Review Dish"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
+{% block title %}{{ 'dinnerclub_approval.page_title_view'|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
 {% block body %}
 
@@ -9,8 +9,8 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li><a href="{{ path('plugin_dinnerclub_approval_pending') }}">Pending</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
+                    <li><a href="{{ path('plugin_dinnerclub_approval_pending') }}">{{ 'dinnerclub_approval.breadcrumb_pending'|trans }}</a></li>
                     <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</a></li>
                 </ul>
             </nav>
@@ -20,28 +20,28 @@
                     <div class="box">
                         <h1 class="title">
                             <span class="icon"><i class="fa-solid fa-clock"></i></span>
-                            <span>Review New Dish</span>
+                            <span>{{ 'dinnerclub_approval.heading_view'|trans }}</span>
                         </h1>
 
                         <div class="content">
                             <h2>{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</h2>
 
                             {% if dish.getPhonetic() %}
-                                <p><strong>Phonetic:</strong> {{ dish.getPhonetic() }}</p>
+                                <p><strong>{{ 'dinnerclub_approval.label_phonetic'|trans }}</strong> {{ dish.getPhonetic() }}</p>
                             {% endif %}
 
                             {% if dish.getTranslatedDescription(app.locale) ?: dish.getAnyTranslatedDescription() %}
-                                <p><strong>Description:</strong></p>
+                                <p><strong>{{ 'dinnerclub_approval.label_description'|trans }}</strong></p>
                                 <blockquote>{{ (dish.getTranslatedDescription(app.locale) ?: dish.getAnyTranslatedDescription())|nl2br }}</blockquote>
                             {% endif %}
 
                             {% if dish.getTranslatedRecipe(app.locale) ?: dish.getAnyTranslatedRecipe() %}
-                                <p><strong>Recipe:</strong></p>
+                                <p><strong>{{ 'dinnerclub_approval.label_recipe'|trans }}</strong></p>
                                 <blockquote>{{ (dish.getTranslatedRecipe(app.locale) ?: dish.getAnyTranslatedRecipe())|nl2br }}</blockquote>
                             {% endif %}
 
                             {% if dish.origin %}
-                                <p><strong>Origin:</strong> {{ dish.origin }}</p>
+                                <p><strong>{{ 'dinnerclub_approval.label_origin'|trans }}</strong> {{ dish.origin }}</p>
                             {% endif %}
                         </div>
 
@@ -50,9 +50,9 @@
                         <div class="buttons">
                             <a href="{{ path('app_profile_review') }}" class="button is-info is-medium">
                                 <span class="icon"><i class="fa-solid fa-check-double"></i></span>
-                                <span>Go to Review Page</span>
+                                <span>{{ 'dinnerclub_approval.button_review_page'|trans }}</span>
                             </a>
-                            <a href="{{ path('plugin_dinnerclub_approval_pending') }}" class="button">Back</a>
+                            <a href="{{ path('plugin_dinnerclub_approval_pending') }}" class="button">{{ 'global.button_back'|trans }}</a>
                         </div>
                     </div>
                 </div>
@@ -60,17 +60,17 @@
                 <div class="column is-4">
                     {% if dish.previewImage %}
                         <div class="box">
-                            <h3 class="title is-5">Preview Image</h3>
+                            <h3 class="title is-5">{{ 'dinnerclub_approval.heading_preview_image'|trans }}</h3>
                             {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
                         </div>
                     {% endif %}
 
                     <div class="box">
-                        <h3 class="title is-5">Submission Info</h3>
-                        <p><strong>Submitted by:</strong> {{ get_user_name(dish.createdBy) }}</p>
-                        <p><strong>Submitted:</strong> {{ dish.createdAt|time_diff }}</p>
+                        <h3 class="title is-5">{{ 'dinnerclub_approval.heading_submission_info'|trans }}</h3>
+                        <p><strong>{{ 'dinnerclub_approval.label_submitted_by'|trans }}</strong> {{ get_user_name(dish.createdBy) }}</p>
+                        <p><strong>{{ 'dinnerclub_approval.label_submitted'|trans }}</strong> {{ dish.createdAt|time_diff }}</p>
                         {% if dish.pronunciationSystem %}
-                        <p><strong>Pronunciation:</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
+                        <p><strong>{{ 'dinnerclub_approval.label_pronunciation'|trans }}</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
                         {% endif %}
                     </div>
                 </div>

@@ -9,11 +9,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DishAddType extends AbstractType
 {
     public function __construct(
         private readonly LanguageService $languageService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[\Override]
@@ -23,36 +25,36 @@ class DishAddType extends AbstractType
         $choices = array_combine(array_map('strtoupper', $codes), $codes);
 
         $builder->add('language', ChoiceType::class, [
-            'label' => 'Language',
+            'label' => 'dinnerclub.field_language',
             'choices' => $choices,
             'data' => $options['current_locale'],
             'required' => true,
         ])->add('name', TextType::class, [
-            'label' => 'Dish Name',
+            'label' => 'dinnerclub.field_name',
             'required' => true,
-            'attr' => ['placeholder' => 'Enter dish name in your language'],
+            'attr' => ['placeholder' => $this->translator->trans('dinnerclub.field_name_placeholder')],
         ])->add('phonetic', TextType::class, [
-            'label' => 'Phonetic',
+            'label' => 'dinnerclub.field_phonetic',
             'required' => false,
-            'attr' => ['placeholder' => 'Optional: How to pronounce it'],
+            'attr' => ['placeholder' => $this->translator->trans('dinnerclub.field_phonetic_placeholder')],
         ])->add('description', TextareaType::class, [
-            'label' => 'Description',
+            'label' => 'dinnerclub.field_description',
             'required' => false,
             'attr' => [
                 'rows' => 3,
-                'placeholder' => 'Optional: Brief description of the dish',
+                'placeholder' => $this->translator->trans('dinnerclub.field_description_placeholder'),
             ],
         ])->add('recipe', TextareaType::class, [
-            'label' => 'Recipe',
+            'label' => 'dinnerclub.field_recipe',
             'required' => false,
             'attr' => [
                 'rows' => 5,
-                'placeholder' => 'Optional: How to prepare this dish',
+                'placeholder' => $this->translator->trans('dinnerclub.field_recipe_placeholder'),
             ],
         ])->add('origin', TextType::class, [
-            'label' => 'Origin / Region',
+            'label' => 'dinnerclub.field_origin',
             'required' => false,
-            'attr' => ['placeholder' => 'Optional: Where is this dish from? (e.g., Southern China, Naples, NYC, Berlin)'],
+            'attr' => ['placeholder' => $this->translator->trans('dinnerclub.field_origin_placeholder')],
         ]);
     }
 

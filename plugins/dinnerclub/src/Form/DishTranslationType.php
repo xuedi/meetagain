@@ -13,14 +13,14 @@ class DishTranslationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('name', TextType::class, [
-            'label' => 'Name',
+            'label' => 'dinnerclub.field_translation_name',
             'required' => true,
         ])->add('description', TextareaType::class, [
-            'label' => 'Description',
+            'label' => 'dinnerclub.field_description',
             'required' => false,
             'attr' => ['rows' => 3],
         ])->add('recipe', TextareaType::class, [
-            'label' => 'Recipe',
+            'label' => 'dinnerclub.field_recipe',
             'required' => false,
             'attr' => ['rows' => 5],
         ]);

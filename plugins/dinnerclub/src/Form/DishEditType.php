@@ -11,27 +11,32 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DishEditType extends AbstractType
 {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {}
+
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('pronunciationSystem', EntityType::class, [
-            'label' => 'Pronunciation System',
+            'label' => 'dinnerclub.field_pronunciation_system',
             'class' => PronunciationSystem::class,
             'choice_label' => static fn(PronunciationSystem $s) => $s->getName() . ' (' . $s->getLanguage() . ')',
             'required' => false,
-            'placeholder' => 'None',
+            'placeholder' => 'dinnerclub.field_pronunciation_system_placeholder',
         ])->add('phonetic', TextType::class, [
-            'label' => 'Phonetic',
+            'label' => 'dinnerclub.field_phonetic',
             'required' => false,
-            'attr' => ['placeholder' => 'e.g. má po dòu fu'],
+            'attr' => ['placeholder' => $this->translator->trans('dinnerclub.field_phonetic_example')],
         ])->add('origin', TextType::class, [
-            'label' => 'Origin / Region',
+            'label' => 'dinnerclub.field_origin',
             'required' => false,
             'attr' => [
-                'placeholder' => 'Optional: Where is this dish from? (e.g., Southern China, Naples, NYC, Berlin)',
+                'placeholder' => $this->translator->trans('dinnerclub.field_origin_placeholder'),
             ],
         ]);
     }

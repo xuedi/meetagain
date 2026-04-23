@@ -9,8 +9,8 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li><a href="{{ path('plugin_dinnerclub_lists') }}">Lists</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
+                    <li><a href="{{ path('plugin_dinnerclub_lists') }}">{{ 'dinnerclub_lists.breadcrumb_lists'|trans }}</a></li>
                     <li class="is-active"><a href="#" aria-current="page">{{ list.name }}</a></li>
                 </ul>
             </nav>
@@ -21,9 +21,9 @@
                         <h1 class="title">
                             {{ list.name }}
                             {% if list.isPublic %}
-                                <span class="tag is-success is-light ml-2">Public</span>
+                                <span class="tag is-success is-light ml-2">{{ 'dinnerclub_lists.tag_public'|trans }}</span>
                             {% else %}
-                                <span class="tag is-light ml-2">Private</span>
+                                <span class="tag is-light ml-2">{{ 'dinnerclub_lists.tag_private'|trans }}</span>
                             {% endif %}
                         </h1>
                         {% if list.description %}
@@ -36,7 +36,7 @@
                         <div class="buttons">
                             <a href="{{ path('plugin_dinnerclub_lists_edit', {'id': list.id}) }}" class="button">
                                 <span class="icon"><i class="fa-solid fa-pen"></i></span>
-                                <span>Edit List</span>
+                                <span>{{ 'dinnerclub_lists.button_edit_list'|trans }}</span>
                             </a>
                         </div>
                     </div>
@@ -45,18 +45,18 @@
 
             <p class="mb-4 has-text-grey">
                 <span class="icon is-small"><i class="fa-solid fa-user"></i></span>
-                by {{ get_user_name(list.createdBy) }}
+                {{ 'dinnerclub_lists.label_by'|trans({'%user%': get_user_name(list.createdBy)}) }}
                 <span class="ml-3">
                     <span class="icon is-small"><i class="fa-solid fa-calendar"></i></span>
-                    Created {{ list.createdAt|time_diff }}
+                    {{ 'dinnerclub_lists.label_created_time'|trans }} {{ list.createdAt|time_diff }}
                 </span>
             </p>
 
             {% if dishes is empty %}
                 <div class="notification is-light">
-                    <p>This list is empty.</p>
+                    <p>{{ 'dinnerclub_lists.empty_list'|trans }}</p>
                     {% if isOwner %}
-                        <p class="mt-2">Browse <a href="{{ path('app_plugin_dinnerclub') }}">dishes</a> and add some to this list!</p>
+                        <p class="mt-2">{{ 'dinnerclub_lists.empty_list_hint'|trans({'%url%': path('app_plugin_dinnerclub')})|raw }}</p>
                     {% endif %}
                 </div>
             {% else %}
@@ -85,13 +85,13 @@
                                 <footer class="card-footer">
                                     <a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}" class="card-footer-item">
                                         <span class="icon"><i class="fa-solid fa-eye"></i></span>
-                                        <span>View</span>
+                                        <span>{{ 'dinnerclub_lists.button_view'|trans }}</span>
                                     </a>
                                     {% if isOwner %}
                                         <a href="#" class="card-footer-item has-text-danger remove-from-list"
                                            data-list-id="{{ list.id }}" data-dish-id="{{ dish.id }}">
                                             <span class="icon"><i class="fa-solid fa-times"></i></span>
-                                            <span>Remove</span>
+                                            <span>{{ 'dinnerclub_lists.button_remove'|trans }}</span>
                                         </a>
                                     {% endif %}
                                 </footer>
@@ -104,7 +104,7 @@
             <div class="mt-5">
                 <a href="{{ path('plugin_dinnerclub_lists') }}" class="button">
                     <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
-                    <span>Back to Lists</span>
+                    <span>{{ 'dinnerclub_lists.button_back_lists'|trans }}</span>
                 </a>
             </div>
 

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Image Suggestions{% endblock %}
+{% block title %}{{ 'dinnerclub_suggestion.page_title_images'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -9,21 +9,21 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li><a href="{{ path('plugin_dinnerclub_suggestions_list') }}">Suggestions</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">Image Suggestions</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
+                    <li><a href="{{ path('plugin_dinnerclub_suggestions_list') }}">{{ 'dinnerclub_suggestion.breadcrumb_suggestions'|trans }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ 'dinnerclub_suggestion.breadcrumb_images'|trans }}</a></li>
                 </ul>
             </nav>
 
             <h1 class="title">
                 <span class="icon"><i class="fa-solid fa-image"></i></span>
-                <span>Dishes with Pending Image Suggestions</span>
+                <span>{{ 'dinnerclub_suggestion.heading_images'|trans }}</span>
             </h1>
 
             {% if dishes is empty %}
                 <div class="notification is-info is-light">
                     <span class="icon"><i class="fa-solid fa-check-circle"></i></span>
-                    <span>No pending image suggestions. All caught up!</span>
+                    <span>{{ 'dinnerclub_suggestion.empty_images'|trans }}</span>
                 </div>
             {% else %}
                 <div class="columns is-multiline">
@@ -41,17 +41,17 @@
                                     <p class="title is-5">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</p>
                                     <p class="subtitle is-6 has-text-grey">
                                         <span class="icon"><i class="fa-solid fa-image"></i></span>
-                                        Pending image suggestions
+                                        {{ 'dinnerclub_suggestion.card_pending_images'|trans }}
                                     </p>
                                 </div>
                                 <footer class="card-footer">
                                     <a href="{{ path('plugin_dinnerclub_image_suggestion_view', {'id': dish.id}) }}" class="card-footer-item">
                                         <span class="icon"><i class="fa-solid fa-eye"></i></span>
-                                        <span>Review</span>
+                                        <span>{{ 'dinnerclub_suggestion.button_review'|trans }}</span>
                                     </a>
                                     <a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}" class="card-footer-item">
                                         <span class="icon"><i class="fa-solid fa-external-link"></i></span>
-                                        <span>View Dish</span>
+                                        <span>{{ 'dinnerclub_suggestion.button_view_dish'|trans }}</span>
                                     </a>
                                 </footer>
                             </div>
@@ -63,7 +63,7 @@
             <div class="mt-5">
                 <a href="{{ path('plugin_dinnerclub_suggestions_list') }}" class="button">
                     <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
-                    <span>Back to Suggestions</span>
+                    <span>{{ 'dinnerclub_suggestion.button_back_suggestions'|trans }}</span>
                 </a>
             </div>
 
