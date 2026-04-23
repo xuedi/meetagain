@@ -12,3 +12,10 @@ page_plugin_dinnerclub_title_details: 'Gericht'
 'Edit List': 'Liste bearbeiten'
 'Pending Dishes': 'Ausstehende Gerichte'
 'Review Dish': 'Gericht prüfen'
+dinnerclub: {}
+dinnerclub_dinner: {}
+dinnerclub_suggestion: {}
+dinnerclub_approval: {}
+dinnerclub_lists: {}
+dinnerclub_views: {}
+dinnerclub_tile: {}
