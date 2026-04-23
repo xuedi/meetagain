@@ -53,24 +53,29 @@ class AdminNavigationSectionMergeTest extends WebTestCase
         );
     }
 
-    public function testContentSectionAppearsExactlyOnce(): void
+    public function testContentSectionAppearsAtMostOnce(): void
     {
         // Arrange
         $client = $this->loginAsAdmin();
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/event');
+        $crawler = $client->request('GET', '/en/admin/events');
         $this->assertResponseIsSuccessful();
 
-        // Assert - exactly one "Content" section
+        // Assert - "Content" section is never duplicated. In multisite group context,
+        // content links are moved to the "Whitelabel: <group>" section so the core
+        // "Content" heading may not appear at all; but it must never appear twice.
         $contentHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(
             static fn($node): bool => trim($node->text()) === 'Content',
         );
 
-        static::assertCount(
+        static::assertLessThanOrEqual(
             1,
-            $contentHeadings,
-            'Sidebar must show exactly one "Content" section heading.',
+            $contentHeadings->count(),
+            'Sidebar must show at most one "Content" section heading. ' .
+            'Found: ' . $contentHeadings->count() . '. ' .
+            'Duplicate sections indicate a plugin is using a raw English section string ' .
+            'instead of the admin_shell.section_content translation key.',
         );
     }
 }
