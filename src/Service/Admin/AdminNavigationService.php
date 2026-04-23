@@ -131,7 +131,7 @@ readonly class AdminNavigationService
                 section: $sectionName,
                 links: array_values($visibleLinks),
                 role: $data['role'],
-                sectionParams: $data['sectionParams'] ?? [],
+                sectionParams: $data['sectionParams'],
             );
         }
 

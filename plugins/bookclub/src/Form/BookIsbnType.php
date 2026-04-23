@@ -6,7 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -29,7 +28,7 @@ class BookIsbnType extends AbstractType
                 new NotBlank(),
                 new Regex(
                     pattern: '/^[\d\-\s X]+$/i',
-                    message: new TranslatableMessage('bookclub_book.error_isbn_invalid'),
+                    message: 'bookclub_book.error_isbn_invalid',
                 ),
             ],
         ]);
