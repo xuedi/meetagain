@@ -1,6 +1,6 @@
 <aside class="menu">
     {% for section in admin_navigation.sidebarSections %}
-        <p class="menu-label">{{ section.section|trans }}</p>
+        <p class="menu-label">{{ section.section|trans(section.sectionParams) }}</p>
         <ul class="menu-list">
             {% for link in section.links %}
                 <li><a class="{% if active == link.active %}is-active{% endif %}" href="{{ path(link.route) }}">{{ link.label | trans }}</a></li>

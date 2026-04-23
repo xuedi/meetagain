@@ -8,13 +8,15 @@ readonly class AdminNavigationConfig
 {
     /**
      * @param list<AdminLink> $links
-     * @param array<string, array<string, string>>|null $modifies Route modifications (route => [field => value])
+     * @param array<string, array<string, mixed>>|null $modifies Route modifications (route => [field => value])
+     * @param array<string, string>|null $sectionParams Translator params for the section label
      */
     public function __construct(
-        public string $section, // Section name (e.g., "System")
-        public array $links, // Array of AdminLink objects
-        public ?array $modifies = null, // Route modifications
-        public ?string $sectionRole = null, // Required role for entire section
-        public int $sectionPriority = 0, // Sort order: lower = first; use 100 for "System"
+        public string $section,
+        public array $links,
+        public ?array $modifies = null,
+        public ?string $sectionRole = null,
+        public int $sectionPriority = 0,
+        public ?array $sectionParams = null,
     ) {}
 }
