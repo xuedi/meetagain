@@ -7,7 +7,7 @@
         {% if is_granted('ROLE_USER') %}
             {{ form_start(commentForm) }}
             {{ form_row(commentForm.comment, { 'id': 'replyInput' }) }}
-            <button class="button is-link">{{ 'global.add'|trans }}</button>
+            <button class="button is-link">{{ 'global.button_add'|trans }}</button>
             {{ form_end(commentForm) }}
         {% endif %}
     </div>

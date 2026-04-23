@@ -5,7 +5,7 @@
     <div class="mb-4">
         <a class="button is-small" href="{{ path('app_admin_cms_edit', {'id': cms.id, 'locale': block.language}) }}">
             <span class="icon"><i class="fa fa-arrow-left"></i></span>
-            <span>{{ "button_back" | trans }}</span>
+            <span>{{ 'global.button_back'|trans }}</span>
         </a>
     </div>
 
@@ -35,9 +35,9 @@
                 } only %}
 
                 <div class="buttons mt-4">
-                    <button class="button is-primary">{{ "button_save" | trans }}</button>
+                    <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
                     <a class="button" href="{{ path('app_admin_cms_block_edit', {'blockId': block.id}) }}">
-                        {{ "button_discard" | trans }}
+                        {{ 'global.button_discard'|trans }}
                     </a>
                     <a class="button is-danger"
                        href="{{ path('app_admin_cms_block_delete', {'id': cms.id, 'blockId': block.id, 'locale': block.language}) }}">
