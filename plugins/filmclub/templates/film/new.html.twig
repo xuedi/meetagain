@@ -1,20 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Add new film"|trans }}{% endblock %}
+{% block title %}{{ 'filmclub_film.page_title_new'|trans }}{% endblock %}
 
 {% block body %}
     <section class="section">
         <div class="container">
-            <h1 class="title">{{ "Add new film"|trans }}</h1>
+            <h1 class="title">{{ 'filmclub_film.page_title_new'|trans }}</h1>
 
             {{ form_start(form) }}
                 {{ form_widget(form) }}
                 <div class="field is-grouped mt-5">
                     <div class="control">
-                        <button class="button is-primary">{{ "Save"|trans }}</button>
+                        <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
                     </div>
                     <div class="control">
-                        <a href="{{ path('app_filmclub_filmlist') }}" class="button is-light">{{ "Cancel"|trans }}</a>
+                        <a href="{{ path('app_filmclub_filmlist') }}" class="button is-light">{{ 'global.button_cancel'|trans }}</a>
                     </div>
                 </div>
             {{ form_end(form) }}

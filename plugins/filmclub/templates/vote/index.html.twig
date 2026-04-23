@@ -1,15 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Film vote"|trans }}{% endblock %}
+{% block title %}{{ 'filmclub_vote.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
-        <h1 class="title">{{ "Vote for next film"|trans }}</h1>
+        <h1 class="title">{{ 'filmclub_vote.heading_vote_for_next'|trans }}</h1>
 
         {% if nextEvent %}
             <div class="box">
-                <h2 class="subtitle">{{ "Next Film Night"|trans }}: {{ nextEvent.title(app.request.locale) }}</h2>
+                <h2 class="subtitle">{{ 'filmclub_vote.label_next_film_night'|trans }}: {{ nextEvent.title(app.request.locale) }}</h2>
                 <p>{{ nextEvent.start|date('d.m.Y H:i') }}</p>
 
                 {% set existingVote = null %}
@@ -21,25 +21,25 @@
 
                 {% if existingVote %}
                     <a href="{{ path('app_filmclub_vote_show', {id: existingVote.id}) }}" class="button is-primary mt-3">
-                        {{ "View current vote"|trans }}
+                        {{ 'filmclub_vote.button_view_vote'|trans }}
                     </a>
                 {% elseif is_granted('ROLE_ORGANIZER') %}
                     <a href="{{ path('app_filmclub_vote_create', {eventId: nextEvent.id}) }}" class="button is-success mt-3">
                         <span class="icon"><i class="fa fa-plus"></i></span>
-                        <span>{{ "Create vote"|trans }}</span>
+                        <span>{{ 'filmclub_vote.button_create_vote'|trans }}</span>
                     </a>
                 {% else %}
-                    <p class="has-text-grey mt-3">{{ "No vote created yet"|trans }}</p>
+                    <p class="has-text-grey mt-3">{{ 'filmclub_vote.no_vote_yet'|trans }}</p>
                 {% endif %}
             </div>
         {% else %}
             <div class="notification is-info">
-                {{ "No upcoming film nights scheduled"|trans }}
+                {{ 'filmclub_vote.no_upcoming_nights'|trans }}
             </div>
         {% endif %}
 
         {% if openVotes|length > 0 %}
-            <h2 class="title is-4 mt-5">{{ "Open Votes"|trans }}</h2>
+            <h2 class="title is-4 mt-5">{{ 'filmclub_vote.heading_open_votes'|trans }}</h2>
             <div class="columns is-multiline">
                 {% for vote in openVotes %}
                     <div class="column is-one-third">
@@ -49,15 +49,15 @@
                                     <p class="title is-5">{{ events[vote.eventId].title(app.request.locale) }}</p>
                                     <p class="subtitle is-6">{{ events[vote.eventId].start|date('d.m.Y H:i') }}</p>
                                 {% else %}
-                                    <p class="title is-5">{{ "Vote #"|trans }}{{ vote.id }}</p>
+                                    <p class="title is-5">{{ 'filmclub_vote.label_vote_number'|trans }}{{ vote.id }}</p>
                                 {% endif %}
-                                <p class="is-size-7">{{ "Closes"|trans }}: {{ vote.closesAt|date('d.m.Y H:i') }}</p>
-                                <p>{{ vote.ballots|length }} {{ "votes cast"|trans }}</p>
+                                <p class="is-size-7">{{ 'filmclub_vote.label_closes'|trans }}: {{ vote.closesAt|date('d.m.Y H:i') }}</p>
+                                <p>{{ vote.ballots|length }} {{ 'filmclub_vote.label_votes_cast'|trans }}</p>
                             </div>
                             <footer class="card-footer">
-                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="card-footer-item">{{ "Vote"|trans }}</a>
+                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="card-footer-item">{{ 'filmclub_vote.button_vote'|trans }}</a>
                                 {% if events[vote.eventId] is defined and events[vote.eventId] %}
-                                    <a href="{{ path('app_event_details', {id: vote.eventId}) }}" class="card-footer-item">{{ "Event"|trans }}</a>
+                                    <a href="{{ path('app_event_details', {id: vote.eventId}) }}" class="card-footer-item">{{ 'filmclub_vote.link_event'|trans }}</a>
                                 {% endif %}
                             </footer>
                         </div>
@@ -67,13 +67,13 @@
         {% endif %}
 
         {% if closedVotes|length > 0 %}
-            <h2 class="title is-4 mt-5">{{ "Past Votes"|trans }}</h2>
+            <h2 class="title is-4 mt-5">{{ 'filmclub_vote.heading_past_votes'|trans }}</h2>
             <table class="table is-fullwidth">
                 <thead>
                     <tr>
-                        <th>{{ "Event"|trans }}</th>
-                        <th>{{ "Winner"|trans }}</th>
-                        <th>{{ "Votes"|trans }}</th>
+                        <th>{{ 'filmclub_vote.col_event'|trans }}</th>
+                        <th>{{ 'filmclub_vote.col_winner'|trans }}</th>
+                        <th>{{ 'filmclub_vote.col_votes'|trans }}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -87,19 +87,19 @@
                                     </a>
                                     <br><span class="is-size-7 has-text-grey">{{ events[vote.eventId].start|date('d.m.Y') }}</span>
                                 {% else %}
-                                    {{ "Vote #"|trans }}{{ vote.id }}
+                                    {{ 'filmclub_vote.label_vote_number'|trans }}{{ vote.id }}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if vote.winningFilm %}
                                     {{ vote.winningFilm.title }}
                                 {% else %}
-                                    <span class="has-text-grey">{{ "No votes"|trans }}</span>
+                                    <span class="has-text-grey">{{ 'filmclub_vote.no_votes'|trans }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ vote.ballots|length }}</td>
                             <td>
-                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="button is-small">{{ "View"|trans }}</a>
+                                <a href="{{ path('app_filmclub_vote_show', {id: vote.id}) }}" class="button is-small">{{ 'filmclub_vote.button_view'|trans }}</a>
                             </td>
                         </tr>
                     {% endfor %}
