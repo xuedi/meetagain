@@ -2,11 +2,11 @@
     <thead>
         <tr>
             <th></th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Year</th>
-            <th>Pages</th>
-            <th>Discussed at</th>
+            <th>{{ 'bookclub_views.col_title'|trans }}</th>
+            <th>{{ 'bookclub_views.col_author'|trans }}</th>
+            <th>{{ 'bookclub_views.col_year'|trans }}</th>
+            <th>{{ 'bookclub_views.col_pages'|trans }}</th>
+            <th>{{ 'bookclub_views.col_discussed_at'|trans }}</th>
             <th></th>
         </tr>
     </thead>
@@ -21,7 +21,7 @@
                 <td>
                     <a href="{{ path('app_plugin_bookclub_book_show', {id: book.id}) }}">{{ book.title }}</a>
                 </td>
-                <td>{{ book.author ?? 'Unknown' }}</td>
+                <td>{{ book.author ?? 'bookclub_views.label_unknown'|trans }}</td>
                 <td>{{ book.publishedYear ?? '-' }}</td>
                 <td>{{ book.pageCount ?? '-' }}</td>
                 <td>
@@ -35,7 +35,7 @@
                 </td>
                 <td>
                     {% if is_granted('ROLE_USER') %}
-                        <a href="{{ path('app_plugin_bookclub_note_edit', {bookId: book.id}) }}" class="button is-small is-light">Notes</a>
+                        <a href="{{ path('app_plugin_bookclub_note_edit', {bookId: book.id}) }}" class="button is-small is-light">{{ 'bookclub_views.button_notes'|trans }}</a>
                     {% endif %}
                 </td>
             </tr>

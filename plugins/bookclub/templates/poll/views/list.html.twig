@@ -2,10 +2,10 @@
     <thead>
         <tr>
             <th></th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>In previous polls</th>
-            <th>Suggested by</th>
+            <th>{{ 'bookclub_poll_views.col_title'|trans }}</th>
+            <th>{{ 'bookclub_poll_views.col_author'|trans }}</th>
+            <th>{{ 'bookclub_poll_views.col_previous_polls'|trans }}</th>
+            <th>{{ 'bookclub_poll_views.col_suggested_by'|trans }}</th>
             <th></th>
         </tr>
     </thead>
@@ -20,7 +20,7 @@
                 <td>
                     <a href="{{ path('app_plugin_bookclub_book_show', {id: suggestion.book.id}) }}">{{ suggestion.book.title }}</a>
                 </td>
-                <td>{{ suggestion.book.author ?? 'Unknown' }}</td>
+                <td>{{ suggestion.book.author ?? 'bookclub_poll_views.label_unknown'|trans }}</td>
                 <td>{{ suggestion.resubmitCount }}</td>
                 <td>{{ get_user_name(suggestion.suggestedBy) }}</td>
                 <td>
@@ -28,10 +28,10 @@
                         <button type="submit" class="button is-primary is-small">
                             {% if userVote and userVote.suggestion.id == suggestion.id %}
                                 <span class="icon"><i class="fas fa-check"></i></span>
-                                <span>Voted</span>
+                                <span>{{ 'bookclub_poll_views.button_voted'|trans }}</span>
                             {% else %}
                                 <span class="icon"><i class="fas fa-vote-yea"></i></span>
-                                <span>Vote</span>
+                                <span>{{ 'bookclub_poll_views.button_vote'|trans }}</span>
                             {% endif %}
                         </button>
                     </form>

@@ -1,30 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}All Polls - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_poll.page_title_list'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li class="is-active"><a>All Polls</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_poll.breadcrumb_all_polls'|trans }}</a></li>
             </ul>
         </nav>
 
-        <h1 class="title">All Polls</h1>
+        <h1 class="title">{{ 'bookclub_poll.heading_all_polls'|trans }}</h1>
 
         {% if polls is empty %}
-            <p class="has-text-grey">No polls have been created yet.</p>
+            <p class="has-text-grey">{{ 'bookclub_poll.empty_polls'|trans }}</p>
         {% else %}
             <table class="table is-fullwidth is-striped is-hoverable">
                 <thead>
                     <tr>
-                        <th>Status</th>
-                        <th>Winner</th>
-                        <th>Event</th>
-                        <th>Options</th>
-                        <th>Created</th>
+                        <th>{{ 'bookclub_poll.col_status'|trans }}</th>
+                        <th>{{ 'bookclub_poll.col_winner'|trans }}</th>
+                        <th>{{ 'bookclub_poll.col_event'|trans }}</th>
+                        <th>{{ 'bookclub_poll.col_options'|trans }}</th>
+                        <th>{{ 'bookclub_poll.col_created'|trans }}</th>
                         <th>
                             {% if is_granted('ROLE_ORGANIZER') %}
                                 <a href="{{ path('app_plugin_bookclub_poll_create') }}">
@@ -41,9 +41,9 @@
                         <tr>
                             <td>
                                 {% if poll.status.value == 1 %}
-                                    <span class="tag is-info">Open</span>
+                                    <span class="tag is-info">{{ 'bookclub_poll.status_open'|trans }}</span>
                                 {% else %}
-                                    <span class="tag is-success">Closed</span>
+                                    <span class="tag is-success">{{ 'bookclub_poll.status_closed'|trans }}</span>
                                 {% endif %}
                             </td>
                             <td>

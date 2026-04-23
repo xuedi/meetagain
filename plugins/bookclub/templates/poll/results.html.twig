@@ -1,40 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Poll Results - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_poll.page_title_results'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li class="is-active"><a>Poll Results</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_poll.breadcrumb_results'|trans }}</a></li>
             </ul>
         </nav>
 
-        <h1 class="title">Poll Results: {{ event.getTitle('en') }}</h1>
+        <h1 class="title">{{ 'bookclub_poll.heading_results'|trans({'%title%': event.getTitle('en')}) }}</h1>
         <p class="subtitle">
-            Total votes: {{ results.totalVotes }} | {{ event.start|date('Y-m-d') }}
+            {{ 'bookclub_poll.label_total_votes'|trans }}: {{ results.totalVotes }} | {{ event.start|date('Y-m-d') }}
         </p>
 
         {% if results.winner %}
             <div class="notification is-success is-light">
                 <h2 class="title is-4">
                     <span class="icon"><i class="fas fa-trophy"></i></span>
-                    Winner: {{ results.winner.book.title }}
+                    {{ 'bookclub_poll.result_winner'|trans }} {{ results.winner.book.title }}
                 </h2>
-                <p>by {{ results.winner.book.author ?? 'Unknown' }}</p>
+                <p>{{ 'bookclub_poll.result_by_author'|trans({'%author%': results.winner.book.author ?? 'bookclub_poll.label_unknown'|trans}) }}</p>
             </div>
         {% endif %}
 
-        <h3 class="subtitle">Full Results</h3>
+        <h3 class="subtitle">{{ 'bookclub_poll.heading_full_results'|trans }}</h3>
         <table class="table is-fullwidth is-striped">
             <thead>
                 <tr>
-                    <th>Book</th>
-                    <th>Author</th>
-                    <th>Votes</th>
-                    <th>Result</th>
+                    <th>{{ 'bookclub_poll.col_book'|trans }}</th>
+                    <th>{{ 'bookclub_poll.col_author'|trans }}</th>
+                    <th>{{ 'bookclub_poll.col_votes'|trans }}</th>
+                    <th>{{ 'bookclub_poll.col_result'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,13 +46,13 @@
                                 {{ suggestion.book.title }}
                             </a>
                         </td>
-                        <td>{{ suggestion.book.author ?? 'Unknown' }}</td>
+                        <td>{{ suggestion.book.author ?? 'bookclub_poll.label_unknown'|trans }}</td>
                         <td>
                             <span class="tag is-info is-medium">{{ voteCount }}</span>
                         </td>
                         <td>
                             {% if results.winner and suggestion.id == results.winner.id %}
-                                <span class="tag is-success">Winner</span>
+                                <span class="tag is-success">{{ 'bookclub_poll.tag_winner'|trans }}</span>
                             {% endif %}
                         </td>
                     </tr>

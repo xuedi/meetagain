@@ -11,9 +11,9 @@
                 {% endif %}
                 <div class="card-content">
                     <p class="title is-5">{{ suggestion.book.title }}</p>
-                    <p class="subtitle is-6">{{ suggestion.book.author ?? 'Unknown' }}</p>
+                    <p class="subtitle is-6">{{ suggestion.book.author ?? 'bookclub_poll_views.label_unknown'|trans }}</p>
                     <p class="is-size-7 has-text-grey">
-                        Suggested by {{ get_user_name(suggestion.suggestedBy) }}
+                        {{ 'bookclub_poll_views.label_suggested_by'|trans({'%user%': get_user_name(suggestion.suggestedBy)}) }}
                     </p>
                 </div>
                 <footer class="card-footer">
@@ -21,10 +21,10 @@
                         <button type="submit" class="button is-primary is-fullwidth">
                             {% if userVote and userVote.suggestion.id == suggestion.id %}
                                 <span class="icon"><i class="fas fa-check"></i></span>
-                                <span>Voted</span>
+                                <span>{{ 'bookclub_poll_views.button_voted'|trans }}</span>
                             {% else %}
                                 <span class="icon"><i class="fas fa-vote-yea"></i></span>
-                                <span>Vote</span>
+                                <span>{{ 'bookclub_poll_views.button_vote'|trans }}</span>
                             {% endif %}
                         </button>
                     </form>
