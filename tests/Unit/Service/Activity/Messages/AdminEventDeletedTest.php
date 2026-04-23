@@ -8,16 +8,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class AdminEventDeletedTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -26,13 +29,13 @@ class AdminEventDeletedTest extends TestCase
         $meta = ['event_id' => 42, 'event_name' => 'Old Meetup'];
 
         $subject = new AdminEventDeleted();
-        $subject->injectServices($this->router, $this->imageService, $meta);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(AdminEventDeleted::TYPE, $subject->getType());
-        static::assertEquals('Deleted event: Old Meetup', $subject->render());
-        static::assertEquals('Deleted event: Old Meetup', $subject->render(true));
+        static::assertEquals('profile_social.activity_admin_event_deleted', $subject->render());
+        static::assertEquals('profile_social.activity_admin_event_deleted', $subject->render(true));
     }
 
     public function testCanCatchMissingEventId(): void
@@ -41,7 +44,7 @@ class AdminEventDeletedTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_deleted"));
 
         $subject = new AdminEventDeleted();
-        $subject->injectServices($this->router, $this->imageService, ['event_name' => 'Old Meetup']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_name' => 'Old Meetup']);
 
         // Act
         $subject->validate();
@@ -53,7 +56,7 @@ class AdminEventDeletedTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_name' in meta in core.admin_event_deleted"));
 
         $subject = new AdminEventDeleted();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 42]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 42]);
 
         // Act
         $subject->validate();

@@ -9,29 +9,32 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class ReportedImageTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
     {
         $imageId = 42;
-        $reason = ImageReportReason::Privacy->value; // Using Privacy reason (value 1)
-        $expectedText = 'Reported image for reason: Privacy';
-        $expectedHtml = 'Reported image for reason: <b>Privacy</b>';
+        $reason = ImageReportReason::Privacy->value;
+        $expectedText = 'profile_social.activity_reported_image';
+        $expectedHtml = 'profile_social.activity_reported_image';
 
         $meta = ['image_id' => $imageId, 'reason' => $reason];
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, $meta);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta);
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
@@ -43,14 +46,14 @@ class ReportedImageTest extends TestCase
     public function testCanBuildWithDifferentReason(): void
     {
         $imageId = 42;
-        $reason = ImageReportReason::Inappropriate->value; // Using Inappropriate reason (value 3)
-        $expectedText = 'Reported image for reason: Inappropriate';
-        $expectedHtml = 'Reported image for reason: <b>Inappropriate</b>';
+        $reason = ImageReportReason::Inappropriate->value;
+        $expectedText = 'profile_social.activity_reported_image';
+        $expectedHtml = 'profile_social.activity_reported_image';
 
         $meta = ['image_id' => $imageId, 'reason' => $reason];
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, $meta);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta);
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
@@ -64,7 +67,7 @@ class ReportedImageTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'image_id' in meta in core.reported_image"));
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, ['reason' => ImageReportReason::Privacy->value]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['reason' => ImageReportReason::Privacy->value]);
         $subject->validate();
     }
 
@@ -75,7 +78,7 @@ class ReportedImageTest extends TestCase
         );
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, [
+        $subject->injectServices($this->router, $this->imageService, $this->translator, [
             'image_id' => 'not-a-number',
             'reason' => ImageReportReason::Privacy->value,
         ]);
@@ -87,7 +90,7 @@ class ReportedImageTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'reason' in meta in core.reported_image"));
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, ['image_id' => 42]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['image_id' => 42]);
         $subject->validate();
     }
 
@@ -98,7 +101,7 @@ class ReportedImageTest extends TestCase
         );
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, ['image_id' => 42, 'reason' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['image_id' => 42, 'reason' => 'not-a-number']);
         $subject->validate();
     }
 }

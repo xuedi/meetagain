@@ -11,6 +11,11 @@ enum ImageReportReason: int
     case Inappropriate = 3;
     case Irrelevant = 4;
 
+    public function label(): string
+    {
+        return 'report.reason_' . strtolower($this->name);
+    }
+
     public static function getChoices(TranslatorInterface $translator): array
     {
         $choices = [];

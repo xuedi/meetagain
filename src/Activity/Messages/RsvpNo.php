@@ -24,16 +24,24 @@ class RsvpNo extends MessageAbstract
     protected function renderText(): string
     {
         $eventId = $this->meta['event_id'];
-        $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        $eventName = $this->eventNames[$eventId] ?? null;
+        if ($eventName === null) {
+            return $this->translator->trans('profile_social.activity_rsvp_no_deleted');
+        }
 
-        return sprintf('Is skipping event: %s', $eventName);
+        return $this->translator->trans('profile_social.activity_rsvp_no', ['%event%' => $eventName]);
     }
 
     protected function renderHtml(): string
     {
         $eventId = $this->meta['event_id'];
-        $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        $eventName = $this->eventNames[$eventId] ?? null;
+        if ($eventName === null) {
+            return $this->translator->trans('profile_social.activity_rsvp_no_deleted');
+        }
 
-        return sprintf('Is skipping event: %s', $this->escapeHtml($eventName));
+        $link = sprintf('<a href="%s">%s</a>', $this->router->generate('app_event_details', ['id' => $eventId]), $this->escapeHtml($eventName));
+
+        return $this->translator->trans('profile_social.activity_rsvp_no', ['%event%' => $link]);
     }
 }

@@ -25,6 +25,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/cms')]
 final class CmsBlockController extends AbstractAdminController
@@ -45,6 +46,7 @@ final class CmsBlockController extends AbstractAdminController
         private readonly ImageService $imageService,
         private readonly ValidatorInterface $validator,
         private readonly ImageLocationService $imageLocationService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/block/{blockId}/edit', name: 'app_admin_cms_block_edit', methods: ['GET'])]
@@ -145,7 +147,7 @@ final class CmsBlockController extends AbstractAdminController
             $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
             $this->cmsPageCacheService->invalidatePage($id);
         } catch (BlockValidationException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('danger', $this->translator->trans('admin_cms.flash_block_validation_error'));
         }
 
         return $this->redirectToRoute('app_admin_cms_edit', [
@@ -196,7 +198,7 @@ final class CmsBlockController extends AbstractAdminController
             $block = $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
             $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
         } catch (BlockValidationException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('danger', $this->translator->trans('admin_cms.flash_block_validation_error'));
         }
 
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
@@ -253,7 +255,7 @@ final class CmsBlockController extends AbstractAdminController
             if ($file instanceof UploadedFile) {
                 $violations = $this->validator->validate($file, $fileConstraint);
                 if (count($violations) > 0) {
-                    $this->addFlash('danger', 'Invalid file: ' . (string) $violations->get(0)->getMessage());
+                    $this->addFlash('danger', $this->translator->trans('admin_cms.flash_invalid_file', ['%error%' => (string) $violations->get(0)->getMessage()]));
                     return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
                 }
 

@@ -20,11 +20,11 @@ class RegistrationEmailResent extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'Registration email resent by admin';
+        return $this->translator->trans('profile_social.activity_registration_email_resent');
     }
 
     protected function renderHtml(): string
     {
-        return 'Registration email resent by admin';
+        return $this->translator->trans('profile_social.activity_registration_email_resent');
     }
 }

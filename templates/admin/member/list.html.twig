@@ -38,7 +38,7 @@
                         {% if 'ROLE_ADMIN' in user.roles %}{% set color = 'has-text-success' %}{% endif %}
                         <span class="icon {{ color }}"><i class="fa fa-user"></i></span>
                     </td>
-                    <td>{{ user.status.name }}</td>
+                    <td>{{ user.status.label()|trans }}</td>
                     <td>{{ user.createdAt|date('Y-m-d') }}</td>
                     <td>
                         {% if user.lastLogin %}

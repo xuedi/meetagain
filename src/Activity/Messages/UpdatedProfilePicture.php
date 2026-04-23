@@ -25,13 +25,13 @@ class UpdatedProfilePicture extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'User changed their profile picture';
+        return $this->translator->trans('profile_social.activity_updated_profile_picture');
     }
 
     protected function renderHtml(): string
     {
         $box = '<div class="is-pulled-top-right">%s<i class="fa-solid fa-arrow-right"></i>%s</div>';
-        $msgTemplate = 'User changed their profile picture' . $box;
+        $msgTemplate = $this->translator->trans('profile_social.activity_updated_profile_picture') . $box;
 
         return sprintf(
             $msgTemplate,

@@ -8,16 +8,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class EventImageUploadedTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -26,8 +29,8 @@ class EventImageUploadedTest extends TestCase
         $eventName = 'Test Event';
         $imageCount = 3;
         $eventUrl = '/event/42';
-        $expectedText = 'uploaded 3 images to the event Test Event';
-        $expectedHtml = 'uploaded <b>3</b> images to the event <a href="/event/42">Test Event</a>';
+        $expectedText = 'profile_social.activity_event_images_uploaded';
+        $expectedHtml = 'profile_social.activity_event_images_uploaded';
 
         $meta = ['event_id' => $eventId, 'images' => $imageCount];
         $eventNames = [$eventId => $eventName];
@@ -41,7 +44,7 @@ class EventImageUploadedTest extends TestCase
             ->willReturn($eventUrl);
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
+        $subject->injectServices($router, $this->imageService, $this->translator, $meta, [], $eventNames);
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
@@ -50,12 +53,23 @@ class EventImageUploadedTest extends TestCase
         static::assertEquals($expectedHtml, $subject->render(true));
     }
 
+    public function testRendersDeletedEventGracefully(): void
+    {
+        $meta = ['event_id' => 99, 'images' => 2];
+
+        $subject = new EventImageUploaded();
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, [], []);
+
+        static::assertSame('profile_social.activity_event_images_uploaded_deleted', $subject->render());
+        static::assertSame('profile_social.activity_event_images_uploaded_deleted', $subject->render(true));
+    }
+
     public function testCanCatchMissingEventId(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.event_image_uploaded"));
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $this->imageService, ['images' => 3]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['images' => 3]);
         $subject->validate();
     }
 
@@ -66,7 +80,7 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number', 'images' => 3]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number', 'images' => 3]);
         $subject->validate();
     }
 
@@ -75,7 +89,7 @@ class EventImageUploadedTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'images' in meta in core.event_image_uploaded"));
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 42]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 42]);
         $subject->validate();
     }
 
@@ -86,7 +100,7 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 42, 'images' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 42, 'images' => 'not-a-number']);
         $subject->validate();
     }
 }

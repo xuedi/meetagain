@@ -40,7 +40,7 @@
                             <span class="has-text-grey">{{ 'admin_support.label_deleted'|trans }}</span>
                         {% endif %}
                     </td>
-                    <td><span class="tag is-light">{{ report.reason.name }}</span></td>
+                    <td><span class="tag is-light">{{ report.reason.label()|trans }}</span></td>
                     <td>{{ report.remarks|default('')|u.truncate(100) }}</td>
                     <td>
                         {% if report.isOpen() %}

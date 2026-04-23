@@ -24,9 +24,12 @@ class AdminEventEdited extends MessageAbstract
     protected function renderText(): string
     {
         $eventId = $this->meta['event_id'];
-        $eventName = $this->eventNames[$eventId] ?? '[deleted]';
+        $eventName = $this->eventNames[$eventId] ?? null;
+        if ($eventName === null) {
+            return $this->translator->trans('profile_social.activity_admin_event_edited_deleted');
+        }
 
-        return sprintf('Edited event: %s', $eventName);
+        return $this->translator->trans('profile_social.activity_admin_event_edited', ['%event%' => $eventName]);
     }
 
     protected function renderHtml(): string

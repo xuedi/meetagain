@@ -7,25 +7,28 @@ use App\Activity\Messages\RegistrationEmailConfirmed;
 use App\Service\Media\ImageHtmlRenderer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class RegistrationEmailConfirmedTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
     {
-        $expectedText = 'User confirmed Email';
-        $expectedHtml = 'User confirmed Email';
+        $expectedText = 'profile_social.activity_registration_email_confirmed';
+        $expectedHtml = 'profile_social.activity_registration_email_confirmed';
 
         $subject = new RegistrationEmailConfirmed();
-        $subject->injectServices($this->router, $this->imageService);
+        $subject->injectServices($this->router, $this->imageService, $this->translator);
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());

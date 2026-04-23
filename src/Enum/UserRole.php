@@ -2,6 +2,8 @@
 
 namespace App\Enum;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 enum UserRole: string
 {
     case Admin = 'ADMIN';
@@ -13,11 +15,11 @@ enum UserRole: string
     public const ROLE_USER = 'ROLE_USER';
     public const ROLE_SYSTEM = 'ROLE_SYSTEM';
 
-    public static function getChoices(): array
+    public static function getChoices(TranslatorInterface $translator): array
     {
         return [
-            'Administrator' => self::Admin,
-            'User' => self::User,
+            $translator->trans('admin_member.role_admin') => self::Admin,
+            $translator->trans('admin_member.role_user') => self::User,
         ];
     }
 

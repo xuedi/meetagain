@@ -43,7 +43,7 @@ final class ReviewController extends AbstractController
         try {
             $this->service->getProviderByIdentifier($providerIdentifier)->approveItem($user, $itemId);
         } catch (Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->addFlash('error', 'profile_review.flash_action_failed');
         }
 
         return $this->redirectToRoute('app_profile_review');
@@ -61,7 +61,7 @@ final class ReviewController extends AbstractController
         try {
             $this->service->getProviderByIdentifier($providerIdentifier)->denyItem($user, $itemId);
         } catch (Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->addFlash('error', 'profile_review.flash_action_failed');
         }
 
         return $this->redirectToRoute('app_profile_review');

@@ -10,16 +10,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class BlockedUnblockedUserTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageRenderer;
+    private IdentityTranslator $translator;
 
     protected function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageRenderer = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     // =========================================================================
@@ -35,30 +38,30 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new BlockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, ['user_id' => 7], [7 => 'Alice']);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 7], [7 => 'Alice']);
 
         // Act + Assert
-        static::assertSame('Blocked user: Alice', $subject->render());
+        static::assertSame('profile_social.activity_blocked_user', $subject->render());
     }
 
     public function testBlockedUserRenderHtml(): void
     {
         // Arrange
         $subject = new BlockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, ['user_id' => 7], [7 => 'Alice<']);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 7], [7 => 'Alice<']);
 
         // Act + Assert
-        static::assertSame('Blocked user: Alice&lt;', $subject->render(true));
+        static::assertSame('profile_social.activity_blocked_user', $subject->render(true));
     }
 
     public function testBlockedUserRenderFallsBackToDeletedWhenUserNameMissing(): void
     {
         // Arrange
         $subject = new BlockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, ['user_id' => 99], []);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 99], []);
 
         // Act + Assert
-        static::assertStringContainsString('[deleted]', $subject->render());
+        static::assertStringContainsString('deleted', $subject->render());
     }
 
     public function testBlockedUserValidateThrowsWhenUserIdMissing(): void
@@ -66,7 +69,7 @@ class BlockedUnblockedUserTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $subject = new BlockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, []);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, []);
         $subject->validate();
     }
 
@@ -75,7 +78,7 @@ class BlockedUnblockedUserTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $subject = new BlockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, ['user_id' => 'nope']);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 'nope']);
         $subject->validate();
     }
 
@@ -92,20 +95,20 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new UnblockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, ['user_id' => 3], [3 => 'Bob']);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 3], [3 => 'Bob']);
 
         // Act + Assert
-        static::assertSame('Unblocked user: Bob', $subject->render());
+        static::assertSame('profile_social.activity_unblocked_user', $subject->render());
     }
 
     public function testUnblockedUserRenderHtml(): void
     {
         // Arrange
         $subject = new UnblockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, ['user_id' => 3], [3 => 'Bob>']);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 3], [3 => 'Bob>']);
 
         // Act + Assert
-        static::assertSame('Unblocked user: Bob&gt;', $subject->render(true));
+        static::assertSame('profile_social.activity_unblocked_user', $subject->render(true));
     }
 
     public function testUnblockedUserValidateThrowsWhenUserIdMissing(): void
@@ -113,7 +116,7 @@ class BlockedUnblockedUserTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $subject = new UnblockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, []);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, []);
         $subject->validate();
     }
 
@@ -130,11 +133,11 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new RegistrationEmailResent();
-        $subject->injectServices($this->router, $this->imageRenderer);
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator);
 
         // Act + Assert
-        static::assertSame('Registration email resent by admin', $subject->render());
-        static::assertSame('Registration email resent by admin', $subject->render(true));
+        static::assertSame('profile_social.activity_registration_email_resent', $subject->render());
+        static::assertSame('profile_social.activity_registration_email_resent', $subject->render(true));
     }
 
     // =========================================================================
@@ -177,7 +180,7 @@ class BlockedUnblockedUserTest extends TestCase
     public function testUnknownActivityMessageInjectServicesReturnsSelf(): void
     {
         $subject = new UnknownActivityMessage('x.y');
-        $result = $subject->injectServices($this->router, $this->imageRenderer);
+        $result = $subject->injectServices($this->router, $this->imageRenderer, $this->translator);
         static::assertSame($subject, $result);
     }
 }

@@ -86,7 +86,7 @@ final class ProfileController extends AbstractController
     public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
     {
         if ($event->getStart() < new DateTimeImmutable()) { // does reload page for flashMessage to trigger
-            $this->addFlash('error', 'You cannot RSVP to an event that has already happened.');
+            $this->addFlash('error', 'events.flash_rsvp_past');
 
             return new Response('', Response::HTTP_LOCKED);
         }

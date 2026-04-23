@@ -6,11 +6,13 @@ namespace App\Service\Notification\User;
 
 use App\Entity\User;
 use App\Repository\MessageRepository;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class UserNotificationProvider implements NotificationProviderInterface
 {
     public function __construct(
         private MessageRepository $messageRepo,
+        private TranslatorInterface $translator,
     ) {}
 
 
@@ -22,7 +24,7 @@ readonly class UserNotificationProvider implements NotificationProviderInterface
             $unreadCount = $this->getUnreadMessageCount($user);
 
             $items[] = new NotificationItem(
-                label: $unreadCount . ' Unread Message' . ($unreadCount > 1 ? 's' : ''),
+                label: $this->translator->trans('chrome.notification_unread_messages', ['%count%' => $unreadCount]),
                 icon: 'fa-envelope',
                 route: 'app_profile_messages',
             );
