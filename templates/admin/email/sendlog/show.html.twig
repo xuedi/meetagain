@@ -9,7 +9,7 @@
         <div class="mb-4">
             <a href="{{ path('app_admin_email_sendlog') }}" class="button is-small">
                 <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                <span>{{ 'button_back'|trans }}</span>
+                <span>{{ 'global.button_back'|trans }}</span>
             </a>
             {% if email.status.value == 'late' or (email.maxSendBy and email.status.value == 'pending' and email.maxSendBy|date('U') < 'now'|date('U')) %}
                 <form method="post" action="{{ path('app_admin_email_sendlog_clear_cap', {id: email.id}) }}" style="display:inline">
