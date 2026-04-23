@@ -57,6 +57,46 @@ just testUnit plugins/dishes/tests/Unit/SomeServiceTest.php
 
 ---
 
+## Translations
+
+The project ships three canonical UI locales: `en` (source), `de`, `zh`. All user-facing
+strings must flow through the translator - no English literals in templates, flash
+messages, form labels, validator messages, or activity messages.
+
+Translation keys use nested YAML namespaces and dot-notation:
+
+```yaml
+# translations/messages.en.yaml
+admin_member:
+    col_name: 'Name'
+    status_active: 'Active'
+```
+
+```twig
+{{ 'admin_member.col_name'|trans }}
+```
+
+Contributing a new locale means committing a real, human-translated
+`translations/messages.<code>.yaml` alongside the existing three. Machine-translation
+dumps will not be accepted. The language dropdown also needs a
+`translations/language_selector/messages.<code>.yaml` with the `language_*` keys
+translated into the new locale.
+
+Useful commands:
+
+```bash
+# Check for missing keys in en / de / zh
+just checkTranslations
+
+# Scan templates and PHP for usages of a key
+just app "app:translation:scan events.button_save"
+
+# Rename keys across all three canonicals from a YAML mapping
+just app "app:translation:rename <mapping.yaml>"
+```
+
+---
+
 ## Plugin Contributions
 
 If you are contributing a new bundled plugin, read the

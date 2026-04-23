@@ -43,7 +43,7 @@ class ProfileType extends AbstractType
                 new File(
                     maxSize: '10M',
                     mimeTypes: ['image/*'],
-                    mimeTypesMessage: 'Please upload a valid image, preferable a square format',
+                    mimeTypesMessage: 'shared.form_image_upload_mime_error_square',
                 ),
             ],
         ])->add('name', TextType::class, [

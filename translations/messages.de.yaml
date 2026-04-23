@@ -421,6 +421,8 @@ shared:
     api_page_heading: 'API-Dokumentation'
     api_page_intro: 'Alle verfügbaren Endpunkte. Einige Endpunkte erfordern ein Token, das über den Auth-Endpunkt bezogen wird. Falls du Workflows nicht per API automatisieren kannst, fordere gerne weitere Endpunkte an.'
     form_label_image_upload: 'Bild hochladen'
+    form_image_upload_mime_error: 'Bitte laden Sie ein gültiges Bild hoch.'
+    form_image_upload_mime_error_square: 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im quadratischen Format.'
     form_image_upload_mime_error_4_3: 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im 4:3-Format'
 admin_shell:
     page_title: 'Admin'
@@ -643,6 +645,7 @@ admin_event:
     col_rsvp: 'RSVP'
     col_type: 'Typ'
     recurring_auto: 'auto'
+    recurring_no: 'Nein'
     legend_recurring_events: 'Wiederkehrende Events'
     legend_one_time_events: 'Einmalige Events'
     legend_auto_generated: 'Automatisch aus einem wiederkehrenden Event generiert'
@@ -984,6 +987,7 @@ admin_system:
     flash_plugin_uninstalled: 'Plugin "%plugin%" deinstalliert.'
     flash_plugin_enabled: 'Plugin "%plugin%" aktiviert.'
     flash_plugin_disabled: 'Plugin "%plugin%" deaktiviert.'
+    validator_language_code_pattern: 'Sprachcode muss aus 2 Kleinbuchstaben bestehen (z. B. en, de, zh).'
 global:
     add: 'Hinzufügen'
     cancel: 'Abbrechen'

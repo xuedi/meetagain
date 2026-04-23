@@ -445,6 +445,8 @@ shared:
     api_page_heading: 'API Documentation'
     api_page_intro: 'All available endpoints. Some endpoints require a token obtained via the auth endpoint. If you cannot automate some of your workflows via API, feel free to request more endpoints.'
     form_label_image_upload: 'Image upload'
+    form_image_upload_mime_error: 'Please upload a valid image.'
+    form_image_upload_mime_error_square: 'Please upload a valid image, preferable a square format.'
     form_image_upload_mime_error_4_3: 'Please upload a valid image, preferable a 4:3 format'
 admin_shell:
     page_title: 'Admin'
@@ -667,6 +669,7 @@ admin_event:
     col_rsvp: 'Rsvp'
     col_type: 'Type'
     recurring_auto: 'auto'
+    recurring_no: 'No'
     legend_recurring_events: 'Recurring events'
     legend_one_time_events: 'One time events'
     legend_auto_generated: 'Automatic generated from a recurring event'
@@ -1008,6 +1011,7 @@ admin_system:
     flash_plugin_uninstalled: 'Plugin "%plugin%" uninstalled.'
     flash_plugin_enabled: 'Plugin "%plugin%" enabled.'
     flash_plugin_disabled: 'Plugin "%plugin%" disabled.'
+    validator_language_code_pattern: 'Language code must be 2 lowercase letters (e.g., en, de, zh).'
 global:
     add: 'Add'
     cancel: 'Cancel'

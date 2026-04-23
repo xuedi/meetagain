@@ -98,9 +98,6 @@ class TranslationRenameCommand extends Command
             $renamed = 0;
             $unknown = [];
             foreach ($mapping as $oldKey => $newKey) {
-                $oldKey = (string) $oldKey;
-                $newKey = (string) $newKey;
-
                 if ($this->hasKey($data, $oldKey)) {
                     $value = $this->extractKey($data, $oldKey);
                     $this->setKey($data, $newKey, $value);

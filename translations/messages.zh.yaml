@@ -421,6 +421,8 @@ shared:
     api_page_heading: 'API 文档'
     api_page_intro: '所有可用接口。部分接口需要通过 auth 接口获取的令牌。如果你的工作流无法通过 API 自动化，欢迎请求新增接口。'
     form_label_image_upload: '图片上传'
+    form_image_upload_mime_error: '请上传有效的图片。'
+    form_image_upload_mime_error_square: '请上传有效的图片，最好是正方形格式。'
     form_image_upload_mime_error_4_3: '请上传有效图片，最好是4:3格式'
 admin_shell:
     page_title: '管理'
@@ -643,6 +645,7 @@ admin_event:
     col_rsvp: '报名'
     col_type: '类型'
     recurring_auto: '自动'
+    recurring_no: '否'
     legend_recurring_events: '重复活动'
     legend_one_time_events: '一次性活动'
     legend_auto_generated: '自动从重复活动生成'
@@ -984,6 +987,7 @@ admin_system:
     flash_plugin_uninstalled: '插件"%plugin%"已卸载。'
     flash_plugin_enabled: '插件"%plugin%"已启用。'
     flash_plugin_disabled: '插件"%plugin%"已禁用。'
+    validator_language_code_pattern: '语言代码必须是 2 个小写字母（例如 en、de、zh）。'
 global:
     add: '添加'
     cancel: '取消'

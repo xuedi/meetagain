@@ -24,7 +24,7 @@ class ImageUploadType extends AbstractType
                     mimeTypes: [
                         'image/*',
                     ],
-                    mimeTypesMessage: 'Please upload a valid image',
+                    mimeTypesMessage: 'shared.form_image_upload_mime_error',
                 ),
             ],
         ]);
