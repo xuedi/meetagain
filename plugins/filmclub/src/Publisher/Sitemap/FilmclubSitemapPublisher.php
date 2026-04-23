@@ -5,6 +5,7 @@ namespace Plugin\Filmclub\Publisher\Sitemap;
 use App\Publisher\Sitemap\SitemapPublisherInterface;
 use App\Publisher\Sitemap\SitemapUrl;
 use App\Service\Config\LanguageService;
+use App\Service\Config\PluginService;
 use Override;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -19,6 +20,7 @@ final readonly class FilmclubSitemapPublisher implements SitemapPublisherInterfa
     public function __construct(
         private LanguageService $languageService,
         private UrlGeneratorInterface $urlGenerator,
+        private PluginService $pluginService,
     ) {}
 
     #[Override]
@@ -33,6 +35,10 @@ final readonly class FilmclubSitemapPublisher implements SitemapPublisherInterfa
     #[Override]
     public function getSitemapUrls(): array
     {
+        if (!in_array('filmclub', $this->pluginService->getActiveList(), true)) {
+            return [];
+        }
+
         $locales = $this->languageService->getFilteredEnabledCodes();
 
         $localeUrls = [];

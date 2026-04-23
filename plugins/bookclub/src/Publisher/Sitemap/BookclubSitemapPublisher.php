@@ -5,6 +5,7 @@ namespace Plugin\Bookclub\Publisher\Sitemap;
 use App\Publisher\Sitemap\SitemapPublisherInterface;
 use App\Publisher\Sitemap\SitemapUrl;
 use App\Service\Config\LanguageService;
+use App\Service\Config\PluginService;
 use DateTimeImmutable;
 use Override;
 use Plugin\Bookclub\Service\BookService;
@@ -22,6 +23,7 @@ final readonly class BookclubSitemapPublisher implements SitemapPublisherInterfa
         private BookService $bookService,
         private LanguageService $languageService,
         private UrlGeneratorInterface $urlGenerator,
+        private PluginService $pluginService,
     ) {}
 
     #[Override]
@@ -36,6 +38,10 @@ final readonly class BookclubSitemapPublisher implements SitemapPublisherInterfa
     #[Override]
     public function getSitemapUrls(): array
     {
+        if (!in_array('bookclub', $this->pluginService->getActiveList(), true)) {
+            return [];
+        }
+
         $locales = $this->languageService->getFilteredEnabledCodes();
 
         return [

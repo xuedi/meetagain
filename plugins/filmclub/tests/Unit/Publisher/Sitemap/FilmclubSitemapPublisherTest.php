@@ -3,6 +3,7 @@
 namespace Plugin\Filmclub\Tests\Unit\Publisher\Sitemap;
 
 use App\Service\Config\LanguageService;
+use App\Service\Config\PluginService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Filmclub\Publisher\Sitemap\FilmclubSitemapPublisher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -39,10 +40,22 @@ class FilmclubSitemapPublisherTest extends TestCase
         self::assertSame([], $urls);
     }
 
+    public function testReturnsEmptyWhenPluginInactive(): void
+    {
+        // Arrange
+        $publisher = $this->makePublisher(locales: ['en'], pluginActive: false);
+
+        // Act
+        $urls = $publisher->getSitemapUrls();
+
+        // Assert
+        self::assertSame([], $urls);
+    }
+
     /**
      * @param array<string> $locales
      */
-    private function makePublisher(array $locales): FilmclubSitemapPublisher
+    private function makePublisher(array $locales, bool $pluginActive = true): FilmclubSitemapPublisher
     {
         $language = $this->createStub(LanguageService::class);
         $language->method('getFilteredEnabledCodes')->willReturn($locales);
@@ -56,6 +69,9 @@ class FilmclubSitemapPublisherTest extends TestCase
             },
         );
 
-        return new FilmclubSitemapPublisher($language, $urlGenerator);
+        $pluginService = $this->createStub(PluginService::class);
+        $pluginService->method('getActiveList')->willReturn($pluginActive ? ['filmclub'] : []);
+
+        return new FilmclubSitemapPublisher($language, $urlGenerator, $pluginService);
     }
 }

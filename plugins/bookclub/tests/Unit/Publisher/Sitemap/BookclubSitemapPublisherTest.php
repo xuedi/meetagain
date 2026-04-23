@@ -3,6 +3,7 @@
 namespace Plugin\Bookclub\Tests\Unit\Publisher\Sitemap;
 
 use App\Service\Config\LanguageService;
+use App\Service\Config\PluginService;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Plugin\Bookclub\Entity\Book;
@@ -70,11 +71,23 @@ class BookclubSitemapPublisherTest extends TestCase
         self::assertSame('2026-02-14', $bookUrl->lastmod?->format('Y-m-d'));
     }
 
+    public function testReturnsEmptyWhenPluginInactive(): void
+    {
+        // Arrange
+        $publisher = $this->makePublisher(locales: ['en'], approvedBooks: [], pluginActive: false);
+
+        // Act
+        $urls = $publisher->getSitemapUrls();
+
+        // Assert
+        self::assertSame([], $urls);
+    }
+
     /**
      * @param array<string> $locales
      * @param array<Book> $approvedBooks
      */
-    private function makePublisher(array $locales, array $approvedBooks): BookclubSitemapPublisher
+    private function makePublisher(array $locales, array $approvedBooks, bool $pluginActive = true): BookclubSitemapPublisher
     {
         $bookService = $this->createStub(BookService::class);
         $bookService->method('getApprovedList')->willReturn($approvedBooks);
@@ -95,7 +108,10 @@ class BookclubSitemapPublisherTest extends TestCase
             },
         );
 
-        return new BookclubSitemapPublisher($bookService, $language, $urlGenerator);
+        $pluginService = $this->createStub(PluginService::class);
+        $pluginService->method('getActiveList')->willReturn($pluginActive ? ['bookclub'] : []);
+
+        return new BookclubSitemapPublisher($bookService, $language, $urlGenerator, $pluginService);
     }
 
     private function makeBook(int $id, DateTimeImmutable $createdAt): Book
