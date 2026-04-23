@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/sendlog')]
 final class SendlogController extends AbstractAdminController
@@ -28,6 +29,7 @@ final class SendlogController extends AbstractAdminController
         private readonly EmailDeliveryProviderInterface $provider,
         private readonly EmailDeliveryStatusSyncService $syncService,
         private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_email_sendlog')]
@@ -68,7 +70,7 @@ final class SendlogController extends AbstractAdminController
         $email->setErrorMessage(null);
         $this->em->flush();
 
-        $this->addFlash('success', 'Max-send-by cap cleared. The email will be dispatched on the next cron tick.');
+        $this->addFlash('success', $this->translator->trans('admin_email.flash_cap_cleared'));
 
         return $this->redirectToRoute('app_admin_email_sendlog_show', ['id' => $email->getId()]);
     }
@@ -79,14 +81,13 @@ final class SendlogController extends AbstractAdminController
         $result = $this->syncService->syncPending(200);
 
         if ($result->available) {
-            $this->addFlash('success', sprintf(
-                'Synced %d of %d email statuses from provider.',
-                $result->updated,
-                $result->checked,
-            ));
+            $this->addFlash('success', $this->translator->trans('admin_email.flash_sync_success', [
+                '%updated%' => $result->updated,
+                '%checked%' => $result->checked,
+            ]));
         }
         if (!$result->available) {
-            $this->addFlash('warning', 'Email delivery provider is not configured.');
+            $this->addFlash('warning', $this->translator->trans('admin_email.flash_provider_not_configured'));
         }
 
         return $this->redirectToRoute('app_admin_email_sendlog');

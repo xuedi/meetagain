@@ -8,30 +8,40 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class UnFollowedUserTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
     {
         $userId = 42;
         $userName = 'testUser';
-        $expectedText = 'Stopped following: testUser';
-        $expectedHtml = 'Stopped following: testUser';
+        $expectedText = 'profile_social.activity_unfollowed_user';
+        $expectedHtml = 'profile_social.activity_unfollowed_user';
 
         $meta = ['user_id' => $userId];
         $userNames = [$userId => $userName];
 
+        $router = $this->createMock(RouterInterface::class);
+        $router
+            ->expects($this->once())
+            ->method('generate')
+            ->with('app_member_view', ['id' => $userId])
+            ->willReturn('/members/view/42');
+
         $subject = new UnFollowedUser();
-        $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
+        $subject->injectServices($router, $this->imageService, $this->translator, $meta, $userNames);
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
@@ -42,18 +52,14 @@ class UnFollowedUserTest extends TestCase
 
     public function testHandlesDeletedUser(): void
     {
-        $userId = 42;
-        $expectedText = 'Stopped following: [deleted]';
-        $expectedHtml = 'Stopped following: [deleted]';
-
-        $meta = ['user_id' => $userId];
-        $userNames = []; // User no longer exists
+        $meta = ['user_id' => 42];
+        $userNames = [];
 
         $subject = new UnFollowedUser();
-        $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, $userNames);
 
-        static::assertEquals($expectedText, $subject->render());
-        static::assertEquals($expectedHtml, $subject->render(true));
+        static::assertEquals('profile_social.activity_unfollowed_user_deleted', $subject->render());
+        static::assertEquals('profile_social.activity_unfollowed_user_deleted', $subject->render(true));
     }
 
     public function testCanCatchMissingUserId(): void
@@ -61,7 +67,7 @@ class UnFollowedUserTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.unfollowed_user"));
 
         $subject = new UnFollowedUser();
-        $subject->injectServices($this->router, $this->imageService, []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, []);
         $subject->validate();
     }
 
@@ -72,7 +78,7 @@ class UnFollowedUserTest extends TestCase
         );
 
         $subject = new UnFollowedUser();
-        $subject->injectServices($this->router, $this->imageService, ['user_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => 'not-a-number']);
         $subject->validate();
     }
 }

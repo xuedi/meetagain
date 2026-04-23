@@ -20,11 +20,11 @@ class RegistrationEmailConfirmed extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'User confirmed Email';
+        return $this->translator->trans('profile_social.activity_registration_email_confirmed');
     }
 
     protected function renderHtml(): string
     {
-        return 'User confirmed Email';
+        return $this->translator->trans('profile_social.activity_registration_email_confirmed');
     }
 }

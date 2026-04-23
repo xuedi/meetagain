@@ -20,11 +20,11 @@ class PasswordChanged extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'Changed password';
+        return $this->translator->trans('profile_social.activity_password_changed');
     }
 
     protected function renderHtml(): string
     {
-        return 'Changed password';
+        return $this->translator->trans('profile_social.activity_password_changed');
     }
 }

@@ -20,11 +20,11 @@ class PasswordResetRequest extends MessageAbstract
 
     protected function renderText(): string
     {
-        return 'Requested password reset';
+        return $this->translator->trans('profile_social.activity_password_reset_request');
     }
 
     protected function renderHtml(): string
     {
-        return 'Requested password reset';
+        return $this->translator->trans('profile_social.activity_password_reset_request');
     }
 }

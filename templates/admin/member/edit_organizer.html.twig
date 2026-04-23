@@ -31,7 +31,7 @@
                                 {% set statusClass = 'is-danger' %}
                             {% endif %}
                             <span class="tag {{ statusClass }}">
-                                {{ user.status.name }}
+                                {{ user.status.label()|trans }}
                             </span>
                         </td>
                     </tr>

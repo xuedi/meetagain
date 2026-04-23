@@ -8,16 +8,19 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class AdminMemberDeniedTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -29,23 +32,23 @@ class AdminMemberDeniedTest extends TestCase
         $userNames = [$userId => $userName];
 
         $subject = new AdminMemberDenied();
-        $subject->injectServices($this->router, $this->imageService, $meta, $userNames);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, $userNames);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(AdminMemberDenied::TYPE, $subject->getType());
-        static::assertEquals('Denied member: JohnDoe', $subject->render());
-        static::assertEquals('Denied member: JohnDoe', $subject->render(true));
+        static::assertEquals('profile_social.activity_admin_member_denied', $subject->render());
+        static::assertEquals('profile_social.activity_admin_member_denied', $subject->render(true));
     }
 
     public function testRendersDeletedUserGracefully(): void
     {
         // Arrange
         $subject = new AdminMemberDenied();
-        $subject->injectServices($this->router, $this->imageService, ['user_id' => 99], []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => 99], []);
 
         // Act & Assert
-        static::assertSame('Denied member: [deleted]', $subject->render());
+        static::assertSame('profile_social.activity_admin_member_denied_deleted', $subject->render());
     }
 
     public function testCanCatchMissingUserId(): void
@@ -54,7 +57,7 @@ class AdminMemberDeniedTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_denied"));
 
         $subject = new AdminMemberDenied();
-        $subject->injectServices($this->router, $this->imageService, []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, []);
 
         // Act
         $subject->validate();
@@ -68,7 +71,7 @@ class AdminMemberDeniedTest extends TestCase
         );
 
         $subject = new AdminMemberDenied();
-        $subject->injectServices($this->router, $this->imageService, ['user_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => 'not-a-number']);
 
         // Act
         $subject->validate();

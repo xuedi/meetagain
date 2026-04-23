@@ -8,17 +8,20 @@ use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 
 class CommentedOnEventTest extends TestCase
 {
     private RouterInterface $router;
     private ImageHtmlRenderer $imageService;
+    private IdentityTranslator $translator;
 
     public function setUp(): void
     {
         // Arrange (shared stubs)
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
+        $this->translator = new IdentityTranslator();
     }
 
     public function testCanBuild(): void
@@ -27,8 +30,8 @@ class CommentedOnEventTest extends TestCase
         $eventId = 42;
         $eventName = 'Test Event';
         $eventUrl = '/event/42';
-        $expectedText = 'commented on event: Test Event';
-        $expectedHtml = 'commented on event <a href="/event/42">Test Event</a>';
+        $expectedText = 'profile_social.activity_commented_on_event';
+        $expectedHtml = 'profile_social.activity_commented_on_event';
 
         $meta = ['event_id' => $eventId];
         $eventNames = [$eventId => $eventName];
@@ -41,7 +44,7 @@ class CommentedOnEventTest extends TestCase
             ->willReturn($eventUrl);
 
         $subject = new CommentedOnEvent();
-        $subject->injectServices($router, $this->imageService, $meta, [], $eventNames);
+        $subject->injectServices($router, $this->imageService, $this->translator, $meta, [], $eventNames);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
@@ -56,11 +59,11 @@ class CommentedOnEventTest extends TestCase
         $meta = ['event_id' => 99];
 
         $subject = new CommentedOnEvent();
-        $subject->injectServices($this->router, $this->imageService, $meta, [], []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, $meta, [], []);
 
         // Act & Assert
-        static::assertSame('commented on event: [deleted]', $subject->render());
-        static::assertSame('commented on event [deleted]', $subject->render(true));
+        static::assertSame('profile_social.activity_commented_on_event_deleted', $subject->render());
+        static::assertSame('profile_social.activity_commented_on_event_deleted', $subject->render(true));
     }
 
     public function testCanCatchMissingEventId(): void
@@ -69,7 +72,7 @@ class CommentedOnEventTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.commented_on_event"));
 
         $subject = new CommentedOnEvent();
-        $subject->injectServices($this->router, $this->imageService, []);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, []);
 
         // Act
         $subject->validate();
@@ -83,7 +86,7 @@ class CommentedOnEventTest extends TestCase
         );
 
         $subject = new CommentedOnEvent();
-        $subject->injectServices($this->router, $this->imageService, ['event_id' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);
 
         // Act
         $subject->validate();

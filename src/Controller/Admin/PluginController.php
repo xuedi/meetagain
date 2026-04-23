@@ -8,6 +8,7 @@ use App\Service\Config\PluginService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
 final class PluginController extends AbstractAdminController
@@ -31,6 +32,7 @@ final class PluginController extends AbstractAdminController
     public function __construct(
         private readonly PluginService $pluginService,
         private readonly CommandService $commandService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/admin/plugin', name: 'app_admin_plugin')]
@@ -48,9 +50,9 @@ final class PluginController extends AbstractAdminController
         try {
             $this->pluginService->install($key);
             $this->commandService->executeSubprocessMigrations();
-            $this->addFlash('success', sprintf('Plugin "%s" installed.', $key));
+            $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_installed', ['%plugin%' => $key]));
         } catch (\Throwable $e) {
-            $this->addFlash('danger', sprintf('Install failed: %s', $e->getMessage()));
+            $this->addFlash('danger', $this->translator->trans('admin_system.flash_plugin_install_failed', ['%error%' => $e->getMessage()]));
         }
 
         return $this->redirectToRoute('app_admin_plugin');
@@ -60,7 +62,7 @@ final class PluginController extends AbstractAdminController
     public function uninstall(string $key): Response
     {
         $this->pluginService->uninstall($key);
-        $this->addFlash('success', sprintf('Plugin "%s" uninstalled.', $key));
+        $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_uninstalled', ['%plugin%' => $key]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }
@@ -69,7 +71,7 @@ final class PluginController extends AbstractAdminController
     public function enable(string $key): Response
     {
         $this->pluginService->enable($key);
-        $this->addFlash('success', sprintf('Plugin "%s" enabled.', $key));
+        $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_enabled', ['%plugin%' => $key]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }
@@ -78,7 +80,7 @@ final class PluginController extends AbstractAdminController
     public function disable(string $key): Response
     {
         $this->pluginService->disable($key);
-        $this->addFlash('success', sprintf('Plugin "%s" disabled.', $key));
+        $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_disabled', ['%plugin%' => $key]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }

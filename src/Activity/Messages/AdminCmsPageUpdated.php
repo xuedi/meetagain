@@ -24,7 +24,7 @@ class AdminCmsPageUpdated extends MessageAbstract
 
     protected function renderText(): string
     {
-        return sprintf('Updated CMS page: %s', $this->meta['cms_slug']);
+        return $this->translator->trans('profile_social.activity_admin_cms_page_updated', ['%slug%' => $this->meta['cms_slug']]);
     }
 
     protected function renderHtml(): string

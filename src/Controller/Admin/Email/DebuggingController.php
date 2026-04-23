@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/debugging')]
@@ -32,6 +33,7 @@ final class DebuggingController extends AbstractAdminController
         private readonly MailerInterface $mailer,
         private readonly ConfigService $config,
         private readonly LanguageService $languageService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -86,11 +88,11 @@ final class DebuggingController extends AbstractAdminController
 
             $this->mailer->send($email);
 
-            $this->addFlash('success', sprintf('Test email "%s" sent to %s', $subject, $recipient));
+            $this->addFlash('success', $this->translator->trans('admin_email.flash_test_email_sent', ['%subject%' => $subject, '%recipient%' => $recipient]));
         } catch (TransportExceptionInterface $e) {
-            $this->addFlash('error', 'Failed to send email: ' . $e->getMessage());
+            $this->addFlash('error', $this->translator->trans('admin_email.flash_test_email_failed'));
         } catch (Throwable $e) {
-            $this->addFlash('error', 'Error: ' . $e->getMessage());
+            $this->addFlash('error', $this->translator->trans('admin_email.flash_test_email_error'));
         }
 
         return $this->redirectToRoute('app_admin_email_debugging');

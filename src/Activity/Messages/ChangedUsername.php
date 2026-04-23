@@ -23,15 +23,14 @@ class ChangedUsername extends MessageAbstract
 
     protected function renderText(): string
     {
-        $msgTemplate = 'Changed username from %s to %s';
-
-        return sprintf($msgTemplate, $this->meta['old'], $this->meta['new']);
+        return $this->translator->trans('profile_social.activity_changed_username', ['%old%' => $this->meta['old'], '%new%' => $this->meta['new']]);
     }
 
     protected function renderHtml(): string
     {
-        $msgTemplate = 'Changed username from <b>%s</b> to <b>%s</b>';
-
-        return sprintf($msgTemplate, $this->escapeHtml($this->meta['old']), $this->escapeHtml($this->meta['new']));
+        return $this->translator->trans('profile_social.activity_changed_username', [
+            '%old%' => '<b>' . $this->escapeHtml($this->meta['old']) . '</b>',
+            '%new%' => '<b>' . $this->escapeHtml($this->meta['new']) . '</b>',
+        ]);
     }
 }

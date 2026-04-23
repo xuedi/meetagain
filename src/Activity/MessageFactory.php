@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class MessageFactory
 {
@@ -21,6 +22,7 @@ readonly class MessageFactory
         private EventRepository $eventRepository,
         private RequestStack $requestStack,
         private ImageHtmlRenderer $imageRenderer,
+        private TranslatorInterface $translator,
     ) {}
 
     public function build(Activity $activity): MessageInterface
@@ -36,6 +38,7 @@ readonly class MessageFactory
             return $message->injectServices(
                 $this->router,
                 $this->imageRenderer,
+                $this->translator,
                 $activity->getMeta(),
                 $this->userRepository->getUserNameList(),
                 $this->eventRepository->getEventNameList($locale),

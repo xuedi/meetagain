@@ -55,7 +55,7 @@ class UserType extends AbstractType
                 'label' => 'admin_member.form_label_bio',
             ])
             ->add('role', ChoiceType::class, [
-                'choices' => UserRole::getChoices(),
+                'choices' => UserRole::getChoices($this->translator),
                 'expanded' => true,
                 'multiple' => false,
             ])
