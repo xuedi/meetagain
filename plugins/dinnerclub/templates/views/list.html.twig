@@ -1,10 +1,10 @@
 <table id="filteredTable" class="table is-fullwidth">
     <thead>
     <tr>
-        <th>Image</th>
-        <th>Name</th>
-        <th>Phonetic</th>
-        <th>Description</th>
+        <th>{{ 'dinnerclub_views.col_image'|trans }}</th>
+        <th>{{ 'dinnerclub_views.col_name'|trans }}</th>
+        <th>{{ 'dinnerclub_views.col_phonetic'|trans }}</th>
+        <th>{{ 'dinnerclub_views.col_description'|trans }}</th>
         <th>
             {% if is_granted('ROLE_USER') %}
                 <a href="{{ path('plugin_dinnerclub_add') }}">

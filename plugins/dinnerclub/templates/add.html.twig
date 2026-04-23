@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Add a Dish"|trans }}{% endblock %}
+{% block title %}{{ 'dinnerclub.page_title_add'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -9,8 +9,8 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">Add New</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ 'dinnerclub.breadcrumb_add_new'|trans }}</a></li>
                 </ul>
             </nav>
 
@@ -19,11 +19,11 @@
                     <div class="box">
                         <h2 class="title is-4">
                             <span class="icon"><i class="fa-solid fa-plus"></i></span>
-                            <span>Add a New Dish</span>
+                            <span>{{ 'dinnerclub.heading_add'|trans }}</span>
                         </h2>
 
                         <p class="mb-4 has-text-grey">
-                            Share a dish you talked about at a meetup! Add it in your language and others can suggest translations later.
+                            {{ 'dinnerclub.add_subtitle'|trans }}
                         </p>
 
                         {{ form_start(form, {'attr': {'class': 'dish-add-form'}}) }}
@@ -32,7 +32,7 @@
                             <label class="label">
                                 <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-language"></i></span>
-                                    <span>{{ form.language.vars.label }}</span>
+                                    <span>{{ form.language.vars.label|trans }}</span>
                                 </span>
                             </label>
                             <div class="control">
@@ -47,7 +47,7 @@
                             <label class="label">
                                 <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-utensils"></i></span>
-                                    <span>{{ form.name.vars.label }}</span>
+                                    <span>{{ form.name.vars.label|trans }}</span>
                                 </span>
                             </label>
                             <div class="control">
@@ -60,7 +60,7 @@
                             <label class="label">
                                 <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
-                                    <span>{{ form.phonetic.vars.label }}</span>
+                                    <span>{{ form.phonetic.vars.label|trans }}</span>
                                 </span>
                             </label>
                             <div class="control">
@@ -73,7 +73,7 @@
                             <label class="label">
                                 <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-align-left"></i></span>
-                                    <span>{{ form.description.vars.label }}</span>
+                                    <span>{{ form.description.vars.label|trans }}</span>
                                 </span>
                             </label>
                             <div class="control">
@@ -86,7 +86,7 @@
                             <label class="label">
                                 <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-book-open"></i></span>
-                                    <span>{{ form.recipe.vars.label }}</span>
+                                    <span>{{ form.recipe.vars.label|trans }}</span>
                                 </span>
                             </label>
                             <div class="control">
@@ -99,7 +99,7 @@
                             <label class="label">
                                 <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
-                                    <span>{{ form.origin.vars.label }}</span>
+                                    <span>{{ form.origin.vars.label|trans }}</span>
                                 </span>
                             </label>
                             <div class="control">
@@ -112,11 +112,11 @@
                             <div class="control">
                                 <button type="submit" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-check"></i></span>
-                                    <span>Add Dish</span>
+                                    <span>{{ 'dinnerclub.button_add_dish'|trans }}</span>
                                 </button>
                             </div>
                             <div class="control">
-                                <a href="{{ path('app_plugin_dinnerclub') }}" class="button">Cancel</a>
+                                <a href="{{ path('app_plugin_dinnerclub') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                             </div>
                         </div>
 
@@ -128,14 +128,14 @@
                     <div class="box">
                         <h3 class="title is-5">
                             <span class="icon"><i class="fa-solid fa-circle-info"></i></span>
-                            <span>How it works</span>
+                            <span>{{ 'dinnerclub.how_it_works_heading'|trans }}</span>
                         </h3>
                         <div class="content">
                             <ol>
-                                <li>Add the dish in your language</li>
-                                <li>{% if is_granted('ROLE_ORGANIZER') %}Your dish will be added immediately{% else %}Wait for approval from a manager{% endif %}</li>
-                                <li>Other users can suggest translations</li>
-                                <li>Build a multilingual dish collection together!</li>
+                                <li>{{ 'dinnerclub.how_it_works_step1'|trans }}</li>
+                                <li>{% if is_granted('ROLE_ORGANIZER') %}{{ 'dinnerclub.how_it_works_step2_manager'|trans }}{% else %}{{ 'dinnerclub.how_it_works_step2_user'|trans }}{% endif %}</li>
+                                <li>{{ 'dinnerclub.how_it_works_step3'|trans }}</li>
+                                <li>{{ 'dinnerclub.how_it_works_step4'|trans }}</li>
                             </ol>
                         </div>
                     </div>
@@ -143,14 +143,14 @@
                     <div class="box">
                         <h3 class="title is-5">
                             <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
-                            <span>Tips</span>
+                            <span>{{ 'dinnerclub.tips_heading'|trans }}</span>
                         </h3>
                         <div class="content is-small">
                             <ul>
-                                <li>Only the <strong>name</strong> is required</li>
-                                <li>Add <strong>phonetic</strong> for pronunciation help</li>
-                                <li>Include the <strong>origin</strong> to help others find regional dishes</li>
-                                <li>You can add an image later</li>
+                                <li>{{ 'dinnerclub.tips_name_required'|trans }}</li>
+                                <li>{{ 'dinnerclub.tips_phonetic'|trans }}</li>
+                                <li>{{ 'dinnerclub.tips_origin'|trans }}</li>
+                                <li>{{ 'dinnerclub.tips_image'|trans }}</li>
                             </ul>
                         </div>
                     </div>
@@ -158,21 +158,25 @@
                     <div class="box">
                         <h3 class="title is-5">
                             <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
-                            <span>Phonetic systems</span>
+                            <span>{{ 'dinnerclub.phonetic_systems_heading'|trans }}</span>
                         </h3>
                         <div class="content is-small">
                             <table class="table is-narrow is-fullwidth">
                                 <thead>
-                                    <tr><th>Language</th><th>System</th><th>Example</th></tr>
+                                    <tr>
+                                        <th>{{ 'dinnerclub.phonetic_col_language'|trans }}</th>
+                                        <th>{{ 'dinnerclub.phonetic_col_system'|trans }}</th>
+                                        <th>{{ 'dinnerclub.phonetic_col_example'|trans }}</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td>Chinese</td><td>Pinyin</td><td>má po dòu fu</td></tr>
-                                    <tr><td>Japanese</td><td>Rōmaji</td><td>ra-men</td></tr>
-                                    <tr><td>Arabic</td><td>Romanisation</td><td>kus-kus</td></tr>
-                                    <tr><td>Korean</td><td>Revised Romanisation</td><td>bi-bim-bap</td></tr>
-                                    <tr><td>Thai</td><td>RTGS</td><td>phàt thai</td></tr>
-                                    <tr><td>Hindi</td><td>IAST</td><td>bi-ryā-nī</td></tr>
-                                    <tr><td>Greek</td><td>Greeklish</td><td>mu-sa-kás</td></tr>
+                                    <tr><td>{{ 'dinnerclub.phonetic_lang_chinese'|trans }}</td><td>Pinyin</td><td>má po dòu fu</td></tr>
+                                    <tr><td>{{ 'dinnerclub.phonetic_lang_japanese'|trans }}</td><td>Rōmaji</td><td>ra-men</td></tr>
+                                    <tr><td>{{ 'dinnerclub.phonetic_lang_arabic'|trans }}</td><td>Romanisation</td><td>kus-kus</td></tr>
+                                    <tr><td>{{ 'dinnerclub.phonetic_lang_korean'|trans }}</td><td>Revised Romanisation</td><td>bi-bim-bap</td></tr>
+                                    <tr><td>{{ 'dinnerclub.phonetic_lang_thai'|trans }}</td><td>RTGS</td><td>phàt thai</td></tr>
+                                    <tr><td>{{ 'dinnerclub.phonetic_lang_hindi'|trans }}</td><td>IAST</td><td>bi-ryā-nī</td></tr>
+                                    <tr><td>{{ 'dinnerclub.phonetic_lang_greek'|trans }}</td><td>Greeklish</td><td>mu-sa-kás</td></tr>
                                 </tbody>
                             </table>
                         </div>

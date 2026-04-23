@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_dinnerclub_title_details"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
+{% block title %}{{ 'dinnerclub.page_title_details'|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
 {% block javascripts %}
     {% if dish.previewImage or galleryImages|length > 0 %}
@@ -15,7 +15,7 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
                     <li class="is-active"><a href="#" aria-current="page">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</a></li>
                 </ul>
             </nav>
@@ -30,7 +30,7 @@
                                 </div>
                                 {% if not dish.approved %}
                                     <div class="level-item">
-                                        <span class="tag is-warning">Pending Approval</span>
+                                        <span class="tag is-warning">{{ 'dinnerclub.status_pending'|trans }}</span>
                                     </div>
                                 {% endif %}
                             </div>
@@ -83,14 +83,14 @@
 
                         {% if dish.getTranslatedDescription(app.locale) or dish.getAnyTranslatedDescription() %}
                             <div class="content">
-                                <h4>Description</h4>
+                                <h4>{{ 'dinnerclub.heading_description'|trans }}</h4>
                                 <p>{{ (dish.getTranslatedDescription(app.locale) ?: dish.getAnyTranslatedDescription())|nl2br }}</p>
                             </div>
                         {% endif %}
 
                         {% if dish.getTranslatedRecipe(app.locale) or dish.getAnyTranslatedRecipe() %}
                             <div class="content">
-                                <h4>Recipe</h4>
+                                <h4>{{ 'dinnerclub.heading_recipe'|trans }}</h4>
                                 <p>{{ (dish.getTranslatedRecipe(app.locale) ?: dish.getAnyTranslatedRecipe())|nl2br }}</p>
                             </div>
                         {% endif %}
@@ -98,23 +98,23 @@
                         {% if dish.origin %}
                             <p>
                                 <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
-                                <strong>Origin:</strong> {{ dish.origin }}
+                                <strong>{{ 'dinnerclub.label_origin'|trans }}</strong> {{ dish.origin }}
                             </p>
                         {% endif %}
 
                         {% if dish.hasSuggestions and is_granted('ROLE_ORGANIZER') %}
                             <div class="notification is-light mt-4">
                                 <span class="icon"><i class="fa-solid fa-lightbulb"></i></span>
-                                This dish has {{ dish.suggestionObjects|length }} pending suggestion(s).
-                                <a href="{{ path('plugin_dinnerclub_suggestion_view', {'id': dish.id}) }}">Review now</a>
+                                {{ 'dinnerclub.suggestions_pending'|trans({'%count%': dish.suggestionObjects|length}) }}
+                                <a href="{{ path('plugin_dinnerclub_suggestion_view', {'id': dish.id}) }}">{{ 'dinnerclub.link_review_now'|trans }}</a>
                             </div>
                         {% endif %}
 
                         {% if imageSuggestionCount > 0 and is_granted('ROLE_ORGANIZER') %}
                             <div class="notification is-light mt-2">
                                 <span class="icon"><i class="fa-solid fa-image"></i></span>
-                                This dish has {{ imageSuggestionCount }} pending image suggestion(s).
-                                <a href="{{ path('plugin_dinnerclub_image_suggestion_view', {'id': dish.id}) }}">Review now</a>
+                                {{ 'dinnerclub.image_suggestions_pending'|trans({'%count%': imageSuggestionCount}) }}
+                                <a href="{{ path('plugin_dinnerclub_image_suggestion_view', {'id': dish.id}) }}">{{ 'dinnerclub.link_review_now'|trans }}</a>
                             </div>
                         {% endif %}
                     </div>
@@ -126,23 +126,23 @@
                     <div class="box">
                         <div class="level">
                             <div class="level-left">
-                                <h3 class="title is-5 mb-0">Info</h3>
+                                <h3 class="title is-5 mb-0">{{ 'dinnerclub.heading_info'|trans }}</h3>
                             </div>
                             {% if is_granted('ROLE_ORGANIZER') %}
                             <div class="level-right">
                                 <a href="{{ path('plugin_dinnerclub_edit', {'id': dish.id, 'lang': app.locale}) }}" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
-                                    <span>Edit</span>
+                                    <span>{{ 'dinnerclub.button_edit'|trans }}</span>
                                 </a>
                             </div>
                             {% endif %}
                         </div>
-                        <p><strong>Added by:</strong> {{ get_user_name(dish.createdBy) }}</p>
-                        <p><strong>Added:</strong> {{ dish.createdAt|time_diff }}</p>
+                        <p><strong>{{ 'dinnerclub.label_added_by'|trans }}</strong> {{ get_user_name(dish.createdBy) }}</p>
+                        <p><strong>{{ 'dinnerclub.label_added'|trans }}</strong> {{ dish.createdAt|time_diff }}</p>
                         {% if dish.pronunciationSystem %}
-                        <p><strong>Pronunciation:</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
+                        <p><strong>{{ 'dinnerclub.label_pronunciation'|trans }}</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
                         {% endif %}
-                        <p><strong>Likes:</strong> <span class="like-count-display">{{ dish.likes }}</span></p>
+                        <p><strong>{{ 'dinnerclub.label_likes'|trans }}</strong> <span class="like-count-display">{{ dish.likes }}</span></p>
                     </div>
 
                     {% if is_granted('ROLE_USER') %}
@@ -151,16 +151,16 @@
                     <div class="box">
                         <h3 class="title is-5">
                             <span class="icon"><i class="fa-solid fa-list"></i></span>
-                            <span>Add to List</span>
+                            <span>{{ 'dinnerclub.heading_add_to_list'|trans }}</span>
                         </h3>
                         <div class="field has-addons">
                             <div class="control is-expanded">
                                 <div class="select is-fullwidth">
                                     <select id="add-to-list-select">
-                                        <option value="">Select a list...</option>
+                                        <option value="">{{ 'dinnerclub.select_list_placeholder'|trans }}</option>
                                         {% for list in userLists %}
                                             <option value="{{ list.id }}" {% if list.hasDish(dish.id) %}disabled{% endif %}>
-                                                {{ list.name }}{% if list.hasDish(dish.id) %} (already added){% endif %}
+                                                {{ list.name }}{% if list.hasDish(dish.id) %} {{ 'dinnerclub.list_already_added'|trans }}{% endif %}
                                             </option>
                                         {% endfor %}
                                     </select>
@@ -169,24 +169,24 @@
                             <div class="control">
                                 <button class="button is-link add-to-list-btn"
                                         data-url-template="{{ path('plugin_dinnerclub_lists_add_dish', {'listId': '__LIST__', 'dishId': dish.id}) }}">
-                                    <span>Add</span>
+                                    <span>{{ 'dinnerclub.button_add'|trans }}</span>
                                 </button>
                             </div>
                         </div>
                         <p class="is-size-7 has-text-centered">
-                            <a href="{{ path('plugin_dinnerclub_lists_create') }}">Create new list</a>
+                            <a href="{{ path('plugin_dinnerclub_lists_create') }}">{{ 'dinnerclub.link_create_list'|trans }}</a>
                         </p>
                     </div>
                     {% else %}
                     <div class="box">
                         <h3 class="title is-5">
                             <span class="icon"><i class="fa-solid fa-list"></i></span>
-                            <span>Add to List</span>
+                            <span>{{ 'dinnerclub.heading_add_to_list'|trans }}</span>
                         </h3>
-                        <p class="has-text-grey is-size-7 mb-3">You don't have any lists yet. Add a new one like: favorites, plan to cook, want to try, best hungover food</p>
+                        <p class="has-text-grey is-size-7 mb-3">{{ 'dinnerclub.no_lists_hint'|trans }}</p>
                         <a href="{{ path('plugin_dinnerclub_lists_create') }}" class="button is-link is-fullwidth">
                             <span class="icon"><i class="fa-solid fa-plus"></i></span>
-                            <span>Create a List</span>
+                            <span>{{ 'dinnerclub.button_create_list'|trans }}</span>
                         </a>
                     </div>
                     {% endif %}

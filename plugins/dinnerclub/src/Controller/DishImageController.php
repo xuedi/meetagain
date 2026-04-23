@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/dinnerclub/image')]
 #[IsGranted('ROLE_USER')]
@@ -29,6 +30,7 @@ final class DishImageController extends AbstractController
         private readonly ImageService $imageService,
         private readonly ActivityService $activityService,
         private readonly ImageLocationService $imageLocationService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/upload/{id}', name: 'plugin_dinnerclub_image_upload', methods: ['POST'])]
@@ -41,7 +43,7 @@ final class DishImageController extends AbstractController
 
         $file = $request->files->get('image');
         if ($file === null) {
-            $this->addFlash('danger', 'No image file provided.');
+            $this->addFlash('danger', $this->translator->trans('dinnerclub.flash_no_image'));
 
             return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
         }
@@ -49,7 +51,7 @@ final class DishImageController extends AbstractController
         $user = $this->getAuthedUser();
         $image = $this->imageService->upload($file, $user, ImageType::PluginDish);
         if ($image === null) {
-            $this->addFlash('danger', 'Could not process the uploaded image.');
+            $this->addFlash('danger', $this->translator->trans('dinnerclub.flash_image_error'));
 
             return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
         }
@@ -58,7 +60,7 @@ final class DishImageController extends AbstractController
 
         if ($this->isGranted('ROLE_ORGANIZER')) {
             $this->dishService->addGalleryImage($dish, $image);
-            $this->addFlash('success', 'Image added to gallery.');
+            $this->addFlash('success', $this->translator->trans('dinnerclub.flash_image_added'));
             return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $id])));
         }
 
@@ -68,7 +70,7 @@ final class DishImageController extends AbstractController
             'dish_name' => $this->getDishName($dish),
             'suggestion_type' => $suggestion->getType()?->value,
         ]);
-        $this->addFlash('success', 'Image suggestion submitted for review.');
+        $this->addFlash('success', $this->translator->trans('dinnerclub.flash_image_suggestion'));
         return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $id])));
     }
 
@@ -102,7 +104,7 @@ final class DishImageController extends AbstractController
             }
             $this->imageLocationService->addLocation($image->getId(), ImageType::PluginDish, $dishId);
 
-            $this->addFlash('success', 'Preview image updated.');
+            $this->addFlash('success', $this->translator->trans('dinnerclub.flash_preview_updated'));
             return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $dishId])));
         }
 
@@ -112,7 +114,7 @@ final class DishImageController extends AbstractController
             'dish_name' => $this->getDishName($dish),
             'suggestion_type' => $suggestion->getType()?->value,
         ]);
-        $this->addFlash('success', 'Preview suggestion submitted for review.');
+        $this->addFlash('success', $this->translator->trans('dinnerclub.flash_preview_suggestion'));
         return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $dishId])));
     }
 
@@ -128,7 +130,7 @@ final class DishImageController extends AbstractController
         $dishId = $dishImage->getDish()?->getId();
 
         $this->dishService->removeGalleryImage($dishImageId);
-        $this->addFlash('success', 'Image removed from gallery.');
+        $this->addFlash('success', $this->translator->trans('dinnerclub.flash_image_removed'));
 
         return $this->redirect($this->getReturnUrl($request, $this->generateUrl('plugin_dinnerclub_item_show', ['id' => $dishId])));
     }

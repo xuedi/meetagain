@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Pending Dishes"|trans }}{% endblock %}
+{% block title %}{{ 'dinnerclub_approval.page_title'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -9,20 +9,20 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">Pending Approval</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ 'dinnerclub_approval.breadcrumb'|trans }}</a></li>
                 </ul>
             </nav>
 
             <h1 class="title">
                 <span class="icon"><i class="fa-solid fa-clock"></i></span>
-                <span>Dishes Pending Approval</span>
+                <span>{{ 'dinnerclub_approval.heading'|trans }}</span>
             </h1>
 
             {% if dishes is empty %}
                 <div class="notification is-success is-light">
                     <span class="icon"><i class="fa-solid fa-check-circle"></i></span>
-                    <span>No dishes pending approval. All caught up!</span>
+                    <span>{{ 'dinnerclub_approval.empty'|trans }}</span>
                 </div>
             {% else %}
                 <div class="columns is-multiline">
@@ -55,11 +55,11 @@
                                 <footer class="card-footer">
                                     <a href="{{ path('plugin_dinnerclub_approval_view', {'id': dish.id}) }}" class="card-footer-item">
                                         <span class="icon"><i class="fa-solid fa-eye"></i></span>
-                                        <span>View</span>
+                                        <span>{{ 'dinnerclub_approval.button_view'|trans }}</span>
                                     </a>
                                     <a href="{{ path('app_profile_review') }}" class="card-footer-item has-text-info">
                                         <span class="icon"><i class="fa-solid fa-check-double"></i></span>
-                                        <span>Review</span>
+                                        <span>{{ 'dinnerclub_approval.button_review'|trans }}</span>
                                     </a>
                                 </footer>
                             </div>
@@ -71,7 +71,7 @@
             <div class="mt-5">
                 <a href="{{ path('app_plugin_dinnerclub') }}" class="button">
                     <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
-                    <span>Back to Dishes</span>
+                    <span>{{ 'dinnerclub_approval.button_back'|trans }}</span>
                 </a>
             </div>
 

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Dinner Menu"|trans }} - {{ event.getTitle(app.locale) }}{% endblock %}
+{% block title %}{{ 'dinnerclub_dinner.page_title'|trans }} - {{ event.getTitle(app.locale) }}{% endblock %}
 
 {% block body %}
     <section class="section">
@@ -8,21 +8,21 @@
 
             <nav class="breadcrumb">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li class="is-active"><a>Dinner for {{ event.getTitle(app.locale) }}</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
+                    <li class="is-active"><a>{{ 'dinnerclub_dinner.breadcrumb_event'|trans({'%event%': event.getTitle(app.locale)}) }}</a></li>
                 </ul>
             </nav>
 
-            <h1 class="title">Dinner Menu</h1>
+            <h1 class="title">{{ 'dinnerclub_dinner.heading'|trans }}</h1>
             <p class="subtitle">
                 <a href="{{ path('app_event_details', {id: event.id}) }}">{{ event.getTitle(app.locale) }}</a>
             </p>
 
             {% if not dinner %}
 
-                <p class="has-text-grey mb-4">No dinner planned for this event yet.</p>
+                <p class="has-text-grey mb-4">{{ 'dinnerclub_dinner.empty'|trans }}</p>
                 <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: event.id}) }}">
-                    <button type="submit" class="button">Create dinner</button>
+                    <button type="submit" class="button">{{ 'dinnerclub_dinner.button_create'|trans }}</button>
                 </form>
 
             {% else %}
@@ -32,7 +32,7 @@
 
                 <div class="box" style="border: 1px solid #dbdbdb; box-shadow: none; padding: 2rem 2.5rem;">
                     <p class="has-text-centered has-text-weight-light is-uppercase is-size-7 has-letter-spacing mb-4"
-                       style="letter-spacing: 0.15em; color: #7a7a7a;">- Menu -</p>
+                       style="letter-spacing: 0.15em; color: #7a7a7a;">{{ 'dinnerclub_dinner.menu_label'|trans }}</p>
 
                     {% for course in dinner.courses %}
                         {% if not loop.first %}
@@ -45,7 +45,7 @@
                                       action="{{ path('app_plugin_dinnerclub_dinner_course_delete', {courseId: course.id}) }}">
                                     <button type="submit" class="button is-ghost p-0"
                                             style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
-                                        remove
+                                        {{ 'dinnerclub_dinner.button_remove'|trans }}
                                     </button>
                                 </form>
                             </div>
@@ -57,17 +57,17 @@
                                           action="{{ path('app_plugin_dinnerclub_dinner_item_delete', {itemId: item.id}) }}">
                                         <button type="submit" class="button is-ghost p-0"
                                                 style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
-                                            remove
+                                            {{ 'dinnerclub_dinner.button_remove'|trans }}
                                         </button>
                                     </form>
                                 </div>
                             {% else %}
-                                <p class="has-text-grey is-size-7">No dishes yet.</p>
+                                <p class="has-text-grey is-size-7">{{ 'dinnerclub_dinner.empty_dishes'|trans }}</p>
                             {% endfor %}
 
                         </div>
                     {% else %}
-                        <p class="has-text-grey is-size-7 has-text-centered">No courses yet. Add one on the right.</p>
+                        <p class="has-text-grey is-size-7 has-text-centered">{{ 'dinnerclub_dinner.empty_courses'|trans }}</p>
                     {% endfor %}
                 </div>
 
@@ -78,18 +78,18 @@
                 <div class="column is-4">
 
 
-                <p class="has-text-weight-semibold mb-2">Add course</p>
+                <p class="has-text-weight-semibold mb-2">{{ 'dinnerclub_dinner.heading_add_course'|trans }}</p>
                 <form method="post"
                       action="{{ path('app_plugin_dinnerclub_dinner_course_add', {dinnerId: dinner.id}) }}"
                       class="is-flex mb-5" style="gap: 0.5rem;">
-                    <input class="input is-small" type="text" name="name" placeholder="e.g. Starter, Main, Dessert"
+                    <input class="input is-small" type="text" name="name" placeholder="{{ 'dinnerclub_dinner.course_placeholder'|trans }}"
                            required style="width: 220px;">
-                    <button type="submit" class="button is-small">Add</button>
+                    <button type="submit" class="button is-small">{{ 'dinnerclub_dinner.button_add'|trans }}</button>
                 </form>
 
 
                 {% if dinner.courses|length > 0 %}
-                    <p class="has-text-weight-semibold mb-2">Rename course</p>
+                    <p class="has-text-weight-semibold mb-2">{{ 'dinnerclub_dinner.heading_rename_course'|trans }}</p>
                     <form method="post"
                           action="{{ path('app_plugin_dinnerclub_dinner_course_edit', {courseId: '__id__'}) }}"
                           class="is-flex mb-5" style="gap: 0.5rem; align-items: center;"
@@ -104,7 +104,7 @@
                         </div>
                         <input class="input is-small" type="text" name="name" id="rename-course-name"
                                style="width: 140px;" required>
-                        <button type="submit" class="button is-small">Rename</button>
+                        <button type="submit" class="button is-small">{{ 'dinnerclub_dinner.button_rename'|trans }}</button>
                     </form>
                     <script>
                         (function () {
@@ -125,7 +125,7 @@
                     </script>
 
 
-                    <p class="has-text-weight-semibold mb-2">Add dish</p>
+                    <p class="has-text-weight-semibold mb-2">{{ 'dinnerclub_dinner.heading_add_dish'|trans }}</p>
                     <form method="post"
                           action="{{ path('app_plugin_dinnerclub_dinner_item_add', {courseId: 0}) }}"
                           class="is-flex mb-5" style="gap: 0.5rem; align-items: center;"
@@ -139,13 +139,13 @@
                         </div>
                         <div class="select is-small">
                             <select name="dish_id" required>
-                                <option value="">Select dish...</option>
+                                <option value="">{{ 'dinnerclub_dinner.select_dish_placeholder'|trans }}</option>
                                 {% for dish in dishes %}
                                     <option value="{{ dish.id }}">{{ dish.getTranslatedName(app.locale) ?: dish.getTranslatedName('en') }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <button type="submit" class="button is-small">Add</button>
+                        <button type="submit" class="button is-small">{{ 'dinnerclub_dinner.button_add'|trans }}</button>
                     </form>
                     <script>
                         (function () {
@@ -175,7 +175,7 @@
                 <div class="box">
 
                     {% set location = event.location %}
-                    <p class="has-text-weight-semibold mb-1">Event</p>
+                    <p class="has-text-weight-semibold mb-1">{{ 'dinnerclub_dinner.heading_event'|trans }}</p>
                     <p class="is-size-7 mb-1">{{ event.start|date('D, d M Y, H:i') }}</p>
                     {% if location %}
                         <p class="is-size-7">{{ location.name }}{% if location.street %}, {{ location.street }}{% endif %}{% if location.city %}, {{ location.city }}{% endif %}</p>
@@ -183,38 +183,35 @@
 
                     <hr>
 
-                    <p class="has-text-weight-semibold mb-2">Reservation name</p>
+                    <p class="has-text-weight-semibold mb-2">{{ 'dinnerclub_dinner.heading_reservation'|trans }}</p>
                     <form method="post"
                           action="{{ path('app_plugin_dinnerclub_dinner_reservation_name', {dinnerId: dinner.id}) }}"
                           class="is-flex mb-5" style="gap: 0.5rem; align-items: center;">
                         <input class="input is-small" type="text" name="reservation_name"
                                value="{{ dinner.reservationName ?? '' }}"
-                               placeholder="e.g. Smith" style="width: 200px;">
-                        <button type="submit" class="button is-small">Save</button>
+                               placeholder="{{ 'dinnerclub_dinner.reservation_placeholder'|trans }}" style="width: 200px;">
+                        <button type="submit" class="button is-small">{{ 'global.button_save'|trans }}</button>
                     </form>
 
-                    <p class="has-text-weight-semibold mb-2">Price per person</p>
+                    <p class="has-text-weight-semibold mb-2">{{ 'dinnerclub_dinner.heading_price'|trans }}</p>
                     <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_price', {dinnerId: dinner.id}) }}"
                           class="is-flex mb-5" style="gap: 0.5rem; align-items: center;">
                         <input class="input is-small" type="number" name="price_per_person" step="0.01" min="0"
                                value="{{ dinner.pricePerPerson is not null ? dinner.pricePerPerson|number_format(2) : '' }}"
-                               placeholder="e.g. 15.00" style="width: 140px;">
-                        <button type="submit" class="button is-small">Save</button>
+                               placeholder="{{ 'dinnerclub_dinner.price_placeholder'|trans }}" style="width: 140px;">
+                        <button type="submit" class="button is-small">{{ 'global.button_save'|trans }}</button>
                     </form>
 
                     <hr>
 
                     <form method="post"
                           action="{{ path('app_plugin_dinnerclub_dinner_delete', {dinnerId: dinner.id}) }}">
-                        <button type="submit" class="button is-small is-danger">Delete entire dinner</button>
+                        <button type="submit" class="button is-small is-danger">{{ 'dinnerclub_dinner.button_delete'|trans }}</button>
                     </form>
 
                 </div>
 
                 </div>{# /column right #}
-
-
-
 
 
                 </div>{# /columns #}
