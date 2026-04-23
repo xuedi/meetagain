@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "page_plugin_glossary_new_title"|trans }}{% endblock %}
+{% block title %}{{ 'glossary.page_title_new'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -13,7 +13,7 @@
                 </div>
                 <div class="column is-3">
                     {% if is_granted('ROLE_USER') %}
-                        <h2 class="title is-5">Suggest a change</h2>
+                        <h2 class="title is-5">{{ 'glossary.heading_suggest_change'|trans }}</h2>
                         <div class="box">
 
                             {{ form_start(form) }}
@@ -22,11 +22,11 @@
                             {{ form_row(form.explanation) }}
                             {{ form_row(form.category) }}
                             <div class="has-text-right mt-6">
-                                <a href="{{ path('app_plugin_glossary') }}" class="button">cancel</a>
+                                <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.cancel'|trans }}</a>
                                 {% if is_granted('ROLE_ORGANIZER') %}
-                                    <button type="submit" class="button is-link">Save</button>
+                                    <button type="submit" class="button is-link">{{ 'global.save'|trans }}</button>
                                 {% else %}
-                                    <button type="submit" class="button is-link">Suggest change</button>
+                                    <button type="submit" class="button is-link">{{ 'glossary.button_suggest_change'|trans }}</button>
                                 {% endif %}
                             </div>
                             {{ form_end(form) }}
@@ -35,11 +35,11 @@
                     {% endif %}
 
                     {% if editItem.suggestions is not empty %}
-                        <h2 class="title is-5">Waiting for approval</h2>
+                        <h2 class="title is-5">{{ 'glossary.heading_waiting_approval'|trans }}</h2>
                         {% for suggestion in editItem.suggestions %}
                             {% set value = suggestion.value %}
                             {% if suggestion.field.value == categoryFieldValue %}
-                                {% set value = categoryNames[suggestion.value] %}
+                                {% set value = categoryNames[suggestion.value]|trans %}
                             {% endif %}
                             <div class="box has-background-info-light">
                                 <p>
@@ -56,4 +56,3 @@
     </section>
 
 {% endblock %}
-

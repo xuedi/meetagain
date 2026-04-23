@@ -1,30 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Book Club"|trans }}{% endblock %}
+{% block title %}{{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
-        <h1 class="title">Book Club</h1>
+        <h1 class="title">{{ 'bookclub.page_title'|trans }}</h1>
 
         <div class="is-flex is-justify-content-space-between is-align-items-flex-start mb-4">
             <div class="buttons">
                 {% if is_granted('ROLE_USER') %}
                     <a href="{{ path('app_plugin_bookclub_book_add') }}" class="button is-primary">
                         <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span>Add Book</span>
+                        <span>{{ 'bookclub.button_add_book'|trans }}</span>
                     </a>
                     <a href="{{ path('app_plugin_bookclub_suggestions') }}" class="button is-info">
                         <span class="icon"><i class="fas fa-lightbulb"></i></span>
-                        <span>Suggestions</span>
+                        <span>{{ 'bookclub.button_suggestions'|trans }}</span>
                     </a>
                     <a href="{{ path('app_plugin_bookclub_notes') }}" class="button is-info">
                         <span class="icon"><i class="fas fa-sticky-note"></i></span>
-                        <span>My Notes</span>
+                        <span>{{ 'bookclub.button_my_notes'|trans }}</span>
                     </a>
                     <a href="{{ path('app_plugin_bookclub_poll_list') }}" class="button is-info">
                         <span class="icon"><i class="fas fa-poll"></i></span>
-                        <span>Polls</span>
+                        <span>{{ 'bookclub.button_polls'|trans }}</span>
                     </a>
                 {% endif %}
             </div>
@@ -42,7 +42,7 @@
         {% if books|length > 0 %}
             {% include '@Bookclub/views/' ~ viewType ~ '.html.twig' %}
         {% else %}
-            <p class="has-text-grey">No books in the catalog yet.</p>
+            <p class="has-text-grey">{{ 'bookclub.empty_catalog'|trans }}</p>
         {% endif %}
 
     </div>

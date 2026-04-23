@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/bookclub')]
 final class BookController extends AbstractController
@@ -19,6 +20,7 @@ final class BookController extends AbstractController
     public function __construct(
         private readonly BookService $bookService,
         private readonly UserRepository $userRepository,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_plugin_bookclub', methods: ['GET'])]
@@ -73,11 +75,11 @@ final class BookController extends AbstractController
                 $book = $this->bookService->createFromIsbn($isbn, $user->getId(), $isManager);
 
                 if ($book === null) {
-                    $this->addFlash('warning', 'Book not found via ISBN lookup. Please try a different ISBN.');
+                    $this->addFlash('warning', $this->translator->trans('bookclub_book.flash_isbn_not_found'));
                     return $this->redirectToRoute('app_plugin_bookclub_book_add');
                 }
 
-                $this->addFlash('success', $isManager ? 'Book added successfully.' : 'Book submitted for approval.');
+                $this->addFlash('success', $this->translator->trans($isManager ? 'bookclub_book.flash_added' : 'bookclub_book.flash_submitted'));
 
                 return $this->redirectToRoute('app_plugin_bookclub_book_show', ['id' => $book->getId()]);
             } catch (RuntimeException $e) {
