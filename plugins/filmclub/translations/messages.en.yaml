@@ -1,5 +1,5 @@
 filmclub_film:
-    page_title_list: 'Film List'
+    page_title_list: 'Film list'
     browser_title_list: 'Filmlist'
     page_title_new: 'Add New Film'
     col_title: 'Title'
