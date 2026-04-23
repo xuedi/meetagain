@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Edit List"|trans }} - {{ list.name }}{% endblock %}
+{% block title %}{{ 'dinnerclub_lists.page_title_edit'|trans }} - {{ list.name }}{% endblock %}
 
 {% block body %}
 
@@ -9,10 +9,10 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
-                    <li><a href="{{ path('plugin_dinnerclub_lists') }}">My Lists</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
+                    <li><a href="{{ path('plugin_dinnerclub_lists') }}">{{ 'dinnerclub_lists.breadcrumb'|trans }}</a></li>
                     <li><a href="{{ path('plugin_dinnerclub_lists_view', {'id': list.id}) }}">{{ list.name }}</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">Edit</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ 'dinnerclub_lists.breadcrumb_edit'|trans }}</a></li>
                 </ul>
             </nav>
 
@@ -21,13 +21,13 @@
                     <div class="box">
                         <h1 class="title is-4">
                             <span class="icon"><i class="fa-solid fa-pen"></i></span>
-                            <span>Edit List</span>
+                            <span>{{ 'dinnerclub_lists.heading_edit'|trans }}</span>
                         </h1>
 
                         {{ form_start(form) }}
 
                         <div class="field">
-                            <label class="label">{{ form.name.vars.label }}</label>
+                            <label class="label">{{ form.name.vars.label|trans }}</label>
                             <div class="control">
                                 {{ form_widget(form.name, {'attr': {'class': 'input'}}) }}
                             </div>
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="field">
-                            <label class="label">{{ form.description.vars.label }}</label>
+                            <label class="label">{{ form.description.vars.label|trans }}</label>
                             <div class="control">
                                 {{ form_widget(form.description, {'attr': {'class': 'textarea'}}) }}
                             </div>
@@ -46,21 +46,21 @@
                             <div class="control">
                                 <label class="checkbox">
                                     {{ form_widget(form.isPublic) }}
-                                    {{ form.isPublic.vars.label }}
+                                    {{ form.isPublic.vars.label|trans }}
                                 </label>
                             </div>
-                            <p class="help">{{ form.isPublic.vars.help }}</p>
+                            <p class="help">{{ form.isPublic.vars.help|trans }}</p>
                         </div>
 
                         <div class="field is-grouped mt-5">
                             <div class="control">
                                 <button type="submit" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-check"></i></span>
-                                    <span>Save Changes</span>
+                                    <span>{{ 'dinnerclub_lists.button_save'|trans }}</span>
                                 </button>
                             </div>
                             <div class="control">
-                                <a href="{{ path('plugin_dinnerclub_lists_view', {'id': list.id}) }}" class="button">Cancel</a>
+                                <a href="{{ path('plugin_dinnerclub_lists_view', {'id': list.id}) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                             </div>
                         </div>
 
@@ -70,9 +70,9 @@
 
                 <div class="column is-6">
                     <div class="box">
-                        <h3 class="title is-5">List Info</h3>
-                        <p><strong>Created:</strong> {{ list.createdAt|time_diff }}</p>
-                        <p><strong>Dishes:</strong> {{ list.dishCount }}</p>
+                        <h3 class="title is-5">{{ 'dinnerclub_lists.heading_list_info'|trans }}</h3>
+                        <p><strong>{{ 'dinnerclub_lists.label_created'|trans }}</strong> {{ list.createdAt|time_diff }}</p>
+                        <p><strong>{{ 'dinnerclub_lists.label_dishes'|trans }}</strong> {{ list.dishCount }}</p>
                     </div>
                 </div>
             </div>

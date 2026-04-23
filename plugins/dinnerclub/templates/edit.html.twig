@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "Translate Dish"|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
+{% block title %}{{ 'dinnerclub.page_title_edit'|trans }} - {{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}{% endblock %}
 
 {% block javascripts %}
     {% if dish.previewImage or galleryImages|length > 0 %}
@@ -15,9 +15,9 @@
 
             <nav class="breadcrumb" aria-label="breadcrumbs">
                 <ul>
-                    <li><a href="{{ path('app_plugin_dinnerclub') }}">Dishes</a></li>
+                    <li><a href="{{ path('app_plugin_dinnerclub') }}">{{ 'dinnerclub.breadcrumb_dishes'|trans }}</a></li>
                     <li><a href="{{ path('plugin_dinnerclub_item_show', {'id': dish.id}) }}">{{ dish.getTranslatedName(app.locale) ?: dish.getAnyTranslatedName() }}</a></li>
-                    <li class="is-active"><a href="#" aria-current="page">Translate ({{ targetLanguage|upper }})</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">{{ 'dinnerclub.breadcrumb_translate_lang'|trans({'%lang%': targetLanguage|upper}) }}</a></li>
                 </ul>
             </nav>
 
@@ -26,7 +26,7 @@
                     <div class="box">
                         <div class="columns mb-0">
                             <div class="column is-6">
-                                <p class="has-text-grey">Select a language to translate</p>
+                                <p class="has-text-grey">{{ 'dinnerclub.edit_select_language'|trans }}</p>
                             </div>
                             <div class="column is-6">
                                 <div class="buttons has-addons is-pulled-right" id="lang-switcher">
@@ -42,24 +42,24 @@
 
                         <h2 class="title is-4">
                             <span class="icon"><i class="fa-solid fa-language"></i></span>
-                            <span>{% if existingTranslation %}Edit{% else %}Add{% endif %} Translation</span>
+                            <span>{{ existingTranslation ? 'dinnerclub.heading_edit_translation'|trans : 'dinnerclub.heading_add_translation'|trans }}</span>
                             <span class="tag is-info is-medium ml-2">{{ targetLanguage|upper }}</span>
                         </h2>
 
                         {% if existingTranslation %}
                             <p class="mb-4 has-text-grey">
                                 {% if is_granted('ROLE_ORGANIZER') %}
-                                    Update the {{ targetLanguage|upper }} translation for this dish.
+                                    {{ 'dinnerclub.edit_manager_update'|trans({'%lang%': targetLanguage|upper}) }}
                                 {% else %}
-                                    Suggest changes to the {{ targetLanguage|upper }} translation. A manager will review your suggestions.
+                                    {{ 'dinnerclub.edit_user_update'|trans({'%lang%': targetLanguage|upper}) }}
                                 {% endif %}
                             </p>
                         {% else %}
                             <p class="mb-4 has-text-grey">
                                 {% if is_granted('ROLE_ORGANIZER') %}
-                                    Add a new {{ targetLanguage|upper }} translation for this dish.
+                                    {{ 'dinnerclub.edit_manager_add'|trans({'%lang%': targetLanguage|upper}) }}
                                 {% else %}
-                                    Suggest a {{ targetLanguage|upper }} translation for this dish. A manager will review your suggestion.
+                                    {{ 'dinnerclub.edit_user_add'|trans({'%lang%': targetLanguage|upper}) }}
                                 {% endif %}
                             </p>
                         {% endif %}
@@ -67,7 +67,7 @@
                         {{ form_start(form, {'attr': {'id': 'translate-form'}}) }}
 
                         <div class="field">
-                            <label class="label">{{ form.name.vars.label }}</label>
+                            <label class="label">{{ form.name.vars.label|trans }}</label>
                             <div class="control">
                                 {{ form_widget(form.name, {'attr': {'class': 'input'}}) }}
                             </div>
@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="field">
-                            <label class="label">{{ form.description.vars.label }}</label>
+                            <label class="label">{{ form.description.vars.label|trans }}</label>
                             <div class="control">
                                 {{ form_widget(form.description, {'attr': {'class': 'textarea'}}) }}
                             </div>
@@ -83,7 +83,7 @@
                         </div>
 
                         <div class="field">
-                            <label class="label">{{ form.recipe.vars.label }}</label>
+                            <label class="label">{{ form.recipe.vars.label|trans }}</label>
                             <div class="control">
                                 {{ form_widget(form.recipe, {'attr': {'class': 'textarea'}}) }}
                             </div>
@@ -94,11 +94,11 @@
                             <div class="control">
                                 <button type="submit" id="save-btn" class="button is-link" disabled>
                                     <span class="icon"><i class="fa-solid fa-check"></i></span>
-                                    <span>{% if is_granted('ROLE_ORGANIZER') %}Save{% else %}Submit Suggestion{% endif %}</span>
+                                    <span>{% if is_granted('ROLE_ORGANIZER') %}{{ 'global.button_save'|trans }}{% else %}{{ 'dinnerclub.button_submit_suggestion'|trans }}{% endif %}</span>
                                 </button>
                             </div>
                             <div class="control">
-                                <a id="reset-btn" href="{{ path('plugin_dinnerclub_edit', {'id': dish.id, 'lang': targetLanguage}) }}" class="button" style="pointer-events: none; opacity: 0.5;">Reset</a>
+                                <a id="reset-btn" href="{{ path('plugin_dinnerclub_edit', {'id': dish.id, 'lang': targetLanguage}) }}" class="button" style="pointer-events: none; opacity: 0.5;">{{ 'dinnerclub.button_reset'|trans }}</a>
                             </div>
                         </div>
 
@@ -109,7 +109,7 @@
                     <div class="box">
                         <h2 class="title is-4">
                             <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
-                            <span>Origin</span>
+                            <span>{{ 'dinnerclub.heading_origin'|trans }}</span>
                         </h2>
 
                         {{ form_start(originForm) }}
@@ -117,7 +117,7 @@
                         <div class="columns">
                             <div class="column is-6">
                                 <div class="field">
-                                    <label class="label">{{ originForm.pronunciationSystem.vars.label }}</label>
+                                    <label class="label">{{ originForm.pronunciationSystem.vars.label|trans }}</label>
                                     <div class="control">
                                         <div class="select is-fullwidth">
                                             {{ form_widget(originForm.pronunciationSystem, {'attr': {'id': 'pronunciation-system-select'}}) }}
@@ -128,7 +128,7 @@
                             </div>
                             <div class="column is-6">
                                 <div class="field">
-                                    <label class="label" id="phonetic-label">Transcription</label>
+                                    <label class="label" id="phonetic-label">{{ 'dinnerclub.label_transcription'|trans }}</label>
                                     <div class="control">
                                         {{ form_widget(originForm.phonetic, {'attr': {'class': 'input', 'id': 'phonetic-input'}}) }}
                                     </div>
@@ -141,7 +141,7 @@
                             <label class="label">
                                 <span class="icon-text">
                                     <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
-                                    <span>{{ originForm.origin.vars.label }}</span>
+                                    <span>{{ originForm.origin.vars.label|trans }}</span>
                                 </span>
                             </label>
                             <div class="control">
@@ -154,7 +154,7 @@
                             <div class="control">
                                 <button type="submit" class="button is-link">
                                     <span class="icon"><i class="fa-solid fa-check"></i></span>
-                                    <span>Save Origin</span>
+                                    <span>{{ 'dinnerclub.button_save_origin'|trans }}</span>
                                 </button>
                             </div>
                         </div>
@@ -169,7 +169,7 @@
 
                     {% if dish.previewImage %}
                     <div class="box">
-                        <h3 class="title is-6 mb-2">Preview Image</h3>
+                        <h3 class="title is-6 mb-2">{{ 'dinnerclub.heading_preview_image'|trans }}</h3>
                         {% set reportCaption = 'You can <a href=' ~ path('app_report_image', {'id': dish.previewImage.id}) ~ '>report</a> an image if there is something wrong.' %}
                         <figure class="image">
                             <a data-fancybox="dish-gallery" data-caption="{{ reportCaption }}" href="/images/thumbnails/{{ dish.previewImage.hash }}_1024x768.webp">
@@ -181,7 +181,7 @@
 
                     {% if galleryImages|length > 0 %}
                     <div class="box">
-                        <h3 class="title is-6 mb-2">Gallery</h3>
+                        <h3 class="title is-6 mb-2">{{ 'dinnerclub.heading_gallery'|trans }}</h3>
                         <div class="columns is-multiline is-mobile">
                             {% for dishImage in galleryImages %}
                                 {% set img = dishImage.image %}
@@ -195,14 +195,14 @@
                                     <div class="has-text-centered mt-1">
                                         <a href="{{ path('plugin_dinnerclub_suggest_preview', {'dishId': dish.id, 'dishImageId': dishImage.id}) }}?returnUrl={{ returnUrl|url_encode }}"
                                            class="is-size-7 has-text-grey"
-                                           title="{{ isOrganizer ? 'Set as preview' : 'Suggest as preview' }}">
+                                           title="{{ isOrganizer ? 'dinnerclub.title_set_preview'|trans : 'dinnerclub.title_suggest_preview'|trans }}">
                                             <span class="icon is-small"><i class="fa-solid fa-star"></i></span>
                                         </a>
                                         {% if isOrganizer %}
                                         <a href="{{ path('plugin_dinnerclub_image_delete', {'dishImageId': dishImage.id}) }}?returnUrl={{ returnUrl|url_encode }}"
                                            class="is-size-7 has-text-danger"
-                                           title="Remove from gallery"
-                                           onclick="return confirm('Remove this image from the gallery?')">
+                                           title="{{ 'dinnerclub.title_remove_gallery'|trans }}"
+                                           onclick="return confirm('{{ 'dinnerclub.confirm_remove_gallery'|trans|escape('js') }}')">
                                             <span class="icon is-small"><i class="fa-solid fa-trash"></i></span>
                                         </a>
                                         {% endif %}
@@ -219,10 +219,10 @@
                     <div class="box">
                         <h3 class="title is-5">
                             <span class="icon"><i class="fa-solid fa-camera"></i></span>
-                            <span>{{ isOrganizer ? 'Add Photo' : 'Suggest Photo' }}</span>
+                            <span>{{ isOrganizer ? 'dinnerclub.heading_add_photo'|trans : 'dinnerclub.heading_suggest_photo'|trans }}</span>
                         </h3>
                         <p class="mb-3 is-size-7 has-text-grey">
-                            {{ isOrganizer ? 'Add a photo to the gallery' : 'Suggest a photo for this dish' }}
+                            {{ isOrganizer ? 'dinnerclub.photo_add_hint'|trans : 'dinnerclub.photo_suggest_hint'|trans }}
                         </p>
                         <form action="{{ path('plugin_dinnerclub_image_upload', {'id': dish.id}) }}"
                               method="post" enctype="multipart/form-data">
@@ -236,7 +236,7 @@
                                 <div class="control">
                                     <button type="submit" class="button is-link is-fullwidth">
                                         <span class="icon"><i class="fa-solid fa-upload"></i></span>
-                                        <span>Upload</span>
+                                        <span>{{ 'dinnerclub.button_upload'|trans }}</span>
                                     </button>
                                 </div>
                             </div>

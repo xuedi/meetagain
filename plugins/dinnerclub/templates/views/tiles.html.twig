@@ -7,7 +7,7 @@
                         <span class="icon is-large has-text-link">
                             <i class="fa-solid fa-plus fa-2x"></i>
                         </span>
-                        <p class="mt-3 has-text-link">Add Dish</p>
+                        <p class="mt-3 has-text-link">{{ 'dinnerclub_views.button_add_dish'|trans }}</p>
                     </div>
                 </div>
             </a>
@@ -23,7 +23,7 @@
                             {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '400x400'} %}
                         </figure>
                         {% if not item.approved %}
-                            <span class="tag is-warning" style="position: absolute; top: 5px; right: 5px;">Pending</span>
+                            <span class="tag is-warning" style="position: absolute; top: 5px; right: 5px;">{{ 'dinnerclub_views.tag_pending'|trans }}</span>
                         {% endif %}
                     </div>
                     <div class="card-content p-2">

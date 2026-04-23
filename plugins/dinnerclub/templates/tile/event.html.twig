@@ -1,7 +1,7 @@
 <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
-    <h3 class="title is-5 mb-0">Dinner Menu</h3>
+    <h3 class="title is-5 mb-0">{{ 'dinnerclub_tile.heading'|trans }}</h3>
     {% if dinner and is_granted('ROLE_ORGANIZER') %}
-        <a href="{{ path('app_plugin_dinnerclub_dinner_manage', {eventId: eventId}) }}" class="has-text-grey" title="Edit menu">
+        <a href="{{ path('app_plugin_dinnerclub_dinner_manage', {eventId: eventId}) }}" class="has-text-grey" title="{{ 'dinnerclub_tile.title_edit_menu'|trans }}">
             <span class="icon"><i class="fa fa-edit"></i></span>
         </a>
     {% endif %}
@@ -21,18 +21,18 @@
         <hr style="margin: 0.75rem 0;">
         <div class="is-size-7">
             {% if dinner.reservationName %}
-                <p><span class="has-text-grey">Reservation:</span> {{ dinner.reservationName }}</p>
+                <p><span class="has-text-grey">{{ 'dinnerclub_tile.label_reservation'|trans }}</span> {{ dinner.reservationName }}</p>
             {% endif %}
             {% if dinner.pricePerPerson is not null %}
-                <p><span class="has-text-grey">Price per person:</span> {{ dinner.pricePerPerson|number_format(2) }}</p>
+                <p><span class="has-text-grey">{{ 'dinnerclub_tile.label_price'|trans }}</span> {{ dinner.pricePerPerson|number_format(2) }}</p>
             {% endif %}
         </div>
     {% endif %}
 {% else %}
     {% if is_granted('ROLE_ORGANIZER') %}
-        <p class="has-text-grey is-size-7">Add a planned dinner to this, with proper menu options.</p>
+        <p class="has-text-grey is-size-7">{{ 'dinnerclub_tile.hint_no_dinner'|trans }}</p>
         <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: eventId}) }}" class="mt-2">
-            <button type="submit" class="button is-small">Create dinner</button>
+            <button type="submit" class="button is-small">{{ 'dinnerclub_tile.button_create'|trans }}</button>
         </form>
     {% endif %}
 {% endif %}

@@ -1,7 +1,7 @@
 <div class="columns is-multiline">
     {% if is_granted('ROLE_USER') %}
         <div class="column is-1 p-1">
-            <a href="{{ path('plugin_dinnerclub_add') }}" title="Add Dish">
+            <a href="{{ path('plugin_dinnerclub_add') }}" title="{{ 'dinnerclub_views.title_add'|trans }}">
                 <figure class="image" style="background: hsl(217, 71%, 95%); display: flex; align-items: center; justify-content: center; aspect-ratio: 1;">
                     <span class="icon has-text-link"><i class="fa-solid fa-plus fa-lg"></i></span>
                 </figure>

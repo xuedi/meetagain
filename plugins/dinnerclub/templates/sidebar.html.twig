@@ -1,4 +1,3 @@
-
 <div class="buttons has-addons is-centered">
     {% for id, name in viewTypeList %}
     <a class="button {% if viewType == id %} has-background-link has-text-light{% endif %}" href="{{ path('plugin_dinnerclub_set_view_type', {'type': id}) }}">
@@ -13,14 +12,14 @@
 <div class="buttons" id="list-filter-buttons">
     <a href="{{ path('plugin_dinnerclub_lists') }}" class="button is-light is-small is-fullwidth mt-1">
         <span class="icon"><i class="fa-solid fa-list"></i></span>
-        <span>My Lists</span>
+        <span>{{ 'dinnerclub.button_my_lists'|trans }}</span>
     </a>
     {% if favoriteDishIds|default([])|length > 0 %}
         <button class="button is-small is-fullwidth list-filter-btn"
                 data-list-id="favorites"
                 data-dish-ids="{{ favoriteDishIds|join(',') }}">
             <span class="icon is-small"><i class="fa-solid fa-heart"></i></span>
-            <span>Favorites</span>
+            <span>{{ 'dinnerclub.button_favorites'|trans }}</span>
         </button>
     {% endif %}
     {% for userList in userLists|default([])|filter(l => l.dishCount >= 1) %}

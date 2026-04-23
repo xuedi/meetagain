@@ -9,27 +9,32 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DishListType extends AbstractType
 {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {}
+
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('name', TextType::class, [
-            'label' => 'List Name',
+            'label' => 'dinnerclub_lists.field_name',
             'required' => true,
-            'attr' => ['placeholder' => 'e.g., My Favorite Sichuan Dishes'],
+            'attr' => ['placeholder' => $this->translator->trans('dinnerclub_lists.field_name_placeholder')],
         ])->add('description', TextareaType::class, [
-            'label' => 'Description',
+            'label' => 'dinnerclub_lists.field_description',
             'required' => false,
             'attr' => [
                 'rows' => 3,
-                'placeholder' => 'Optional: Describe what this list is about',
+                'placeholder' => $this->translator->trans('dinnerclub_lists.field_description_placeholder'),
             ],
         ])->add('isPublic', CheckboxType::class, [
-            'label' => 'Make this list public',
+            'label' => 'dinnerclub_lists.field_is_public',
             'required' => false,
-            'help' => 'Public lists can be viewed by other users',
+            'help' => 'dinnerclub_lists.field_is_public_help',
         ]);
     }
 

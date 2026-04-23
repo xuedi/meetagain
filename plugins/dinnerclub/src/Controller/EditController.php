@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/dinnerclub')]
 #[IsGranted('ROLE_USER')]
@@ -23,6 +24,7 @@ final class EditController extends AbstractController
         private readonly DishService $dishService,
         private readonly LanguageService $languageService,
         private readonly ActivityService $activityService,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('/edit/{id}/{lang}', name: 'plugin_dinnerclub_edit', methods: ['GET', 'POST'])]
@@ -73,7 +75,7 @@ final class EditController extends AbstractController
 
             $this->addFlash(
                 'success',
-                $isManager ? 'Translation has been updated.' : 'Translation suggestion has been submitted for review.',
+                $this->translator->trans($isManager ? 'dinnerclub.flash_translation_updated' : 'dinnerclub.flash_suggestion_submitted'),
             );
 
             return $this->redirectToRoute('plugin_dinnerclub_edit', ['id' => $id, 'lang' => $lang]);
@@ -81,7 +83,7 @@ final class EditController extends AbstractController
 
         if ($originForm->isSubmitted() && $originForm->isValid()) {
             $this->dishService->saveBaseData($dish);
-            $this->addFlash('success', 'Dish origin has been updated.');
+            $this->addFlash('success', $this->translator->trans('dinnerclub.flash_origin_updated'));
 
             return $this->redirectToRoute('plugin_dinnerclub_edit', ['id' => $id, 'lang' => $lang]);
         }
