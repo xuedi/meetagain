@@ -1,29 +1,29 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pending Approval - Book Club{% endblock %}
+{% block title %}{{ 'bookclub_manage.page_title_pending'|trans }} - {{ 'bookclub.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <section class="section">
     <div class="container">
         <nav class="breadcrumb">
             <ul>
-                <li><a href="{{ path('app_plugin_bookclub') }}">Book Club</a></li>
-                <li class="is-active"><a>Pending Approval</a></li>
+                <li><a href="{{ path('app_plugin_bookclub') }}">{{ 'bookclub.page_title'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'bookclub_manage.breadcrumb_pending'|trans }}</a></li>
             </ul>
         </nav>
 
-        <h1 class="title">Books Pending Approval</h1>
+        <h1 class="title">{{ 'bookclub_manage.heading_pending'|trans }}</h1>
 
         {% if books|length > 0 %}
             <table class="table is-fullwidth is-striped">
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>ISBN</th>
-                        <th>Added By</th>
-                        <th>Added At</th>
-                        <th>Actions</th>
+                        <th>{{ 'bookclub_manage.col_title'|trans }}</th>
+                        <th>{{ 'bookclub_manage.col_author'|trans }}</th>
+                        <th>{{ 'bookclub_manage.col_isbn'|trans }}</th>
+                        <th>{{ 'bookclub_manage.col_added_by'|trans }}</th>
+                        <th>{{ 'bookclub_manage.col_added_at'|trans }}</th>
+                        <th>{{ 'bookclub_manage.col_actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,14 +34,14 @@
                                     {{ book.title }}
                                 </a>
                             </td>
-                            <td>{{ book.author ?? 'Unknown' }}</td>
+                            <td>{{ book.author ?? 'bookclub_manage.label_unknown'|trans }}</td>
                             <td>{{ book.isbn }}</td>
                             <td>{{ get_user_name(book.createdBy) }}</td>
                             <td>{{ book.createdAt|date('Y-m-d H:i') }}</td>
                             <td>
                                 <a href="{{ path('app_profile_review') }}" class="button is-small is-info is-outlined">
                                     <span class="icon"><i class="fas fa-check-double"></i></span>
-                                    <span>Review</span>
+                                    <span>{{ 'bookclub_manage.button_review'|trans }}</span>
                                 </a>
                             </td>
                         </tr>
@@ -50,7 +50,7 @@
             </table>
         {% else %}
             <div class="notification is-light">
-                <p>No books pending approval!</p>
+                <p>{{ 'bookclub_manage.empty_no_pending'|trans }}</p>
             </div>
         {% endif %}
 

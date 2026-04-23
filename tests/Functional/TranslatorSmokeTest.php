@@ -63,6 +63,7 @@ class TranslatorSmokeTest extends WebTestCase
         'bookclub_suggestion',
         'bookclub_manage',
         'bookclub_tile',
+        'bookclub_views',
         // Dinnerclub plugin namespaces
         'dinnerclub',
         'dinnerclub_dinner',
