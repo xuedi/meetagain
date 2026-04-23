@@ -23,7 +23,7 @@
                 <div class="level-item">
                     <a href="{{ path('app_admin_email_announcements') }}" class="button">
                         <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                        <span>{{ 'button_back' | trans }}</span>
+                        <span>{{ 'global.button_back'|trans }}</span>
                     </a>
                 </div>
             </div>
@@ -112,7 +112,7 @@
                         <form action="{{ path('app_admin_email_announcements_delete', {'id': announcement.id}) }}" method="post">
                             <button type="submit" class="button is-danger is-fullwidth" onclick="return confirm('{{ 'admin_cms.confirm_delete_announcement' | trans | e('js') }}');">
                                 <span class="icon"><i class="fa fa-trash"></i></span>
-                                <span>{{ 'button_delete' | trans }}</span>
+                                <span>{{ 'global.button_delete'|trans }}</span>
                             </button>
                         </form>
                     {% else %}
