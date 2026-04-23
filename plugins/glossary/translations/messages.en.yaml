@@ -1,3 +1,5 @@
 page_plugin_glossary_title: 'Glossary'
 page_plugin_glossary_new_title: 'New entry'
 page_plugin_glossary_delete_title: 'Delete entry'
+glossary: {}
+glossary_blocks: {}
