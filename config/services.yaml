@@ -43,6 +43,11 @@ services:
         arguments:
             - !php/const Monolog\Logger::INFO
 
+    Sentry\Monolog\Handler:
+        arguments:
+            $hub: '@Sentry\State\HubInterface'
+            $level: !php/const Monolog\Logger::ERROR
+
     App\AssetMapper\OpaqueMediaPathResolver:
         decorates: asset_mapper.public_assets_path_resolver
 
