@@ -4,6 +4,7 @@ dinnerclub:
     page_title_edit: '翻译菜肴'
     page_title_details: '菜肴'
     menu_label: '晚餐俱乐部'
+    menu_dishes: '菜肴'
     breadcrumb_dishes: '菜肴'
     breadcrumb_add_new: '新增'
     breadcrumb_translate_lang: '翻译 (%lang%)'
