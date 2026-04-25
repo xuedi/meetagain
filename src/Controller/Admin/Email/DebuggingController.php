@@ -88,11 +88,11 @@ final class DebuggingController extends AbstractAdminController
 
             $this->mailer->send($email);
 
-            $this->addFlash('success', $this->translator->trans('admin_email.flash_test_email_sent', ['%subject%' => $subject, '%recipient%' => $recipient]));
+            $this->addFlash('success', $this->translator->trans('admin_email_debugging.flash_sent', ['%subject%' => $subject, '%recipient%' => $recipient]));
         } catch (TransportExceptionInterface $e) {
-            $this->addFlash('error', $this->translator->trans('admin_email.flash_test_email_failed'));
+            $this->addFlash('error', $this->translator->trans('admin_email_debugging.flash_failed'));
         } catch (Throwable $e) {
-            $this->addFlash('error', $this->translator->trans('admin_email.flash_test_email_error'));
+            $this->addFlash('error', $this->translator->trans('admin_email_debugging.flash_error'));
         }
 
         return $this->redirectToRoute('app_admin_email_debugging');

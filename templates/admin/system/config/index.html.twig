@@ -9,7 +9,7 @@
         <div class="columns">
             <div class="column is-6">
 
-                <h1 class="title is-5">{{ 'admin_system.heading_website_settings'|trans }}</h1>
+                <h1 class="title is-5">{{ 'admin_system_config.heading_website_settings'|trans }}</h1>
                 {{ form_start(form) }}
                 {{ form_row(form.url) }}
                 {{ form_row(form.host) }}
@@ -25,7 +25,7 @@
                 {{ form_row(form.dateFormat) }}
 
                 <fieldset class="p-4 mb-4 mt-4 fieldset-default">
-                    <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_system.heading_footer_columns'|trans }}</legend>
+                    <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_system_config.heading_footer_columns'|trans }}</legend>
                     <div class="columns mb-0">
                         <div class="column">
                             {{ form_row(form.footerCol1Title) }}
@@ -51,12 +51,12 @@
             <div class="column is-1"></div>
             <div class="column is-5 content">
 
-                <h1 class="title is-5">{{ 'admin_system.heading_on_off_settings'|trans }}</h1>
+                <h1 class="title is-5">{{ 'admin_system_config.heading_on_off_settings'|trans }}</h1>
                 <table class="table is-fullwidth">
                     <tbody>
                     {% for item in config %}
                         <tr>
-                            <td>{{ ("admin_system.config_option_" ~ item.name)|trans }}</td>
+                            <td>{{ ("admin_system_config.option_" ~ item.name)|trans }}</td>
                             <td>
                                 {% if item.isBoolean %}
 

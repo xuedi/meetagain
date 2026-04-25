@@ -50,9 +50,9 @@ final class PluginController extends AbstractAdminController
         try {
             $this->pluginService->install($key);
             $this->commandService->executeSubprocessMigrations();
-            $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_installed', ['%plugin%' => $key]));
+            $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_installed', ['%plugin%' => $key]));
         } catch (\Throwable $e) {
-            $this->addFlash('error', $this->translator->trans('admin_system.flash_plugin_install_failed', ['%error%' => $e->getMessage()]));
+            $this->addFlash('error', $this->translator->trans('admin_system_plugins.flash_install_failed', ['%error%' => $e->getMessage()]));
         }
 
         return $this->redirectToRoute('app_admin_plugin');
@@ -62,7 +62,7 @@ final class PluginController extends AbstractAdminController
     public function uninstall(string $key): Response
     {
         $this->pluginService->uninstall($key);
-        $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_uninstalled', ['%plugin%' => $key]));
+        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_uninstalled', ['%plugin%' => $key]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }
@@ -71,7 +71,7 @@ final class PluginController extends AbstractAdminController
     public function enable(string $key): Response
     {
         $this->pluginService->enable($key);
-        $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_enabled', ['%plugin%' => $key]));
+        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_enabled', ['%plugin%' => $key]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }
@@ -80,7 +80,7 @@ final class PluginController extends AbstractAdminController
     public function disable(string $key): Response
     {
         $this->pluginService->disable($key);
-        $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_disabled', ['%plugin%' => $key]));
+        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_disabled', ['%plugin%' => $key]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }

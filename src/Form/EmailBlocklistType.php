@@ -23,7 +23,7 @@ class EmailBlocklistType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'label' => 'admin_email.field_email',
+                'label' => 'admin_email_blocklist.field_email',
                 'constraints' => [
                     new NotBlank(),
                     new EmailConstraint(),
@@ -31,14 +31,14 @@ class EmailBlocklistType extends AbstractType
                 ],
             ])
             ->add('reason', TextType::class, [
-                'label' => 'admin_email.field_reason',
+                'label' => 'admin_email_blocklist.field_reason',
                 'constraints' => [
                     new NotBlank(),
                     new Length(max: 255),
                 ],
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'admin_email.button_add_blocklist',
+                'label' => 'admin_email_blocklist.button_add',
                 'attr' => ['class' => 'button is-primary'],
             ]);
     }

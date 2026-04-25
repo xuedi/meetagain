@@ -7,8 +7,8 @@
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
 
         <div class="content">
-            <h1 class="title">{{ 'admin_email.button_preview'|trans }}: {{ template.identifier }}</h1>
-            <p>{{ 'admin_email.preview_mock_notice'|trans }}</p>
+            <h1 class="title">{{ 'admin_email_templates.button_preview'|trans }}: {{ template.identifier }}</h1>
+            <p>{{ 'admin_email_templates.preview_mock_notice'|trans }}</p>
         </div>
 
         <div class="mb-4">
@@ -25,7 +25,7 @@
         <div class="columns">
             <div class="column is-8">
                 <div class="box">
-                    <p class="mb-4"><strong>{{ 'admin_email.col_subject'|trans }}:</strong> {{ renderedSubject }}</p>
+                    <p class="mb-4"><strong>{{ 'admin_email_templates.col_subject'|trans }}:</strong> {{ renderedSubject }}</p>
                     <hr>
                     <div class="content">
                         {{ renderedBody|raw }}
@@ -34,7 +34,7 @@
             </div>
             <div class="column">
                 <div class="box">
-                    <h3 class="subtitle">{{ 'admin_email.context_variables'|trans }}</h3>
+                    <h3 class="subtitle">{{ 'admin_email_templates.context_variables'|trans }}</h3>
                     <table class="table is-narrow is-fullwidth">
                         {% for key, value in context %}
                             <tr>

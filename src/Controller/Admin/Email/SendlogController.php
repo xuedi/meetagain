@@ -70,7 +70,7 @@ final class SendlogController extends AbstractAdminController
         $email->setErrorMessage(null);
         $this->em->flush();
 
-        $this->addFlash('success', $this->translator->trans('admin_email.flash_cap_cleared'));
+        $this->addFlash('success', $this->translator->trans('admin_email_sendlog.flash_cap_cleared'));
 
         return $this->redirectToRoute('app_admin_email_sendlog_show', ['id' => $email->getId()]);
     }
@@ -81,13 +81,13 @@ final class SendlogController extends AbstractAdminController
         $result = $this->syncService->syncPending(200);
 
         if ($result->available) {
-            $this->addFlash('success', $this->translator->trans('admin_email.flash_sync_success', [
+            $this->addFlash('success', $this->translator->trans('admin_email_sendlog.flash_sync_success', [
                 '%updated%' => $result->updated,
                 '%checked%' => $result->checked,
             ]));
         }
         if (!$result->available) {
-            $this->addFlash('warning', $this->translator->trans('admin_email.flash_provider_not_configured'));
+            $this->addFlash('warning', $this->translator->trans('admin_email_sendlog.flash_provider_not_configured'));
         }
 
         return $this->redirectToRoute('app_admin_email_sendlog');

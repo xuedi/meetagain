@@ -51,7 +51,7 @@ final class BlocklistController extends AbstractAdminController
         if ($form->isSubmitted() && $form->isValid()) {
             $existing = $this->repo->findByEmail((string) $entry->getEmail());
             if ($existing !== null) {
-                $this->addFlash('warning', $this->translator->trans('admin_email.flash_warning_already_blocklisted', [
+                $this->addFlash('warning', $this->translator->trans('admin_email_blocklist.flash_already_blocklisted', [
                     '%email%' => $existing->getEmail(),
                     '%reason%' => $existing->getReason(),
                 ]));
@@ -70,7 +70,7 @@ final class BlocklistController extends AbstractAdminController
             $this->em->persist($entry);
             $this->em->flush();
 
-            $this->addFlash('success', $this->translator->trans('admin_email.flash_success_added_blocklist', [
+            $this->addFlash('success', $this->translator->trans('admin_email_blocklist.flash_added', [
                 '%email%' => $entry->getEmail(),
             ]));
 
@@ -90,7 +90,7 @@ final class BlocklistController extends AbstractAdminController
         $this->em->remove($entry);
         $this->em->flush();
 
-        $this->addFlash('success', $this->translator->trans('admin_email.flash_success_removed_blocklist', [
+        $this->addFlash('success', $this->translator->trans('admin_email_blocklist.flash_removed', [
             '%email%' => $removed,
         ]));
 

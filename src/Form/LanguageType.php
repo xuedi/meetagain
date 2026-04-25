@@ -22,32 +22,32 @@ class LanguageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('code', TextType::class, [
-            'label' => 'admin_system.col_code',
+            'label' => 'admin_system_language.col_code',
             'constraints' => [
                 new NotBlank(),
                 new Length(exactly: 2),
                 new Regex(
                     pattern: '/^[a-z]{2}$/',
-                    message: 'admin_system.validator_language_code_pattern',
+                    message: 'admin_system_language.validator_code_pattern',
                 ),
             ],
             'disabled' => $options['is_edit'],
             'attr' => ['maxlength' => 2],
         ])->add('name', TextType::class, [
-            'label' => 'admin_system.col_name',
+            'label' => 'admin_system_language.col_name',
             'constraints' => [
                 new NotBlank(),
                 new Length(max: 64),
             ],
         ])->add('enabled', CheckboxType::class, [
-            'label' => 'admin_system.status_enabled',
+            'label' => 'admin_system_language.status_enabled',
             'required' => false,
         ])->add('sortOrder', IntegerType::class, [
-            'label' => 'admin_system.col_sort_order',
+            'label' => 'admin_system_language.col_sort_order',
         ])->add('tileImage', FileType::class, [
             'mapped' => false,
             'required' => false,
-            'label' => 'admin_system.heading_tile_image',
+            'label' => 'admin_system_language.heading_tile_image',
             'constraints' => [
                 new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error'),
             ],

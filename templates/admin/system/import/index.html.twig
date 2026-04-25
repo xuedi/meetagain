@@ -6,52 +6,52 @@
 
     {% if summary is defined %}
         <div class="notification is-success">
-            <h2 class="title is-5">{{ 'admin_system.import_success_title'|trans }}</h2>
+            <h2 class="title is-5">{{ 'admin_system_import.success_title'|trans }}</h2>
             <table class="table is-narrow">
                 <tbody>
                     <tr>
-                        <td>{{ 'admin_system.import_users_created'|trans }}</td>
+                        <td>{{ 'admin_system_import.users_created'|trans }}</td>
                         <td>{{ summary.usersCreated }}</td>
                     </tr>
                     <tr>
-                        <td>{{ 'admin_system.import_users_skipped'|trans }}</td>
+                        <td>{{ 'admin_system_import.users_skipped'|trans }}</td>
                         <td>{{ summary.usersSkipped }}</td>
                     </tr>
                     <tr>
-                        <td>{{ 'admin_system.import_locations_created'|trans }}</td>
+                        <td>{{ 'admin_system_import.locations_created'|trans }}</td>
                         <td>{{ summary.locationsCreated }}</td>
                     </tr>
                     <tr>
-                        <td>{{ 'admin_system.import_events_created'|trans }}</td>
+                        <td>{{ 'admin_system_import.events_created'|trans }}</td>
                         <td>{{ summary.eventsCreated }}</td>
                     </tr>
                     <tr>
-                        <td>{{ 'admin_system.import_cms_created'|trans }}</td>
+                        <td>{{ 'admin_system_import.cms_created'|trans }}</td>
                         <td>{{ summary.cmsPagesCreated }}</td>
                     </tr>
                     <tr>
-                        <td>{{ 'admin_system.import_cms_skipped'|trans }}</td>
+                        <td>{{ 'admin_system_import.cms_skipped'|trans }}</td>
                         <td>{{ summary.cmsPagesSkipped }}</td>
                     </tr>
                 </tbody>
             </table>
-            <p class="mt-3">{{ 'admin_system.import_note'|trans }}</p>
+            <p class="mt-3">{{ 'admin_system_import.note'|trans }}</p>
         </div>
     {% endif %}
 
     {% if error is defined %}
         <div class="notification is-danger">
-            <strong>{{ 'admin_system.import_failed'|trans }}</strong> {{ error }}
+            <strong>{{ 'admin_system_import.failed'|trans }}</strong> {{ error }}
         </div>
     {% endif %}
 
     <div class="box">
-        <h2 class="title is-5">{{ 'admin_system.heading_import'|trans }}</h2>
-        <p class="content">{{ 'admin_system.help_import'|trans }}</p>
+        <h2 class="title is-5">{{ 'admin_system_import.heading'|trans }}</h2>
+        <p class="content">{{ 'admin_system_import.help'|trans }}</p>
 
         <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
             <div class="field">
-                <label class="label">{{ 'admin_system.label_zip_file'|trans }}</label>
+                <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
                 <div class="control">
                     <input class="input" type="file" name="import_file" accept=".zip" required>
                 </div>
@@ -59,7 +59,7 @@
             <div class="field">
                 <button type="submit" class="button is-link">
                     <span class="icon"><i class="fas fa-file-import"></i></span>
-                    <span>{{ 'admin_system.button_import'|trans }}</span>
+                    <span>{{ 'admin_system_import.button'|trans }}</span>
                 </button>
             </div>
         </form>

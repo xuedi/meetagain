@@ -6,9 +6,9 @@
         <div class="control is-flex is-align-items-center">
             {{ form_widget(field) }}
             {% if text_preview|default(false) %}
-                <span class="ml-3" style="color: {{ field.vars.data }};">{{ 'admin_system.color_picker_sample'|trans }}</span>
+                <span class="ml-3" style="color: {{ field.vars.data }};">{{ 'admin_system_theme.color_picker_sample'|trans }}</span>
             {% else %}
-                <span class="tag ml-3" style="background-color: {{ field.vars.data }}; color: {{ light_text|default(true) ? 'white' : 'black' }};">{{ 'admin_system.color_picker_preview'|trans }}</span>
+                <span class="tag ml-3" style="background-color: {{ field.vars.data }}; color: {{ light_text|default(true) ? 'white' : 'black' }};">{{ 'admin_system_theme.color_picker_preview'|trans }}</span>
             {% endif %}
         </div>
         <p class="help">{{ help_key|trans }}</p>
