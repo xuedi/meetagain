@@ -6,8 +6,10 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Sentry\EventId;
 use Sentry\SentrySdk;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Twig\Environment;
@@ -25,6 +27,21 @@ final class ErrorController extends AbstractController
                 '_locale' => $request->getLocale(),
                 'message' => 'cms.error_404_default_message',
             ]), Response::HTTP_NOT_FOUND);
+        }
+
+        if ($exception instanceof HttpExceptionInterface) {
+            $status = $exception->getStatusCode();
+
+            if (str_starts_with($request->getPathInfo(), '/api/')) {
+                return new JsonResponse(['error' => $exception->getMessage()], $status);
+            }
+
+            $eventId = SentrySdk::getCurrentHub()->getLastEventId() ?? EventId::generate();
+
+            return new Response($this->twig->render('cms/error.html.twig', [
+                'errorId' => (string) $eventId,
+                'occurredAt' => (new DateTimeImmutable())->setTimezone(new DateTimeZone('UTC')),
+            ]), $status);
         }
 
         $eventId = SentrySdk::getCurrentHub()->getLastEventId() ?? EventId::generate();
