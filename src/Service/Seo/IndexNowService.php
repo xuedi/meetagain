@@ -19,7 +19,7 @@ use function Sentry\withScope;
 
 readonly class IndexNowService
 {
-    private const string CONFIG_KEY = 'indexnow_key';
+    private const string STATE_KEY = 'seo_indexnow_key';
     private const string STATE_KEY_LAST_SUBMIT = 'seo_indexnow_last_submit';
     private const string INDEXNOW_ENDPOINT = 'https://api.indexnow.org/IndexNow';
 
@@ -36,14 +36,14 @@ readonly class IndexNowService
 
     public function getOrCreateKey(): string
     {
-        $key = $this->configService->getString(self::CONFIG_KEY, '');
+        $key = $this->appStateService->get(self::STATE_KEY);
 
-        if ($key !== '') {
+        if ($key !== null && $key !== '') {
             return $key;
         }
 
         $key = bin2hex(random_bytes(16));
-        $this->configService->setString(self::CONFIG_KEY, $key);
+        $this->appStateService->set(self::STATE_KEY, $key);
 
         return $key;
     }
