@@ -17,6 +17,10 @@ when@dev:
             sentry_logs:
                 type: service
                 id: Sentry\SentryBundle\Monolog\LogsHandler
+            sentry_issues:
+                type: service
+                id: Sentry\Monolog\Handler
+                channels: ["!event"]
 
 when@test:
     monolog:
@@ -43,3 +47,7 @@ when@prod:
             sentry_logs:
                 type: service
                 id: Sentry\SentryBundle\Monolog\LogsHandler
+            sentry_issues:
+                type: service
+                id: Sentry\Monolog\Handler
+                channels: ["!event"]
