@@ -52,7 +52,7 @@ final class PluginController extends AbstractAdminController
             $this->commandService->executeSubprocessMigrations();
             $this->addFlash('success', $this->translator->trans('admin_system.flash_plugin_installed', ['%plugin%' => $key]));
         } catch (\Throwable $e) {
-            $this->addFlash('danger', $this->translator->trans('admin_system.flash_plugin_install_failed', ['%error%' => $e->getMessage()]));
+            $this->addFlash('error', $this->translator->trans('admin_system.flash_plugin_install_failed', ['%error%' => $e->getMessage()]));
         }
 
         return $this->redirectToRoute('app_admin_plugin');
