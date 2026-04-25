@@ -84,7 +84,7 @@ final class SelectionController extends AbstractController
         try {
             $this->selectionService->select($book, $event, $user->getId());
         } catch (RuntimeException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
@@ -100,14 +100,14 @@ final class SelectionController extends AbstractController
 
         $poll = $this->pollRepository->findByEventId($eventId);
         if ($poll === null) {
-            $this->addFlash('danger', $this->translator->trans('bookclub_manage.flash_no_poll'));
+            $this->addFlash('error', $this->translator->trans('bookclub_manage.flash_no_poll'));
             return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
         }
 
         $results = $this->pollService->getResults($poll->getId());
         $winner = $results['winner'];
         if ($winner === null) {
-            $this->addFlash('danger', $this->translator->trans('bookclub_manage.flash_no_winner'));
+            $this->addFlash('error', $this->translator->trans('bookclub_manage.flash_no_winner'));
             return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);
         }
 
@@ -116,7 +116,7 @@ final class SelectionController extends AbstractController
         try {
             $this->selectionService->select($winner->getBook(), $event, $user->getId());
         } catch (RuntimeException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_plugin_bookclub_select', ['eventId' => $eventId]);

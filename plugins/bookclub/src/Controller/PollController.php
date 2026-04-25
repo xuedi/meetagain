@@ -126,7 +126,7 @@ final class PollController extends AbstractController
                 ]);
             }
         } catch (RuntimeException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_plugin_bookclub_poll');
@@ -175,7 +175,7 @@ final class PollController extends AbstractController
 
                 return $this->redirectToRoute('app_plugin_bookclub_poll');
             } catch (RuntimeException $e) {
-                $this->addFlash('danger', $e->getMessage());
+                $this->addFlash('error', $e->getMessage());
             }
         }
 
@@ -219,7 +219,7 @@ final class PollController extends AbstractController
                 ]);
             }
         } catch (RuntimeException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_plugin_bookclub_poll');

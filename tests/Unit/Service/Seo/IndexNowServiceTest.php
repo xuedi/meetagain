@@ -14,6 +14,8 @@ use App\Service\Config\LanguageService;
 use App\Service\Seo\IndexNowService;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -28,6 +30,7 @@ class IndexNowServiceTest extends TestCase
         ?LanguageService $languageService = null,
         ?EventRepository $eventRepository = null,
         ?CmsRepository $cmsRepository = null,
+        ?LoggerInterface $logger = null,
     ): IndexNowService {
         $configStub = $configService ?? $this->createStub(ConfigService::class);
         $languageStub = $languageService ?? $this->createStub(LanguageService::class);
@@ -41,6 +44,7 @@ class IndexNowServiceTest extends TestCase
             languageService: $languageStub,
             eventRepository: $eventRepository ?? $this->createStub(EventRepository::class),
             cmsRepository: $cmsRepository ?? $this->createStub(CmsRepository::class),
+            logger: $logger ?? new NullLogger(),
         );
     }
 
