@@ -90,9 +90,6 @@ just checkTranslations
 
 # Scan templates and PHP for usages of a key
 just app "app:translation:scan events.button_save"
-
-# Rename keys across all three canonicals from a YAML mapping
-just app "app:translation:rename <mapping.yaml>"
 ```
 
 ---
