@@ -90,13 +90,13 @@ class LanguageExtensionTest extends TestCase
         $this->subject->getCurrentLocale();
     }
 
-    public function testGetAlternativeLanguageCodesReturnsAbsoluteUrls(): void
+    public function testGetAlternativeLanguageCodesReturnsAbsoluteUrlsOnCurrentHost(): void
     {
         $request = $this->createStub(Request::class);
         $request->method('getRequestUri')->willReturn('/en/events');
         $request->method('getLocale')->willReturn('en');
+        $request->method('getSchemeAndHttpHost')->willReturn('https://meetagain.local');
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
-        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local');
 
         $this->languageServiceStub
             ->method('getAltLangList')
@@ -107,6 +107,26 @@ class LanguageExtensionTest extends TestCase
         static::assertSame([
             'de' => 'https://meetagain.local/de/events',
             'zh' => 'https://meetagain.local/zh/events',
+        ], $result);
+    }
+
+    public function testGetAlternativeLanguageCodesStaysOnWhitelabelHost(): void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getRequestUri')->willReturn('/zh/events');
+        $request->method('getLocale')->willReturn('zh');
+        $request->method('getSchemeAndHttpHost')->willReturn('https://weiqi.example.org');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        $this->languageServiceStub
+            ->method('getAltLangList')
+            ->willReturn(['en' => '/en/events', 'de' => '/de/events']);
+
+        $result = $this->subject->getLanguageSwitcherOptions();
+
+        static::assertSame([
+            'en' => 'https://weiqi.example.org/en/events',
+            'de' => 'https://weiqi.example.org/de/events',
         ], $result);
     }
 

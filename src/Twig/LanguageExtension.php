@@ -87,7 +87,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
         $allAltLangList = $this->languageService->getAltLangList($request->getLocale(), $currentUri);
         $supportedLocales = array_flip(array_keys($this->applyAlternateLinkFilters($allAltLangList, $request)));
-        $host = rtrim($this->configService->getHost(), '/');
+        $host = $request->getSchemeAndHttpHost();
 
         $result = [];
         foreach ($allAltLangList as $locale => $path) {
