@@ -185,6 +185,8 @@ cms:
     languages_empty: '没有可用的语言'
     languages_tile_alt: '%language% 的图片'
     page_no_title_fallback: '未设置标题'
+    event_teaser_headline: '即将举行的活动'
+    event_teaser_empty: '暂无即将举行的活动'
 member:
     page_title: '成员目录'
     page_title_paginated: '成员目录 - 第 %page% 页'
