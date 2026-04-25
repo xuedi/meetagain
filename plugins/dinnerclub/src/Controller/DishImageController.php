@@ -43,7 +43,7 @@ final class DishImageController extends AbstractController
 
         $file = $request->files->get('image');
         if ($file === null) {
-            $this->addFlash('danger', $this->translator->trans('dinnerclub.flash_no_image'));
+            $this->addFlash('error', $this->translator->trans('dinnerclub.flash_no_image'));
 
             return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
         }
@@ -51,7 +51,7 @@ final class DishImageController extends AbstractController
         $user = $this->getAuthedUser();
         $image = $this->imageService->upload($file, $user, ImageType::PluginDish);
         if ($image === null) {
-            $this->addFlash('danger', $this->translator->trans('dinnerclub.flash_image_error'));
+            $this->addFlash('error', $this->translator->trans('dinnerclub.flash_image_error'));
 
             return $this->redirectToRoute('plugin_dinnerclub_item_show', ['id' => $id]);
         }
