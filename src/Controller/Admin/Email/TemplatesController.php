@@ -112,7 +112,7 @@ final class TemplatesController extends AbstractAdminController
             $template->setUpdatedAt(new DateTimeImmutable());
             $this->em->flush();
 
-            $this->addFlash('success', $this->translator->trans('admin_email.flash_success_template_saved'));
+            $this->addFlash('success', $this->translator->trans('admin_email_templates.flash_saved'));
 
             return $this->redirectToRoute('app_admin_email_templates');
         }
@@ -171,7 +171,7 @@ final class TemplatesController extends AbstractAdminController
         $template->setUpdatedAt(new DateTimeImmutable());
         $this->em->flush();
 
-        $this->addFlash('success', $this->translator->trans('admin_email.flash_success_template_reset'));
+        $this->addFlash('success', $this->translator->trans('admin_email_templates.flash_reset'));
 
         return $this->redirectToRoute('app_admin_email_templates_edit', ['id' => $template->getId()]);
     }

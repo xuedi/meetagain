@@ -9,10 +9,10 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ 'admin_email.col_email'|trans }}</th>
-                <th>{{ 'admin_email.col_reason'|trans }}</th>
-                <th>{{ 'admin_email.col_added_by'|trans }}</th>
-                <th>{{ 'admin_email.col_added_at'|trans }}</th>
+                <th>{{ 'admin_email_blocklist.col_email'|trans }}</th>
+                <th>{{ 'admin_email_blocklist.col_reason'|trans }}</th>
+                <th>{{ 'admin_email_blocklist.col_added_by'|trans }}</th>
+                <th>{{ 'admin_email_blocklist.col_added_at'|trans }}</th>
                 <th>
                     <a href="{{ path('app_admin_email_blocklist_add') }}">
                         <span class="icon"><i class="fa fa-plus"></i></span>
@@ -42,7 +42,7 @@
             {% else %}
                 <tr>
                     <td colspan="5" class="has-text-centered has-text-grey">
-                        {{ 'admin_email.blocklist_empty'|trans }}
+                        {{ 'admin_email_blocklist.empty'|trans }}
                     </td>
                 </tr>
             {% endfor %}

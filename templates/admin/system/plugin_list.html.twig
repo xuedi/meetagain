@@ -13,9 +13,9 @@
         <table class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ 'admin_system.col_version'|trans }}</th>
-                <th>{{ 'admin_system.col_plugin_name'|trans }}</th>
-                <th>{{ 'admin_system.col_description'|trans }}</th>
+                <th>{{ 'admin_system_plugins.col_version'|trans }}</th>
+                <th>{{ 'admin_system_plugins.col_plugin_name'|trans }}</th>
+                <th>{{ 'admin_system_plugins.col_description'|trans }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -28,23 +28,23 @@
                     <td class="has-text-right">
                         {% if plugin.installed %}
                             {% if plugin.enabled %}
-                                <button class="button is-danger is-light" disabled>{{ 'admin_system.button_uninstall'|trans }}</button>
+                                <button class="button is-danger is-light" disabled>{{ 'admin_system_plugins.button_uninstall'|trans }}</button>
                                 <form method="post" action="{{ path('admin_plugin_disable', {key: plugin.key}) }}" class="is-inline">
-                                    <button type="submit" class="button is-danger is-light">{{ 'admin_system.button_disable'|trans }}</button>
+                                    <button type="submit" class="button is-danger is-light">{{ 'admin_system_plugins.button_disable'|trans }}</button>
                                 </form>
                             {% else %}
                                 <form method="post" action="{{ path('admin_plugin_uninstall', {key: plugin.key}) }}" class="is-inline">
-                                    <button type="submit" class="button is-danger is-light">{{ 'admin_system.button_uninstall'|trans }}</button>
+                                    <button type="submit" class="button is-danger is-light">{{ 'admin_system_plugins.button_uninstall'|trans }}</button>
                                 </form>
                                 <form method="post" action="{{ path('admin_plugin_enable', {key: plugin.key}) }}" class="is-inline">
-                                    <button type="submit" class="button is-success is-light">{{ 'admin_system.button_enable'|trans }}</button>
+                                    <button type="submit" class="button is-success is-light">{{ 'admin_system_plugins.button_enable'|trans }}</button>
                                 </form>
                             {% endif %}
                         {% else %}
                             <form method="post" action="{{ path('admin_plugin_install', {key: plugin.key}) }}" class="is-inline">
-                                <button type="submit" class="button is-success is-light">{{ 'admin_system.button_install'|trans }}</button>
+                                <button type="submit" class="button is-success is-light">{{ 'admin_system_plugins.button_install'|trans }}</button>
                             </form>
-                            <button class="button is-success is-light" disabled>{{ 'admin_system.button_enable'|trans }}</button>
+                            <button class="button is-success is-light" disabled>{{ 'admin_system_plugins.button_enable'|trans }}</button>
                         {% endif %}
                     </td>
                 </tr>

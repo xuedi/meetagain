@@ -35,7 +35,7 @@ final class SeoController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->configService->saveSeoForm($form->getData());
-            $this->addFlash('success', $this->translator->trans('admin_system.flash_seo_saved'));
+            $this->addFlash('success', $this->translator->trans('admin_system_seo.flash_saved'));
         }
 
         return $this->render('admin/system/seo/index.html.twig', [
@@ -60,10 +60,10 @@ final class SeoController extends AbstractAdminController
 
         if ($status === 200 || $status === 202) {
             $this->indexNowService->recordSubmission();
-            $this->addFlash('success', $this->translator->trans('admin_system.flash_indexnow_submitted', ['%status%' => $status]));
+            $this->addFlash('success', $this->translator->trans('admin_system_seo.flash_indexnow_submitted', ['%status%' => $status]));
         }
         if ($status !== 200 && $status !== 202) {
-            $this->addFlash('error', $this->translator->trans('admin_system.flash_indexnow_failed', ['%status%' => $status]));
+            $this->addFlash('error', $this->translator->trans('admin_system_seo.flash_indexnow_failed', ['%status%' => $status]));
         }
 
         return $this->redirectToRoute('app_admin_system_seo');

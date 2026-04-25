@@ -7,7 +7,7 @@
         {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
 
         <div class="content">
-            <p>{{ 'admin_email.templates_intro'|trans }}</p>
+            <p>{{ 'admin_email_templates.intro'|trans }}</p>
         </div>
 
         {% for name,email in emails %}
@@ -22,7 +22,7 @@
             <div class="columns">
                 <div class="column is-7">
                     <div class="box">
-                        <p>{{ 'admin_email.col_subject'|trans }}: <b>{{ email.subject }}</b></p>
+                        <p>{{ 'admin_email_templates.col_subject'|trans }}: <b>{{ email.subject }}</b></p>
                         <br>
                         <div>
                             {{ email.renderedBody|raw }}

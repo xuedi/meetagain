@@ -4,8 +4,8 @@
     {% include 'admin/system/_tabs_navigation.html.twig' %}
 
     <div class="box">
-        <h2 class="title is-5">{{ 'admin_system.heading_permissions'|trans }}</h2>
-        <p class="content is-size-7 mb-5">{{ 'admin_system.help_permissions'|trans }}</p>
+        <h2 class="title is-5">{{ 'admin_system_permissions.heading'|trans }}</h2>
+        <p class="content is-size-7 mb-5">{{ 'admin_system_permissions.help'|trans }}</p>
 
         {% for roleId in roleOrder %}
             {% if groups[roleId] is defined %}
@@ -18,9 +18,9 @@
 
                     <span class="has-text-grey is-size-7 ml-3 mr-auto flex-shrink-0">
                         {% if roleId == 'Anonymous' %}
-                            {{ 'admin_system.anon_no_auth'|trans }}
+                            {{ 'admin_system_permissions.anon_no_auth'|trans }}
                         {% else %}
-                            {{ 'admin_system.anon_min_role'|trans }}
+                            {{ 'admin_system_permissions.anon_min_role'|trans }}
                         {% endif %}
                     </span>
 
@@ -54,7 +54,7 @@
                                     <td class="is-size-7 is-family-monospace">{{ entry.routeName }}</td>
                                     <td>
                                         {% if entry.httpMethods is empty %}
-                                            <span class="tag is-light is-size-7">{{ 'admin_system.perm_any'|trans }}</span>
+                                            <span class="tag is-light is-size-7">{{ 'admin_system_permissions.perm_any'|trans }}</span>
                                         {% else %}
                                             {% for method in entry.httpMethods %}
                                                 <span class="tag is-light is-size-7">{{ method }}</span>
@@ -65,13 +65,13 @@
                                     <td class="is-size-7">{{ entry.methodName }}</td>
                                     <td>
                                         {% for perm in entry.classPermissions %}
-                                            <span class="tag is-light is-size-7" title="{{ 'admin_system.perm_class_level'|trans }}">{{ perm }}</span>
+                                            <span class="tag is-light is-size-7" title="{{ 'admin_system_permissions.perm_class_level'|trans }}">{{ perm }}</span>
                                         {% endfor %}
                                         {% for perm in entry.methodPermissions %}
-                                            <span class="tag is-light is-size-7" title="{{ 'admin_system.perm_method_level'|trans }}">{{ perm }} ⬤</span>
+                                            <span class="tag is-light is-size-7" title="{{ 'admin_system_permissions.perm_method_level'|trans }}">{{ perm }} ⬤</span>
                                         {% endfor %}
                                         {% if entry.classPermissions is empty and entry.methodPermissions is empty %}
-                                            <span class="tag is-light is-size-7">{{ 'admin_system.perm_public'|trans }}</span>
+                                            <span class="tag is-light is-size-7">{{ 'admin_system_permissions.perm_public'|trans }}</span>
                                         {% endif %}
                                     </td>
                                 </tr>

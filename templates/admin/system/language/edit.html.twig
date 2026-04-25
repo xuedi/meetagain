@@ -6,7 +6,7 @@
 
         {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'language'} %}
 
-        <h1 class="title">{{ isEdit ? 'admin_system.page_title_edit'|trans : 'admin_system.page_title_add'|trans }}</h1>
+        <h1 class="title">{{ isEdit ? 'admin_system_language.page_title_edit'|trans : 'admin_system_language.page_title_add'|trans }}</h1>
 
         {{ form_start(form) }}
 
@@ -19,14 +19,14 @@
             </div>
             <div class="column is-4">
                 <div class="box">
-                    <h4 class="subtitle is-5">{{ 'admin_system.heading_tile_image'|trans }}</h4>
+                    <h4 class="subtitle is-5">{{ 'admin_system_language.heading_tile_image'|trans }}</h4>
                     {% if language.tileImage %}
                         <div class="mb-3">
                             {% include '_components/image.html.twig' with {'image': language.tileImage, 'size': '300x200'} %}
                         </div>
                     {% else %}
                         <div class="mb-3 has-text-grey">
-                            <em>{{ 'admin_system.no_image_uploaded'|trans }}</em>
+                            <em>{{ 'admin_system_images.no_image_uploaded'|trans }}</em>
                         </div>
                     {% endif %}
                     {{ form_row(form.tileImage) }}

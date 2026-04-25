@@ -21,27 +21,27 @@ class SeoSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('seoDescriptionDefault', TextareaType::class, [
-            'label' => 'admin_system.field_seo_default',
+            'label' => 'admin_system_seo.field_default',
             'required' => false,
             'data' => $this->configService->getSeoDescription('default'),
-            'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => $this->translator->trans('admin_system.placeholder_seo_default')],
+            'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => $this->translator->trans('admin_system_seo.placeholder_default')],
         ])->add('seoDescriptionEvents', TextareaType::class, [
-            'label' => 'admin_system.field_seo_events',
+            'label' => 'admin_system_seo.field_events',
             'required' => false,
             'data' => $this->configService->getSeoDescription('events'),
             'attr' => [
                 'rows' => 3,
                 'maxlength' => 160,
-                'placeholder' => $this->translator->trans('admin_system.placeholder_seo_events'),
+                'placeholder' => $this->translator->trans('admin_system_seo.placeholder_events'),
             ],
         ])->add('seoDescriptionMembers', TextareaType::class, [
-            'label' => 'admin_system.field_seo_members',
+            'label' => 'admin_system_seo.field_members',
             'required' => false,
             'data' => $this->configService->getSeoDescription('members'),
             'attr' => [
                 'rows' => 3,
                 'maxlength' => 160,
-                'placeholder' => $this->translator->trans('admin_system.placeholder_seo_members'),
+                'placeholder' => $this->translator->trans('admin_system_seo.placeholder_members'),
             ],
         ]);
     }

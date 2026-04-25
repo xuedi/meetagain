@@ -9,13 +9,13 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ 'admin_system.col_created_at'|trans }}</th>
-                <th>{{ 'admin_system.col_uploader'|trans }}</th>
+                <th>{{ 'admin_system_images.col_created_at'|trans }}</th>
+                <th>{{ 'admin_system_images.col_uploader'|trans }}</th>
                 <th></th>
-                <th>{{ 'admin_system.col_size'|trans }}</th>
-                <th>{{ 'admin_system.col_type'|trans }}</th>
-                <th>{{ 'admin_system.col_mime_type'|trans }}</th>
-                <th>{{ 'admin_system.col_usages'|trans }}</th>
+                <th>{{ 'admin_system_images.col_size'|trans }}</th>
+                <th>{{ 'admin_system_images.col_type'|trans }}</th>
+                <th>{{ 'admin_system_images.col_mime_type'|trans }}</th>
+                <th>{{ 'admin_system_images.col_usages'|trans }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -65,21 +65,21 @@
 
         <div class="buttons mt-4">
             <form action="{{ path('app_admin_regenerate_thumbnails') }}" method="post">
-                <button type="submit" class="button is-info" onclick="return confirm('{{ 'admin_system.confirm_regenerate_thumbnails'|trans|e('js') }}');">
+                <button type="submit" class="button is-info" onclick="return confirm('{{ 'admin_system_images.confirm_regenerate_thumbnails'|trans|e('js') }}');">
                     <span class="icon"><i class="fa fa-sync"></i></span>
-                    <span>{{ 'admin_system.button_regenerate_thumbnails'|trans }}</span>
+                    <span>{{ 'admin_system_images.button_regenerate_thumbnails'|trans }}</span>
                 </button>
             </form>
             <form action="{{ path('app_admin_cleanup_thumbnails') }}" method="post">
-                <button type="submit" class="button is-warning" onclick="return confirm('{{ 'admin_system.confirm_cleanup_thumbnails'|trans|e('js') }}');">
+                <button type="submit" class="button is-warning" onclick="return confirm('{{ 'admin_system_images.confirm_cleanup_thumbnails'|trans|e('js') }}');">
                     <span class="icon"><i class="fa fa-trash"></i></span>
-                    <span>{{ 'admin_system.button_cleanup_thumbnails'|trans }}</span>
+                    <span>{{ 'admin_system_images.button_cleanup_thumbnails'|trans }}</span>
                 </button>
             </form>
             <form action="{{ path('app_admin_sync_image_locations') }}" method="post">
-                <button type="submit" class="button is-primary" onclick="return confirm('{{ 'admin_system.confirm_sync_locations'|trans|e('js') }}');">
+                <button type="submit" class="button is-primary" onclick="return confirm('{{ 'admin_system_images.confirm_sync_locations'|trans|e('js') }}');">
                     <span class="icon"><i class="fa fa-map-pin"></i></span>
-                    <span>{{ 'admin_system.button_sync_locations'|trans }}</span>
+                    <span>{{ 'admin_system_images.button_sync_locations'|trans }}</span>
                 </button>
             </form>
         </div>

@@ -12,7 +12,7 @@
                     <input type="hidden" name="_token" value="{{ csrf_token('sync') }}">
                     <button type="submit" class="button is-small is-info">
                         <span class="icon"><i class="fa fa-refresh"></i></span>
-                        <span>{{ 'admin_email.button_sync'|trans }}</span>
+                        <span>{{ 'admin_email_sendlog.button_sync'|trans }}</span>
                     </button>
                 </form>
             </div>
@@ -21,12 +21,12 @@
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
-                <th>{{ 'admin_email.col_created'|trans }}</th>
-                <th>{{ 'admin_email.col_recipient'|trans }}</th>
-                <th>{{ 'admin_email.col_status'|trans }}</th>
-                <th>{{ 'admin_email.col_provider_status'|trans }}</th>
-                <th>{{ 'admin_email.col_template'|trans }}</th>
-                <th>{{ 'admin_email.col_dispatched'|trans }}</th>
+                <th>{{ 'admin_email_sendlog.col_created'|trans }}</th>
+                <th>{{ 'admin_email_sendlog.col_recipient'|trans }}</th>
+                <th>{{ 'admin_email_sendlog.col_status'|trans }}</th>
+                <th>{{ 'admin_email_sendlog.col_provider_status'|trans }}</th>
+                <th>{{ 'admin_email_sendlog.col_template'|trans }}</th>
+                <th>{{ 'admin_email_sendlog.col_dispatched'|trans }}</th>
                 <th></th>
             </tr>
             </thead>
@@ -56,7 +56,7 @@
                         {% elseif ps is not null %}
                             <span class="tag is-light">{{ ps }}</span>
                         {% elseif email.providerMessageId %}
-                            <span class="has-text-grey">{{ 'admin_email.status_pending_sync'|trans }}</span>
+                            <span class="has-text-grey">{{ 'admin_email_sendlog.status_pending_sync'|trans }}</span>
                         {% else %}
                             <span class="has-text-grey">–</span>
                         {% endif %}
@@ -84,7 +84,7 @@
             {% else %}
                 <tr>
                     <td colspan="7" class="has-text-centered has-text-grey">
-                        {{ 'admin_email.sendlog_empty'|trans }}
+                        {{ 'admin_email_sendlog.empty'|trans }}
                     </td>
                 </tr>
             {% endfor %}

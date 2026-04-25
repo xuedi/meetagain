@@ -40,7 +40,7 @@ final class ConfigController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->configService->saveForm($form->getData());
-            $this->addFlash('success', $this->translator->trans('admin_system.flash_settings_saved'));
+            $this->addFlash('success', $this->translator->trans('admin_system_config.flash_saved'));
         }
 
         return $this->render('admin/system/config/index.html.twig', [
