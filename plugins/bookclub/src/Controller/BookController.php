@@ -83,7 +83,7 @@ final class BookController extends AbstractController
 
                 return $this->redirectToRoute('app_plugin_bookclub_book_show', ['id' => $book->getId()]);
             } catch (RuntimeException $e) {
-                $this->addFlash('danger', $e->getMessage());
+                $this->addFlash('error', $e->getMessage());
             }
         }
 
