@@ -47,7 +47,6 @@ final class MemberController extends AbstractAdminController
     #[Route('/admin/member', name: 'app_admin_member')]
     public function list(): Response
     {
-        // Apply member filtering (multisite WhitelabelMemberFilter will inject restrictions)
         $filterResult = $this->filterService->getUserIdFilter();
         $users = $this->repo->findAllForAdmin($filterResult->getUserIds());
 

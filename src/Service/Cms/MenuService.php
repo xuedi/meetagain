@@ -40,11 +40,9 @@ readonly class MenuService
             return [];
         }
 
-        // Apply CMS filter (multisite filtering) — memoized per request
         $filterResult = $this->cmsFilterService->getCmsIdFilter();
         $allowedCmsIds = $filterResult->getCmsIds();
 
-        // Build cache key from type, locale and the set of allowed IDs
         $idHash = $allowedCmsIds !== null ? md5(implode(',', $allowedCmsIds)) : 'all';
         $cacheKey = sprintf('menu_%s_%s_%s', $type, $locale, $idHash);
 

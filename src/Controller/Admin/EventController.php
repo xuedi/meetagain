@@ -70,7 +70,6 @@ final class EventController extends AbstractAdminController
     #[Route('', name: 'app_admin_event')]
     public function list(): Response
     {
-        // Apply multisite filtering if enabled
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $eventIds = $filterResult->getEventIds();
 
