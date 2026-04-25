@@ -186,89 +186,31 @@ input[type="color"] {
     padding: 6px;
 }
 
-// Upcoming events teaser - calendar-pill list shown in the CMS EventTeaser block.
-.upcoming-events {
-    &__list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-}
+// Upcoming events teaser - bespoke bits not covered by Bulma utilities (fixed-width
+// date pill, hover background on the row, single-line ellipsis title).
+.upcoming-event__link {
+    color: inherit;
+    text-decoration: none;
+    border-radius: 4px;
+    align-items: center;
+    transition: background-color 0.12s ease;
 
-.upcoming-event {
-    & + & {
-        border-top: 1px solid #ececec;
-    }
-
-    &__link {
-        display: flex;
-        align-items: center;
-        gap: 0.85rem;
-        padding: 0.65rem 0.25rem;
+    &:hover {
+        background-color: #f6f8fb;
         color: inherit;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: background-color 0.12s ease;
-
-        &:hover {
-            background-color: #f6f8fb;
-            color: inherit;
-        }
     }
 
-    &__date {
-        flex: 0 0 auto;
+    .upcoming-event__date {
         width: 3.1rem;
-        text-align: center;
-        border-radius: 6px;
-        overflow: hidden;
         border: 1px solid #e0e0e0;
-        background: #fff;
-        line-height: 1;
+        border-radius: 6px;
+        line-height: 1.2;
     }
 
-    &__month {
-        display: block;
-        background: #485fc7;
-        color: #fff;
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        padding: 0.25rem 0;
-    }
-
-    &__day {
-        display: block;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #363636;
-        padding: 0.25rem 0 0.3rem;
-    }
-
-    &__body {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-
-    &__title {
-        display: block;
-        font-weight: 600;
-        color: #363636;
-        line-height: 1.25;
-        margin-bottom: 0.25rem;
+    .upcoming-event__title {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    &__meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25rem 0.85rem;
-        font-size: 0.8rem;
-        color: #7a7a7a;
-
-        .icon { color: #b5b5b5; }
     }
 }
 
