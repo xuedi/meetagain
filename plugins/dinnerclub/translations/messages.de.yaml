@@ -4,6 +4,7 @@ dinnerclub:
     page_title_edit: 'Gericht übersetzen'
     page_title_details: 'Gericht'
     menu_label: 'Dinner Club'
+    menu_dishes: 'Gerichte'
     breadcrumb_dishes: 'Gerichte'
     breadcrumb_add_new: 'Neu hinzufügen'
     breadcrumb_translate_lang: 'Übersetzen (%lang%)'

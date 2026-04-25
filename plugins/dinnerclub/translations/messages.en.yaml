@@ -4,6 +4,7 @@ dinnerclub:
     page_title_edit: 'Translate Dish'
     page_title_details: 'Dish'
     menu_label: 'Dinner Club'
+    menu_dishes: 'Dishes'
     breadcrumb_dishes: 'Dishes'
     breadcrumb_add_new: 'Add New'
     breadcrumb_translate_lang: 'Translate (%lang%)'
