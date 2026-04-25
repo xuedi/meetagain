@@ -61,9 +61,9 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->getUserDisplay($user), true);
     }
 
-    public function getAdminList(): array
+    public function getAdminList(int $limit = 250): array
     {
-        return $this->prepareActivityList($this->repo->findBy([], ['createdAt' => 'DESC'], 250));
+        return $this->prepareActivityList($this->repo->findRecentForAdmin($limit));
     }
 
     public function getAdminDetail(int $id): ?Activity

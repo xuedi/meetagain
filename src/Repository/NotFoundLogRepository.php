@@ -57,13 +57,32 @@ class NotFoundLogRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
-    public function getRecent200(): array
+    public function getRecent(int $limit = 200): array
     {
         return $this
             ->createQueryBuilder('n')
             ->orderBy('n.createdAt', 'DESC')
-            ->setMaxResults(200)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    public function countAll(): int
+    {
+        return (int) $this
+            ->createQueryBuilder('n')
+            ->select('COUNT(n.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findMostRecent(): ?NotFoundLog
+    {
+        return $this
+            ->createQueryBuilder('n')
+            ->orderBy('n.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

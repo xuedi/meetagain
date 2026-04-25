@@ -3,12 +3,13 @@
 namespace App\Service\System;
 
 use App\ValueObject\LogEntry;
+use DateTimeImmutable;
 use SplFileObject;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class LogReaderService
 {
-    private const int MAX_LIMIT = 500;
+    public const int MAX_LIMIT = 1000;
     private const int READ_MULTIPLIER = 10;
 
     public function __construct(
@@ -59,6 +60,30 @@ readonly class LogReaderService
         }
 
         return $entries;
+    }
+
+    public function countLines(): int
+    {
+        $logFile = $this->getLogFilePath();
+
+        if (!file_exists($logFile)) {
+            return 0;
+        }
+
+        $file = new SplFileObject($logFile, 'r');
+        $file->seek(PHP_INT_MAX);
+
+        return $file->key();
+    }
+
+    public function getLatestTimestamp(): ?DateTimeImmutable
+    {
+        $entries = $this->getRecentEntries(1);
+        if ($entries === []) {
+            return null;
+        }
+
+        return $entries[0]->getDate();
     }
 
     public function getLogFilePath(): string

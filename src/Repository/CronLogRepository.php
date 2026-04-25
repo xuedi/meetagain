@@ -38,6 +38,14 @@ class CronLogRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function countAll(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function deleteOlderThan(DateTimeImmutable $cutoff): int
     {
         return $this->createQueryBuilder('c')
