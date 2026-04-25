@@ -8,6 +8,7 @@ use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -25,6 +26,7 @@ readonly class IndexNowService
         private LanguageService $languageService,
         private EventRepository $eventRepository,
         private CmsRepository $cmsRepository,
+        private LoggerInterface $logger,
     ) {}
 
     public function getOrCreateKey(): string
@@ -113,8 +115,20 @@ readonly class IndexNowService
             'json' => $payload,
         ]);
 
+        $status = $response->getStatusCode();
+
+        if ($status !== 200 && $status !== 202) {
+            $this->logger->error('Submit to IndexNow failed', [
+                'status' => $status,
+                'host' => $host,
+                'key_location' => $payload['keyLocation'],
+                'url_count' => count($payload['urlList']),
+                'response_body' => $response->getContent(false),
+            ]);
+        }
+
         return [
-            'status' => $response->getStatusCode(),
+            'status' => $status,
             'host' => $host,
         ];
     }

@@ -59,7 +59,7 @@ final class SuggestionController extends AbstractController
                 'book_title' => $book->getTitle(),
             ]);
         } catch (RuntimeException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('error', $e->getMessage());
         }
 
         if ($request->request->get('redirect') === 'book') {
@@ -84,7 +84,7 @@ final class SuggestionController extends AbstractController
                 ]);
             }
         } catch (RuntimeException $e) {
-            $this->addFlash('danger', $e->getMessage());
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->redirectToRoute('app_plugin_bookclub_suggestions');
