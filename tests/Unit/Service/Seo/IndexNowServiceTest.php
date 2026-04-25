@@ -51,10 +51,10 @@ class IndexNowServiceTest extends TestCase
     public function testGetOrCreateKeyReturnsExistingKey(): void
     {
         // Arrange
-        $configStub = $this->createStub(ConfigService::class);
-        $configStub->method('getString')->willReturn('existingkey1234567890abcdef123456');
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn('existingkey1234567890abcdef123456');
 
-        $service = $this->makeService(configService: $configStub);
+        $service = $this->makeService(appStateService: $appStateStub);
 
         // Act
         $key = $service->getOrCreateKey();
@@ -66,14 +66,14 @@ class IndexNowServiceTest extends TestCase
     public function testGetOrCreateKeyGeneratesAndPersistsNewKeyWhenAbsent(): void
     {
         // Arrange
-        $configMock = $this->createMock(ConfigService::class);
-        $configMock->method('getString')->willReturn('');
-        $configMock
+        $appStateMock = $this->createMock(AppStateService::class);
+        $appStateMock->method('get')->willReturn(null);
+        $appStateMock
             ->expects($this->once())
-            ->method('setString')
-            ->with('indexnow_key', static::matchesRegularExpression('/^[a-f0-9]{32}$/'));
+            ->method('set')
+            ->with('seo_indexnow_key', static::matchesRegularExpression('/^[a-f0-9]{32}$/'));
 
-        $service = $this->makeService(configService: $configMock);
+        $service = $this->makeService(appStateService: $appStateMock);
 
         // Act
         $key = $service->getOrCreateKey();
@@ -84,21 +84,21 @@ class IndexNowServiceTest extends TestCase
 
     public function testGetOrCreateKeyReturnsSameKeyOnConsecutiveCalls(): void
     {
-        // Arrange: first call returns empty (key generated), subsequent calls return the generated key
+        // Arrange: first call returns null (key generated), subsequent calls return the generated key
         $generatedKey = null;
-        $configStub = $this->createStub(ConfigService::class);
-        $configStub
-            ->method('getString')
-            ->willReturnCallback(static function () use (&$generatedKey): string {
-                return $generatedKey ?? '';
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub
+            ->method('get')
+            ->willReturnCallback(static function () use (&$generatedKey): ?string {
+                return $generatedKey;
             });
-        $configStub
-            ->method('setString')
+        $appStateStub
+            ->method('set')
             ->willReturnCallback(static function (string $name, string $value) use (&$generatedKey): void {
                 $generatedKey = $value;
             });
 
-        $service = $this->makeService(configService: $configStub);
+        $service = $this->makeService(appStateService: $appStateStub);
 
         // Act
         $key1 = $service->getOrCreateKey();
@@ -215,8 +215,10 @@ class IndexNowServiceTest extends TestCase
     {
         // Arrange
         $configStub = $this->createStub(ConfigService::class);
-        $configStub->method('getString')->willReturn('abc123def456abc1');
         $configStub->method('getHost')->willReturn('https://example.com');
+
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn('abc123def456abc1');
 
         $responseMock = $this->createStub(ResponseInterface::class);
         $responseMock->method('getStatusCode')->willReturn(200);
@@ -250,6 +252,7 @@ class IndexNowServiceTest extends TestCase
 
         $service = $this->makeService(
             configService: $configStub,
+            appStateService: $appStateStub,
             httpClient: $httpClientMock,
             urlGenerator: $urlGeneratorStub,
             eventRepository: $eventRepositoryStub,
