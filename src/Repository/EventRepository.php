@@ -214,7 +214,32 @@ class EventRepository extends ServiceEntityRepository
      */
     public function getUpcomingEvents(int $number = 3, ?array $restrictToEventIds = null): array
     {
-        $qb = $this
+        // Two-step query so setMaxResults applies to distinct events, not to the
+        // post-join row count. Fetch-joining translations + rsvp inflates the row
+        // count per event; a single-pass LIMIT would truncate inside one event
+        // and hydrate fewer distinct entities than requested.
+        if ($restrictToEventIds === []) {
+            return [];
+        }
+
+        $idsQb = $this
+            ->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.start > :date')
+            ->setParameter('date', new DateTime())
+            ->orderBy('e.start', 'ASC')
+            ->setMaxResults($number);
+
+        if ($restrictToEventIds !== null) {
+            $idsQb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        $ids = $idsQb->getQuery()->getSingleColumnResult();
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
@@ -224,18 +249,11 @@ class EventRepository extends ServiceEntityRepository
             ->addSelect('r')
             ->leftJoin('e.previewImage', 'pi')
             ->addSelect('pi')
-            ->where('e.start > :date')
-            ->setParameter('date', new DateTime());
-
-        // Apply event ID filter if provided
-        if ($restrictToEventIds !== null) {
-            if ($restrictToEventIds === []) {
-                return [];
-            }
-            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
-        }
-
-        return $qb->orderBy('e.start', 'ASC')->setMaxResults($number)->getQuery()->getResult();
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('e.start', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**

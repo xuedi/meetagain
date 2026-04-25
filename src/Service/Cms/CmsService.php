@@ -5,7 +5,6 @@ namespace App\Service\Cms;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
-use App\Repository\EventRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -16,7 +15,6 @@ readonly class CmsService
     public function __construct(
         private Environment $twig,
         private CmsRepository $repo,
-        private EventRepository $eventRepo,
         private EventFilterService $eventFilterService,
         private CmsFilterService $cmsFilterService,
         private CmsPageCacheService $cmsPageCacheService,
@@ -47,7 +45,9 @@ readonly class CmsService
             ]), Response::HTTP_NO_CONTENT);
         }
 
-        // Apply event filter — affects which events are embedded in the page content
+        // Resolve the event filter result for cache fingerprinting only. The actual events
+        // embedded in EventTeaser blocks are looked up at render time via the
+        // `cms_upcoming_events()` Twig function, which calls the same filter chain.
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $eventIds = $filterResult->getEventIds();
 
@@ -70,7 +70,6 @@ readonly class CmsService
         $content = $this->twig->render('cms/index.html.twig', [
             'title' => $cms->getPageTitle($locale) ?? $this->translator->trans('cms.page_no_title_fallback'),
             'blocks' => $blocks,
-            'events' => $this->eventRepo->getUpcomingEvents(3, $eventIds),
         ]);
 
         if ($anonymous) {
