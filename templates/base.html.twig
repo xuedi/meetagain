@@ -34,6 +34,9 @@
     {% block json_ld %}{% endblock %}
 
     <link rel="stylesheet" href="{{ asset('styles/app.scss') }}"/>
+    {% if app.request.locale starts with 'zh' %}
+        <link rel="stylesheet" href="{{ asset('styles/lxgw-wenkai.scss') }}"/>
+    {% endif %}
     {% for stylesheetPath in get_plugin_stylesheets() %}
         <link rel="stylesheet" href="{{ asset(stylesheetPath) }}"/>
     {% endfor %}
