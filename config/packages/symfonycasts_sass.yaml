@@ -1,4 +1,5 @@
 symfonycasts_sass:
     root_sass:
         - 'assets/styles/app.scss'
+        - 'assets/styles/lxgw-wenkai.scss'
     binary: /usr/local/bin/sass
