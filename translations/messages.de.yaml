@@ -185,6 +185,8 @@ cms:
     languages_empty: 'Keine Sprachen verfügbar'
     languages_tile_alt: 'Bild für %language%'
     page_no_title_fallback: 'Kein Titel gesetzt'
+    event_teaser_headline: 'Anstehende Events'
+    event_teaser_empty: 'Keine anstehenden Events'
 member:
     page_title: 'Mitgliederverzeichnis'
     page_title_paginated: 'Mitgliederverzeichnis - Seite %page%'

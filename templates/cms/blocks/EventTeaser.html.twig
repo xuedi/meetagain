@@ -18,21 +18,44 @@
                 </div>
             {% endif %}
             <div class="column is-4">
-                <div class="box mb-6">
-                    <div class="has-text-centered mb-4">
-                        <h2 class="title is-6">upcoming Events</h2>
-                    </div>
-                    {% for event in cms_upcoming_events(3) %}
-                        <div>
-                            <div class="columns has-text-grey mb-0">
-                                <div class="column"><i class="fas fa-calendar"></i> {{ event.start|date('Y-m-d') }}</div>
-                                <div class="column"><i class="fas fa-clock"></i> {{ event.start|date('H:i') }}</div>
-                                <div class="column"><i class="fas fa-location-pin"></i> {{ event.location.name }}</div>
-                            </div>
-                            <a class="title is-6" href="{{ path('app_event_details', { 'id': event.id }) }}">{{ event.title(app.locale)|slice(0, 32) }}</a>
-                            {% if not loop.last %}<hr />{% endif %}
-                        </div>
-                    {% endfor %}
+                <div class="box upcoming-events mb-6">
+                    <h3 class="title is-5 mb-4">
+                        <span class="icon-text">
+                            <span>{{ 'cms.event_teaser_headline'|trans }}</span>
+                        </span>
+                    </h3>
+                    {% set upcomingEvents = cms_upcoming_events(4) %}
+                    {% if upcomingEvents is empty %}
+                        <p class="has-text-grey has-text-centered py-3">
+                            {{ 'cms.event_teaser_empty'|trans }}
+                        </p>
+                    {% else %}
+                        <ul class="upcoming-events__list">
+                            {% for event in upcomingEvents %}
+                                <li class="upcoming-event">
+                                    <a class="upcoming-event__link" href="{{ path('app_event_details', { 'id': event.id }) }}">
+                                        <div class="upcoming-event__date" aria-hidden="true">
+                                            <span class="upcoming-event__month">{{ event.start|date('M')|upper }}</span>
+                                            <span class="upcoming-event__day">{{ event.start|date('j') }}</span>
+                                        </div>
+                                        <div class="upcoming-event__body">
+                                            <span class="upcoming-event__title">{{ event.title(app.locale) }}</span>
+                                            <span class="upcoming-event__meta">
+                                                <span class="icon-text">
+                                                    <span class="icon is-small"><i class="far fa-clock"></i></span>
+                                                    <span>{{ event.start|date('H:i') }}</span>
+                                                </span>
+                                                <span class="icon-text">
+                                                    <span class="icon is-small"><i class="fas fa-location-dot"></i></span>
+                                                    <span>{{ event.location.name }}</span>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
         </div>
