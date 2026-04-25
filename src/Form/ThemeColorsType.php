@@ -25,44 +25,44 @@ class ThemeColorsType extends AbstractType
 
         $builder
             ->add('color_primary', ColorType::class, [
-                'label' => 'admin_system.field_color_primary',
+                'label' => 'admin_system_theme.field_color_primary',
                 'data' => $colors['color_primary'],
-                'attr' => ['title' => $t->trans('admin_system.color_primary')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_primary')],
             ])
             ->add('color_link', ColorType::class, [
-                'label' => 'admin_system.field_color_link',
+                'label' => 'admin_system_theme.field_color_link',
                 'data' => $colors['color_link'],
-                'attr' => ['title' => $t->trans('admin_system.color_link')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_link')],
             ])
             ->add('color_info', ColorType::class, [
-                'label' => 'admin_system.field_color_info',
+                'label' => 'admin_system_theme.field_color_info',
                 'data' => $colors['color_info'],
-                'attr' => ['title' => $t->trans('admin_system.color_info')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_info')],
             ])
             ->add('color_success', ColorType::class, [
-                'label' => 'admin_system.field_color_success',
+                'label' => 'admin_system_theme.field_color_success',
                 'data' => $colors['color_success'],
-                'attr' => ['title' => $t->trans('admin_system.color_success')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_success')],
             ])
             ->add('color_warning', ColorType::class, [
-                'label' => 'admin_system.field_color_warning',
+                'label' => 'admin_system_theme.field_color_warning',
                 'data' => $colors['color_warning'],
-                'attr' => ['title' => $t->trans('admin_system.color_warning')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_warning')],
             ])
             ->add('color_danger', ColorType::class, [
-                'label' => 'admin_system.field_color_danger',
+                'label' => 'admin_system_theme.field_color_danger',
                 'data' => $colors['color_danger'],
-                'attr' => ['title' => $t->trans('admin_system.color_danger')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_danger')],
             ])
             ->add('color_text_grey', ColorType::class, [
-                'label' => 'admin_system.field_color_text_grey',
+                'label' => 'admin_system_theme.field_color_text_grey',
                 'data' => $colors['color_text_grey'],
-                'attr' => ['title' => $t->trans('admin_system.color_text_grey')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_text_grey')],
             ])
             ->add('color_text_grey_light', ColorType::class, [
-                'label' => 'admin_system.field_color_text_grey_light',
+                'label' => 'admin_system_theme.field_color_text_grey_light',
                 'data' => $colors['color_text_grey_light'],
-                'attr' => ['title' => $t->trans('admin_system.color_text_grey_light')],
+                'attr' => ['title' => $t->trans('admin_system_theme.color_text_grey_light')],
             ]);
     }
 

@@ -31,7 +31,7 @@ Error: 错误
 'support.validator_message_blank': '请输入消息内容。'
 'support.validator_message_max': '消息不能超过 {{ limit }} 个字符。'
 
-# Shared + admin_system - phase 38 (validator-domain keys reused across forms)
+# Shared + admin_system_language - phase 38 (validator-domain keys reused across forms)
 'shared.form_image_upload_mime_error': '请上传有效的图片。'
 'shared.form_image_upload_mime_error_square': '请上传有效的图片，最好是正方形格式。'
-'admin_system.validator_language_code_pattern': '语言代码必须是 2 个小写字母（例如 en、de、zh）。'
+'admin_system_language.validator_code_pattern': '语言代码必须是 2 个小写字母（例如 en、de、zh）。'

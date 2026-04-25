@@ -37,12 +37,12 @@ class EmailTemplateType extends AbstractType
                     'language' => $languageCode,
                 ]);
                 $builder->add("subject-{$languageCode}", TextType::class, [
-                    'label' => $this->translator->trans('admin_email.field_subject_locale', ['%locale%' => $languageCode]),
+                    'label' => $this->translator->trans('admin_email_templates.field_subject_locale', ['%locale%' => $languageCode]),
                     'data' => $translation?->getSubject() ?? '',
                     'mapped' => false,
                 ]);
                 $builder->add("body-{$languageCode}", TextareaType::class, [
-                    'label' => $this->translator->trans('admin_email.field_body_locale', ['%locale%' => $languageCode]),
+                    'label' => $this->translator->trans('admin_email_templates.field_body_locale', ['%locale%' => $languageCode]),
                     'data' => $translation?->getBody() ?? '',
                     'mapped' => false,
                     'attr' => ['rows' => 15],

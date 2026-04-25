@@ -200,7 +200,7 @@ Error: Error
 'support.validator_message_blank': 'Please enter a message.'
 'support.validator_message_max': 'Message cannot be longer than {{ limit }} characters.'
 
-# Shared + admin_system - phase 38 (validator-domain keys reused across forms)
+# Shared + admin_system_language - phase 38 (validator-domain keys reused across forms)
 'shared.form_image_upload_mime_error': 'Please upload a valid image.'
 'shared.form_image_upload_mime_error_square': 'Please upload a valid image, preferably in square format.'
-'admin_system.validator_language_code_pattern': 'Language code must be 2 lowercase letters (e.g., en, de, zh).'
+'admin_system_language.validator_code_pattern': 'Language code must be 2 lowercase letters (e.g., en, de, zh).'

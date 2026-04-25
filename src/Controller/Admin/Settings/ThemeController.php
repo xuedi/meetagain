@@ -36,7 +36,7 @@ final class ThemeController extends AbstractAdminController
         if ($colorsForm->isSubmitted() && $colorsForm->isValid()) {
             $this->configService->saveColors($colorsForm->getData());
             $this->commandService->rebuildTheme();
-            $this->addFlash('success', $this->translator->trans('admin_system.flash_theme_saved'));
+            $this->addFlash('success', $this->translator->trans('admin_system_theme.flash_saved'));
         }
 
         return $this->render('admin/system/theme/index.html.twig', [

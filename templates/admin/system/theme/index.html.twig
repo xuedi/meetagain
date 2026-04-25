@@ -6,19 +6,19 @@
 
         {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'theme'} %}
 
-        <h1 class="title is-5">{{ 'admin_system.heading_theme_colors'|trans }}</h1>
-        <p class="subtitle is-6 has-text-grey">{{ 'admin_system.help_theme_colors'|trans }}</p>
+        <h1 class="title is-5">{{ 'admin_system_theme.heading_colors'|trans }}</h1>
+        <p class="subtitle is-6 has-text-grey">{{ 'admin_system_theme.help_colors'|trans }}</p>
 
         {{ form_start(colorsForm) }}
         <div class="columns is-multiline">
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_primary, help_key: 'admin_system.color_primary'} %}
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_link, help_key: 'admin_system.color_link'} %}
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_info, help_key: 'admin_system.color_info'} %}
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_success, help_key: 'admin_system.color_success'} %}
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_warning, help_key: 'admin_system.color_warning', light_text: false} %}
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_danger, help_key: 'admin_system.color_danger'} %}
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_text_grey, help_key: 'admin_system.color_text_grey', text_preview: true} %}
-            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_text_grey_light, help_key: 'admin_system.color_text_grey_light', text_preview: true} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_primary, help_key: 'admin_system_theme.color_primary'} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_link, help_key: 'admin_system_theme.color_link'} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_info, help_key: 'admin_system_theme.color_info'} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_success, help_key: 'admin_system_theme.color_success'} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_warning, help_key: 'admin_system_theme.color_warning', light_text: false} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_danger, help_key: 'admin_system_theme.color_danger'} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_text_grey, help_key: 'admin_system_theme.color_text_grey', text_preview: true} %}
+            {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_text_grey_light, help_key: 'admin_system_theme.color_text_grey_light', text_preview: true} %}
         </div>
         <button class="button is-link">{{ 'global.button_save'|trans }}</button>
         {{ form_end(colorsForm) }}

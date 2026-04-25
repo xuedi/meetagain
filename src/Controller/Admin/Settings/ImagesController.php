@@ -69,7 +69,7 @@ final class ImagesController extends AbstractAdminController
         $cnt = $this->imageService->regenerateAllThumbnails();
         $executionTime = round(microtime(true) - $startTime, 2);
 
-        $this->addFlash('success', $this->translator->trans('admin_system.flash_thumbnails_regenerated', [
+        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_thumbnails_regenerated', [
             '%count%' => $cnt,
             '%seconds%' => $executionTime,
         ]));
@@ -84,7 +84,7 @@ final class ImagesController extends AbstractAdminController
         $cnt = $this->imageService->deleteObsoleteThumbnails();
         $executionTime = round(microtime(true) - $startTime, 2);
 
-        $this->addFlash('success', $this->translator->trans('admin_system.flash_thumbnails_cleaned', [
+        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_thumbnails_cleaned', [
             '%count%' => $cnt,
             '%seconds%' => $executionTime,
         ]));
@@ -96,7 +96,7 @@ final class ImagesController extends AbstractAdminController
     public function syncLocations(): Response
     {
         $this->imageLocationService->discover();
-        $this->addFlash('success', $this->translator->trans('admin_system.flash_locations_synced'));
+        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_locations_synced'));
 
         return $this->redirectToRoute('app_admin_system_images');
     }

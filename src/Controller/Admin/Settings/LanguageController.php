@@ -66,7 +66,7 @@ final class LanguageController extends AbstractAdminController
 
             $this->languageService->invalidateCache();
 
-            $this->addFlash('success', $this->translator->trans('admin_system.flash_language_added'));
+            $this->addFlash('success', $this->translator->trans('admin_system_language.flash_added'));
 
             return $this->redirectToRoute('app_admin_language');
         }
@@ -101,7 +101,7 @@ final class LanguageController extends AbstractAdminController
 
             $this->languageService->invalidateCache();
 
-            $this->addFlash('success', $this->translator->trans('admin_system.flash_language_updated'));
+            $this->addFlash('success', $this->translator->trans('admin_system_language.flash_updated'));
 
             return $this->redirectToRoute('app_admin_language');
         }
