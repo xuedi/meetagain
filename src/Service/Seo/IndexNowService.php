@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Service\Seo;
 
@@ -131,7 +133,7 @@ readonly class IndexNowService
                 'response_body' => $response->getContent(false),
             ];
             $this->logger->error('Submit to IndexNow failed', $context);
-            withScope(function (Scope $scope) use ($context): void {
+            withScope(static function (Scope $scope) use ($context): void {
                 $scope->setContext('indexnow', $context);
                 captureMessage('Submit to IndexNow failed', Severity::error());
             });
@@ -160,7 +162,7 @@ readonly class IndexNowService
     {
         $this->appStateService->set(
             self::STATE_KEY_LAST_SUBMIT,
-            (new DateTimeImmutable('now'))->format(DateTimeImmutable::ATOM),
+            new DateTimeImmutable('now')->format(DateTimeImmutable::ATOM),
         );
     }
 }

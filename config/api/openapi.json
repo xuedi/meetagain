@@ -509,8 +509,8 @@
                 "tags": [
                     "logs"
                 ],
-                "summary": "Read recent application log entries",
-                "x-example": "curl 'HOST/api/logs?limit=50&level=WARNING' \\\n  -H \"Authorization: Bearer $TOKEN\"",
+                "summary": "Summary of all log streams (counts + latest timestamps)",
+                "x-example": "curl 'HOST/api/logs' \\\n  -H \"Authorization: Bearer $TOKEN\"",
                 "security": [
                     {
                         "bearerAuth": []
@@ -519,6 +519,94 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/logs/system": {
+            "get": {
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Recent file-based system log entries (Monolog rotating file)",
+                "x-example": "curl 'HOST/api/logs/system?limit=50&level=WARNING' \\\n  -H \"Authorization: Bearer $TOKEN\"",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - limit out of range or non-numeric"
+                    }
+                }
+            }
+        },
+        "/api/logs/activity": {
+            "get": {
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Recent user activity stream entries",
+                "x-example": "curl 'HOST/api/logs/activity?limit=50' \\\n  -H \"Authorization: Bearer $TOKEN\"",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - limit out of range or non-numeric"
+                    }
+                }
+            }
+        },
+        "/api/logs/not-found": {
+            "get": {
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Recent 404 not-found URL log entries",
+                "x-example": "curl 'HOST/api/logs/not-found?limit=50' \\\n  -H \"Authorization: Bearer $TOKEN\"",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - limit out of range or non-numeric"
+                    }
+                }
+            }
+        },
+        "/api/logs/cron": {
+            "get": {
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Recent cron run log entries",
+                "x-example": "curl 'HOST/api/logs/cron?limit=50' \\\n  -H \"Authorization: Bearer $TOKEN\"",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request - limit out of range or non-numeric"
                     }
                 }
             }

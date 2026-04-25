@@ -131,8 +131,8 @@ class ActivityServiceTest extends TestCase
         $repoMock = $this->createMock(ActivityRepository::class);
         $repoMock
             ->expects($this->once())
-            ->method('findBy')
-            ->with([], ['createdAt' => 'DESC'], 250)
+            ->method('findRecentForAdmin')
+            ->with(250)
             ->willReturn($activities);
 
         // Arrange: mock MessageInterface instances that render messages for admin view (without links)
