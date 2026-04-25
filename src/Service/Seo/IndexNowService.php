@@ -9,8 +9,13 @@ use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
+use Sentry\Severity;
+use Sentry\State\Scope;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+use function Sentry\captureMessage;
+use function Sentry\withScope;
 
 readonly class IndexNowService
 {
@@ -118,13 +123,18 @@ readonly class IndexNowService
         $status = $response->getStatusCode();
 
         if ($status !== 200 && $status !== 202) {
-            $this->logger->error('Submit to IndexNow failed', [
+            $context = [
                 'status' => $status,
                 'host' => $host,
                 'key_location' => $payload['keyLocation'],
                 'url_count' => count($payload['urlList']),
                 'response_body' => $response->getContent(false),
-            ]);
+            ];
+            $this->logger->error('Submit to IndexNow failed', $context);
+            withScope(function (Scope $scope) use ($context): void {
+                $scope->setContext('indexnow', $context);
+                captureMessage('Submit to IndexNow failed', Severity::error());
+            });
         }
 
         return [
