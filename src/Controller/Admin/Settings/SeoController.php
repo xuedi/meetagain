@@ -50,7 +50,7 @@ final class SeoController extends AbstractAdminController
     public function indexNowSubmit(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('indexnow_submit', $request->request->getString('_token'))) {
-            $this->addFlash('danger', $this->translator->trans('admin_system.flash_invalid_csrf'));
+            $this->addFlash('error', $this->translator->trans('admin_system.flash_invalid_csrf'));
 
             return $this->redirectToRoute('app_admin_system_seo');
         }
@@ -63,7 +63,7 @@ final class SeoController extends AbstractAdminController
             $this->addFlash('success', $this->translator->trans('admin_system.flash_indexnow_submitted', ['%status%' => $status]));
         }
         if ($status !== 200 && $status !== 202) {
-            $this->addFlash('danger', $this->translator->trans('admin_system.flash_indexnow_failed', ['%status%' => $status]));
+            $this->addFlash('error', $this->translator->trans('admin_system.flash_indexnow_failed', ['%status%' => $status]));
         }
 
         return $this->redirectToRoute('app_admin_system_seo');
