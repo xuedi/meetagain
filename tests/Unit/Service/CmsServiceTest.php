@@ -8,7 +8,6 @@ use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
-use App\Repository\EventRepository;
 use App\Service\Cms\CmsPageCacheService;
 use App\Service\Cms\CmsService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -35,7 +34,6 @@ class CmsServiceTest extends TestCase
         $subject = new CmsService(
             twig: $twigMock,
             repo: $this->createStub(CmsRepository::class),
-            eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
@@ -65,7 +63,6 @@ class CmsServiceTest extends TestCase
         $subject = new CmsService(
             twig: $this->createStub(Environment::class),
             repo: $cmsRepoMock,
-            eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $this->createStub(CmsFilterService::class),
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
@@ -106,7 +103,6 @@ class CmsServiceTest extends TestCase
         $subject = new CmsService(
             twig: $twigMock,
             repo: $cmsRepoMock,
-            eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
@@ -155,7 +151,6 @@ class CmsServiceTest extends TestCase
         $subject = new CmsService(
             twig: $twigMock,
             repo: $cmsRepoMock,
-            eventRepo: $this->createStub(EventRepository::class),
             eventFilterService: $this->createStub(EventFilterService::class),
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
@@ -178,7 +173,6 @@ class CmsServiceTest extends TestCase
         $slug = 'existing-page';
         $pageTitle = 'Page Title';
         $expectedContent = 'rendered page content';
-        $upcomingEvents = ['event1', 'event2'];
         $blocks = new ArrayCollection(['block1', 'block2']);
 
         $cmsMock = $this->createMock(Cms::class);
@@ -205,9 +199,6 @@ class CmsServiceTest extends TestCase
         $cmsRepoMock = $this->createMock(CmsRepository::class);
         $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn($cmsMock);
 
-        $eventRepoMock = $this->createMock(EventRepository::class);
-        $eventRepoMock->expects($this->once())->method('getUpcomingEvents')->with(3, null)->willReturn($upcomingEvents);
-
         $twigMock = $this->createMock(Environment::class);
         $twigMock
             ->expects($this->once())
@@ -215,14 +206,12 @@ class CmsServiceTest extends TestCase
             ->with('cms/index.html.twig', [
                 'title' => $pageTitle,
                 'blocks' => $blocks,
-                'events' => $upcomingEvents,
             ])
             ->willReturn($expectedContent);
 
         $subject = new CmsService(
             twig: $twigMock,
             repo: $cmsRepoMock,
-            eventRepo: $eventRepoMock,
             eventFilterService: $eventFilterServiceMock,
             cmsFilterService: $cmsFilterServiceMock,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
@@ -256,10 +245,6 @@ class CmsServiceTest extends TestCase
         $cmsRepoStub = $this->createStub(CmsRepository::class);
         $cmsRepoStub->method('findPublishedBySlug')->willReturn($cmsStub);
 
-        // Arrange: stub event repository to return empty events
-        $eventRepoStub = $this->createStub(EventRepository::class);
-        $eventRepoStub->method('getUpcomingEvents')->willReturn([]);
-
         // Arrange: stub filter services
         $cmsFilterServiceStub = $this->createStub(CmsFilterService::class);
         $cmsFilterServiceStub->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
@@ -275,14 +260,12 @@ class CmsServiceTest extends TestCase
             ->with('cms/index.html.twig', [
                 'title' => 'cms.page_no_title_fallback',
                 'blocks' => $blocks,
-                'events' => [],
             ])
             ->willReturn($expectedContent);
 
         $subject = new CmsService(
             twig: $twigMock,
             repo: $cmsRepoStub,
-            eventRepo: $eventRepoStub,
             eventFilterService: $eventFilterServiceStub,
             cmsFilterService: $cmsFilterServiceStub,
             cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
