@@ -199,6 +199,8 @@ cms:
     languages_empty: 'No languages available'
     languages_tile_alt: 'Image for %language%'
     page_no_title_fallback: 'No title set'
+    event_teaser_headline: 'Upcoming events'
+    event_teaser_empty: 'No upcoming events'
 member:
     page_title: 'Member Directory'
     page_title_paginated: 'Member Directory - Page %page%'
