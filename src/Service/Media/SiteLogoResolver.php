@@ -2,7 +2,7 @@
 
 namespace App\Service\Media;
 
-use App\Filter\Image\SiteLogoUrlFilterInterface;
+use App\Publisher\SiteLogo\SiteLogoUrlProviderInterface;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
 use Symfony\Component\Asset\Packages;
@@ -11,11 +11,11 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 readonly class SiteLogoResolver
 {
     /**
-     * @param iterable<SiteLogoUrlFilterInterface> $filters
+     * @param iterable<SiteLogoUrlProviderInterface> $providers
      */
     public function __construct(
-        #[AutowireIterator(SiteLogoUrlFilterInterface::class)]
-        private iterable $filters,
+        #[AutowireIterator(SiteLogoUrlProviderInterface::class)]
+        private iterable $providers,
         private ConfigService $configService,
         private ImageRepository $imageRepository,
         private Packages $assetPackages,
@@ -24,8 +24,8 @@ readonly class SiteLogoResolver
     public function resolveUrl(): string
     {
         // 1. Pre-SiteLogo override (e.g. whitelabel domain-locked group logo).
-        foreach ($this->filters as $filter) {
-            $url = $filter->resolveSiteLogoUrl();
+        foreach ($this->providers as $provider) {
+            $url = $provider->resolveSiteLogoUrl();
             if ($url !== null) {
                 return $url;
             }
@@ -46,8 +46,8 @@ readonly class SiteLogoResolver
         }
 
         // 3. Post-SiteLogo fallback (e.g. main-host-group's logo as implicit platform branding).
-        foreach ($this->filters as $filter) {
-            $url = $filter->resolveFallbackSiteLogoUrl();
+        foreach ($this->providers as $provider) {
+            $url = $provider->resolveFallbackSiteLogoUrl();
             if ($url !== null) {
                 return $url;
             }

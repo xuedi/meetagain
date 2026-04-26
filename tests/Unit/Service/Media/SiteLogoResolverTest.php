@@ -3,7 +3,7 @@
 namespace Tests\Unit\Service\Media;
 
 use App\Entity\Image;
-use App\Filter\Image\SiteLogoUrlFilterInterface;
+use App\Publisher\SiteLogo\SiteLogoUrlProviderInterface;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Media\SiteLogoResolver;
@@ -27,12 +27,12 @@ class SiteLogoResolverTest extends TestCase
     public function testFilterOverrideWinsOverEverything(): void
     {
         // Arrange: filter returns override URL; configured SiteLogo also exists.
-        $filter = $this->createStub(SiteLogoUrlFilterInterface::class);
+        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn('/group/logo.webp');
         $this->configServiceStub->method('getSiteLogoId')->willReturn(99);
 
         $resolver = new SiteLogoResolver(
-            filters: [$filter],
+            providers:[$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -45,7 +45,7 @@ class SiteLogoResolverTest extends TestCase
     {
         // Arrange: no override, but both SiteLogo configured AND fallback would match.
         // SiteLogo (admin's explicit choice) must win over the fallback (implicit).
-        $filter = $this->createStub(SiteLogoUrlFilterInterface::class);
+        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn(null);
         $filter->method('resolveFallbackSiteLogoUrl')->willReturn('/fallback/logo.webp');
         $this->configServiceStub->method('getSiteLogoId')->willReturn(42);
@@ -55,7 +55,7 @@ class SiteLogoResolverTest extends TestCase
         $this->imageRepositoryStub->method('find')->willReturn($image);
 
         $resolver = new SiteLogoResolver(
-            filters: [$filter],
+            providers:[$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -67,13 +67,13 @@ class SiteLogoResolverTest extends TestCase
     public function testFallbackUsedWhenNoSiteLogoConfigured(): void
     {
         // Arrange: no override, no SiteLogo, but fallback returns a URL.
-        $filter = $this->createStub(SiteLogoUrlFilterInterface::class);
+        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn(null);
         $filter->method('resolveFallbackSiteLogoUrl')->willReturn('/fallback/logo.webp');
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
         $resolver = new SiteLogoResolver(
-            filters: [$filter],
+            providers:[$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -85,13 +85,13 @@ class SiteLogoResolverTest extends TestCase
     public function testFallsThroughToDefaultAssetWhenNothingMatches(): void
     {
         // Arrange: no override, no SiteLogo, no fallback.
-        $filter = $this->createStub(SiteLogoUrlFilterInterface::class);
+        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn(null);
         $filter->method('resolveFallbackSiteLogoUrl')->willReturn(null);
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
         $resolver = new SiteLogoResolver(
-            filters: [$filter],
+            providers:[$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -107,7 +107,7 @@ class SiteLogoResolverTest extends TestCase
         $this->imageRepositoryStub->method('find')->willReturn(null);
 
         $resolver = new SiteLogoResolver(
-            filters: [],
+            providers:[],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
