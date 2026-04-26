@@ -11,7 +11,6 @@
             <tr>
                 <th colspan="2">{{ 'admin_logs.col_created_at'|trans }}</th>
                 <th>{{ 'admin_logs.col_user'|trans }}</th>
-                <th>{{ 'admin_logs.col_type'|trans }}</th>
                 <th>{{ 'admin_logs.col_message'|trans }}</th>
                 <th></th>
             </tr>
@@ -22,7 +21,6 @@
                     <td>{{ activity.createdAt | date('Y-m-d') }}</td>
                     <td>{{ activity.createdAt | date('H:i') }}</td>
                     <td>{{ activity.user.email }}</td>
-                    <td>{{ activity.type }}</td>
                     <td>{{ activity.message }}</td>
                     <td>
                         <a href="{{ path('app_admin_activity_log_show', {'id': activity.id}) }}">
