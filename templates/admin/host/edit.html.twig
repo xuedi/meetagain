@@ -4,53 +4,10 @@
     <div class="container">
         <h1 class="title">{{ host.id ? 'admin_host.page_title_edit'|trans : 'admin_host.page_title_create'|trans }}</h1>
 
-        {% if host.id %}
-            {% set warningContent %}
-                {% if events_using_host|length > 0 %}
-                    <p>
-                        <span class="icon"><i class="fa fa-exclamation-triangle"></i></span>
-                        {{ 'admin_host.warning_delete_used'|trans({'%count%': events_using_host|length}) }}
-                    </p>
-                {% else %}
-                    <p>
-                        {{ 'admin_host.warning_delete_confirm'|trans }}
-                    </p>
-                {% endif %}
-            {% endset %}
-
-            {% include '_components/warning_box.html.twig' with {
-                'id': 'host-delete-warning',
-                'title': 'admin_host.warning_delete_title'|trans,
-                'content': warningContent,
-                'buttonLabel': 'admin_host.warning_delete_button'|trans,
-                'buttonUrl': path('app_admin_host_delete', {'id': host.id}),
-                'showButton': events_using_host|length == 0,
-                'type': 'danger'
-            } %}
-        {% endif %}
-
         {{ form_start(form) }}
 
-        <div class="columns">
-            <div class="column is-8">
-                {{ form_row(form.name) }}
-                {{ form_row(form.user) }}
-            </div>
-
-            <div class="column is-4">
-                {% if host.id %}
-                    <fieldset class="mt-5 p-4 fieldset-warning">
-                        <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">{{ 'admin_host.danger_zone'|trans }}</legend>
-
-                        <a class="button is-light is-fullwidth toggleTrigger" data-id="host-delete-warning"
-                           href="{{ path('app_admin_host_delete', {'id': host.id}) }}">
-                            <span class="icon"><i class="fa fa-trash"></i></span>
-                            <span>{{ 'admin_host.danger_delete_host'|trans }}</span>
-                        </a>
-                    </fieldset>
-                {% endif %}
-            </div>
-        </div>
+        {{ form_row(form.name) }}
+        {{ form_row(form.user) }}
 
         <div class="field mt-5">
             <button type="submit" class="button is-link">
@@ -59,6 +16,12 @@
             <a href="{{ path('app_admin_host') }}" class="button is-light">
                 <span>{{ 'global.button_cancel'|trans }}</span>
             </a>
+            {% if host.id %}
+                <a href="{{ path('app_admin_host_delete', {'id': host.id}) }}" class="button is-danger">
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                    <span>{{ 'admin_host.danger_delete_host'|trans }}</span>
+                </a>
+            {% endif %}
         </div>
 
         {{ form_end(form) }}
