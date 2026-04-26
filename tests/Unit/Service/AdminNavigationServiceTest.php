@@ -594,6 +594,169 @@ final class AdminNavigationServiceTest extends TestCase
         static::assertSame('app_admin_test', $link->getRoute());
     }
 
+    public function testModifiesRouteSwapsLink(): void
+    {
+        // Arrange - base controller provides core route, modifier swaps it to plugin route
+        $baseController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'Members', route: 'app_admin_member', active: 'member'),
+                ]);
+            }
+        };
+
+        $modifierController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    links: [],
+                    modifies: [
+                        'app_admin_member' => ['route' => 'app_multisite_admin_member'],
+                    ],
+                );
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $this->allowAll();
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert
+        static::assertCount(1, $sections);
+        $links = $sections[0]->getLinks();
+        static::assertCount(1, $links);
+        static::assertSame('app_multisite_admin_member', $links[0]->getRoute(), 'Route should be swapped');
+        static::assertSame('Members', $links[0]->getLabel(), 'Label should be unchanged');
+    }
+
+    public function testModifiesHiddenRemovesLink(): void
+    {
+        // Arrange - base controller provides link, modifier hides it
+        $baseController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'Hidden', route: 'app_admin_hidden'),
+                ]);
+            }
+        };
+
+        $modifierController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    links: [],
+                    modifies: [
+                        'app_admin_hidden' => ['hidden' => true],
+                    ],
+                );
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $this->allowAll();
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert
+        static::assertEmpty($sections, 'Section with only hidden links should not appear');
+    }
+
+    public function testModifiesRouteToUnknownRouteSilentlyDropsLink(): void
+    {
+        // Arrange - swap to a route that does not exist; link is silently dropped
+        $baseController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(section: 'System', links: [
+                    new AdminLink(label: 'Members', route: 'app_admin_member'),
+                ]);
+            }
+        };
+
+        $modifierController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'System',
+                    links: [],
+                    modifies: [
+                        'app_admin_member' => ['route' => 'app_does_not_exist'],
+                    ],
+                );
+            }
+        };
+
+        $router = $this->createStub(RouterInterface::class);
+        $router
+            ->method('generate')
+            ->willReturnCallback(static function (string $name): string {
+                if ($name === 'app_does_not_exist') {
+                    throw new RouteNotFoundException();
+                }
+
+                return '/some/path';
+            });
+
+        $service = new AdminNavigationService($this->security, $router, [$baseController, $modifierController]);
+        $this->allowAll();
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert
+        static::assertEmpty($sections, 'Link with unknown swapped route should be dropped');
+    }
+
+    public function testModifiesCombinedSectionLabelRoute(): void
+    {
+        // Arrange - modifier swaps route, section, and label in one go
+        $baseController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(section: 'Old', links: [
+                    new AdminLink(label: 'Old Label', route: 'app_old_route'),
+                ]);
+            }
+        };
+
+        $modifierController = new class implements AdminNavigationInterface {
+            public function getAdminNavigation(): ?AdminNavigationConfig
+            {
+                return new AdminNavigationConfig(
+                    section: 'New',
+                    links: [],
+                    modifies: [
+                        'app_old_route' => [
+                            'section' => 'New',
+                            'label' => 'New Label',
+                            'route' => 'app_new_route',
+                        ],
+                    ],
+                );
+            }
+        };
+
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $this->allowAll();
+
+        // Act
+        $sections = $service->getSidebarSections();
+
+        // Assert
+        static::assertCount(1, $sections);
+        static::assertSame('New', $sections[0]->getSection());
+        $link = $sections[0]->getLinks()[0];
+        static::assertSame('New Label', $link->getLabel());
+        static::assertSame('app_new_route', $link->getRoute());
+    }
+
     public function testLinksWithNonExistentRoutesAreFiltered(): void
     {
         // Arrange

@@ -68,11 +68,22 @@ readonly class AdminNavigationService
 
                 if (isset($modifications[$route])) {
                     $mods = $modifications[$route];
+
+                    // Drop the link entirely when explicitly hidden by a modifier.
+                    if (($mods['hidden'] ?? false) === true) {
+                        continue;
+                    }
+
                     $section = isset($mods['section']) ? (string) $mods['section'] : $section;
                     $label = isset($mods['label']) ? (string) $mods['label'] : $label;
                     $active = isset($mods['active']) ? (string) $mods['active'] : $active;
                     if (isset($mods['sectionParams']) && is_array($mods['sectionParams'])) {
                         $sectionParams = $mods['sectionParams'];
+                    }
+                    // Swap the route last so the routeExists() check below validates the
+                    // replacement; an unknown replacement route fails soft (link dropped).
+                    if (isset($mods['route']) && is_string($mods['route']) && $mods['route'] !== '') {
+                        $route = $mods['route'];
                     }
                 }
 
