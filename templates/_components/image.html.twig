@@ -31,7 +31,7 @@
     {% endif %}
 {% endif %}
 
-{% if image is defined and image %}
+{% if image is defined and image and image.hash %}
     {% set file = image.hash ~ '_' ~ size ~ '.webp' %}{# ~ image.extension #}
     {% if image.updatedAt is not null %}{# to invalidate browser cache #}
         {% set file = file ~ '?v' ~ image.updatedAt|date("YmdHis") %}
