@@ -105,7 +105,7 @@ appUpgrade:
 # Compile SCSS and version all assets into public/assets/
 [group('app')]
 appAssets:
-    rm -rf public/assets/
+    rm -rf public/assets/ public/media/
     {{PHP}} php bin/console sass:build
     {{PHP}} php bin/console asset-map:compile
     {{PHP}} php bin/console app:media:compile
