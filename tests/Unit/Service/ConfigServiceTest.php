@@ -76,6 +76,10 @@ class ConfigServiceTest extends TestCase
             ImageType::PluginDish,
             [[1024, 768], [600, 400], [400, 400], [100, 100], [50, 50]],
         ];
+        yield 'site logo' => [
+            ImageType::SiteLogo,
+            [[400, 400], [100, 100]],
+        ];
     }
 
     public function testGetThumbnailSizeList(): void

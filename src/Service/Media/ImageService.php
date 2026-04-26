@@ -4,6 +4,7 @@ namespace App\Service\Media;
 
 use App\Entity\Event;
 use App\Entity\Image;
+use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\Entity\User;
 use App\ExtendedFilesystem;
@@ -79,6 +80,7 @@ readonly class ImageService
         $source = $this->getSourceFile($image);
         $imageType ??= $image->getType();
         $sizes = $this->configService->getThumbnailSizes($imageType);
+        $fitMode = $this->configService->getFitMode($imageType);
         foreach ($sizes as [$width, $height]) {
             $target = $this->getThumbnailFile($image, $width, $height);
             if ($this->filesystem->fileExists($target)) {
@@ -90,7 +92,11 @@ readonly class ImageService
                 $imagick->readImage($source);
                 $imagick->setImageCompressionQuality(90);
                 $imagick->autoOrient();
-                $imagick->cropThumbnailImage($width, $height);
+                if ($fitMode === ImageFitMode::Fit) {
+                    $imagick->thumbnailImage($width, $height, true);
+                } else {
+                    $imagick->cropThumbnailImage($width, $height);
+                }
                 $imagick->stripImage(); // metadata
                 $imagick->setFormat('webp');
                 $imagick->writeImage($target);

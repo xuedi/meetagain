@@ -144,6 +144,13 @@ admin_system_theme:
     field_color_danger: 'Danger'
     field_color_text_grey: 'Text Grey'
     field_color_text_grey_light: 'Text Grey Light'
+    heading_logo: 'Site Logo'
+    help_logo: 'Upload a logo to replace the default in the navbar. Best results with square images. PNG, JPG, or WEBP up to 5 MB.'
+    field_logo: 'Logo image'
+    flash_logo_saved: 'Site logo updated'
+    logo_mime_error: 'Please upload a valid image (PNG, JPG, or WEBP).'
+    current_logo_label: 'Current logo'
+    default_logo_label: 'Default logo (no upload yet)'
 admin_system_permissions:
     heading: 'Permission Overview'
     help: 'All routes decorated with #[IsGranted], grouped by the minimum role required. Method-level permissions take precedence over class-level ones. Routes with no #[IsGranted] are publicly accessible and grouped under Anonymous.'

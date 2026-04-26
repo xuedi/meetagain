@@ -6,11 +6,14 @@ namespace App\Service\Config;
 
 use App\Entity\Config;
 use App\Enum\ConfigType;
+use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
+use App\Filter\Image\ImageThumbnailSizeFilterInterface;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -22,12 +25,17 @@ readonly class ConfigService
     private const string CACHE_KEY_PREFIX = 'config_';
     private const int CACHE_TTL = 60 * 60 * 24;
 
+    /**
+     * @param iterable<ImageThumbnailSizeFilterInterface> $thumbnailSizeFilters
+     */
     public function __construct(
         private ConfigRepository $repo,
         private EntityManagerInterface $em,
         private CacheInterface $cache,
         private KernelInterface $kernel,
         private AppStateService $appState,
+        #[AutowireIterator(ImageThumbnailSizeFilterInterface::class)]
+        private iterable $thumbnailSizeFilters = [],
     ) {}
 
     /**
@@ -39,6 +47,13 @@ readonly class ConfigService
      */
     public function getThumbnailSizes(ImageType $type): array
     {
+        foreach ($this->thumbnailSizeFilters as $filter) {
+            $sizes = $filter->getThumbnailSizes($type);
+            if ($sizes !== null) {
+                return $sizes;
+            }
+        }
+
         return match ($type) {
             ImageType::ProfilePicture => [[400, 400], [100, 100], [80, 80], [50, 50]],
             ImageType::EventTeaser => [[1024, 768], [600, 400], [210, 140], [100, 100], [50, 50]], // included EventUpload
@@ -48,6 +63,26 @@ readonly class ConfigService
             ImageType::PluginDish => [[1024, 768], [600, 400], [400, 400], [100, 100], [50, 50]],
             ImageType::LanguageTile => [[600, 400], [300, 200], [100, 100], [50, 50]],
             ImageType::PluginBookclubCover => [[400, 500], [200, 250], [100, 100], [50, 50]],
+            ImageType::SiteLogo => [[400, 400], [100, 100]],
+            default => throw new RuntimeException(sprintf(
+                'No thumbnail sizes registered for image type "%s". Plugin-owned types must be supplied via ImageThumbnailSizeFilterInterface.',
+                $type->name,
+            )),
+        };
+    }
+
+    public function getFitMode(ImageType $type): ImageFitMode
+    {
+        foreach ($this->thumbnailSizeFilters as $filter) {
+            $mode = $filter->getFitMode($type);
+            if ($mode !== null) {
+                return $mode;
+            }
+        }
+
+        return match ($type) {
+            ImageType::SiteLogo => ImageFitMode::Fit,
+            default => ImageFitMode::Crop,
         };
     }
 
@@ -101,6 +136,18 @@ readonly class ConfigService
     public function getSystemUserId(): int
     {
         return $this->getInt('system_user_id', 1);
+    }
+
+    public function getSiteLogoId(): ?int
+    {
+        $id = $this->getInt('site_logo_id', 0);
+
+        return $id > 0 ? $id : null;
+    }
+
+    public function setSiteLogoId(?int $id): void
+    {
+        $this->setInt('site_logo_id', $id ?? 0);
     }
 
     public function getMailerAddress(): Address

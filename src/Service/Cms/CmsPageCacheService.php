@@ -54,7 +54,7 @@ readonly class CmsPageCacheService
         $this->cache->get(
             $key,
             static function (ItemInterface $item) use ($html, $tag): string {
-                $item->tag([$tag]);
+                $item->tag([$tag, 'cms_page_all']);
 
                 return $html;
             },
@@ -68,6 +68,15 @@ readonly class CmsPageCacheService
     public function invalidatePage(int $pageId): void
     {
         $this->cache->invalidateTags([$this->buildTag($pageId)]);
+    }
+
+    /**
+     * Invalidates ALL cached CMS pages across every page id, locale, and fingerprint.
+     * Use when a global, navbar-affecting setting changes (site logo, group logo, theme colors).
+     */
+    public function invalidateAll(): void
+    {
+        $this->cache->invalidateTags(['cms_page_all']);
     }
 
     /**

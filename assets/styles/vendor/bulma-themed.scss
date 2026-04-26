@@ -15,7 +15,11 @@
 @forward "bulma/sass/base";
 @forward "bulma/sass/elements";
 @forward "bulma/sass/form";
-@forward "bulma/sass/components";
+// Raise the navbar-img cap (default 1.75rem = 28px) so the brand logo can fill
+// the topbar's vertical slot. Actual logo size is set in custom.scss `.brand-logo`.
+@forward "bulma/sass/components" with (
+  $navbar-item-img-max-height: 3rem
+);
 @forward "bulma/sass/grid";
 @forward "bulma/sass/layout";
 @forward "bulma/sass/base/skeleton";
