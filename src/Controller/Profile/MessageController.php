@@ -47,7 +47,7 @@ final class MessageController extends AbstractController
                 if ($form->isSubmitted() && $form->isValid()) {
                     $msg = new Message();
                     $msg->setDeleted(false);
-                    $msg->setWasRead(true); // hopefully ^_^
+                    $msg->setWasRead(false);
                     $msg->setSender($this->getAuthedUser());
                     $msg->setReceiver($conversationPartner);
                     $msg->setCreatedAt(new DateTimeImmutable());
