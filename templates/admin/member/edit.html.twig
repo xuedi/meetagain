@@ -1,71 +1,271 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block content %}
-
     <div class="container">
 
-        <article class="message is-danger is-hidden" id="user-delete-warning">
-            <div class="message-header">
-                <p>{{ 'admin_member.warning_delete_title'|trans }}</p>
-                <button class="delete toggleTrigger" data-id="user-delete-warning" aria-label="delete"></button>
-            </div>
-            <div class="message-body has-text-black has-background-white">
-                <p>{{ 'admin_member.warning_delete_content'|trans }}</p>
-                <div class="has-text-right">
-                    <form method="post" action="{{ path('app_admin_member_delete', {'id': user.id}) }}" class="is-inline">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                        <button type="submit" class="button">
-                            <span class="icon"><i class="fa fa-trash"></i></span>
-                            <span>{{ 'admin_member.warning_delete_button'|trans }}</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </article>
-
-        {{ form_start(form) }}
-
-        <div class="columns">
-            <div class="column is-9">
-                {{ form_row(form.name) }}
-                {{ form_row(form.email) }}
-                {{ form_row(form.bio) }}
-
-                <div class="columns">
-                    <div class="column">
-                        {{ form_row(form.verified) }}
+        {# Topbar #}
+        <div class="box">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <strong>{{ user.name }}</strong>
                     </div>
-                    <div class="column">
-                        {{ form_row(form.restricted) }}
+                    <div class="level-item has-text-grey">
+                        {{ user.email }}
                     </div>
-                    <div class="column">
-                        {{ form_row(form.public) }}
-                    </div>
-                    <div class="column">
-                        {{ form_row(form.tagging) }}
-                    </div>
-                    <div class="column">
-                        {{ form_row(form.osmConsent) }}
+                    <div class="level-item">
+                        {{ user.status.label()|trans }}
                     </div>
                 </div>
-            </div>
-            <div class="column is-3">
-                {{ form_row(form.locale) }}
-                {{ form_row(form.status) }}
-                {{ form_row(form.role) }}
-                <br>
-                <br>
-                <button type="button" class="button is-danger toggleTrigger" data-id="user-delete-warning">
-                    <span class="icon"><i class="fa fa-trash"></i></span>
-                </button>
-                <button type="submit" class="button">{{ 'global.button_save'|trans }}</button>
+                <div class="level-right">
+                    <div class="level-item">
+                        <a href="{{ path('app_admin_member') }}" class="button is-small">
+                            <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
+                            <span>{{ 'admin_member.button_back'|trans }}</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        {{ form_widget(form) }}
+        <div class="columns">
+            {# Left column - read-only summary #}
+            <div class="column is-8">
+                <p class="title is-6 mb-3">{{ 'admin_member.section_summary'|trans }}</p>
+                <table class="table is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <th class="col-medium">{{ 'admin_member.summary_row_name'|trans }}</th>
+                            <td>{{ user.name ?: '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_email'|trans }}</th>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_bio'|trans }}</th>
+                            <td>{{ user.bio ?: '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_locale'|trans }}</th>
+                            <td>{{ user.locale }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_role'|trans }}</th>
+                            <td>{{ ('admin_member.role_' ~ user.role.value|lower)|trans }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_status'|trans }}</th>
+                            <td>
+                                {% if user.status.value == 3 %}
+                                    <strong class="has-text-danger">{{ user.status.label()|trans }}</strong>
+                                    <span class="has-text-grey is-size-7 ml-2">{{ 'admin_member.status_blocked_hint'|trans }}</span>
+                                {% else %}
+                                    {{ user.status.label()|trans }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_verified'|trans }}</th>
+                            <td>{{ user.verified ? 'admin_member.choice_yes'|trans : 'admin_member.choice_no'|trans }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_restricted'|trans }}</th>
+                            <td>
+                                {% if user.restricted %}
+                                    <strong class="has-text-danger">{{ 'admin_member.choice_yes'|trans }}</strong>
+                                    <span class="has-text-grey is-size-7 ml-2">{{ 'admin_member.restricted_hint'|trans }}</span>
+                                {% else %}
+                                    {{ 'admin_member.choice_no'|trans }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_public'|trans }}</th>
+                            <td>{{ user.public ? 'admin_member.choice_yes'|trans : 'admin_member.choice_no'|trans }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_tagging'|trans }}</th>
+                            <td>{{ user.tagging ? 'admin_member.choice_yes'|trans : 'admin_member.choice_no'|trans }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_osm_consent'|trans }}</th>
+                            <td>{{ user.osmConsent ? 'admin_member.choice_yes'|trans : 'admin_member.choice_no'|trans }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_created'|trans }}</th>
+                            <td>{{ user.createdAt ? user.createdAt|date('Y-m-d H:i') : '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_last_login'|trans }}</th>
+                            <td>
+                                {% if user.lastLogin %}
+                                    {{ user.lastLogin|date('Y-m-d H:i') }}
+                                {% else %}
+                                    {{ 'admin_member.legend_never'|trans }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_followers'|trans }}</th>
+                            <td>{{ user.followers|length }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_member.summary_row_rsvp_count'|trans }}</th>
+                            <td>{{ user.rsvpEvents|length }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-        {{ form_end(form) }}
+                <div class="mt-4">
+                    <p>
+                        <span class="icon"><i class="fas fa-user"></i></span>
+                        {{ 'admin_member.legend_member'|trans }}
+                        - {{ 'admin_member.legend_member_title'|trans }}
+                    </p>
+                    <p>
+                        <span class="icon"><i class="fas fa-user"></i></span>
+                        {{ 'admin_member.legend_admin'|trans }}
+                        - {{ 'admin_member.legend_admin_title'|trans }}
+                    </p>
+                </div>
+
+            </div>
+
+            {# Right column - avatar + admin action panel #}
+            <div class="column is-4">
+
+                {% if user.image %}
+                    <figure class="image mb-4">
+                        {% include '_components/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
+                    </figure>
+                {% endif %}
+
+                {% if is_granted('ROLE_ADMIN') and user.role.value != 'SYSTEM' and user.id != app.user.id %}
+
+                    {# Role section #}
+                    <fieldset class="mt-2 p-4">
+                        <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_member.section_role'|trans }}</legend>
+
+                        {% if user.role.value != 'ADMIN' %}
+                            <form method="post" action="{{ path('app_admin_member_set_role', {id: user.id, role: 'admin'}) }}" class="mb-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_role_' ~ user.id) }}">
+                                <button type="submit" class="button is-primary is-fullwidth">
+                                    <span class="icon"><i class="fa fa-arrow-up"></i></span>
+                                    <span>{{ 'admin_member.button_promote_admin'|trans }}</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                        {% if user.role.value != 'USER' %}
+                            <form method="post" action="{{ path('app_admin_member_set_role', {id: user.id, role: 'user'}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_role_' ~ user.id) }}">
+                                <button type="submit" class="button is-light is-fullwidth">
+                                    <span class="icon"><i class="fa fa-arrow-down"></i></span>
+                                    <span>{{ 'admin_member.button_demote_user'|trans }}</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </fieldset>
+
+                    {# Flags section #}
+                    <fieldset class="mt-4 p-4">
+                        <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_member.section_flags'|trans }}</legend>
+
+                        <form method="post" action="{{ path('app_admin_member_toggle_flag', {id: user.id, flag: 'verified'}) }}" class="mb-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('member_toggle_' ~ user.id ~ '_verified') }}">
+                            <button type="submit" class="button is-light is-fullwidth">
+                                <span class="icon"><i class="fa fa-{{ user.verified ? 'times' : 'check' }}"></i></span>
+                                <span>{{ user.verified ? 'admin_member.button_mark_unverified'|trans : 'admin_member.button_mark_verified'|trans }}</span>
+                            </button>
+                        </form>
+
+                        <form method="post" action="{{ path('app_admin_member_toggle_flag', {id: user.id, flag: 'restricted'}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('member_toggle_' ~ user.id ~ '_restricted') }}">
+                            <button type="submit" class="button is-light is-fullwidth">
+                                <span class="icon"><i class="fa fa-{{ user.restricted ? 'unlock' : 'lock' }}"></i></span>
+                                <span>{{ user.restricted ? 'admin_member.button_mark_unrestricted'|trans : 'admin_member.button_mark_restricted'|trans }}</span>
+                            </button>
+                        </form>
+                    </fieldset>
+
+                    {# Status section (positive transitions) #}
+                    {% if user.status.value == 1 or user.status.value in [0, 1] %}
+                        <fieldset class="mt-4 p-4">
+                            {% if user.status.value == 1 %}
+                                <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 2}) }}" class="mb-2">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                    <button type="submit" class="button is-primary is-fullwidth">
+                                        <span class="icon"><i class="fa fa-check"></i></span>
+                                        <span>{{ 'admin_member.button_status_approve'|trans }}</span>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if user.status.value in [0, 1] %}
+                                <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 5}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                    <button type="submit" class="button is-light is-fullwidth">
+                                        <span class="icon"><i class="fa fa-times"></i></span>
+                                        <span>{{ 'admin_member.button_status_deny'|trans }}</span>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </fieldset>
+                    {% endif %}
+
+                    {# Danger zone #}
+                    <fieldset class="mt-4 p-4 fieldset-warning">
+                        <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">{{ 'admin_member.section_danger_zone'|trans }}</legend>
+
+                        {% if user.status.value == 2 %}
+                            <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 3}) }}" class="mb-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                <button type="submit" class="button is-light is-fullwidth">
+                                    <span class="icon"><i class="fa fa-ban"></i></span>
+                                    <span>{{ 'admin_member.button_status_block'|trans }}</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                        {% if user.status.value == 3 %}
+                            <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 2}) }}" class="mb-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                <button type="submit" class="button is-light is-fullwidth">
+                                    <span class="icon"><i class="fa fa-undo"></i></span>
+                                    <span>{{ 'admin_member.button_status_unblock'|trans }}</span>
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <a class="button is-light is-fullwidth toggleTrigger" data-id="member-delete-warning">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                            <span>{{ 'admin_member.warning_delete_button'|trans }}</span>
+                        </a>
+                    </fieldset>
+
+                {% endif %}
+            </div>
+        </div>
+
+        {# Delete confirmation panel #}
+        {% if is_granted('ROLE_ADMIN') and user.role.value != 'SYSTEM' and user.id != app.user.id %}
+            <article class="message is-danger is-hidden" id="member-delete-warning">
+                <div class="message-header">
+                    <p>{{ 'admin_member.warning_delete_title'|trans }}</p>
+                    <button class="delete toggleTrigger" data-id="member-delete-warning" aria-label="{{ 'shared.image_upload_aria_delete'|trans }}"></button>
+                </div>
+                <div class="message-body has-text-black has-background-white">
+                    <p>{{ 'admin_member.warning_delete_content'|trans }}</p>
+                    <div class="has-text-right mt-3">
+                        <form method="post" action="{{ path('app_admin_member_delete', {'id': user.id}) }}" class="is-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                            <button type="submit" class="button">
+                                <span class="icon"><i class="fa fa-trash"></i></span>
+                                <span>{{ 'admin_member.warning_delete_button'|trans }}</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        {% endif %}
 
     </div>
-
 {% endblock %}
