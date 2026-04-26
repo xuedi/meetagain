@@ -68,6 +68,15 @@ input[type="color"] {
     border-bottom: 1px solid lightgray;
 }
 
+// Bulma's `$navbar-item-img-max-height` is overridden to 3rem in vendor/bulma-themed.scss
+// so the brand logo can fill the topbar's vertical slot.
+.brand-logo {
+    height: 2.5rem; // 40px
+    width: auto;
+    max-width: 200px;
+    object-fit: contain;
+}
+
 #navBurgenMenu details.navbar-burger-submenu {
     width: 100%;
     > summary {
