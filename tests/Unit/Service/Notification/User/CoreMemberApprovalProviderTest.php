@@ -2,14 +2,12 @@
 
 namespace Tests\Unit\Service\Notification\User;
 
-use App\Activity\ActivityService;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
-use App\Emails\Types\WelcomeEmail;
+use App\Service\Member\UserService;
 use App\Service\Notification\User\CoreMemberApprovalProvider;
 use App\Service\Notification\User\ReviewNotificationItem;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -40,9 +38,7 @@ class CoreMemberApprovalProviderTest extends TestCase
 
         return new CoreMemberApprovalProvider(
             userRepo: $repo,
-            em: $this->createStub(EntityManagerInterface::class),
-            welcomeEmail: $this->createStub(WelcomeEmail::class),
-            activityService: $this->createStub(ActivityService::class),
+            userService: $this->createStub(UserService::class),
             security: $security,
         );
     }
