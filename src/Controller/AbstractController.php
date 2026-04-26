@@ -6,6 +6,7 @@ use App\AssetMapper\OpaqueMediaPathResolver;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\WebLink\Link;
@@ -40,6 +41,13 @@ abstract class AbstractController extends AbstractSymfonyController
             'styles/app.scss'          => ['as' => 'style'],
             'fonts/fa-solid-900.woff2' => ['as' => 'font', 'crossorigin' => 'anonymous'],
         ];
+
+        /** @var RequestStack $requestStack */
+        $requestStack = $this->container->get('request_stack');
+        $request = $requestStack->getCurrentRequest();
+        if ($request !== null && str_starts_with($request->getLocale(), 'zh')) {
+            $preloads['styles/lxgw-wenkai.scss'] = ['as' => 'style'];
+        }
 
         $links = [];
         foreach ($preloads as $logicalPath => $attrs) {
