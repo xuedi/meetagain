@@ -6,6 +6,27 @@
 
         {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'theme'} %}
 
+        <h1 class="title is-5">{{ 'admin_system_theme.heading_logo'|trans }}</h1>
+        <p class="subtitle is-6 has-text-grey">{{ 'admin_system_theme.help_logo'|trans }}</p>
+
+        <div class="columns mb-4">
+            <div class="column is-one-third">
+                {% if currentLogo %}
+                    <p class="has-text-grey-light is-size-7 mb-2">{{ 'admin_system_theme.current_logo_label'|trans }}</p>
+                    {% include '_components/image.html.twig' with {image: currentLogo, size: '400x400'} %}
+                {% else %}
+                    <p class="has-text-grey-light is-size-7 mb-2">{{ 'admin_system_theme.default_logo_label'|trans }}</p>
+                    <img src="{{ asset('images/logo.webp') }}" alt="Default logo" width="100" height="100">
+                {% endif %}
+            </div>
+            <div class="column">
+                {{ form_start(logoForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                {{ form_row(logoForm.file) }}
+                <button class="button is-link">{{ 'global.button_save'|trans }}</button>
+                {{ form_end(logoForm) }}
+            </div>
+        </div>
+
         <h1 class="title is-5">{{ 'admin_system_theme.heading_colors'|trans }}</h1>
         <p class="subtitle is-6 has-text-grey">{{ 'admin_system_theme.help_colors'|trans }}</p>
 

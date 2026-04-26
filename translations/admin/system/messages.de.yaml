@@ -144,6 +144,13 @@ admin_system_theme:
     field_color_danger: 'Gefahr'
     field_color_text_grey: 'Textgrau'
     field_color_text_grey_light: 'Textgrau hell'
+    heading_logo: 'Website-Logo'
+    help_logo: 'Laden Sie ein Logo hoch, um das Standardlogo in der Navigationsleiste zu ersetzen. Beste Ergebnisse mit quadratischen Bildern. PNG, JPG oder WEBP, bis zu 5 MB.'
+    field_logo: 'Logo-Bild'
+    flash_logo_saved: 'Website-Logo aktualisiert'
+    logo_mime_error: 'Bitte laden Sie ein gültiges Bild hoch (PNG, JPG oder WEBP).'
+    current_logo_label: 'Aktuelles Logo'
+    default_logo_label: 'Standardlogo (noch kein Upload)'
 admin_system_permissions:
     heading: 'Berechtigungsübersicht'
     help: 'Alle mit #[IsGranted] dekorierten Routen, gruppiert nach der erforderlichen Mindeststufe. Berechtigungen auf Methodenebene haben Vorrang vor Berechtigungen auf Klassenebene. Routen ohne #[IsGranted] sind öffentlich zugänglich.'

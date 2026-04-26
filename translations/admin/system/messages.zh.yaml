@@ -144,6 +144,13 @@ admin_system_theme:
     field_color_danger: '危险色'
     field_color_text_grey: '文字灰色'
     field_color_text_grey_light: '文字浅灰色'
+    heading_logo: '网站徽标'
+    help_logo: '上传徽标以替换导航栏中的默认徽标。方形图片效果最佳。支持 PNG、JPG 或 WEBP，最大 5 MB。'
+    field_logo: '徽标图片'
+    flash_logo_saved: '网站徽标已更新'
+    logo_mime_error: '请上传有效的图片（PNG、JPG 或 WEBP）。'
+    current_logo_label: '当前徽标'
+    default_logo_label: '默认徽标（尚未上传）'
 admin_system_permissions:
     heading: '权限概览'
     help: '所有用#[IsGranted]装饰的路由，按所需最低角色分组。方法级权限优先于类级权限。没有#[IsGranted]的路由是公开可访问的。'

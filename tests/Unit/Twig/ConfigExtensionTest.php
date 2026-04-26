@@ -3,6 +3,7 @@
 namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
+use App\Service\Media\SiteLogoResolver;
 use App\Twig\ConfigExtension;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -10,25 +11,28 @@ use PHPUnit\Framework\TestCase;
 class ConfigExtensionTest extends TestCase
 {
     private Stub&ConfigService $configServiceStub;
+    private Stub&SiteLogoResolver $siteLogoResolverStub;
     private ConfigExtension $subject;
 
     protected function setUp(): void
     {
         $this->configServiceStub = $this->createStub(ConfigService::class);
-        $this->subject = new ConfigExtension($this->configServiceStub);
+        $this->siteLogoResolverStub = $this->createStub(SiteLogoResolver::class);
+        $this->subject = new ConfigExtension($this->configServiceStub, $this->siteLogoResolverStub);
     }
 
     public function testGetFunctionsReturnsExpectedFunctions(): void
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(4, $functions);
+        static::assertCount(5, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('is_show_frontpage', $functionNames);
         static::assertContains('get_date_format', $functionNames);
         static::assertContains('get_date_format_flatpickr', $functionNames);
         static::assertContains('get_footer_column_title', $functionNames);
+        static::assertContains('site_logo_url', $functionNames);
     }
 
     public function testIsShowFrontpageDelegatesToConfigService(): void

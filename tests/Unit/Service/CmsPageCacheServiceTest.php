@@ -203,8 +203,8 @@ class CmsPageCacheServiceTest extends TestCase
         // Act
         $service->store(7, 'en', null, '<h1>Hello</h1>');
 
-        // Assert: page tag set correctly
-        static::assertSame(['cms_page_7'], $capturedTag);
+        // Assert: page tag plus the global cms_page_all tag (used by invalidateAll)
+        static::assertSame(['cms_page_7', 'cms_page_all'], $capturedTag);
     }
 
     // ---- invalidatePage() ----
