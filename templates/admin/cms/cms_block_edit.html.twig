@@ -1,5 +1,10 @@
 {% extends 'admin/base.html.twig' %}
 
+{% set caps = block.type.capabilities %}
+{% set supportsImage = caps.supportsImage() %}
+{% set hasImageRight = caps.supportsImageRight %}
+{% set imageOnRight = hasImageRight and blockObject.imageRight %}
+
 {% block content %}
 
     <div class="mb-4">
@@ -9,10 +14,6 @@
         </a>
     </div>
 
-    {% set caps = block.type.capabilities %}
-    {% set supportsImage = caps.supportsImage() %}
-    {% set hasImageRight = caps.supportsImageRight %}
-    {% set imageOnRight = hasImageRight and blockObject.imageRight %}
     {% set removeImageUrl = blockImage is not null
         ? path('app_admin_cms_block_image_remove', {'blockId': block.id})
         : null %}
