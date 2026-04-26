@@ -193,11 +193,11 @@ class ConfigServiceTest extends TestCase
         static::assertSame('Example Sender', $address->getName());
     }
 
-    public function testIsShowFrontpageReturnsFalseByDefault(): void
+    public function testIsShowFrontpageReturnsTrueByDefault(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(null);
 
-        static::assertFalse($this->subject->isShowFrontpage());
+        static::assertTrue($this->subject->isShowFrontpage());
     }
 
     public function testIsShowFrontpageReturnsTrueWhenEnabled(): void

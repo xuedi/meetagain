@@ -5,13 +5,14 @@
     no image is provided. The size can be passed explicitly; when omitted it is derived
     from the image type enum value. A cache-busting query string is appended via updatedAt.
 
-    Used in:    widely used — _components/comment, usercard, image_upload and many page templates
+    Used in:    widely used - _components/comment, usercard, image_upload and many page templates
     Parameters:
-        - image (Image|null, optional) — entity with hash, alt, updatedAt, type; null shows placeholder
-        - size  (string, optional)     — explicit thumbnail dimensions as 'WxH' e.g. '400x400';
+        - image (Image|null, optional) - entity with hash, alt, updatedAt, type; null shows placeholder
+        - size  (string, optional)     - explicit thumbnail dimensions as 'WxH' e.g. '400x400';
                                          auto-selected from image.type when omitted:
-                                         type 1 → 400x400, type 2 → 600x400, type 3 → 210x140,
-                                         type 4 → 432x432, default → 50x50
+                                         type 1 -> 400x400, type 2 -> 600x400, type 3 -> 210x140,
+                                         type 4 -> 432x432, default -> 50x50
+        - alt   (string, optional)     - alt text override; falls back to image.alt then ''
 #}
 {% if size is not defined  %}
     {% set size = '50x50' %}
@@ -36,7 +37,7 @@
     {% if image.updatedAt is not null %}{# to invalidate browser cache #}
         {% set file = file ~ '?v' ~ image.updatedAt|date("YmdHis") %}
     {% endif %}
-    <img src="/images/thumbnails/{{ file }}" alt="{{ image.alt|default('') }}" width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
+    <img src="/images/thumbnails/{{ file }}" alt="{{ alt|default(image.alt|default('')) }}" width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
 {% else %}
     <img src="{{ asset('images/default_' ~ size ~ '.png') }}" alt="Placeholder IMAGE"/>
 {% endif %}
