@@ -14,6 +14,7 @@ readonly class LanguageService
 {
     private const string CACHE_KEY_ENABLED_CODES = 'language.enabled_codes';
     private const string CACHE_KEY_ALL_LANGUAGES = 'language.all_languages';
+    private const string CACHE_KEY_ENABLED_LANGUAGES = 'language.enabled_languages';
     private const int CACHE_TTL = 3600;
 
     public function __construct(
@@ -49,6 +50,7 @@ readonly class LanguageService
         try {
             $this->appCache->delete(self::CACHE_KEY_ENABLED_CODES);
             $this->appCache->delete(self::CACHE_KEY_ALL_LANGUAGES);
+            $this->appCache->delete(self::CACHE_KEY_ENABLED_LANGUAGES);
         } catch (InvalidArgumentException) {
             return; // Cache invalidation failures are non-critical - cache will be refreshed on next request
         }
@@ -74,6 +76,22 @@ readonly class LanguageService
             });
         } catch (InvalidArgumentException) {
             return $this->languageRepo->findAllOrdered();
+        }
+    }
+
+    /**
+     * @return Language[]
+     */
+    public function getEnabledLanguages(): array
+    {
+        try {
+            return $this->appCache->get(self::CACHE_KEY_ENABLED_LANGUAGES, function (ItemInterface $item): array {
+                $item->expiresAfter(self::CACHE_TTL);
+
+                return $this->languageRepo->findEnabledOrdered();
+            });
+        } catch (InvalidArgumentException) {
+            return $this->languageRepo->findEnabledOrdered();
         }
     }
 
