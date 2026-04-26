@@ -1,36 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "cms.page_title_languages_index"|trans }}{% endblock %}
+{% block title %}{{ 'cms.frontpage_title'|trans }}{% endblock %}
+
+{% block meta_description %}{{ 'cms.frontpage_meta_description'|trans }}{% endblock %}
+
+{% block meta_robots %}
+    {% if languages|length == 0 %}
+        <meta name="robots" content="noindex">
+    {% endif %}
+{% endblock %}
+
+{% block json_ld %}
+    {% if languages|length > 0 %}
+        <script type="application/ld+json">{{ {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            'url': get_canonical_url(),
+            'name': 'meetAgain',
+            'description': 'cms.frontpage_meta_description'|trans,
+            'inLanguage': get_enabled_locales(),
+        }|json_encode|raw }}</script>
+    {% endif %}
+{% endblock %}
 
 {% block body %}
 
     <section class="section">
         <div class="container">
 
+            <header class="has-text-centered mb-6">
+                <h1 class="title is-2">{{ 'cms.frontpage_heading'|trans }}</h1>
+                <p class="subtitle is-5">{{ 'cms.frontpage_intro'|trans }}</p>
+            </header>
+
             <div class="columns is-multiline is-centered">
                 {% for language in languages %}
                     <div class="column is-4 p-5">
-
-                        <div class="card">
-                            <a href="/{{ language.code }}/" class="card-image">
-                                <figure class="image p-5">
-                                    {% if language.tileImage %}
-                                        {% include '_components/image.html.twig' with {'image': language.tileImage, 'size': '600x400'} %}
-                                    {% else %}
-                                        <img src="/images/locations/default.jpg" alt="{{ 'cms.languages_tile_alt'|trans({'%language%': language.name}) }}">
-                                    {% endif %}
-                                </figure>
-                            </a>
+                        <a href="/{{ language.code }}/" hreflang="{{ language.code }}" class="card">
+                            <figure class="image p-5">
+                                {% if language.tileImage %}
+                                    {% include '_components/image.html.twig' with {
+                                        'image': language.tileImage,
+                                        'size': '600x400',
+                                        'alt': 'cms.languages_tile_alt'|trans({'%language%': language.name}),
+                                    } %}
+                                {% else %}
+                                    <img src="/images/locations/default.jpg" alt="{{ 'cms.languages_tile_alt'|trans({'%language%': language.name}) }}">
+                                {% endif %}
+                            </figure>
                             <div class="card-content has-text-centered">
                                 <div class="content">
-                                    <h4>{{ language.name }}</h4>
-                                    <a href="/{{ language.code }}/" class="button is-link">
-                                        {{ language.code|upper }}
-                                    </a>
+                                    <h2 class="title is-4" lang="{{ language.code }}">{{ language.name }}</h2>
+                                    <span class="tag is-link is-medium">{{ language.code|upper }}</span>
                                 </div>
                             </div>
-                        </div>
-
+                        </a>
                     </div>
                 {% else %}
                     <div class="column has-text-centered">

@@ -58,4 +58,61 @@ class PublicPagesTest extends WebTestCase
         static::assertStringNotContainsString('anthropic-ai', $content, 'anthropic-ai is deprecated and must not appear');
     }
 
+    public function testFrontpageReturns200WithSelfCanonical(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/');
+
+        // Assert
+        $this->assertResponseIsSuccessful('GET / must render directly, not 302 to a locale path');
+        $content = $client->getResponse()->getContent();
+        static::assertMatchesRegularExpression(
+            '#<link rel="canonical" href="https?://[^/]+/"\s*/?>#',
+            $content,
+            'Canonical href must end at the bare root, not /en/ or any locale path',
+        );
+    }
+
+    public function testFrontpageHasSingleH1AndPerLanguageHreflangLinks(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/');
+        $content = $client->getResponse()->getContent();
+
+        // Assert
+        static::assertSame(1, substr_count($content, '<h1'), 'Frontpage must have exactly one <h1>');
+        static::assertMatchesRegularExpression(
+            '#<a [^>]*href="/en/"[^>]*hreflang="en"#',
+            $content,
+            'English language link must carry hreflang="en"',
+        );
+    }
+
+    public function testFrontpageEmitsWebSiteJsonLdAndCustomMetaDescription(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/');
+        $content = $client->getResponse()->getContent();
+
+        // Assert: WebSite JSON-LD block is present
+        static::assertStringContainsString('"@type":"WebSite"', $content);
+        static::assertStringContainsString('"inLanguage"', $content);
+
+        // Assert: meta_description block was overridden (not the generic default)
+        static::assertMatchesRegularExpression(
+            '#<meta name="description" content="meetAgain is a community platform[^"]+">#',
+            $content,
+            'Frontpage must override meta_description with the frontpage-specific value',
+        );
+    }
+
 }
