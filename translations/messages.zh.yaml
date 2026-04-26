@@ -404,7 +404,7 @@ cookie:
     button_deny: '拒绝'
     button_status: '状态'
     options: '可选饼干'
-    cookies_text: '我们仅存储您是否接受Cookie的信息。这将避免您下次访问时出现Cookie弹窗。'
+    cookies_text: '我们仅存储您的Cookie选择本身，不存储其他任何信息。这将避免您下次访问时出现Cookie弹窗。'
     current_status: '当前状态'
     cookies_label: '允许Cookies'
     status_granted: '接受'
