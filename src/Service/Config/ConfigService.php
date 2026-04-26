@@ -160,7 +160,7 @@ readonly class ConfigService
 
     public function isShowFrontpage(): bool
     {
-        return $this->getBoolean('show_frontpage', false);
+        return $this->getBoolean('show_frontpage', true);
     }
 
     public function isAutomaticRegistration(): bool

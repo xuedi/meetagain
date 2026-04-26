@@ -105,11 +105,12 @@ class LanguageServiceTest extends TestCase
         );
 
         $this->appCache
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('delete')
             ->with(static::logicalOr(
                 static::equalTo('language.enabled_codes'),
                 static::equalTo('language.all_languages'),
+                static::equalTo('language.enabled_languages'),
             ));
 
         $this->service->invalidateCache();

@@ -47,7 +47,7 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
             ],
             [
                 'show_frontpage',
-                'false',
+                'true',
                 ConfigType::Boolean,
             ],
             [
