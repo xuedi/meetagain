@@ -12,4 +12,11 @@
     </div>
 </div>
 
+<div class="field">
+    <label class="label">{{ 'cms.event_teaser_edit_event_count_label'|trans }}</label>
+    <div class="control">
+        <input class="input" name="eventCount" type="number" min="1" max="20" value="{{ block is defined ? block.eventCount : 4 }}">
+    </div>
+</div>
+
 <input type="hidden" name="imageRight" value="{{ block is defined and block.imageRight ? '1' : '0' }}">

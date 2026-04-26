@@ -187,6 +187,7 @@ cms:
     page_no_title_fallback: '未设置标题'
     event_teaser_headline: '即将举行的活动'
     event_teaser_empty: '暂无即将举行的活动'
+    event_teaser_edit_event_count_label: '活动数量'
 member:
     page_title: '成员目录'
     page_title_paginated: '成员目录 - 第 %page% 页'

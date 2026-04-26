@@ -187,6 +187,7 @@ cms:
     page_no_title_fallback: 'Kein Titel gesetzt'
     event_teaser_headline: 'Anstehende Events'
     event_teaser_empty: 'Keine anstehenden Events'
+    event_teaser_edit_event_count_label: 'Anzahl Events'
 member:
     page_title: 'Mitgliederverzeichnis'
     page_title_paginated: 'Mitgliederverzeichnis - Seite %page%'

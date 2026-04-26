@@ -24,40 +24,14 @@
                             <span>{{ 'cms.event_teaser_headline'|trans }}</span>
                         </span>
                     </h3>
-                    {% set upcomingEvents = cms_upcoming_events(4) %}
+                    {% set upcomingEvents = cms_upcoming_events(block.eventCount) %}
                     {% if upcomingEvents is empty %}
                         <p class="has-text-grey has-text-centered py-3">
                             {{ 'cms.event_teaser_empty'|trans }}
                         </p>
                     {% else %}
                         {% for event in upcomingEvents %}
-                            <a class="media upcoming-event__link" href="{{ path('app_event_details', { 'id': event.id }) }}">
-                                <div class="media-left">
-                                    <div class="upcoming-event__date has-text-centered has-background-white is-clipped" aria-hidden="true">
-                                        <p class="has-background-link has-text-white has-text-weight-bold is-uppercase is-size-7 py-1 mb-0">
-                                            {{ event.start|date('M')|upper }}
-                                        </p>
-                                        <p class="has-text-grey-dark has-text-weight-bold is-size-4 py-1 mb-0">
-                                            {{ event.start|date('j') }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="media-content">
-                                    <p class="upcoming-event__title has-text-grey-dark has-text-weight-semibold mb-1">
-                                        {{ event.title(app.locale) }}
-                                    </p>
-                                    <div class="is-size-7 has-text-grey is-flex is-flex-wrap-wrap is-gap-2">
-                                        <span class="icon-text">
-                                            <span class="icon is-small has-text-grey-light"><i class="far fa-clock"></i></span>
-                                            <span>{{ event.start|date('H:i') }}</span>
-                                        </span>
-                                        <span class="icon-text">
-                                            <span class="icon is-small has-text-grey-light"><i class="fas fa-location-dot"></i></span>
-                                            <span>{{ event.location.name }}</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
+                            {% include '_components/upcoming_event_card.html.twig' with {'event': event} only %}
                         {% endfor %}
                     {% endif %}
                 </div>
