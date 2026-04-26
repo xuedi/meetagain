@@ -74,13 +74,10 @@ final class HostController extends AbstractAdminController
             return $this->redirectToRoute('app_admin_host');
         }
 
-        $eventsUsingHost = $this->eventRepo->findByHost($host);
-
         return $this->render('admin/host/edit.html.twig', [
             'active' => 'host',
             'host' => $host,
             'form' => $form,
-            'events_using_host' => $eventsUsingHost,
         ]);
     }
 
