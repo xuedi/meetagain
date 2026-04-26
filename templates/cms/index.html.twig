@@ -4,13 +4,7 @@
     <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
 {% endblock %}
 
-{% block title %}
-    {% if title is defined  %}
-        {{ title }}
-    {% else %}
-        {{ "cms.page_title_cms"|trans }}
-    {% endif %}
-{% endblock %}
+{% block title %}{{ title is defined ? title : "cms.page_title_cms"|trans }}{% endblock %}
 
 {% block body %}
 
