@@ -404,7 +404,7 @@ cookie:
     button_deny: 'Ablehnen'
     button_status: 'Status'
     options: 'Optionale cookies'
-    cookies_text: 'Wir speichern lediglich die Information, ob Sie Cookies akzeptiert haben oder nicht. Dadurch wird das Cookie-Popup-Fenster bei Ihrem nächsten Besuch unnoetig.'
+    cookies_text: 'Wir speichern lediglich deine Cookie-Entscheidung selbst - sonst nichts. Dadurch erscheint das Cookie-Popup bei deinem nächsten Besuch nicht mehr.'
     current_status: 'Jetziger Status'
     cookies_label: 'Cookies erlauben'
     status_granted: 'Akzeptiert'

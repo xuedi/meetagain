@@ -418,7 +418,7 @@ cookie:
     button_deny: 'Reject'
     button_status: 'Status'
     options: 'Optional cookies'
-    cookies_text: 'We just store the information if you accepted cookies or not. This prevents the cookie popup window on your next visit'
+    cookies_text: 'We only store your cookie choice itself - nothing else. This prevents the cookie popup window on your next visit.'
     current_status: 'Current Status'
     cookies_label: 'Accept cookies'
     status_granted: 'Granted'
