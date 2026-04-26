@@ -35,6 +35,7 @@
                         <div class="hidden">{{ user.roles|join }}</div>
                         {% set color = 'has-text-grey' %}
                         {% if 'ROLE_ORGANIZER' in user.roles %}{% set color = 'has-text-info' %}{% endif %}
+                        {% if 'ROLE_STEWARD' in user.roles %}{% set color = 'has-text-warning' %}{% endif %}
                         {% if 'ROLE_ADMIN' in user.roles %}{% set color = 'has-text-success' %}{% endif %}
                         <span class="icon {{ color }}"><i class="fa fa-user"></i></span>
                     </td>
@@ -58,19 +59,19 @@
         </table>
 
         <div class="mt-4 has-text-centered">
-            <span class="icon-text">
+            <span class="icon-text" title="{{ 'admin_member.legend_member_title'|trans }}">
                 <span class="icon has-text-grey"><i class="fas fa-user"></i></span>
                 <span class="has-text-grey">{{ 'admin_member.legend_member'|trans }}</span>
             </span>
-            <span class="icon-text">
+            <span class="icon-text" title="{{ 'admin_member.legend_organizer_title'|trans }}">
                 <span class="icon has-text-info"><i class="fas fa-user"></i></span>
                 <span class="has-text-info">{{ 'admin_member.legend_organizer'|trans }}</span>
             </span>
-            <span class="icon-text">
+            <span class="icon-text" title="{{ 'admin_member.legend_steward_title'|trans }}">
                 <span class="icon has-text-warning"><i class="fas fa-user"></i></span>
-                <span class="has-text-warning">{{ 'admin_member.legend_founder'|trans }}</span>
+                <span class="has-text-warning">{{ 'admin_member.legend_steward'|trans }}</span>
             </span>
-            <span class="icon-text">
+            <span class="icon-text" title="{{ 'admin_member.legend_admin_title'|trans }}">
                 <span class="icon has-text-success"><i class="fas fa-user"></i></span>
                 <span class="has-text-success">{{ 'admin_member.legend_admin'|trans }}</span>
             </span>
