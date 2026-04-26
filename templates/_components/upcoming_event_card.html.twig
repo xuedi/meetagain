@@ -1,0 +1,40 @@
+{#
+    Upcoming Event Card -- Compact clickable row for an upcoming event
+
+    Renders a single upcoming event as a Bulma `media` row with a date pill,
+    localized title, start time and location. Shared between the EventTeaser CMS
+    block sidebar and the plugins "Upcoming events" sidebar so both
+    surfaces look identical.
+
+    Used in:    templates/cms/blocks/EventTeaser.html.twig
+                (and plugins)
+    Parameters:
+        - event (App\Entity\Event, required) -- the event entity to render
+#}
+<a class="media upcoming-event__link" href="{{ path('app_event_details', { 'id': event.id }) }}">
+    <div class="media-left">
+        <div class="upcoming-event__date has-text-centered has-background-white is-clipped" aria-hidden="true">
+            <p class="has-background-link has-text-white has-text-weight-bold is-uppercase is-size-7 py-1 mb-0">
+                {{ event.start|date('M')|upper }}
+            </p>
+            <p class="has-text-grey-dark has-text-weight-bold is-size-4 py-1 mb-0">
+                {{ event.start|date('j') }}
+            </p>
+        </div>
+    </div>
+    <div class="media-content">
+        <p class="upcoming-event__title has-text-grey-dark has-text-weight-semibold mb-1">
+            {{ event.title(app.locale) }}
+        </p>
+        <div class="is-size-7 has-text-grey is-flex is-flex-wrap-wrap is-gap-2">
+            <span class="icon-text">
+                <span class="icon is-small has-text-grey-light"><i class="far fa-clock"></i></span>
+                <span>{{ event.start|date('H:i') }}</span>
+            </span>
+            <span class="icon-text">
+                <span class="icon is-small has-text-grey-light"><i class="fas fa-location-dot"></i></span>
+                <span>{{ event.location.name }}</span>
+            </span>
+        </div>
+    </div>
+</a>
