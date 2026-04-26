@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace App\Service\Notification\User;
 
-use App\Activity\ActivityService;
-use App\Activity\Messages\AdminMemberApproved;
-use App\Activity\Messages\AdminMemberDenied;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
-use App\Emails\Types\WelcomeEmail;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Member\UserService;
 use InvalidArgumentException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -20,12 +16,9 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
 {
     public function __construct(
         private UserRepository $userRepo,
-        private EntityManagerInterface $em,
-        private WelcomeEmail $welcomeEmail,
-        private ActivityService $activityService,
+        private UserService $userService,
         private Security $security,
     ) {}
-
 
     public function getIdentifier(): string
     {
@@ -64,12 +57,7 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
             throw new InvalidArgumentException('User not found or not pending approval.');
         }
 
-        $pendingUser->setStatus(UserStatus::Active);
-        $this->welcomeEmail->send(['user' => $pendingUser]);
-        $this->em->persist($pendingUser);
-        $this->em->flush();
-
-        $this->activityService->log(AdminMemberApproved::TYPE, $user, ['user_id' => $pendingUser->getId()]);
+        $this->userService->transitionStatus($user, $pendingUser, UserStatus::Active);
     }
 
     public function denyItem(User $user, string $itemId): void
@@ -83,10 +71,6 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
             throw new InvalidArgumentException('User not found or not pending approval.');
         }
 
-        $pendingUser->setStatus(UserStatus::Denied);
-        $this->em->persist($pendingUser);
-        $this->em->flush();
-
-        $this->activityService->log(AdminMemberDenied::TYPE, $user, ['user_id' => $pendingUser->getId()]);
+        $this->userService->transitionStatus($user, $pendingUser, UserStatus::Denied);
     }
 }

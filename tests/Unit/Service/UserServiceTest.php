@@ -2,8 +2,12 @@
 
 namespace App\Tests\Unit\Service;
 
+use App\Activity\ActivityService;
+use App\Emails\Types\WelcomeEmail;
+use App\EntityActionDispatcher;
 use App\Repository\UserRepository;
 use App\Service\Member\UserService;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +19,13 @@ class UserServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->userRepo = $this->createMock(UserRepository::class);
-        $this->service = new UserService($this->userRepo);
+        $this->service = new UserService(
+            userRepo: $this->userRepo,
+            em: $this->createStub(EntityManagerInterface::class),
+            dispatcher: $this->createStub(EntityActionDispatcher::class),
+            activityService: $this->createStub(ActivityService::class),
+            welcomeEmail: $this->createStub(WelcomeEmail::class),
+        );
     }
 
     public function testResolveUserName(): void
