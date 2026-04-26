@@ -25,7 +25,7 @@ final class FrontpageController extends AbstractController
         }
 
         return $this->render('cms/frontpage.html.twig', [
-            'languages' => $this->languageService->getAllLanguages(),
+            'languages' => $this->languageService->getEnabledLanguages(),
         ]);
     }
 
