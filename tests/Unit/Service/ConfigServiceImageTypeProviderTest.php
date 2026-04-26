@@ -4,7 +4,7 @@ namespace Tests\Unit\Service;
 
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
-use App\Filter\Image\ImageThumbnailSizeFilterInterface;
+use App\Publisher\ImageThumbnail\ImageThumbnailSizeProviderInterface;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
@@ -15,13 +15,13 @@ use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * Verifies the plugin filter chain layered on top of ConfigService for
+ * Verifies the plugin provider chain layered on top of ConfigService for
  * thumbnail-size and fit-mode resolution. Kept separate from ConfigServiceTest
  * to keep that class under the per-class method threshold.
  */
-class ConfigServiceImageTypeFilterTest extends TestCase
+class ConfigServiceImageTypeProviderTest extends TestCase
 {
-    private function build(?ImageThumbnailSizeFilterInterface $filter = null): ConfigService
+    private function build(?ImageThumbnailSizeProviderInterface $provider = null): ConfigService
     {
         $cache = $this->createStub(CacheInterface::class);
         $cache->method('get')->willReturnCallback(
@@ -34,32 +34,25 @@ class ConfigServiceImageTypeFilterTest extends TestCase
             cache: $cache,
             kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
-            thumbnailSizeFilters: $filter !== null ? [$filter] : [],
+            thumbnailSizeProviders: $provider !== null ? [$provider] : [],
         );
     }
 
-    public function testFilterOverridesCoreThumbnailSizes(): void
+    public function testProviderOverridesCoreThumbnailSizes(): void
     {
-        // Arrange
-        $filter = $this->createStub(ImageThumbnailSizeFilterInterface::class);
-        $filter->method('getThumbnailSizes')->willReturn([[42, 42]]);
-        $service = $this->build($filter);
+        $provider = $this->createStub(ImageThumbnailSizeProviderInterface::class);
+        $provider->method('getThumbnailSizes')->willReturn([[42, 42]]);
+        $service = $this->build($provider);
 
-        // Act
-        $result = $service->getThumbnailSizes(ImageType::ProfilePicture);
-
-        // Assert: filter wins over core ProfilePicture arm
-        static::assertSame([[42, 42]], $result);
+        static::assertSame([[42, 42]], $service->getThumbnailSizes(ImageType::ProfilePicture));
     }
 
-    public function testFilterFallsThroughWhenReturnsNull(): void
+    public function testProviderFallsThroughWhenReturnsNull(): void
     {
-        // Arrange: filter declines, core map handles
-        $filter = $this->createStub(ImageThumbnailSizeFilterInterface::class);
-        $filter->method('getThumbnailSizes')->willReturn(null);
-        $service = $this->build($filter);
+        $provider = $this->createStub(ImageThumbnailSizeProviderInterface::class);
+        $provider->method('getThumbnailSizes')->willReturn(null);
+        $service = $this->build($provider);
 
-        // Act + Assert: core ProfilePicture sizes returned
         static::assertSame(
             [[400, 400], [100, 100], [80, 80], [50, 50]],
             $service->getThumbnailSizes(ImageType::ProfilePicture),
@@ -79,14 +72,12 @@ class ConfigServiceImageTypeFilterTest extends TestCase
         static::assertSame(ImageFitMode::Crop, $service->getFitMode(ImageType::EventTeaser));
     }
 
-    public function testFilterOverridesFitMode(): void
+    public function testProviderOverridesFitMode(): void
     {
-        // Arrange: filter forces Fit on a core type
-        $filter = $this->createStub(ImageThumbnailSizeFilterInterface::class);
-        $filter->method('getFitMode')->willReturn(ImageFitMode::Fit);
-        $service = $this->build($filter);
+        $provider = $this->createStub(ImageThumbnailSizeProviderInterface::class);
+        $provider->method('getFitMode')->willReturn(ImageFitMode::Fit);
+        $service = $this->build($provider);
 
-        // Act + Assert
         static::assertSame(ImageFitMode::Fit, $service->getFitMode(ImageType::ProfilePicture));
     }
 }

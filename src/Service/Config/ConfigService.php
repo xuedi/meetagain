@@ -8,7 +8,7 @@ use App\Entity\Config;
 use App\Enum\ConfigType;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
-use App\Filter\Image\ImageThumbnailSizeFilterInterface;
+use App\Publisher\ImageThumbnail\ImageThumbnailSizeProviderInterface;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,7 +26,7 @@ readonly class ConfigService
     private const int CACHE_TTL = 60 * 60 * 24;
 
     /**
-     * @param iterable<ImageThumbnailSizeFilterInterface> $thumbnailSizeFilters
+     * @param iterable<ImageThumbnailSizeProviderInterface> $thumbnailSizeProviders
      */
     public function __construct(
         private ConfigRepository $repo,
@@ -34,8 +34,8 @@ readonly class ConfigService
         private CacheInterface $cache,
         private KernelInterface $kernel,
         private AppStateService $appState,
-        #[AutowireIterator(ImageThumbnailSizeFilterInterface::class)]
-        private iterable $thumbnailSizeFilters = [],
+        #[AutowireIterator(ImageThumbnailSizeProviderInterface::class)]
+        private iterable $thumbnailSizeProviders = [],
     ) {}
 
     /**
@@ -47,7 +47,7 @@ readonly class ConfigService
      */
     public function getThumbnailSizes(ImageType $type): array
     {
-        foreach ($this->thumbnailSizeFilters as $filter) {
+        foreach ($this->thumbnailSizeProviders as $filter) {
             $sizes = $filter->getThumbnailSizes($type);
             if ($sizes !== null) {
                 return $sizes;
@@ -65,7 +65,7 @@ readonly class ConfigService
             ImageType::PluginBookclubCover => [[400, 500], [200, 250], [100, 100], [50, 50]],
             ImageType::SiteLogo => [[400, 400], [100, 100]],
             default => throw new RuntimeException(sprintf(
-                'No thumbnail sizes registered for image type "%s". Plugin-owned types must be supplied via ImageThumbnailSizeFilterInterface.',
+                'No thumbnail sizes registered for image type "%s". Plugin-owned types must be supplied via ImageThumbnailSizeProviderInterface.',
                 $type->name,
             )),
         };
@@ -73,7 +73,7 @@ readonly class ConfigService
 
     public function getFitMode(ImageType $type): ImageFitMode
     {
-        foreach ($this->thumbnailSizeFilters as $filter) {
+        foreach ($this->thumbnailSizeProviders as $filter) {
             $mode = $filter->getFitMode($type);
             if ($mode !== null) {
                 return $mode;
