@@ -1,0 +1,36 @@
+{% set codes = get_enabled_locales() %}
+{% if codes|length > 0 %}
+    <div class="navbar-item dropdown is-hoverable pl-0">
+        <div class="dropdown-trigger is-hoverable">
+            <button class="button" aria-haspopup="menu" aria-label="{{ 'chrome.aria_select_language'|trans }}">
+                <span class="icon">
+                    <img class="is-flag" src="{{ asset('images/flags/' ~ app.request.locale ~ '.svg') }}" width="32" height="24"
+                         alt="Current locale flag: {{ app.request.locale }}"/>
+                </span>
+                <span class="icon is-small"><i class="fas fa-angle-down" aria-hidden="true"></i></span>
+            </button>
+        </div>
+        <div class="dropdown-menu" id="dropdown-languages" role="menu">
+            <div class="dropdown-content">
+                {% for code in codes %}
+                    {% if code != app.request.locale %}
+                        <nobr>
+                            <a class="navbar-item" href="{{ path('app_set_session_locale', {'locale': code}) }}" role="menuitem" hreflang="{{ code }}">
+                                <figure class="flag-icon">
+                                    <img class="is-flag" src="{{ asset('images/flags/' ~ code ~ '.svg') }}" width="32" height="24"
+                                         alt="Locale flag: {{ code }}"/>
+                                </figure>
+                                <span class="ml-3">
+                                    {{ ('language_'~code) | trans({}, "messages", code) }}
+                                </span>
+                                <span class="ml-2 has-text-grey">
+                                    ({{ ('language_'~code) | trans }})
+                                </span>
+                            </a>
+                        </nobr>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}

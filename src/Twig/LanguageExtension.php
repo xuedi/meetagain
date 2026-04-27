@@ -61,7 +61,18 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('get_canonical_url', $this->getCanonicalUrl(...)),
             new TwigFunction('get_meta_description', $this->getMetaDescription(...)),
             new TwigFunction('get_organization_schema', $this->getOrganizationSchema(...), ['is_safe' => ['html']]),
+            new TwigFunction('is_frontpage', $this->isFrontpage(...)),
         ];
+    }
+
+    public function isFrontpage(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request instanceof Request) {
+            return false;
+        }
+
+        return $request->attributes->get('_route') === 'app_frontpage';
     }
 
     public function getCurrentLocale(): string

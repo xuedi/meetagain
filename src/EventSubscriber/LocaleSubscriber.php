@@ -19,7 +19,11 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequest', 250],
+                // Run after SessionListener (128) so the session factory is
+                // attached, and after RouterListener (32) so the `_locale`
+                // route attribute is populated. Stays above LocaleListener
+                // (16) so the translator picks up the session-based locale.
+                ['onKernelRequest', 20],
             ],
         ];
     }
@@ -37,8 +41,17 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
             $request->getSession()->set('_locale', $locale);
             return;
         }
-        $filteredDefault = $this->languageService->getFilteredDefaultLocale();
-        $locale = $request->getSession()->get('_locale', $filteredDefault);
-        $request->setLocale($locale);
+        $session = $request->getSession();
+        if ($session->has('_locale')) {
+            $request->setLocale($session->get('_locale'));
+            return;
+        }
+
+        // No explicit session locale: honour Accept-Language as a hint without
+        // persisting it. Picks one of the enabled codes (q-weighted match);
+        // falls back to the configured filtered default if none match.
+        $codes = $this->languageService->getEnabledCodes();
+        $hint = $codes === [] ? null : $request->getPreferredLanguage($codes);
+        $request->setLocale($hint ?? $this->languageService->getFilteredDefaultLocale());
     }
 }

@@ -105,7 +105,7 @@ admin_system_config:
     heading_footer_columns: 'Footer-Spaltentitel'
     heading_on_off_settings: 'Ein/Aus-Einstellungen'
     flash_saved: 'Einstellungen gespeichert'
-    option_show_frontpage: 'Auf der Startseite anzeigen'
+    option_show_frontpage: 'Sprach-Startseite anzeigen'
     option_automatic_registration: 'Automatische Registrierung'
     option_send_rsvp_notifications: 'RSVP-Benachrichtigungen senden'
     option_send_event_reminders: 'Erinnerungs-E-Mails'

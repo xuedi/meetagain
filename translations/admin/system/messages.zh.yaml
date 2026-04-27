@@ -105,7 +105,7 @@ admin_system_config:
     heading_footer_columns: '页脚列标题'
     heading_on_off_settings: '开关设置'
     flash_saved: '设置已保存'
-    option_show_frontpage: '显示在首页'
+    option_show_frontpage: '显示语言首页'
     option_automatic_registration: '自动注册'
     option_send_rsvp_notifications: '发送RSVP通知'
     option_send_event_reminders: '活动提醒邮件'

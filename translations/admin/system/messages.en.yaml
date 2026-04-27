@@ -105,7 +105,7 @@ admin_system_config:
     heading_footer_columns: 'Footer Column Titles'
     heading_on_off_settings: 'On/Off settings'
     flash_saved: 'Settings saved'
-    option_show_frontpage: 'Show on frontpage'
+    option_show_frontpage: 'Show language frontpage'
     option_automatic_registration: 'Automatic registration'
     option_send_rsvp_notifications: 'Send RSVP notifications'
     option_send_event_reminders: 'Event reminder emails'
