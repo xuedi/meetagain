@@ -8,7 +8,7 @@
 <div class="box mt-5">
     <strong>{{ event.start|date('d. F Y') }}</strong>
     <p>
-        {{ event.start|date('H:i') }} to {{ event.start|date('H:i') }}<br>
+        {{ event.start|date('H:i') }} to {{ event.stop|date('H:i') }}<br>
         {% if event.recurringRule is defined and event.recurringRule.name is defined %}
             {{ 'events.label_recurring'|trans }} {{ event.recurringRule.name }}
         {% endif %}
