@@ -1,5 +1,56 @@
+{# Build the list of {code, href} entries from the right source.
+   On the frontpage `/` the URL has no locale segment to swap, so we POST-style
+   write to the session via `app_set_session_locale` and redirect back. On
+   every other page we use the path-rewrite alternates produced by
+   `get_alternative_languages()`. #}
+{% set entries = [] %}
 {% if is_frontpage() %}
-    {% include 'base_navbar_flags_session.html.twig' %}
-{% else %}
-    {% include 'base_navbar_flags_path_rewrite.html.twig' %}
+    {% for code in get_enabled_locales() %}
+        {% if code != app.request.locale %}
+            {% set entries = entries|merge([{
+                'code': code,
+                'href': path('app_set_session_locale', {'locale': code}),
+            }]) %}
+        {% endif %}
+    {% endfor %}
+{% elseif app.request.attributes.get('_route_params') is not null %}
+    {% for code, link in get_alternative_languages() %}
+        {% if code != app.request.locale %}
+            {% set entries = entries|merge([{'code': code, 'href': link}]) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if entries|length > 0 %}
+    <div class="navbar-item dropdown is-hoverable pl-0">
+        <div class="dropdown-trigger is-hoverable">
+            <button class="button" aria-haspopup="menu" aria-label="{{ 'chrome.aria_select_language'|trans }}">
+                <span class="icon">
+                    <img class="is-flag" src="{{ asset('images/flags/' ~ app.request.locale ~ '.svg') }}" width="32" height="24"
+                         alt="Current locale flag: {{ app.request.locale }}"/>
+                </span>
+                <span class="icon is-small"><i class="fas fa-angle-down" aria-hidden="true"></i></span>
+            </button>
+        </div>
+        <div class="dropdown-menu" id="dropdown-languages" role="menu">
+            <div class="dropdown-content">
+                {% for entry in entries %}
+                    <nobr>
+                        <a class="navbar-item" href="{{ entry.href }}" role="menuitem" hreflang="{{ entry.code }}">
+                            <figure class="flag-icon">
+                                <img class="is-flag" src="{{ asset('images/flags/' ~ entry.code ~ '.svg') }}" width="32" height="24"
+                                     alt="Locale flag: {{ entry.code }}"/>
+                            </figure>
+                            <span class="ml-3">
+                                {{ ('language_'~entry.code) | trans({}, "messages", entry.code) }}
+                            </span>
+                            <span class="ml-2 has-text-grey">
+                                ({{ ('language_'~entry.code) | trans }})
+                            </span>
+                        </a>
+                    </nobr>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endif %}
