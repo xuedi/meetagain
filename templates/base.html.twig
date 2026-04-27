@@ -11,6 +11,9 @@
     {% for altLangCode, altLangLink in get_hreflang_languages() %}
         <link rel="alternate" hreflang="{{ get_hreflang_code(altLangCode) }}" href="{{ altLangLink }}" />
     {% endfor %}
+    {% if app.request.attributes.get('_route') == 'app_frontpage' %}
+        <link rel="alternate" hreflang="x-default" href="{{ get_canonical_url() }}" />
+    {% endif %}
 
     <title>{% block title %}meetAgain{% endblock %}</title>
     <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}">
@@ -59,7 +62,9 @@
     {% block javascripts %}{% endblock %}
 </head>
 <body id="body" class="has-navbar-fixed-top mt-5">
-{% include 'base_navbar.html.twig' %}
+{% if not (chrome_disabled|default(false)) %}
+    {% include 'base_navbar.html.twig' %}
+{% endif %}
 {% block body %}{% endblock %}
 {% for message in app.flashes('success') %}
     <div class="notification is-success flashNotification">
@@ -79,7 +84,9 @@
         {{ message|trans }}
     </div>
 {% endfor %}
-{% include 'base_footer.html.twig' %}
+{% if not (chrome_disabled|default(false)) %}
+    {% include 'base_footer.html.twig' %}
+{% endif %}
 <div id="globalImageModal" class="modal">
     <div class="modal-background"></div>
     <div class="modal-content"><div class="box" id="globalImageModalContent"></div></div>

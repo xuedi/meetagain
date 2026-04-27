@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Enum\ImageType;
 use App\Entity\Language;
+use App\Service\Config\LanguageService;
 use App\Service\Media\ImageService;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -95,6 +96,7 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
 
     public function __construct(
         private readonly ImageService $imageService,
+        private readonly LanguageService $languageService,
     ) {}
 
     public function load(ObjectManager $manager): void
@@ -123,6 +125,7 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
         }
 
         $manager->flush();
+        $this->languageService->invalidateCache();
         $this->stop();
     }
 

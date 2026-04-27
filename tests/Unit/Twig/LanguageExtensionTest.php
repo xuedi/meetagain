@@ -55,7 +55,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(12, $functions);
+        static::assertCount(13, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('get_hreflang_code', $functionNames);
@@ -69,6 +69,32 @@ class LanguageExtensionTest extends TestCase
         static::assertContains('get_canonical_url', $functionNames);
         static::assertContains('get_meta_description', $functionNames);
         static::assertContains('get_organization_schema', $functionNames);
+        static::assertContains('is_frontpage', $functionNames);
+    }
+
+    public function testIsFrontpageReturnsTrueForFrontpageRoute(): void
+    {
+        $request = new Request();
+        $request->attributes->set('_route', 'app_frontpage');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        static::assertTrue($this->subject->isFrontpage());
+    }
+
+    public function testIsFrontpageReturnsFalseForOtherRoutes(): void
+    {
+        $request = new Request();
+        $request->attributes->set('_route', 'app_default');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        static::assertFalse($this->subject->isFrontpage());
+    }
+
+    public function testIsFrontpageReturnsFalseWhenNoRequest(): void
+    {
+        $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
+
+        static::assertFalse($this->subject->isFrontpage());
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void

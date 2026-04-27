@@ -258,3 +258,22 @@ input[type="color"] {
     border-top: 1px solid rgba(10, 10, 10, .1);
     height: calc(2.25rem + 1px);
 }
+
+.landing-column .card,
+.landing-column .card-content {
+    height: 100%;
+}
+.landing-column .card-content {
+    display: flex;
+    flex-direction: column;
+}
+.landing-column .card-content > .title {
+    min-height: 4.5rem; // ~2 lines at title is-3
+}
+.landing-column .card-content > .subtitle {
+    min-height: 4.5rem; // ~3 lines at subtitle is-5
+}
+.landing-column .card-content > .button {
+    margin-top: auto;
+    align-self: center;
+}

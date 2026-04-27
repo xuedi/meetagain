@@ -13,10 +13,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class LocaleSubscriberTest extends TestCase
 {
-    private function createLanguageServiceStub(string $filteredDefaultLocale = 'en'): LanguageService
+    private function createLanguageServiceStub(string $filteredDefaultLocale = 'en', array $enabledCodes = ['en', 'de', 'zh']): LanguageService
     {
         $languageService = $this->createStub(LanguageService::class);
         $languageService->method('getFilteredDefaultLocale')->willReturn($filteredDefaultLocale);
+        $languageService->method('getEnabledCodes')->willReturn($enabledCodes);
 
         return $languageService;
     }
@@ -39,13 +40,13 @@ class LocaleSubscriberTest extends TestCase
         $events = LocaleSubscriber::getSubscribedEvents();
 
         static::assertArrayHasKey(KernelEvents::REQUEST, $events);
-        static::assertEquals([['onKernelRequest', 250]], $events[KernelEvents::REQUEST]);
+        static::assertEquals([['onKernelRequest', 20]], $events[KernelEvents::REQUEST]);
     }
 
     public function testOnKernelRequestReturnsEarlyWhenNoPreviousSession(): void
     {
         $languageService = $this->createLanguageServiceStub('en');
-        $subscriber = new LocaleSubscriber($languageService, 'en');
+        $subscriber = new LocaleSubscriber($languageService);
 
         $request = new Request();
         // No session set, so hasPreviousSession() returns false
@@ -62,7 +63,7 @@ class LocaleSubscriberTest extends TestCase
     public function testOnKernelRequestSavesLocaleToSessionWhenAttributePresent(): void
     {
         $languageService = $this->createLanguageServiceStub('en');
-        $subscriber = new LocaleSubscriber($languageService, 'en');
+        $subscriber = new LocaleSubscriber($languageService);
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())->method('set')->with('_locale', 'de');
@@ -79,9 +80,10 @@ class LocaleSubscriberTest extends TestCase
     public function testOnKernelRequestRestoresLocaleFromSessionWhenNoAttribute(): void
     {
         $languageService = $this->createLanguageServiceStub('en');
-        $subscriber = new LocaleSubscriber($languageService, 'en');
+        $subscriber = new LocaleSubscriber($languageService);
 
         $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('has')->willReturn(true);
         $sessionStub->method('get')->willReturn('fr');
 
         $request = $this->createRequestWithSession($sessionStub);
@@ -95,21 +97,50 @@ class LocaleSubscriberTest extends TestCase
         static::assertSame('fr', $request->getLocale());
     }
 
-    public function testOnKernelRequestUsesDefaultLocaleWhenSessionEmpty(): void
+    public function testOnKernelRequestUsesAcceptLanguageHintWhenSessionEmpty(): void
     {
-        $languageService = $this->createLanguageServiceStub('es');
-        $subscriber = new LocaleSubscriber($languageService, 'es');
+        // No session locale set, but Accept-Language header asks for German.
+        // The subscriber should pick `de` (an enabled code) without persisting.
+        $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
+        $subscriber = new LocaleSubscriber($languageService);
 
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')->willReturn('es'); // Returns the default
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('getName')->willReturn('PHPSESSID');
+        $sessionMock->method('has')->willReturn(false);
+        $sessionMock->expects($this->never())->method('set'); // hint not persisted
 
-        $request = $this->createRequestWithSession($sessionStub);
+        $request = new Request([], [], [], ['PHPSESSID' => 'test-session-id']);
+        $request->setSession($sessionMock);
+        $request->headers->set('Accept-Language', 'fr, es;q=0.5, de;q=0.1');
 
         $kernelStub = $this->createStub(HttpKernelInterface::class);
         $event = new RequestEvent($kernelStub, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $subscriber->onKernelRequest($event);
 
-        static::assertSame('es', $request->getLocale());
+        static::assertSame('de', $request->getLocale());
+    }
+
+    public function testOnKernelRequestFallsBackToFilteredDefaultWhenAcceptLanguageHasNoMatch(): void
+    {
+        // Accept-Language asks for Japanese, which is not enabled.
+        // The subscriber should fall back to the filtered default (`en`).
+        $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
+        $subscriber = new LocaleSubscriber($languageService);
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('has')->willReturn(false);
+
+        $request = $this->createRequestWithSession($sessionStub);
+        $request->headers->set('Accept-Language', 'ja');
+
+        $kernelStub = $this->createStub(HttpKernelInterface::class);
+        $event = new RequestEvent($kernelStub, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $subscriber->onKernelRequest($event);
+
+        // Symfony's getPreferredLanguage returns the first locale in the list
+        // when none match, which is 'en' here.
+        static::assertSame('en', $request->getLocale());
     }
 }
