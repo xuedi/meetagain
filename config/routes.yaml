@@ -18,6 +18,10 @@ frontpage:
     type: attribute
     resource: ../src/Controller/NonLocale/FrontpageController.php
 
+set_session_locale:
+    type: attribute
+    resource: ../src/Controller/NonLocale/SetSessionLocaleController.php
+
 ajax:
     type: attribute
     resource: ../src/Controller/NonLocale/AjaxController.php

@@ -33,9 +33,18 @@
                 <p class="subtitle is-5">{{ 'cms.frontpage_intro'|trans }}</p>
             </header>
 
+            {% set thin_column_class = {
+                'single': 'is-12',
+                'pair': 'is-6',
+                'trio': 'is-4',
+                'grid': 'is-4',
+                'compressed': 'is-3',
+                'accordion': 'is-3',
+            }[layout.value|default('trio')]|default('is-4') %}
+
             <div class="columns is-multiline is-centered">
                 {% for language in languages %}
-                    <div class="column is-4 p-5">
+                    <div class="column {{ thin_column_class }} p-5">
                         <a href="/{{ language.code }}/" hreflang="{{ language.code }}" class="card">
                             <figure class="image p-5">
                                 {% if language.tileImage %}
