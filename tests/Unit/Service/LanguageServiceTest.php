@@ -105,13 +105,9 @@ class LanguageServiceTest extends TestCase
         );
 
         $this->appCache
-            ->expects($this->exactly(3))
+            ->expects($this->once())
             ->method('delete')
-            ->with(static::logicalOr(
-                static::equalTo('language.enabled_codes'),
-                static::equalTo('language.all_languages'),
-                static::equalTo('language.enabled_languages'),
-            ));
+            ->with('language.enabled_codes');
 
         $this->service->invalidateCache();
     }
@@ -142,50 +138,25 @@ class LanguageServiceTest extends TestCase
         static::assertSame('en', $this->service->getLocaleRegexPattern());
     }
 
-    public function testGetAllLanguagesUsesCache(): void
+    public function testGetAllLanguagesQueriesRepoEachCall(): void
     {
-        $this->appCache = $this->createMock(TagAwareCacheInterface::class);
-        $this->service = new LanguageService(
-            $this->languageRepo,
-            $this->appCache,
-            $this->languageFilterService,
-            $this->adminLanguageFilterService,
-        );
-
         $langEn = new Language();
-        $this->appCache
-            ->expects($this->once())
-            ->method('get')
-            ->with('language.all_languages')
-            ->willReturnCallback(function ($key, $callback) {
-                $item = $this->createStub(ItemInterface::class);
-
-                return $callback($item);
-            });
-
         $this->languageRepo->method('findAllOrdered')->willReturn([$langEn]);
 
+        // Doctrine entities are not cached (proxy associations break across
+        // serialize/unserialize); the service is expected to delegate to the
+        // repository directly.
+        static::assertEquals([$langEn], $this->service->getAllLanguages());
         static::assertEquals([$langEn], $this->service->getAllLanguages());
     }
 
-    public function testGetAllLanguagesFallbackOnCacheError(): void
+    public function testGetEnabledLanguagesQueriesRepoEachCall(): void
     {
-        $this->appCache = $this->createMock(TagAwareCacheInterface::class);
-        $this->service = new LanguageService(
-            $this->languageRepo,
-            $this->appCache,
-            $this->languageFilterService,
-            $this->adminLanguageFilterService,
-        );
+        $langEn = new Language();
+        $this->languageRepo->method('findEnabledOrdered')->willReturn([$langEn]);
 
-        $this->appCache
-            ->expects($this->once())
-            ->method('get')
-            ->willThrowException(new class extends Exception implements InvalidArgumentException {});
-
-        $this->languageRepo->method('findAllOrdered')->willReturn([]);
-
-        static::assertEquals([], $this->service->getAllLanguages());
+        static::assertEquals([$langEn], $this->service->getEnabledLanguages());
+        static::assertEquals([$langEn], $this->service->getEnabledLanguages());
     }
 
     public function testFindByCode(): void
