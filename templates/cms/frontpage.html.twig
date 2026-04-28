@@ -23,14 +23,17 @@
     {% endif %}
 {% endblock %}
 
+{% block stylesheets %}
+    <style>.landing-column .card { background-color: hsl(0deg, 0%, 96%); }</style>
+{% endblock %}
+
 {% block body %}
 
     <section class="section">
         <div class="container">
 
             <header class="has-text-centered mb-6">
-                <h1 class="title is-2">{{ 'cms.frontpage_heading'|trans }}</h1>
-                <p class="subtitle is-5">{{ 'cms.frontpage_intro'|trans }}</p>
+                <h1 class="title is-1">{{ app.request.host }}</h1>
             </header>
 
             {% set thin_column_class = {
@@ -44,27 +47,11 @@
 
             <div class="columns is-multiline is-centered">
                 {% for language in languages %}
-                    <div class="column {{ thin_column_class }} p-5">
-                        <a href="/{{ language.code }}/" hreflang="{{ language.code }}" class="card">
-                            <figure class="image p-5">
-                                {% if language.tileImage %}
-                                    {% include '_components/image.html.twig' with {
-                                        'image': language.tileImage,
-                                        'size': '600x400',
-                                        'alt': 'cms.languages_tile_alt'|trans({'%language%': language.name}),
-                                    } %}
-                                {% else %}
-                                    <img src="/images/locations/default.jpg" alt="{{ 'cms.languages_tile_alt'|trans({'%language%': language.name}) }}">
-                                {% endif %}
-                            </figure>
-                            <div class="card-content has-text-centered">
-                                <div class="content">
-                                    <h2 class="title is-4" lang="{{ language.code }}">{{ language.name }}</h2>
-                                    <span class="tag is-link is-medium">{{ language.code|upper }}</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                    {% include '_components/language_tile.html.twig' with {
+                        'language': language,
+                        'column_class': thin_column_class,
+                        'with_intro': false,
+                    } only %}
                 {% else %}
                     <div class="column has-text-centered">
                         <p class="has-text-grey">{{ 'cms.languages_empty'|trans }}</p>
