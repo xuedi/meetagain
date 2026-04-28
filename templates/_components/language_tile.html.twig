@@ -1,0 +1,34 @@
+{# Per-language landing tile, rendered side-by-side on language picker pages.
+   Renders greeting + (optional) intro + image + CTA, each in the tile's own language.
+
+   Inputs:
+     - language: Language entity (must expose `code`, `name`, `tileImage`)
+     - column_class: Bulma column-width class (e.g. 'is-4'). Default 'is-4'.
+     - with_intro: bool, render the intro paragraph below the greeting. Default false.
+#}
+<section class="column {{ column_class|default('is-4') }} landing-column" lang="{{ language.code }}">
+    <a href="/{{ language.code }}/" hreflang="{{ language.code }}" class="card">
+        <div class="card-content has-text-centered">
+            <h2 class="title is-3">
+                {{ ('language_tile.greeting_' ~ language.code)|trans({}, 'messages', language.code) }}
+            </h2>
+            {% if with_intro|default(false) %}
+                <p class="subtitle is-5">
+                    {{ ('language_tile.intro_' ~ language.code)|trans({}, 'messages', language.code) }}
+                </p>
+            {% endif %}
+            {% if language.tileImage %}
+                <figure class="image mt-4 mb-4">
+                    {% include '_components/image.html.twig' with {
+                        'image': language.tileImage,
+                        'size': '600x400',
+                        'alt': ('language_tile.tile_alt_' ~ language.code)|trans({'%language%': language.name}, 'messages', language.code),
+                    } %}
+                </figure>
+            {% endif %}
+            <span class="button is-link is-medium mt-4">
+                {{ ('language_tile.cta_continue_' ~ language.code)|trans({}, 'messages', language.code) }}
+            </span>
+        </div>
+    </a>
+</section>
