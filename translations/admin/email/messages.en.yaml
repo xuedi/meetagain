@@ -54,6 +54,9 @@ admin_email_sendlog:
     flash_cap_cleared: 'Max-send-by cap cleared. The email will be dispatched on the next cron tick.'
     flash_sync_success: 'Synced %updated% of %checked% email statuses from provider.'
     flash_provider_not_configured: 'Email delivery provider is not configured.'
+    rendered_message: 'Rendered Message'
+    rendered_message_error: 'Could not render message'
+    context_variables: 'Context Variables'
 admin_email_planned:
     empty: 'No scheduled emails planned in the next 14 days.'
     col_expected_time: 'Expected Time'
