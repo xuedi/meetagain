@@ -1,0 +1,22 @@
+{#
+    Gallery: Pagination -- id="filteredTable" auto-pagination hint
+
+    The project's admin pagination is JS-driven via assets/js/admin/base.js which
+    listens for tables with id="filteredTable". Adding the id is the entire setup.
+    Anchor: g-pagination.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: assets/js/admin/base.js (#filteredTable)
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>.claude/architecture/ux-admin.md</code> ("Pagination"),
+    <code>templates/admin/host/list.html.twig</code>
+</p>
+
+<p class="mt-3">{{ 'admin_system_gallery.pagination_hint'|trans }}</p>
+
+<pre class="mt-3 p-3 has-background-light"><code>&lt;table id="filteredTable" class="table is-fullwidth"&gt;
+    ...
+&lt;/table&gt;</code></pre>

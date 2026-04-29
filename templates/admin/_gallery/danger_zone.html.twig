@@ -1,0 +1,55 @@
+{#
+    Gallery: Danger zone -- Save/Cancel/Delete cluster + warning_box reveal
+
+    Two parts: (a) the bottom-of-form button cluster from edit pages; (b) the
+    fieldset-warning + warning_box pattern from member/edit. Anchor: g-danger-zone.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/warning_box.html.twig, assets/js/toggles.js (.toggleTrigger)
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/host/edit.html.twig</code>,
+    <code>templates/admin/member/edit.html.twig</code>,
+    <code>templates/_components/warning_box.html.twig</code>
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.variation_label'|trans }} (a) edit-form button cluster</h3>
+<div class="field mt-3">
+    <button type="button" class="button is-link">
+        <span>{{ 'admin_system_gallery.button_demo_save'|trans }}</span>
+    </button>
+    <a href="#" class="button is-light">
+        <span>{{ 'admin_system_gallery.button_demo_cancel'|trans }}</span>
+    </a>
+    <a href="#" class="button is-danger">
+        <span class="icon"><i class="fa fa-trash"></i></span>
+        <span>{{ 'admin_system_gallery.button_demo_danger'|trans }}</span>
+    </a>
+</div>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (b) fieldset danger zone with warning_box</h3>
+<fieldset class="mt-2 p-4 fieldset-warning">
+    <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">danger zone</legend>
+    <a class="button is-light is-fullwidth">
+        <span class="icon"><i class="fa fa-trash"></i></span>
+        <span>{{ 'admin_system_gallery.button_demo_danger'|trans }}</span>
+    </a>
+</fieldset>
+
+<article class="message is-danger mt-4">
+    <div class="message-header">
+        <p>{{ 'admin_system_gallery.confirm_destructive_title'|trans }}</p>
+        <button class="delete" aria-label="close"></button>
+    </div>
+    <div class="message-body has-text-black has-background-white">
+        <p>{{ 'admin_system_gallery.sample_warning_content'|trans }}</p>
+        <div class="has-text-right mt-3">
+            <a class="button" href="#">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'admin_system_gallery.sample_warning_button'|trans }}</span>
+            </a>
+        </div>
+    </div>
+</article>

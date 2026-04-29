@@ -1,0 +1,38 @@
+{#
+    Gallery: API endpoint component -- HTTP method + path with collapsible example
+
+    Source: templates/_components/api_endpoint.html.twig.
+    GET and POST variants with stubbed example payloads.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/api_endpoint.html.twig (visualised here without the JS toggle)
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/api_endpoint.html.twig</code>
+</p>
+
+<div class="mt-3">
+    {% include '_components/api_endpoint.html.twig' with {
+        'method': 'GET',
+        'apiPath': '/api/v1/events',
+        'description': 'List upcoming events.',
+        'example': 'curl HOST/api/v1/events',
+        'route': null,
+    } %}
+    {% include '_components/api_endpoint.html.twig' with {
+        'method': 'POST',
+        'apiPath': '/api/v1/rsvp/{eventId}',
+        'description': 'Toggle RSVP for the authenticated user.',
+        'example': 'curl -X POST HOST/api/v1/rsvp/123 -H "Authorization: Bearer TOKEN"',
+        'route': null,
+    } %}
+    {% include '_components/api_endpoint.html.twig' with {
+        'method': 'DELETE',
+        'apiPath': '/api/v1/comments/{id}',
+        'description': 'Delete a comment owned by the authenticated user.',
+        'example': 'curl -X DELETE HOST/api/v1/comments/42',
+        'route': null,
+    } %}
+</div>

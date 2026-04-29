@@ -1,0 +1,42 @@
+{#
+    Gallery: Form inputs -- Text input variations
+
+    Default, with help text, error state, disabled. Anchor: g-form-inputs.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/host/edit.html.twig</code> (Symfony form_row)
+</p>
+
+<div class="field mt-4">
+    <label class="label">{{ 'admin_system_gallery.field_demo_name'|trans }}</label>
+    <div class="control">
+        <input class="input" type="text" placeholder="{{ 'admin_system_gallery.field_demo_name'|trans }}">
+    </div>
+</div>
+
+<div class="field">
+    <label class="label">{{ 'admin_system_gallery.field_demo_email'|trans }}</label>
+    <div class="control">
+        <input class="input" type="email" value="{{ 'admin_system_gallery.sample_email'|trans }}">
+    </div>
+    <p class="help">{{ 'admin_system_gallery.field_demo_help'|trans }}</p>
+</div>
+
+<div class="field">
+    <label class="label">{{ 'admin_system_gallery.field_demo_email'|trans }}</label>
+    <div class="control">
+        <input class="input is-danger" type="email" value="invalid">
+    </div>
+    <p class="help is-danger">{{ 'admin_system_gallery.field_demo_error'|trans }}</p>
+</div>
+
+<div class="field">
+    <label class="label">disabled</label>
+    <div class="control">
+        <input class="input" type="text" value="readonly value" disabled>
+    </div>
+</div>

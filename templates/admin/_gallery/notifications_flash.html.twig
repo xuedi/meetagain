@@ -1,0 +1,26 @@
+{#
+    Gallery: Notifications & flash messages -- Bulma notification colour variants
+
+    Used only when the change is invisible after reload (background jobs, queued emails,
+    validation failures). Avoid for obvious info. Anchor: g-notifications.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>.claude/architecture/ux-admin.md</code> ("No flash messages when the result is visible after reload")
+</p>
+
+<div class="notification is-success is-light mt-4">
+    A success flash message after a queued background job (e.g. emails dispatched).
+</div>
+<div class="notification is-info is-light">
+    An info flash message used sparingly for non-obvious context.
+</div>
+<div class="notification is-warning is-light">
+    A warning flash message - validation passed but with caveats.
+</div>
+<div class="notification is-danger is-light">
+    A danger flash message - the action failed and the page does not show the error inline.
+</div>

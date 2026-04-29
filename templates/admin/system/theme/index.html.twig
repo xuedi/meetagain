@@ -42,6 +42,10 @@
             {% include 'admin/system/theme/_color_picker.html.twig' with {field: colorsForm.color_text_grey_light, help_key: 'admin_system_theme.color_text_grey_light', text_preview: true} %}
         </div>
         <button class="button is-link">{{ 'global.button_save'|trans }}</button>
+        <a href="{{ path('app_admin_system_gallery') }}" class="button is-light">
+            <span class="icon"><i class="fa fa-palette"></i></span>
+            <span>{{ 'admin_system_theme.button_gallery'|trans }}</span>
+        </a>
         {{ form_end(colorsForm) }}
 
     </div>

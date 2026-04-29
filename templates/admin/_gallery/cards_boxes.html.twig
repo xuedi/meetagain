@@ -1,0 +1,52 @@
+{#
+    Gallery: Cards & boxes -- plain box, box with title, columns layout
+
+    Anchor: g-cards.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    ux-admin.md prefers no decorative wrappers; reach for <code>.box</code> only when you
+    truly need a visual container (sidebar widgets, infobars, gallery sections).
+</p>
+
+<h3 class="title is-6 mt-4">plain box</h3>
+<div class="box">
+    Body content inside a box.
+</div>
+
+<h3 class="title is-6 mt-5">box with title</h3>
+<div class="box">
+    <p class="title is-6 mb-2">{{ 'admin_system_gallery.sample_info_title'|trans }}</p>
+    <p>{{ 'admin_system_gallery.sample_info_intro'|trans }}</p>
+</div>
+
+<h3 class="title is-6 mt-5">columns layout</h3>
+<div class="columns">
+    <div class="column">
+        <div class="box has-text-centered">left</div>
+    </div>
+    <div class="column">
+        <div class="box has-text-centered">middle</div>
+    </div>
+    <div class="column">
+        <div class="box has-text-centered">right</div>
+    </div>
+</div>
+
+<h3 class="title is-6 mt-5">card</h3>
+<div class="columns">
+    <div class="column is-one-third">
+        <div class="card">
+            <div class="card-image">
+                <figure class="image">
+                    {% include '_components/image.html.twig' with {'image': null, 'size': '400x400'} %}
+                </figure>
+            </div>
+            <div class="card-content p-3 has-text-centered">
+                <strong>{{ 'admin_system_gallery.sample_name'|trans }}</strong>
+            </div>
+        </div>
+    </div>
+</div>

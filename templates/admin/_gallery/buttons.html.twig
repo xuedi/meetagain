@@ -1,0 +1,65 @@
+{#
+    Gallery: Buttons -- Bulma button colour, size, and icon variants
+
+    Demonstrates the project's button vocabulary: is-link for primary save, is-light
+    for secondary, is-danger for destructive, is-warning sparingly. Anchor: g-buttons.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/host/edit.html.twig</code>,
+    <code>.claude/architecture/ux-admin.md</code> ("Bulma - use")
+</p>
+
+<h3 class="title is-6 mt-4">colours</h3>
+<div class="buttons">
+    <button class="button is-link">{{ 'admin_system_gallery.button_demo_save'|trans }}</button>
+    <button class="button is-light">{{ 'admin_system_gallery.button_demo_cancel'|trans }}</button>
+    <button class="button is-danger">{{ 'admin_system_gallery.button_demo_danger'|trans }}</button>
+    <button class="button is-warning">{{ 'admin_system_gallery.plain_status_draft'|trans }}</button>
+    <button class="button">default</button>
+</div>
+
+<h3 class="title is-6 mt-5">sizes</h3>
+<div class="buttons">
+    <button class="button is-small">small</button>
+    <button class="button">normal</button>
+    <button class="button is-large">large</button>
+</div>
+
+<h3 class="title is-6 mt-5">with icon</h3>
+<div class="buttons">
+    <button class="button is-link">
+        <span class="icon"><i class="fa fa-save"></i></span>
+        <span>{{ 'admin_system_gallery.button_demo_save'|trans }}</span>
+    </button>
+    <button class="button is-danger">
+        <span class="icon"><i class="fa fa-trash"></i></span>
+        <span>{{ 'admin_system_gallery.button_demo_danger'|trans }}</span>
+    </button>
+    <button class="button is-light">
+        <span class="icon"><i class="fa fa-arrow-left"></i></span>
+        <span>{{ 'global.button_back'|trans }}</span>
+    </button>
+</div>
+
+<h3 class="title is-6 mt-5">icon-only (with title for accessibility)</h3>
+<div class="buttons">
+    <a href="#" class="button is-small" title="Edit">
+        <span class="icon"><i class="fa fa-edit"></i></span>
+    </a>
+    <a href="#" class="button is-small" title="View">
+        <span class="icon"><i class="fa fa-eye"></i></span>
+    </a>
+    <a href="#" class="button is-small" title="Delete">
+        <span class="icon"><i class="fa fa-trash"></i></span>
+    </a>
+</div>
+
+<h3 class="title is-6 mt-5">disabled / loading</h3>
+<div class="buttons">
+    <button class="button is-link" disabled>{{ 'admin_system_gallery.button_demo_save'|trans }}</button>
+    <button class="button is-link is-loading">{{ 'admin_system_gallery.button_demo_save'|trans }}</button>
+</div>

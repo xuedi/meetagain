@@ -1,0 +1,32 @@
+{#
+    Gallery: Tooltips & titles -- accessibility for icon-only links/buttons
+
+    Anchor: g-tooltips.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>.claude/architecture/ux-frontend.md</code> ("Accessibility attributes")
+</p>
+
+<p class="mt-3">
+    Icon-only links and buttons must carry <code>title</code> or <code>aria-label</code>
+    so screen readers announce them. Hover any icon below to see the native browser tooltip.
+</p>
+
+<div class="buttons mt-3">
+    <a href="#" class="button is-small" title="View">
+        <span class="icon"><i class="fa fa-eye"></i></span>
+    </a>
+    <a href="#" class="button is-small" title="Edit">
+        <span class="icon"><i class="fa fa-edit"></i></span>
+    </a>
+    <a href="#" class="button is-small" title="Delete">
+        <span class="icon"><i class="fa fa-trash"></i></span>
+    </a>
+    <button type="button" class="button is-small" aria-label="close">
+        <span class="icon"><i class="fa fa-times"></i></span>
+    </button>
+</div>
