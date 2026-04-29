@@ -8,13 +8,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Resolves the canonical URL for the current request.
- *
- * Default behaviour (standalone install, no plugin registered):
- *   → ConfigService::getHost() + current request URI (self-referencing canonical)
- *
- * With a CanonicalUrlProviderInterface implementation registered (e.g. multisite plugin):
- *   → delegate to the provider; fall back to default if provider returns null
+ * Resolves the canonical URL for the current request. Delegates to any registered
+ * CanonicalUrlProviderInterface; falls back to a self-referencing canonical
+ * (ConfigService::getHost() + current path) when no provider returns a value.
  */
 readonly class CanonicalUrlService
 {

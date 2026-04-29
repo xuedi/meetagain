@@ -59,9 +59,7 @@ class CmsRepository extends ServiceEntityRepository
             $qb->andWhere('c.id IN (:allowedIds)')->setParameter('allowedIds', $allowedIds);
         }
 
-        // Order by ID and limit to 1 to handle duplicates gracefully
-        // In multisite context, the filter should ensure only one result
-        // Without filtering, we get the first available page
+        // Limit to 1 with a stable order so unfiltered queries pick the same page deterministically.
         $qb->orderBy('c.id', 'ASC')->setMaxResults(1);
 
         $results = $qb->getQuery()->getResult();

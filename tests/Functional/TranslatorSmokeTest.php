@@ -94,8 +94,7 @@ class TranslatorSmokeTest extends WebTestCase
         // Glossary plugin namespaces
         'glossary',
         'glossary_blocks',
-        // Multisite plugin namespaces are covered by
-        // plugins/multisite/tests/Functional/TranslatorSmokeTest.php
+        // Commercial-plugin namespaces are covered by the plugin's own TranslatorSmokeTest.
     ];
 
     #[DataProvider('provideRoutes')]

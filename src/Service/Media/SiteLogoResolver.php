@@ -23,7 +23,7 @@ readonly class SiteLogoResolver
 
     public function resolveUrl(): string
     {
-        // 1. Pre-SiteLogo override (e.g. whitelabel domain-locked group logo).
+        // 1. Plugin-provided override
         foreach ($this->providers as $provider) {
             $url = $provider->resolveSiteLogoUrl();
             if ($url !== null) {

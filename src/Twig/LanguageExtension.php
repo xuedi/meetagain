@@ -145,7 +145,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
     public function getMetaDescription(string $context = 'default'): string
     {
-        // 1. Plugin-provided value (e.g. per-group override from multisite)
+        // 1. Plugin-provided value
         foreach ($this->metaDescriptionProviders as $provider) {
             $value = $provider->getMetaDescription($context);
             if ($value !== null && $value !== '') {

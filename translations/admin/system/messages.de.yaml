@@ -154,7 +154,7 @@ admin_system_theme:
     button_gallery: 'Komponenten-Galerie'
 admin_system_gallery:
     page_title: 'Komponenten-Galerie'
-    intro: 'Visuelle Referenz für die wiederverwendbaren UI-Komponenten und Admin-Muster des Projekts. Jeder Abschnitt zeigt das kanonische Markup mit mehreren Varianten. Markdown-Styleguides unter .claude/architecture/ verlinken direkt auf diese Partials.'
+    intro: 'Visuelle Referenz für die wiederverwendbaren UI-Komponenten und Admin-Muster des Projekts. Jeder Abschnitt zeigt das kanonische Markup mit mehreren Varianten. Interne Styleguides verlinken direkt auf diese Partials.'
     toc_label: 'Abschnitte'
     toc_group_components: 'Geteilte _components/'
     toc_group_atoms: 'Formularatome & Typografie'

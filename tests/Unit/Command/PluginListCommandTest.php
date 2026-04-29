@@ -27,16 +27,16 @@ class PluginListCommandTest extends TestCase
     public function testListsPluginsWithStatus(): void
     {
         // Arrange: create test plugin structure
-        $pluginDir = $this->tempDir . '/plugins/multisite';
+        $pluginDir = $this->tempDir . '/plugins/demo';
         mkdir($pluginDir);
         file_put_contents($pluginDir . '/manifest.json', json_encode([
-            'name' => 'Multisite',
+            'name' => 'Demo',
             'version' => '1.0.0',
-            'description' => 'Multisite plugin',
+            'description' => 'Demo plugin',
         ]));
 
         // Create plugin config
-        file_put_contents($this->tempDir . '/config/plugins.php', "<?php\nreturn ['multisite' => true];");
+        file_put_contents($this->tempDir . '/config/plugins.php', "<?php\nreturn ['demo' => true];");
 
         // Create command with modified paths
         $command = new class($this->tempDir) extends PluginListCommand {
@@ -138,8 +138,8 @@ class PluginListCommandTest extends TestCase
         // Assert: output contains plugin info
         $output = $commandTester->getDisplay();
         static::assertSame(Command::SUCCESS, $exitCode);
-        static::assertStringContainsString('multisite', $output);
-        static::assertStringContainsString('Multisite', $output);
+        static::assertStringContainsString('demo', $output);
+        static::assertStringContainsString('Demo', $output);
         static::assertStringContainsString('1.0.0', $output);
         static::assertStringContainsString('Enabled', $output);
     }

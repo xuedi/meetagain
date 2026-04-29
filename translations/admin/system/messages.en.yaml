@@ -154,7 +154,7 @@ admin_system_theme:
     button_gallery: 'Component Gallery'
 admin_system_gallery:
     page_title: 'Component Gallery'
-    intro: 'Visual reference for the project''s reusable UI components and admin patterns. Each section shows the canonical markup with multiple variations. Markdown style guides under .claude/architecture/ link directly to these partials.'
+    intro: 'Visual reference for the project''s reusable UI components and admin patterns. Each section shows the canonical markup with multiple variations. Internal style guides link directly to these partials.'
     toc_label: 'Sections'
     toc_group_components: 'Shared _components/'
     toc_group_atoms: 'Form atoms & typography'

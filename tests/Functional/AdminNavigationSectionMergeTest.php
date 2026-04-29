@@ -62,9 +62,8 @@ class AdminNavigationSectionMergeTest extends WebTestCase
         $crawler = $client->request('GET', '/en/admin/events');
         $this->assertResponseIsSuccessful();
 
-        // Assert - "Content" section is never duplicated. In multisite group context,
-        // content links are moved to the "Whitelabel: <group>" section so the core
-        // "Content" heading may not appear at all; but it must never appear twice.
+        // Assert - the "Content" section heading must never appear twice. A plugin may move
+        // its links into a different section, so the heading may also be absent.
         $contentHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(
             static fn($node): bool => trim($node->text()) === 'Content',
         );

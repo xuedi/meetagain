@@ -220,5 +220,5 @@ just testPrintResults                      # AI-readable summary
 just testPrintResults --failures-only      # Failures only
 ```
 
-The `/test-unit` and `/test-functional` Claude Code skills wrap these commands and
-automatically use the Haiku model to keep costs low.
+The internal `/test-unit` and `/test-functional` agent skills wrap these commands and
+automatically use a small model to keep costs low.

@@ -13,9 +13,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Adds the public bookclub index plus a detail entry per approved book.
- *
- * BookService::getApprovedList already applies the multisite group filter, so
- * whitelabel tenants only see books their group can access.
  */
 final readonly class BookclubSitemapPublisher implements SitemapPublisherInterface
 {
