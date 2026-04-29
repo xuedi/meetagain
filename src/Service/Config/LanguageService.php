@@ -84,6 +84,24 @@ readonly class LanguageService
         return $this->languageRepo->findEnabledOrdered();
     }
 
+    /**
+     * Entity counterpart of `getFilteredEnabledCodes()`: enabled `Language`
+     * entities restricted to codes the frontend filter chain allows. Use this
+     * wherever language tiles must respect the same filters as the navbar
+     * selector.
+     *
+     * @return Language[]
+     */
+    public function getFilteredEnabledLanguages(): array
+    {
+        $allowedCodes = array_flip($this->getFilteredEnabledCodes());
+
+        return array_values(array_filter(
+            $this->getEnabledLanguages(),
+            static fn (Language $language): bool => isset($allowedCodes[$language->getCode()]),
+        ));
+    }
+
     public function findByCode(string $code): ?Language
     {
         return $this->languageRepo->findByCode($code);
