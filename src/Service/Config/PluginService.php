@@ -79,8 +79,8 @@ readonly class PluginService
     /**
      * Returns active plugin keys for the current request context.
      * Applies all registered PluginListFilterInterface implementations (AND logic).
-     * Filters only operate on group-activatable plugins; core and infrastructure plugins
-     * (e.g. core_navigation, multisite) are always included regardless of group context.
+     * Filters only operate on filterable plugins; core and infrastructure plugins
+     * are always included.
      *
      * @return array<string>
      */

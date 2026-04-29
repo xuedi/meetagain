@@ -19,12 +19,12 @@ class EventApiSerializerTest extends TestCase
         $serializer = new EventApiSerializer($this->makeUrlGenerator());
 
         // Act
-        $summary = $serializer->toSummary($event, 'en', 'https://tenant.example');
+        $summary = $serializer->toSummary($event, 'en', 'https://example.com');
 
         // Assert
         self::assertSame(42, $summary['id']);
-        self::assertSame('https://tenant.example/en/event/42', $summary['url']);
-        self::assertSame('https://tenant.example/images/thumbnails/abc123_600x400.webp', $summary['previewImageUrl']);
+        self::assertSame('https://example.com/en/event/42', $summary['url']);
+        self::assertSame('https://example.com/images/thumbnails/abc123_600x400.webp', $summary['previewImageUrl']);
         self::assertSame('2026-05-01T10:00:00+00:00', $summary['start']);
     }
 
@@ -35,7 +35,7 @@ class EventApiSerializerTest extends TestCase
         $serializer = new EventApiSerializer($this->makeUrlGenerator());
 
         // Act
-        $summary = $serializer->toSummary($event, 'en', 'https://tenant.example');
+        $summary = $serializer->toSummary($event, 'en', 'https://example.com');
 
         // Assert
         self::assertNull($summary['previewImageUrl']);
@@ -48,7 +48,7 @@ class EventApiSerializerTest extends TestCase
         $serializer = new EventApiSerializer($this->makeUrlGenerator());
 
         // Act
-        $detail = $serializer->toDetail($event, 'en', 'https://tenant.example');
+        $detail = $serializer->toDetail($event, 'en', 'https://example.com');
 
         // Assert
         self::assertArrayHasKey('description', $detail);

@@ -1,16 +1,15 @@
 {#
     Gallery: Detail page header -- box + level infobar with Back button
 
-    Two variations: (a) the core rule (plain-text status), (b) the multisite-plugin
-    variation that uses tag is-* for status. Anchor: g-detail-header.
+    Two variations: (a) plain-text status (core), (b) tag-based status (plugin override).
+    Anchor: g-detail-header.
 
     Used in:    admin/_gallery/index.html.twig
     Parameters: none
 #}
 <p class="is-size-7 has-text-grey">
     {{ 'admin_system_gallery.source_of_truth'|trans }}
-    <code>templates/admin/member/edit.html.twig</code>,
-    <code>plugins/multisite/templates/admin/meta/cms-pages/detail.html.twig</code>
+    <code>templates/admin/member/edit.html.twig</code>
 </p>
 
 <h3 class="title is-6 mt-4">{{ 'admin_system_gallery.label_core_rule'|trans }}</h3>

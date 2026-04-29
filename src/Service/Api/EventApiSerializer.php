@@ -7,10 +7,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Serialises an `Event` into the shape returned by the public JSON API.
- *
- * Locale selection is the caller's responsibility; pass the resolved locale in.
- * `$baseUrl` is the absolute scheme+host from the current request (e.g. tenant
- * domain) so the emitted `url` and `previewImageUrl` point at the requesting host.
+ * `$baseUrl` is the absolute scheme+host from the current request, so the emitted URLs
+ * point at the requesting host.
  */
 final readonly class EventApiSerializer
 {

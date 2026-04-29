@@ -36,7 +36,7 @@ class PluginCommandTest extends TestCase
         // Act: execute command with invalid action
         $exitCode = $this->commandTester->execute([
             'action' => 'invalid',
-            'plugin' => 'multisite',
+            'plugin' => 'demo',
         ]);
 
         // Assert: returns failure
@@ -80,17 +80,17 @@ class PluginCommandTest extends TestCase
         $this->pluginService
             ->expects($this->once())
             ->method('install')
-            ->with('multisite');
+            ->with('demo');
 
         $this->pluginService
             ->expects($this->once())
             ->method('enable')
-            ->with('multisite');
+            ->with('demo');
 
         // Act: enable a plugin
         $exitCode = $this->commandTester->execute([
             'action' => 'enable',
-            'plugin' => 'multisite',
+            'plugin' => 'demo',
         ]);
 
         // Assert: returns success
@@ -103,12 +103,12 @@ class PluginCommandTest extends TestCase
         $this->pluginService
             ->expects($this->once())
             ->method('disable')
-            ->with('multisite');
+            ->with('demo');
 
         // Act: disable a plugin
         $exitCode = $this->commandTester->execute([
             'action' => 'disable',
-            'plugin' => 'multisite',
+            'plugin' => 'demo',
         ]);
 
         // Assert: returns success

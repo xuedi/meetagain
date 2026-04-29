@@ -135,7 +135,7 @@ admin_cms:
     flash_error_already_sent: 'This announcement has already been sent.'
     flash_success_sent: 'Announcement sent to %count% recipient(s).'
     flash_error_cannot_delete_sent: 'Sent announcements cannot be deleted.'
-    status_locked_help: 'Locked pages are visible across all tenants (e.g., imprint, privacy)'
+    status_locked_help: 'Locked pages are visible everywhere (e.g., imprint, privacy)'
     field_page_title: 'Page Title'
     field_page_title_help: 'Title shown in browser and page content'
     field_link_name: 'Menu Link Name'
