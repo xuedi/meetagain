@@ -41,9 +41,8 @@ class MessageRepository extends ServiceEntityRepository
 
         $list = [];
         foreach ($messages as $message) {
-            $partner = $message->getSender()->getId() === $user->getId()
-                ? $message->getReceiver()
-                : $message->getSender();
+            $isReceived = $message->getReceiver()->getId() === $user->getId();
+            $partner = $isReceived ? $message->getSender() : $message->getReceiver();
             $partnerId = $partner->getId();
 
             // Skip blocked users
@@ -51,17 +50,19 @@ class MessageRepository extends ServiceEntityRepository
                 continue;
             }
 
+            $isUnread = $isReceived && $message->isWasRead() === false;
+
             if (!isset($list[$partnerId])) {
                 $list[$partnerId] = [
                     'messages' => 1,
-                    'unread' => $message->isWasRead() === false ? 1 : 0,
+                    'unread' => $isUnread ? 1 : 0,
                     'lastMessage' => $message->getCreatedAt(),
                     'user' => $partner,
                 ];
                 continue;
             }
             ++$list[$partnerId]['messages'];
-            if ($message->isWasRead() === false) {
+            if ($isUnread) {
                 $list[$partnerId]['unread'] = ($list[$partnerId]['unread'] ?? 0) + 1;
             }
         }
