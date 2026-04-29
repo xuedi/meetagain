@@ -8,6 +8,7 @@ use App\Activity\Messages\AdminCmsPageDeleted;
 use App\Activity\Messages\AdminCmsPageUpdated;
 use App\Entity\AdminLink;
 use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\FactsRow;
 use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
@@ -132,6 +133,7 @@ final class CmsController extends AbstractAdminController
             Hero::getType(),
             EventTeaser::getType(),
             TrioCards::getType(),
+            FactsRow::getType(),
         ];
 
         return $this->render('admin/cms/cms_edit.html.twig', [

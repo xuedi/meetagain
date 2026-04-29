@@ -1,0 +1,25 @@
+{% if block.facts|length > 0 %}
+    <section class="section cms-facts-row">
+        <div class="container">
+            {% if block.headline %}
+                <h2 class="title has-text-centered mb-5">{{ block.headline }}</h2>
+            {% endif %}
+            <div class="columns is-vcentered is-multiline has-text-centered">
+                {% for fact in block.facts %}
+                    {% set rawIcon = fact.icon|trim %}
+                    {% set iconClass = (rawIcon starts with 'fa-') ? 'fa ' ~ rawIcon : rawIcon %}
+                    <div class="column">
+                        {% if rawIcon %}
+                            <span class="icon mb-2 has-text-indigo">
+                                <i class="{{ iconClass }}" aria-hidden="true"></i>
+                            </span>
+                        {% endif %}
+                        {% if fact.label %}
+                            <p class="is-size-6 has-text-weight-semibold">{{ fact.label }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endif %}

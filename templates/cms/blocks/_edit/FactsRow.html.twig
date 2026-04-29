@@ -1,0 +1,113 @@
+{# Headline (optional) #}
+<div class="field">
+    <label class="label">{{ 'admin_cms.facts_row_headline'|trans }}</label>
+    <div class="control">
+        <input class="input" name="headline" type="text"
+               value="{{ block is defined ? block.headline : '' }}">
+    </div>
+</div>
+
+{# Hidden tile template - cloned by JS into the visible list. Inputs have empty `name`
+   attributes so they are not submitted; JS sets the names on the cloned node. #}
+<template id="facts-row-tile-template">
+    <div class="column is-half-tablet is-one-third-desktop facts-row-tile">
+        <div class="box">
+            <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+                <p class="has-text-weight-bold">
+                    {{- 'admin_cms.facts_row_fact_index_label'|trans({'%n%': '__N__'}) -}}
+                </p>
+                <button type="button" class="delete facts-row-remove"
+                        title="{{ 'admin_cms.facts_row_remove_fact'|trans }}"
+                        aria-label="{{ 'admin_cms.facts_row_remove_fact'|trans }}"></button>
+            </div>
+
+            <div class="field">
+                <label class="label">{{ 'admin_cms.facts_row_fact_icon'|trans }}</label>
+                <div class="field has-addons mb-0">
+                    <div class="control is-expanded">
+                        <input class="input facts-row-icon-input" data-name-suffix="[icon]"
+                               type="text" value="">
+                    </div>
+                    <div class="control">
+                        <span class="button is-static">
+                            <span class="icon facts-row-icon-preview"><i class=""></i></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="is-flex is-justify-content-space-between is-align-items-baseline">
+                    <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" rel="noopener noreferrer" class="is-size-7">
+                        {{ 'admin_cms.facts_row_fact_icon_link'|trans }}
+                    </a>
+                    <p class="help">{{ 'admin_cms.facts_row_fact_icon_help'|trans }}</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">{{ 'admin_cms.facts_row_fact_label_text'|trans }}</label>
+                <div class="control">
+                    <input class="input" data-name-suffix="[label]" type="text" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+{# Server-rendered list of existing facts (works without JS for editing already-saved tiles) #}
+<div id="facts-row-tiles" class="columns is-multiline mt-4">
+    {% for i, fact in (block is defined ? block.facts : []) %}
+        {% set rawIcon = fact.icon|trim %}
+        {% set previewIconClass = (rawIcon starts with 'fa-') ? 'fa ' ~ rawIcon : rawIcon %}
+        <div class="column is-half-tablet is-one-third-desktop facts-row-tile">
+            <div class="box">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+                    <p class="has-text-weight-bold">
+                        {{- 'admin_cms.facts_row_fact_index_label'|trans({'%n%': i + 1}) -}}
+                    </p>
+                    <button type="button" class="delete facts-row-remove"
+                            title="{{ 'admin_cms.facts_row_remove_fact'|trans }}"
+                            aria-label="{{ 'admin_cms.facts_row_remove_fact'|trans }}"></button>
+                </div>
+
+                <div class="field">
+                    <label class="label">{{ 'admin_cms.facts_row_fact_icon'|trans }}</label>
+                    <div class="field has-addons mb-0">
+                        <div class="control is-expanded">
+                            <input class="input facts-row-icon-input"
+                                   name="facts[{{ i }}][icon]" type="text"
+                                   value="{{ fact.icon }}">
+                        </div>
+                        <div class="control">
+                            <span class="button is-static">
+                                <span class="icon facts-row-icon-preview"><i class="{{ previewIconClass }}"></i></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="is-flex is-justify-content-space-between is-align-items-baseline">
+                    <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" rel="noopener noreferrer" class="is-size-7">
+                        {{ 'admin_cms.facts_row_fact_icon_link'|trans }}
+                    </a>
+                    <p class="help">{{ 'admin_cms.facts_row_fact_icon_help'|trans }}</p>
+                </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">{{ 'admin_cms.facts_row_fact_label_text'|trans }}</label>
+                    <div class="control">
+                        <input class="input" name="facts[{{ i }}][label]" type="text"
+                               value="{{ fact.label }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="field mt-3">
+    <button type="button" id="facts-row-add" class="button is-light">
+        <span class="icon"><i class="fa fa-plus"></i></span>
+        <span>{{ 'admin_cms.facts_row_add_fact'|trans }}</span>
+    </button>
+    <span id="facts-row-cap-msg" class="help has-text-grey ml-2 is-hidden">
+        {{ 'admin_cms.facts_row_max_reached'|trans }}
+    </span>
+</div>
