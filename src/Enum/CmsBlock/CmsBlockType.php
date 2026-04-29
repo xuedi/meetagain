@@ -5,6 +5,7 @@ namespace App\Enum\CmsBlock;
 use App\Entity\BlockType\BlockCapabilities;
 use App\Entity\BlockType\BlockType;
 use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\FactsRow;
 use App\Entity\BlockType\FieldDefinition;
 use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
@@ -23,6 +24,7 @@ enum CmsBlockType: int
     case Hero = 8;
     case EventTeaser = 9;
     case TrioCards = 10;
+    case FactsRow = 11;
 
     /** @return class-string<BlockType> */
     public function getBlockClass(): string
@@ -34,6 +36,7 @@ enum CmsBlockType: int
             self::Hero        => Hero::class,
             self::EventTeaser => EventTeaser::class,
             self::TrioCards   => TrioCards::class,
+            self::FactsRow    => FactsRow::class,
             default           => throw new LogicException(sprintf('CmsBlockType::%s is not yet implemented.', $this->name)),
         };
     }

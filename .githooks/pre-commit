@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# pre-commit dispatcher -- runs every executable *.bash script in bin/commit-hooks/.
+#
+# Activate locally with:
+#   git config core.hooksPath .githooks
+#
+# Each script must:
+#   - be executable (chmod +x)
+#   - exit 0 to pass, non-zero to abort the commit
+#
+# Scripts run in alphabetical order (so prefix with 01-, 02-, ... to control order).
+# Public/open-source contributors typically have an empty bin/commit-hooks/ and the
+# hook becomes a no-op. Private tooling (e.g. .claude/) can drop scripts here without
+# the core repo needing to know about them.
+#
+# Bypass once with: git commit --no-verify
+
+set -e
+
+dir="bin/commit-hooks"
+[ -d "$dir" ] || exit 0
+
+for hook in "$dir"/*.bash; do
+    [ -x "$hook" ] || continue
+    "$hook" || exit 1
+done
+
+exit 0

@@ -101,4 +101,7 @@
     {% if supportsImage %}
     <script src="{{ asset('js/admin/cms-block-edit.js') }}" defer></script>
     {% endif %}
+    {% if block.type.name == 'FactsRow' %}
+    <script src="{{ asset('js/admin/cms-facts-row-editor.js') }}" defer></script>
+    {% endif %}
 {% endblock %}

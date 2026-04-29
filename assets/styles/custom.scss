@@ -305,3 +305,9 @@ details.activities-load-more {
     margin-top: auto;
     align-self: center;
 }
+
+// -- FactsRow CMS block --
+// Mirrors the platform plugin's hardcoded `.platform-trust-strip` so the admin-authored
+// FactsRow matches its visual styling (padding + larger icon font-size).
+.cms-facts-row { padding-top: 2rem; padding-bottom: 2rem; }
+.cms-facts-row .icon { font-size: 1.5rem; }
