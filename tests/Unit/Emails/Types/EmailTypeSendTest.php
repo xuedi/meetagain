@@ -21,6 +21,7 @@ use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\ContactType;
 use App\Enum\EmailType;
+use App\Filter\Event\FollowerEventNotificationFilterInterface;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
@@ -29,6 +30,7 @@ use App\Service\Email\BlocklistCheckerInterface;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
@@ -438,6 +440,117 @@ class EmailTypeSendTest extends TestCase
         $user = $this->makeUser(settings: new NotificationSettings(['followingUpdates' => true]));
 
         static::assertTrue($email->guardCheck(['user' => $user, 'event' => $this->makeEvent(), 'attendeeMap' => []]));
+    }
+
+    // =========================================================================
+    // RsvpAggregatedEmail follower-filter wiring (buildAttendeeMap via getDueContexts)
+    // =========================================================================
+
+    public function testRsvpAggregatedIncludesFollowerWhenFilterAllows(): void
+    {
+        $follower = $this->makeUser('f@example.com', 'Follower', id: 7);
+        $attendee = $this->makeUserWithFollowers('a@example.com', 'Attendee', 8, [$follower]);
+        $event = $this->makeEventWithAttendees([$attendee]);
+
+        $eventRepo = $this->createStub(EventRepository::class);
+        $eventRepo->method('findUpcomingEventsNeedingRsvpNotification')->willReturn([$event]);
+
+        $allowFilter = $this->createStub(FollowerEventNotificationFilterInterface::class);
+        $allowFilter->method('isFollowerAllowed')->willReturn(true);
+
+        $email = new RsvpAggregatedEmail(
+            $this->blocklist,
+            $this->createStub(EmailQueueInterface::class),
+            $this->config,
+            $eventRepo,
+            $this->createStub(EntityManagerInterface::class),
+            [$allowFilter],
+        );
+
+        $contexts = $email->getDueContexts(new DateTimeImmutable('2026-05-30 12:00:00'));
+
+        static::assertCount(1, $contexts);
+        $attendeeMap = $contexts[0]->data['attendeeMap'];
+        static::assertArrayHasKey(7, $attendeeMap);
+        static::assertSame($follower, $attendeeMap[7]['recipient']);
+    }
+
+    public function testRsvpAggregatedDropsFollowerWhenFilterVetos(): void
+    {
+        $follower = $this->makeUser('f@example.com', 'Follower', id: 7);
+        $attendee = $this->makeUserWithFollowers('a@example.com', 'Attendee', 8, [$follower]);
+        $event = $this->makeEventWithAttendees([$attendee]);
+
+        $eventRepo = $this->createStub(EventRepository::class);
+        $eventRepo->method('findUpcomingEventsNeedingRsvpNotification')->willReturn([$event]);
+
+        $denyFilter = $this->createStub(FollowerEventNotificationFilterInterface::class);
+        $denyFilter->method('isFollowerAllowed')->willReturn(false);
+
+        $email = new RsvpAggregatedEmail(
+            $this->blocklist,
+            $this->createStub(EmailQueueInterface::class),
+            $this->config,
+            $eventRepo,
+            $this->createStub(EntityManagerInterface::class),
+            [$denyFilter],
+        );
+
+        $contexts = $email->getDueContexts(new DateTimeImmutable('2026-05-30 12:00:00'));
+
+        static::assertSame([], $contexts, 'event with no recipients should be dropped entirely');
+    }
+
+    public function testRsvpAggregatedFilterChainAndsAllResults(): void
+    {
+        $follower = $this->makeUser('f@example.com', 'Follower', id: 7);
+        $attendee = $this->makeUserWithFollowers('a@example.com', 'Attendee', 8, [$follower]);
+        $event = $this->makeEventWithAttendees([$attendee]);
+
+        $eventRepo = $this->createStub(EventRepository::class);
+        $eventRepo->method('findUpcomingEventsNeedingRsvpNotification')->willReturn([$event]);
+
+        $allowFilter = $this->createStub(FollowerEventNotificationFilterInterface::class);
+        $allowFilter->method('isFollowerAllowed')->willReturn(true);
+        $denyFilter = $this->createStub(FollowerEventNotificationFilterInterface::class);
+        $denyFilter->method('isFollowerAllowed')->willReturn(false);
+
+        $email = new RsvpAggregatedEmail(
+            $this->blocklist,
+            $this->createStub(EmailQueueInterface::class),
+            $this->config,
+            $eventRepo,
+            $this->createStub(EntityManagerInterface::class),
+            [$allowFilter, $denyFilter],
+        );
+
+        $contexts = $email->getDueContexts(new DateTimeImmutable('2026-05-30 12:00:00'));
+
+        static::assertSame([], $contexts, 'any veto in the chain drops the recipient');
+    }
+
+    private function makeUserWithFollowers(string $email, string $name, int $id, array $followers): User
+    {
+        $user = $this->createStub(User::class);
+        $user->method('getEmail')->willReturn($email);
+        $user->method('getName')->willReturn($name);
+        $user->method('getLocale')->willReturn('en');
+        $user->method('getId')->willReturn($id);
+        $user->method('isNotification')->willReturn(true);
+        $user->method('getNotificationSettings')->willReturn(new NotificationSettings([]));
+        $user->method('getFollowers')->willReturn(new ArrayCollection($followers));
+
+        return $user;
+    }
+
+    private function makeEventWithAttendees(array $attendees): Event
+    {
+        $event = $this->createStub(Event::class);
+        $event->method('getId')->willReturn(42);
+        $event->method('getStart')->willReturn(new DateTime('2026-06-01 19:00:00'));
+        $event->method('getRsvp')->willReturn(new ArrayCollection($attendees));
+
+        return $event;
     }
 
     public function testUpcomingDigestGuardCheckReturnsTrueWhenSettingOn(): void

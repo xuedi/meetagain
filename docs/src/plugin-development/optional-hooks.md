@@ -23,6 +23,8 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `MessageInterface`                            | Define a new activity type with display rendering    | `getType()`, `validate()`, `render()` |
 | `SitemapPublisherInterface`                   | Contribute URLs to `/sitemap.xml`                    | `getPriority()`, `getSitemapUrls()`   |
 | `SitemapEventVisibilityFilterInterface`       | Suppress event URLs on specific tenants              | `shouldEmitEvents()`                  |
+| `FollowerEventNotificationFilterInterface`    | Drop follower-RSVP email recipients per event        | `isFollowerAllowed()`                 |
+| `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`        |
 
 ---
 
@@ -756,3 +758,81 @@ For **scheduled emails** (cron-driven), implement `ScheduledEmailInterface` addi
 Plugin email identifiers must not collide with core `EmailType` enum values. If your email type
 does not have a corresponding `EmailType` entry, you will need to add one or use a string identifier
 and implement the template system separately.
+
+---
+
+## Follower Event Notification Filter
+
+Implement `FollowerEventNotificationFilterInterface` to drop follower-RSVP email recipients per
+`(recipient, attendee, event)` triple. Returning `false` silently drops that recipient/attendee
+pair from the aggregated email and the in-app notification - no email is sent and no fallback
+runs. The chain is AND-combined: any filter returning `false` vetoes.
+
+```php
+namespace Plugin\YourPlugin\Filter;
+
+use App\Entity\Event;
+use App\Entity\User;
+use App\Filter\Event\FollowerEventNotificationFilterInterface;
+
+readonly class MyFollowerFilter implements FollowerEventNotificationFilterInterface
+{
+    public function isFollowerAllowed(User $recipient, User $attendee, Event $event): bool
+    {
+        // Return true to allow, false to drop the pair.
+        return true;
+    }
+}
+```
+
+The multisite plugin already supplies a same-group implementation (`FollowerSameGroupFilter`); a
+filter you add layers on top via AND-intersection with that one.
+
+---
+
+## Data Hotfix
+
+Implement `DataHotfixInterface` to ship a one-off data repair that runs once per database
+lifetime. The runner (`DataHotfixRunner`) discovers all implementations on every cron tick,
+checks the per-identifier AppState lock, runs the hotfix if not yet locked, and writes the lock
+on success. Throwing leaves the lock unwritten so the next tick retries.
+
+```php
+namespace Plugin\YourPlugin\DataHotfix;
+
+use App\DataHotfix\DataHotfixInterface;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+
+readonly class FixOrphanedThings implements DataHotfixInterface
+{
+    public function __construct(
+        private UserRepository $userRepository,
+        private EntityManagerInterface $em,
+    ) {}
+
+    public function getIdentifier(): string
+    {
+        // Date-prefixed snake_case. Plugin authors should namespace with the plugin slug
+        // when there is any risk of collision with core or other plugins.
+        return 'yourplugin_2026_05_15_fix_orphaned_things';
+    }
+
+    public function execute(): void
+    {
+        $i = 0;
+        foreach ($this->userRepository->iterateAll() as $user) {
+            // ... mutate via entity API ...
+            if (++$i % 200 === 0) {
+                $this->em->flush();
+                $this->em->clear();
+            }
+        }
+        $this->em->flush();
+    }
+}
+```
+
+Identifiers must be stable - they are AppState row keys. Once a hotfix has shipped, never
+rename its identifier; treat it like a Doctrine migration version. To force a rerun on a single
+environment, delete the `app_state` row with key `data_hotfix.{identifier}`.
