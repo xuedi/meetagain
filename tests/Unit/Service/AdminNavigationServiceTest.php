@@ -613,7 +613,7 @@ final class AdminNavigationServiceTest extends TestCase
                     section: 'System',
                     links: [],
                     modifies: [
-                        'app_admin_member' => ['route' => 'app_multisite_admin_member'],
+                        'app_admin_member' => ['route' => 'app_alt_admin_member'],
                     ],
                 );
             }
@@ -629,7 +629,7 @@ final class AdminNavigationServiceTest extends TestCase
         static::assertCount(1, $sections);
         $links = $sections[0]->getLinks();
         static::assertCount(1, $links);
-        static::assertSame('app_multisite_admin_member', $links[0]->getRoute(), 'Route should be swapped');
+        static::assertSame('app_alt_admin_member', $links[0]->getRoute(), 'Route should be swapped');
         static::assertSame('Members', $links[0]->getLabel(), 'Label should be unchanged');
     }
 

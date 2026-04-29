@@ -136,7 +136,7 @@ class LanguageExtensionTest extends TestCase
         ], $result);
     }
 
-    public function testGetAlternativeLanguageCodesStaysOnWhitelabelHost(): void
+    public function testGetAlternativeLanguageCodesStaysOnSameHost(): void
     {
         $request = $this->createStub(Request::class);
         $request->method('getRequestUri')->willReturn('/zh/events');

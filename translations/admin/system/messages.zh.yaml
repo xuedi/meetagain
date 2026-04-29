@@ -154,7 +154,7 @@ admin_system_theme:
     button_gallery: '组件库'
 admin_system_gallery:
     page_title: '组件库'
-    intro: '项目可复用 UI 组件与后台模式的可视化参考。每个章节展示规范写法及多种变体。.claude/architecture/ 下的样式指南文档可直接链接到这些片段。'
+    intro: '项目可复用 UI 组件与后台模式的可视化参考。每个章节展示规范写法及多种变体。内部样式指南文档可直接链接到这些片段。'
     toc_label: '章节'
     toc_group_components: '共享 _components/'
     toc_group_atoms: '表单原子与排版'

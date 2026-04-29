@@ -3,7 +3,7 @@
     "info": {
         "title": "meetagain public API",
         "version": "1.0.0",
-        "description": "Public REST API. The same spec applies to every tenant domain; hostnames are relative."
+        "description": "Public REST API. The same spec applies to every host; hostnames are relative."
     },
     "servers": [
         {

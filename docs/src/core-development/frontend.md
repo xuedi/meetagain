@@ -158,7 +158,7 @@ The entire UI uses [Bulma](https://bulma.io/) compiled from SCSS source — no o
 ## Admin UI conventions
 
 The admin interface follows a minimal design philosophy. See the full spec in
-[design guidelines](.claude/docs/core/design.md).
+the internal admin design guidelines.
 
 ### Table lists
 
@@ -268,7 +268,7 @@ action.save: 'Save'
 
 1. Add the key and English value to `translations/messages.en.yaml`
 2. Run `just translationExtract` to scan all templates for new keys
-3. Run `/fill-translations` in Claude Code to fill missing DE/CN keys
+3. Use your AI agent's translation workflow to fill missing DE/CN keys
 
 ---
 

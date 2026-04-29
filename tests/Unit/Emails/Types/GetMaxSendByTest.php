@@ -28,8 +28,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Regression coverage for each email type's getMaxSendBy() policy. The exact numbers come
- * from the Phase 3 analysis table in .claude/plans/2026-04-21_email-queue-max-delay-guard.md.
- * A sign flip or a changed constant should fail one of these assertions immediately.
+ * from the original design analysis for the email-queue max-delay guard. A sign flip or a
+ * changed constant should fail one of these assertions immediately.
  */
 final class GetMaxSendByTest extends TestCase
 {

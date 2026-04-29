@@ -53,7 +53,7 @@ final class OpenApiSpecBuilderTest extends TestCase
             'paths' => ['/api/core' => ['get' => []]],
             'components' => ['schemas' => ['CoreThing' => ['type' => 'object']]],
         ]);
-        $plugin = new FakePlugin('multisite', [
+        $plugin = new FakePlugin('demo', [
             'paths' => ['/api/groups' => ['get' => ['summary' => 'List groups']]],
             'components' => ['schemas' => ['Group' => ['type' => 'object']]],
         ]);
@@ -86,12 +86,12 @@ final class OpenApiSpecBuilderTest extends TestCase
     {
         // Arrange
         $this->writeCoreSpec(['paths' => ['/api/x' => ['get' => []]]]);
-        $plugin = new FakePlugin('multisite', ['paths' => ['/api/x' => ['post' => []]]]);
+        $plugin = new FakePlugin('demo', ['paths' => ['/api/x' => ['post' => []]]]);
         $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), $this->fixtureDir);
 
         // Act + Assert
         $this->expectException(OpenApiCollisionException::class);
-        $this->expectExceptionMessageMatches("/path collision: \\/api\\/x.*'core'.*'multisite'/");
+        $this->expectExceptionMessageMatches("/path collision: \\/api\\/x.*'core'.*'demo'/");
         $builder->build();
     }
 
@@ -113,12 +113,12 @@ final class OpenApiSpecBuilderTest extends TestCase
     {
         // Arrange
         $this->writeCoreSpec(['tags' => [['name' => 'data', 'description' => 'core data']]]);
-        $plugin = new FakePlugin('multisite', ['tags' => [['name' => 'data', 'description' => 'plugin data']]]);
+        $plugin = new FakePlugin('demo', ['tags' => [['name' => 'data', 'description' => 'plugin data']]]);
         $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), $this->fixtureDir);
 
         // Act + Assert
         $this->expectException(OpenApiCollisionException::class);
-        $this->expectExceptionMessageMatches("/tag collision: 'data'.*'core'.*'multisite'/");
+        $this->expectExceptionMessageMatches("/tag collision: 'data'.*'core'.*'demo'/");
         $builder->build();
     }
 

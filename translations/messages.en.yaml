@@ -450,7 +450,7 @@ shared:
     toggle_yes: 'Yes'
     toggle_no: 'No'
     api_toolbox_title: 'Use meetagain with AI agents'
-    api_toolbox_intro: 'The meetagain-toolbox repo bundles an MCP server and an agent skill so Claude, Copilot and other agents can search events and manage RSVPs on your behalf.'
+    api_toolbox_intro: 'The meetagain-toolbox repo bundles an MCP server and an agent skill so AI agents can search events and manage RSVPs on your behalf.'
     api_toolbox_bullet_mcp: 'MCP server: install once, then ask your agent things like "what is on next week?"'
     api_toolbox_bullet_skill: 'Or drop in the SKILL.md if you want the agent to call the REST API directly.'
     api_toolbox_bullet_rest: 'Or roll your own client - the OpenAPI spec covers everything.'

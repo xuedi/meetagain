@@ -17,10 +17,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Core sitemap URLs: public static routes, published CMS pages, published events.
- *
- * Events are suppressed when any `SitemapEventVisibilityFilterInterface` implementation
- * returns false (e.g. multisite plugin on whitelabel hosts, where events are
- * platform-canonical).
+ * Event URLs may be suppressed by registered SitemapEventVisibilityFilterInterface implementations.
  */
 final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
 {
@@ -109,9 +106,8 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
     }
 
     /**
-     * Emit one entry per page of the public member directory, mirroring the
-     * controller's PAGE_SIZE and the same MemberFilterService restrictions
-     * anonymous visitors would see (so whitelabel tenants do not over-emit).
+     * One entry per page of the public member directory, applying the same
+     * MemberFilterService restrictions an anonymous visitor would see.
      *
      * @param array<string> $locales
      * @return array<SitemapUrl>

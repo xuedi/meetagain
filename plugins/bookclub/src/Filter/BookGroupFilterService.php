@@ -5,8 +5,8 @@ namespace Plugin\Bookclub\Filter;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
- * Composite filter service that collects all BookGroupFilterInterface implementations.
- * Returns null when no filter is active (single-tenant / main host = no restriction).
+ * Composite filter that collects all BookGroupFilterInterface implementations.
+ * Returns null when no filter is active.
  */
 readonly class BookGroupFilterService
 {
