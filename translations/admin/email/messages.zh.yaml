@@ -54,6 +54,9 @@ admin_email_sendlog:
     flash_cap_cleared: '最大发送日期已重置。邮件将在下次计划任务时发送。'
     flash_sync_success: '已从提供商同步 %updated% / %checked% 封邮件状态。'
     flash_provider_not_configured: '邮件投递提供商未配置。'
+    rendered_message: '渲染后的消息'
+    rendered_message_error: '无法渲染消息'
+    context_variables: '上下文变量'
 admin_email_planned:
     empty: '未来14天内无计划邮件。'
     col_expected_time: '预计时间'

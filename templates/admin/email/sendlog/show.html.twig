@@ -136,23 +136,42 @@
                         <td class="has-text-danger">{{ email.errorMessage }}</td>
                     </tr>
                 {% endif %}
-                <tr>
-                    <th>{{ 'admin_email_sendlog.col_context'|trans }}</th>
-                    <td>
-                        <table class="table is-narrow is-bordered">
-                            <tbody>
-                                {% for key, value in email.context %}
-                                    <tr>
-                                        <th>{{ key }}</th>
-                                        <td>{{ value }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
             </tbody>
         </table>
+
+        <div class="columns">
+            <div class="column">
+                <div class="box">
+                    <h3 class="subtitle">{{ 'admin_email_sendlog.context_variables'|trans }}</h3>
+                    <table class="table is-narrow is-bordered is-fullwidth">
+                        <tbody>
+                            {% for key, value in email.context %}
+                                <tr>
+                                    <th>{{ key }}</th>
+                                    <td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="column">
+                {% if renderedBody is not null %}
+                    <div class="box">
+                        <h3 class="subtitle">{{ 'admin_email_sendlog.rendered_message'|trans }}</h3>
+                        <p class="mb-4"><strong>{{ 'admin_email_sendlog.col_subject'|trans }}:</strong> {{ renderedSubject }}</p>
+                        <hr>
+                        <div class="content">
+                            {{ renderedBody|raw }}
+                        </div>
+                    </div>
+                {% elseif renderError is not null %}
+                    <div class="notification is-warning">
+                        {{ 'admin_email_sendlog.rendered_message_error'|trans }}: {{ renderError }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
     </div>
 
