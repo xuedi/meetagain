@@ -485,4 +485,4 @@ global:
     button_discard: 'Discard'
     button_yes: 'Yes'
     button_no: 'No'
-'notification.review.pending_count': '{%count%} item pending your review|{%count%} items pending your review'
+'notification.review.pending_count': '%count% item pending your review|%count% items pending your review'
