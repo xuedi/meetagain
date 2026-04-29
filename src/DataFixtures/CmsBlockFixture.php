@@ -267,6 +267,52 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 ],
                 'group-zh.jpg',
             ],
+            // ========== FactsRow on INDEX (1-6 trust facts) ==========
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::ENGLISH,
+                CmsBlockType::FactsRow,
+                [
+                    'headline' => 'Why play with us',
+                    'facts' => [
+                        ['icon' => 'fa fa-users', 'label' => 'Active community'],
+                        ['icon' => 'fa fa-globe', 'label' => 'Players worldwide'],
+                        ['icon' => 'fa fa-graduation-cap', 'label' => 'Beginner-friendly'],
+                        ['icon' => 'fa fa-trophy', 'label' => 'Regular tournaments'],
+                    ],
+                ],
+                null,
+            ],
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::GERMAN,
+                CmsBlockType::FactsRow,
+                [
+                    'headline' => 'Warum mit uns spielen',
+                    'facts' => [
+                        ['icon' => 'fa fa-users', 'label' => 'Aktive Community'],
+                        ['icon' => 'fa fa-globe', 'label' => 'Spieler weltweit'],
+                        ['icon' => 'fa fa-graduation-cap', 'label' => 'Anfaengerfreundlich'],
+                        ['icon' => 'fa fa-trophy', 'label' => 'Regelmaessige Turniere'],
+                    ],
+                ],
+                null,
+            ],
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::CHINESE,
+                CmsBlockType::FactsRow,
+                [
+                    'headline' => '为什么和我们一起下棋',
+                    'facts' => [
+                        ['icon' => 'fa fa-users', 'label' => '活跃的社区'],
+                        ['icon' => 'fa fa-globe', 'label' => '全球棋手'],
+                        ['icon' => 'fa fa-graduation-cap', 'label' => '适合初学者'],
+                        ['icon' => 'fa fa-trophy', 'label' => '定期比赛'],
+                    ],
+                ],
+                null,
+            ],
             // ========== Rules Page ==========
             [
                 CmsFixture::RULES,

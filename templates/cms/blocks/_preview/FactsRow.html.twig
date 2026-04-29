@@ -1,0 +1,19 @@
+<div class="box">
+    {% if block.headline %}
+        <p class="has-text-weight-bold mb-2">{{ block.headline }}</p>
+    {% endif %}
+    <div class="tags">
+        {% for fact in block.facts %}
+            {% set rawIcon = fact.icon|trim %}
+            {% set iconClass = (rawIcon starts with 'fa-') ? 'fa ' ~ rawIcon : rawIcon %}
+            <span class="tag is-light">
+                {% if rawIcon %}
+                    <span class="icon is-small mr-1"><i class="{{ iconClass }}"></i></span>
+                {% endif %}
+                <span>{{ fact.label }}</span>
+            </span>
+        {% else %}
+            <span class="has-text-grey is-size-7">{{ 'admin_cms.facts_row_empty_preview'|trans }}</span>
+        {% endfor %}
+    </div>
+</div>

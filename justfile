@@ -127,6 +127,12 @@ appUpdateBulma version='latest':
 
 
 
+# Activate the local git hook dispatcher (.githooks/pre-commit). Run once per clone.
+[group('development')]
+install:
+    git config core.hooksPath .githooks
+    @echo "Pre-commit dispatcher activated. Scripts in bin/commit-hooks/ will run on every commit."
+
 # Shared reset sequence used by devModeFixtures and devModeMinimal
 [group('development')]
 devModeReset plugins='':
