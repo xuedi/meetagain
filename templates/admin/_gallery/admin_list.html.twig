@@ -1,0 +1,110 @@
+{#
+    Gallery: Admin list -- Standard list table with icon-only row actions
+
+    Two real-world variations: (a) the canonical minimal host list, (b) the richer cms list
+    with state-flag icons and a bottom legend. Anchor: g-admin-list.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/host/list.html.twig</code>,
+    <code>templates/admin/cms/cms_list.html.twig</code>
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.variation_label'|trans }} (a) minimal</h3>
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>{{ 'admin_system_gallery.col_name'|trans }}</th>
+            <th>{{ 'admin_system_gallery.col_user'|trans }}</th>
+            <th>
+                <a href="#" title="{{ 'admin_system_gallery.empty_card_cta'|trans }}">
+                    <span class="icon"><i class="fa fa-plus"></i></span>
+                </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Sample Host A</td>
+            <td>{{ 'admin_system_gallery.sample_name'|trans }}</td>
+            <td>
+                <a href="#" title="Edit">
+                    <span class="icon"><i class="fa fa-edit"></i></span>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>Sample Host B</td>
+            <td>-</td>
+            <td>
+                <a href="#" title="Edit">
+                    <span class="icon"><i class="fa fa-edit"></i></span>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (b) richer with state flags + legend</h3>
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>slug</th>
+            <th>{{ 'admin_system_gallery.col_status'|trans }}</th>
+            <th></th>
+            <th>
+                <a href="#" title="{{ 'admin_system_gallery.empty_card_cta'|trans }}">
+                    <span class="icon"><i class="fa fa-plus"></i></span>
+                </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>about</td>
+            <td><span class="has-text-success">{{ 'admin_system_gallery.plain_status_published'|trans }}</span></td>
+            <td>
+                <span class="icon-text">
+                    <span class="icon has-text-grey-light" title="home"><i class="fa fa-home"></i></span>
+                    <span class="icon has-text-grey-light" title="locked"><i class="fa fa-lock"></i></span>
+                </span>
+            </td>
+            <td>
+                <a href="#" title="Edit"><span class="icon"><i class="fa fa-edit"></i></span></a>
+            </td>
+        </tr>
+        <tr>
+            <td>contact</td>
+            <td><span class="has-text-grey-light">{{ 'admin_system_gallery.plain_status_draft'|trans }}</span></td>
+            <td></td>
+            <td>
+                <a href="#" title="Edit"><span class="icon"><i class="fa fa-edit"></i></span></a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div class="mt-4 has-text-centered">
+    <span class="icon-text">
+        <span class="icon has-text-grey-light"><i class="fas fa-home"></i></span>
+        <span class="has-text-grey-light">home page</span>
+    </span>
+    <span class="icon-text ml-4">
+        <span class="icon has-text-grey-light"><i class="fas fa-lock"></i></span>
+        <span class="has-text-grey-light">{{ 'admin_system_gallery.plain_status_locked'|trans }}</span>
+    </span>
+</div>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (c) row state via background colour</h3>
+<table class="table is-fullwidth">
+    <thead>
+        <tr><th>name</th><th>{{ 'admin_system_gallery.col_status'|trans }}</th><th></th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Normal row</td><td>active</td><td><a href="#"><span class="icon"><i class="fa fa-edit"></i></span></a></td></tr>
+        <tr class="has-background-warning-light"><td>Pending row</td><td>pending</td><td><a href="#"><span class="icon"><i class="fa fa-edit"></i></span></a></td></tr>
+        <tr class="has-background-danger-light"><td>Blocked row</td><td>blocked</td><td><a href="#"><span class="icon"><i class="fa fa-edit"></i></span></a></td></tr>
+    </tbody>
+</table>

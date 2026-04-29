@@ -1,0 +1,36 @@
+{#
+    Gallery: Checkboxes and radios -- standalone, group, inline
+
+    Anchor: g-form-check.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">Bulma class-less checkbox/radio inside <code>.field</code>.</p>
+
+<div class="field mt-4">
+    <label class="checkbox">
+        <input type="checkbox" checked>
+        {{ 'admin_system_gallery.field_demo_check_label_a'|trans }}
+    </label>
+</div>
+<div class="field">
+    <label class="checkbox">
+        <input type="checkbox">
+        {{ 'admin_system_gallery.field_demo_check_label_b'|trans }}
+    </label>
+</div>
+
+<div class="field mt-4">
+    <label class="label">{{ 'admin_system_gallery.field_demo_radio_label'|trans }}</label>
+    <div class="control">
+        <label class="radio">
+            <input type="radio" name="g-radio-demo" checked>
+            {{ 'admin_system_gallery.field_demo_radio_a'|trans }}
+        </label>
+        <label class="radio">
+            <input type="radio" name="g-radio-demo">
+            {{ 'admin_system_gallery.field_demo_radio_b'|trans }}
+        </label>
+    </div>
+</div>

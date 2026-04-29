@@ -1,0 +1,26 @@
+{#
+    Gallery: Event tags component -- Plugin-contributed tag row for event lists
+
+    Source: templates/_components/event_list_item_tags.html.twig. Stubs a tag array
+    matching the documented contract (text, color, url, icon).
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/event_list_item_tags.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/event_list_item_tags.html.twig</code>
+</p>
+
+<div class="mt-3">
+    {% include '_components/event_list_item_tags.html.twig' with {
+        'tags': [
+            {'text': 'dishes',   'color': 'is-primary', 'url': null, 'icon': 'fas fa-utensils'},
+            {'text': 'film',     'color': 'is-info',    'url': null, 'icon': 'fas fa-film'},
+            {'text': 'book',     'color': 'is-success', 'url': '#',  'icon': 'fas fa-book'},
+            {'text': 'karaoke',  'color': 'is-warning', 'url': null, 'icon': 'fas fa-music'},
+            {'text': 'glossary', 'color': 'is-light',   'url': null, 'icon': null},
+        ]
+    } %}
+</div>

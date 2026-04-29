@@ -1,0 +1,32 @@
+{#
+    Gallery: Language tile component -- Per-locale entry tile
+
+    Source: templates/_components/language_tile.html.twig.
+    Three tiles side by side using stub language hashes (no DB).
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/language_tile.html.twig, _components/image.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/language_tile.html.twig</code>
+</p>
+
+<div class="columns mt-3">
+    {% include '_components/language_tile.html.twig' with {
+        'language': {'code': 'en', 'name': 'English', 'tileImage': null},
+        'column_class': 'is-4',
+        'with_intro': false,
+    } %}
+    {% include '_components/language_tile.html.twig' with {
+        'language': {'code': 'de', 'name': 'Deutsch', 'tileImage': null},
+        'column_class': 'is-4',
+        'with_intro': false,
+    } %}
+    {% include '_components/language_tile.html.twig' with {
+        'language': {'code': 'zh', 'name': '中文', 'tileImage': null},
+        'column_class': 'is-4',
+        'with_intro': false,
+    } %}
+</div>

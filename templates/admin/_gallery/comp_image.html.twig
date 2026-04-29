@@ -1,0 +1,29 @@
+{#
+    Gallery: Image component -- Renders multiple sizes and the placeholder fallback
+
+    Source: templates/_components/image.html.twig
+    Anchor: g-comp-image.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/image.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/image.html.twig</code>
+</p>
+
+<div class="columns mt-3">
+    <div class="column is-narrow">
+        <p class="heading">size 50x50 (placeholder)</p>
+        {% include '_components/image.html.twig' with {'image': null, 'size': '50x50'} %}
+    </div>
+    <div class="column is-narrow">
+        <p class="heading">size 210x140 (placeholder)</p>
+        {% include '_components/image.html.twig' with {'image': null, 'size': '210x140'} %}
+    </div>
+    <div class="column is-narrow">
+        <p class="heading">size 400x400 (placeholder)</p>
+        {% include '_components/image.html.twig' with {'image': null, 'size': '400x400'} %}
+    </div>
+</div>

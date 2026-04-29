@@ -1,0 +1,43 @@
+{#
+    Gallery: Warning box component -- Hidden message panel revealed by toggleTrigger
+
+    Source: templates/_components/warning_box.html.twig. Variants: danger and warning.
+    The component renders with `is-hidden` by default; here we strip it so the markup
+    is visible inside the gallery.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/warning_box.html.twig (visualised here without the hidden class)
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/warning_box.html.twig</code>
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.variation_label'|trans }} (a) danger (default)</h3>
+<article class="message is-danger">
+    <div class="message-header">
+        <p>{{ 'admin_system_gallery.confirm_destructive_title'|trans }}</p>
+        <button class="delete" aria-label="close"></button>
+    </div>
+    <div class="message-body has-text-black has-background-white">
+        <p>{{ 'admin_system_gallery.sample_warning_content'|trans }}</p>
+        <div class="has-text-right mt-3">
+            <a class="button" href="#">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'admin_system_gallery.sample_warning_button'|trans }}</span>
+            </a>
+        </div>
+    </div>
+</article>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (b) warning</h3>
+<article class="message is-warning">
+    <div class="message-header">
+        <p>Reset to default?</p>
+        <button class="delete" aria-label="close"></button>
+    </div>
+    <div class="message-body has-text-black has-background-white">
+        <p>This will discard your customisations and restore the default values.</p>
+    </div>
+</article>

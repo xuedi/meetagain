@@ -1,0 +1,48 @@
+{#
+    Gallery: Form select -- single, multi, placeholder variants
+
+    Anchor: g-form-select.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">Bulma <code>.select</code> wrapper around native <code>&lt;select&gt;</code>.</p>
+
+<div class="field mt-4">
+    <label class="label">single</label>
+    <div class="control">
+        <div class="select">
+            <select>
+                <option>{{ 'admin_system_gallery.field_demo_select_a'|trans }}</option>
+                <option>{{ 'admin_system_gallery.field_demo_select_b'|trans }}</option>
+                <option>{{ 'admin_system_gallery.field_demo_select_c'|trans }}</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <label class="label">with placeholder</label>
+    <div class="control">
+        <div class="select">
+            <select>
+                <option value="" disabled selected>{{ 'admin_system_gallery.field_demo_select_pick'|trans }}</option>
+                <option>{{ 'admin_system_gallery.field_demo_select_a'|trans }}</option>
+                <option>{{ 'admin_system_gallery.field_demo_select_b'|trans }}</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <label class="label">multi</label>
+    <div class="control">
+        <div class="select is-multiple">
+            <select multiple size="4">
+                <option>{{ 'admin_system_gallery.field_demo_select_a'|trans }}</option>
+                <option>{{ 'admin_system_gallery.field_demo_select_b'|trans }}</option>
+                <option>{{ 'admin_system_gallery.field_demo_select_c'|trans }}</option>
+            </select>
+        </div>
+    </div>
+</div>

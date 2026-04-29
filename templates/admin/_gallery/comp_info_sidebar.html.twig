@@ -1,0 +1,30 @@
+{#
+    Gallery: Info sidebar component -- Right-side guidance column
+
+    Source: templates/_components/info_sidebar.html.twig.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/info_sidebar.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/info_sidebar.html.twig</code>
+</p>
+
+<div class="columns mt-3">
+    <div class="column is-half">
+        {% include '_components/info_sidebar.html.twig' with {
+            'title': 'admin_system_gallery.sample_info_title'|trans,
+            'intro': 'admin_system_gallery.sample_info_intro'|trans,
+            'bullets': [
+                'admin_system_gallery.sample_info_bullet_a'|trans,
+                'admin_system_gallery.sample_info_bullet_b'|trans,
+                'admin_system_gallery.sample_info_bullet_c'|trans,
+            ],
+            'link_url': '#',
+            'link_text': 'admin_system_gallery.sample_info_link'|trans,
+            'link_icon': 'book',
+        } %}
+    </div>
+</div>
