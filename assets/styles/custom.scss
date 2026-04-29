@@ -77,6 +77,15 @@ input[type="color"] {
     object-fit: contain;
 }
 
+details.activities-load-more {
+    > summary {
+        list-style: none;
+        cursor: pointer;
+        &::-webkit-details-marker { display: none; }
+    }
+    &[open] > summary { display: none; }
+}
+
 #navBurgenMenu details.navbar-burger-submenu {
     width: 100%;
     > summary {

@@ -291,6 +291,7 @@ profile_social:
     list_show_more: 'show more'
     button_unfollow: 'Unfollow'
     button_follow_back: 'Follow back'
+    button_load_all: 'Load all'
     find_more_hint: 'Find more people to follow at the member page or ask for their username at the next meetup.'
     activity_login: 'Logged in'
     activity_password_changed: 'Changed password'
