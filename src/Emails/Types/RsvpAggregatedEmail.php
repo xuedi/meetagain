@@ -10,6 +10,7 @@ use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
+use App\Filter\Event\FollowerEventNotificationFilterInterface;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
@@ -18,6 +19,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEmailInterface
 {
@@ -27,6 +29,8 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         private ConfigService $config,
         private EventRepository $eventRepo,
         private EntityManagerInterface $em,
+        #[AutowireIterator(FollowerEventNotificationFilterInterface::class)]
+        private iterable $followerFilters = [],
     ) {
         parent::__construct($blocklist);
     }
@@ -209,6 +213,9 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
                 if (!$follower instanceof User) {
                     continue;
                 }
+                if (!$this->passesFollowerFilters($follower, $attendee, $event)) {
+                    continue;
+                }
                 if (!isset($map[$follower->getId()])) {
                     $map[$follower->getId()] = ['recipient' => $follower, 'attendees' => []];
                 }
@@ -217,5 +224,16 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         }
 
         return $map;
+    }
+
+    private function passesFollowerFilters(User $recipient, User $attendee, Event $event): bool
+    {
+        foreach ($this->followerFilters as $filter) {
+            if (!$filter->isFollowerAllowed($recipient, $attendee, $event)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

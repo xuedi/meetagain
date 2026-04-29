@@ -46,6 +46,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->userNameList;
     }
 
+    /**
+     * Cursor-style iteration over every user. Streams results without loading all users into
+     * memory at once.
+     *
+     * @return iterable<User>
+     */
+    public function iterateAll(): iterable
+    {
+        return $this->createQueryBuilder('u')->getQuery()->toIterable();
+    }
+
     public function getFollowers(User $user, bool $excludeFriends = false): array
     {
         if ($excludeFriends === false) {
