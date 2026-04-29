@@ -277,6 +277,7 @@ profile_social:
     list_show_more: 'mehr anzeigen'
     button_unfollow: 'Nicht mehr folgen'
     button_follow_back: 'Zurück folgen'
+    button_load_all: 'Alle anzeigen'
     find_more_hint: 'Finde mehr Leute zum Folgen auf der Mitgliederseite oder frage beim nächsten Treffen nach ihrem Nutzernamen.'
     activity_login: 'Angemeldet'
     activity_password_changed: 'Passwort geändert'

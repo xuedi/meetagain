@@ -277,6 +277,7 @@ profile_social:
     list_show_more: '显示更多'
     button_unfollow: '取消关注'
     button_follow_back: '回关'
+    button_load_all: '显示全部'
     find_more_hint: '在成员页面寻找更多可关注的人，或在下次聚会时询问他们的用户名。'
     activity_login: '已登录'
     activity_password_changed: '已更改密码'
