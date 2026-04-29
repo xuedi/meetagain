@@ -1,0 +1,23 @@
+{#
+    Gallery: Toggle component -- Yes/No button pair for boolean settings
+
+    Source: templates/_components/toggle.html.twig.
+    On / off variants demonstrate the active button highlight.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/toggle.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/toggle.html.twig</code>
+</p>
+
+<div class="mt-3">
+    <p class="heading">on (status: true)</p>
+    {% include '_components/toggle.html.twig' with {'link': '#', 'status': true, 'noAjax': true} %}
+</div>
+<div class="mt-3">
+    <p class="heading">off (status: false)</p>
+    {% include '_components/toggle.html.twig' with {'link': '#', 'status': false, 'noAjax': true} %}
+</div>

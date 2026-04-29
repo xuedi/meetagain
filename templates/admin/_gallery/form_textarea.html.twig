@@ -1,0 +1,31 @@
+{#
+    Gallery: Textarea -- default, with rows, with error
+
+    Anchor: g-form-textarea.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">Bulma <code>.textarea</code> on a native <code>&lt;textarea&gt;</code>.</p>
+
+<div class="field mt-4">
+    <label class="label">{{ 'admin_system_gallery.field_demo_bio'|trans }}</label>
+    <div class="control">
+        <textarea class="textarea" placeholder="{{ 'admin_system_gallery.field_demo_bio'|trans }}"></textarea>
+    </div>
+</div>
+
+<div class="field">
+    <label class="label">with rows</label>
+    <div class="control">
+        <textarea class="textarea" rows="2"></textarea>
+    </div>
+</div>
+
+<div class="field">
+    <label class="label">with error</label>
+    <div class="control">
+        <textarea class="textarea is-danger"></textarea>
+    </div>
+    <p class="help is-danger">{{ 'admin_system_gallery.field_demo_error'|trans }}</p>
+</div>

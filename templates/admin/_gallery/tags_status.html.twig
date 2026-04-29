@@ -1,0 +1,35 @@
+{#
+    Gallery: Status display -- Plain text vs tag variants
+
+    Shows the core admin rule (plain text + has-text-* colour) alongside the plugin/frontend
+    acceptable variant (tag is-*). Anchor: g-tags-status.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>.claude/architecture/ux-admin.md</code> ("Status display")
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.label_core_rule'|trans }}</h3>
+<p>
+    <span class="has-text-success">{{ 'admin_system_gallery.plain_status_published'|trans }}</span>
+    <span class="has-text-grey-light ml-3">{{ 'admin_system_gallery.plain_status_draft'|trans }}</span>
+    <span class="has-text-danger ml-3">blocked</span>
+    <span class="has-text-warning ml-3">pending</span>
+</p>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.label_plugin_variation'|trans }}</h3>
+<p>
+    <span class="tag is-success">{{ 'admin_system_gallery.plain_status_published'|trans }}</span>
+    <span class="tag is-light ml-2">{{ 'admin_system_gallery.plain_status_draft'|trans }}</span>
+    <span class="tag is-danger ml-2">blocked</span>
+    <span class="tag is-warning ml-2">pending</span>
+</p>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.label_avoid'|trans }}</h3>
+<p class="has-text-grey">
+    <span class="tag is-success" style="text-decoration: line-through;">{{ 'admin_system_gallery.plain_status_published'|trans }}</span>
+    inside a core admin list - use plain-text colour classes instead.
+</p>

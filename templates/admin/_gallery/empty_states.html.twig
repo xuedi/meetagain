@@ -1,0 +1,33 @@
+{#
+    Gallery: Empty states -- Two patterns
+
+    (a) inline "no entries" hint above an empty table; (b) full-width empty card with CTA.
+    Anchor: g-empty-states.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/cms/cms_list.html.twig</code> (admin_cms.empty_state)
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.variation_label'|trans }} (a) inline hint</h3>
+<p class="has-text-grey-light">{{ 'admin_system_gallery.empty_inline_hint'|trans }}</p>
+<table class="table is-fullwidth mt-2">
+    <thead><tr><th>{{ 'admin_system_gallery.col_name'|trans }}</th><th></th></tr></thead>
+    <tbody></tbody>
+</table>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (b) full-width empty card</h3>
+<div class="has-text-centered py-6">
+    <span class="icon is-large has-text-grey-light mb-3">
+        <i class="fa fa-inbox fa-2x"></i>
+    </span>
+    <h4 class="title is-5 has-text-grey">{{ 'admin_system_gallery.empty_card_title'|trans }}</h4>
+    <p class="has-text-grey">{{ 'admin_system_gallery.empty_card_body'|trans }}</p>
+    <a href="#" class="button is-link mt-4">
+        <span class="icon"><i class="fa fa-plus"></i></span>
+        <span>{{ 'admin_system_gallery.empty_card_cta'|trans }}</span>
+    </a>
+</div>

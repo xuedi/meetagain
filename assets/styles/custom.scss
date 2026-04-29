@@ -191,6 +191,12 @@ details.activities-load-more {
 .api-toolbox-sidebar code      { font-size: 0.85rem; word-break: break-all; padding: 0.5rem 0.75rem; }
 .api-toolbox-sidebar .buttons  { margin-top: 0.5rem; }
 
+// -- Gallery TOC --
+.gallery-toc                   { position: sticky; top: 5rem; max-height: calc(100vh - 6rem); overflow-y: auto; }
+.gallery-toc ul                { list-style: none; margin: 0; padding: 0; }
+.gallery-toc li                { padding: 0.15rem 0; }
+.gallery-toc a                 { font-size: 0.9rem; }
+
 // Floating action menu — absolute top-right overlay on image/card containers.
 .float-box-menu {
     position: absolute;

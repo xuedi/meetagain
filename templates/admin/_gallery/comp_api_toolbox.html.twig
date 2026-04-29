@@ -1,0 +1,21 @@
+{#
+    Gallery: API toolbox sidebar -- Sticky info box promoting meetagain-toolbox
+
+    Source: templates/_components/api_toolbox_sidebar.html.twig.
+    Renders inside a constrained column so the sticky behaviour is observable but does
+    not dominate the gallery layout.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/api_toolbox_sidebar.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/api_toolbox_sidebar.html.twig</code>
+</p>
+
+<div class="columns mt-3">
+    <div class="column is-half">
+        {% include '_components/api_toolbox_sidebar.html.twig' %}
+    </div>
+</div>

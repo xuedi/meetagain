@@ -1,0 +1,67 @@
+{#
+    Gallery: Detail page header -- box + level infobar with Back button
+
+    Two variations: (a) the core rule (plain-text status), (b) the multisite-plugin
+    variation that uses tag is-* for status. Anchor: g-detail-header.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/member/edit.html.twig</code>,
+    <code>plugins/multisite/templates/admin/meta/cms-pages/detail.html.twig</code>
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.label_core_rule'|trans }}</h3>
+<div class="box">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <strong>{{ 'admin_system_gallery.sample_name'|trans }}</strong>
+            </div>
+            <div class="level-item has-text-grey">
+                {{ 'admin_system_gallery.sample_email'|trans }}
+            </div>
+            <div class="level-item">
+                {{ 'admin_system_gallery.sample_status'|trans }}
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <a href="#" class="button is-small">
+                    <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
+                    <span>{{ 'global.button_back'|trans }}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.label_plugin_variation'|trans }}</h3>
+<div class="box">
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <strong>{{ 'admin_system_gallery.sample_name'|trans }}</strong>
+            </div>
+            <div class="level-item">
+                <span class="tag is-success">{{ 'admin_system_gallery.plain_status_published'|trans }}</span>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <a href="#" class="button is-small">
+                    <span class="icon is-small"><i class="fa fa-eye"></i></span>
+                    <span>view</span>
+                </a>
+            </div>
+            <div class="level-item">
+                <a href="#" class="button is-small">
+                    <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
+                    <span>{{ 'global.button_back'|trans }}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

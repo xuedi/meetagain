@@ -1,0 +1,53 @@
+{#
+    Gallery: Modals & confirmations -- Static markup for the project's existing modal patterns
+
+    Two patterns: (a) the inline "message"-style reveal panel used for danger zones,
+    (b) the modal-content fragment loaded into a Bulma modal via JS. Both rendered
+    statically here so the markup is visible without triggering the JS hooks.
+    Anchor: g-modals.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+    Depends on: assets/js/toggles.js (.toggleTrigger), assets/js/modal.js (.modalTrigger)
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/cms/gallery_upload_modal.html.twig</code>,
+    <code>templates/image/modal_content.html.twig</code>,
+    <code>templates/_components/warning_box.html.twig</code>
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.variation_label'|trans }} (a) inline reveal panel (warning_box pattern)</h3>
+<article class="message is-danger">
+    <div class="message-header">
+        <p>{{ 'admin_system_gallery.confirm_destructive_title'|trans }}</p>
+        <button class="delete" aria-label="close"></button>
+    </div>
+    <div class="message-body has-text-black has-background-white">
+        <p>{{ 'admin_system_gallery.confirm_destructive_body'|trans }}</p>
+        <div class="has-text-right mt-3">
+            <a class="button" href="#">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'admin_system_gallery.sample_warning_button'|trans }}</span>
+            </a>
+        </div>
+    </div>
+</article>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (b) Bulma modal (open state)</h3>
+<div class="modal is-active" style="position: relative; height: 320px;">
+    <div class="modal-background" style="position: absolute; background: rgba(10, 10, 10, 0.4);"></div>
+    <div class="modal-card" style="position: absolute; top: 1rem; left: 50%; transform: translateX(-50%);">
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{ 'admin_system_gallery.confirm_destructive_title'|trans }}</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>{{ 'admin_system_gallery.confirm_destructive_body'|trans }}</p>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-danger">{{ 'admin_system_gallery.sample_warning_button'|trans }}</button>
+            <button class="button">{{ 'admin_system_gallery.button_demo_cancel'|trans }}</button>
+        </footer>
+    </div>
+</div>

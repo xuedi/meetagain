@@ -1,0 +1,95 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        <h1 class="title is-3">{{ 'admin_system_gallery.page_title'|trans }}</h1>
+        <p class="subtitle is-6 has-text-grey">{{ 'admin_system_gallery.intro'|trans }}</p>
+
+        <div class="columns">
+
+            <div class="column is-3">
+                <nav class="gallery-toc">
+                    <p class="heading">{{ 'admin_system_gallery.toc_label'|trans }}</p>
+                    <ul>
+                        <li><a href="#g-admin-list">{{ 'admin_system_gallery.section_admin_list_title'|trans }}</a></li>
+                        <li><a href="#g-detail-header">{{ 'admin_system_gallery.section_detail_header_title'|trans }}</a></li>
+                        <li><a href="#g-tabs-nav">{{ 'admin_system_gallery.section_tabs_nav_title'|trans }}</a></li>
+                        <li><a href="#g-tags-status">{{ 'admin_system_gallery.section_tags_status_title'|trans }}</a></li>
+                        <li><a href="#g-notifications">{{ 'admin_system_gallery.section_notifications_title'|trans }}</a></li>
+                        <li><a href="#g-modals">{{ 'admin_system_gallery.section_modals_title'|trans }}</a></li>
+                        <li><a href="#g-pagination">{{ 'admin_system_gallery.section_pagination_title'|trans }}</a></li>
+                        <li><a href="#g-empty-states">{{ 'admin_system_gallery.section_empty_states_title'|trans }}</a></li>
+                        <li><a href="#g-back-button">{{ 'admin_system_gallery.section_back_button_title'|trans }}</a></li>
+                        <li><a href="#g-danger-zone">{{ 'admin_system_gallery.section_danger_zone_title'|trans }}</a></li>
+                        <li class="mt-3"><strong class="has-text-grey">{{ 'admin_system_gallery.toc_group_components'|trans }}</strong></li>
+                        <li><a href="#g-comp-image">{{ 'admin_system_gallery.section_comp_image_title'|trans }}</a></li>
+                        <li><a href="#g-comp-warning-box">{{ 'admin_system_gallery.section_comp_warning_box_title'|trans }}</a></li>
+                        <li><a href="#g-comp-toggle">{{ 'admin_system_gallery.section_comp_toggle_title'|trans }}</a></li>
+                        <li><a href="#g-comp-info-sidebar">{{ 'admin_system_gallery.section_comp_info_sidebar_title'|trans }}</a></li>
+                        <li><a href="#g-comp-language-tile">{{ 'admin_system_gallery.section_comp_language_tile_title'|trans }}</a></li>
+                        <li><a href="#g-comp-event-tags">{{ 'admin_system_gallery.section_comp_event_tags_title'|trans }}</a></li>
+                        <li><a href="#g-comp-api-endpoint">{{ 'admin_system_gallery.section_comp_api_endpoint_title'|trans }}</a></li>
+                        <li><a href="#g-comp-api-toolbox">{{ 'admin_system_gallery.section_comp_api_toolbox_title'|trans }}</a></li>
+                        <li class="mt-3"><strong class="has-text-grey">{{ 'admin_system_gallery.toc_group_atoms'|trans }}</strong></li>
+                        <li><a href="#g-buttons">{{ 'admin_system_gallery.section_buttons_title'|trans }}</a></li>
+                        <li><a href="#g-form-inputs">{{ 'admin_system_gallery.section_form_inputs_title'|trans }}</a></li>
+                        <li><a href="#g-form-select">{{ 'admin_system_gallery.section_form_select_title'|trans }}</a></li>
+                        <li><a href="#g-form-check">{{ 'admin_system_gallery.section_form_check_title'|trans }}</a></li>
+                        <li><a href="#g-form-textarea">{{ 'admin_system_gallery.section_form_textarea_title'|trans }}</a></li>
+                        <li><a href="#g-typography">{{ 'admin_system_gallery.section_typography_title'|trans }}</a></li>
+                        <li><a href="#g-cards">{{ 'admin_system_gallery.section_cards_title'|trans }}</a></li>
+                        <li><a href="#g-tooltips">{{ 'admin_system_gallery.section_tooltips_title'|trans }}</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="column is-9">
+
+                {% set sections = [
+                    {slug: 'g-admin-list', key: 'admin_list', partial: 'admin_list'},
+                    {slug: 'g-detail-header', key: 'detail_header', partial: 'detail_header'},
+                    {slug: 'g-tabs-nav', key: 'tabs_nav', partial: 'tabs_nav'},
+                    {slug: 'g-tags-status', key: 'tags_status', partial: 'tags_status'},
+                    {slug: 'g-notifications', key: 'notifications', partial: 'notifications_flash'},
+                    {slug: 'g-modals', key: 'modals', partial: 'modals_confirmations'},
+                    {slug: 'g-pagination', key: 'pagination', partial: 'pagination'},
+                    {slug: 'g-empty-states', key: 'empty_states', partial: 'empty_states'},
+                    {slug: 'g-back-button', key: 'back_button', partial: 'back_button_topbar'},
+                    {slug: 'g-danger-zone', key: 'danger_zone', partial: 'danger_zone'},
+                    {slug: 'g-comp-image', key: 'comp_image', partial: 'comp_image'},
+                    {slug: 'g-comp-warning-box', key: 'comp_warning_box', partial: 'comp_warning_box'},
+                    {slug: 'g-comp-toggle', key: 'comp_toggle', partial: 'comp_toggle'},
+                    {slug: 'g-comp-info-sidebar', key: 'comp_info_sidebar', partial: 'comp_info_sidebar'},
+                    {slug: 'g-comp-language-tile', key: 'comp_language_tile', partial: 'comp_language_tile'},
+                    {slug: 'g-comp-event-tags', key: 'comp_event_tags', partial: 'comp_event_tags'},
+                    {slug: 'g-comp-api-endpoint', key: 'comp_api_endpoint', partial: 'comp_api_endpoint'},
+                    {slug: 'g-comp-api-toolbox', key: 'comp_api_toolbox', partial: 'comp_api_toolbox'},
+                    {slug: 'g-buttons', key: 'buttons', partial: 'buttons'},
+                    {slug: 'g-form-inputs', key: 'form_inputs', partial: 'form_inputs'},
+                    {slug: 'g-form-select', key: 'form_select', partial: 'form_select'},
+                    {slug: 'g-form-check', key: 'form_check', partial: 'form_checkbox_radio'},
+                    {slug: 'g-form-textarea', key: 'form_textarea', partial: 'form_textarea'},
+                    {slug: 'g-typography', key: 'typography', partial: 'typography'},
+                    {slug: 'g-cards', key: 'cards', partial: 'cards_boxes'},
+                    {slug: 'g-tooltips', key: 'tooltips', partial: 'tooltips_titles'}
+                ] %}
+
+                {% for section in sections %}
+                    <section id="{{ section.slug }}" class="mb-6">
+                        <h2 class="title is-4">{{ ('admin_system_gallery.section_' ~ section.key ~ '_title')|trans }}</h2>
+                        <p class="subtitle is-6 has-text-grey">{{ ('admin_system_gallery.section_' ~ section.key ~ '_caption')|trans }}</p>
+                        <hr>
+                        <div class="box">
+                            {% include 'admin/_gallery/' ~ section.partial ~ '.html.twig' %}
+                        </div>
+                    </section>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

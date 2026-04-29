@@ -1,0 +1,42 @@
+{#
+    Gallery: Tabs navigation -- Boxed tabs with icon + label
+
+    Demonstrates the canonical admin tabs pattern. Anchor: g-tabs-nav.
+
+    Used in:    admin/_gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/admin/system/_tabs_navigation.html.twig</code>,
+    <code>templates/admin/email/_tabs_navigation.html.twig</code>
+</p>
+
+<div class="tabs is-boxed mt-4">
+    <ul>
+        <li class="is-active">
+            <a href="#">
+                <span class="icon is-small"><i class="fa fa-cog" aria-hidden="true"></i></span>
+                <span>config</span>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <span class="icon is-small"><i class="fa fa-palette" aria-hidden="true"></i></span>
+                <span>theme</span>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <span class="icon is-small"><i class="fa fa-image" aria-hidden="true"></i></span>
+                <span>images</span>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <span class="icon is-small"><i class="fa fa-language" aria-hidden="true"></i></span>
+                <span>language</span>
+            </a>
+        </li>
+    </ul>
+</div>
