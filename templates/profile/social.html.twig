@@ -14,9 +14,20 @@
                         {{ 'profile_social.section_intro'|trans }}
                     </p>
                     <div class="mt-5">
-                        {% for activity in activities %}
+                        {% set initialActivityCount = 12 %}
+                        {% for activity in activities|slice(0, initialActivityCount) %}
                             {% include 'profile/_partials/activity.html.twig' with { 'activity': activity} %}
                         {% endfor %}
+                        {% if activities|length > initialActivityCount %}
+                            <details class="activities-load-more">
+                                <summary class="button is-fullwidth mt-3">
+                                    {{ 'profile_social.button_load_all'|trans }}
+                                </summary>
+                                {% for activity in activities|slice(initialActivityCount) %}
+                                    {% include 'profile/_partials/activity.html.twig' with { 'activity': activity} %}
+                                {% endfor %}
+                            </details>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="column is-1">
