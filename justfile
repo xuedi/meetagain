@@ -127,10 +127,14 @@ appUpdateBulma version='latest':
 
 
 
-# Activate the local git hook dispatcher (.githooks/pre-commit). Run once per clone.
+# Activate the local git hook dispatcher and copy bundled commit hooks into bin/commit-hooks/.
+# Run once per clone (and again whenever a new hook is added under tests/config/commit-hooks/).
 [group('development')]
 install:
     git config core.hooksPath .githooks
+    mkdir -p bin/commit-hooks
+    cp tests/config/commit-hooks/*.bash bin/commit-hooks/
+    chmod +x bin/commit-hooks/*.bash
     @echo "Pre-commit dispatcher activated. Scripts in bin/commit-hooks/ will run on every commit."
 
 # Shared reset sequence used by devModeFixtures and devModeMinimal
