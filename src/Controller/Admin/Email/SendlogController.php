@@ -9,7 +9,9 @@ use App\Enum\EmailQueueStatus;
 use App\Repository\EmailQueueRepository;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 use App\Service\Email\Delivery\EmailDeliveryStatusSyncService;
+use App\Service\Email\EmailTemplateService;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,6 +30,7 @@ final class SendlogController extends AbstractAdminController
         private readonly EmailQueueRepository $emailQueueRepo,
         private readonly EmailDeliveryProviderInterface $provider,
         private readonly EmailDeliveryStatusSyncService $syncService,
+        private readonly EmailTemplateService $templateService,
         private readonly EntityManagerInterface $em,
         private readonly TranslatorInterface $translator,
     ) {}
@@ -52,9 +55,31 @@ final class SendlogController extends AbstractAdminController
     #[Route('/{id}', name: 'app_admin_email_sendlog_show', requirements: ['id' => '\d+'])]
     public function show(EmailQueue $email): Response
     {
+        $renderedSubject = null;
+        $renderedBody = null;
+        $renderError = null;
+
+        $templateType = $email->getTemplate();
+        if ($templateType !== null) {
+            try {
+                $content = $this->templateService->getTemplateContent(
+                    $templateType,
+                    $email->getLang() ?? 'en',
+                );
+                $context = $email->getContext();
+                $renderedSubject = $this->templateService->renderContent($content['subject'], $context);
+                $renderedBody = $this->templateService->renderContent($content['body'], $context);
+            } catch (RuntimeException $e) {
+                $renderError = $e->getMessage();
+            }
+        }
+
         return $this->render('admin/email/sendlog/show.html.twig', [
             'active' => 'email',
             'email' => $email,
+            'renderedSubject' => $renderedSubject,
+            'renderedBody' => $renderedBody,
+            'renderError' => $renderError,
         ]);
     }
 
