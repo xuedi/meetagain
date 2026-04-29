@@ -29,7 +29,7 @@ class NotificationSettings implements JsonSerializable
     public function __construct(array $data)
     {
         $this->announcements = $data['announcements'] ?? true;
-        $this->followingUpdates = $data['followingUpdates'] ?? true;
+        $this->followingUpdates = $data['followingUpdates'] ?? false;
         $this->receivedMessage = $data['receivedMessage'] ?? true;
         $this->eventReminder = $data['eventReminder'] ?? true;
         $this->upcomingEvents = $data['upcomingEvents'] ?? true;
