@@ -6,6 +6,7 @@ use App\Activity\Messages\Login;
 use App\Activity\Messages\RsvpYes;
 use App\Activity\Messages\SendMessage;
 use App\Activity\NotificationService as ActivityNotificationService;
+use App\Emails\Guard\EmailGuardEvaluator;
 use App\Emails\Types\NotificationMessageEmail;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
@@ -42,6 +43,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             appCache: $this->createStub(TagAwareCacheInterface::class),
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: notify
@@ -73,6 +75,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $userRepoMock,
             appCache: $cacheMock,
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: notify
@@ -101,6 +104,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: notify
@@ -126,6 +130,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: send RSVP notification
@@ -167,6 +172,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: send RSVP notification
@@ -205,6 +211,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: send RSVP notification
@@ -225,6 +232,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: send message notification with null user (via reflection)
@@ -251,6 +259,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $userRepoStub,
             appCache: $cacheMock,
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: send message notification (via reflection)
@@ -294,6 +303,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $userRepoStub,
             appCache: $cacheMock,
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: send message notification (via reflection)
@@ -317,8 +327,16 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoStub = $this->createStub(UserRepository::class);
         $userRepoStub->method('findOneBy')->willReturn($recipient);
 
+        $skipRule = new class implements \App\Emails\EmailGuardRuleInterface {
+            public function getName(): string { return 'test-skip'; }
+            public function getCost(): \App\Emails\EmailGuardCost { return \App\Emails\EmailGuardCost::Free; }
+            public function evaluate(array $context): \App\Emails\EmailGuardResult
+            {
+                return \App\Emails\EmailGuardResult::skip('test-skip', 'recently active');
+            }
+        };
         $emailMock = $this->createMock(NotificationMessageEmail::class);
-        $emailMock->method('guardCheck')->willReturn(false);
+        $emailMock->method('getGuardRules')->willReturn([$skipRule]);
         $emailMock->expects($this->never())->method('send');
 
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
@@ -337,6 +355,7 @@ final class ActivityNotificationServiceTest extends TestCase
             userRepo: $userRepoStub,
             appCache: $cacheMock,
             logger: new NullLogger(),
+            guardEvaluator: new EmailGuardEvaluator(),
         );
 
         // Act: send message notification (via reflection)

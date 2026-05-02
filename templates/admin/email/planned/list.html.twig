@@ -17,6 +17,7 @@
                         <th>{{ 'admin_email_planned.col_mail_type'|trans }}</th>
                         <th>{{ 'admin_email_planned.col_description'|trans }}</th>
                         <th>{{ 'admin_email_planned.col_expected_recipients'|trans }}</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,6 +27,12 @@
                             <td>{{ item.mailType }}</td>
                             <td>{{ item.label }}</td>
                             <td>{{ item.expectedRecipients }}</td>
+                            <td>
+                                <a href="{{ path('app_admin_email_planned_detail', {'key': item.key}) }}"
+                                   title="{{ 'admin_email_planned.detail_link_title'|trans }}">
+                                    <span class="icon"><i class="fa fa-search"></i></span>
+                                </a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

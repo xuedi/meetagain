@@ -8,6 +8,8 @@ use App\Entity\Activity;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Emails\EmailGuardOutcome;
+use App\Emails\Guard\EmailGuardEvaluator;
 use App\Emails\Types\NotificationMessageEmail;
 use InvalidArgumentException;
 use Psr\Cache\InvalidArgumentException as CacheInvalidArgumentException;
@@ -26,6 +28,7 @@ readonly class NotificationService
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
         private LoggerInterface $logger,
+        private EmailGuardEvaluator $guardEvaluator,
     ) {}
 
     public function notify(Activity $activity): void
@@ -94,9 +97,9 @@ readonly class NotificationService
             $item->expiresAfter(self::EIGHT_HOURS);
             $ctx = ['sender' => $user, 'recipient' => $recipient];
             try {
-                $shouldSend = $this->notificationMessageEmail->guardCheck($ctx);
+                $result = $this->guardEvaluator->evaluate($this->notificationMessageEmail, $ctx);
             } catch (InvalidArgumentException $e) {
-                $logger->error('guardCheck contract violation - email skipped', [
+                $logger->error('guard rule threw - email skipped', [
                     'email' => $this->notificationMessageEmail->getIdentifier(),
                     'caller' => 'NotificationService::sendMessage',
                     'context_keys' => array_keys($ctx),
@@ -106,7 +109,19 @@ readonly class NotificationService
                 return 'skip';
             }
 
-            if (!$shouldSend) {
+            if ($result->outcome === EmailGuardOutcome::Error) {
+                $logger->error('guard rule returned Error - email skipped', [
+                    'email' => $this->notificationMessageEmail->getIdentifier(),
+                    'caller' => 'NotificationService::sendMessage',
+                    'rule' => $result->ruleName,
+                    'explanation' => $result->explanation,
+                    'context_key' => $result->contextKey,
+                ]);
+
+                return 'skip';
+            }
+
+            if ($result->outcome !== EmailGuardOutcome::Pass) {
                 return 'skip';
             }
             $this->notificationMessageEmail->send($ctx);

@@ -114,6 +114,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
+            new \Symfony\Component\Clock\MockClock(),
         );
 
         static::assertFalse($email->guardCheck([
