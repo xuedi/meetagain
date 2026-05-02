@@ -1,9 +1,7 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\Logs;
 
-use App\Admin\Tabs\AdminTab;
-use App\Admin\Tabs\AdminTabs;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
@@ -20,18 +18,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/logs/cron')]
-final class CronLogController extends AbstractAdminController implements AdminTabsInterface
+final class CronLogController extends AbstractLogsController implements AdminTabsInterface
 {
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return null;
-    }
-
-    public function __construct(
-        private readonly CronLogRepository $cronLogRepository,
-        private readonly TranslatorInterface $translator,
-    ) {}
-
     private const string DEFAULT_RANGE = '1h';
 
     /** @var array<string, string|null> */
@@ -51,6 +39,13 @@ final class CronLogController extends AbstractAdminController implements AdminTa
         'error' => ['error'],
         'exception' => ['exception'],
     ];
+
+    public function __construct(
+        TranslatorInterface $translator,
+        private readonly CronLogRepository $cronLogRepository,
+    ) {
+        parent::__construct($translator, 'cron');
+    }
 
     #[Route('', name: 'app_admin_cron_log')]
     public function list(Request $request): Response
@@ -98,6 +93,59 @@ final class CronLogController extends AbstractAdminController implements AdminTa
         return $this->render('admin/logs/logs_cron_list.html.twig', [
             'active' => 'logs',
             'logs' => $logs,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_admin_cron_log_show')]
+    public function show(CronLog $cronLog): Response
+    {
+        $statusValue = $cronLog->getStatus()->value;
+        $statusTag = match ($statusValue) {
+            'ok' => sprintf(
+                '<span class="tag is-success is-medium">%s</span>',
+                $this->translator->trans('admin_logs.status_ok'),
+            ),
+            'warning' => sprintf(
+                '<span class="tag is-warning is-medium">%s</span>',
+                $this->translator->trans('admin_logs.status_warning'),
+            ),
+            'error' => sprintf(
+                '<span class="tag is-danger is-medium">%s</span>',
+                $this->translator->trans('admin_logs.status_error'),
+            ),
+            default => sprintf(
+                '<span class="tag is-danger is-dark is-medium">%s</span>',
+                $this->translator->trans('admin_logs.status_exception'),
+            ),
+        };
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%s</strong>',
+                    $cronLog->getRunAt()->format('Y-m-d H:i:s'),
+                )),
+                new AdminTopInfoHtml($statusTag),
+                new AdminTopInfoHtml(sprintf(
+                    '<span class="has-text-grey">%d %s</span>',
+                    $cronLog->getDurationMs(),
+                    $this->translator->trans('admin_logs.duration_ms_total'),
+                )),
+            ],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_logs.back'),
+                    target: $this->generateUrl('app_admin_cron_log'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
+
+        return $this->render('admin/logs/logs_cron_show.html.twig', [
+            'active' => 'logs',
+            'log' => $cronLog,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
@@ -159,85 +207,5 @@ final class CronLogController extends AbstractAdminController implements AdminTa
             options: $options,
             icon: 'clock',
         );
-    }
-
-    #[Route('/{id}', name: 'app_admin_cron_log_show')]
-    public function show(CronLog $cronLog): Response
-    {
-        $statusValue = $cronLog->getStatus()->value;
-        $statusTag = match ($statusValue) {
-            'ok' => sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_ok'),
-            ),
-            'warning' => sprintf(
-                '<span class="tag is-warning is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_warning'),
-            ),
-            'error' => sprintf(
-                '<span class="tag is-danger is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_error'),
-            ),
-            default => sprintf(
-                '<span class="tag is-danger is-dark is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_exception'),
-            ),
-        };
-
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%s</strong>',
-                    $cronLog->getRunAt()->format('Y-m-d H:i:s'),
-                )),
-                new AdminTopInfoHtml($statusTag),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="has-text-grey">%d %s</span>',
-                    $cronLog->getDurationMs(),
-                    $this->translator->trans('admin_logs.duration_ms_total'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_logs.back'),
-                    target: $this->generateUrl('app_admin_cron_log'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
-
-        return $this->render('admin/logs/logs_cron_show.html.twig', [
-            'active' => 'logs',
-            'log' => $cronLog,
-            'adminTop' => $adminTop,
-            'adminTabs' => $this->getTabs(),
-        ]);
-    }
-
-    public function getTabs(): AdminTabs
-    {
-        return new AdminTabs([
-            new AdminTab(
-                label: $this->translator->trans('admin_logs.tab_activity'),
-                target: $this->generateUrl('app_admin_activity_log'),
-                icon: 'list',
-            ),
-            new AdminTab(
-                label: $this->translator->trans('admin_logs.tab_system'),
-                target: $this->generateUrl('app_admin_system_log'),
-                icon: 'file-alt',
-            ),
-            new AdminTab(
-                label: $this->translator->trans('admin_logs.tab_404'),
-                target: $this->generateUrl('app_admin_not_found_log'),
-                icon: 'exclamation-triangle',
-            ),
-            new AdminTab(
-                label: $this->translator->trans('admin_logs.tab_cron'),
-                target: $this->generateUrl('app_admin_cron_log'),
-                icon: 'clock',
-                isActive: true,
-            ),
-        ]);
     }
 }
