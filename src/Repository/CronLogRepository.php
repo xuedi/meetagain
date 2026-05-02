@@ -51,6 +51,24 @@ class CronLogRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @param list<string>|null $statuses
+     */
+    public function countFiltered(?DateTimeImmutable $since = null, ?array $statuses = null): int
+    {
+        $qb = $this->createQueryBuilder('c')->select('COUNT(c.id)');
+
+        if ($since !== null) {
+            $qb->andWhere('c.runAt >= :since')->setParameter('since', $since);
+        }
+
+        if ($statuses !== null && $statuses !== []) {
+            $qb->andWhere('c.status IN (:statuses)')->setParameter('statuses', $statuses);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     public function findMostRecent(): ?CronLog
     {
         return $this->createQueryBuilder('c')
