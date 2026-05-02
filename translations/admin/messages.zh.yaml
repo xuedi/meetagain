@@ -59,6 +59,8 @@ admin_cms:
     no_cms_page: '未选择 CMS 页面。'
     button_send_announcement: '发送'
     button_edit_cms_page: '编辑'
+    button_create_cms_page: '新建 CMS 页面'
+    button_link_cms_page: '关联 CMS 页面'
     announcements_list_intro: '群发给平台用户的邮件 - 可直接撰写或从 CMS 页面生成。'
     button_change_cms_page: '更改 CMS 页面'
     confirm_delete_announcement: '您确定要删除此公告吗？'
