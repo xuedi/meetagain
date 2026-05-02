@@ -6,7 +6,13 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\AdminCmsPageCreated;
 use App\Activity\Messages\AdminCmsPageDeleted;
 use App\Activity\Messages\AdminCmsPageUpdated;
-use App\Entity\AdminLink;
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Entity\Announcement;
 use App\Entity\BlockType\EventTeaser;
 use App\Entity\BlockType\FactsRow;
 use App\Entity\BlockType\Gallery;
@@ -22,19 +28,23 @@ use App\Form\CmsType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
+use App\Entity\User;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/cms')]
-final class CmsController extends AbstractAdminController
+final class CmsController extends AbstractController implements AdminNavigationInterface
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
@@ -58,6 +68,7 @@ final class CmsController extends AbstractAdminController
         private readonly LanguageService $languageService,
         private readonly ActivityService $activityService,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_admin_cms')]
@@ -74,12 +85,46 @@ final class CmsController extends AbstractAdminController
         $cmsPages = $this->repo->findByIds($filterResult->getCmsIds());
 
         $cmsIdsWithAnnouncements = [];
+        $publishedCount = 0;
         foreach ($cmsPages as $page) {
             $announcement = $this->announcementRepo->findByCmsPage($page->getId());
             if ($announcement !== null) {
                 $cmsIdsWithAnnouncements[] = $page->getId();
             }
+            if ($page->isPublished()) {
+                $publishedCount++;
+            }
         }
+
+        $info = [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($cmsPages),
+                $this->translator->trans('admin_cms.summary_total'),
+            )),
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                $publishedCount,
+                $this->translator->trans('admin_cms.summary_published'),
+            )),
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($cmsIdsWithAnnouncements),
+                $this->translator->trans('admin_cms.summary_with_announcement'),
+            )),
+        ];
+
+        $adminTop = new AdminTop(
+            info: $info,
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_cms.button_add_page'),
+                    target: '#',
+                    icon: 'plus',
+                    toggleId: 'cms-add',
+                ),
+            ],
+        );
 
         return $this->render('admin/cms/cms_list.html.twig', [
             'active' => 'cms',
@@ -87,6 +132,7 @@ final class CmsController extends AbstractAdminController
             'cms' => $cmsPages,
             'is_admin' => $isAdmin,
             'cms_with_announcements' => $cmsIdsWithAnnouncements,
+            'adminTop' => $adminTop,
         ]);
     }
 
@@ -136,6 +182,8 @@ final class CmsController extends AbstractAdminController
             FactsRow::getType(),
         ];
 
+        $linkedAnnouncement = $this->announcementRepo->findByCmsPage($cms->getId());
+
         return $this->render('admin/cms/cms_edit.html.twig', [
             'active' => 'cms',
             'newBlocks' => $newBlocks,
@@ -143,9 +191,75 @@ final class CmsController extends AbstractAdminController
             'blocks' => $this->blockRepo->getBlocks($cms->getId(), $locale),
             'form' => $form,
             'cms' => $cms,
-            'linkedAnnouncement' => $this->announcementRepo->findByCmsPage($cms->getId()),
+            'linkedAnnouncement' => $linkedAnnouncement,
             'is_admin' => $isAdmin,
+            'adminTop' => $this->buildEditTop($cms, $linkedAnnouncement),
         ]);
+    }
+
+    private function buildEditTop(Cms $cms, ?Announcement $linkedAnnouncement): AdminTop
+    {
+        $statusTag = $cms->isPublished()
+            ? sprintf(
+                '<span class="tag is-success is-medium">%s</span>',
+                htmlspecialchars($this->translator->trans('admin_cms.published'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            )
+            : sprintf(
+                '<span class="tag is-light is-medium">%s</span>',
+                htmlspecialchars($this->translator->trans('admin_cms.draft'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            );
+
+        $info = [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>/%s</strong>',
+                htmlspecialchars((string) $cms->getSlug(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            )),
+            new AdminTopInfoHtml($statusTag),
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($cms->getBlocks()),
+                $this->translator->trans('admin_cms.summary_blocks'),
+            )),
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($cms->getLanguages()),
+                $this->translator->trans('admin_cms.summary_languages'),
+            )),
+        ];
+
+        $actions = [];
+        if ($linkedAnnouncement !== null) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.button_open_announcement'),
+                target: $this->generateUrl('app_admin_email_announcements_view', ['id' => $linkedAnnouncement->getId()]),
+                icon: 'bullhorn',
+            );
+        } else {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.button_create_announcement'),
+                target: $this->generateUrl('app_admin_email_announcements_from_cms', ['id' => $cms->getId()]),
+                icon: 'bullhorn',
+            );
+        }
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_cms'),
+            icon: 'arrow-left',
+        );
+
+        return new AdminTop(info: $info, actions: $actions);
+    }
+
+    private function getAuthedUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException(
+                'Should never happen, see: config/packages/security.yaml',
+            );
+        }
+
+        return $user;
     }
 
     #[Route('/delete', name: 'app_admin_cms_delete', methods: ['GET'])]

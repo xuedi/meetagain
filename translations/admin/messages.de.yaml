@@ -41,6 +41,12 @@ admin_shell:
     menu_announcement: 'Ankündigungen'
     menu_menus: 'Menus'
 admin_cms:
+    summary_total: 'Seiten'
+    summary_published: 'veröffentlicht'
+    summary_with_announcement: 'mit Ankündigung'
+    summary_blocks: 'Blöcke'
+    summary_languages: 'Sprachen'
+    button_add_page: 'Seite hinzufügen'
     announcement_cms_page: 'CMS-Seite'
     announcement_content: 'Inhalt'
     announcement_content_help: 'Der Inhalt wird von der ausgewählten CMS-Seite übernommen.'
