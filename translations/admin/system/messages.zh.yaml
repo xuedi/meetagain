@@ -104,6 +104,7 @@ admin_system_debug:
     heading: '错误追踪器'
     help: '触发测试异常以验证Bugsink是否正确捕获错误并发送通知邮件。'
 admin_system_config:
+    intro: '全站设置：身份、发件人、页脚以及开关项。'
     heading_website_settings: '网站设置'
     heading_footer_columns: '页脚列标题'
     heading_on_off_settings: '开关设置'
