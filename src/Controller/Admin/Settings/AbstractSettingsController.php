@@ -83,12 +83,6 @@ abstract class AbstractSettingsController extends AbstractController
                 icon: 'file-import',
                 isActive: $this->activeSettingsTab === 'import',
             ),
-            new AdminTab(
-                label: $this->translator->trans('admin_system.tab_debug'),
-                target: $this->generateUrl('app_admin_system_debug'),
-                icon: 'bug',
-                isActive: $this->activeSettingsTab === 'debug',
-            ),
         ]);
     }
 }

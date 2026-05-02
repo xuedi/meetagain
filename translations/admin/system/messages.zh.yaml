@@ -128,10 +128,6 @@ admin_system_import:
     note: '导入的用户没有设置密码，必须使用"忘记密码"来激活账户。'
     failed: '导入失败：'
     label_zip_file: '导出ZIP文件'
-admin_system_debug:
-    button_trigger_exception: '触发测试异常'
-    heading: '错误追踪器'
-    help: '触发测试异常以验证Bugsink是否正确捕获错误并发送通知邮件。'
 admin_system_config:
     intro: '全站设置：身份、发件人、页脚以及开关项。'
     heading_website_settings: '网站设置'
