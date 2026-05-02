@@ -2,6 +2,9 @@
 
 namespace App\Admin\Navigation;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+
+#[AutoconfigureTag]
 interface AdminNavigationInterface
 {
     public function getAdminNavigation(): ?AdminNavigationConfig;
