@@ -11,8 +11,11 @@
     <div class="dropdown-menu" role="menu">
         <div class="dropdown-content">
             {% for option in action.options %}
-                <a href="{{ option.target }}" class="dropdown-item{% if option.isActive %} is-active{% endif %}">
-                    {{ option.label }}
+                <a href="{{ option.target }}" class="dropdown-item is-flex is-justify-content-space-between{% if option.isActive %} is-active{% endif %}">
+                    <span>{{ option.label }}</span>
+                    {% if option.count is not null %}
+                        <span class="has-text-grey is-size-7 ml-3">({{ option.count }})</span>
+                    {% endif %}
                 </a>
             {% endfor %}
         </div>

@@ -85,7 +85,7 @@ final class CronLogController extends AbstractLogsController implements AdminTab
                 )),
         ];
 
-        $statusDropdown = $this->buildStatusDropdown($status, $range);
+        $statusDropdown = $this->buildStatusDropdown($status, $range, $since);
         $rangeDropdown = $this->buildRangeDropdown($range, $status);
 
         $adminTop = new AdminTop(info: $info, actions: [$statusDropdown, $rangeDropdown]);
@@ -151,7 +151,7 @@ final class CronLogController extends AbstractLogsController implements AdminTab
         ]);
     }
 
-    private function buildStatusDropdown(string $current, string $range): AdminTopActionDropdown
+    private function buildStatusDropdown(string $current, string $range, ?DateTimeImmutable $since): AdminTopActionDropdown
     {
         $options = [];
         foreach (array_keys(self::STATUS_FILTERS) as $key) {
@@ -162,10 +162,15 @@ final class CronLogController extends AbstractLogsController implements AdminTab
             if ($range !== self::DEFAULT_RANGE) {
                 $params['range'] = $range;
             }
+            $count = match ($key) {
+                'warning', 'error', 'exception' => $this->cronLogRepository->countFiltered($since, [$key]),
+                default => null,
+            };
             $options[] = new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_logs.status_filter_' . $key),
                 target: $this->generateUrl('app_admin_cron_log', $params),
                 isActive: $key === $current,
+                count: $count,
             );
         }
 
@@ -182,8 +187,9 @@ final class CronLogController extends AbstractLogsController implements AdminTab
 
     private function buildRangeDropdown(string $current, string $status): AdminTopActionDropdown
     {
+        $statuses = self::STATUS_FILTERS[$status];
         $options = [];
-        foreach (array_keys(self::RANGE_OFFSETS) as $key) {
+        foreach (self::RANGE_OFFSETS as $key => $offset) {
             $params = [];
             if ($key !== self::DEFAULT_RANGE) {
                 $params['range'] = $key;
@@ -191,10 +197,12 @@ final class CronLogController extends AbstractLogsController implements AdminTab
             if ($status !== 'all') {
                 $params['status'] = $status;
             }
+            $optionSince = $offset !== null ? new DateTimeImmutable($offset) : null;
             $options[] = new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_logs.range_' . $key),
                 target: $this->generateUrl('app_admin_cron_log', $params),
                 isActive: $key === $current,
+                count: $this->cronLogRepository->countFiltered($optionSince, $statuses),
             );
         }
 
