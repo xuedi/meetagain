@@ -3,50 +3,31 @@
 {% block content %}
 <div class="container">
 
-    {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'sitemap'} %}
+    {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+    {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-    <div class="level mb-4">
-        <div class="level-left">
-            <div class="notification is-info is-light mb-0">
-                {{ 'admin_system_sitemap.info'|trans({'%total%': total}) }}
-            </div>
-        </div>
-        <div class="level-right">
-            <a class="button is-info is-light" href="https://search.google.com/search-console/sitemaps" target="_blank" rel="noopener">
-                Google Search Console ↗
-            </a>
-        </div>
-    </div>
-
-    {% set warnings_total = urls|filter(u => u.warnings|length > 0)|length %}
-    {% if warnings_total > 0 %}
-    <div class="notification is-warning is-light mb-4">
-        {{ 'admin_system_sitemap.warnings'|trans({'%count%': warnings_total}) }}
-    </div>
-    {% endif %}
-
-    <table class="table is-fullwidth is-striped is-hoverable">
+    <table id="filteredTable" class="table is-fullwidth is-hoverable">
         <thead>
             <tr>
                 <th>{{ 'admin_system_sitemap.col_section'|trans }}</th>
+                <th>{{ 'admin_system_sitemap.col_locale'|trans }}</th>
                 <th>{{ 'admin_system_sitemap.col_label'|trans }}</th>
                 <th>{{ 'admin_system_sitemap.col_url'|trans }}</th>
-                <th>{{ 'admin_system_sitemap.col_locales'|trans }}</th>
                 <th>{{ 'admin_system_sitemap.col_last_mod'|trans }}</th>
                 <th>{{ 'admin_system_sitemap.col_warnings'|trans }}</th>
             </tr>
         </thead>
         <tbody>
         {% for entry in urls %}
-            <tr{% if entry.warnings|length > 0 %} class="has-background-warning-light"{% endif %}>
+            <tr>
                 <td><span class="tag is-light">{{ entry.section }}</span></td>
+                <td><span class="tag is-light">{{ entry.locale|upper }}</span></td>
                 <td>{{ entry.label }}</td>
                 <td>
                     <a href="{{ entry.url }}" target="_blank" rel="noopener" class="is-size-7 has-text-grey">
                         {{ entry.url }}
                     </a>
                 </td>
-                <td>{{ entry.locales }}</td>
                 <td>{{ entry.lastmod }}</td>
                 <td>
                     {% for warning in entry.warnings %}
@@ -57,5 +38,12 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <p class="is-size-7 has-text-grey mt-3">
+        <a href="https://search.google.com/search-console/sitemaps" target="_blank" rel="noopener">
+            {{ 'admin_system_sitemap.button_search_console'|trans }}
+            <span class="icon is-small"><i class="fa fa-arrow-up-right-from-square"></i></span>
+        </a>
+    </p>
 </div>
 {% endblock %}
