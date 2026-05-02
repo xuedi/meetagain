@@ -28,6 +28,11 @@ readonly class NotificationEventCanceledEmail extends EmailAbstract
         return EmailType::NotificationEventCanceled->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_notification_event_canceled';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

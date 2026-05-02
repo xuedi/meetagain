@@ -10,6 +10,12 @@ interface EmailInterface
 {
     public function getIdentifier(): string;
 
+    /**
+     * Translation key describing when this email is sent (e.g. 'Sunday 12:00', 'after registration').
+     * Rendered in the admin templates list as a hint about the dispatch trigger.
+     */
+    public function getTriggerLabel(): string;
+
     /** @return array{subject: string, context: array<string, mixed>} */
     public function getDisplayMockData(): array;
 

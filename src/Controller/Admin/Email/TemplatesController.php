@@ -79,7 +79,13 @@ final class TemplatesController extends AbstractEmailController implements Admin
                 'template' => $dbTemplate,
                 'section' => new AdminCollapsibleSection(
                     id: 'email-section-' . $identifier,
-                    left: [new AdminSectionTextItem($this->translator->trans($identifier))],
+                    left: [
+                        new AdminSectionTextItem($this->translator->trans($identifier)),
+                        new AdminSectionTextItem(
+                            $this->translator->trans($emailType->getTriggerLabel()),
+                            'has-text-grey is-size-7 ml-3',
+                        ),
+                    ],
                     right: $right,
                     openByDefault: false,
                 ),

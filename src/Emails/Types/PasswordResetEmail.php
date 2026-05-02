@@ -25,6 +25,11 @@ readonly class PasswordResetEmail extends EmailAbstract
         return EmailType::PasswordResetRequest->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_password_reset_request';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

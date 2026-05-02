@@ -40,6 +40,11 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         return EmailType::NotificationRsvpAggregated->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_notification_rsvp_aggregated';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

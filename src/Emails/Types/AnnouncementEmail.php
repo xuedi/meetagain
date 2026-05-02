@@ -27,6 +27,11 @@ readonly class AnnouncementEmail extends EmailAbstract
         return EmailType::Announcement->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_announcement';
+    }
+
     public function getDisplayMockData(): array
     {
         return [
