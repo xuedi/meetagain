@@ -1,8 +1,10 @@
 {#
-    Gallery: Danger zone -- Save/Cancel/Delete cluster + warning_box reveal
+    Gallery: Danger zone -- Save inside the form; Delete and Back live in the topbar
 
-    Two parts: (a) the bottom-of-form button cluster from edit pages; (b) the
-    fieldset-warning + warning_box pattern from member/edit. Anchor: g-danger-zone.
+    `architecture/ux-admin.md` Form pages: the Save button stays inside `form_start ...
+    form_end` as the form submit; Cancel links are gone (the Back button in the topbar
+    replaces them). Other actions (Delete, Reset, Preview) move to the topbar as
+    `AdminTopActionButton` entries with their own variants.
 
     Used in:    admin/system/theme/gallery/index.html.twig
     Parameters: none
@@ -10,38 +12,33 @@
 #}
 <p class="is-size-7 has-text-grey">
     {{ 'admin_system_gallery.source_of_truth'|trans }}
+    architecture/ux-admin.md ("Form pages"),
     <code>templates/admin/host/edit.html.twig</code>,
-    <code>templates/admin/member/edit.html.twig</code>,
     <code>templates/_components/warning_box.html.twig</code>
 </p>
 
-<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.variation_label'|trans }} (a) edit-form button cluster</h3>
-<div class="field mt-3">
-    <button type="button" class="button is-link">
-        <span>{{ 'admin_system_gallery.button_demo_save'|trans }}</span>
-    </button>
-    <a href="#" class="button is-light">
-        <span>{{ 'admin_system_gallery.button_demo_cancel'|trans }}</span>
-    </a>
-    <a href="#" class="button is-danger">
-        <span class="icon"><i class="fa fa-trash"></i></span>
-        <span>{{ 'admin_system_gallery.button_demo_danger'|trans }}</span>
-    </a>
-</div>
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.danger_zone_form_title'|trans }}</h3>
+<p class="has-text-grey is-size-7">{{ 'admin_system_gallery.danger_zone_form_caption'|trans }}</p>
+<form class="mt-3" onsubmit="return false">
+    <div class="field">
+        <label class="label">{{ 'admin_system_gallery.field_demo_name'|trans }}</label>
+        <div class="control">
+            <input class="input" type="text" value="{{ 'admin_system_gallery.sample_name'|trans }}">
+        </div>
+    </div>
+    <div class="field mt-4">
+        <button type="submit" class="button is-primary">
+            <span>{{ 'admin_system_gallery.button_demo_save'|trans }}</span>
+        </button>
+    </div>
+</form>
 
-<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (b) fieldset danger zone with warning_box</h3>
-<fieldset class="mt-2 p-4 fieldset-warning">
-    <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">danger zone</legend>
-    <a class="button is-light is-fullwidth">
-        <span class="icon"><i class="fa fa-trash"></i></span>
-        <span>{{ 'admin_system_gallery.button_demo_danger'|trans }}</span>
-    </a>
-</fieldset>
-
-<article class="message is-danger mt-4">
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.danger_zone_warning_title'|trans }}</h3>
+<p class="has-text-grey is-size-7">{{ 'admin_system_gallery.danger_zone_warning_caption'|trans }}</p>
+<article class="message is-danger mt-3">
     <div class="message-header">
         <p>{{ 'admin_system_gallery.confirm_destructive_title'|trans }}</p>
-        <button class="delete" aria-label="close"></button>
+        <button class="delete" aria-label="close" type="button"></button>
     </div>
     <div class="message-body has-text-black has-background-white">
         <p>{{ 'admin_system_gallery.sample_warning_content'|trans }}</p>

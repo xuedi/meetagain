@@ -1,26 +1,29 @@
 {#
-    Gallery: Notifications & flash messages -- Bulma notification colour variants
+    Gallery: Notifications & flash messages -- when NOT to use them in admin
 
-    Used only when the change is invisible after reload (background jobs, queued emails,
-    validation failures). Avoid for obvious info. Anchor: g-notifications.
+    `architecture/ux-admin.md` Design Rules: notifications and flash messages exist for
+    invisible-after-reload signals only (queued background jobs, validation failures).
+    `notification` and `message` are otherwise on the avoid list. For counts, use
+    `AdminTopInfoHtml` in the topbar; for instructions, use a single `AdminTopInfoText`.
 
     Used in:    admin/system/theme/gallery/index.html.twig
     Parameters: none
 #}
 <p class="is-size-7 has-text-grey">
     {{ 'admin_system_gallery.source_of_truth'|trans }}
-    admin UX guide ("No flash messages when the result is visible after reload")
+    architecture/ux-admin.md ("No flash messages when the result is visible after reload")
 </p>
 
-<div class="notification is-success is-light mt-4">
-    A success flash message after a queued background job (e.g. emails dispatched).
+<p class="mt-3">{{ 'admin_system_gallery.notifications_intro'|trans }}</p>
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.notifications_valid_title'|trans }}</h3>
+<p class="has-text-grey is-size-7">{{ 'admin_system_gallery.notifications_valid_caption'|trans }}</p>
+<div class="notification is-success is-light mt-2">
+    {{ 'admin_system_gallery.notifications_valid_body'|trans }}
 </div>
-<div class="notification is-info is-light">
-    An info flash message used sparingly for non-obvious context.
-</div>
-<div class="notification is-warning is-light">
-    A warning flash message - validation passed but with caveats.
-</div>
-<div class="notification is-danger is-light">
-    A danger flash message - the action failed and the page does not show the error inline.
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.notifications_invalid_title'|trans }}</h3>
+<p class="has-text-grey is-size-7">{{ 'admin_system_gallery.notifications_invalid_caption'|trans }}</p>
+<div class="notification is-info is-light mt-2">
+    {{ 'admin_system_gallery.notifications_invalid_body'|trans }}
 </div>
