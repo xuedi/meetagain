@@ -401,6 +401,12 @@ admin_support:
     button_image_details: 'Image details'
     empty_requests: 'No support requests found.'
     empty_reports: 'No image reports found.'
+    summary_total_requests: 'support requests'
+    summary_new_requests: 'new'
+    summary_all_read: 'all read'
+    summary_total_reports: 'image reports'
+    summary_open_reports: 'open'
+    summary_all_resolved: 'all resolved'
 admin_system:
     tab_config: 'Config'
     tab_theme: 'Theme'

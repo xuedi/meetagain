@@ -4,7 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/support/_tabs_navigation.html.twig' with {'activeSection': 'requests'} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <table class="table is-fullwidth">
             <thead>
@@ -13,18 +14,14 @@
                 <th>{{ 'admin_support.col_type'|trans }}</th>
                 <th>{{ 'admin_support.col_name'|trans }}</th>
                 <th>{{ 'admin_support.col_email'|trans }}</th>
-                <th>{{ 'admin_support.col_message'|trans }}</th>
                 <th>{{ 'admin_support.col_status'|trans }}</th>
                 <th></th>
             </tr>
             </thead>
             <tbody>
             {% for request in requests %}
-                <tr{% if request.isNew() %} class="has-background-warning-light"{% endif %}>
-                    <td>
-                        {{ request.createdAt|date('Y-m-d') }}<br>
-                        <small class="has-text-grey">{{ request.createdAt|date('H:i:s') }}</small>
-                    </td>
+                <tr>
+                    <td class="is-nowrap">{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
                     <td><span class="tag is-light">{{ request.contactType.label() }}</span></td>
                     <td>
                         {% if request.isNew() %}<strong>{% endif %}
@@ -32,7 +29,6 @@
                         {% if request.isNew() %}</strong>{% endif %}
                     </td>
                     <td>{{ request.email }}</td>
-                    <td>{{ request.message|u.truncate(100) }}</td>
                     <td>
                         {% if request.isNew() %}
                             <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
@@ -41,12 +37,9 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if request.isNew() %}
-                            <form method="post" action="{{ path('app_admin_support_mark_read', {id: request.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('mark_read_' ~ request.id) }}">
-                                <button type="submit" class="button is-small is-light">{{ 'admin_support.button_mark_read'|trans }}</button>
-                            </form>
-                        {% endif %}
+                        <a href="{{ path('app_admin_support_request_show', {id: request.id}) }}">
+                            <span class="icon"><i class="fa fa-eye"></i></span>
+                        </a>
                     </td>
                 </tr>
             {% else %}

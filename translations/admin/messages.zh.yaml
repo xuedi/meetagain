@@ -401,6 +401,12 @@ admin_support:
     button_image_details: '图片详情'
     empty_requests: '未找到支持请求。'
     empty_reports: '未找到图片举报。'
+    summary_total_requests: '支持请求'
+    summary_new_requests: '新'
+    summary_all_read: '全部已读'
+    summary_total_reports: '图片举报'
+    summary_open_reports: '未处理'
+    summary_all_resolved: '全部已处理'
 admin_system:
     tab_config: '配置'
     tab_theme: '主题'
