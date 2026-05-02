@@ -4,23 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
-
-        <div class="content">
-            <h1 class="title">{{ 'admin_email_templates.button_preview'|trans }}: {{ template.identifier }}</h1>
-            <p>{{ 'admin_email_templates.preview_mock_notice'|trans }}</p>
-        </div>
-
-        <div class="mb-4">
-            <div class="buttons has-addons">
-                {% for locale in languages %}
-                    <a href="{{ path('app_admin_email_templates_preview', {id: template.id, lang: locale}) }}"
-                       class="button {% if locale == currentLanguage %}is-info is-selected{% endif %}">
-                        {{ locale }}
-                    </a>
-                {% endfor %}
-            </div>
-        </div>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <div class="columns">
             <div class="column is-8">
@@ -33,6 +18,14 @@
                 </div>
             </div>
             <div class="column">
+                <div class="buttons has-addons mb-4">
+                    {% for locale in languages %}
+                        <a href="{{ path('app_admin_email_templates_preview', {id: template.id, lang: locale}) }}"
+                           class="button {% if locale == currentLanguage %}is-info is-selected{% endif %}">
+                            {{ locale }}
+                        </a>
+                    {% endfor %}
+                </div>
                 <div class="box">
                     <h3 class="subtitle">{{ 'admin_email_templates.context_variables'|trans }}</h3>
                     <table class="table is-narrow is-fullwidth">
@@ -45,13 +38,6 @@
                     </table>
                 </div>
             </div>
-        </div>
-
-        <div class="buttons">
-            <a href="{{ path('app_admin_email_templates_edit', {id: template.id}) }}" class="button is-info">
-                <span class="icon"><i class="fa fa-edit"></i></span>
-            </a>
-            <a href="{{ path('app_admin_email_templates') }}" class="button">{{ 'global.button_back'|trans }}</a>
         </div>
 
     </div>

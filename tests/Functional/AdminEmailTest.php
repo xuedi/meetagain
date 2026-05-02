@@ -67,7 +67,7 @@ class AdminEmailTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('.title', 'Preview');
+        $this->assertSelectorTextContains('.box .level .level-left strong', $template->getIdentifier());
     }
 
     public function testEmailTemplateEditSubmitsSuccessfully(): void
@@ -89,7 +89,7 @@ class AdminEmailTest extends WebTestCase
         $client->submit($form);
 
         // Assert
-        $this->assertResponseRedirects('/en/admin/email/templates');
+        $this->assertResponseRedirects('/en/admin/email/templates/' . $template->getId() . '/edit');
 
         // Verify changes persisted
         $client->followRedirect();
