@@ -4,9 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'announcements'} %}
-
-        <h1 class="title">{{ 'admin_cms.announcement_new' | trans }}</h1>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {{ form_start(form) }}
 
@@ -16,13 +15,9 @@
                 <p class="mb-3">
                     {{ 'admin_cms.announcement_new_intro' | trans }}
                 </p>
-                {{ form_widget(form.cmsPage) }}
-
-                <div class="field mt-3">
-                    <div class="control">
-                        <button class="button is-primary">{{ 'global.button_create'|trans }}</button>
-                        <a href="{{ path('app_admin_email_announcements') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
-                    </div>
+                <div class="is-flex is-align-items-center" style="gap: 0.5rem;">
+                    {{ form_widget(form.cmsPage) }}
+                    <button class="button is-primary">{{ 'admin_cms.button_link_cms_page'|trans }}</button>
                 </div>
             </div>
         </div>

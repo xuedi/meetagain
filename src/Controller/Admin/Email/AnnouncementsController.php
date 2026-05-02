@@ -43,6 +43,13 @@ final class AnnouncementsController extends AbstractEmailController implements A
     {
         $adminTop = new AdminTop(
             info: [new AdminTopInfoText($this->translator->trans('admin_cms.announcements_list_intro'))],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_cms.announcement_new'),
+                    target: $this->generateUrl('app_admin_email_announcements_new'),
+                    icon: 'plus',
+                ),
+            ],
         );
 
         return $this->render('admin/email/announcements/list.html.twig', [
@@ -73,9 +80,30 @@ final class AnnouncementsController extends AbstractEmailController implements A
             return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
         }
 
+        $adminTop = new AdminTop(
+            info: [new AdminTopInfoHtml(sprintf(
+                '<strong>%s</strong>',
+                htmlspecialchars($this->translator->trans('admin_cms.announcement_new'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            ))],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_cms.button_create_cms_page'),
+                    target: $this->generateUrl('app_admin_cms'),
+                    icon: 'file-circle-plus',
+                ),
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_email_announcements'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
+
         return $this->render('admin/email/announcements/new.html.twig', [
             'active' => 'email',
             'form' => $form,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 

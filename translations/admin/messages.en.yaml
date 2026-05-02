@@ -59,6 +59,8 @@ admin_cms:
     no_cms_page: 'No CMS page selected.'
     button_send_announcement: 'Send'
     button_edit_cms_page: 'Edit'
+    button_create_cms_page: 'Create CMS page'
+    button_link_cms_page: 'Link to CMS page'
     announcements_list_intro: 'Bulk emails sent to platform users - composed directly or built from a CMS page.'
     button_change_cms_page: 'Change CMS Page'
     confirm_delete_announcement: 'Are you sure you want to delete this announcement?'
