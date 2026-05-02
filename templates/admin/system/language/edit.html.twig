@@ -4,9 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'language'} %}
-
-        <h1 class="title">{{ isEdit ? 'admin_system_language.page_title_edit'|trans : 'admin_system_language.page_title_add'|trans }}</h1>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {{ form_start(form) }}
 
@@ -34,14 +33,7 @@
             </div>
         </div>
 
-        <div class="field is-grouped">
-            <div class="control">
-                <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
-            </div>
-            <div class="control">
-                <a class="button" href="{{ path('app_admin_language') }}">{{ 'global.button_cancel'|trans }}</a>
-            </div>
-        </div>
+        <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
         {{ form_end(form) }}
 
     </div>
