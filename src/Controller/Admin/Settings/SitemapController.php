@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller\Admin\Settings;
 
@@ -54,9 +56,11 @@ final class SitemapController extends AbstractSettingsController implements Admi
 
         $rows = array_filter(
             $allUrls,
-            static fn(array $row): bool => ($localeFilter === '' || $row['locale'] === $localeFilter)
+            static fn(array $row): bool => (
+                ($localeFilter === '' || $row['locale'] === $localeFilter)
                 && ($sectionFilter === '' || $row['section'] === $sectionFilter)
-                && (!$warningsOnly || count($row['warnings']) > 0),
+                && (!$warningsOnly || count($row['warnings']) > 0)
+            ),
         );
 
         $info = [
@@ -82,14 +86,11 @@ final class SitemapController extends AbstractSettingsController implements Admi
             ));
         }
 
-        $adminTop = new AdminTop(
-            info: $info,
-            actions: [
-                $this->buildWarningsToggle($warningsOnly, $localeFilter, $sectionFilter),
-                $this->buildSectionDropdown($sectionFilter, $localeFilter, $warningsOnly, $allUrls),
-                $this->buildLocaleDropdown($localeFilter, $sectionFilter, $warningsOnly, $allUrls, $locales),
-            ],
-        );
+        $adminTop = new AdminTop(info: $info, actions: [
+            $this->buildWarningsToggle($warningsOnly, $localeFilter, $sectionFilter),
+            $this->buildSectionDropdown($sectionFilter, $localeFilter, $warningsOnly, $allUrls),
+            $this->buildLocaleDropdown($localeFilter, $sectionFilter, $warningsOnly, $allUrls, $locales),
+        ]);
 
         return $this->render('admin/system/sitemap/index.html.twig', [
             'active' => 'system',
@@ -193,16 +194,22 @@ final class SitemapController extends AbstractSettingsController implements Admi
     {
         $count = 0;
         foreach ($urls as $url) {
-            if (count($url['warnings']) > 0) {
-                ++$count;
+            if (count($url['warnings']) <= 0) {
+                continue;
             }
+
+            ++$count;
         }
 
         return $count;
     }
 
-    private function buildSectionDropdown(string $current, string $locale, bool $warnings, array $allUrls): AdminTopActionDropdown
-    {
+    private function buildSectionDropdown(
+        string $current,
+        string $locale,
+        bool $warnings,
+        array $allUrls,
+    ): AdminTopActionDropdown {
         $base = $this->buildBaseParams($locale, '', $warnings);
 
         $options = [
@@ -215,9 +222,11 @@ final class SitemapController extends AbstractSettingsController implements Admi
         foreach (self::SECTIONS as $section) {
             $count = 0;
             foreach ($allUrls as $row) {
-                if ($row['section'] === $section && ($locale === '' || $row['locale'] === $locale)) {
-                    ++$count;
+                if (!($row['section'] === $section && ($locale === '' || $row['locale'] === $locale))) {
+                    continue;
                 }
+
+                ++$count;
             }
             $options[] = new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_system_sitemap.section_' . $section),
@@ -243,8 +252,13 @@ final class SitemapController extends AbstractSettingsController implements Admi
     /**
      * @param list<string> $locales
      */
-    private function buildLocaleDropdown(string $current, string $section, bool $warnings, array $allUrls, array $locales): AdminTopActionDropdown
-    {
+    private function buildLocaleDropdown(
+        string $current,
+        string $section,
+        bool $warnings,
+        array $allUrls,
+        array $locales,
+    ): AdminTopActionDropdown {
         $base = $this->buildBaseParams('', $section, $warnings);
 
         $options = [
@@ -257,9 +271,11 @@ final class SitemapController extends AbstractSettingsController implements Admi
         foreach ($locales as $locale) {
             $count = 0;
             foreach ($allUrls as $row) {
-                if ($row['locale'] === $locale && ($section === '' || $row['section'] === $section)) {
-                    ++$count;
+                if (!($row['locale'] === $locale && ($section === '' || $row['section'] === $section))) {
+                    continue;
                 }
+
+                ++$count;
             }
             $options[] = new AdminTopActionDropdownOption(
                 label: strtoupper($locale),

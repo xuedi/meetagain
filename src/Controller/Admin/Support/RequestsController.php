@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller\Admin\Support;
 
@@ -38,9 +40,11 @@ final class RequestsController extends AbstractSupportController implements Admi
 
         $newCount = 0;
         foreach ($requests as $request) {
-            if ($request->isNew()) {
-                $newCount++;
+            if (!$request->isNew()) {
+                continue;
             }
+
+            $newCount++;
         }
         $totalCount = count($requests);
 
@@ -84,14 +88,12 @@ final class RequestsController extends AbstractSupportController implements Admi
         $statusKey = $request->isNew() ? 'admin_support.status_new' : 'admin_support.status_read';
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%s</strong>',
-                $request->getCreatedAt()->format('Y-m-d H:i:s'),
-            )),
-            new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-light is-medium">%s</span>',
-                htmlspecialchars($request->getContactType()->label(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', $request->getCreatedAt()->format('Y-m-d H:i:s'))),
+            new AdminTopInfoHtml(sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
+                $request->getContactType()->label(),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
             new AdminTopInfoHtml(sprintf(
                 '<span class="tag %s is-medium">%s</span>',
                 $statusVariant,

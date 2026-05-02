@@ -128,10 +128,6 @@ admin_system_import:
     note: 'Imported users have no password set and must use Forgot password to activate their account.'
     failed: 'Import failed:'
     label_zip_file: 'Export ZIP file'
-admin_system_debug:
-    button_trigger_exception: 'Trigger Test Exception'
-    heading: 'Error Tracker'
-    help: 'Trigger a test exception to verify that Bugsink is capturing errors and sending notification emails correctly.'
 admin_system_config:
     intro: 'Site-wide settings: identity, sender, footer, and on/off toggles.'
     heading_website_settings: 'Website settings'

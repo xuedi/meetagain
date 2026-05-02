@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Controller\Admin\Support;
 
@@ -40,9 +42,11 @@ final class ReportsController extends AbstractSupportController implements Admin
 
         $openCount = 0;
         foreach ($reports as $report) {
-            if ($report->isOpen()) {
-                $openCount++;
+            if (!$report->isOpen()) {
+                continue;
             }
+
+            $openCount++;
         }
         $totalCount = count($reports);
 
@@ -82,9 +86,7 @@ final class ReportsController extends AbstractSupportController implements Admin
             throw $this->createNotFoundException();
         }
 
-        $location = $report->getImage() !== null
-            ? $this->imageLocationService->locate($report->getImage())
-            : null;
+        $location = $report->getImage() !== null ? $this->imageLocationService->locate($report->getImage()) : null;
 
         $statusVariant = $report->isOpen() ? 'is-warning' : 'is-success';
         $statusKey = $report->isOpen() ? 'admin_support.status_open' : 'admin_support.status_resolved';
