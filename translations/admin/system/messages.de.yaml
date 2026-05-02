@@ -41,6 +41,7 @@ admin_system_sitemap:
     info: '%total% URLs in 3 Abschnitten werden in der Sitemap enthalten sein. Jede URL wird auf alle aktivierten Sprachen in der Sitemap-XML erweitert.'
     warnings: '%count% URL(s) haben Warnungen - prüfen Sie die Tabelle unten.'
 admin_system_images:
+    summary_total: 'Bilder'
     col_created_at: 'Erstellt am'
     col_uploader: 'Hochgeladen von'
     col_size: 'Größe'
