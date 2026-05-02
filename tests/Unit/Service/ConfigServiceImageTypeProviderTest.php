@@ -54,7 +54,7 @@ class ConfigServiceImageTypeProviderTest extends TestCase
         $service = $this->build($provider);
 
         static::assertSame(
-            [[400, 400], [100, 100], [80, 80], [50, 50]],
+            [[400, 400], [350, 350], [100, 100], [80, 80], [50, 50]],
             $service->getThumbnailSizes(ImageType::ProfilePicture),
         );
     }
