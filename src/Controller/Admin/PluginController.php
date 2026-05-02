@@ -2,17 +2,28 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\AdminLink;
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Service\Admin\CommandService;
 use App\Service\Config\PluginService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
-final class PluginController extends AbstractAdminController
+final class PluginController extends AbstractController implements AdminNavigationInterface
 {
+    public function __construct(
+        private readonly PluginService $pluginService,
+        private readonly CommandService $commandService,
+        private readonly TranslatorInterface $translator,
+    ) {}
+
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
@@ -29,18 +40,38 @@ final class PluginController extends AbstractAdminController
         );
     }
 
-    public function __construct(
-        private readonly PluginService $pluginService,
-        private readonly CommandService $commandService,
-        private readonly TranslatorInterface $translator,
-    ) {}
-
     #[Route('/admin/plugin', name: 'app_admin_plugin')]
     public function list(): Response
     {
+        $plugins = $this->pluginService->getAdminList();
+        $totalCount = count($plugins);
+        $installedCount = count(array_filter($plugins, static fn (array $p): bool => (bool) ($p['installed'] ?? false)));
+        $enabledCount = count(array_filter($plugins, static fn (array $p): bool => (bool) ($p['enabled'] ?? false)));
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    $totalCount,
+                    $this->translator->trans('admin_system_plugins.summary_available'),
+                )),
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    $installedCount,
+                    $this->translator->trans('admin_system_plugins.summary_installed'),
+                )),
+                new AdminTopInfoHtml(sprintf(
+                    '<span class="tag is-success is-medium">%d&nbsp;%s</span>',
+                    $enabledCount,
+                    $this->translator->trans('admin_system_plugins.summary_enabled'),
+                )),
+            ],
+        );
+
         return $this->render('admin/system/plugin_list.html.twig', [
-            'plugins' => $this->pluginService->getAdminList(),
+            'plugins' => $plugins,
             'active' => 'plugin',
+            'adminTop' => $adminTop,
         ]);
     }
 

@@ -4,6 +4,8 @@
 
     <div class="container">
 
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
         {% for type, messages in app.flashes %}
             {% for message in messages %}
                 <div class="notification is-{{ type }}">{{ message }}</div>

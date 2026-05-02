@@ -2,9 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Admin\Navigation\AdminNavigationInterface as NewAdminNavigationInterface;
 use App\Controller\Admin\AdminNavigationInterface;
 use App\Entity\AdminLink;
 use App\Entity\AdminSection;
+use Generator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -13,20 +15,31 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * Builds admin sidebar navigation from controllers.
  *
- * All admin controllers implement AdminNavigationInterface to define their navigation.
+ * Iterates both the deprecated `Controller\Admin\AdminNavigationInterface` and
+ * the new `Admin\Navigation\AdminNavigationInterface` so legacy and migrated
+ * controllers contribute side by side during the in-flight namespace migration.
  * Sections and links are sorted alphabetically.
  */
 readonly class AdminNavigationService
 {
     /**
-     * @param iterable<AdminNavigationInterface> $controllers
+     * @param iterable<AdminNavigationInterface>    $legacyControllers
+     * @param iterable<NewAdminNavigationInterface> $controllers
      */
     public function __construct(
         private Security $security,
         private RouterInterface $router,
         #[AutowireIterator(AdminNavigationInterface::class)]
+        private iterable $legacyControllers,
+        #[AutowireIterator(NewAdminNavigationInterface::class)]
         private iterable $controllers,
     ) {}
+
+    private function allControllers(): Generator
+    {
+        yield from $this->legacyControllers;
+        yield from $this->controllers;
+    }
 
     /**
      * @return list<AdminSection>
@@ -37,7 +50,7 @@ readonly class AdminNavigationService
         $modifications = [];
 
         // First pass: collect all route modifications
-        foreach ($this->controllers as $controller) {
+        foreach ($this->allControllers() as $controller) {
             $config = $controller->getAdminNavigation();
             if ($config === null) {
                 continue;
@@ -51,7 +64,7 @@ readonly class AdminNavigationService
         }
 
         // Second pass: collect navigation, applying modifications
-        foreach ($this->controllers as $controller) {
+        foreach ($this->allControllers() as $controller) {
             $config = $controller->getAdminNavigation();
             if ($config === null) {
                 continue; // Skip controllers without navigation
