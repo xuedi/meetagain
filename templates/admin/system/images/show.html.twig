@@ -4,33 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'images'} %}
-
-        <div class="box">
-            <div class="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <span class="tag is-light">{{ image.type.name }}</span>
-                    </div>
-                    <div class="level-item has-text-grey">
-                        {{ image.size | format_bytes }}
-                    </div>
-                    <div class="level-item has-text-grey">
-                        <a href="{{ path('app_admin_member_edit', {'id': image.uploader.id}) }}">
-                            {{ image.uploader.email }}
-                        </a>
-                    </div>
-                </div>
-                <div class="level-right">
-                    <div class="level-item">
-                        <a href="{{ path('app_admin_system_images') }}" class="button is-small">
-                            <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
-                            <span>{{ 'global.button_back'|trans }}</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <table class="table is-fullwidth">
             <tbody>
@@ -76,7 +51,7 @@
                         {% if image.updatedAt %}
                             {{ image.updatedAt | date('Y-m-d H:i:s') }}
                         {% else %}
-                            <span class="has-text-grey">&mdash;</span>
+                            <span class="has-text-grey">-</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -86,7 +61,7 @@
                         {% if image.reported %}
                             <span class="tag is-danger is-light">{{ image.reported.name }}</span>
                         {% else %}
-                            <span class="has-text-grey">&mdash;</span>
+                            <span class="has-text-grey">-</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -98,9 +73,7 @@
 
         <h2 class="subtitle mt-5">{{ 'admin_system_images.heading_locations'|trans }}</h2>
         {% if locations is empty %}
-            <div class="notification is-info is-light">
-                {{ 'admin_system_images.empty_locations'|trans }}
-            </div>
+            <p class="has-text-grey">{{ 'admin_system_images.empty_locations'|trans }}</p>
         {% else %}
             <table class="table is-fullwidth is-narrow">
                 <thead>

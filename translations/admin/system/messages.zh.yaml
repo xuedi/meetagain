@@ -41,6 +41,7 @@ admin_system_sitemap:
     info: '%total%个URL分布在3个分区中，将包含在站点地图中。每个URL在站点地图XML中扩展到所有已启用的语言。'
     warnings: '%count%个URL有警告 - 请检查下面的表格。'
 admin_system_images:
+    summary_total: '张图片'
     col_created_at: '创建时间'
     col_uploader: '上传者'
     col_size: '大小'

@@ -41,6 +41,7 @@ admin_system_sitemap:
     info: '%total% URLs across 3 sections will be included in the sitemap. Each URL is expanded to all enabled locales in the sitemap XML.'
     warnings: '%count% URL(s) have warnings - check the table below.'
 admin_system_images:
+    summary_total: 'images'
     col_created_at: 'Created at'
     col_uploader: 'Uploader'
     col_size: 'Size'
