@@ -25,6 +25,11 @@ readonly class SupportNotificationEmail extends EmailAbstract
         return EmailType::SupportNotification->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_support_notification';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

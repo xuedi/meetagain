@@ -27,6 +27,11 @@ readonly class AdminNotificationEmail extends EmailAbstract
         return EmailType::AdminNotification->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_admin_notification';
+    }
+
     public function getDisplayMockData(): array
     {
         return [
