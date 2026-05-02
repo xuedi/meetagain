@@ -115,7 +115,9 @@ admin_system_seo:
 admin_system_import:
     button: 'Import'
     heading: 'Import Group Data'
-    help: 'Upload a meetagain.org export ZIP file to import group data into this instance. Duplicate users (same email) and CMS pages (same slug) will be skipped. Events are always imported.'
+    help: 'Upload a meetagain.org export ZIP. Duplicate users and CMS pages are skipped; events are always imported.'
+    error_no_file: 'No file uploaded.'
+    error_not_zip: 'Only ZIP files are accepted.'
     success_title: 'Import complete'
     users_created: 'Users created'
     users_skipped: 'Users skipped (already exist)'
