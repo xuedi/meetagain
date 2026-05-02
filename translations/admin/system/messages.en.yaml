@@ -278,9 +278,10 @@ admin_system_gallery:
     sample_info_link: 'Read more'
 admin_system_permissions:
     heading: 'Permission Overview'
-    help: 'All routes decorated with #[IsGranted], grouped by the minimum role required. Method-level permissions take precedence over class-level ones. Routes with no #[IsGranted] are publicly accessible and grouped under Anonymous.'
+    help: 'Routes grouped by minimum required role; method-level overrides class-level.'
     anon_no_auth: 'no authentication required'
     anon_min_role: 'minimum required role'
+    routes_count: '%count% routes'
     perm_any: 'ANY'
     perm_class_level: 'class-level'
     perm_method_level: 'method-level'

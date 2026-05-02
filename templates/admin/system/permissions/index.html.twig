@@ -1,43 +1,15 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block content %}
-    {% include 'admin/system/_tabs_navigation.html.twig' %}
 
-    <div class="box">
-        <h2 class="title is-5">{{ 'admin_system_permissions.heading'|trans }}</h2>
-        <p class="content is-size-7 mb-5">{{ 'admin_system_permissions.help'|trans }}</p>
+    <div class="container">
 
-        {% for roleId in roleOrder %}
-            {% if groups[roleId] is defined %}
-                {% set sectionId = 'perm-section-' ~ loop.index %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-                <div class="perm-section-header is-flex is-align-items-center mt-4 mb-2 px-4 py-3"
-                     data-target="{{ sectionId }}">
-
-                    <span class="flex-shrink-0">{{ roleId }}</span>
-
-                    <span class="has-text-grey is-size-7 ml-3 mr-auto flex-shrink-0">
-                        {% if roleId == 'Anonymous' %}
-                            {{ 'admin_system_permissions.anon_no_auth'|trans }}
-                        {% else %}
-                            {{ 'admin_system_permissions.anon_min_role'|trans }}
-                        {% endif %}
-                    </span>
-
-                    <span class="has-text-grey is-size-7 mr-3 is-nowrap">
-                        {{ groups[roleId]|length }} route{{ groups[roleId]|length != 1 ? 's' : '' }}
-                    </span>
-
-                    <button class="button is-small is-light perm-section-toggle flex-shrink-0"
-                            aria-expanded="false"
-                            aria-controls="{{ sectionId }}"
-                            type="button">
-                        <span class="icon is-small"><i class="fas fa-chevron-down"></i></span>
-                    </button>
-
-                </div>
-
-                <div id="{{ sectionId }}" class="perm-section-body mb-4 is-hidden">
+        {% for row in sections %}
+            {% embed 'admin/_components/admin_section.html.twig' with {'section': row.section} %}
+                {% block body %}
                     <table class="table is-fullwidth is-hoverable is-narrow is-bordered">
                         <thead>
                             <tr>
@@ -49,7 +21,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for entry in groups[roleId] %}
+                            {% for entry in row.entries %}
                                 <tr>
                                     <td class="is-size-7 is-family-monospace">{{ entry.routeName }}</td>
                                     <td>
@@ -68,7 +40,7 @@
                                             <span class="tag is-light is-size-7" title="{{ 'admin_system_permissions.perm_class_level'|trans }}">{{ perm }}</span>
                                         {% endfor %}
                                         {% for perm in entry.methodPermissions %}
-                                            <span class="tag is-light is-size-7" title="{{ 'admin_system_permissions.perm_method_level'|trans }}">{{ perm }} ⬤</span>
+                                            <span class="tag is-light is-size-7" title="{{ 'admin_system_permissions.perm_method_level'|trans }}">{{ perm }}</span>
                                         {% endfor %}
                                         {% if entry.classPermissions is empty and entry.methodPermissions is empty %}
                                             <span class="tag is-light is-size-7">{{ 'admin_system_permissions.perm_public'|trans }}</span>
@@ -78,15 +50,10 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                </div>
-
-            {% endif %}
+                {% endblock %}
+            {% endembed %}
         {% endfor %}
 
     </div>
 
-{% endblock %}
-
-{% block javascripts %}
-    <script src="{{ asset('js/admin/permissions.js') }}" defer></script>
 {% endblock %}
