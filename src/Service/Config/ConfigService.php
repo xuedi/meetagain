@@ -44,6 +44,10 @@ readonly class ConfigService
      * Note: sizes may appear in multiple ImageType entries — e.g. EventTeaser and EventUpload
      * share the same size set. This is intentional: each ImageType also represents a location,
      * and the same physical size can be valid in more than one location context.
+     *
+     * The 350-width entry is the universal admin preview size rendered on the image detail page
+     * (`/admin/system/images/{id}`) - every type carries one with its native aspect ratio so the
+     * preview looks consistent regardless of the source type.
      */
     public function getThumbnailSizes(ImageType $type): array
     {
@@ -55,20 +59,37 @@ readonly class ConfigService
         }
 
         return match ($type) {
-            ImageType::ProfilePicture => [[400, 400], [100, 100], [80, 80], [50, 50]],
-            ImageType::EventTeaser => [[1024, 768], [600, 400], [210, 140], [100, 100], [50, 50]], // included EventUpload
-            ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [210, 140], [100, 100], [50, 50]],
-            ImageType::CmsCardImage => [[600, 400], [300, 200], [100, 100], [50, 50]],
-            ImageType::CmsBlock => [[432, 432], [100, 100], [80, 80], [50, 50]],
-            ImageType::PluginDish => [[1024, 768], [600, 400], [400, 400], [100, 100], [50, 50]],
-            ImageType::LanguageTile => [[600, 400], [300, 200], [100, 100], [50, 50]],
-            ImageType::PluginBookclubCover => [[400, 500], [200, 250], [100, 100], [50, 50]],
-            ImageType::SiteLogo => [[400, 400], [100, 100]],
+            ImageType::ProfilePicture => [[400, 400], [350, 350], [100, 100], [80, 80], [50, 50]],
+            ImageType::EventTeaser => [[1024, 768], [600, 400], [350, 263], [210, 140], [100, 100], [50, 50]], // included EventUpload
+            ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [350, 263], [210, 140], [100, 100], [50, 50]],
+            ImageType::CmsCardImage => [[600, 400], [350, 233], [300, 200], [100, 100], [50, 50]],
+            ImageType::CmsBlock => [[432, 432], [350, 350], [100, 100], [80, 80], [50, 50]],
+            ImageType::PluginDish => [[1024, 768], [600, 400], [400, 400], [350, 263], [100, 100], [50, 50]],
+            ImageType::LanguageTile => [[600, 400], [350, 233], [300, 200], [100, 100], [50, 50]],
+            ImageType::PluginBookclubCover => [[400, 500], [350, 438], [200, 250], [100, 100], [50, 50]],
+            ImageType::SiteLogo => [[400, 400], [350, 350], [100, 100]],
             default => throw new RuntimeException(sprintf(
                 'No thumbnail sizes registered for image type "%s". Plugin-owned types must be supplied via ImageThumbnailSizeProviderInterface.',
                 $type->name,
             )),
         };
+    }
+
+    /**
+     * Returns the 'WxH' string for the universal 350-width admin preview thumbnail.
+     */
+    public function getAdminPreviewSize(ImageType $type): string
+    {
+        foreach ($this->getThumbnailSizes($type) as [$width, $height]) {
+            if ($width === 350) {
+                return sprintf('%dx%d', $width, $height);
+            }
+        }
+
+        throw new RuntimeException(sprintf(
+            'No 350-width admin preview thumbnail registered for image type "%s".',
+            $type->name,
+        ));
     }
 
     public function getFitMode(ImageType $type): ImageFitMode
@@ -92,9 +113,15 @@ readonly class ConfigService
             '1024x768' => 0, // gallery image bit
             '600x400' => 0, // event preview image
             '432x432' => 0, // cmsBlock image
+            '400x500' => 0, // bookclub cover (portrait)
             '400x400' => 0, // profile big
+            '350x438' => 0, // admin preview (bookclub cover, portrait)
+            '350x350' => 0, // admin preview (square types)
+            '350x263' => 0, // admin preview (4:3 types)
+            '350x233' => 0, // admin preview (3:2 types)
             '300x200' => 0, // cms card image
             '210x140' => 0, // gallery image preview
+            '200x250' => 0, // bookclub cover small
             '100x100' => 0, // report preview
             '80x80' => 0, // ?
             '50x50' => 0, // ?
