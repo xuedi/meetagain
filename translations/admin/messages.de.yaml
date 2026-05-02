@@ -283,7 +283,11 @@ admin_logs:
     range_6h: '6 Stunden'
     range_24h: '24 Stunden'
     range_1w: '1 Woche'
+    range_1m: '1 Monat'
     range_all: 'Alle'
+    summary_total_404: '404-Treffer gesamt'
+    summary_in_range: 'im Zeitraum'
+    summary_no_404_in_range: 'keine 404 im Zeitraum'
 admin_member:
     col_name: 'Name'
     col_email: 'E-Mail'

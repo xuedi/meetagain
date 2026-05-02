@@ -283,7 +283,11 @@ admin_logs:
     range_6h: '6 小时'
     range_24h: '24 小时'
     range_1w: '1 周'
+    range_1m: '1 个月'
     range_all: '全部'
+    summary_total_404: '404 总数'
+    summary_in_range: '范围内'
+    summary_no_404_in_range: '范围内没有 404'
 admin_member:
     col_name: '姓名'
     col_email: '邮箱'
