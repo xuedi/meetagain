@@ -123,6 +123,15 @@ details.activities-load-more {
 
 // ── Components ───────────────────────────────────────────────────────────────
 
+// Admin top action dropdown - counts column alignment.
+// Bulma sets .dropdown-menu min-width: 12rem and a.dropdown-item padding-right: 3rem,
+// which strands right-aligned counts ~48px from the menu edge. Tighten both so the
+// counts sit at the same 1rem inset as the labels.
+[data-admin-dropdown] {
+    .dropdown-menu { min-width: 0; }
+    .dropdown-item { padding-right: 1rem; }
+}
+
 // Flash notification — fixed bottom-center overlay for Symfony flash messages.
 .flashNotification {
     position: fixed;
