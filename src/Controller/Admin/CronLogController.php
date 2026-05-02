@@ -2,10 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Tabs\AdminTab;
 use App\Admin\Tabs\AdminTabs;
-use App\Admin\Tabs\AdminTabsFactory;
+use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
-use App\Admin\Top\AdminTopFactory;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Entity\CronLog;
@@ -27,8 +27,6 @@ final class CronLogController extends AbstractAdminController
 
     public function __construct(
         private readonly CronLogRepository $cronLogRepository,
-        private readonly AdminTopFactory $adminTopFactory,
-        private readonly AdminTabsFactory $adminTabsFactory,
         private readonly TranslatorInterface $translator,
     ) {}
 
@@ -66,30 +64,32 @@ final class CronLogController extends AbstractAdminController
             ));
 
         $problemsToggle = $problemsOnly
-            ? $this->adminTopFactory->actionButton(
-                labelKey: 'admin_logs.filter_show_all',
-                route: 'app_admin_cron_log',
-                routeParams: $showAll ? ['showAll' => 1] : [],
+            ? new AdminTopActionButton(
+                label: $this->translator->trans('admin_logs.filter_show_all'),
+                target: $this->generateUrl('app_admin_cron_log', $showAll ? ['showAll' => 1] : []),
                 icon: 'list',
             )
-            : $this->adminTopFactory->actionButton(
-                labelKey: 'admin_logs.filter_problems_only',
-                route: 'app_admin_cron_log',
-                routeParams: $showAll ? ['problemsOnly' => 1, 'showAll' => 1] : ['problemsOnly' => 1],
+            : new AdminTopActionButton(
+                label: $this->translator->trans('admin_logs.filter_problems_only'),
+                target: $this->generateUrl(
+                    'app_admin_cron_log',
+                    $showAll ? ['problemsOnly' => 1, 'showAll' => 1] : ['problemsOnly' => 1],
+                ),
                 icon: 'filter',
             );
 
         $timeToggle = $showAll
-            ? $this->adminTopFactory->actionButton(
-                labelKey: 'admin_logs.filter_last_24h',
-                route: 'app_admin_cron_log',
-                routeParams: $problemsOnly ? ['problemsOnly' => 1] : [],
+            ? new AdminTopActionButton(
+                label: $this->translator->trans('admin_logs.filter_last_24h'),
+                target: $this->generateUrl('app_admin_cron_log', $problemsOnly ? ['problemsOnly' => 1] : []),
                 icon: 'clock',
             )
-            : $this->adminTopFactory->actionButton(
-                labelKey: 'admin_logs.filter_show_all_time',
-                route: 'app_admin_cron_log',
-                routeParams: $problemsOnly ? ['problemsOnly' => 1, 'showAll' => 1] : ['showAll' => 1],
+            : new AdminTopActionButton(
+                label: $this->translator->trans('admin_logs.filter_show_all_time'),
+                target: $this->generateUrl(
+                    'app_admin_cron_log',
+                    $problemsOnly ? ['problemsOnly' => 1, 'showAll' => 1] : ['showAll' => 1],
+                ),
                 icon: 'list',
             );
 
@@ -140,9 +140,9 @@ final class CronLogController extends AbstractAdminController
                 )),
             ],
             actions: [
-                $this->adminTopFactory->actionButton(
-                    labelKey: 'admin_logs.back',
-                    route: 'app_admin_cron_log',
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_logs.back'),
+                    target: $this->generateUrl('app_admin_cron_log'),
                     icon: 'arrow-left',
                 ),
             ],
@@ -159,10 +159,27 @@ final class CronLogController extends AbstractAdminController
     private function buildLogsTabs(): AdminTabs
     {
         return new AdminTabs([
-            $this->adminTabsFactory->tab('admin_logs.tab_activity', 'app_admin_activity_log', icon: 'list'),
-            $this->adminTabsFactory->tab('admin_logs.tab_system', 'app_admin_system_log', icon: 'file-alt'),
-            $this->adminTabsFactory->tab('admin_logs.tab_404', 'app_admin_not_found_log', icon: 'exclamation-triangle'),
-            $this->adminTabsFactory->tab('admin_logs.tab_cron', 'app_admin_cron_log', icon: 'clock', isActive: true),
+            new AdminTab(
+                label: $this->translator->trans('admin_logs.tab_activity'),
+                target: $this->generateUrl('app_admin_activity_log'),
+                icon: 'list',
+            ),
+            new AdminTab(
+                label: $this->translator->trans('admin_logs.tab_system'),
+                target: $this->generateUrl('app_admin_system_log'),
+                icon: 'file-alt',
+            ),
+            new AdminTab(
+                label: $this->translator->trans('admin_logs.tab_404'),
+                target: $this->generateUrl('app_admin_not_found_log'),
+                icon: 'exclamation-triangle',
+            ),
+            new AdminTab(
+                label: $this->translator->trans('admin_logs.tab_cron'),
+                target: $this->generateUrl('app_admin_cron_log'),
+                icon: 'clock',
+                isActive: true,
+            ),
         ]);
     }
 }
