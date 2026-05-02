@@ -191,6 +191,31 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Find all upcoming, published, non-canceled events in a window with their RSVP set
+     * eagerly hydrated. Used by previews that need to filter "user has RSVP'd" in PHP across
+     * many users without firing one query per user.
+     *
+     * @return array<Event>
+     */
+    public function findUpcomingEventsWithRsvp(DateTimeInterface $from, DateTimeInterface $to): array
+    {
+        return $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.rsvp', 'r')
+            ->addSelect('r')
+            ->where('e.start BETWEEN :from AND :to')
+            ->andWhere('e.canceled = :notCanceled')
+            ->andWhere('e.status IN (:statuses)')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setParameter('notCanceled', false)
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->orderBy('e.start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getEventNameList(string $language): array
     {
         $events = $this
