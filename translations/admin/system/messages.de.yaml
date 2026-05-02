@@ -127,6 +127,7 @@ admin_system_config:
     field_footer_col3: 'Fußzeile Spalte 3'
     field_footer_col4: 'Fußzeile Spalte 4'
 admin_system_theme:
+    intro: 'Logo und Farbpalette der Website anpassen. Beim Speichern der Farben wird das CSS-Bundle neu gebaut.'
     heading_colors: 'Design-Farben'
     help_colors: 'Passen Sie das Farbschema der Website an Ihre Marke an. Die grauen Textfarben sind für WCAG AA-Barrierefreiheit optimiert.'
     color_primary: 'Hauptschaltflächen und Hervorhebungen'

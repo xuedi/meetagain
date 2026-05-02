@@ -127,6 +127,7 @@ admin_system_config:
     field_footer_col3: 'Footer Column 3'
     field_footer_col4: 'Footer Column 4'
 admin_system_theme:
+    intro: 'Customise the site logo and colour palette. Saving the colours rebuilds the CSS bundle.'
     heading_colors: 'Theme Colors'
     help_colors: 'Customize the site''s color scheme to match your brand. The text grey colors are optimized for WCAG AA accessibility compliance.'
     color_primary: 'Main buttons and highlights'
