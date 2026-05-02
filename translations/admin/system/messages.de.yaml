@@ -128,10 +128,6 @@ admin_system_import:
     note: 'Importierte Benutzer haben kein Passwort und müssen "Passwort vergessen" verwenden, um ihr Konto zu aktivieren.'
     failed: 'Import fehlgeschlagen:'
     label_zip_file: 'Export-ZIP-Datei'
-admin_system_debug:
-    button_trigger_exception: 'Testausnahme auslösen'
-    heading: 'Fehler-Tracker'
-    help: 'Lösen Sie eine Testausnahme aus, um zu überprüfen, ob Bugsink Fehler erfasst und Benachrichtigungs-E-Mails korrekt sendet.'
 admin_system_config:
     intro: 'Site-weite Einstellungen: Identität, Absender, Footer und Ein-/Aus-Schalter.'
     heading_website_settings: 'Website-Einstellungen'

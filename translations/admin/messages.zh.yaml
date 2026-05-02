@@ -413,7 +413,6 @@ admin_system:
     tab_images: '图片'
     tab_language: '语言'
     tab_seo: 'SEO'
-    tab_debug: '调试'
     tab_import: '导入'
     tab_permissions: '权限'
     tab_sitemap: '站点地图'

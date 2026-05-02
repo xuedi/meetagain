@@ -413,7 +413,6 @@ admin_system:
     tab_images: 'Bilder'
     tab_language: 'Sprache'
     tab_seo: 'SEO'
-    tab_debug: 'Debug'
     tab_import: 'Import'
     tab_permissions: 'Berechtigungen'
     tab_sitemap: 'Sitemap'
