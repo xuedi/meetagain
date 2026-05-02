@@ -115,7 +115,9 @@ admin_system_seo:
 admin_system_import:
     button: 'Importieren'
     heading: 'Gruppendaten importieren'
-    help: 'Laden Sie eine meetagain.org-Export-ZIP-Datei hoch, um Gruppendaten in diese Instanz zu importieren. Doppelte Benutzer (gleiche E-Mail) und CMS-Seiten (gleicher Slug) werden übersprungen. Veranstaltungen werden immer importiert.'
+    help: 'Laden Sie eine meetagain.org-Export-ZIP hoch. Doppelte Benutzer und CMS-Seiten werden übersprungen; Veranstaltungen werden immer importiert.'
+    error_no_file: 'Keine Datei hochgeladen.'
+    error_not_zip: 'Nur ZIP-Dateien werden akzeptiert.'
     success_title: 'Import abgeschlossen'
     users_created: 'Benutzer erstellt'
     users_skipped: 'Benutzer übersprungen (bereits vorhanden)'

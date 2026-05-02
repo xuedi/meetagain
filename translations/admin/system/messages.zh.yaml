@@ -115,7 +115,9 @@ admin_system_seo:
 admin_system_import:
     button: '导入'
     heading: '导入群组数据'
-    help: '上传meetagain.org导出的ZIP文件以将群组数据导入此实例。重复的用户（相同邮箱）和CMS页面（相同slug）将被跳过。活动始终导入。'
+    help: '上传 meetagain.org 导出的 ZIP；重复的用户与 CMS 页面会跳过，活动始终导入。'
+    error_no_file: '未上传文件。'
+    error_not_zip: '只接受 ZIP 文件。'
     success_title: '导入完成'
     users_created: '已创建用户'
     users_skipped: '已跳过用户（已存在）'
