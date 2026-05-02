@@ -354,7 +354,6 @@ final class SendlogController extends AbstractEmailController implements AdminTa
                 target: $this->generateUrl('app_admin_email_sendlog_clear_cap', ['id' => $email->getId()]),
                 icon: 'redo',
                 variant: 'is-warning',
-                confirm: $this->translator->trans('admin_email_sendlog.confirm_clear_cap'),
             );
         }
 

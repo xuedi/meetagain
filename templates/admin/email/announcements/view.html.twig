@@ -4,41 +4,44 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'announcements'} %}
-
-        <nav class="level">
-            <div class="level-left">
-                <div class="level-item">
-                    <h1 class="title">{{ announcement.cmsPage ? announcement.cmsPage.slug : 'Announcement #' ~ announcement.id }}</h1>
-                </div>
-                <div class="level-item">
-                    {% if announcement.draft %}
-                        <span class="tag is-warning is-medium">{{ 'admin_cms.draft' | trans }}</span>
-                    {% else %}
-                        <span class="tag is-success is-medium">{{ 'admin_cms.sent' | trans }}</span>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="level-right">
-                <div class="level-item">
-                    <a href="{{ path('app_admin_email_announcements') }}" class="button">
-                        <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                        <span>{{ 'global.button_back'|trans }}</span>
-                    </a>
-                </div>
-            </div>
-        </nav>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <div class="columns">
             <div class="column is-8">
-
+                {% if preview %}
+                    <div class="box">
+                        <div class="level">
+                            <div class="level-left">
+                                <h2 class="subtitle">{{ 'admin_cms.announcement_email_preview' | trans }}</h2>
+                            </div>
+                            <div class="level-right">
+                                <div class="buttons has-addons">
+                                    {% for locale in get_admin_language_codes() %}
+                                        <a href="{{ path('app_admin_email_announcements_view', {'id': announcement.id, 'locale': locale}) }}"
+                                           class="button is-small {% if locale == previewLocale %}is-active is-info{% endif %}">
+                                            {{ locale }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <p><strong>{{ 'admin_cms.email_subject' | trans }}:</strong> {{ preview.subject }}</p>
+                        <hr>
+                        <div class="content">
+                            {{ preview.body | raw }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="column">
                 <div class="box">
                     <h2 class="subtitle">{{ 'admin_cms.announcement_details' | trans }}</h2>
 
-                    <table class="table is-fullwidth">
+                    <table class="table is-fullwidth is-narrow">
                         <tbody>
                         <tr>
-                            <th class="col-medium">{{ 'admin_cms.announcement_cms_page' | trans }}</th>
+                            <th>{{ 'admin_cms.announcement_cms_page' | trans }}</th>
                             <td>{{ announcement.cmsPage.slug }}</td>
                         </tr>
                         <tr>
@@ -50,79 +53,17 @@
                             <td>{{ announcement.createdBy.name }}</td>
                         </tr>
                         {% if announcement.sent %}
-                        <tr>
-                            <th>{{ 'admin_cms.announcement_sent_at' | trans }}</th>
-                            <td>{{ announcement.sentAt|date('Y-m-d H:i') }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_cms.announcement_recipients' | trans }}</th>
-                            <td>{{ announcement.recipientCount }}</td>
-                        </tr>
+                            <tr>
+                                <th>{{ 'admin_cms.announcement_sent_at' | trans }}</th>
+                                <td>{{ announcement.sentAt|date('Y-m-d H:i') }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ 'admin_cms.announcement_recipients' | trans }}</th>
+                                <td>{{ announcement.recipientCount }}</td>
+                            </tr>
                         {% endif %}
                         </tbody>
                     </table>
-                </div>
-
-                {% if preview %}
-                <div class="box">
-                    <div class="level">
-                        <div class="level-left">
-                            <h2 class="subtitle">{{ 'admin_cms.announcement_email_preview' | trans }}</h2>
-                        </div>
-                        <div class="level-right">
-                            <div class="buttons has-addons">
-                                {% for locale in get_admin_language_codes() %}
-                                    <a href="{{ path('app_admin_email_announcements_view', {'id': announcement.id, 'locale': locale}) }}"
-                                       class="button is-small {% if locale == previewLocale %}is-active is-info{% endif %}">
-                                        {{ locale }}
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <p><strong>{{ 'admin_cms.email_subject' | trans }}:</strong> {{ preview.subject }}</p>
-                    <hr>
-                    <div class="content">
-                        {{ preview.body | raw }}
-                    </div>
-                </div>
-                {% endif %}
-
-            </div>
-
-            <div class="column is-4">
-                <div class="box">
-                    <h2 class="subtitle">{{ 'admin_cms.actions' | trans }}</h2>
-
-                    {% if announcement.draft %}
-                        <form action="{{ path('app_admin_email_announcements_send', {'id': announcement.id}) }}" method="post" class="mb-3">
-                            <button type="submit" class="button is-success is-fullwidth" onclick="return confirm('{{ 'admin_cms.confirm_send_announcement' | trans | e('js') }}');">
-                                <span class="icon"><i class="fa fa-paper-plane"></i></span>
-                                <span>{{ 'admin_cms.button_send_announcement' | trans }}</span>
-                            </button>
-                        </form>
-
-                        {% if announcement.cmsPage %}
-                        <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}" class="button is-info is-fullwidth mb-3">
-                            <span class="icon"><i class="fa fa-edit"></i></span>
-                            <span>{{ 'admin_cms.button_edit_cms_page' | trans }}</span>
-                        </a>
-                        {% endif %}
-
-                        <form action="{{ path('app_admin_email_announcements_delete', {'id': announcement.id}) }}" method="post">
-                            <button type="submit" class="button is-danger is-fullwidth" onclick="return confirm('{{ 'admin_cms.confirm_delete_announcement' | trans | e('js') }}');">
-                                <span class="icon"><i class="fa fa-trash"></i></span>
-                                <span>{{ 'global.button_delete'|trans }}</span>
-                            </button>
-                        </form>
-                    {% else %}
-                        {% if announcement.cmsPage %}
-                        <a href="{{ path('app_admin_cms_edit', {'id': announcement.cmsPage.id}) }}" class="button is-info is-fullwidth">
-                            <span class="icon"><i class="fa fa-edit"></i></span>
-                            <span>{{ 'admin_cms.button_edit_cms_page' | trans }}</span>
-                        </a>
-                        {% endif %}
-                    {% endif %}
                 </div>
             </div>
         </div>
