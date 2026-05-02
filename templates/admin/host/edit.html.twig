@@ -2,7 +2,8 @@
 
 {% block content %}
     <div class="container">
-        <h1 class="title">{{ host.id ? 'admin_host.page_title_edit'|trans : 'admin_host.page_title_create'|trans }}</h1>
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {{ form_start(form) }}
 
@@ -10,18 +11,9 @@
         {{ form_row(form.user) }}
 
         <div class="field mt-5">
-            <button type="submit" class="button is-link">
+            <button type="submit" class="button is-primary">
                 <span>{{ 'global.button_save'|trans }}</span>
             </button>
-            <a href="{{ path('app_admin_host') }}" class="button is-light">
-                <span>{{ 'global.button_cancel'|trans }}</span>
-            </a>
-            {% if host.id %}
-                <a href="{{ path('app_admin_host_delete', {'id': host.id}) }}" class="button is-danger">
-                    <span class="icon"><i class="fa fa-trash"></i></span>
-                    <span>{{ 'admin_host.danger_delete_host'|trans }}</span>
-                </a>
-            {% endif %}
         </div>
 
         {{ form_end(form) }}

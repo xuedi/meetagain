@@ -65,6 +65,13 @@ final class LocationController extends AbstractController implements AdminNaviga
                     $this->translator->trans('admin_location.summary_total'),
                 )),
             ],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_location.page_title_create'),
+                    target: $this->generateUrl('app_admin_location_add'),
+                    icon: 'plus',
+                ),
+            ],
         );
 
         return $this->render('admin/location/list.html.twig', [
