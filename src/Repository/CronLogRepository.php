@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CronLog;
+use App\Enum\CronTaskStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,13 +21,47 @@ class CronLogRepository extends ServiceEntityRepository
     /**
      * @return CronLog[]
      */
-    public function findRecent(int $limit = 200): array
+    public function findRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        return $this->createQueryBuilder('c')
+        $qb = $this->createQueryBuilder('c')
             ->orderBy('c.runAt', 'DESC')
-            ->setMaxResults($limit)
+            ->setMaxResults($limit);
+
+        if ($since !== null) {
+            $qb->andWhere('c.runAt >= :since')
+                ->setParameter('since', $since);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return CronLog[]
+     */
+    public function findRecentProblems(int $limit = 200, ?DateTimeImmutable $since = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.status != :ok')
+            ->setParameter('ok', CronTaskStatus::ok->value)
+            ->orderBy('c.runAt', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($since !== null) {
+            $qb->andWhere('c.runAt >= :since')
+                ->setParameter('since', $since);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countProblems(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.status != :ok')
+            ->setParameter('ok', CronTaskStatus::ok->value)
             ->getQuery()
-            ->getResult();
+            ->getSingleScalarResult();
     }
 
     public function findMostRecent(): ?CronLog

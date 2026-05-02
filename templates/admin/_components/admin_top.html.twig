@@ -1,0 +1,26 @@
+{#
+ # AdminTop component - canonical box+level infobar for admin list and detail pages.
+ #
+ # Inputs:
+ #   adminTop - App\Admin\Top\AdminTop
+ #
+ # Renders left-aligned info items separated by '|' and right-aligned actions in the order
+ # they were added (so add Back first, contextual actions afterwards).
+ #}
+<div class="box">
+    <div class="level">
+        <div class="level-left">
+            {% for info in adminTop.info %}
+                <div class="level-item">{% include info.template with {'info': info} only %}</div>
+                {% if not loop.last %}
+                    <div class="level-item has-text-grey-light">|</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="level-right">
+            {% for action in adminTop.actions %}
+                <div class="level-item">{% include action.template with {'action': action} only %}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
