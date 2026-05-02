@@ -193,11 +193,11 @@ final class CmsController extends AbstractController implements AdminNavigationI
             'cms' => $cms,
             'linkedAnnouncement' => $linkedAnnouncement,
             'is_admin' => $isAdmin,
-            'adminTop' => $this->buildEditTop($cms, $linkedAnnouncement),
+            'adminTop' => $this->buildEditTop($cms, $linkedAnnouncement, $isAdmin),
         ]);
     }
 
-    private function buildEditTop(Cms $cms, ?Announcement $linkedAnnouncement): AdminTop
+    private function buildEditTop(Cms $cms, ?Announcement $linkedAnnouncement, bool $isAdmin): AdminTop
     {
         $statusTag = $cms->isPublished()
             ? sprintf(
@@ -228,18 +228,20 @@ final class CmsController extends AbstractController implements AdminNavigationI
         ];
 
         $actions = [];
-        if ($linkedAnnouncement !== null) {
-            $actions[] = new AdminTopActionButton(
-                label: $this->translator->trans('admin_cms.button_open_announcement'),
-                target: $this->generateUrl('app_admin_email_announcements_view', ['id' => $linkedAnnouncement->getId()]),
-                icon: 'bullhorn',
-            );
-        } else {
-            $actions[] = new AdminTopActionButton(
-                label: $this->translator->trans('admin_cms.button_create_announcement'),
-                target: $this->generateUrl('app_admin_email_announcements_from_cms', ['id' => $cms->getId()]),
-                icon: 'bullhorn',
-            );
+        if ($isAdmin) {
+            if ($linkedAnnouncement !== null) {
+                $actions[] = new AdminTopActionButton(
+                    label: $this->translator->trans('admin_cms.button_open_announcement'),
+                    target: $this->generateUrl('app_admin_email_announcements_view', ['id' => $linkedAnnouncement->getId()]),
+                    icon: 'bullhorn',
+                );
+            } else {
+                $actions[] = new AdminTopActionButton(
+                    label: $this->translator->trans('admin_cms.button_create_announcement'),
+                    target: $this->generateUrl('app_admin_email_announcements_from_cms', ['id' => $cms->getId()]),
+                    icon: 'bullhorn',
+                );
+            }
         }
         $actions[] = new AdminTopActionButton(
             label: $this->translator->trans('global.button_back'),
