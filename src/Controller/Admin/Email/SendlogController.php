@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin\Email;
 
+use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
@@ -25,7 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/sendlog')]
-final class SendlogController extends AbstractEmailController implements AdminTabsInterface
+final class SendlogController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
     private const int LIST_LIMIT = 5000;
