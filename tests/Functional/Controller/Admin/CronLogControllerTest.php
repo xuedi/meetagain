@@ -82,9 +82,9 @@ class CronLogControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         static::assertStringContainsString(
-            'filter: 24 hours',
+            'range: 24 hours',
             $crawler->filter('.box .level .level-left')->text(),
-            'Default page should display the 24 hours filter info text',
+            'Default page should display the 24 hours range info text',
         );
         $rightLinks = $crawler->filter('.box .level .level-right a');
         $hrefs = $rightLinks->each(static fn ($node) => (string) $node->attr('href'));
@@ -98,7 +98,7 @@ class CronLogControllerTest extends WebTestCase
         static::assertTrue($hasShowAllLink, 'A toggle action should link to ?showAll=1');
     }
 
-    public function testCronListPageWithShowAllHidesFilterInfoAndOffersReverseToggle(): void
+    public function testCronListPageWithShowAllSwapsRangeInfoAndOffersReverseToggle(): void
     {
         // Arrange
         $client = static::createClient();
@@ -109,10 +109,16 @@ class CronLogControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
+        $leftText = $crawler->filter('.box .level .level-left')->text();
+        static::assertStringContainsString(
+            'range: all',
+            $leftText,
+            'Showing all entries should display the "range: all" info text',
+        );
         static::assertStringNotContainsString(
-            'filter: 24 hours',
-            $crawler->filter('.box .level .level-left')->text(),
-            'Filter info text should be hidden when showing all entries',
+            'range: 24 hours',
+            $leftText,
+            '"range: 24 hours" should not appear when showing all entries',
         );
         static::assertStringContainsString(
             'Last 24 hours',
