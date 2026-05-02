@@ -13,7 +13,7 @@ admin_email_blocklist:
     flash_removed: '"%email%" wurde von der Sperrliste entfernt.'
 admin_email_templates:
     page_title: 'E-Mail-Vorlagen'
-    intro: 'E-Mail-Vorlagen konfigurieren. Verwenden Sie {{variable}} Platzhalter in Betreff und Text. Klicken Sie auf Bearbeiten, um eine Vorlage anzupassen.'
+    intro: '{{variable}}-Platzhalter in Betreff und Text verwenden, zum Anpassen auf Bearbeiten klicken.'
     col_subject: 'Betreff'
     edit_title: 'E-Mail-Vorlage bearbeiten'
     available_variables: 'Verfügbare Variablen'

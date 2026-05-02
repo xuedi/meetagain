@@ -4,74 +4,68 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
-
-        <div class="content">
-            <h1 class="title">{{ 'admin_email_templates.edit_title'|trans }}: {{ template.identifier }}</h1>
-        </div>
-
-        <div class="box mb-4">
-            <h3 class="subtitle">{{ 'admin_email_templates.available_variables'|trans }}</h3>
-            <div class="tags">
-                {% for variable in template.availableVariables %}
-                    <span class="tag is-info">{{ '{{' }}{{ variable }}{{ '}}' }}</span>
-                {% endfor %}
-            </div>
-            <p class="help">{{ 'admin_email_templates.available_variables_help'|trans }}</p>
-        </div>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {{ form_start(form) }}
-        <div class="box">
-            <div class="columns">
-                <div class="column is-6">
-                    <p class="has-text-grey">{{ 'admin_email_templates.edit_for_locale'|trans }}</p>
-                </div>
-                <div class="column is-6">
-                    <div class="buttons has-addons is-pulled-right">
-                        {% set defaultLocale = languages|first %}
-                        {% for locale in languages %}
-                            <a class="button translation-button {% if locale == defaultLocale %}is-active{% endif %}"
-                               id="translation-button-{{ locale }}"
-                               data-id="{{ locale }}">{{ locale }}</a>
-                        {% endfor %}
+        <div class="columns">
+            <div class="column is-8">
+                <div class="box">
+                    <div class="columns">
+                        <div class="column is-6">
+                            <p class="has-text-grey">{{ 'admin_email_templates.edit_for_locale'|trans }}</p>
+                        </div>
+                        <div class="column is-6">
+                            <div class="buttons has-addons is-pulled-right">
+                                {% set defaultLocale = languages|first %}
+                                {% for locale in languages %}
+                                    <a class="button translation-button {% if locale == defaultLocale %}is-active{% endif %}"
+                                       id="translation-button-{{ locale }}"
+                                       data-id="{{ locale }}">{{ locale }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
+
+                    {% set defaultLocale = languages|first %}
+                    {% for locale in languages %}
+                        <div class="translation-div {% if locale != defaultLocale %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
+                            <div class="field">
+                                <label class="label">Subject ({{ locale }})</label>
+                                <div class="control">
+                                    {{ form_widget(form.("subject-"~locale), {'attr': {'class': 'input'}}) }}
+                                </div>
+                                {{ form_errors(form.("subject-"~locale)) }}
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Body ({{ locale }})</label>
+                                <div class="control">
+                                    {{ form_widget(form.("body-"~locale), {'attr': {'class': 'textarea', 'rows': 15}}) }}
+                                </div>
+                                {{ form_errors(form.("body-"~locale)) }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="buttons">
+                    <button class="button is-link" type="submit">{{ 'global.button_save'|trans }}</button>
                 </div>
             </div>
-
-            {% set defaultLocale = languages|first %}
-            {% for locale in languages %}
-                <div class="translation-div {% if locale != defaultLocale %}is-hidden{% endif %}" id="translation-div-{{ locale }}">
-                    <div class="field">
-                        <label class="label">Subject ({{ locale }})</label>
-                        <div class="control">
-                            {{ form_widget(form.("subject-"~locale), {'attr': {'class': 'input'}}) }}
+            <div class="column">
+                <div class="box">
+                    <h3 class="subtitle">{{ 'admin_email_templates.available_variables'|trans }}</h3>
+                    {% for variable in template.availableVariables %}
+                        <div class="mb-1">
+                            <span class="tag is-info">{{ '{{' }}{{ variable }}{{ '}}' }}</span>
                         </div>
-                        {{ form_errors(form.("subject-"~locale)) }}
-                    </div>
-
-                    <div class="field">
-                        <label class="label">Body ({{ locale }})</label>
-                        <div class="control">
-                            {{ form_widget(form.("body-"~locale), {'attr': {'class': 'textarea', 'rows': 15}}) }}
-                        </div>
-                        {{ form_errors(form.("body-"~locale)) }}
-                    </div>
+                    {% endfor %}
+                    <p class="help mt-3">{{ 'admin_email_templates.available_variables_help'|trans }}</p>
                 </div>
-            {% endfor %}
-        </div>
-
-        <div class="buttons">
-            <button class="button is-link" type="submit">{{ 'global.button_save'|trans }}</button>
-            <a href="{{ path('app_admin_email_templates_preview', {id: template.id}) }}" class="button" target="_blank">{{ 'admin_email_templates.button_preview'|trans }}</a>
-            <a href="{{ path('app_admin_email_templates') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+            </div>
         </div>
         {{ form_end(form) }}
-
-        <form action="{{ path('app_admin_email_templates_reset', {id: template.id}) }}" method="post" class="mt-4">
-            <button type="submit" class="button is-warning" onclick="return confirm('{{ 'admin_email_templates.confirm_reset'|trans|e('js') }}');">
-                {{ 'admin_email_templates.button_reset'|trans }}
-            </button>
-        </form>
 
     </div>
 

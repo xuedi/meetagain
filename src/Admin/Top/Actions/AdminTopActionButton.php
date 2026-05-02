@@ -11,6 +11,7 @@ final readonly class AdminTopActionButton implements AdminTopActionInterface
         public string $target,
         public ?string $icon = null,
         public ?string $variant = null,
+        public ?string $confirm = null,
     ) {}
 
     public function getTemplate(): string

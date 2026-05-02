@@ -13,7 +13,7 @@ admin_email_blocklist:
     flash_removed: '已将 "%email%" 从黑名单中移除。'
 admin_email_templates:
     page_title: '邮件模板'
-    intro: '配置网站发送的邮件模板。在主题和正文中使用{{variable}}占位符。点击编辑自定义模板。'
+    intro: '在主题和正文中使用 {{variable}} 占位符，点击编辑可自定义。'
     col_subject: '主题'
     edit_title: '编辑邮件模板'
     available_variables: '可用变量'

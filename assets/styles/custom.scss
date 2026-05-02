@@ -159,7 +159,32 @@ details.activities-load-more {
 .messages-scroll     { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
 .message-own         { background-color: aliceblue; }
 
-// Permissions accordion
+// Admin collapsible section (AdminCollapsibleSection component)
+.admin-section-header {
+    cursor: pointer;
+    user-select: none;
+    background: #f5f5f5;
+    border-radius: 6px;
+    transition: background 0.12s ease;
+    gap: 0.75rem;
+}
+.admin-section-header:hover { background: #ebebeb; }
+.admin-section-header.is-open {
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 0 !important;
+}
+.admin-section-header.is-open + .admin-section-body {
+    border: 1px solid #e8e8e8;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+    padding: 1rem;
+}
+.admin-section-header.is-open + .admin-section-body table {
+    margin-bottom: 0;
+}
+
+// Permissions accordion (legacy, pre-component)
 .perm-section-header {
     cursor: pointer;
     user-select: none;

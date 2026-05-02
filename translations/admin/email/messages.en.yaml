@@ -13,7 +13,7 @@ admin_email_blocklist:
     flash_removed: 'Removed "%email%" from the blocklist.'
 admin_email_templates:
     page_title: 'Email Templates'
-    intro: 'Configure email templates sent by the website. Use {{variable}} placeholders in subject and body fields. Click edit to customize a template.'
+    intro: 'Use {{variable}} placeholders in subject and body, click edit to customize.'
     col_subject: 'Subject'
     edit_title: 'Edit Email Template'
     available_variables: 'Available Variables'

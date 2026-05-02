@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin\Email;
 
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
+use App\Admin\Section\AdminCollapsibleSection;
+use App\Admin\Section\Items\AdminSectionLinkItem;
+use App\Admin\Section\Items\AdminSectionTextItem;
+use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Emails\EmailInterface;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
@@ -24,17 +30,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/templates')]
-final class TemplatesController extends AbstractAdminController
+final class TemplatesController extends AbstractEmailController implements AdminTabsInterface
 {
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return null;
-    }
-
     /**
      * @param iterable<EmailInterface> $emailTypes
      */
     public function __construct(
+        TranslatorInterface $translator,
         #[AutowireIterator(EmailInterface::class)]
         private readonly iterable $emailTypes,
         private readonly EmailTemplateRepository $templateRepo,
@@ -42,8 +44,9 @@ final class TemplatesController extends AbstractAdminController
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
         private readonly EmailTemplateTranslationRepository $translationRepo,
-        private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+        parent::__construct($translator, 'templates');
+    }
 
     #[Route('', name: 'app_admin_email_templates')]
     public function templates(): Response
@@ -56,6 +59,13 @@ final class TemplatesController extends AbstractAdminController
             $identifier = $emailType->getIdentifier();
             $mockData = $emailType->getDisplayMockData();
             $dbTemplate = $templatesByIdentifier[$identifier] ?? null;
+            $right = $dbTemplate !== null
+                ? [new AdminSectionLinkItem(
+                    href: $this->generateUrl('app_admin_email_templates_edit', ['id' => $dbTemplate->getId()]),
+                    icon: 'edit',
+                    title: $this->translator->trans('admin_email_templates.button_preview'),
+                )]
+                : [];
             $emails[$identifier] = [
                 'subject' => $mockData['subject'],
                 'context' => $mockData['context'],
@@ -66,12 +76,24 @@ final class TemplatesController extends AbstractAdminController
                     )
                     : '<p>Template not found. Run app:email-templates:seed</p>',
                 'template' => $dbTemplate,
+                'section' => new AdminCollapsibleSection(
+                    id: 'email-section-' . $identifier,
+                    left: [new AdminSectionTextItem($this->translator->trans($identifier))],
+                    right: $right,
+                    openByDefault: false,
+                ),
             ];
         }
+
+        $adminTop = new AdminTop(
+            info: [new AdminTopInfoText($this->translator->trans('admin_email_templates.intro'))],
+        );
 
         return $this->render('admin/email/templates/list.html.twig', [
             'active' => 'email',
             'emails' => $emails,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -114,14 +136,44 @@ final class TemplatesController extends AbstractAdminController
 
             $this->addFlash('success', $this->translator->trans('admin_email_templates.flash_saved'));
 
-            return $this->redirectToRoute('app_admin_email_templates');
+            return $this->redirectToRoute('app_admin_email_templates_edit', ['id' => $template->getId()]);
         }
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%s</strong>',
+                    htmlspecialchars((string) $template->getIdentifier(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                )),
+            ],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_email_templates.button_reset'),
+                    target: $this->generateUrl('app_admin_email_templates_reset', ['id' => $template->getId()]),
+                    icon: 'rotate-left',
+                    variant: 'is-warning',
+                    confirm: $this->translator->trans('admin_email_templates.confirm_reset'),
+                ),
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_email_templates.button_preview'),
+                    target: $this->generateUrl('app_admin_email_templates_preview', ['id' => $template->getId()]),
+                    icon: 'eye',
+                ),
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_email_templates'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
 
         return $this->render('admin/email/templates/edit.html.twig', [
             'active' => 'email',
             'form' => $form,
             'template' => $template,
             'languages' => $this->languageService->getAdminFilteredEnabledCodes(),
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -134,6 +186,23 @@ final class TemplatesController extends AbstractAdminController
         $renderedSubject = $this->templateService->renderContent($template->getSubject($language), $mockContext);
         $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
 
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%s</strong>',
+                    htmlspecialchars((string) $template->getIdentifier(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                )),
+                new AdminTopInfoText($this->translator->trans('admin_email_templates.preview_mock_notice')),
+            ],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_email_templates_edit', ['id' => $template->getId()]),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
+
         return $this->render('admin/email/templates/preview.html.twig', [
             'active' => 'email',
             'template' => $template,
@@ -142,10 +211,12 @@ final class TemplatesController extends AbstractAdminController
             'context' => $mockContext,
             'currentLanguage' => $language,
             'languages' => $this->languageService->getAdminFilteredEnabledCodes(),
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
-    #[Route('/{id}/reset', name: 'app_admin_email_templates_reset', methods: ['POST'])]
+    #[Route('/{id}/reset', name: 'app_admin_email_templates_reset', methods: ['GET', 'POST'])]
     public function templatesReset(EmailTemplate $template): Response
     {
         $identifier = $template->getIdentifier();
