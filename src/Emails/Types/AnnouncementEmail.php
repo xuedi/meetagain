@@ -4,6 +4,10 @@ namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\Guard\Rule\RenderedAnnouncementPresentRule;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -47,19 +51,14 @@ readonly class AnnouncementEmail extends EmailAbstract
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'user', User::class);
-        $this->ensureHasKey($context, 'renderedContent');
-        $this->ensureHasKey($context, 'announcementUrl');
-
-        /** @var User $user */
-        $user = $context['user'];
-        if ($this->isBlocked((string) $user->getEmail())) {
-            return false;
-        }
-
-        return $user->getNotificationSettings()->isActive('announcements');
+        return [
+            new RecipientUserPresentRule(),
+            new RenderedAnnouncementPresentRule(),
+            new NotificationToggleEnabledRule('announcements'),
+            new RecipientNotBlocklistedRule($this->blocklist),
+        ];
     }
 
     public function send(array $context): void

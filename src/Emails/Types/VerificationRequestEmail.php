@@ -4,6 +4,8 @@ namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -30,6 +32,14 @@ readonly class VerificationRequestEmail extends EmailAbstract
         return 'admin_email_templates.trigger_verification_request';
     }
 
+    public function getGuardRules(): array
+    {
+        return [
+            new RecipientUserPresentRule(),
+            new RecipientNotBlocklistedRule($this->blocklist),
+        ];
+    }
+
     public function getDisplayMockData(): array
     {
         return [
@@ -42,19 +52,6 @@ readonly class VerificationRequestEmail extends EmailAbstract
                 'lang' => 'en',
             ],
         ];
-    }
-
-    public function guardCheck(array $context): bool
-    {
-        $this->ensureInstanceOf($context, 'user', User::class);
-
-        /** @var User $user */
-        $user = $context['user'];
-        if ($this->isBlocked((string) $user->getEmail())) {
-            return false;
-        }
-
-        return true;
     }
 
     public function send(array $context): void

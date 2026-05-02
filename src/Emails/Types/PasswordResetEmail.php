@@ -4,6 +4,8 @@ namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -43,17 +45,12 @@ readonly class PasswordResetEmail extends EmailAbstract
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'user', User::class);
-
-        /** @var User $user */
-        $user = $context['user'];
-        if ($this->isBlocked((string) $user->getEmail())) {
-            return false;
-        }
-
-        return true;
+        return [
+            new RecipientUserPresentRule(),
+            new RecipientNotBlocklistedRule($this->blocklist),
+        ];
     }
 
     public function send(array $context): void

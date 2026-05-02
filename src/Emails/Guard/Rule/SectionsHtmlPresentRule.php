@@ -1,0 +1,33 @@
+<?php declare(strict_types=1);
+
+namespace App\Emails\Guard\Rule;
+
+use App\Emails\EmailGuardCost;
+use App\Emails\EmailGuardResult;
+use App\Emails\EmailGuardRuleInterface;
+
+final readonly class SectionsHtmlPresentRule implements EmailGuardRuleInterface
+{
+    public function getName(): string
+    {
+        return 'sections_html_present';
+    }
+
+    public function getCost(): EmailGuardCost
+    {
+        return EmailGuardCost::Free;
+    }
+
+    public function evaluate(array $context): EmailGuardResult
+    {
+        if (!array_key_exists('sectionsHtml', $context) || $context['sectionsHtml'] === null) {
+            return EmailGuardResult::error(
+                $this->getName(),
+                "Context is missing 'sectionsHtml'.",
+                'sectionsHtml',
+            );
+        }
+
+        return EmailGuardResult::pass($this->getName());
+    }
+}

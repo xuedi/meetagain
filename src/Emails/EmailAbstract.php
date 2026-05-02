@@ -17,33 +17,34 @@ abstract readonly class EmailAbstract implements EmailInterface
         return null;
     }
 
-    protected function isBlocked(string $email): bool
+    public function getGuardRules(): array
     {
-        return $this->blocklist->isBlocked($email);
+        return [];
     }
 
-    protected function ensureHasKey(array $context, string $key): void
+    public function guardCheck(array $context): bool
     {
-        if (!array_key_exists($key, $context) || $context[$key] === null) {
-            throw new InvalidArgumentException(sprintf(
-                "Missing '%s' in context for email '%s'",
-                $key,
-                $this->getIdentifier(),
-            ));
+        $rules = $this->getGuardRules();
+        if ($rules === []) {
+            return true;
         }
+
+        foreach ($rules as $rule) {
+            $result = $rule->evaluate($context);
+            if ($result->outcome === EmailGuardOutcome::Error) {
+                throw new InvalidArgumentException(sprintf(
+                    "Guard rule '%s' for email '%s' returned Error: %s",
+                    $result->ruleName,
+                    $this->getIdentifier(),
+                    $result->explanation,
+                ));
+            }
+            if ($result->outcome === EmailGuardOutcome::Skip) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    protected function ensureInstanceOf(array $context, string $key, string $fqcn): void
-    {
-        $this->ensureHasKey($context, $key);
-        if (!$context[$key] instanceof $fqcn) {
-            throw new InvalidArgumentException(sprintf(
-                "Context key '%s' for email '%s' must be instance of %s, got %s",
-                $key,
-                $this->getIdentifier(),
-                $fqcn,
-                get_debug_type($context[$key]),
-            ));
-        }
-    }
 }

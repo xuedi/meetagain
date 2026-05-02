@@ -50,7 +50,7 @@ class EmailTypesTest extends TestCase
             'Announcement' => new AnnouncementEmail($this->blocklist, $this->queue, $this->config),
             'EventReminder' => new EventReminderEmail($this->blocklist, $this->queue, $this->config, $eventRepo, $em),
             'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->blocklist, $this->queue, $this->config),
-            'NotificationMessage' => new NotificationMessageEmail($this->blocklist, $this->queue, $this->config),
+            'NotificationMessage' => new NotificationMessageEmail($this->blocklist, $this->queue, $this->config, new \Symfony\Component\Clock\MockClock()),
             'PasswordReset' => new PasswordResetEmail($this->blocklist, $this->queue, $this->config),
             'RsvpAggregated' => new RsvpAggregatedEmail($this->blocklist, $this->queue, $this->config, $eventRepo, $em),
             'SupportNotification' => new SupportNotificationEmail($this->blocklist, $this->queue, $this->config),

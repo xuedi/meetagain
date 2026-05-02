@@ -5,6 +5,11 @@ namespace App\Emails\Types;
 use App\Emails\DueContext;
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\Guard\Rule\UserHasGroupEventsThisWeekRule;
+use App\Emails\Guard\Rule\WeekStartEndPresentRule;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
@@ -64,19 +69,15 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'user', User::class);
-        $this->ensureHasKey($context, 'weekStart');
-        $this->ensureHasKey($context, 'weekEnd');
-
-        /** @var User $user */
-        $user = $context['user'];
-        if ($this->isBlocked((string) $user->getEmail())) {
-            return false;
-        }
-
-        return $user->getNotificationSettings()->upcomingEvents;
+        return [
+            new RecipientUserPresentRule(),
+            new WeekStartEndPresentRule(),
+            new NotificationToggleEnabledRule('upcomingEvents'),
+            new RecipientNotBlocklistedRule($this->blocklist),
+            new UserHasGroupEventsThisWeekRule($this->eventRepo, $this->digestFilters),
+        ];
     }
 
     public function send(array $context): void
@@ -131,6 +132,19 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
 
         $weekStart = $now->modify('+1 day');
         $weekEnd = $now->modify('+8 days');
+        $allUsers = $this->userRepo->findAnnouncementSubscribers();
+
+        return [new DueContext(
+            ['week' => $weekKey, 'weekStart' => $weekStart, 'weekEnd' => $weekEnd],
+            $allUsers,
+        )];
+    }
+
+    public function getPreviewContexts(DateTimeImmutable $for): array
+    {
+        $weekKey = $for->modify('+1 day')->format('W');
+        $weekStart = $for->modify('+1 day');
+        $weekEnd = $for->modify('+8 days');
         $allUsers = $this->userRepo->findAnnouncementSubscribers();
 
         return [new DueContext(

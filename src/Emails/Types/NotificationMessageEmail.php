@@ -4,14 +4,20 @@ namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
+use App\Emails\Guard\Rule\RecipientKeyUserPresentRule;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientNotRecentlyActiveRule;
+use App\Emails\Guard\Rule\SenderUserPresentRule;
+use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Clock\ClockInterface;
 
 readonly class NotificationMessageEmail extends EmailAbstract
 {
@@ -19,6 +25,7 @@ readonly class NotificationMessageEmail extends EmailAbstract
         BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
+        private ClockInterface $clock,
     ) {
         parent::__construct($blocklist);
     }
@@ -47,28 +54,16 @@ readonly class NotificationMessageEmail extends EmailAbstract
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'recipient', User::class);
-        $this->ensureInstanceOf($context, 'sender', User::class);
-
-        /** @var User $recipient */
-        $recipient = $context['recipient'];
-
-        if ($this->isBlocked((string) $recipient->getEmail())) {
-            return false;
-        }
-        if (!$recipient->isNotification()) {
-            return false;
-        }
-        if (!$recipient->getNotificationSettings()->receivedMessage) {
-            return false;
-        }
-        if ($recipient->getLastLogin() > new DateTime('-2 hours')) {
-            return false;
-        }
-
-        return true;
+        return [
+            new RecipientKeyUserPresentRule(),
+            new SenderUserPresentRule(),
+            new UserNotificationsMasterToggleRule('recipient'),
+            new NotificationToggleEnabledRule('receivedMessage', 'recipient'),
+            new RecipientNotRecentlyActiveRule($this->clock, new DateInterval('PT2H'), 'recipient'),
+            new RecipientNotBlocklistedRule($this->blocklist, 'recipient'),
+        ];
     }
 
     public function send(array $context): void
