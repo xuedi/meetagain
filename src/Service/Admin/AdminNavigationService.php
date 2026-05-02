@@ -114,6 +114,15 @@ readonly class AdminNavigationService
                     continue;
                 }
 
+                // Dedup by route within the section so a link contributed from a
+                // shared abstract (e.g. AbstractEmailController) doesn't render N
+                // times - once per concrete subclass that inherits the contribution.
+                foreach ($sectionsMap[$section]['links'] as $existingLink) {
+                    if ($existingLink->getRoute() === $route) {
+                        continue 2;
+                    }
+                }
+
                 // Create modified link
                 $modifiedLink = new AdminLink(label: $label, route: $route, active: $active, role: $role);
 

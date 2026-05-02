@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin\Logs;
 
+use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
@@ -18,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/logs/cron')]
-final class CronLogController extends AbstractLogsController implements AdminTabsInterface
+final class CronLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '1h';
 

@@ -7,6 +7,7 @@ namespace App\Controller\Admin\Email;
 use App\Admin\Section\AdminCollapsibleSection;
 use App\Admin\Section\Items\AdminSectionLinkItem;
 use App\Admin\Section\Items\AdminSectionTextItem;
+use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
@@ -30,7 +31,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/templates')]
-final class TemplatesController extends AbstractEmailController implements AdminTabsInterface
+final class TemplatesController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     /**
      * @param iterable<EmailInterface> $emailTypes

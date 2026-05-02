@@ -2,13 +2,14 @@
 
 namespace App\Controller\Admin\Email;
 
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Tabs\AdminTab;
 use App\Admin\Tabs\AdminTabs;
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class AbstractEmailController extends AbstractAdminController
+abstract class AbstractEmailController extends AbstractController
 {
     public function __construct(
         protected readonly TranslatorInterface $translator,
@@ -17,7 +18,18 @@ abstract class AbstractEmailController extends AbstractAdminController
 
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return null;
+        return new AdminNavigationConfig(
+            section: 'admin_shell.section_system',
+            links: [
+                new AdminLink(
+                    label: 'admin_shell.menu_email',
+                    route: 'app_admin_email_templates',
+                    active: 'email',
+                    role: 'ROLE_ADMIN',
+                ),
+            ],
+            sectionPriority: 100,
+        );
     }
 
     final public function getTabs(): AdminTabs

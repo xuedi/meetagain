@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin\Email;
 
+use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/planned')]
-final class PlannedController extends AbstractEmailController implements AdminTabsInterface
+final class PlannedController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
