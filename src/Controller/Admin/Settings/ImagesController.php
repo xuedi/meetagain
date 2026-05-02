@@ -9,6 +9,7 @@ use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
+use App\Service\Config\ConfigService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly ImageRepository $imageRepository,
         private readonly ImageLocationRepository $imageLocationRepository,
         private readonly ImageLocationService $imageLocationService,
+        private readonly ConfigService $configService,
     ) {
         parent::__construct($translator, 'images');
     }
@@ -117,6 +119,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
             'image' => $image,
             'locations' => $locations,
             'editLinks' => $editLinks,
+            'previewSize' => $this->configService->getAdminPreviewSize($image->getType()),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);

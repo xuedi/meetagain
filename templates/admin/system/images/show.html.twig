@@ -7,100 +7,109 @@
         {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-        <table class="table is-fullwidth">
-            <tbody>
-                <tr>
-                    <th>{{ 'admin_system_images.label_id'|trans }}</th>
-                    <td><code>{{ image.id }}</code></td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.label_hash'|trans }}</th>
-                    <td><code>{{ image.hash }}</code></td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.col_type'|trans }}</th>
-                    <td><span class="tag is-light">{{ image.type.name }}</span></td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.col_mime_type'|trans }}</th>
-                    <td>{{ image.mimeType }}</td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.label_extension'|trans }}</th>
-                    <td>{{ image.extension }}</td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.label_file_size'|trans }}</th>
-                    <td>{{ image.size | format_bytes }}</td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.col_uploader'|trans }}</th>
-                    <td>
-                        <a href="{{ path('app_admin_member_edit', {'id': image.uploader.id}) }}">
-                            {{ image.uploader.email }}
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.col_created_at'|trans }}</th>
-                    <td>{{ image.createdAt | date('Y-m-d H:i:s') }}</td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.label_updated_at'|trans }}</th>
-                    <td>
-                        {% if image.updatedAt %}
-                            {{ image.updatedAt | date('Y-m-d H:i:s') }}
-                        {% else %}
-                            <span class="has-text-grey">-</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_system_images.label_reported'|trans }}</th>
-                    <td>
-                        {% if image.reported %}
-                            <span class="tag is-danger is-light">{{ image.reported.name }}</span>
-                        {% else %}
-                            <span class="has-text-grey">-</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="columns">
+            <div class="column is-8">
 
-        <h2 class="subtitle mt-5">{{ 'admin_system_images.heading_preview'|trans }}</h2>
-        {% include '_components/image.html.twig' with {'image': image} %}
-
-        <h2 class="subtitle mt-5">{{ 'admin_system_images.heading_locations'|trans }}</h2>
-        {% if locations is empty %}
-            <p class="has-text-grey">{{ 'admin_system_images.empty_locations'|trans }}</p>
-        {% else %}
-            <table class="table is-fullwidth is-narrow">
-                <thead>
-                    <tr>
-                        <th>{{ 'admin_system_images.col_type'|trans }}</th>
-                        <th>{{ 'admin_system_images.col_location_id'|trans }}</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for location in locations %}
+                <table class="table is-fullwidth">
+                    <tbody>
                         <tr>
-                            <td><span class="tag is-light">{{ location.locationType.name }}</span></td>
-                            <td><code>{{ location.locationId }}</code></td>
+                            <th>{{ 'admin_system_images.label_id'|trans }}</th>
+                            <td><code>{{ image.id }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.label_hash'|trans }}</th>
+                            <td><code>{{ image.hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.col_type'|trans }}</th>
+                            <td><span class="tag is-light">{{ image.type.name }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.col_mime_type'|trans }}</th>
+                            <td>{{ image.mimeType }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.label_extension'|trans }}</th>
+                            <td>{{ image.extension }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.label_file_size'|trans }}</th>
+                            <td>{{ image.size | format_bytes }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.col_uploader'|trans }}</th>
                             <td>
-                                {% set link = editLinks[location.id] ?? null %}
-                                {% if link %}
-                                    <a href="{{ path(link.route, link.params) }}">
-                                        <span class="icon"><i class="fa fa-eye"></i></span>
-                                    </a>
+                                <a href="{{ path('app_admin_member_edit', {'id': image.uploader.id}) }}">
+                                    {{ image.uploader.email }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.col_created_at'|trans }}</th>
+                            <td>{{ image.createdAt | date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_system_images.label_updated_at'|trans }}</th>
+                            <td>
+                                {% if image.updatedAt %}
+                                    {{ image.updatedAt | date('Y-m-d H:i:s') }}
+                                {% else %}
+                                    <span class="has-text-grey">-</span>
                                 {% endif %}
                             </td>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
+                        <tr>
+                            <th>{{ 'admin_system_images.label_reported'|trans }}</th>
+                            <td>
+                                {% if image.reported %}
+                                    <span class="tag is-danger is-light">{{ image.reported.name }}</span>
+                                {% else %}
+                                    <span class="has-text-grey">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="column is-4">
+
+                <h2 class="subtitle">{{ 'admin_system_images.heading_preview'|trans }}</h2>
+                {% include '_components/image.html.twig' with {'image': image, 'size': previewSize} %}
+
+                <h2 class="subtitle mt-5">{{ 'admin_system_images.heading_locations'|trans }}</h2>
+                {% if locations is empty %}
+                    <p class="has-text-grey">{{ 'admin_system_images.empty_locations'|trans }}</p>
+                {% else %}
+                    <table class="table is-fullwidth is-narrow">
+                        <thead>
+                            <tr>
+                                <th>{{ 'admin_system_images.col_type'|trans }}</th>
+                                <th>{{ 'admin_system_images.col_location_id'|trans }}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for location in locations %}
+                                <tr>
+                                    <td><span class="tag is-light">{{ location.locationType.name }}</span></td>
+                                    <td><code>{{ location.locationId }}</code></td>
+                                    <td>
+                                        {% set link = editLinks[location.id] ?? null %}
+                                        {% if link %}
+                                            <a href="{{ path(link.route, link.params) }}">
+                                                <span class="icon"><i class="fa fa-eye"></i></span>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+            </div>
+        </div>
 
     </div>
 
