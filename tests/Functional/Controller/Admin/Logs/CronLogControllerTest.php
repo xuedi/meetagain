@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Functional\Controller\Admin;
+namespace Tests\Functional\Controller\Admin\Logs;
 
 use App\Entity\CronLog;
 use App\Enum\CronTaskStatus;
