@@ -278,9 +278,10 @@ admin_system_gallery:
     sample_info_link: 'Mehr erfahren'
 admin_system_permissions:
     heading: 'Berechtigungsübersicht'
-    help: 'Alle mit #[IsGranted] dekorierten Routen, gruppiert nach der erforderlichen Mindeststufe. Berechtigungen auf Methodenebene haben Vorrang vor Berechtigungen auf Klassenebene. Routen ohne #[IsGranted] sind öffentlich zugänglich.'
+    help: 'Routen nach erforderlicher Mindestrolle gruppiert; Methodenebene überschreibt Klassenebene.'
     anon_no_auth: 'keine Authentifizierung erforderlich'
     anon_min_role: 'erforderliche Mindestrolle'
+    routes_count: '%count% Routen'
     perm_any: 'ALLE'
     perm_class_level: 'Klassenebene'
     perm_method_level: 'Methodenebene'

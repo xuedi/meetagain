@@ -278,9 +278,10 @@ admin_system_gallery:
     sample_info_link: '了解更多'
 admin_system_permissions:
     heading: '权限概览'
-    help: '所有用#[IsGranted]装饰的路由，按所需最低角色分组。方法级权限优先于类级权限。没有#[IsGranted]的路由是公开可访问的。'
+    help: '按所需最低角色分组的路由；方法级覆盖类级。'
     anon_no_auth: '无需身份验证'
     anon_min_role: '所需最低角色'
+    routes_count: '%count% 条路由'
     perm_any: '任意'
     perm_class_level: '类级别'
     perm_method_level: '方法级别'
