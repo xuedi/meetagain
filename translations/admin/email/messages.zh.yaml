@@ -8,6 +8,7 @@ admin_email_blocklist:
     field_email: '邮箱'
     field_reason: '原因'
     button_add: '加入黑名单'
+    summary_total: '已封禁地址'
     flash_already_blocklisted: '"%email%" 已在黑名单中（原因：%reason%）。'
     flash_added: '已将 "%email%" 加入黑名单。'
     flash_removed: '已将 "%email%" 从黑名单中移除。'
