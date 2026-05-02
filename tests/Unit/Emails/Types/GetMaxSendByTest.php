@@ -165,6 +165,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            new \Symfony\Component\Clock\MockClock(),
         );
 
         $result = $email->getMaxSendBy([], new DateTimeImmutable(self::NOW));

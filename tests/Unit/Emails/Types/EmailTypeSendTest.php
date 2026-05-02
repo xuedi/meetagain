@@ -136,7 +136,7 @@ class EmailTypeSendTest extends TestCase
 
         $sender = $this->makeUser('sender@example.com', 'Bob', 'en', null, true, null, 2);
 
-        (new NotificationMessageEmail($this->blocklist, $queue, $this->config))->send([
+        (new NotificationMessageEmail($this->blocklist, $queue, $this->config, new \Symfony\Component\Clock\MockClock()))->send([
             'sender' => $sender,
             'recipient' => $this->makeUser(),
         ]);
@@ -288,7 +288,7 @@ class EmailTypeSendTest extends TestCase
         $user = $this->makeUser(isNotification: false);
 
         static::assertFalse(
-            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config))
+            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config, new \Symfony\Component\Clock\MockClock()))
                 ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
@@ -298,7 +298,7 @@ class EmailTypeSendTest extends TestCase
         $user = $this->makeUser(settings: new NotificationSettings(['receivedMessage' => false]));
 
         static::assertFalse(
-            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config))
+            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config, new \Symfony\Component\Clock\MockClock()))
                 ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
@@ -311,7 +311,7 @@ class EmailTypeSendTest extends TestCase
         );
 
         static::assertFalse(
-            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config))
+            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config, new \Symfony\Component\Clock\MockClock()))
                 ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
@@ -324,7 +324,7 @@ class EmailTypeSendTest extends TestCase
         );
 
         static::assertTrue(
-            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config))
+            (new NotificationMessageEmail($this->blocklist, $this->createStub(EmailQueueInterface::class), $this->config, new \Symfony\Component\Clock\MockClock()))
                 ->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)])
         );
     }
@@ -555,10 +555,13 @@ class EmailTypeSendTest extends TestCase
 
     public function testUpcomingDigestGuardCheckReturnsTrueWhenSettingOn(): void
     {
+        $eventRepo = $this->createStub(EventRepository::class);
+        $eventRepo->method('findUpcomingEventsNotRsvpdByUser')->willReturn([$this->makeEvent()]);
+
         $email = new UpcomingDigestEmail(
             $this->blocklist,
             $this->createStub(EmailQueueInterface::class), $this->config,
-            $this->createStub(EventRepository::class),
+            $eventRepo,
             $this->createStub(UserRepository::class),
             $this->createStub(AppStateService::class),
             [],

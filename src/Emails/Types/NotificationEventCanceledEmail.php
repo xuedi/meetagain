@@ -4,6 +4,9 @@ namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\EventInContextRule;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -49,18 +52,13 @@ readonly class NotificationEventCanceledEmail extends EmailAbstract
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'user', User::class);
-        $this->ensureInstanceOf($context, 'event', Event::class);
-
-        /** @var User $user */
-        $user = $context['user'];
-        if ($this->isBlocked((string) $user->getEmail())) {
-            return false;
-        }
-
-        return true;
+        return [
+            new RecipientUserPresentRule(),
+            new EventInContextRule(),
+            new RecipientNotBlocklistedRule($this->blocklist),
+        ];
     }
 
     public function send(array $context): void

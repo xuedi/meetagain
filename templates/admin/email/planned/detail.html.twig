@@ -1,0 +1,115 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-4">
+
+                <h2 class="title is-5">{{ 'admin_email_planned.detail_recipients_heading'|trans }}</h2>
+
+                {% if rows is empty %}
+                    <p class="has-text-grey">{{ 'admin_email_planned.detail_no_recipients'|trans }}</p>
+                {% else %}
+                    <table class="table is-fullwidth is-narrow">
+                        <thead>
+                            <tr>
+                                <th>{{ 'admin_email_planned.detail_col_email'|trans }}</th>
+                                <th>{{ 'admin_email_planned.detail_col_outcome'|trans }}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                <tr {% if previewUser and row.user.id == previewUser.id %}class="has-background-info-light"{% endif %}>
+                                    <td class="is-size-7">{{ row.user.email }}</td>
+                                    <td>
+                                        {% if row.outcome.value == 'pass' %}
+                                            <span class="tag is-success">{{ 'admin_email_planned.outcome_pass'|trans }}</span>
+                                        {% elseif row.outcome.value == 'skip' %}
+                                            <span class="tag is-warning">{{ 'admin_email_planned.outcome_skip'|trans }}</span>
+                                        {% else %}
+                                            <span class="tag is-danger">{{ 'admin_email_planned.outcome_error'|trans }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('app_admin_email_planned_detail', {'key': detailKey, 'user': row.user.id, 'outcome': outcomeFilter}) }}"
+                                           title="{{ 'admin_email_planned.detail_view_chain'|trans }}">
+                                            <span class="icon"><i class="fa fa-arrow-right"></i></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+            </div>
+            <div class="column is-8">
+
+                {% if previewUser %}
+                    <h2 class="title is-5">
+                        {{ 'admin_email_planned.detail_chain_for'|trans }}
+                        <code class="is-size-6">{{ previewUser.email }}</code>
+                    </h2>
+
+                    <table class="table is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th>{{ 'admin_email_planned.detail_col_rule'|trans }}</th>
+                                <th>{{ 'admin_email_planned.detail_col_cost'|trans }}</th>
+                                <th>{{ 'admin_email_planned.detail_col_outcome'|trans }}</th>
+                                <th>{{ 'admin_email_planned.detail_col_explanation'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for result in results %}
+                            <tr>
+                                <td><code>{{ result.ruleName }}</code></td>
+                                <td>{{ rules[loop.index0].cost.name|default('-') }}</td>
+                                <td>
+                                    {% if result.outcome.value == 'pass' %}
+                                        <span class="tag is-success">{{ 'admin_email_planned.outcome_pass'|trans }}</span>
+                                    {% elseif result.outcome.value == 'skip' %}
+                                        <span class="tag is-warning">{{ 'admin_email_planned.outcome_skip'|trans }}</span>
+                                    {% else %}
+                                        <span class="tag is-danger">{{ 'admin_email_planned.outcome_error'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ result.explanation ?: '-' }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <h2 class="title is-5">{{ 'admin_email_planned.detail_chain_heading'|trans }}</h2>
+                    <p class="has-text-grey">{{ 'admin_email_planned.detail_pick_user_hint'|trans }}</p>
+
+                    <table class="table is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th>{{ 'admin_email_planned.detail_col_rule'|trans }}</th>
+                                <th>{{ 'admin_email_planned.detail_col_cost'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for rule in rules %}
+                            <tr>
+                                <td><code>{{ rule.name }}</code></td>
+                                <td>{{ rule.cost.name }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

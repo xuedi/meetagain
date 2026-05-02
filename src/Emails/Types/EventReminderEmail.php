@@ -7,6 +7,11 @@ namespace App\Emails\Types;
 use App\Emails\DueContext;
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\EventInContextRule;
+use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
@@ -60,25 +65,15 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'user', User::class);
-        $this->ensureInstanceOf($context, 'event', Event::class);
-
-        /** @var User $user */
-        $user = $context['user'];
-
-        if ($this->isBlocked((string) $user->getEmail())) {
-            return false;
-        }
-        if (!$user->isNotification()) {
-            return false;
-        }
-        if (!$user->getNotificationSettings()->eventReminder) {
-            return false;
-        }
-
-        return true;
+        return [
+            new RecipientUserPresentRule(),
+            new EventInContextRule(),
+            new UserNotificationsMasterToggleRule(),
+            new NotificationToggleEnabledRule('eventReminder'),
+            new RecipientNotBlocklistedRule($this->blocklist),
+        ];
     }
 
     public function send(array $context): void
@@ -131,6 +126,11 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
         }
 
         return $contexts;
+    }
+
+    public function getPreviewContexts(DateTimeImmutable $for): array
+    {
+        return $this->getDueContexts($for);
     }
 
     public function markContextSent(DueContext $context): void

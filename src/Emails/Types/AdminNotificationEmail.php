@@ -4,6 +4,9 @@ namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\Guard\Rule\SectionsHtmlPresentRule;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -45,18 +48,13 @@ readonly class AdminNotificationEmail extends EmailAbstract
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'user', User::class);
-        $this->ensureHasKey($context, 'sectionsHtml');
-
-        /** @var User $user */
-        $user = $context['user'];
-        if ($this->isBlocked((string) $user->getEmail())) {
-            return false;
-        }
-
-        return true;
+        return [
+            new RecipientUserPresentRule(),
+            new SectionsHtmlPresentRule(),
+            new RecipientNotBlocklistedRule($this->blocklist),
+        ];
     }
 
     public function send(array $context): void

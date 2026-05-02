@@ -4,6 +4,8 @@ namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
+use App\Emails\Guard\Rule\SupportRequestPresentRule;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -43,15 +45,12 @@ readonly class SupportNotificationEmail extends EmailAbstract
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'request', SupportRequest::class);
-
-        if ($this->isBlocked($this->config->getMailerAddress()->getAddress())) {
-            return false;
-        }
-
-        return true;
+        return [
+            new SupportRequestPresentRule(),
+            new OutboundMailerNotBlocklistedRule($this->blocklist, $this->config),
+        ];
     }
 
     public function send(array $context): void

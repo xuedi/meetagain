@@ -5,6 +5,13 @@ namespace App\Emails\Types;
 use App\Emails\DueContext;
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
+use App\Emails\Guard\Rule\EventInContextRule;
+use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
+use App\Emails\Guard\Rule\RecipientNotAlreadyRsvpdRule;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\Guard\Rule\RsvpAttendeeMapPresentRule;
+use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
@@ -62,31 +69,17 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        $this->ensureInstanceOf($context, 'user', User::class);
-        $this->ensureInstanceOf($context, 'event', Event::class);
-        $this->ensureHasKey($context, 'attendeeMap');
-
-        /** @var User $recipient */
-        $recipient = $context['user'];
-        /** @var Event $event */
-        $event = $context['event'];
-
-        if ($this->isBlocked((string) $recipient->getEmail())) {
-            return false;
-        }
-        if (!$recipient->isNotification()) {
-            return false;
-        }
-        if (!$recipient->getNotificationSettings()->followingUpdates) {
-            return false;
-        }
-        if ($event->hasRsvp($recipient)) {
-            return false;
-        }
-
-        return true;
+        return [
+            new RecipientUserPresentRule(),
+            new EventInContextRule(),
+            new RsvpAttendeeMapPresentRule(),
+            new UserNotificationsMasterToggleRule(),
+            new NotificationToggleEnabledRule('followingUpdates'),
+            new RecipientNotAlreadyRsvpdRule(),
+            new RecipientNotBlocklistedRule($this->blocklist),
+        ];
     }
 
     public function send(array $context): void
@@ -158,6 +151,11 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         }
 
         return $contexts;
+    }
+
+    public function getPreviewContexts(DateTimeImmutable $for): array
+    {
+        return $this->getDueContexts($for);
     }
 
     public function markContextSent(DueContext $context): void

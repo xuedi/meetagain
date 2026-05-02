@@ -21,6 +21,15 @@ interface EmailInterface
 
     public function guardCheck(array $context): bool;
 
+    /**
+     * Ordered list of guard rules evaluated before send. Cheapest-first; the first non-Pass result
+     * short-circuits dispatch. Empty list means "no per-type guards" (the legacy `guardCheck()`
+     * path is still used).
+     *
+     * @return list<EmailGuardRuleInterface>
+     */
+    public function getGuardRules(): array;
+
     public function send(array $context): void;
 
     /**

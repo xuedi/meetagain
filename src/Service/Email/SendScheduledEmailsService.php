@@ -3,6 +3,8 @@
 namespace App\Service\Email;
 
 use App\CronTaskInterface;
+use App\Emails\EmailGuardOutcome;
+use App\Emails\Guard\EmailGuardEvaluator;
 use App\Emails\ScheduledEmailInterface;
 use App\Enum\CronTaskStatus;
 use App\ValueObject\CronTaskResult;
@@ -22,6 +24,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
         private iterable $scheduledEmails,
         private ClockInterface $clock,
         private LoggerInterface $logger,
+        private EmailGuardEvaluator $guardEvaluator,
     ) {}
 
     public function getIdentifier(): string
@@ -51,12 +54,12 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
                     foreach ($dueContext->potentialRecipients as $user) {
                         $ctx = array_merge($dueContext->data, ['user' => $user]);
                         try {
-                            $shouldSend = $email->guardCheck($ctx);
+                            $result = $this->guardEvaluator->evaluate($email, $ctx);
                         } catch (InvalidArgumentException $e) {
                             $dedupKey = $email->getIdentifier() . ':' . $e->getMessage();
                             if (!isset($loggedGuardErrors[$dedupKey])) {
                                 $loggedGuardErrors[$dedupKey] = true;
-                                $this->logger->error('guardCheck contract violation - email skipped', [
+                                $this->logger->error('guard rule threw - email skipped', [
                                     'email' => $email->getIdentifier(),
                                     'caller' => 'SendScheduledEmailsService::runCronTask',
                                     'context_keys' => array_keys($ctx),
@@ -66,7 +69,22 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
                             continue;
                         }
 
-                        if ($shouldSend) {
+                        if ($result->outcome === EmailGuardOutcome::Error) {
+                            $dedupKey = $email->getIdentifier() . ':' . $result->ruleName;
+                            if (!isset($loggedGuardErrors[$dedupKey])) {
+                                $loggedGuardErrors[$dedupKey] = true;
+                                $this->logger->error('guard rule returned Error - email skipped', [
+                                    'email' => $email->getIdentifier(),
+                                    'caller' => 'SendScheduledEmailsService::runCronTask',
+                                    'rule' => $result->ruleName,
+                                    'explanation' => $result->explanation,
+                                    'context_key' => $result->contextKey,
+                                ]);
+                            }
+                            continue;
+                        }
+
+                        if ($result->outcome === EmailGuardOutcome::Pass) {
                             $email->send($ctx);
                             $sent++;
                         }
