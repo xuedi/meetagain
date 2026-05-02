@@ -2,7 +2,12 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\AdminLink;
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Location;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
@@ -12,6 +17,7 @@ use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,8 +25,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/locations')]
-final class LocationController extends AbstractAdminController
+final class LocationController extends AbstractController implements AdminNavigationInterface
 {
+    public function __construct(
+        private readonly LocationRepository $repo,
+        private readonly EventRepository $eventRepo,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly AdminLocationListFilterService $locationFilterService,
+        private readonly TranslatorInterface $translator,
+    ) {}
+
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
@@ -37,23 +51,26 @@ final class LocationController extends AbstractAdminController
         );
     }
 
-    public function __construct(
-        private readonly LocationRepository $repo,
-        private readonly EventRepository $eventRepo,
-        private readonly EntityActionDispatcher $entityActionDispatcher,
-        private readonly AdminLocationListFilterService $locationFilterService,
-        private readonly TranslatorInterface $translator,
-    ) {}
-
     #[Route('', name: 'app_admin_location')]
     public function list(): Response
     {
         $filterResult = $this->locationFilterService->getLocationIdFilter();
-        $locationIds = $filterResult->getLocationIds();
+        $locations = $this->repo->findAllForAdmin($filterResult->getLocationIds());
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    count($locations),
+                    $this->translator->trans('admin_location.summary_total'),
+                )),
+            ],
+        );
 
         return $this->render('admin/location/list.html.twig', [
             'active' => 'location',
-            'locations' => $this->repo->findAllForAdmin($locationIds),
+            'locations' => $locations,
+            'adminTop' => $adminTop,
         ]);
     }
 
@@ -74,10 +91,9 @@ final class LocationController extends AbstractAdminController
 
             $this->addFlash('success', $this->translator->trans('admin_location.flash_updated'));
 
-            return $this->redirectToRoute('app_admin_location');
+            return $this->redirectToRoute('app_admin_location_edit', ['id' => $location->getId()]);
         }
 
-        // Get events using this location
         $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
 
         return $this->render('admin/location/edit.html.twig', [
@@ -85,6 +101,7 @@ final class LocationController extends AbstractAdminController
             'location' => $location,
             'form' => $form,
             'events_using_location' => $eventsUsingLocation,
+            'adminTop' => $this->buildEditTop($location, count($eventsUsingLocation)),
         ]);
     }
 
@@ -95,7 +112,6 @@ final class LocationController extends AbstractAdminController
             throw $this->createNotFoundException('Location not found in current context.');
         }
 
-        // Check if location is used in any events
         $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
         if (count($eventsUsingLocation) > 0) {
             $this->addFlash(
@@ -125,10 +141,8 @@ final class LocationController extends AbstractAdminController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-
             $location->setCreatedAt(new DateTimeImmutable());
-            $location->setUser($user);
+            $location->setUser($this->getUser());
 
             $entityManager->persist($location);
             $entityManager->flush();
@@ -137,13 +151,52 @@ final class LocationController extends AbstractAdminController
 
             $this->addFlash('success', $this->translator->trans('admin_location.flash_created'));
 
-            return $this->redirectToRoute('app_admin_location');
+            return $this->redirectToRoute('app_admin_location_edit', ['id' => $location->getId()]);
         }
 
         return $this->render('admin/location/edit.html.twig', [
             'active' => 'location',
             'location' => $location,
             'form' => $form,
+            'events_using_location' => [],
+            'adminTop' => $this->buildEditTop($location, 0),
         ]);
+    }
+
+    private function buildEditTop(Location $location, int $eventsUsingCount): AdminTop
+    {
+        $isNew = $location->getId() === null;
+
+        $info = [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%s</strong>',
+                htmlspecialchars(
+                    $isNew
+                        ? $this->translator->trans('admin_location.page_title_create')
+                        : ($location->getName() ?? ''),
+                    ENT_QUOTES | ENT_HTML5,
+                    'UTF-8',
+                ),
+            )),
+        ];
+
+        if (!$isNew && $eventsUsingCount > 0) {
+            $info[] = new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                $eventsUsingCount,
+                $this->translator->trans('admin_location.summary_events_using'),
+            ));
+        }
+
+        return new AdminTop(
+            info: $info,
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_location'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
     }
 }

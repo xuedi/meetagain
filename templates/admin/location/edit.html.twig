@@ -2,7 +2,8 @@
 
 {% block content %}
     <div class="container">
-        <h1 class="title">{{ location.id ? 'admin_location.page_title_edit'|trans : 'admin_location.page_title_create'|trans }}</h1>
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {% if location.id %}
             {% set warningContent %}
@@ -81,12 +82,9 @@
         </div>
 
         <div class="field mt-5">
-            <button type="submit" class="button is-link">
+            <button type="submit" class="button is-primary">
                 <span>{{ 'global.button_save'|trans }}</span>
             </button>
-            <a href="{{ path('app_admin_location') }}" class="button is-light">
-                <span>{{ 'global.button_cancel'|trans }}</span>
-            </a>
         </div>
 
         {{ form_end(form) }}

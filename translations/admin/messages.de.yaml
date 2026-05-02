@@ -219,10 +219,11 @@ admin_host:
     flash_created: 'Gastgeber erfolgreich erstellt'
     flash_delete_blocked: 'Gastgeber kann nicht gelöscht werden. Er wird derzeit in %count% Veranstaltung(en) verwendet.'
 admin_location:
+    summary_total: 'Veranstaltungsorte'
+    summary_events_using: 'Veranstaltung(en) verwenden diesen Ort'
     col_name: 'Name'
     col_address: 'Adresse'
     col_created_by: 'Erstellt von'
-    page_title_edit: 'Veranstaltungsort bearbeiten'
     page_title_create: 'Veranstaltungsort erstellen'
     warning_delete_title: 'Veranstaltungsort löschen'
     warning_delete_used: 'Dieser Veranstaltungsort kann nicht gelöscht werden! Er wird derzeit in %count% Veranstaltung(en) verwendet.'
