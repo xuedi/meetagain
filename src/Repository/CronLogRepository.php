@@ -19,9 +19,10 @@ class CronLogRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param list<string>|null $statuses Filter by exact status values; null means no status filter.
      * @return CronLog[]
      */
-    public function findRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
+    public function findRecent(int $limit = 200, ?DateTimeImmutable $since = null, ?array $statuses = null): array
     {
         $qb = $this->createQueryBuilder('c')
             ->orderBy('c.runAt', 'DESC')
@@ -32,23 +33,9 @@ class CronLogRepository extends ServiceEntityRepository
                 ->setParameter('since', $since);
         }
 
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * @return CronLog[]
-     */
-    public function findRecentProblems(int $limit = 200, ?DateTimeImmutable $since = null): array
-    {
-        $qb = $this->createQueryBuilder('c')
-            ->where('c.status != :ok')
-            ->setParameter('ok', CronTaskStatus::ok->value)
-            ->orderBy('c.runAt', 'DESC')
-            ->setMaxResults($limit);
-
-        if ($since !== null) {
-            $qb->andWhere('c.runAt >= :since')
-                ->setParameter('since', $since);
+        if ($statuses !== null && $statuses !== []) {
+            $qb->andWhere('c.status IN (:statuses)')
+                ->setParameter('statuses', $statuses);
         }
 
         return $qb->getQuery()->getResult();

@@ -1,0 +1,20 @@
+<div class="dropdown" data-admin-dropdown>
+    <div class="dropdown-trigger">
+        <button class="button is-small" aria-haspopup="true">
+            {% if action.icon %}
+                <span class="icon is-small"><i class="fa fa-{{ action.icon }}"></i></span>
+            {% endif %}
+            <span>{{ action.label }}</span>
+            <span class="icon is-small"><i class="fa fa-angle-down"></i></span>
+        </button>
+    </div>
+    <div class="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+            {% for option in action.options %}
+                <a href="{{ option.target }}" class="dropdown-item{% if option.isActive %} is-active{% endif %}">
+                    {{ option.label }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>

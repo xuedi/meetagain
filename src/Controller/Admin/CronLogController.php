@@ -6,9 +6,10 @@ use App\Admin\Tabs\AdminTab;
 use App\Admin\Tabs\AdminTabs;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionDropdown;
+use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
-use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Entity\CronLog;
 use App\Repository\CronLogRepository;
 use DateTimeImmutable;
@@ -31,15 +32,43 @@ final class CronLogController extends AbstractAdminController implements AdminTa
         private readonly TranslatorInterface $translator,
     ) {}
 
+    private const string DEFAULT_RANGE = '1h';
+
+    /** @var array<string, string|null> */
+    private const array RANGE_OFFSETS = [
+        '1h' => '-1 hour',
+        '6h' => '-6 hours',
+        '24h' => '-24 hours',
+        '1w' => '-1 week',
+        'all' => null,
+    ];
+
+    /** @var array<string, list<string>|null> */
+    private const array STATUS_FILTERS = [
+        'all' => null,
+        'problems' => ['warning', 'error', 'exception'],
+        'warning' => ['warning'],
+        'error' => ['error'],
+        'exception' => ['exception'],
+    ];
+
     #[Route('', name: 'app_admin_cron_log')]
     public function list(Request $request): Response
     {
-        $problemsOnly = $request->query->getBoolean('problemsOnly');
-        $showAll = $request->query->getBoolean('showAll');
-        $since = $showAll ? null : new DateTimeImmutable('-24 hours');
-        $logs = $problemsOnly
-            ? $this->cronLogRepository->findRecentProblems(5000, $since)
-            : $this->cronLogRepository->findRecent(5000, $since);
+        $range = $request->query->getString('range', self::DEFAULT_RANGE);
+        if (!array_key_exists($range, self::RANGE_OFFSETS)) {
+            $range = self::DEFAULT_RANGE;
+        }
+        $status = $request->query->getString('status', 'all');
+        if (!array_key_exists($status, self::STATUS_FILTERS)) {
+            $status = 'all';
+        }
+
+        $rangeOffset = self::RANGE_OFFSETS[$range];
+        $since = $rangeOffset !== null ? new DateTimeImmutable($rangeOffset) : null;
+        $statuses = self::STATUS_FILTERS[$status];
+
+        $logs = $this->cronLogRepository->findRecent(5000, $since, $statuses);
         $totalCount = $this->cronLogRepository->countAll();
         $problemCount = $this->cronLogRepository->countProblems();
 
@@ -49,52 +78,22 @@ final class CronLogController extends AbstractAdminController implements AdminTa
                 $totalCount,
                 $this->translator->trans('admin_logs.summary_total'),
             )),
-            new AdminTopInfoText($this->translator->trans(
-                $showAll ? 'admin_logs.filter_range_all' : 'admin_logs.filter_range_24h',
-            )),
+            $problemCount > 0
+                ? new AdminTopInfoHtml(sprintf(
+                    '<span class="tag is-danger is-medium">%d&nbsp;%s</span>',
+                    $problemCount,
+                    $this->translator->trans('admin_logs.summary_problems'),
+                ))
+                : new AdminTopInfoHtml(sprintf(
+                    '<span class="tag is-success is-medium">%s</span>',
+                    $this->translator->trans('admin_logs.summary_all_ok'),
+                )),
         ];
-        $info[] = $problemCount > 0
-            ? new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-danger is-medium">%d&nbsp;%s</span>',
-                $problemCount,
-                $this->translator->trans('admin_logs.summary_problems'),
-            ))
-            : new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                $this->translator->trans('admin_logs.summary_all_ok'),
-            ));
 
-        $problemsToggle = $problemsOnly
-            ? new AdminTopActionButton(
-                label: $this->translator->trans('admin_logs.filter_show_all'),
-                target: $this->generateUrl('app_admin_cron_log', $showAll ? ['showAll' => 1] : []),
-                icon: 'list',
-            )
-            : new AdminTopActionButton(
-                label: $this->translator->trans('admin_logs.filter_problems_only'),
-                target: $this->generateUrl(
-                    'app_admin_cron_log',
-                    $showAll ? ['problemsOnly' => 1, 'showAll' => 1] : ['problemsOnly' => 1],
-                ),
-                icon: 'filter',
-            );
+        $statusDropdown = $this->buildStatusDropdown($status, $range);
+        $rangeDropdown = $this->buildRangeDropdown($range, $status);
 
-        $timeToggle = $showAll
-            ? new AdminTopActionButton(
-                label: $this->translator->trans('admin_logs.filter_last_24h'),
-                target: $this->generateUrl('app_admin_cron_log', $problemsOnly ? ['problemsOnly' => 1] : []),
-                icon: 'clock',
-            )
-            : new AdminTopActionButton(
-                label: $this->translator->trans('admin_logs.filter_show_all_time'),
-                target: $this->generateUrl(
-                    'app_admin_cron_log',
-                    $problemsOnly ? ['problemsOnly' => 1, 'showAll' => 1] : ['showAll' => 1],
-                ),
-                icon: 'list',
-            );
-
-        $adminTop = new AdminTop(info: $info, actions: [$problemsToggle, $timeToggle]);
+        $adminTop = new AdminTop(info: $info, actions: [$statusDropdown, $rangeDropdown]);
 
         return $this->render('admin/logs/logs_cron_list.html.twig', [
             'active' => 'logs',
@@ -102,6 +101,64 @@ final class CronLogController extends AbstractAdminController implements AdminTa
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    private function buildStatusDropdown(string $current, string $range): AdminTopActionDropdown
+    {
+        $options = [];
+        foreach (array_keys(self::STATUS_FILTERS) as $key) {
+            $params = [];
+            if ($key !== 'all') {
+                $params['status'] = $key;
+            }
+            if ($range !== self::DEFAULT_RANGE) {
+                $params['range'] = $range;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $this->translator->trans('admin_logs.status_filter_' . $key),
+                target: $this->generateUrl('app_admin_cron_log', $params),
+                isActive: $key === $current,
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf(
+                '%s %s',
+                $this->translator->trans('admin_logs.status_filter_label'),
+                $this->translator->trans('admin_logs.status_filter_' . $current),
+            ),
+            options: $options,
+            icon: 'filter',
+        );
+    }
+
+    private function buildRangeDropdown(string $current, string $status): AdminTopActionDropdown
+    {
+        $options = [];
+        foreach (array_keys(self::RANGE_OFFSETS) as $key) {
+            $params = [];
+            if ($key !== self::DEFAULT_RANGE) {
+                $params['range'] = $key;
+            }
+            if ($status !== 'all') {
+                $params['status'] = $status;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $this->translator->trans('admin_logs.range_' . $key),
+                target: $this->generateUrl('app_admin_cron_log', $params),
+                isActive: $key === $current,
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf(
+                '%s %s',
+                $this->translator->trans('admin_logs.range_label'),
+                $this->translator->trans('admin_logs.range_' . $current),
+            ),
+            options: $options,
+            icon: 'clock',
+        );
     }
 
     #[Route('/{id}', name: 'app_admin_cron_log_show')]
