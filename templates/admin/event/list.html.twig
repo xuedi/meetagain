@@ -4,6 +4,8 @@
 
     <div class="container">
 
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>

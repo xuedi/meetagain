@@ -2,7 +2,8 @@
 
 {% block content %}
     <div class="container">
-        <h1 class="title">{{ 'admin_event.page_title_new'|trans }}</h1>
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {{ form_start(form) }}
 
@@ -38,13 +39,10 @@
         {{ form_widget(form) }}
 
         <div class="field mt-5">
-            <button type="submit" class="button is-link">
+            <button type="submit" class="button is-primary">
                 <span class="icon"><i class="fa fa-plus"></i></span>
                 <span>{{ 'global.button_add'|trans }}</span>
             </button>
-            <a href="{{ path('app_admin_event') }}" class="button is-light">
-                <span>{{ 'global.button_cancel'|trans }}</span>
-            </a>
         </div>
 
         {{ form_end(form) }}

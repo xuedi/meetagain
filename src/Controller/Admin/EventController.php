@@ -8,14 +8,21 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\AdminEventCancelled;
 use App\Activity\Messages\AdminEventCreated;
 use App\Activity\Messages\AdminEventEdited;
-use App\Entity\AdminLink;
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Host;
 use App\Entity\Image;
 use App\Entity\Location;
+use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Enum\EventType as EventTypeEnum;
 use App\Enum\ImageType;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
@@ -27,15 +34,19 @@ use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Admin\Top\Actions\AdminTopActionDropdown;
+use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/events')]
-final class EventController extends AbstractAdminController
+final class EventController extends AbstractController implements AdminNavigationInterface
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
@@ -68,17 +79,219 @@ final class EventController extends AbstractAdminController
     ) {}
 
     #[Route('', name: 'app_admin_event')]
-    public function list(): Response
+    public function list(Request $request): Response
     {
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $eventIds = $filterResult->getEventIds();
+        $allEvents = $this->repo->findAllForAdmin($eventIds);
+
+        $hideAuto = $request->query->getBoolean('hide_auto');
+        $typeFilter = $request->query->getInt('type') ?: null;
+        $scheduleFilter = $request->query->getString('schedule');
+        if (!in_array($scheduleFilter, ['onetime', 'series'], true)) {
+            $scheduleFilter = 'all';
+        }
+
+        $events = array_values(array_filter(
+            $allEvents,
+            fn (Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $scheduleFilter),
+        ));
+
+        $canceledCount = 0;
+        foreach ($events as $event) {
+            if ($event->isCanceled()) {
+                $canceledCount++;
+            }
+        }
+
+        $info = [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($events),
+                $this->translator->trans('admin_event.summary_total'),
+            )),
+        ];
+        if (count($events) !== count($allEvents)) {
+            $info[] = new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($allEvents),
+                $this->translator->trans('admin_event.summary_total_all'),
+            ));
+        }
+        if ($canceledCount > 0) {
+            $info[] = new AdminTopInfoHtml(sprintf(
+                '<span class="tag is-warning is-medium"><strong>%d</strong>&nbsp;%s</span>',
+                $canceledCount,
+                $this->translator->trans('admin_event.summary_canceled'),
+            ));
+        }
+
+        $actions = [
+            $this->buildHideAutoToggle($hideAuto, $typeFilter, $scheduleFilter),
+            $this->buildTypeDropdown($allEvents, $hideAuto, $typeFilter, $scheduleFilter),
+            $this->buildScheduleDropdown($allEvents, $hideAuto, $typeFilter, $scheduleFilter),
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_event.page_title_new'),
+                target: $this->generateUrl('app_admin_event_add'),
+                icon: 'plus',
+            ),
+        ];
 
         return $this->render('admin/event/list.html.twig', [
             'nextEvent' => $this->repo->getNextEventId($eventIds),
-            'events' => $this->repo->findAllForAdmin($eventIds),
+            'events' => $events,
             'rsvpCounts' => $this->repo->getRsvpCounts($eventIds),
             'active' => 'event',
+            'adminTop' => new AdminTop(info: $info, actions: $actions),
         ]);
+    }
+
+    private function matchesFilters(Event $e, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): bool
+    {
+        if ($hideAuto && $e->getRecurringOf() !== null) {
+            return false;
+        }
+        if ($typeFilter !== null && $e->getType()?->value !== $typeFilter) {
+            return false;
+        }
+        if ($scheduleFilter === 'onetime' && ($e->getRecurringOf() !== null || $e->getRecurringRule() !== null)) {
+            return false;
+        }
+        if ($scheduleFilter === 'series' && $e->getRecurringOf() === null && $e->getRecurringRule() === null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array<string, int|string|bool> URL params preserving every active filter except $exclude.
+     */
+    private function preserveFiltersExcept(string $exclude, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): array
+    {
+        $p = [];
+        if ($exclude !== 'hide_auto' && $hideAuto) {
+            $p['hide_auto'] = 1;
+        }
+        if ($exclude !== 'type' && $typeFilter !== null) {
+            $p['type'] = $typeFilter;
+        }
+        if ($exclude !== 'schedule' && $scheduleFilter !== 'all') {
+            $p['schedule'] = $scheduleFilter;
+        }
+
+        return $p;
+    }
+
+    private function buildHideAutoToggle(bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionButton
+    {
+        $params = $this->preserveFiltersExcept('hide_auto', $hideAuto, $typeFilter, $scheduleFilter);
+        if (!$hideAuto) {
+            $params['hide_auto'] = 1;
+        }
+
+        return new AdminTopActionButton(
+            label: $this->translator->trans(
+                $hideAuto ? 'admin_event.button_show_auto' : 'admin_event.button_hide_auto',
+            ),
+            target: $this->generateUrl('app_admin_event', $params),
+            icon: $hideAuto ? 'eye' : 'eye-slash',
+        );
+    }
+
+    /**
+     * @param list<Event> $allEvents
+     */
+    private function buildTypeDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    {
+        $countAll = count(array_filter(
+            $allEvents,
+            fn (Event $e) => $this->matchesFilters($e, $hideAuto, null, $scheduleFilter),
+        ));
+
+        $options = [
+            new AdminTopActionDropdownOption(
+                label: $this->translator->trans('admin_event.filter_type_any'),
+                target: $this->generateUrl(
+                    'app_admin_event',
+                    $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter),
+                ),
+                isActive: $typeFilter === null,
+                count: $countAll,
+            ),
+        ];
+
+        $activeLabel = $this->translator->trans('admin_event.filter_type_any');
+        foreach (EventTypeEnum::cases() as $case) {
+            $count = count(array_filter(
+                $allEvents,
+                fn (Event $e) => $this->matchesFilters($e, $hideAuto, $case->value, $scheduleFilter),
+            ));
+            $params = $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter);
+            $params['type'] = $case->value;
+            $label = $this->translator->trans('admin_event.filter_type_' . strtolower($case->name));
+            $isActive = $typeFilter === $case->value;
+            if ($isActive) {
+                $activeLabel = $label;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $label,
+                target: $this->generateUrl('app_admin_event', $params),
+                isActive: $isActive,
+                count: $count,
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf(
+                '%s %s',
+                $this->translator->trans('admin_event.filter_type_label'),
+                $activeLabel,
+            ),
+            options: $options,
+            icon: 'tag',
+        );
+    }
+
+    /**
+     * @param list<Event> $allEvents
+     */
+    private function buildScheduleDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    {
+        $values = ['all', 'onetime', 'series'];
+        $options = [];
+        $activeLabel = '';
+        foreach ($values as $value) {
+            $count = count(array_filter(
+                $allEvents,
+                fn (Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $value),
+            ));
+            $params = $this->preserveFiltersExcept('schedule', $hideAuto, $typeFilter, $scheduleFilter);
+            if ($value !== 'all') {
+                $params['schedule'] = $value;
+            }
+            $label = $this->translator->trans('admin_event.filter_schedule_' . $value);
+            $isActive = $scheduleFilter === $value;
+            if ($isActive) {
+                $activeLabel = $label;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $label,
+                target: $this->generateUrl('app_admin_event', $params),
+                isActive: $isActive,
+                count: $count,
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf(
+                '%s %s',
+                $this->translator->trans('admin_event.filter_schedule_label'),
+                $activeLabel,
+            ),
+            options: $options,
+            icon: 'calendar',
+        );
     }
 
     #[Route('/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
@@ -177,6 +390,7 @@ final class EventController extends AbstractAdminController
             'active' => 'event',
             'event' => $event,
             'form' => $form,
+            'adminTop' => $this->buildBackOnlyTop(),
         ]);
     }
 
@@ -273,6 +487,32 @@ final class EventController extends AbstractAdminController
             'active' => 'event',
             'location' => $event,
             'form' => $form,
+            'adminTop' => $this->buildBackOnlyTop(),
         ]);
+    }
+
+    private function buildBackOnlyTop(): AdminTop
+    {
+        return new AdminTop(
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_event'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
+    }
+
+    private function getAuthedUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException(
+                'Should never happen, see: config/packages/security.yaml',
+            );
+        }
+
+        return $user;
     }
 }
