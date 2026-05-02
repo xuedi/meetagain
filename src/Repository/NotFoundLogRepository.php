@@ -45,26 +45,34 @@ class NotFoundLogRepository extends ServiceEntityRepository
         return $list;
     }
 
-    public function getTop100(): array
+    public function getTop100(?DateTimeImmutable $since = null): array
     {
-        return $this
+        $qb = $this
             ->createQueryBuilder('n')
             ->select('COUNT(n.id) as number', 'n.url')
-            ->GroupBy('n.url')
+            ->groupBy('n.url')
             ->orderBy('number', 'DESC')
-            ->setMaxResults(100)
-            ->getQuery()
-            ->getArrayResult();
+            ->setMaxResults(100);
+
+        if ($since !== null) {
+            $qb->where('n.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        return $qb->getQuery()->getArrayResult();
     }
 
-    public function getRecent(int $limit = 200): array
+    public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        return $this
+        $qb = $this
             ->createQueryBuilder('n')
             ->orderBy('n.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        if ($since !== null) {
+            $qb->where('n.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function countAll(): int
@@ -72,6 +80,17 @@ class NotFoundLogRepository extends ServiceEntityRepository
         return (int) $this
             ->createQueryBuilder('n')
             ->select('COUNT(n.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countSince(DateTimeImmutable $since): int
+    {
+        return (int) $this
+            ->createQueryBuilder('n')
+            ->select('COUNT(n.id)')
+            ->where('n.createdAt >= :since')
+            ->setParameter('since', $since)
             ->getQuery()
             ->getSingleScalarResult();
     }
