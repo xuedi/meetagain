@@ -36,6 +36,19 @@ class ActivityRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function countSince(?DateTimeImmutable $since, ?int $userId = null): int
+    {
+        $qb = $this->createQueryBuilder('a')->select('COUNT(a.id)');
+        if ($since !== null) {
+            $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);
+        }
+        if ($userId !== null) {
+            $qb->andWhere('a.user = :user')->setParameter('user', $userId);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     public function findMostRecent(): ?Activity
     {
         return $this->createQueryBuilder('a')
@@ -48,13 +61,20 @@ class ActivityRepository extends ServiceEntityRepository
     /**
      * @return Activity[]
      */
-    public function findRecentForAdmin(int $limit): array
+    public function findRecentForAdmin(int $limit, ?DateTimeImmutable $since = null, ?int $userId = null): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        if ($since !== null) {
+            $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);
+        }
+        if ($userId !== null) {
+            $qb->andWhere('a.user = :user')->setParameter('user', $userId);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function getUserDisplay(User $user): array

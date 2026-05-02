@@ -132,7 +132,7 @@ class ActivityServiceTest extends TestCase
         $repoMock
             ->expects($this->once())
             ->method('findRecentForAdmin')
-            ->with(250)
+            ->with(250, null, null)
             ->willReturn($activities);
 
         // Arrange: mock MessageInterface instances that render messages for admin view (without links)
