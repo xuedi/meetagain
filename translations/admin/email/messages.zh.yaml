@@ -77,6 +77,8 @@ admin_email_planned:
     mode_only_expected: '仅有收件人'
     mode_all: '全部条目'
 admin_email_debugging:
+    intro: '发送测试邮件以验证渲染与投递。'
+    mock_values: '模拟值'
     field_email_type: '邮件类型'
     field_language: '语言'
     field_recipient: '收件人邮箱'
