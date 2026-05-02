@@ -219,10 +219,11 @@ admin_host:
     flash_created: 'Host created successfully'
     flash_delete_blocked: 'Cannot delete host. It is currently used in %count% event(s).'
 admin_location:
+    summary_total: 'locations'
+    summary_events_using: 'events use this location'
     col_name: 'Name'
     col_address: 'Address'
     col_created_by: 'Created By'
-    page_title_edit: 'Edit Location'
     page_title_create: 'Create Location'
     warning_delete_title: 'Delete Location'
     warning_delete_used: 'Cannot delete this location! It is currently used in %count% event(s).'

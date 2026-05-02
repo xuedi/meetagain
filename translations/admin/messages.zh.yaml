@@ -219,10 +219,11 @@ admin_host:
     flash_created: '主机创建成功'
     flash_delete_blocked: '无法删除主机。它目前已被 %count% 个活动使用。'
 admin_location:
+    summary_total: '个场地'
+    summary_events_using: '个活动使用此场地'
     col_name: '名称'
     col_address: '地址'
     col_created_by: '创建者'
-    page_title_edit: '编辑场地'
     page_title_create: '创建场地'
     warning_delete_title: '删除场地'
     warning_delete_used: '无法删除此场地！它目前已被 %count% 个活动使用。'
