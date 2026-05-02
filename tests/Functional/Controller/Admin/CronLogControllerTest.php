@@ -45,32 +45,20 @@ class CronLogControllerTest extends WebTestCase
             $crawler->filter('.box .level .level-left strong')->count(),
             'Top box should contain a <strong> info item',
         );
+        $rightText = $crawler->filter('.box .level .level-right')->text();
         static::assertStringContainsString(
-            'Show problems only',
-            $crawler->filter('.box .level .level-right')->text(),
-            'Default action should be "Show problems only"',
+            'Status: All',
+            $rightText,
+            'Default status dropdown trigger should read "Status: All"',
+        );
+        static::assertStringContainsString(
+            'Range: 1 hour',
+            $rightText,
+            'Default range dropdown trigger should read "Range: 1 hour"',
         );
     }
 
-    public function testCronListPageWithProblemsOnlyTogglesButtonLabel(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $this->loginAsAdmin($client);
-
-        // Act
-        $crawler = $client->request('GET', '/en/admin/logs/cron?problemsOnly=1');
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-        static::assertStringContainsString(
-            'Show all',
-            $crawler->filter('.box .level .level-right')->text(),
-            'Toggled action should be "Show all"',
-        );
-    }
-
-    public function testCronListPageDefaultFiltersToLast24HoursAndShowsToggleButton(): void
+    public function testCronListPageRendersTwoDropdownsWithExpectedOptions(): void
     {
         // Arrange
         $client = static::createClient();
@@ -81,49 +69,39 @@ class CronLogControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertStringContainsString(
-            'range: 24 hours',
-            $crawler->filter('.box .level .level-left')->text(),
-            'Default page should display the 24 hours range info text',
+        static::assertSame(
+            2,
+            $crawler->filter('.box .level .level-right .dropdown[data-admin-dropdown]')->count(),
+            'Two dropdowns (status, range) should be rendered',
         );
-        $rightLinks = $crawler->filter('.box .level .level-right a');
-        $hrefs = $rightLinks->each(static fn ($node) => (string) $node->attr('href'));
-        $hasShowAllLink = false;
-        foreach ($hrefs as $href) {
-            if (str_contains($href, 'showAll=1')) {
-                $hasShowAllLink = true;
-                break;
-            }
+        $items = $crawler->filter('.box .level .level-right .dropdown-item');
+        $itemTexts = $items->each(static fn ($node) => trim($node->text()));
+        foreach (['All', 'All problems', 'Warnings', 'Errors', 'Exceptions'] as $expected) {
+            static::assertContains($expected, $itemTexts, sprintf('Status option "%s" should be present', $expected));
         }
-        static::assertTrue($hasShowAllLink, 'A toggle action should link to ?showAll=1');
+        foreach (['1 hour', '6 hours', '24 hours', '1 week'] as $expected) {
+            static::assertContains($expected, $itemTexts, sprintf('Range option "%s" should be present', $expected));
+        }
     }
 
-    public function testCronListPageWithShowAllSwapsRangeInfoAndOffersReverseToggle(): void
+    public function testCronListPageReflectsActiveSelectionInDropdownTriggers(): void
     {
         // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/logs/cron?showAll=1');
+        $crawler = $client->request('GET', '/en/admin/logs/cron?status=error&range=1w');
 
         // Assert
         $this->assertResponseIsSuccessful();
-        $leftText = $crawler->filter('.box .level .level-left')->text();
-        static::assertStringContainsString(
-            'range: all',
-            $leftText,
-            'Showing all entries should display the "range: all" info text',
-        );
-        static::assertStringNotContainsString(
-            'range: 24 hours',
-            $leftText,
-            '"range: 24 hours" should not appear when showing all entries',
-        );
-        static::assertStringContainsString(
-            'Last 24 hours',
-            $crawler->filter('.box .level .level-right')->text(),
-            'Reverse toggle button should appear when showing all entries',
+        $rightText = $crawler->filter('.box .level .level-right')->text();
+        static::assertStringContainsString('Status: Errors', $rightText);
+        static::assertStringContainsString('Range: 1 week', $rightText);
+        static::assertSame(
+            2,
+            $crawler->filter('.box .level .level-right .dropdown-item.is-active')->count(),
+            'Exactly one option in each dropdown should be marked active',
         );
     }
 
