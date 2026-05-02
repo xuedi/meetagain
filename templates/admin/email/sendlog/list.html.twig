@@ -4,7 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'sendlog'} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {% if providerAvailable %}
             <div class="mb-4">
@@ -37,7 +38,19 @@
                         {{ email.createdAt|date('Y-m-d') }}<br>
                         <small class="has-text-grey">{{ email.createdAt|date('H:i:s') }}</small>
                     </td>
-                    <td>{{ email.recipient }}</td>
+                    <td>
+                        {{ email.recipient }}
+                        {% if email.recipient and email.recipient != recipientFilter %}
+                            {% set filterParams = {'recipient': email.recipient} %}
+                            {% if currentRange != defaultRange %}{% set filterParams = filterParams|merge({'range': currentRange}) %}{% endif %}
+                            {% if currentTemplate %}{% set filterParams = filterParams|merge({'template': currentTemplate}) %}{% endif %}
+                            <a href="{{ path('app_admin_email_sendlog', filterParams) }}"
+                               class="ml-1 has-text-grey"
+                               title="{{ 'admin_email_sendlog.filter_by_recipient'|trans }}">
+                                <span class="icon is-small"><i class="fa fa-filter"></i></span>
+                            </a>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if email.status.value == 'late' or email.status.value == 'failed' %}
                             <span class="has-text-danger">{{ email.status.value }}</span>
