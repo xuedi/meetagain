@@ -4,42 +4,33 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'templates'} %}
-
-        <div class="content">
-            <p>{{ 'admin_email_templates.intro'|trans }}</p>
-        </div>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {% for name,email in emails %}
-            <div class="content has-background-grey-lighter p-3 mt-6 is-large is-flex is-justify-content-space-between is-align-items-center">
-                <span>{{ name | lower | trans }}</span>
-                {% if email.template %}
-                    <a href="{{ path('app_admin_email_templates_edit', {id: email.template.id}) }}" class="button is-small is-info">
-                        <span class="icon"><i class="fa fa-edit"></i></span>
-                    </a>
-                {% endif %}
-            </div>
-            <div class="columns">
-                <div class="column is-7">
-                    <div class="box">
-                        <p>{{ 'admin_email_templates.col_subject'|trans }}: <b>{{ email.subject }}</b></p>
-                        <br>
-                        <div>
-                            {{ email.renderedBody|raw }}
+            {% embed 'admin/_components/admin_section.html.twig' with {'section': email.section} %}
+                {% block body %}
+                    <div class="columns m-0">
+                        <div class="column is-7">
+                            <p>{{ 'admin_email_templates.col_subject'|trans }}: <b>{{ email.subject }}</b></p>
+                            <br>
+                            <div>
+                                {{ email.renderedBody|raw }}
+                            </div>
+                        </div>
+                        <div class="column">
+                            <table class="table is-narrow is-fullwidth">
+                                {% for key,value in email.context %}
+                                    <tr>
+                                        <th>{{ key }}</th>
+                                        <td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
                         </div>
                     </div>
-                </div>
-                <div class="column">
-                    <table class="table is-narrow is-fullwidth">
-                        {% for key,value in email.context %}
-                            <tr>
-                                <th>{{ key }}</th>
-                                <td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
+                {% endblock %}
+            {% endembed %}
         {% endfor %}
 
     </div>

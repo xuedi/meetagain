@@ -1,0 +1,30 @@
+{#
+ # AdminCollapsibleSection - clickable header + collapsible body.
+ #
+ # Inputs:
+ #   section - App\Admin\Section\AdminCollapsibleSection (id, left, right, openByDefault)
+ #
+ # Override `body` block via {% embed %} to supply the collapsible body content.
+ # Generic toggle JS lives in assets/js/admin/sections.js (loaded on every admin page).
+ #}
+<div class="admin-section">
+    <div class="admin-section-header is-flex is-align-items-center mt-4 mb-2 px-4 py-3{% if section.openByDefault %} is-open{% endif %}"
+         data-target="{{ section.id }}">
+        {% for item in section.left %}
+            {% include item.template with {'item': item} only %}
+        {% endfor %}
+        <span class="mr-auto"></span>
+        {% for item in section.right %}
+            {% include item.template with {'item': item} only %}
+        {% endfor %}
+        <button class="button is-small is-light admin-section-toggle flex-shrink-0"
+                aria-expanded="{{ section.openByDefault ? 'true' : 'false' }}"
+                aria-controls="{{ section.id }}"
+                type="button">
+            <span class="icon is-small"><i class="fas fa-chevron-{{ section.openByDefault ? 'up' : 'down' }}"></i></span>
+        </button>
+    </div>
+    <div id="{{ section.id }}" class="admin-section-body mb-4{% if not section.openByDefault %} is-hidden{% endif %}">
+        {% block body %}{% endblock %}
+    </div>
+</div>

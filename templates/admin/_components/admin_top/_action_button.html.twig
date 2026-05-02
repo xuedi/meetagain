@@ -1,4 +1,6 @@
-<a href="{{ action.target }}" class="button is-small{% if action.variant %} {{ action.variant }}{% endif %}">
+<a href="{{ action.target }}"
+   class="button is-small{% if action.variant %} {{ action.variant }}{% endif %}"
+   {%- if action.confirm %} onclick="return confirm({{ action.confirm|json_encode|e('html_attr') }});"{% endif %}>
     {% if action.icon %}
         <span class="icon is-small"><i class="fa fa-{{ action.icon }}"></i></span>
     {% endif %}
