@@ -71,6 +71,11 @@ admin_email_planned:
     col_mail_type: 'E-Mail-Typ'
     col_description: 'Beschreibung'
     col_expected_recipients: 'Erwartete Empfänger'
+    summary_planned: 'geplant in den nächsten 14 Tagen'
+    filter_only_expected: 'Nur mit Empfängern'
+    filter_show_all: 'Alle anzeigen'
+    mode_only_expected: 'nur mit Empfängern'
+    mode_all: 'alle Einträge'
 admin_email_debugging:
     field_email_type: 'E-Mail-Typ'
     field_language: 'Sprache'
