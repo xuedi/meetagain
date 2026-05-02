@@ -48,10 +48,10 @@ final class CronLogController extends AbstractAdminController
                 $totalCount,
                 $this->translator->trans('admin_logs.summary_total'),
             )),
+            new AdminTopInfoText($this->translator->trans(
+                $showAll ? 'admin_logs.filter_range_all' : 'admin_logs.filter_range_24h',
+            )),
         ];
-        if (!$showAll) {
-            $info[] = new AdminTopInfoText($this->translator->trans('admin_logs.filter_last_24h_info'));
-        }
         $info[] = $problemCount > 0
             ? new AdminTopInfoHtml(sprintf(
                 '<span class="tag is-danger is-medium">%d&nbsp;%s</span>',

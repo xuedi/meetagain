@@ -274,7 +274,8 @@ admin_logs:
     summary_all_ok: '全部正常'
     filter_problems_only: '仅显示有问题的'
     filter_show_all: '显示全部'
-    filter_last_24h_info: '筛选：24 小时'
+    filter_range_24h: '范围：24 小时'
+    filter_range_all: '范围：全部'
     filter_last_24h: '最近 24 小时'
     filter_show_all_time: '显示全部'
 admin_member:

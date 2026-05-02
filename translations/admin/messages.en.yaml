@@ -274,7 +274,8 @@ admin_logs:
     summary_all_ok: 'all ok'
     filter_problems_only: 'Show problems only'
     filter_show_all: 'Show all'
-    filter_last_24h_info: 'filter: 24 hours'
+    filter_range_24h: 'range: 24 hours'
+    filter_range_all: 'range: all'
     filter_last_24h: 'Last 24 hours'
     filter_show_all_time: 'Show all'
 admin_member:
