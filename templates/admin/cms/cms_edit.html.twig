@@ -11,6 +11,10 @@
         'type': 'danger'
     } %}
 
+    <div class="container">
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+    </div>
+
     <div class="box">
         {{ form_start(form) }}
         <div class="columns is-vcentered">
@@ -35,17 +39,6 @@
                        href="{{ path('app_admin_cms_delete', {'id': cms.id}) }}">
                         <span class="icon"><i class="fa fa-trash"></i></span>
                     </a>
-                    {% if linkedAnnouncement %}
-                        <a class="button is-info" href="{{ path('app_admin_email_announcements_view', {'id': linkedAnnouncement.id}) }}">
-                            <span class="icon"><i class="fa fa-bullhorn"></i></span>
-                            <span>{{ 'admin_cms.button_open_announcement' | trans }}</span>
-                        </a>
-                    {% else %}
-                        <a class="button is-info" href="{{ path('app_admin_email_announcements_from_cms', {'id': cms.id}) }}">
-                            <span class="icon"><i class="fa fa-bullhorn"></i></span>
-                            <span>{{ 'admin_cms.button_create_announcement' | trans }}</span>
-                        </a>
-                    {% endif %}
                 </div>
             </div>
         </div>

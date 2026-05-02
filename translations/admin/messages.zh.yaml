@@ -41,6 +41,12 @@ admin_shell:
     menu_announcement: '公告'
     menu_menus: '菜单'
 admin_cms:
+    summary_total: '个页面'
+    summary_published: '已发布'
+    summary_with_announcement: '带公告'
+    summary_blocks: '个区块'
+    summary_languages: '种语言'
+    button_add_page: '添加页面'
     announcement_cms_page: 'CMS 页面'
     announcement_content: '内容'
     announcement_content_help: '内容将从所选的 CMS 页面中提取。'

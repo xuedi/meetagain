@@ -3,6 +3,9 @@
 {% block content %}
 
     <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
         <article class="message is-success is-hidden" id="cms-add">
             {{ form_start(form) }}
             <div class="message-header">
