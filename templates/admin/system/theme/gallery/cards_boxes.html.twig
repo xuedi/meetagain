@@ -1,19 +1,21 @@
 {#
-    Gallery: Cards & boxes -- plain box, box with title, columns layout
+    Gallery: Boxes & columns -- `.box` and `.columns` layout primitives
 
-    Anchor: g-cards.
+    Bulma `card` is on the avoid list for admin (see `architecture/ux-admin.md` Bulma
+    allowlist). The `.box` wrapper is only valid inside section bodies; the columns
+    primitive is the preferred way to lay out side-by-side blocks.
 
     Used in:    admin/system/theme/gallery/index.html.twig
     Parameters: none
 #}
 <p class="is-size-7 has-text-grey">
-    ux-admin.md prefers no decorative wrappers; reach for <code>.box</code> only when you
-    truly need a visual container (sidebar widgets, infobars, gallery sections).
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    architecture/ux-admin.md ("Bulma allowlist")
 </p>
 
 <h3 class="title is-6 mt-4">plain box</h3>
 <div class="box">
-    Body content inside a box.
+    {{ 'admin_system_gallery.boxes_plain_body'|trans }}
 </div>
 
 <h3 class="title is-6 mt-5">box with title</h3>
@@ -32,21 +34,5 @@
     </div>
     <div class="column">
         <div class="box has-text-centered">right</div>
-    </div>
-</div>
-
-<h3 class="title is-6 mt-5">card</h3>
-<div class="columns">
-    <div class="column is-one-third">
-        <div class="card">
-            <div class="card-image">
-                <figure class="image">
-                    {% include '_components/image.html.twig' with {'image': null, 'size': '400x400'} %}
-                </figure>
-            </div>
-            <div class="card-content p-3 has-text-centered">
-                <strong>{{ 'admin_system_gallery.sample_name'|trans }}</strong>
-            </div>
-        </div>
     </div>
 </div>
