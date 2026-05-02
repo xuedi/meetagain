@@ -8,5 +8,6 @@ final readonly class AdminTopActionDropdownOption
         public string $label,
         public string $target,
         public bool $isActive = false,
+        public ?int $count = null,
     ) {}
 }

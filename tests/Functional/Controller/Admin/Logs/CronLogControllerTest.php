@@ -76,11 +76,21 @@ class CronLogControllerTest extends WebTestCase
         );
         $items = $crawler->filter('.box .level .level-right .dropdown-item');
         $itemTexts = $items->each(static fn ($node) => trim($node->text()));
+        $hasItemContaining = static fn (string $needle): bool => array_any(
+            $itemTexts,
+            static fn (string $text): bool => str_contains($text, $needle),
+        );
         foreach (['All', 'All problems', 'Warnings', 'Errors', 'Exceptions'] as $expected) {
-            static::assertContains($expected, $itemTexts, sprintf('Status option "%s" should be present', $expected));
+            static::assertTrue(
+                $hasItemContaining($expected),
+                sprintf('Status option "%s" should be present', $expected),
+            );
         }
         foreach (['1 hour', '6 hours', '24 hours', '1 week'] as $expected) {
-            static::assertContains($expected, $itemTexts, sprintf('Range option "%s" should be present', $expected));
+            static::assertTrue(
+                $hasItemContaining($expected),
+                sprintf('Range option "%s" should be present', $expected),
+            );
         }
     }
 
