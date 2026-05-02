@@ -173,15 +173,22 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         $weekStart = $nextSunday->modify('+1 day');
         $weekEnd = $nextSunday->modify('+8 days');
         $allUsers = $this->userRepo->findAnnouncementSubscribers();
+        $allEvents = $this->eventRepo->findUpcomingEventsWithRsvp($weekStart, $weekEnd);
 
         $eligibleCount = 0;
         foreach ($allUsers as $user) {
             if (!$user->getNotificationSettings()->upcomingEvents) {
                 continue;
             }
-            $events = $this->eventRepo->findUpcomingEventsNotRsvpdByUser($weekStart, $weekEnd, $user);
-            $events = $this->applyDigestFilters($events, $user);
-            if ($events !== []) {
+            $candidateEvents = [];
+            foreach ($allEvents as $event) {
+                if ($event->hasRsvp($user)) {
+                    continue;
+                }
+                $candidateEvents[] = $event;
+            }
+            $candidateEvents = $this->applyDigestFilters($candidateEvents, $user);
+            if ($candidateEvents !== []) {
                 $eligibleCount++;
             }
         }
