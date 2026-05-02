@@ -10,7 +10,7 @@ use App\Entity\NotFoundLog;
 use App\Repository\ActivityRepository;
 use App\Repository\CronLogRepository;
 use App\Repository\NotFoundLogRepository;
-use App\Service\System\LogReaderService;
+use App\Service\System\SystemLogService;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class LogsApiController extends AbstractController
 {
     private const int SYSTEM_DEFAULT_LIMIT = 100;
-    private const int SYSTEM_MAX_LIMIT = LogReaderService::MAX_LIMIT;
+    private const int SYSTEM_MAX_LIMIT = SystemLogService::MAX_LIMIT;
     private const int ACTIVITY_DEFAULT_LIMIT = 100;
     private const int ACTIVITY_MAX_LIMIT = 1000;
     private const int NOT_FOUND_DEFAULT_LIMIT = 200;
@@ -31,7 +31,7 @@ final class LogsApiController extends AbstractController
     private const int CRON_MAX_LIMIT = 5000;
 
     public function __construct(
-        private readonly LogReaderService $logReaderService,
+        private readonly SystemLogService $systemLogService,
         private readonly ActivityService $activityService,
         private readonly ActivityRepository $activityRepository,
         private readonly NotFoundLogRepository $notFoundLogRepository,
@@ -43,8 +43,8 @@ final class LogsApiController extends AbstractController
     {
         return new JsonResponse([
             'system' => [
-                'count' => $this->logReaderService->countLines(),
-                'latest' => $this->formatTimestamp($this->logReaderService->getLatestTimestamp()),
+                'count' => $this->systemLogService->countLines(),
+                'latest' => $this->formatTimestamp($this->systemLogService->getLatestTimestamp()),
             ],
             'activity' => [
                 'count' => $this->activityRepository->countAll(),
@@ -68,12 +68,12 @@ final class LogsApiController extends AbstractController
         $level = $request->query->get('level');
         $channel = $request->query->get('channel');
 
-        $entries = $this->logReaderService->getRecentEntries($limit, $level, $channel);
+        $entries = $this->systemLogService->getRecentEntries($limit, $level, $channel);
 
         return new JsonResponse([
             'count' => count($entries),
             'limit' => $limit,
-            'file' => basename($this->logReaderService->getLogFilePath()),
+            'file' => basename($this->systemLogService->getLogFilePath()),
             'entries' => array_map(static fn($e) => $e->toArray(), $entries),
         ]);
     }
