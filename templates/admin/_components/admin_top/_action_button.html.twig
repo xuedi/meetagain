@@ -1,0 +1,6 @@
+<a href="{{ action.target }}" class="button is-small{% if action.variant %} {{ action.variant }}{% endif %}">
+    {% if action.icon %}
+        <span class="icon is-small"><i class="fa fa-{{ action.icon }}"></i></span>
+    {% endif %}
+    <span>{{ action.label }}</span>
+</a>

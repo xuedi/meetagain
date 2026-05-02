@@ -4,7 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/logs/_tabs_navigation.html.twig' with {'activeLog': activeLog} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
