@@ -4,23 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'sendlog'} %}
-
-        <div class="mb-4">
-            <a href="{{ path('app_admin_email_sendlog') }}" class="button is-small">
-                <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                <span>{{ 'global.button_back'|trans }}</span>
-            </a>
-            {% if email.status.value == 'late' or (email.maxSendBy and email.status.value == 'pending' and email.maxSendBy|date('U') < 'now'|date('U')) %}
-                <form method="post" action="{{ path('app_admin_email_sendlog_clear_cap', {id: email.id}) }}" style="display:inline">
-                    <input type="hidden" name="_token" value="{{ csrf_token('clear_cap_' ~ email.id) }}">
-                    <button type="submit" class="button is-small is-warning">
-                        <span class="icon"><i class="fa fa-redo"></i></span>
-                        <span>{{ 'admin_email_sendlog.button_clear_cap_retry'|trans }}</span>
-                    </button>
-                </form>
-            {% endif %}
-        </div>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <table class="table is-fullwidth">
             <tbody>

@@ -4,9 +4,11 @@ namespace App\Repository;
 
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
+use App\Enum\EmailType;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,6 +19,73 @@ class EmailQueueRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, EmailQueue::class);
+    }
+
+    public function countAll(): int
+    {
+        return (int) $this
+            ->createQueryBuilder('eq')
+            ->select('COUNT(eq.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @param list<EmailQueueStatus>|null $statuses
+     * @return EmailQueue[]
+     */
+    public function findFiltered(
+        int $limit,
+        ?DateTimeImmutable $since = null,
+        ?EmailType $template = null,
+        ?string $recipient = null,
+        ?array $statuses = null,
+    ): array {
+        $qb = $this->createQueryBuilder('eq')
+            ->orderBy('eq.createdAt', 'DESC')
+            ->setMaxResults($limit);
+        $this->applyFilters($qb, $since, $template, $recipient, $statuses);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param list<EmailQueueStatus>|null $statuses
+     */
+    public function countFiltered(
+        ?DateTimeImmutable $since = null,
+        ?EmailType $template = null,
+        ?string $recipient = null,
+        ?array $statuses = null,
+    ): int {
+        $qb = $this->createQueryBuilder('eq')->select('COUNT(eq.id)');
+        $this->applyFilters($qb, $since, $template, $recipient, $statuses);
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param list<EmailQueueStatus>|null $statuses
+     */
+    private function applyFilters(
+        QueryBuilder $qb,
+        ?DateTimeImmutable $since,
+        ?EmailType $template,
+        ?string $recipient,
+        ?array $statuses,
+    ): void {
+        if ($since !== null) {
+            $qb->andWhere('eq.createdAt >= :since')->setParameter('since', $since);
+        }
+        if ($template !== null) {
+            $qb->andWhere('eq.template = :template')->setParameter('template', $template);
+        }
+        if ($recipient !== null && $recipient !== '') {
+            $qb->andWhere('eq.recipient = :recipient')->setParameter('recipient', $recipient);
+        }
+        if ($statuses !== null && $statuses !== []) {
+            $qb->andWhere('eq.status IN (:statuses)')->setParameter('statuses', $statuses);
+        }
     }
 
     public function getPendingCount(): int
