@@ -25,6 +25,11 @@ readonly class VerificationRequestEmail extends EmailAbstract
         return EmailType::VerificationRequest->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_verification_request';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

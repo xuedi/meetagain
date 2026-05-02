@@ -27,6 +27,11 @@ readonly class WelcomeEmail extends EmailAbstract
         return EmailType::Welcome->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_welcome';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

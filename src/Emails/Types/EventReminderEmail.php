@@ -38,6 +38,11 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
         return EmailType::EventReminder->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_event_reminder';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

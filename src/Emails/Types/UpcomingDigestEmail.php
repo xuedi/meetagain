@@ -46,6 +46,11 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         return EmailType::UpcomingEvents->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_upcoming_events';
+    }
+
     public function getDisplayMockData(): array
     {
         return [

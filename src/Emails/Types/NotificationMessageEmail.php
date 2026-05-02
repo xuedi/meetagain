@@ -28,6 +28,11 @@ readonly class NotificationMessageEmail extends EmailAbstract
         return EmailType::NotificationMessage->value;
     }
 
+    public function getTriggerLabel(): string
+    {
+        return 'admin_email_templates.trigger_notification_message';
+    }
+
     public function getDisplayMockData(): array
     {
         return [
