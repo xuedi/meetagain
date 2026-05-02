@@ -4,57 +4,38 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'debugging'} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <form method="post" action="{{ path('app_admin_email_debugging_send') }}">
+            <input type="hidden" name="emailType" value="{{ currentType }}">
+            <input type="hidden" name="language" value="{{ currentLanguage }}">
 
-            <div class="columns">
-                <div class="column is-4">
-                    <div class="field">
-                        <label class="label">{{ 'admin_email_debugging.field_email_type'|trans }}</label>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select id="emailType" name="emailType">
-                                    {% for emailType in emailTypes %}
-                                        <option value="{{ emailType.value }}"
-                                                data-context="{{ mockData[emailType.value].context|json_encode }}">
-                                            {{ emailType.value }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="column is-2">
-                    <div class="field">
-                        <label class="label">{{ 'admin_email_debugging.field_language'|trans }}</label>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select name="language">
-                                    {% for lang in languages %}
-                                        <option value="{{ lang }}">{{ lang }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="column">
-                    <div class="field">
-                        <label class="label">{{ 'admin_email_debugging.field_recipient'|trans }}</label>
-                        <div class="control">
-                            <input class="input" type="email" name="recipient" placeholder="test@example.com" required>
-                        </div>
-                    </div>
+            <div class="field">
+                <label class="label">{{ 'admin_email_debugging.field_recipient'|trans }}</label>
+                <div class="control">
+                    <input class="input" type="email" name="recipient" placeholder="test@example.com" required>
                 </div>
             </div>
 
             <div class="box">
-                <h3 class="subtitle">{{ 'admin_email_debugging.context_variables'|trans }}</h3>
-                <div id="contextFields"></div>
+                <h3 class="subtitle">{{ 'admin_email_debugging.mock_values'|trans }}</h3>
+                <div id="contextFields">
+                    {% for key, value in context %}
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">{{ key }}</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input" type="text" name="context[{{ key }}]" value="{{ value }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
 
             <div class="field">
@@ -70,8 +51,4 @@
 
     </div>
 
-{% endblock %}
-
-{% block javascripts %}
-    <script src="{{ asset('js/admin/email-debug.js') }}" defer></script>
 {% endblock %}

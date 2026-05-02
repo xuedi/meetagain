@@ -77,6 +77,8 @@ admin_email_planned:
     mode_only_expected: 'nur mit Empfängern'
     mode_all: 'alle Einträge'
 admin_email_debugging:
+    intro: 'Test-E-Mail senden, um Rendering und Zustellung zu prüfen.'
+    mock_values: 'Mock-Werte'
     field_email_type: 'E-Mail-Typ'
     field_language: 'Sprache'
     field_recipient: 'Empfänger-E-Mail'
