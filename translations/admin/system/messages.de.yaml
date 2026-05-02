@@ -80,6 +80,8 @@ admin_system_images:
     flash_thumbnails_cleaned: '%count% veraltetes Vorschaubild in %seconds% Sekunden gelöscht'
     flash_locations_synced: 'Bildortindex wurde synchronisiert.'
 admin_system_seo:
+    intro: 'Seitenweite Meta-Beschreibungen und IndexNow-Ping für die Suchmaschinen-Indexierung.'
+    confirm_submit_indexnow: 'Alle öffentlichen URLs jetzt an IndexNow senden?'
     button_submit_indexnow: 'An IndexNow senden'
     heading_meta: 'SEO-Meta-Beschreibungen'
     heading_indexnow: 'IndexNow'

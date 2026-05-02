@@ -80,6 +80,8 @@ admin_system_images:
     flash_thumbnails_cleaned: '已在%seconds%秒内删除%count%个过时缩略图'
     flash_locations_synced: '图片位置索引已同步。'
 admin_system_seo:
+    intro: '各页面元描述以及供搜索引擎索引的 IndexNow 推送。'
+    confirm_submit_indexnow: '立即将所有公开 URL 提交到 IndexNow？'
     button_submit_indexnow: '提交至IndexNow'
     heading_meta: 'SEO元描述'
     heading_indexnow: 'IndexNow'

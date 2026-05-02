@@ -80,6 +80,8 @@ admin_system_images:
     flash_thumbnails_cleaned: 'Deleted %count% obsolete thumbnail in %seconds% seconds'
     flash_locations_synced: 'Image location index has been synchronised.'
 admin_system_seo:
+    intro: 'Per-page meta descriptions and IndexNow ping for search-engine indexing.'
+    confirm_submit_indexnow: 'Submit all public URLs to IndexNow now?'
     button_submit_indexnow: 'Submit to IndexNow'
     heading_meta: 'SEO Meta Descriptions'
     heading_indexnow: 'IndexNow'
