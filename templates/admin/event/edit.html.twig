@@ -31,6 +31,8 @@
 
     <div class="container">
 
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
         {{ form_start(form) }}
 
         <div class="columns">
