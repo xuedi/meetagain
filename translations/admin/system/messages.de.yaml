@@ -104,6 +104,7 @@ admin_system_debug:
     heading: 'Fehler-Tracker'
     help: 'Lösen Sie eine Testausnahme aus, um zu überprüfen, ob Bugsink Fehler erfasst und Benachrichtigungs-E-Mails korrekt sendet.'
 admin_system_config:
+    intro: 'Site-weite Einstellungen: Identität, Absender, Footer und Ein-/Aus-Schalter.'
     heading_website_settings: 'Website-Einstellungen'
     heading_footer_columns: 'Footer-Spaltentitel'
     heading_on_off_settings: 'Ein/Aus-Einstellungen'

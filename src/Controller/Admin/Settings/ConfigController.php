@@ -2,8 +2,10 @@
 
 namespace App\Controller\Admin\Settings;
 
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Form\SettingsType;
 use App\Service\Config\ConfigService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,17 +16,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
-final class ConfigController extends AbstractAdminController
+final class ConfigController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return null;
-    }
-
     public function __construct(
+        TranslatorInterface $translator,
         private readonly ConfigService $configService,
-        private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+        parent::__construct($translator, 'config');
+    }
 
     #[Route('', name: 'app_admin_system')]
     public function index(): Response
@@ -43,10 +42,16 @@ final class ConfigController extends AbstractAdminController
             $this->addFlash('success', $this->translator->trans('admin_system_config.flash_saved'));
         }
 
+        $adminTop = new AdminTop(
+            info: [new AdminTopInfoText($this->translator->trans('admin_system_config.intro'))],
+        );
+
         return $this->render('admin/system/config/index.html.twig', [
             'active' => 'system',
             'form' => $form,
             'config' => $this->configService->getBooleanConfigs(),
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 

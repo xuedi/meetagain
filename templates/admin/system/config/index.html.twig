@@ -4,7 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'config'} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <div class="columns">
             <div class="column is-6">
@@ -44,7 +45,7 @@
                     </div>
                 </fieldset>
 
-                <button class="button is-link">{{ 'global.button_save'|trans }}</button>
+                <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
                 {{ form_end(form) }}
 
             </div>
