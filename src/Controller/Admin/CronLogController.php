@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Admin\Tabs\AdminTab;
 use App\Admin\Tabs\AdminTabs;
+use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
@@ -18,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/logs/cron')]
-final class CronLogController extends AbstractAdminController
+final class CronLogController extends AbstractAdminController implements AdminTabsInterface
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
@@ -99,7 +100,7 @@ final class CronLogController extends AbstractAdminController
             'active' => 'logs',
             'logs' => $logs,
             'adminTop' => $adminTop,
-            'adminTabs' => $this->buildLogsTabs(),
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -152,11 +153,11 @@ final class CronLogController extends AbstractAdminController
             'active' => 'logs',
             'log' => $cronLog,
             'adminTop' => $adminTop,
-            'adminTabs' => $this->buildLogsTabs(),
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
-    private function buildLogsTabs(): AdminTabs
+    public function getTabs(): AdminTabs
     {
         return new AdminTabs([
             new AdminTab(
