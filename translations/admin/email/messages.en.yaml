@@ -8,6 +8,7 @@ admin_email_blocklist:
     field_email: 'Email'
     field_reason: 'Reason'
     button_add: 'Add to blocklist'
+    summary_total: 'blocked addresses'
     flash_already_blocklisted: '"%email%" is already on the blocklist (reason: %reason%).'
     flash_added: 'Added "%email%" to the blocklist.'
     flash_removed: 'Removed "%email%" from the blocklist.'

@@ -4,9 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'blocklist'} %}
-
-        <h1 class="title">{{ 'admin_email_blocklist.add_title'|trans }}</h1>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <div class="columns">
             <div class="column is-8">
@@ -15,9 +14,6 @@
                 {{ form_row(form.reason) }}
                 <div class="field mt-5">
                     {{ form_widget(form.submit) }}
-                    <a href="{{ path('app_admin_email_blocklist') }}" class="button is-light">
-                        <span>{{ 'global.button_cancel'|trans }}</span>
-                    </a>
                 </div>
                 {{ form_end(form) }}
             </div>

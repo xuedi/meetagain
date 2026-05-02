@@ -8,6 +8,7 @@ admin_email_blocklist:
     field_email: 'E-Mail'
     field_reason: 'Grund'
     button_add: 'Zur Sperrliste hinzufügen'
+    summary_total: 'gesperrte Adressen'
     flash_already_blocklisted: '"%email%" ist bereits auf der Sperrliste (Grund: %reason%).'
     flash_added: '"%email%" wurde zur Sperrliste hinzugefügt.'
     flash_removed: '"%email%" wurde von der Sperrliste entfernt.'
