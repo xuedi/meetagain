@@ -28,6 +28,9 @@ admin_system_plugins:
     flash_uninstalled: '插件"%plugin%"已卸载。'
     flash_enabled: '插件"%plugin%"已启用。'
     flash_disabled: '插件"%plugin%"已禁用。'
+    summary_available: '可用'
+    summary_installed: '已安装'
+    summary_enabled: '已启用'
 admin_system_sitemap:
     col_section: '分区'
     col_label: '标签'

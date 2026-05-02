@@ -28,6 +28,9 @@ admin_system_plugins:
     flash_uninstalled: 'Plugin "%plugin%" deinstalliert.'
     flash_enabled: 'Plugin "%plugin%" aktiviert.'
     flash_disabled: 'Plugin "%plugin%" deaktiviert.'
+    summary_available: 'verfügbar'
+    summary_installed: 'installiert'
+    summary_enabled: 'aktiviert'
 admin_system_sitemap:
     col_section: 'Abschnitt'
     col_label: 'Bezeichnung'

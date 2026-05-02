@@ -51,7 +51,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController], []);
 
         $this->allowAll();
 
@@ -103,6 +103,7 @@ final class AdminNavigationServiceTest extends TestCase
             $this->security,
             $this->router,
             [$controllerZ, $controllerA, $controllerM],
+            [],
         );
 
         $this->allowAll();
@@ -155,6 +156,7 @@ final class AdminNavigationServiceTest extends TestCase
             $this->security,
             $this->router,
             [$systemController, $pluginController, $anotherPluginController],
+            [],
         );
 
         $this->allowAll();
@@ -205,6 +207,7 @@ final class AdminNavigationServiceTest extends TestCase
             $this->security,
             $this->router,
             [$controllerZ, $controllerA, $controllerM],
+            [],
         );
 
         $this->allowAll();
@@ -241,7 +244,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController], []);
 
         // Deny ROLE_ADMIN
         $this->denyAll();
@@ -263,7 +266,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController], []);
 
         $this->allowAll();
 
@@ -291,7 +294,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController], []);
 
         $this->allowAll();
 
@@ -336,6 +339,7 @@ final class AdminNavigationServiceTest extends TestCase
             $this->security,
             $this->router,
             [$singleLinkController, $multiLinkController],
+            [],
         );
 
         $this->allowAll();
@@ -372,7 +376,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$mockController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$mockController], []);
 
         // Only deny ROLE_ADMIN
         $this->security
@@ -421,7 +425,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController], []);
 
         $this->allowAll();
 
@@ -478,6 +482,7 @@ final class AdminNavigationServiceTest extends TestCase
             $this->security,
             $this->router,
             [$cmsController, $systemController, $modifierController],
+            [],
         );
 
         $this->allowAll();
@@ -533,7 +538,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$cmsController, $modifier1, $modifier2]);
+        $service = new AdminNavigationService($this->security, $this->router, [$cmsController, $modifier1, $modifier2], []);
 
         $this->allowAll();
 
@@ -577,7 +582,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController], []);
 
         $this->allowAll();
 
@@ -619,7 +624,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController], []);
         $this->allowAll();
 
         // Act
@@ -658,7 +663,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController], []);
         $this->allowAll();
 
         // Act
@@ -704,7 +709,7 @@ final class AdminNavigationServiceTest extends TestCase
                 return '/some/path';
             });
 
-        $service = new AdminNavigationService($this->security, $router, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $router, [$baseController, $modifierController], []);
         $this->allowAll();
 
         // Act
@@ -743,7 +748,7 @@ final class AdminNavigationServiceTest extends TestCase
             }
         };
 
-        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController]);
+        $service = new AdminNavigationService($this->security, $this->router, [$baseController, $modifierController], []);
         $this->allowAll();
 
         // Act
@@ -781,7 +786,7 @@ final class AdminNavigationServiceTest extends TestCase
                 return '/some/path';
             });
 
-        $service = new AdminNavigationService($this->security, $router, [$mockController]);
+        $service = new AdminNavigationService($this->security, $router, [$mockController], []);
         $this->allowAll();
 
         // Act

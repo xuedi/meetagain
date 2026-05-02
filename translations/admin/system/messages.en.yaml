@@ -28,6 +28,9 @@ admin_system_plugins:
     flash_uninstalled: 'Plugin "%plugin%" uninstalled.'
     flash_enabled: 'Plugin "%plugin%" enabled.'
     flash_disabled: 'Plugin "%plugin%" disabled.'
+    summary_available: 'available'
+    summary_installed: 'installed'
+    summary_enabled: 'enabled'
 admin_system_sitemap:
     col_section: 'Section'
     col_label: 'Label'
