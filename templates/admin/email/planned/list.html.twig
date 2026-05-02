@@ -4,7 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/email/_tabs_navigation.html.twig' with {'activeSection': 'planned'} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         {% if items is empty %}
             <p class="has-text-grey">{{ 'admin_email_planned.empty'|trans }}</p>

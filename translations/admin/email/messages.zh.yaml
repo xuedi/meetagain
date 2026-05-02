@@ -71,6 +71,11 @@ admin_email_planned:
     col_mail_type: '邮件类型'
     col_description: '描述'
     col_expected_recipients: '预计收件人数'
+    summary_planned: '未来 14 天内计划'
+    filter_only_expected: '仅有收件人'
+    filter_show_all: '显示全部'
+    mode_only_expected: '仅有收件人'
+    mode_all: '全部条目'
 admin_email_debugging:
     field_email_type: '邮件类型'
     field_language: '语言'
