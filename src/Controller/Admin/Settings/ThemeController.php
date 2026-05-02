@@ -2,9 +2,13 @@
 
 namespace App\Controller\Admin\Settings;
 
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Entity\Image;
+use App\Entity\User;
 use App\Enum\ImageType;
 use App\Form\SiteLogoType;
 use App\Form\ThemeColorsType;
@@ -18,28 +22,26 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system/theme')]
-final class ThemeController extends AbstractAdminController
+#[IsGranted('ROLE_ADMIN')]
+final class ThemeController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return null;
-    }
-
     public function __construct(
+        TranslatorInterface $translator,
         private readonly ConfigService $configService,
         private readonly CommandService $commandService,
-        private readonly TranslatorInterface $translator,
         private readonly ImageService $imageService,
         private readonly ImageLocationService $imageLocationService,
         private readonly ImageRepository $imageRepository,
         private readonly EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+        parent::__construct($translator, 'theme');
+    }
 
-    #[Route('', name: 'app_admin_system_theme', methods: ['GET', 'POST'])]
+    #[Route('/admin/system/theme', name: 'app_admin_system_theme', methods: ['GET', 'POST'])]
     public function theme(Request $request): Response
     {
         $colorsForm = $this->createForm(ThemeColorsType::class);
@@ -58,7 +60,7 @@ final class ThemeController extends AbstractAdminController
             $file = $logoForm->get('file')->getData();
             if ($file instanceof UploadedFile) {
                 $oldId = $this->configService->getSiteLogoId();
-                $image = $this->imageService->upload($file, $this->getAuthedUser(), ImageType::SiteLogo);
+                $image = $this->imageService->upload($file, $this->requireUser(), ImageType::SiteLogo);
                 if ($image instanceof Image) {
                     $this->entityManager->flush();
                     $this->imageService->createThumbnails($image, ImageType::SiteLogo);
@@ -77,11 +79,54 @@ final class ThemeController extends AbstractAdminController
             $currentLogo = $this->imageRepository->find($currentLogoId);
         }
 
+        $adminTop = new AdminTop(
+            info: [new AdminTopInfoText($this->translator->trans('admin_system_theme.intro'))],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_system_theme.button_gallery'),
+                    target: $this->generateUrl('app_admin_system_gallery'),
+                    icon: 'palette',
+                ),
+            ],
+        );
+
         return $this->render('admin/system/theme/index.html.twig', [
             'active' => 'system',
             'colorsForm' => $colorsForm,
             'logoForm' => $logoForm,
             'currentLogo' => $currentLogo,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    #[Route('/admin/system/component-gallery', name: 'app_admin_system_gallery', methods: ['GET'])]
+    public function gallery(): Response
+    {
+        $adminTop = new AdminTop(
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_system_theme'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
+
+        return $this->render('admin/system/theme/gallery/index.html.twig', [
+            'active' => 'system',
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
+        ]);
+    }
+
+    private function requireUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException();
+        }
+
+        return $user;
     }
 }

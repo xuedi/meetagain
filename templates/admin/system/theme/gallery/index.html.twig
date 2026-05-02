@@ -4,6 +4,9 @@
 
     <div class="container">
 
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
         <h1 class="title is-3">{{ 'admin_system_gallery.page_title'|trans }}</h1>
         <p class="subtitle is-6 has-text-grey">{{ 'admin_system_gallery.intro'|trans }}</p>
 
@@ -82,7 +85,7 @@
                         <p class="subtitle is-6 has-text-grey">{{ ('admin_system_gallery.section_' ~ section.key ~ '_caption')|trans }}</p>
                         <hr>
                         <div class="box">
-                            {% include 'admin/_gallery/' ~ section.partial ~ '.html.twig' %}
+                            {% include 'admin/system/theme/gallery/' ~ section.partial ~ '.html.twig' %}
                         </div>
                     </section>
                 {% endfor %}
