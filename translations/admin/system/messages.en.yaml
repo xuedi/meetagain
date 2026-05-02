@@ -1,4 +1,6 @@
 admin_system_language:
+    summary_total: 'languages'
+    summary_enabled: 'enabled'
     col_flag: 'Flag'
     col_code: 'Code'
     col_name: 'Name'

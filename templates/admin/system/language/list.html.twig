@@ -4,7 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/system/_tabs_navigation.html.twig' with {'activeSection': 'language'} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
@@ -17,7 +18,7 @@
                 <th>{{ 'admin_system_language.col_sort_order'|trans }}</th>
                 <th>
                     <a href="{{ path('app_admin_language_add') }}">
-                        <span class="icon"><i class="fa fa-add"></i></span>
+                        <span class="icon"><i class="fa fa-plus"></i></span>
                     </a>
                 </th>
             </tr>

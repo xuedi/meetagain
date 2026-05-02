@@ -1,4 +1,6 @@
 admin_system_language:
+    summary_total: '种语言'
+    summary_enabled: '已启用'
     col_flag: '旗帜'
     col_code: '代码'
     col_name: '名称'

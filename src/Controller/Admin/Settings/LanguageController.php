@@ -2,47 +2,75 @@
 
 namespace App\Controller\Admin\Settings;
 
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Image;
-use App\Enum\ImageType;
 use App\Entity\Language;
+use App\Entity\User;
+use App\Enum\ImageType;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/language')]
-final class LanguageController extends AbstractAdminController
+final class LanguageController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return null;
-    }
-
     public function __construct(
+        TranslatorInterface $translator,
         private readonly LanguageRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
         private readonly ImageService $imageService,
         private readonly ImageLocationService $imageLocationService,
-        private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+        parent::__construct($translator, 'language');
+    }
 
     #[Route('', name: 'app_admin_language')]
     public function list(): Response
     {
+        $languages = $this->repo->findAllOrdered();
+        $enabledCount = 0;
+        foreach ($languages as $language) {
+            if ($language->isEnabled()) {
+                ++$enabledCount;
+            }
+        }
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    count($languages),
+                    $this->translator->trans('admin_system_language.summary_total'),
+                )),
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    $enabledCount,
+                    $this->translator->trans('admin_system_language.summary_enabled'),
+                )),
+            ],
+        );
+
         return $this->render('admin/system/language/list.html.twig', [
             'active' => 'system',
-            'languages' => $this->repo->findAllOrdered(),
+            'languages' => $languages,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -76,6 +104,8 @@ final class LanguageController extends AbstractAdminController
             'form' => $form,
             'language' => $language,
             'isEdit' => false,
+            'adminTop' => $this->buildEditAdminTop(false),
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -103,7 +133,7 @@ final class LanguageController extends AbstractAdminController
 
             $this->addFlash('success', $this->translator->trans('admin_system_language.flash_updated'));
 
-            return $this->redirectToRoute('app_admin_language');
+            return $this->redirectToRoute('app_admin_language_edit', ['id' => $language->getId()]);
         }
 
         return $this->render('admin/system/language/edit.html.twig', [
@@ -111,6 +141,8 @@ final class LanguageController extends AbstractAdminController
             'form' => $form,
             'language' => $language,
             'isEdit' => true,
+            'adminTop' => $this->buildEditAdminTop(true, $language),
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -124,7 +156,35 @@ final class LanguageController extends AbstractAdminController
         return $this->redirectToRoute('app_admin_language');
     }
 
-    private function handleImageUpload(mixed $form, Language $language): void
+    private function buildEditAdminTop(bool $isEdit, ?Language $language = null): AdminTop
+    {
+        $titleKey = $isEdit ? 'admin_system_language.page_title_edit' : 'admin_system_language.page_title_add';
+        $info = [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%s</strong>',
+                htmlspecialchars($this->translator->trans($titleKey), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            )),
+        ];
+        if ($isEdit && $language !== null) {
+            $info[] = new AdminTopInfoHtml(sprintf(
+                '<span class="tag is-light">%s</span>',
+                htmlspecialchars((string) $language->getCode(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            ));
+        }
+
+        return new AdminTop(
+            info: $info,
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_language'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
+    }
+
+    private function handleImageUpload(FormInterface $form, Language $language): void
     {
         $imageData = $form->get('tileImage')->getData();
         if (!$imageData instanceof UploadedFile) {
@@ -132,6 +192,9 @@ final class LanguageController extends AbstractAdminController
         }
 
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException();
+        }
 
         $image = $this->imageService->upload($imageData, $user, ImageType::LanguageTile);
         if ($image instanceof Image) {
