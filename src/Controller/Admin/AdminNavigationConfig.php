@@ -4,6 +4,11 @@ namespace App\Controller\Admin;
 
 use App\Entity\AdminLink;
 
+/**
+ * @deprecated since 2026-04-30, use {@see \App\Admin\Navigation\AdminNavigationConfig} instead.
+ *             This class will be removed once all admin controllers have migrated to the new
+ *             Admin\Navigation module. See plan 2026-04-30_admin-top-component.md.
+ */
 readonly class AdminNavigationConfig
 {
     /**

@@ -2,6 +2,11 @@
 
 namespace App\Entity;
 
+/**
+ * @deprecated since 2026-04-30, use {@see \App\Admin\Navigation\AdminLink} instead.
+ *             This class will be removed once all admin controllers have migrated to the new
+ *             Admin\Navigation module. See plan 2026-04-30_admin-top-component.md.
+ */
 readonly class AdminLink
 {
     public function __construct(

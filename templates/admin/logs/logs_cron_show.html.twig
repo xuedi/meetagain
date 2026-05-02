@@ -4,39 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/logs/_tabs_navigation.html.twig' with {'activeLog': activeLog} %}
-
-        <div class="box">
-            <div class="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <strong>{{ log.runAt | date('Y-m-d H:i:s') }}</strong>
-                    </div>
-                    <div class="level-item">
-                        {% if log.status.value == 'ok' %}
-                            <span class="tag is-success is-medium">{{ 'admin_logs.status_ok'|trans }}</span>
-                        {% elseif log.status.value == 'warning' %}
-                            <span class="tag is-warning is-medium">{{ 'admin_logs.status_warning'|trans }}</span>
-                        {% elseif log.status.value == 'error' %}
-                            <span class="tag is-danger is-medium">{{ 'admin_logs.status_error'|trans }}</span>
-                        {% else %}
-                            <span class="tag is-danger is-dark is-medium">{{ 'admin_logs.status_exception'|trans }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="level-item has-text-grey">
-                        {{ log.durationMs }} {{ 'admin_logs.duration_ms_total'|trans }}
-                    </div>
-                </div>
-                <div class="level-right">
-                    <div class="level-item">
-                        <a href="{{ path('app_admin_cron_log') }}" class="button is-small">
-                            <span class="icon is-small"><i class="fa fa-arrow-left"></i></span>
-                            <span>{{ 'admin_logs.back'|trans }}</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <table class="table is-fullwidth">
             <thead>
