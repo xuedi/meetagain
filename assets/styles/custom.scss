@@ -184,30 +184,6 @@ details.activities-load-more {
     margin-bottom: 0;
 }
 
-// Permissions accordion (legacy, pre-component)
-.perm-section-header {
-    cursor: pointer;
-    user-select: none;
-    background: #f5f5f5;
-    border-radius: 6px;
-    transition: background 0.12s ease;
-    gap: 0.75rem;
-}
-.perm-section-header:hover { background: #ebebeb; }
-.perm-section-header.is-open {
-    border-radius: 6px 6px 0 0;
-    margin-bottom: 0 !important;
-}
-.perm-section-header.is-open + .perm-section-body {
-    border: 1px solid #e8e8e8;
-    border-top: none;
-    border-radius: 0 0 6px 6px;
-    overflow: hidden;
-}
-.perm-section-header.is-open + .perm-section-body table {
-    margin-bottom: 0;
-}
-
 // API documentation
 .api-endpoint                     { width: fit-content; border-left: 4px solid transparent; padding: 0.35rem 0.5rem; border-radius: 4px; margin-bottom: 0.25rem; }
 .api-endpoint .buttons.has-addons { display: inline-flex; margin-bottom: 0; }
