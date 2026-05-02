@@ -1,11 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Admin\Email;
 
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
+use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\EmailBlocklistEntry;
 use App\Entity\User;
 use App\Form\EmailBlocklistType;
@@ -19,25 +19,43 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/blocklist')]
-final class BlocklistController extends AbstractAdminController
+final class BlocklistController extends AbstractEmailController implements AdminTabsInterface
 {
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return null;
-    }
-
     public function __construct(
+        TranslatorInterface $translator,
         private readonly EmailBlocklistRepository $repo,
         private readonly EntityManagerInterface $em,
-        private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+        parent::__construct($translator, 'blocklist');
+    }
 
     #[Route('', name: 'app_admin_email_blocklist')]
     public function list(): Response
     {
+        $entries = $this->repo->findAllOrdered();
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    count($entries),
+                    $this->translator->trans('admin_email_blocklist.summary_total'),
+                )),
+            ],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_email_blocklist.button_add'),
+                    target: $this->generateUrl('app_admin_email_blocklist_add'),
+                    icon: 'plus',
+                ),
+            ],
+        );
+
         return $this->render('admin/email/blocklist/list.html.twig', [
             'active' => 'email',
-            'entries' => $this->repo->findAllOrdered(),
+            'entries' => $entries,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -59,6 +77,8 @@ final class BlocklistController extends AbstractAdminController
                 return $this->render('admin/email/blocklist/add.html.twig', [
                     'active' => 'email',
                     'form' => $form,
+                    'adminTop' => $this->buildAddAdminTop(),
+                    'adminTabs' => $this->getTabs(),
                 ]);
             }
 
@@ -80,6 +100,8 @@ final class BlocklistController extends AbstractAdminController
         return $this->render('admin/email/blocklist/add.html.twig', [
             'active' => 'email',
             'form' => $form,
+            'adminTop' => $this->buildAddAdminTop(),
+            'adminTabs' => $this->getTabs(),
         ]);
     }
 
@@ -95,5 +117,24 @@ final class BlocklistController extends AbstractAdminController
         ]));
 
         return $this->redirectToRoute('app_admin_email_blocklist');
+    }
+
+    private function buildAddAdminTop(): AdminTop
+    {
+        return new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%s</strong>',
+                    htmlspecialchars($this->translator->trans('admin_email_blocklist.add_title'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                )),
+            ],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_email_blocklist'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
     }
 }
