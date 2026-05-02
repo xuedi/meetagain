@@ -411,7 +411,6 @@ admin_system:
     tab_config: 'Config'
     tab_theme: 'Theme'
     tab_images: 'Images'
-    tab_gallery: 'Gallery'
     tab_language: 'Language'
     tab_seo: 'SEO'
     tab_debug: 'Debug'

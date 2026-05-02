@@ -127,6 +127,7 @@ admin_system_config:
     field_footer_col3: '页脚栏3'
     field_footer_col4: '页脚栏4'
 admin_system_theme:
+    intro: '自定义站点 Logo 与配色方案。保存颜色后会重新构建 CSS 包。'
     heading_colors: '主题颜色'
     help_colors: '自定义网站配色方案以匹配您的品牌。灰色文字颜色已针对WCAG AA无障碍合规性进行优化。'
     color_primary: '主按钮和高亮'

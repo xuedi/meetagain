@@ -54,12 +54,6 @@ abstract class AbstractSettingsController extends AbstractController
                 isActive: $this->activeSettingsTab === 'images',
             ),
             new AdminTab(
-                label: $this->translator->trans('admin_system.tab_gallery'),
-                target: $this->generateUrl('app_admin_system_gallery'),
-                icon: 'th-large',
-                isActive: $this->activeSettingsTab === 'gallery',
-            ),
-            new AdminTab(
                 label: $this->translator->trans('admin_system.tab_language'),
                 target: $this->generateUrl('app_admin_language'),
                 icon: 'language',
