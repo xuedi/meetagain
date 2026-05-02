@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Image;
 use App\Entity\User;
+use App\Enum\ImageType;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -108,6 +109,37 @@ class ImageRepository extends ServiceEntityRepository
         }
 
         return $return;
+    }
+
+    /**
+     * @return Image[]
+     */
+    public function findFiltered(?ImageType $type, ?DateTimeImmutable $since): array
+    {
+        $qb = $this->createQueryBuilder('i')->orderBy('i.createdAt', 'DESC');
+        if ($type !== null) {
+            $qb->andWhere('i.type = :type')->setParameter('type', $type);
+        }
+
+        if ($since !== null) {
+            $qb->andWhere('i.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countFiltered(?ImageType $type, ?DateTimeImmutable $since): int
+    {
+        $qb = $this->createQueryBuilder('i')->select('COUNT(i.id)');
+        if ($type !== null) {
+            $qb->andWhere('i.type = :type')->setParameter('type', $type);
+        }
+
+        if ($since !== null) {
+            $qb->andWhere('i.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     public function getFileList(): array
