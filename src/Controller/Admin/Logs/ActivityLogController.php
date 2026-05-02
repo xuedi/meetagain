@@ -3,14 +3,13 @@
 namespace App\Controller\Admin\Logs;
 
 use App\Activity\ActivityService;
+use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
-use App\Controller\Admin\AdminNavigationConfig;
-use App\Entity\AdminLink;
 use App\Entity\User;
 use App\Repository\ActivityRepository;
 use App\Repository\UserRepository;
@@ -22,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/logs')]
-final class ActivityLogController extends AbstractLogsController implements AdminTabsInterface
+final class ActivityLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
     private const int LIST_LIMIT = 5000;
@@ -43,22 +42,6 @@ final class ActivityLogController extends AbstractLogsController implements Admi
         private readonly UserRepository $userRepository,
     ) {
         parent::__construct($translator, 'activity');
-    }
-
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return new AdminNavigationConfig(
-            section: 'admin_shell.section_system',
-            links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_logs',
-                    route: 'app_admin_activity_log',
-                    active: 'logs',
-                    role: 'ROLE_ADMIN',
-                ),
-            ],
-            sectionPriority: 100,
-        );
     }
 
     #[Route('', name: 'app_admin_logs')]

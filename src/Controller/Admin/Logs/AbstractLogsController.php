@@ -2,13 +2,14 @@
 
 namespace App\Controller\Admin\Logs;
 
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Tabs\AdminTab;
 use App\Admin\Tabs\AdminTabs;
-use App\Controller\Admin\AbstractAdminController;
-use App\Controller\Admin\AdminNavigationConfig;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class AbstractLogsController extends AbstractAdminController
+abstract class AbstractLogsController extends AbstractController
 {
     public function __construct(
         protected readonly TranslatorInterface $translator,
@@ -17,7 +18,18 @@ abstract class AbstractLogsController extends AbstractAdminController
 
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
-        return null;
+        return new AdminNavigationConfig(
+            section: 'admin_shell.section_system',
+            links: [
+                new AdminLink(
+                    label: 'admin_shell.menu_logs',
+                    route: 'app_admin_activity_log',
+                    active: 'logs',
+                    role: 'ROLE_ADMIN',
+                ),
+            ],
+            sectionPriority: 100,
+        );
     }
 
     final public function getTabs(): AdminTabs

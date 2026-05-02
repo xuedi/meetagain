@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin\Email;
 
+use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
@@ -24,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/debugging')]
-final class DebuggingController extends AbstractEmailController implements AdminTabsInterface
+final class DebuggingController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     /**
      * @param iterable<EmailInterface> $emailTypes
