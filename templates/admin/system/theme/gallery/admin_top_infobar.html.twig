@@ -1,0 +1,32 @@
+{#
+    Gallery: AdminTop infobar -- Tab strip + page-top infobar shown on every admin page
+
+    Two stub renders that exercise the same `admin_top.html.twig` partial: a list-page
+    shape (info: total + in-range count + status tag; actions: filter dropdown + Back)
+    and a detail-page shape (info: strong identifier + a `tag is-light` type label;
+    actions: Back). The tab strip is rendered above with two demo tabs to show how
+    `admin_tabs.html.twig` sits above the infobar on tabbed groups. Mirrors
+    `ActivityLogController` and `SendlogController::show()`.
+
+    Used in:    admin/system/theme/gallery/index.html.twig
+    Parameters:
+        - galleryAdminTabsDemo  (App\Admin\Tabs\AdminTabs, required)
+        - galleryAdminTopList   (App\Admin\Top\AdminTop, required)
+        - galleryAdminTopDetail (App\Admin\Top\AdminTop, required)
+    Depends on: admin/_components/admin_tabs.html.twig, admin/_components/admin_top.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>src/Admin/Top/AdminTop.php</code>,
+    <code>templates/admin/_components/admin_top.html.twig</code>,
+    <code>templates/admin/_components/admin_tabs.html.twig</code>
+</p>
+
+<h3 class="title is-6 mt-4">{{ 'admin_system_gallery.variation_label'|trans }} (a) tab strip</h3>
+{% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': galleryAdminTabsDemo} only %}
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (b) list-page topbar</h3>
+{% include 'admin/_components/admin_top.html.twig' with {'adminTop': galleryAdminTopList} only %}
+
+<h3 class="title is-6 mt-5">{{ 'admin_system_gallery.variation_label'|trans }} (c) detail-page topbar</h3>
+{% include 'admin/_components/admin_top.html.twig' with {'adminTop': galleryAdminTopDetail} only %}
