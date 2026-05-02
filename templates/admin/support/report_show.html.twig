@@ -4,20 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/support/_tabs_navigation.html.twig' with {'activeSection': 'reports'} %}
-
-        <div class="mb-4 is-flex is-gap-3">
-            <a href="{{ path('app_admin_support_reports') }}" class="button is-small">
-                <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                <span>{{ 'admin_support.button_back'|trans }}</span>
-            </a>
-            {% if report.image %}
-                <a href="{{ path('app_admin_system_images_show', {'id': report.image.id}) }}" class="button is-small">
-                    <span class="icon"><i class="fa fa-eye"></i></span>
-                    <span>{{ 'admin_support.button_image_details'|trans }}</span>
-                </a>
-            {% endif %}
-        </div>
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <div class="columns">
             <div class="column is-narrow">
@@ -85,17 +73,6 @@
                                 {% endif %}
                             </td>
                         </tr>
-                        {% if report.isOpen() %}
-                        <tr>
-                            <th></th>
-                            <td>
-                                <form method="post" action="{{ path('app_admin_support_report_resolve', {id: report.id}) }}">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('resolve_report_' ~ report.id) }}">
-                                    <button type="submit" class="button is-light">{{ 'admin_support.button_mark_resolved'|trans }}</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endif %}
                     </tbody>
                 </table>
             </div>

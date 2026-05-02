@@ -4,7 +4,8 @@
 
     <div class="container">
 
-        {% include 'admin/support/_tabs_navigation.html.twig' with {'activeSection': 'reports'} %}
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <table class="table is-fullwidth">
             <thead>
@@ -16,12 +17,11 @@
                 <th>{{ 'admin_support.col_remarks'|trans }}</th>
                 <th>{{ 'admin_support.col_status'|trans }}</th>
                 <th></th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
             {% for report in reports %}
-                <tr{% if report.isOpen() %} class="has-background-warning-light"{% endif %}>
+                <tr>
                     <td>
                         {{ report.createdAt|date('Y-m-d') }}<br>
                         <small class="has-text-grey">{{ report.createdAt|date('H:i:s') }}</small>
@@ -50,14 +50,6 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if report.isOpen() %}
-                            <form method="post" action="{{ path('app_admin_support_report_resolve', {id: report.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('resolve_report_' ~ report.id) }}">
-                                <button type="submit" class="button is-small is-light">{{ 'admin_support.button_mark_resolved'|trans }}</button>
-                            </form>
-                        {% endif %}
-                    </td>
-                    <td>
                         <a href="{{ path('app_admin_support_report_show', {id: report.id}) }}">
                             <span class="icon"><i class="fa fa-eye"></i></span>
                         </a>
@@ -65,7 +57,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="8" class="has-text-centered has-text-grey">
+                    <td colspan="7" class="has-text-centered has-text-grey">
                         {{ 'admin_support.empty_reports'|trans }}
                     </td>
                 </tr>

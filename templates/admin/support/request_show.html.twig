@@ -1,0 +1,51 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <th>{{ 'admin_support.label_id'|trans }}</th>
+                    <td><code>{{ request.id }}</code></td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support.col_date'|trans }}</th>
+                    <td>{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support.col_type'|trans }}</th>
+                    <td><span class="tag is-light">{{ request.contactType.label() }}</span></td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support.col_name'|trans }}</th>
+                    <td>{{ request.name }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support.col_email'|trans }}</th>
+                    <td><a href="mailto:{{ request.email }}">{{ request.email }}</a></td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support.col_message'|trans }}</th>
+                    <td>{{ request.message|nl2br }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support.col_status'|trans }}</th>
+                    <td>
+                        {% if request.isNew() %}
+                            <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
+                        {% else %}
+                            <span class="tag is-light">{{ 'admin_support.status_read'|trans }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
