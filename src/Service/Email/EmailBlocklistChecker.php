@@ -5,15 +5,16 @@ namespace App\Service\Email;
 use App\Repository\EmailBlocklistRepository;
 
 /**
- * Wraps EmailBlocklistRepository with a per-request / per-CLI-invocation memo so a cron sweep
- * over thousands of recipients does not re-query the DB for the same address.
+ * Wraps EmailBlocklistRepository with a per-request / per-CLI-invocation cache. The first call
+ * loads the entire blocklist into memory in a single query; subsequent lookups are O(1) hash
+ * checks. Blocklists are hand-curated bounce/spam addresses, so the full set fits in RAM trivially.
  *
- * Non-readonly because of the memo array.
+ * Non-readonly because of the lazy loaded set.
  */
 final class EmailBlocklistChecker implements BlocklistCheckerInterface
 {
-    /** @var array<string, bool> */
-    private array $memo = [];
+    /** @var array<string, true>|null */
+    private ?array $blockedSet = null;
 
     public function __construct(
         private readonly EmailBlocklistRepository $repository,
@@ -26,10 +27,13 @@ final class EmailBlocklistChecker implements BlocklistCheckerInterface
             return false;
         }
 
-        if (array_key_exists($key, $this->memo)) {
-            return $this->memo[$key];
+        if ($this->blockedSet === null) {
+            $this->blockedSet = [];
+            foreach ($this->repository->findAllOrdered() as $entry) {
+                $this->blockedSet[strtolower(trim((string) $entry->getEmail()))] = true;
+            }
         }
 
-        return $this->memo[$key] = $this->repository->isBlocked($key);
+        return isset($this->blockedSet[$key]);
     }
 }
