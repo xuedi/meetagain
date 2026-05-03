@@ -41,7 +41,6 @@ final class AdminController extends AbstractController
             // Side tiles data
             'actionItems' => $this->dashboardAction->getActionItems(),
             'unverifiedCount' => $this->dashboardAction->getUnverifiedCount(),
-            'upcomingEvents' => $this->dashboardAction->getUpcomingEvents(3),
             'details' => $this->dashboardStats->getDetails($year, $week),
             'activeUsers' => $this->dashboardAction->getActiveUsersCount(),
             'recurringEvents' => $this->dashboardAction->getRecurringEventsCount(),

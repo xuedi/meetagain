@@ -74,31 +74,6 @@
 
         {# Side column (4-wide) - Fixed info #}
         <div class="column is-4">
-            {# Upcoming Events (Priority 90) - ROLE_ORGANIZER #}
-            {% if is_granted('ROLE_ORGANIZER') %}
-            <div class="box">
-                <h2 class="title is-6">{{ 'admin_shell.dashboard_upcoming_title'|trans }}</h2>
-                {% if upcomingEvents|length == 0 %}
-                    <p class="has-text-grey">{{ 'admin_shell.dashboard_upcoming_empty'|trans }}</p>
-                {% else %}
-                    <table class="table is-fullwidth is-narrow">
-                        <tbody>
-                        {% for event in upcomingEvents %}
-                            <tr>
-                                <td>{{ event.start|date('Y-m-d') }}</td>
-                                <td>
-                                    <a href="{{ path('app_event_details', {'id': event.id}) }}">
-                                        {{ event.getTitle('en')|u.truncate(25) }}
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-            </div>
-            {% endif %}
-
             {# Quick Statistics (Priority 80) - ROLE_ADMIN only #}
             {% if is_granted('ROLE_ADMIN') %}
             <div class="box">

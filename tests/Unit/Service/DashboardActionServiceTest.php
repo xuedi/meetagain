@@ -99,16 +99,6 @@ class DashboardActionServiceTest extends TestCase
         static::assertSame($stats, $result);
     }
 
-    public function testGetUpcomingEventsReturnsEvents(): void
-    {
-        $events = [new Event(), new Event(), new Event()];
-        $this->eventRepoStub->method('getUpcomingEvents')->willReturn($events);
-
-        $result = $this->subject->getUpcomingEvents(3);
-
-        static::assertCount(3, $result);
-    }
-
     public function testGetPastEventsWithoutPhotosReturnsEvents(): void
     {
         $events = [new Event()];

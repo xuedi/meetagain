@@ -53,11 +53,6 @@ readonly class DashboardActionService
         return $this->imageRepo->getStorageStats($start, $stop);
     }
 
-    public function getUpcomingEvents(int $limit = 3): array
-    {
-        return $this->eventRepo->getUpcomingEvents($limit);
-    }
-
     public function getPastEventsWithoutPhotos(int $limit = 5): array
     {
         return $this->eventRepo->getPastEventsWithoutPhotos($limit);
