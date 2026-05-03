@@ -18,6 +18,7 @@ use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,13 +29,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/cms')]
-final class CmsBlockController extends AbstractAdminController
+final class CmsBlockController extends AbstractController
 {
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return null;
-    }
-
     public function __construct(
         private readonly CmsRepository $cmsRepo,
         private readonly EntityManagerInterface $em,
