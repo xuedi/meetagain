@@ -20,8 +20,6 @@ admin_shell:
     dashboard_rsvp_no: 'Nein'
     dashboard_rsvp_total: 'Gesamt'
     dashboard_not_found_title: 'Nicht gefundene Seiten (diese Woche)'
-    dashboard_upcoming_title: 'Bevorstehende Events - Plattform'
-    dashboard_upcoming_empty: 'Keine bevorstehenden Events'
     dashboard_stats_title: 'Statistiken'
     dashboard_stats_metric: 'Kennzahl'
     dashboard_stats_all: 'Gesamt'
