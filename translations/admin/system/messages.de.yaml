@@ -155,6 +155,13 @@ admin_system_config:
     field_footer_col2: 'Fußzeile Spalte 2'
     field_footer_col3: 'Fußzeile Spalte 3'
     field_footer_col4: 'Fußzeile Spalte 4'
+    heading_website_image: 'Website-Bild'
+    help_website_image: 'Empfohlen 1200 x 630 px, JPEG/PNG/WebP, max. 5 MB. Wird als Standard-Vorschau beim Teilen von Links verwendet.'
+    current_website_image_label: 'Aktuelles Bild'
+    no_website_image_label: 'Kein Bild gesetzt'
+    field_website_image_label: 'Neues Bild hochladen'
+    usage_website_image: 'Wird als Link-Vorschau angezeigt, wenn jemand eine Seite dieser Site in sozialen Medien oder Chat-Apps teilt.'
+    flash_website_image_saved: 'Website-Bild gespeichert'
 admin_system_theme:
     intro: 'Logo und Farbpalette der Website anpassen. Beim Speichern der Farben wird das CSS-Bundle neu gebaut.'
     heading_colors: 'Design-Farben'

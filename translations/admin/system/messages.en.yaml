@@ -155,6 +155,13 @@ admin_system_config:
     field_footer_col2: 'Footer Column 2'
     field_footer_col3: 'Footer Column 3'
     field_footer_col4: 'Footer Column 4'
+    heading_website_image: 'Website image'
+    help_website_image: 'Recommended 1200 x 630 px, JPEG/PNG/WebP, max 5 MB. Used as default social-share preview when links are shared.'
+    current_website_image_label: 'Current image'
+    no_website_image_label: 'No image set'
+    field_website_image_label: 'Upload new image'
+    usage_website_image: 'Shown as the link preview when someone shares a page from this site on social media or in chat apps.'
+    flash_website_image_saved: 'Website image saved'
 admin_system_theme:
     intro: 'Customise the site logo and colour palette. Saving the colours rebuilds the CSS bundle.'
     heading_colors: 'Theme Colors'

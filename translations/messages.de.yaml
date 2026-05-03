@@ -1,4 +1,5 @@
 chrome:
+    og_image_default_alt: 'meetAgain - Wo sich alle wiedersehen'
     menu_login: 'Anmelden'
     menu_default: 'Startseite'
     menu_events: 'Events'
