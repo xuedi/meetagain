@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Twig;
 
-use App\Entity\AdminSection;
 use App\Entity\EventListItemTag;
 use App\Entity\Link;
 use App\Enum\WarmCacheType;
@@ -37,7 +36,6 @@ final class PluginExtension extends AbstractExtension
     {
         return [
             new TwigFunction('get_plugins_links', $this->getPluginsLinks(...)),
-            new TwigFunction('get_plugins_admin_system_links', $this->getPluginsAdminSystemLinks(...)),
             new TwigFunction('get_plugin_stylesheets', $this->getPluginStylesheets(...)),
             new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
@@ -62,14 +60,6 @@ final class PluginExtension extends AbstractExtension
     public function isPluginEnabled(string $pluginKey): bool
     {
         return in_array($pluginKey, $this->pluginService->getActiveList(), true);
-    }
-
-    /**
-     * @return list<AdminSection>
-     */
-    public function getPluginsAdminSystemLinks(): array
-    {
-        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getAdminSection());
     }
 
     /**
