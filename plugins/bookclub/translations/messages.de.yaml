@@ -1,4 +1,5 @@
 bookclub:
+    menu_books: 'Bücher'
     page_title: 'Buchclub'
     button_add_book: 'Buch hinzufügen'
     button_suggestions: 'Vorschläge'
