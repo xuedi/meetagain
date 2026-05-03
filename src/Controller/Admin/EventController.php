@@ -99,9 +99,10 @@ final class EventController extends AbstractController implements AdminNavigatio
 
         $canceledCount = 0;
         foreach ($events as $event) {
-            if ($event->isCanceled()) {
-                $canceledCount++;
+            if (!$event->isCanceled()) {
+                continue;
             }
+            $canceledCount++;
         }
 
         $info = [
@@ -200,7 +201,7 @@ final class EventController extends AbstractController implements AdminNavigatio
     }
 
     /**
-     * @param list<Event> $allEvents
+     * @param array<Event> $allEvents
      */
     private function buildTypeDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
     {
@@ -254,7 +255,7 @@ final class EventController extends AbstractController implements AdminNavigatio
     }
 
     /**
-     * @param list<Event> $allEvents
+     * @param array<Event> $allEvents
      */
     private function buildScheduleDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
     {
