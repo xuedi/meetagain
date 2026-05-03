@@ -1,70 +1,53 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\NonLocale\Api;
+namespace Plugin\Dinnerclub\Controller\NonLocale\Api;
 
-use App\Controller\AbstractController;
-use App\Filter\Event\EventFilterService;
-use App\Repository\EventRepository;
 use App\Service\Api\ApiCache;
-use App\Service\Api\EventApiSerializer;
+use App\Service\Api\PluginRouteGuard;
 use App\Service\Config\LanguageService;
-use DateTimeImmutable;
-use Exception;
+use Plugin\Dinnerclub\Repository\DinnerRepository;
+use Plugin\Dinnerclub\Service\Api\DinnerSerializer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class EventApiController extends AbstractController
+final class DinnerApiController extends AbstractController
 {
+    private const string PLUGIN_KEY = 'dinnerclub';
     private const int DEFAULT_LIMIT = 20;
     private const int MAX_LIMIT = 100;
-    private const int TTL_SECONDS = 60;
+    private const int TTL_SECONDS = 120;
 
     public function __construct(
-        private readonly EventRepository $eventRepository,
-        private readonly EventFilterService $eventFilterService,
-        private readonly EventApiSerializer $serializer,
+        private readonly DinnerRepository $dinnerRepository,
+        private readonly DinnerSerializer $serializer,
         private readonly LanguageService $languageService,
+        private readonly PluginRouteGuard $pluginRouteGuard,
         private readonly ApiCache $apiCache,
     ) {}
 
-    #[Route('/api/events', name: 'app_api_events_list', methods: ['GET'])]
+    #[Route('/api/dinners', name: 'plugin_dinnerclub_api_dinners_list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {
-        $locale = $this->resolveLocale($request);
+        $this->pluginRouteGuard->requireActive(self::PLUGIN_KEY);
+
         $limit = $this->clamp((int) $request->query->get('limit', (string) self::DEFAULT_LIMIT), 1, self::MAX_LIMIT);
         $offset = max(0, (int) $request->query->get('offset', '0'));
 
-        $from = $this->parseDate($request->query->get('from', '')) ?? new DateTimeImmutable('now');
-        $to = $this->parseDate($request->query->get('to', ''));
-        $baseUrl = $request->getSchemeAndHttpHost();
-
         $payload = $this->apiCache->getJson(
             $request,
-            'events.list',
+            'dinnerclub.dinners.list',
             self::TTL_SECONDS,
-            [
-                'locale' => $locale,
-                'limit' => $limit,
-                'offset' => $offset,
-                'from' => $from->format('c'),
-                'to' => $to?->format('c'),
-                'baseUrl' => $baseUrl,
-            ],
-            function () use ($from, $to, $limit, $offset, $locale, $baseUrl): array {
-                $filterResult = $this->eventFilterService->getEventIdFilter();
-                $restrictToIds = $filterResult->hasActiveFilter() ? ($filterResult->getEventIds() ?? []) : null;
-
-                $result = $this->eventRepository->findPublicUpcoming($from, $to, $limit, $offset, $restrictToIds);
-                $items = array_map(
-                    fn($event) => $this->serializer->toSummary($event, $locale, $baseUrl),
-                    $result['items'],
-                );
+            ['limit' => $limit, 'offset' => $offset],
+            function () use ($limit, $offset): array {
+                $dinners = $this->dinnerRepository->findBy([], ['createdAt' => 'DESC'], $limit, $offset);
+                $total = $this->dinnerRepository->count([]);
 
                 return [
-                    'items' => $items,
-                    'total' => $result['total'],
+                    'items' => array_map(fn($dinner) => $this->serializer->toSummary($dinner), $dinners),
+                    'total' => $total,
                     'limit' => $limit,
                     'offset' => $offset,
                 ];
@@ -74,27 +57,26 @@ final class EventApiController extends AbstractController
         return $this->jsonWithCaching($payload);
     }
 
-    #[Route('/api/events/{id}', name: 'app_api_events_detail', methods: ['GET'], requirements: ['id' => '\d+'])]
+    #[Route('/api/dinners/{id}', name: 'plugin_dinnerclub_api_dinners_detail', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function detail(int $id, Request $request): JsonResponse
     {
+        $this->pluginRouteGuard->requireActive(self::PLUGIN_KEY);
+
         $locale = $this->resolveLocale($request);
         $baseUrl = $request->getSchemeAndHttpHost();
 
         $payload = $this->apiCache->getJson(
             $request,
-            'events.detail',
+            'dinnerclub.dinners.detail',
             self::TTL_SECONDS,
             ['id' => $id, 'locale' => $locale, 'baseUrl' => $baseUrl],
             function () use ($id, $locale, $baseUrl): ?array {
-                if (!$this->eventFilterService->isEventAccessible($id)) {
-                    return null;
-                }
-                $event = $this->eventRepository->find($id);
-                if ($event === null) {
+                $dinner = $this->dinnerRepository->find($id);
+                if ($dinner === null) {
                     return null;
                 }
 
-                return $this->serializer->toDetail($event, $locale, $baseUrl);
+                return $this->serializer->toDetail($dinner, $locale, $baseUrl);
             },
         );
 
@@ -111,25 +93,12 @@ final class EventApiController extends AbstractController
         if ($query !== '' && $this->languageService->isValidCode($query)) {
             return $query;
         }
-
         $requestLocale = $request->getLocale();
         if ($requestLocale !== '' && $this->languageService->isValidCode($requestLocale)) {
             return $requestLocale;
         }
 
         return $this->languageService->getFilteredDefaultLocale();
-    }
-
-    private function parseDate(string $value): ?DateTimeImmutable
-    {
-        if ($value === '') {
-            return null;
-        }
-        try {
-            return new DateTimeImmutable($value);
-        } catch (Exception) {
-            return null;
-        }
     }
 
     private function clamp(int $value, int $min, int $max): int

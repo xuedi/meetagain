@@ -8,6 +8,7 @@ use App\Enum\WarmCacheType;
 use App\Exception\OpenApiCollisionException;
 use App\Plugin;
 use App\Service\Api\OpenApiSpecBuilder;
+use App\Service\Config\ActivePluginListInterface;
 use App\ValueObject\LinkCollection;
 use Override;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +38,7 @@ final class OpenApiSpecBuilderTest extends TestCase
     {
         // Arrange
         $this->writeCoreSpec(['openapi' => '3.1.0', 'paths' => ['/api/x' => ['get' => []]]]);
-        $builder = new OpenApiSpecBuilder([], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act
         $spec = $builder->build();
@@ -57,7 +58,7 @@ final class OpenApiSpecBuilderTest extends TestCase
             'paths' => ['/api/groups' => ['get' => ['summary' => 'List groups']]],
             'components' => ['schemas' => ['Group' => ['type' => 'object']]],
         ]);
-        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act
         $spec = $builder->build();
@@ -74,7 +75,7 @@ final class OpenApiSpecBuilderTest extends TestCase
         $this->writeCoreSpec([]);
         $a = new FakePlugin('alpha', ['paths' => ['/api/x' => ['get' => []]]]);
         $b = new FakePlugin('beta', ['paths' => ['/api/x' => ['post' => []]]]);
-        $builder = new OpenApiSpecBuilder([$a, $b], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([$a, $b], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act + Assert
         $this->expectException(OpenApiCollisionException::class);
@@ -87,7 +88,7 @@ final class OpenApiSpecBuilderTest extends TestCase
         // Arrange
         $this->writeCoreSpec(['paths' => ['/api/x' => ['get' => []]]]);
         $plugin = new FakePlugin('demo', ['paths' => ['/api/x' => ['post' => []]]]);
-        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act + Assert
         $this->expectException(OpenApiCollisionException::class);
@@ -101,7 +102,7 @@ final class OpenApiSpecBuilderTest extends TestCase
         $this->writeCoreSpec([]);
         $a = new FakePlugin('alpha', ['components' => ['schemas' => ['Foo' => ['type' => 'object']]]]);
         $b = new FakePlugin('beta', ['components' => ['schemas' => ['Foo' => ['type' => 'object']]]]);
-        $builder = new OpenApiSpecBuilder([$a, $b], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([$a, $b], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act + Assert
         $this->expectException(OpenApiCollisionException::class);
@@ -114,7 +115,7 @@ final class OpenApiSpecBuilderTest extends TestCase
         // Arrange
         $this->writeCoreSpec(['tags' => [['name' => 'data', 'description' => 'core data']]]);
         $plugin = new FakePlugin('demo', ['tags' => [['name' => 'data', 'description' => 'plugin data']]]);
-        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act + Assert
         $this->expectException(OpenApiCollisionException::class);
@@ -127,7 +128,7 @@ final class OpenApiSpecBuilderTest extends TestCase
         // Arrange
         $this->writeCoreSpec(['paths' => ['/api/core' => ['get' => []]]]);
         $emptyPlugin = new FakePlugin('navigation', []);
-        $builder = new OpenApiSpecBuilder([$emptyPlugin], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([$emptyPlugin], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act
         $spec = $builder->build();
@@ -141,7 +142,7 @@ final class OpenApiSpecBuilderTest extends TestCase
         // Arrange — a plugin that throws if asked twice. Two build() calls must hit the cache after the first.
         $this->writeCoreSpec([]);
         $plugin = new SpyPlugin('spy', ['paths' => ['/api/x' => ['get' => []]]]);
-        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), $this->fixtureDir);
+        $builder = new OpenApiSpecBuilder([$plugin], new ArrayAdapter(), new AllActivePluginList(), $this->fixtureDir);
 
         // Act
         $builder->build();
@@ -149,6 +150,44 @@ final class OpenApiSpecBuilderTest extends TestCase
 
         // Assert
         static::assertSame(1, $plugin->fragmentCalls, 'Plugin fragment must only be loaded once');
+    }
+
+    public function testSkipsFragmentForInactivePlugin(): void
+    {
+        // Arrange
+        $this->writeCoreSpec(['paths' => ['/api/core' => ['get' => []]]]);
+        $active = new FakePlugin('alpha', ['paths' => ['/api/alpha' => ['get' => []]]]);
+        $inactive = new FakePlugin('beta', ['paths' => ['/api/beta' => ['get' => []]]]);
+        $builder = new OpenApiSpecBuilder(
+            [$active, $inactive],
+            new ArrayAdapter(),
+            new FixedActivePluginList(['alpha']),
+            $this->fixtureDir,
+        );
+
+        // Act
+        $spec = $builder->build();
+
+        // Assert
+        static::assertSame(['/api/core', '/api/alpha'], array_keys($spec['paths']));
+    }
+
+    public function testCacheKeyVariesByActivePluginSet(): void
+    {
+        // Arrange — same plugin, different active sets must produce different merged specs.
+        $this->writeCoreSpec(['paths' => ['/api/core' => ['get' => []]]]);
+        $plugin = new FakePlugin('alpha', ['paths' => ['/api/alpha' => ['get' => []]]]);
+        $cache = new ArrayAdapter();
+        $withAlpha = new OpenApiSpecBuilder([$plugin], $cache, new FixedActivePluginList(['alpha']), $this->fixtureDir);
+        $withoutAlpha = new OpenApiSpecBuilder([$plugin], $cache, new FixedActivePluginList([]), $this->fixtureDir);
+
+        // Act
+        $specWith = $withAlpha->build();
+        $specWithout = $withoutAlpha->build();
+
+        // Assert — both built from the same plugin instance and shared cache, but each gets its own cached entry.
+        static::assertSame(['/api/core', '/api/alpha'], array_keys($specWith['paths']));
+        static::assertSame(['/api/core'], array_keys($specWithout['paths']));
     }
 
     /**
@@ -243,5 +282,32 @@ final class SpyPlugin extends FakePlugin
         $this->fragmentCalls++;
 
         return $this->fragment;
+    }
+}
+
+/**
+ * Test double: every plugin key is "active" - the builder merges every fragment.
+ */
+final readonly class AllActivePluginList implements ActivePluginListInterface
+{
+    public function getActiveList(): array
+    {
+        return ['alpha', 'beta', 'demo', 'navigation', 'spy'];
+    }
+}
+
+/**
+ * Test double: only the configured set is active.
+ */
+final readonly class FixedActivePluginList implements ActivePluginListInterface
+{
+    /**
+     * @param array<string> $keys
+     */
+    public function __construct(private array $keys) {}
+
+    public function getActiveList(): array
+    {
+        return $this->keys;
     }
 }

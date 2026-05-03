@@ -473,6 +473,8 @@ shared:
     api_page_title: 'Public Data API'
     api_page_heading: 'API Documentation'
     api_page_intro: 'All available endpoints. Some endpoints require a token obtained via the auth endpoint. If you cannot automate some of your workflows via API, feel free to request more endpoints.'
+    api_copy_label: 'Copy'
+    api_copy_aria: 'Copy example to clipboard'
     form_label_image_upload: 'Image upload'
     form_image_upload_mime_error: 'Please upload a valid image.'
     form_image_upload_mime_error_square: 'Please upload a valid image, preferable a square format.'

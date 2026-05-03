@@ -449,6 +449,8 @@ shared:
     api_page_title: 'Öffentliche Daten-API'
     api_page_heading: 'API-Dokumentation'
     api_page_intro: 'Alle verfügbaren Endpunkte. Einige Endpunkte erfordern ein Token, das über den Auth-Endpunkt bezogen wird. Falls du Workflows nicht per API automatisieren kannst, fordere gerne weitere Endpunkte an.'
+    api_copy_label: 'Kopieren'
+    api_copy_aria: 'Beispiel in die Zwischenablage kopieren'
     form_label_image_upload: 'Bild hochladen'
     form_image_upload_mime_error: 'Bitte laden Sie ein gültiges Bild hoch.'
     form_image_upload_mime_error_square: 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im quadratischen Format.'

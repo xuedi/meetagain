@@ -28,4 +28,26 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    document.querySelectorAll('.api-copy').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const pre = this.closest('.api-example').querySelector('.api-example-pre');
+            if (!pre) {
+                return;
+            }
+            const label = this.querySelector('.api-copy-label');
+            const original = label ? label.textContent : '';
+            navigator.clipboard.writeText(pre.textContent).then(function () {
+                if (label) {
+                    label.textContent = '✓';
+                    setTimeout(function () { label.textContent = original; }, 1500);
+                }
+            }).catch(function () {
+                if (label) {
+                    label.textContent = '!';
+                    setTimeout(function () { label.textContent = original; }, 1500);
+                }
+            });
+        });
+    });
 });

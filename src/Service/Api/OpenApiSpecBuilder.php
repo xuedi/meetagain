@@ -4,6 +4,7 @@ namespace App\Service\Api;
 
 use App\Exception\OpenApiCollisionException;
 use App\Plugin;
+use App\Service\Config\ActivePluginListInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -11,17 +12,25 @@ use Symfony\Contracts\Cache\ItemInterface;
 /**
  * Assembles the public OpenAPI 3.1 spec served at /api/openapi.json from:
  *   - core's `config/api/openapi.json` (the base)
- *   - plus every plugin's `getOpenApiFragment()` contribution
+ *   - plus every active plugin's `getOpenApiFragment()` contribution
+ *
+ * "Active" means present in PluginService::getActiveList() for the current
+ * request: globally enabled in config/plugins.php AND not filtered out by
+ * the request-context filter chain (e.g. per-group activation). On a
+ * domain that does not have a plugin enabled, the plugin's paths and
+ * schemas are simply absent from the merged spec.
  *
  * Collisions on paths, schemas, or tags surface as OpenApiCollisionException
  * rather than silently overwriting; that is a configuration bug we want loud.
  *
- * Result is cached in the app pool. Cache invalidates whenever cache.app is
- * cleared (every `just appAssets` does this; plugin enable/disable clears too).
+ * Result is cached in the app pool keyed by the active-plugin-set
+ * fingerprint, so toggling a plugin for a group naturally produces a new
+ * cache entry. Old entries age out via TTL.
  */
 readonly class OpenApiSpecBuilder
 {
-    private const string CACHE_KEY = 'api.openapi_spec';
+    private const string CACHE_KEY_PREFIX = 'api.openapi_spec';
+    private const int CACHE_TTL_SECONDS = 600;
 
     /**
      * @param iterable<Plugin> $plugins
@@ -30,6 +39,7 @@ readonly class OpenApiSpecBuilder
         #[AutowireIterator(Plugin::class)]
         private iterable $plugins,
         private CacheInterface $appCache,
+        private ActivePluginListInterface $pluginService,
         private string $kernelProjectDir,
     ) {}
 
@@ -38,17 +48,23 @@ readonly class OpenApiSpecBuilder
      */
     public function build(): array
     {
-        return $this->appCache->get(self::CACHE_KEY, function (ItemInterface $item): array {
-            $item->expiresAfter(null);
+        $activeKeys = $this->pluginService->getActiveList();
+        sort($activeKeys);
+        $fingerprint = sha1(implode(',', $activeKeys));
+        $cacheKey = self::CACHE_KEY_PREFIX . '.' . $fingerprint;
 
-            return $this->assemble();
+        return $this->appCache->get($cacheKey, function (ItemInterface $item) use ($activeKeys): array {
+            $item->expiresAfter(self::CACHE_TTL_SECONDS);
+
+            return $this->assemble($activeKeys);
         });
     }
 
     /**
+     * @param array<string> $activeKeys
      * @return array<string, mixed>
      */
-    private function assemble(): array
+    private function assemble(array $activeKeys): array
     {
         $spec = $this->loadCoreSpec();
         $spec['paths'] ??= [];
@@ -73,11 +89,14 @@ readonly class OpenApiSpecBuilder
         }
 
         foreach ($this->plugins as $plugin) {
+            $owner = $plugin->getPluginKey();
+            if (!in_array($owner, $activeKeys, true)) {
+                continue;
+            }
             $fragment = $plugin->getOpenApiFragment();
             if ($fragment === []) {
                 continue;
             }
-            $owner = $plugin->getPluginKey();
             $this->mergeFragment($spec, $fragment, $owner, $pathOwners, $schemaOwners, $tagOwners);
         }
 
