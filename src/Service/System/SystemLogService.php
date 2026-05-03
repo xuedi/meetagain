@@ -111,7 +111,10 @@ readonly class SystemLogService
     {
         $entries = [];
         foreach ($this->resolveAllLogFiles() as $file) {
-            $content = @file_get_contents($file);
+            if (!is_readable($file)) {
+                continue;
+            }
+            $content = file_get_contents($file);
             if ($content === false) {
                 continue;
             }
@@ -185,7 +188,7 @@ readonly class SystemLogService
             } catch (Throwable) {
                 continue;
             }
-            if ($fileDate < $cutoff && @unlink($file)) {
+            if ($fileDate < $cutoff && file_exists($file) && unlink($file)) {
                 $deleted++;
             }
         }
