@@ -39,7 +39,7 @@ class PublicPagesTest extends WebTestCase
         static::assertStringContainsString('<loc>', $content, 'Sitemap should contain at least one URL');
     }
 
-    public function testRobotsTxtContainsAiCrawlerBlocksAndContentSignal(): void
+    public function testRobotsTxtDisallowsApiPathsAndAdvertisesSitemap(): void
     {
         // Arrange
         $client = static::createClient();
@@ -50,12 +50,11 @@ class PublicPagesTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertStringContainsString('User-agent: GPTBot', $content);
-        static::assertStringContainsString('User-agent: ClaudeBot', $content);
-        static::assertStringContainsString('User-agent: Google-Extended', $content);
-        static::assertStringContainsString('Content-Signal: search=yes, ai-train=no, ai-input=no', $content);
-        static::assertStringNotContainsString('Claude-Web', $content, 'Claude-Web is deprecated and must not appear');
-        static::assertStringNotContainsString('anthropic-ai', $content, 'anthropic-ai is deprecated and must not appear');
+        static::assertStringContainsString('User-agent: *', $content);
+        static::assertStringContainsString('Disallow: /api/cms', $content);
+        static::assertStringContainsString('Disallow: /api/logs', $content);
+        static::assertStringContainsString('Disallow: /api/auth', $content);
+        static::assertMatchesRegularExpression('#Sitemap: https?://[^/]+/sitemap\.xml#', $content);
     }
 
     public function testFrontpageReturns200WithSelfCanonical(): void

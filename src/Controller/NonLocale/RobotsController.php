@@ -9,28 +9,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class RobotsController extends AbstractController
 {
-    private const string CONTENT_SIGNAL = 'search=yes, ai-train=no, ai-input=no';
-
-    /**
-     * Named AI-crawler user-agents that should see their own block in robots.txt.
-     * List curated April 2026 - excludes deprecated names like Claude-Web and anthropic-ai.
-     */
-    private const array AI_CRAWLERS = [
-        'GPTBot',
-        'OAI-SearchBot',
-        'ChatGPT-User',
-        'ClaudeBot',
-        'Claude-User',
-        'Claude-SearchBot',
-        'Google-Extended',
-        'Applebot-Extended',
-        'Amazonbot',
-        'Bytespider',
-        'CCBot',
-        'PerplexityBot',
-        'Perplexity-User',
-    ];
-
     #[Route('/robots.txt', name: 'app_robots')]
     public function index(Request $request): Response
     {
@@ -41,16 +19,8 @@ final class RobotsController extends AbstractController
             'Disallow: /api/cms',
             'Disallow: /api/logs',
             'Disallow: /api/auth',
-            'Content-Signal: ' . self::CONTENT_SIGNAL,
             '',
         ];
-
-        foreach (self::AI_CRAWLERS as $agent) {
-            $lines[] = 'User-agent: ' . $agent;
-            $lines[] = 'Allow: /';
-            $lines[] = 'Content-Signal: ' . self::CONTENT_SIGNAL;
-            $lines[] = '';
-        }
 
         $lines[] = 'Sitemap: ' . $sitemapUrl;
 
