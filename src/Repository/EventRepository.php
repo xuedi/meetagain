@@ -19,6 +19,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /** @extends ServiceEntityRepository<Event> */
 class EventRepository extends ServiceEntityRepository
 {
+    private const int IN_PROGRESS_GRACE_HOURS = 4;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Event::class);
@@ -47,9 +49,14 @@ class EventRepository extends ServiceEntityRepository
             ->andWhere('e.status IN (:statuses)')
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
 
+        $cutoff = (new DateTime())->modify('-' . self::IN_PROGRESS_GRACE_HOURS . ' hours');
         match ($time) {
-            EventTimeFilter::Past => $qb->andWhere('e.start <= :now')->setParameter('now', new DateTime()),
-            EventTimeFilter::Future => $qb->andWhere('e.start >= :now')->setParameter('now', new DateTime()),
+            EventTimeFilter::Past => $qb
+                ->andWhere('COALESCE(e.stop, e.start) < :cutoff')
+                ->setParameter('cutoff', $cutoff),
+            EventTimeFilter::Future => $qb
+                ->andWhere('COALESCE(e.stop, e.start) >= :cutoff')
+                ->setParameter('cutoff', $cutoff),
             EventTimeFilter::All => null,
         };
 
