@@ -142,6 +142,31 @@ class ImageRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * Images with more than one usage and no alt text - high-impact SEO/a11y issues
+     * because one missing alt fans out across every page that embeds the image.
+     *
+     * @return array<array{id: int, count: int}>
+     */
+    public function findHighUsageMissingAlt(int $limit = 10): array
+    {
+        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative(
+            'SELECT i.id AS id, COUNT(il.id) AS cnt
+             FROM image i
+             INNER JOIN image_location il ON il.image_id = i.id
+             WHERE i.alt IS NULL OR i.alt = ""
+             GROUP BY i.id
+             HAVING cnt > 1
+             ORDER BY cnt DESC, i.id ASC
+             LIMIT ' . $limit,
+        );
+
+        return array_map(
+            static fn(array $r) => ['id' => (int) $r['id'], 'count' => (int) $r['cnt']],
+            $rows,
+        );
+    }
+
     public function getFileList(): array
     {
         $list = [];

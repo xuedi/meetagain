@@ -23,6 +23,7 @@ chrome:
     notification_unread_messages: '%count% ungelesene Nachricht(en)'
     notification_stale_emails: '%count% verzögerte E-Mail(s)'
     notification_new_support_requests: '%count% neue Support-Anfrage(n)'
+    notification_image_missing_alt: 'Bild #%id% ohne Alt-Text (%count% Verwendungen)'
     footer_powered_by: 'läuft mit'
     aria_select_language: 'Sprache auswählen'
 security:
