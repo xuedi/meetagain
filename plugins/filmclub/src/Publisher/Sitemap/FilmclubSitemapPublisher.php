@@ -57,6 +57,9 @@ final readonly class FilmclubSitemapPublisher implements SitemapPublisherInterfa
                 changefreq: 'weekly',
                 priority: 0.7,
                 alternates: $localeUrls,
+                section: 'filmclub',
+                locale: $locale,
+                meta: ['route' => 'app_filmclub_filmlist'],
             );
         }
 

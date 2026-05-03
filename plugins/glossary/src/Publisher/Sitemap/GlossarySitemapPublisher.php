@@ -57,6 +57,9 @@ final readonly class GlossarySitemapPublisher implements SitemapPublisherInterfa
                 changefreq: 'weekly',
                 priority: 0.7,
                 alternates: $localeUrls,
+                section: 'glossary',
+                locale: $locale,
+                meta: ['route' => 'app_plugin_glossary'],
             );
         }
 
