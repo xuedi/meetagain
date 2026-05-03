@@ -59,6 +59,23 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>{{ 'admin_system_images.label_alt'|trans }}</th>
+                            <td>
+                                <form method="post" action="{{ path('app_admin_system_images_update_alt', {id: image.id}) }}" class="field has-addons mb-0">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('image_update_alt_' ~ image.id) }}">
+                                    <div class="control is-expanded">
+                                        <input type="text" name="alt" maxlength="255" class="input is-small" value="{{ image.alt|default('') }}" placeholder="{{ 'admin_system_images.placeholder_alt'|trans }}">
+                                    </div>
+                                    <div class="control">
+                                        <button type="submit" class="button is-small">
+                                            <span class="icon"><i class="fa fa-save"></i></span>
+                                            <span>{{ 'admin_system_images.button_save_alt'|trans }}</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>{{ 'admin_system_images.label_reported'|trans }}</th>
                             <td>
                                 {% if image.reported %}
