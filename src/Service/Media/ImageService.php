@@ -16,7 +16,9 @@ use Imagick;
 use ImagickException;
 use ImagickPixel;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 
 readonly class ImageService
 {
@@ -41,10 +43,13 @@ readonly class ImageService
             return $image;
         }
 
+        $mimeType = $this->detectMimeType($imageData);
+        $extension = $this->detectExtension($imageData, $mimeType);
+
         $image = new Image();
         $image->setHash($hash);
-        $image->setMimeType($imageData->getMimeType());
-        $image->setExtension($imageData->guessExtension());
+        $image->setMimeType($mimeType);
+        $image->setExtension($extension);
         $image->setType($type);
         $image->setSize($imageData->getSize() ?: 0);
         $image->setCreatedAt(new DateTimeImmutable());
@@ -213,6 +218,41 @@ readonly class ImageService
         }
 
         return $cnt;
+    }
+
+    private function detectMimeType(UploadedFile $imageData): string
+    {
+        $serverMime = $imageData->getMimeType();
+        if ($serverMime !== null && $serverMime !== '') {
+            return $serverMime;
+        }
+
+        $clientMime = $imageData->getClientMimeType();
+        if ($clientMime !== '' && $clientMime !== 'application/octet-stream') {
+            return $clientMime;
+        }
+
+        throw new RuntimeException('Could not determine MIME type for uploaded file.');
+    }
+
+    private function detectExtension(UploadedFile $imageData, string $mimeType): string
+    {
+        $serverExt = $imageData->guessExtension();
+        if ($serverExt !== null && $serverExt !== '') {
+            return $serverExt;
+        }
+
+        $mimeExt = MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null;
+        if ($mimeExt !== null) {
+            return $mimeExt;
+        }
+
+        $clientExt = $imageData->getClientOriginalExtension();
+        if ($clientExt !== '') {
+            return strtolower($clientExt);
+        }
+
+        throw new RuntimeException('Could not determine file extension for uploaded file.');
     }
 
     private function getSourceFile(Image $image): string

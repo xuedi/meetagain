@@ -68,6 +68,7 @@ readonly class ConfigService
             ImageType::LanguageTile => [[600, 400], [350, 233], [300, 200], [100, 100], [50, 50]],
             ImageType::PluginBookclubCover => [[400, 500], [350, 438], [200, 250], [100, 100], [50, 50]],
             ImageType::SiteLogo => [[400, 400], [350, 350], [100, 100]],
+            ImageType::WebsiteImage => [[1200, 630], [350, 184], [100, 100]],
             default => throw new RuntimeException(sprintf(
                 'No thumbnail sizes registered for image type "%s". Plugin-owned types must be supplied via ImageThumbnailSizeProviderInterface.',
                 $type->name,
@@ -111,6 +112,7 @@ readonly class ConfigService
     {
         return [
             '1024x768' => 0, // gallery image bit
+            '1200x630' => 0, // website OG image
             '600x400' => 0, // event preview image
             '432x432' => 0, // cmsBlock image
             '400x500' => 0, // bookclub cover (portrait)
@@ -118,6 +120,7 @@ readonly class ConfigService
             '350x438' => 0, // admin preview (bookclub cover, portrait)
             '350x350' => 0, // admin preview (square types)
             '350x263' => 0, // admin preview (4:3 types)
+            '350x184' => 0, // admin preview (16:8.4 OG image)
             '350x233' => 0, // admin preview (3:2 types)
             '300x200' => 0, // cms card image
             '210x140' => 0, // gallery image preview
@@ -175,6 +178,18 @@ readonly class ConfigService
     public function setSiteLogoId(?int $id): void
     {
         $this->setInt('site_logo_id', $id ?? 0);
+    }
+
+    public function getWebsiteImageId(): ?int
+    {
+        $id = $this->getInt('website_image_id', 0);
+
+        return $id > 0 ? $id : null;
+    }
+
+    public function setWebsiteImageId(?int $id): void
+    {
+        $this->setInt('website_image_id', $id ?? 0);
     }
 
     public function getMailerAddress(): Address

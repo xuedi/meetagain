@@ -21,12 +21,17 @@
     <meta property="og:url" content="{{ get_canonical_url() }}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:site_name" content="meetAgain">
-    {% block og_image %}{% endblock %}
+    {% set ogImage = get_og_image() %}
+    {% block og_image %}{% if ogImage %}<meta property="og:image" content="{{ ogImage.absoluteUrl }}">
+    <meta property="og:image:width" content="{{ ogImage.width }}">
+    <meta property="og:image:height" content="{{ ogImage.height }}">
+    <meta property="og:image:alt" content="{{ ogImage.altText|e('html_attr') }}">{% endif %}{% endblock %}
 
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:title" content="{{ block('og_title') }}"/>
     <meta name="twitter:description" content="{{ block('og_description') }}"/>
-    {% block twitter_image %}{% endblock %}
+    {% block twitter_image %}{% if ogImage %}<meta name="twitter:image" content="{{ ogImage.absoluteUrl }}">
+    <meta name="twitter:image:alt" content="{{ ogImage.altText|e('html_attr') }}">{% endif %}{% endblock %}
 
     <script type="application/ld+json">{{ get_organization_schema()|raw }}</script>
 

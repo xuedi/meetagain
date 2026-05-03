@@ -86,6 +86,7 @@ class ConfigServiceTest extends TestCase
     {
         $expected = [
             '1024x768' => 0,
+            '1200x630' => 0,
             '600x400' => 0,
             '432x432' => 0,
             '400x500' => 0,
@@ -93,6 +94,7 @@ class ConfigServiceTest extends TestCase
             '350x438' => 0,
             '350x350' => 0,
             '350x263' => 0,
+            '350x184' => 0,
             '350x233' => 0,
             '300x200' => 0,
             '210x140' => 0,
