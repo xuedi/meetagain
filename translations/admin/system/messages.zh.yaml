@@ -155,6 +155,13 @@ admin_system_config:
     field_footer_col2: '页脚栏2'
     field_footer_col3: '页脚栏3'
     field_footer_col4: '页脚栏4'
+    heading_website_image: '网站图片'
+    help_website_image: '推荐 1200 x 630 像素，JPEG/PNG/WebP 格式，最大 5 MB。用于链接分享时的默认社交预览图。'
+    current_website_image_label: '当前图片'
+    no_website_image_label: '未设置图片'
+    field_website_image_label: '上传新图片'
+    usage_website_image: '当有人在社交媒体或聊天应用中分享此站点的页面时，将显示为链接预览。'
+    flash_website_image_saved: '网站图片已保存'
 admin_system_theme:
     intro: '自定义站点 Logo 与配色方案。保存颜色后会重新构建 CSS 包。'
     heading_colors: '主题颜色'

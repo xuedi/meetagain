@@ -73,6 +73,24 @@
                     </tbody>
                 </table>
 
+                <fieldset class="p-4 mb-4 mt-6 fieldset-default">
+                    <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_system_config.heading_website_image'|trans }}</legend>
+                    <p class="subtitle is-6 has-text-grey">{{ 'admin_system_config.help_website_image'|trans }}</p>
+
+                    {% if currentWebsiteImage %}
+                        <p class="has-text-grey-light is-size-7 mb-2">{{ 'admin_system_config.current_website_image_label'|trans }}</p>
+                        {% include '_components/image.html.twig' with {image: currentWebsiteImage, size: '350x184'} %}
+                    {% else %}
+                        <p class="has-text-grey-light is-size-7 mb-2">{{ 'admin_system_config.no_website_image_label'|trans }}</p>
+                    {% endif %}
+
+                    {{ form_start(websiteImageForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                    {{ form_row(websiteImageForm.file) }}
+                    <p class="has-text-grey is-size-7 mb-3">{{ 'admin_system_config.usage_website_image'|trans }}</p>
+                    <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
+                    {{ form_end(websiteImageForm) }}
+                </fieldset>
+
             </div>
         </div>
 
