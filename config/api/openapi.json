@@ -2,8 +2,16 @@
     "openapi": "3.1.0",
     "info": {
         "title": "meetagain public API",
-        "version": "1.0.0",
-        "description": "Public REST API. The same spec applies to every host; hostnames are relative."
+        "version": "1.1.0",
+        "description": "Public REST API. The set of endpoints documented here depends on which plugins are active for the host you are querying; an endpoint absent from `paths` is also absent from the live router on this host. Bearer auth is required for everything tagged `Token required` (90-day expiry; issue with `POST /api/auth/token`).",
+        "contact": {
+            "name": "meetagain.org",
+            "url": "https://meetagain.org"
+        },
+        "license": {
+            "name": "EUPL-1.2",
+            "url": "https://eupl.eu/1.2/en/"
+        }
     },
     "servers": [
         {
@@ -13,35 +21,36 @@
     "tags": [
         {
             "name": "public",
-            "description": "Public Endpoints"
+            "description": "Service health and discovery endpoints"
         },
         {
             "name": "data",
-            "description": "Public Data"
+            "description": "Public read-only data"
         },
         {
             "name": "auth",
-            "description": "Authentication"
+            "description": "Authentication / token issuance"
         },
         {
             "name": "cms",
-            "description": "CMS Pages",
+            "description": "CMS page management. Admin-only.",
             "x-badge": "Token required"
         },
         {
             "name": "cms-blocks",
-            "description": "CMS Blocks",
+            "description": "CMS block management. Admin-only.",
             "x-badge": "Token required"
         },
         {
             "name": "logs",
-            "description": "System Logs",
+            "description": "System / activity / not-found / cron log streams. Admin-only.",
             "x-badge": "Token required"
         }
     ],
     "paths": {
         "/api/status": {
             "get": {
+                "operationId": "getStatus",
                 "tags": [
                     "public"
                 ],
@@ -54,47 +63,22 @@
                             "application/json": {
                                 "schema": {
                                     "type": "string"
-                                }
+                                },
+                                "example": "OK"
                             }
                         }
                     }
                 }
             }
         },
-        "/api/translations": {
-            "get": {
-                "tags": [
-                    "public"
-                ],
-                "summary": "Translation strings",
-                "x-example": "curl HOST/api/translations",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/glossary": {
-            "get": {
-                "tags": [
-                    "public"
-                ],
-                "summary": "Glossary data",
-                "x-example": "curl HOST/api/glossary",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
         "/api/auth/token": {
             "post": {
+                "operationId": "issueAuthToken",
                 "tags": [
                     "auth"
                 ],
-                "summary": "Generate Bearer token (email + password)",
+                "summary": "Issue a new Bearer token (email + password)",
+                "description": "Returns a 90-day Bearer token for use in `Authorization: Bearer ...` headers. Rate-limited per IP.",
                 "x-example": "TOKEN=$(curl -s -X POST HOST/api/auth/token \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"email\":\"admin@example.com\",\"password\":\"...\"}' | jq -r .token)",
                 "requestBody": {
                     "required": true,
@@ -115,6 +99,10 @@
                                         "type": "string"
                                     }
                                 }
+                            },
+                            "example": {
+                                "email": "admin@example.com",
+                                "password": "correct-horse-battery-staple"
                             }
                         }
                     }
@@ -131,23 +119,51 @@
                                             "type": "string"
                                         }
                                     }
+                                },
+                                "example": {
+                                    "token": "ag_4f7d9e2a1b8c6f3e5d2c1b9a8e7f6d5c4b3a2e1d"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Malformed request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Invalid credentials"
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     },
                     "429": {
-                        "description": "Too many attempts"
+                        "description": "Too many attempts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
             "delete": {
+                "operationId": "revokeAuthToken",
                 "tags": [
                     "auth"
                 ],
-                "summary": "Revoke current token (requires Bearer)",
+                "summary": "Revoke the current Bearer token",
                 "x-example": "curl -s -X DELETE HOST/api/auth/token \\\n  -H \"Authorization: Bearer $TOKEN\"",
                 "security": [
                     {
@@ -157,12 +173,23 @@
                 "responses": {
                     "204": {
                         "description": "Revoked"
+                    },
+                    "401": {
+                        "description": "Missing or invalid token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
         "/api/events": {
             "get": {
+                "operationId": "listEvents",
                 "tags": [
                     "data"
                 ],
@@ -170,11 +197,7 @@
                 "x-example": "curl 'HOST/api/events?limit=10&from=2026-05-01'",
                 "parameters": [
                     {
-                        "name": "locale",
-                        "in": "query",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "$ref": "#/components/parameters/Locale"
                     },
                     {
                         "name": "limit",
@@ -236,6 +259,22 @@
                                             "type": "integer"
                                         }
                                     }
+                                },
+                                "example": {
+                                    "items": [
+                                        {
+                                            "id": 42,
+                                            "title": "Sunday Dinner: Sichuan Hot Pot",
+                                            "start": "2026-05-10T18:00:00+08:00",
+                                            "end": "2026-05-10T21:00:00+08:00",
+                                            "location": "Beijing Code Loft",
+                                            "url": "https://meetagain.org/en/event/42",
+                                            "previewImageUrl": "https://meetagain.org/images/thumbnails/abc123_600x400.webp"
+                                        }
+                                    ],
+                                    "total": 1,
+                                    "limit": 20,
+                                    "offset": 0
                                 }
                             }
                         }
@@ -245,6 +284,7 @@
         },
         "/api/events/{id}": {
             "get": {
+                "operationId": "getEvent",
                 "tags": [
                     "data"
                 ],
@@ -260,11 +300,7 @@
                         }
                     },
                     {
-                        "name": "locale",
-                        "in": "query",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "$ref": "#/components/parameters/Locale"
                     }
                 ],
                 "responses": {
@@ -279,13 +315,21 @@
                         }
                     },
                     "404": {
-                        "description": "Not found"
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
         "/api/cms/": {
             "get": {
+                "operationId": "listCmsPages",
                 "tags": [
                     "cms"
                 ],
@@ -303,6 +347,7 @@
                 }
             },
             "post": {
+                "operationId": "createCmsPage",
                 "tags": [
                     "cms"
                 ],
@@ -322,6 +367,7 @@
         },
         "/api/cms/{id}": {
             "get": {
+                "operationId": "getCmsPage",
                 "tags": [
                     "cms"
                 ],
@@ -349,6 +395,7 @@
                 }
             },
             "put": {
+                "operationId": "updateCmsPage",
                 "tags": [
                     "cms"
                 ],
@@ -376,6 +423,7 @@
                 }
             },
             "delete": {
+                "operationId": "deleteCmsPage",
                 "tags": [
                     "cms"
                 ],
@@ -405,6 +453,7 @@
         },
         "/api/cms/{id}/blocks": {
             "post": {
+                "operationId": "createCmsBlock",
                 "tags": [
                     "cms-blocks"
                 ],
@@ -434,6 +483,7 @@
         },
         "/api/cms/{id}/blocks/{blockId}": {
             "put": {
+                "operationId": "updateCmsBlock",
                 "tags": [
                     "cms-blocks"
                 ],
@@ -469,6 +519,7 @@
                 }
             },
             "delete": {
+                "operationId": "deleteCmsBlock",
                 "tags": [
                     "cms-blocks"
                 ],
@@ -506,6 +557,7 @@
         },
         "/api/logs": {
             "get": {
+                "operationId": "getLogsSummary",
                 "tags": [
                     "logs"
                 ],
@@ -525,6 +577,7 @@
         },
         "/api/logs/system": {
             "get": {
+                "operationId": "getLogsSystem",
                 "tags": [
                     "logs"
                 ],
@@ -547,6 +600,7 @@
         },
         "/api/logs/activity": {
             "get": {
+                "operationId": "getLogsActivity",
                 "tags": [
                     "logs"
                 ],
@@ -569,6 +623,7 @@
         },
         "/api/logs/not-found": {
             "get": {
+                "operationId": "getLogsNotFound",
                 "tags": [
                     "logs"
                 ],
@@ -591,6 +646,7 @@
         },
         "/api/logs/cron": {
             "get": {
+                "operationId": "getLogsCron",
                 "tags": [
                     "logs"
                 ],
@@ -616,10 +672,40 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "scheme": "bearer"
+                "scheme": "bearer",
+                "description": "API token issued by `POST /api/auth/token`. Token is hashed at rest, scoped to the issuing user, and expires 90 days after issue."
+            }
+        },
+        "parameters": {
+            "Locale": {
+                "name": "locale",
+                "in": "query",
+                "description": "Locale code (e.g. `en`, `de`, `zh`). Falls back to the request's resolved locale and then the configured default.",
+                "schema": {
+                    "type": "string"
+                }
             }
         },
         "schemas": {
+            "Error": {
+                "type": "object",
+                "required": [
+                    "error"
+                ],
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "description": "Short human-readable failure reason"
+                    },
+                    "details": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "example": {
+                    "error": "Not found"
+                }
+            },
             "EventSummary": {
                 "type": "object",
                 "properties": {
