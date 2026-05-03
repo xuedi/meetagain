@@ -20,8 +20,6 @@ admin_shell:
     dashboard_rsvp_no: '否'
     dashboard_rsvp_total: '总计'
     dashboard_not_found_title: '未找到的页面（本周）'
-    dashboard_upcoming_title: '即将举办的活动 - 平台'
-    dashboard_upcoming_empty: '没有即将举办的活动'
     dashboard_stats_title: '统计'
     dashboard_stats_metric: '指标'
     dashboard_stats_all: '全部'
