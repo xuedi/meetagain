@@ -4,7 +4,7 @@
 [![EUPL Licence](https://img.shields.io/badge/Licence-EUPL_v1.2-31c754.svg)](https://eupl.eu/1.2/en)
 [![Code Coverage](https://raw.githubusercontent.com/xuedi/meetagain/main/tests/badge/coverage.svg)](https://github.com/xuedi/meetagain/blob/main/src/Command/BadgeGenerateCommand.php)
 
-A self-hosted, open-source alternative to Meetup.com for organizing groups and scheduling events. Single group installation like WordPress
+A self-hosted, open-source alternative to other cooperate meetup websites for organizing groups and scheduling events. Single group installation like WordPress
 
 ## Features
 
