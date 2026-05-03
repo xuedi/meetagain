@@ -36,22 +36,10 @@ final class ApiController extends AbstractController
         return $response;
     }
 
-    #[Route('/api/glossary', name: 'app_api_glossary', methods: ['GET'])]
-    public function glossaryIndex(): Response
-    {
-        return new JsonResponse('glossary');
-    }
-
     #[Route('/api/status', name: 'app_api_status', methods: ['GET'])]
     public function statusIndex(): Response
     {
         return new JsonResponse('OK');
-    }
-
-    #[Route('/api/translations', name: 'app_api_translations', methods: ['GET'])]
-    public function translationsIndex(): Response
-    {
-        return new JsonResponse('translations');
     }
 
     /**

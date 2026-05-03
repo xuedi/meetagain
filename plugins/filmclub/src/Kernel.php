@@ -201,6 +201,6 @@ class Kernel implements Plugin
 
     public function getOpenApiFragment(): array
     {
-        return [];
+        return require __DIR__ . '/../config/api/openapi-fragment.php';
     }
 }

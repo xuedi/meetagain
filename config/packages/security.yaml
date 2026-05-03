@@ -44,6 +44,10 @@ security:
         - { path: "^/api/status",        roles: PUBLIC_ACCESS }
         - { path: "^/api/events",        roles: PUBLIC_ACCESS }
         - { path: "^/api/groups",        roles: PUBLIC_ACCESS }
+        - { path: "^/api/glossary",      roles: PUBLIC_ACCESS }
+        - { path: "^/api/dinners",       roles: PUBLIC_ACCESS }
+        - { path: "^/api/dishes",        roles: PUBLIC_ACCESS }
+        - { path: "^/api/films",         roles: PUBLIC_ACCESS }
         - { path: "^/api/openapi\\.json", roles: PUBLIC_ACCESS }
         - { path: "^/api/cms",           roles: ROLE_ADMIN }
         - { path: "^/api/logs",          roles: ROLE_ADMIN }

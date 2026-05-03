@@ -19,6 +19,7 @@ final class RobotsController extends AbstractController
             'Disallow: /api/cms',
             'Disallow: /api/logs',
             'Disallow: /api/auth',
+            'Disallow: /api/me',
             '',
         ];
 
