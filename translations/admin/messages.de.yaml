@@ -13,7 +13,7 @@ admin_shell:
     menu_logs: 'Protokolle'
     menu_plugin: 'Erwiterungen'
     menu_system: 'Einstellungen'
-    dashboard_week_label: 'Dashboard für die Woche:'
+    dashboard_week_label: 'Woche:'
     dashboard_login_title: 'Anmeldeaktivität (diese Woche)'
     dashboard_rsvp_title: 'RSVP-Aktivität (diese Woche)'
     dashboard_rsvp_yes: 'Ja'

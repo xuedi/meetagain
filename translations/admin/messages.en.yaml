@@ -13,7 +13,7 @@ admin_shell:
     menu_logs: 'Logs'
     menu_plugin: 'Plugins'
     menu_system: 'Settings'
-    dashboard_week_label: 'Dashboard for the week:'
+    dashboard_week_label: 'Week:'
     dashboard_login_title: 'Login activity (this week)'
     dashboard_rsvp_title: 'RSVP Activity (this week)'
     dashboard_rsvp_yes: 'Yes'
