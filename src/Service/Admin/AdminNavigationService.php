@@ -2,44 +2,30 @@
 
 namespace App\Service\Admin;
 
-use App\Admin\Navigation\AdminNavigationInterface as NewAdminNavigationInterface;
-use App\Controller\Admin\AdminNavigationInterface;
-use App\Entity\AdminLink;
-use App\Entity\AdminSection;
-use Generator;
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Navigation\AdminSection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Builds admin sidebar navigation from controllers.
- *
- * Iterates both the deprecated `Controller\Admin\AdminNavigationInterface` and
- * the new `Admin\Navigation\AdminNavigationInterface` so legacy and migrated
- * controllers contribute side by side during the in-flight namespace migration.
- * Sections and links are sorted alphabetically.
+ * Builds admin sidebar navigation from controllers contributing via
+ * `App\Admin\Navigation\AdminNavigationInterface`. Sections and links are
+ * sorted alphabetically.
  */
 readonly class AdminNavigationService
 {
     /**
-     * @param iterable<AdminNavigationInterface>    $legacyControllers
-     * @param iterable<NewAdminNavigationInterface> $controllers
+     * @param iterable<AdminNavigationInterface> $controllers
      */
     public function __construct(
         private Security $security,
         private RouterInterface $router,
         #[AutowireIterator(AdminNavigationInterface::class)]
-        private iterable $legacyControllers,
-        #[AutowireIterator(NewAdminNavigationInterface::class)]
         private iterable $controllers,
     ) {}
-
-    private function allControllers(): Generator
-    {
-        yield from $this->legacyControllers;
-        yield from $this->controllers;
-    }
 
     /**
      * @return list<AdminSection>
@@ -50,7 +36,7 @@ readonly class AdminNavigationService
         $modifications = [];
 
         // First pass: collect all route modifications
-        foreach ($this->allControllers() as $controller) {
+        foreach ($this->controllers as $controller) {
             $config = $controller->getAdminNavigation();
             if ($config === null) {
                 continue;
@@ -64,20 +50,19 @@ readonly class AdminNavigationService
         }
 
         // Second pass: collect navigation, applying modifications
-        foreach ($this->allControllers() as $controller) {
+        foreach ($this->controllers as $controller) {
             $config = $controller->getAdminNavigation();
             if ($config === null) {
-                continue; // Skip controllers without navigation
+                continue;
             }
 
             foreach ($config->links as $link) {
-                // Apply modifications if they exist for this route
                 $section = $config->section;
                 $sectionParams = $config->sectionParams ?? [];
-                $label = $link->getLabel();
-                $route = $link->getRoute();
-                $active = $link->getActive();
-                $role = $link->getRole();
+                $label = $link->label;
+                $route = $link->route;
+                $active = $link->active;
+                $role = $link->role;
 
                 if (isset($modifications[$route])) {
                     $mods = $modifications[$route];
@@ -100,7 +85,6 @@ readonly class AdminNavigationService
                     }
                 }
 
-                // Initialize section if new
                 if (!isset($sectionsMap[$section])) {
                     $sectionsMap[$section] = [
                         'role' => $config->sectionRole,
@@ -118,15 +102,17 @@ readonly class AdminNavigationService
                 // shared abstract (e.g. AbstractEmailController) doesn't render N
                 // times - once per concrete subclass that inherits the contribution.
                 foreach ($sectionsMap[$section]['links'] as $existingLink) {
-                    if ($existingLink->getRoute() === $route) {
+                    if ($existingLink->route === $route) {
                         continue 2;
                     }
                 }
 
-                // Create modified link
-                $modifiedLink = new AdminLink(label: $label, route: $route, active: $active, role: $role);
-
-                $sectionsMap[$section]['links'][] = $modifiedLink;
+                $sectionsMap[$section]['links'][] = new AdminLink(
+                    label: $label,
+                    route: $route,
+                    active: $active,
+                    role: $role,
+                );
             }
         }
 
@@ -138,24 +124,21 @@ readonly class AdminNavigationService
 
         // Sort links within each section alphabetically by label
         foreach ($sectionsMap as &$sectionData) {
-            usort($sectionData['links'], static fn($a, $b): int => strcmp($a->getLabel(), $b->getLabel()));
+            usort($sectionData['links'], static fn(AdminLink $a, AdminLink $b): int => strcmp($a->label, $b->label));
         }
 
         // Build AdminSection objects and filter by role
         $sections = [];
         foreach ($sectionsMap as $sectionName => $data) {
-            // Filter section by role
             if ($data['role'] !== null && !$this->security->isGranted($data['role'])) {
                 continue;
             }
 
-            // Filter links by role
             $visibleLinks = array_filter(
                 $data['links'],
-                fn($link) => $link->getRole() === null || $this->security->isGranted($link->getRole()),
+                fn(AdminLink $link) => $link->role === null || $this->security->isGranted($link->role),
             );
 
-            // Skip sections with no visible links
             if ($visibleLinks === []) {
                 continue;
             }

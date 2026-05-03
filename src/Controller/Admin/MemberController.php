@@ -2,7 +2,9 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\AdminLink;
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
 use App\Entity\User;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
@@ -11,15 +13,16 @@ use App\Repository\UserRepository;
 use App\Service\Member\MemberActionException;
 use App\Service\Member\MemberActionFailure;
 use App\Service\Member\UserService;
-use Override;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ORGANIZER')]
-final class MemberController extends AbstractAdminController
+final class MemberController extends AbstractController implements AdminNavigationInterface
 {
     public function __construct(
         private readonly UserRepository $repo,
@@ -27,7 +30,6 @@ final class MemberController extends AbstractAdminController
         private readonly UserService $userService,
     ) {}
 
-    #[Override]
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
@@ -37,6 +39,18 @@ final class MemberController extends AbstractAdminController
             ],
             sectionPriority: 50,
         );
+    }
+
+    private function getAuthedUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException(
+                'Should never happen, see: config/packages/security.yaml',
+            );
+        }
+
+        return $user;
     }
 
     #[Route('/admin/member', name: 'app_admin_member')]
