@@ -16,6 +16,7 @@ use App\Service\Config\ConfigService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -43,6 +44,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly ImageLocationRepository $imageLocationRepository,
         private readonly ImageLocationService $imageLocationService,
         private readonly ConfigService $configService,
+        private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct($translator, 'images');
     }
@@ -162,6 +164,30 @@ final class ImagesController extends AbstractSettingsController implements Admin
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    #[Route('/{id}/alt', name: 'app_admin_system_images_update_alt', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function updateAlt(int $id, Request $request): Response
+    {
+        $image = $this->imageRepository->find($id);
+        if ($image === null) {
+            throw $this->createNotFoundException('Image not found');
+        }
+
+        if (!$this->isCsrfTokenValid('image_update_alt_' . $id, (string) $request->request->get('_token'))) {
+            return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
+        }
+
+        $alt = trim((string) $request->request->get('alt', ''));
+        $alt = mb_substr($alt, 0, 255);
+
+        $image->setAlt($alt === '' ? null : $alt);
+        $image->setUpdatedAt(new DateTimeImmutable());
+        $this->entityManager->flush();
+
+        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_alt_saved'));
+
+        return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
     }
 
     #[Route('/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails', methods: ['GET'])]
