@@ -1,4 +1,5 @@
 bookclub:
+    menu_books: 'Books'
     page_title: 'Book Club'
     button_add_book: 'Add Book'
     button_suggestions: 'Suggestions'

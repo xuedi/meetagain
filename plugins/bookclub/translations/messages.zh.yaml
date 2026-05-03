@@ -1,4 +1,5 @@
 bookclub:
+    menu_books: '书籍'
     page_title: '读书俱乐部'
     button_add_book: '添加书籍'
     button_suggestions: '建议'
