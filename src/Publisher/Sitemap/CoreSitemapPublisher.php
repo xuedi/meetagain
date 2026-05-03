@@ -98,6 +98,9 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                     changefreq: $routeConfig['changefreq'],
                     priority: $routeConfig['priority'],
                     alternates: $localeUrls,
+                    section: 'static',
+                    locale: $locale,
+                    meta: ['route' => $routeConfig['route']],
                 );
             }
         }
@@ -141,6 +144,9 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                     changefreq: 'weekly',
                     priority: 0.7,
                     alternates: $localeUrls,
+                    section: 'members',
+                    locale: $locale,
+                    meta: ['page' => $page],
                 );
             }
         }
@@ -187,6 +193,9 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                     lastmod: $lastmod,
                     priority: 0.7,
                     alternates: $localeUrls,
+                    section: 'cms',
+                    locale: $locale,
+                    meta: ['cms_id' => (int) $page->getId(), 'slug' => $slug],
                 );
             }
         }
@@ -234,6 +243,9 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                     lastmod: $lastmod,
                     priority: 0.6,
                     alternates: $localeUrls,
+                    section: 'events',
+                    locale: $locale,
+                    meta: ['event_id' => $id],
                 );
             }
         }

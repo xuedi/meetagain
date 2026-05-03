@@ -69,6 +69,9 @@ final readonly class BookclubSitemapPublisher implements SitemapPublisherInterfa
                 changefreq: 'weekly',
                 priority: 0.7,
                 alternates: $localeUrls,
+                section: 'bookclub',
+                locale: $locale,
+                meta: ['route' => 'app_plugin_bookclub'],
             );
         }
 
@@ -115,6 +118,9 @@ final readonly class BookclubSitemapPublisher implements SitemapPublisherInterfa
                     changefreq: 'monthly',
                     priority: 0.5,
                     alternates: $localeUrls,
+                    section: 'bookclub',
+                    locale: $locale,
+                    meta: ['book_id' => $id, 'title' => (string) $book->getTitle()],
                 );
             }
         }

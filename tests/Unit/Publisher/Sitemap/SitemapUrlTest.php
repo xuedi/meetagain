@@ -20,6 +20,9 @@ class SitemapUrlTest extends TestCase
             changefreq: 'daily',
             priority: 0.8,
             alternates: ['en' => 'https://example.com/en/page', 'de' => 'https://example.com/de/page'],
+            section: 'cms',
+            locale: 'en',
+            meta: ['cms_id' => 42, 'slug' => 'about'],
         );
 
         // Assert
@@ -28,6 +31,9 @@ class SitemapUrlTest extends TestCase
         self::assertSame('daily', $url->changefreq);
         self::assertSame(0.8, $url->priority);
         self::assertSame(['en' => 'https://example.com/en/page', 'de' => 'https://example.com/de/page'], $url->alternates);
+        self::assertSame('cms', $url->section);
+        self::assertSame('en', $url->locale);
+        self::assertSame(['cms_id' => 42, 'slug' => 'about'], $url->meta);
     }
 
     public function testDefaultsAreNullOrEmpty(): void
@@ -40,5 +46,8 @@ class SitemapUrlTest extends TestCase
         self::assertNull($url->changefreq);
         self::assertNull($url->priority);
         self::assertSame([], $url->alternates);
+        self::assertNull($url->section);
+        self::assertNull($url->locale);
+        self::assertSame([], $url->meta);
     }
 }
