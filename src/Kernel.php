@@ -22,6 +22,42 @@ class Kernel extends BaseKernel
         return $this->getProjectDir() . '/config';
     }
 
+    /**
+     * Merge per-plugin bundle registrations into the kernel. Plugins ship their
+     * Symfony bundles in plugins/<name>/config/bundles.php using the same array
+     * shape as core's config/bundles.php. Registration depends only on the
+     * directory existing (matching composer dependency presence), not on the
+     * runtime plugin-enabled flag in config/plugins.php.
+     */
+    public function registerBundles(): iterable
+    {
+        foreach ($this->doRegisterBundles($this->getConfigDir() . '/bundles.php') as $bundle) {
+            yield $bundle;
+        }
+        foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
+            $bundlesFile = $pluginConfigDir . '/bundles.php';
+            if (!file_exists($bundlesFile)) {
+                continue;
+            }
+            foreach ($this->doRegisterBundles($bundlesFile) as $bundle) {
+                yield $bundle;
+            }
+        }
+    }
+
+    private function doRegisterBundles(string $bundlesFile): iterable
+    {
+        if (!file_exists($bundlesFile)) {
+            return;
+        }
+        $contents = require $bundlesFile;
+        foreach ($contents as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
+    }
+
     public function getPluginConfigDirs(): iterable
     {
         // Check for environment-specific plugins config first (e.g., plugins_test.php)
