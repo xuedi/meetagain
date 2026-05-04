@@ -16,6 +16,7 @@ use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
@@ -163,7 +164,7 @@ final class ImageUploadController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        if (!$this->isGranted('event.upload', $event)) {
+        if (!$this->isGranted(PermissionAttribute::EVENT_IMAGE_UPLOAD, $event)) {
             $this->addFlash('warning', 'events.flash_group_only');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
