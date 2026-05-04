@@ -8,12 +8,6 @@ controllers:
         namespace: App\Controller
     exclude: ../src/Controller/NonLocale/
 
-api:
-    type: attribute
-    resource:
-        path: ../src/Controller/NonLocale/Api/
-        namespace: App\Controller\NonLocale\Api
-
 frontpage:
     type: attribute
     resource: ../src/Controller/NonLocale/FrontpageController.php

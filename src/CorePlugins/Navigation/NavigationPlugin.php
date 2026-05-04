@@ -90,9 +90,4 @@ readonly class NavigationPlugin implements Plugin
     {
         return [];
     }
-
-    public function getOpenApiFragment(): array
-    {
-        return [];
-    }
 }
