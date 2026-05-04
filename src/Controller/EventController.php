@@ -19,6 +19,7 @@ use App\Form\CommentType;
 use App\Form\EventFilterType;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\EventService;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
@@ -106,7 +107,7 @@ final class EventController extends AbstractController
         $form = $this->createForm(CommentType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isGranted('event.comment', $event)) {
+            if (!$this->isGranted(PermissionAttribute::EVENT_COMMENT_CREATE, $event)) {
                 $this->addFlash('warning', 'events.flash_group_only');
 
                 return $this->redirectToRoute('app_event_details', ['id' => $id]);
@@ -221,7 +222,7 @@ final class EventController extends AbstractController
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
         $user = $this->getAuthedUser();
-        if (!$this->isGranted('event.rsvp', $event)) {
+        if (!$this->isGranted(PermissionAttribute::EVENT_RSVP, $event)) {
             $this->addFlash('warning', 'events.flash_group_only');
 
             return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
