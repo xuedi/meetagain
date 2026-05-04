@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CoreSitemapPublisherTest extends TestCase
 {
-    private const int STATIC_ROUTE_COUNT = 9;
+    private const int STATIC_ROUTE_COUNT = 8;
 
     public function testEmitsStaticRoutesWithLocaleAlternates(): void
     {
@@ -68,7 +68,6 @@ class CoreSitemapPublisherTest extends TestCase
             'app_event',
             'app_event_featured',
             'app_contact',
-            'app_api',
             'app_cookie',
             'app_login',
             'app_register',

@@ -17,7 +17,6 @@ chrome:
     footer_col_social: '社交'
     footer_col_legal: '法律'
     nav_contact: '联系'
-    nav_api: 'API'
     burger_logged_in_label: '已登录：%name%'
     burger_admin_section: '管理'
     notifications_view_all: '查看全部'

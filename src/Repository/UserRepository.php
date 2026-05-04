@@ -488,11 +488,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult();
     }
 
-    public function findByApiTokenHash(string $hash): ?User
-    {
-        return $this->findOneBy(['apiTokenHash' => $hash]);
-    }
-
     public function getLatestPendingCreatedAt(): ?DateTimeImmutable
     {
         $result = $this
