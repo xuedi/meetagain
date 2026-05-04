@@ -1,0 +1,27 @@
+<div class="box mb-4">
+    <h2 class="title is-6">{{ tile.title|trans }}</h2>
+    {% if tile.items|length == 0 %}
+        <p class="has-text-grey">{{ tile.emptyMessage|trans }}</p>
+    {% else %}
+        <div class="table-container">
+            <table class="table is-narrow is-fullwidth">
+                <tbody>
+                    {% for item in tile.items %}
+                        <tr>
+                            <td>
+                                {% if item.link %}
+                                    <a href="{{ item.link }}">{{ item.label }}</a>
+                                {% else %}
+                                    {{ item.label }}
+                                {% endif %}
+                                {% if item.sublabel %}
+                                    <span class="is-size-7 has-text-grey ml-2">{{ item.sublabel }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>

@@ -318,15 +318,48 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $breakdown;
     }
 
-    public function getRecentlyActiveCount(int $days = 7): int
+    /**
+     * @param array<int>|null $restrictToUserIds
+     */
+    public function getRecentlyActiveCount(int $days = 7, ?array $restrictToUserIds = null): int
     {
-        return (int) $this
+        if ($restrictToUserIds === []) {
+            return 0;
+        }
+
+        $qb = $this
             ->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.lastLogin > :date')
-            ->setParameter('date', new DateTime('-' . $days . ' days'))
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('date', new DateTime('-' . $days . ' days'));
+
+        if ($restrictToUserIds !== null) {
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param array<int>|null $restrictToUserIds
+     */
+    public function countCreatedSince(DateTimeImmutable $since, ?array $restrictToUserIds = null): int
+    {
+        if ($restrictToUserIds === []) {
+            return 0;
+        }
+
+        $qb = $this
+            ->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.createdAt >= :since')
+            ->setParameter('since', $since);
+
+        if ($restrictToUserIds !== null) {
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -359,11 +392,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * @param array<int>|null $restrictToUserIds
      * @return array{total: int}
      */
-    public function getSocialNetworkStats(DateTimeImmutable $weekStart): array
+    public function getSocialNetworkStats(DateTimeImmutable $weekStart, ?array $restrictToUserIds = null): array
     {
         $em = $this->getEntityManager();
+
+        if ($restrictToUserIds === []) {
+            return ['total' => 0];
+        }
+
+        if ($restrictToUserIds !== null) {
+            $count = (int) $em
+                ->createQueryBuilder()
+                ->select('COUNT(f.id)')
+                ->from(User::class, 'u')
+                ->innerJoin('u.following', 'f')
+                ->where('u.id IN (:ids)')
+                ->andWhere('f.id IN (:ids)')
+                ->setParameter('ids', $restrictToUserIds)
+                ->getQuery()
+                ->getSingleScalarResult();
+            return ['total' => $count];
+        }
 
         $total = (int) $em->getConnection()->executeQuery('SELECT COUNT(*) FROM user_user')->fetchOne();
 

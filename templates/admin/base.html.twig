@@ -5,10 +5,28 @@
 
 {% block body %}
 
+    <header class="admin-shell-topbar is-hidden-tablet">
+        <button id="adminBurger"
+                class="admin-shell-burger"
+                type="button"
+                aria-label="{{ 'admin_shell.menu_toggle'|trans }}"
+                aria-controls="adminDrawer"
+                aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <span class="admin-shell-title">{{ 'admin_shell.page_title'|trans }}</span>
+    </header>
+
+    <div id="adminBackdrop" class="admin-shell-backdrop" aria-hidden="true"></div>
+
     <section class="section">
         <div class="container">
             <div class="columns">
-                <div class="column is-2">
+                <div id="adminDrawer"
+                     class="column is-2 admin-shell-drawer"
+                     aria-hidden="true">
                     {% include 'admin/base_navbar.html.twig' %}
                 </div>
                 <div class="column is-10">
@@ -29,5 +47,6 @@
             defer></script>
     <script src="{{ asset('js/admin/dropdowns.js') }}" defer></script>
     <script src="{{ asset('js/admin/sections.js') }}" defer></script>
+    <script src="{{ asset('js/admin/sidebar.js') }}" defer></script>
 
 {% endblock %}
