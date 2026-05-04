@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App;
 
 use ReflectionObject;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
@@ -28,33 +31,37 @@ class Kernel extends BaseKernel
      * shape as core's config/bundles.php. Registration depends only on the
      * directory existing (matching composer dependency presence), not on the
      * runtime plugin-enabled flag in config/plugins.php.
+     *
+     * @return iterable<BundleInterface>
      */
     public function registerBundles(): iterable
     {
-        foreach ($this->doRegisterBundles($this->getConfigDir() . '/bundles.php') as $bundle) {
-            yield $bundle;
-        }
+        yield from $this->doRegisterBundles($this->getConfigDir() . '/bundles.php');
         foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
             $bundlesFile = $pluginConfigDir . '/bundles.php';
             if (!file_exists($bundlesFile)) {
                 continue;
             }
-            foreach ($this->doRegisterBundles($bundlesFile) as $bundle) {
-                yield $bundle;
-            }
+            yield from $this->doRegisterBundles($bundlesFile);
         }
     }
 
+    /**
+     * @return iterable<BundleInterface>
+     */
     private function doRegisterBundles(string $bundlesFile): iterable
     {
         if (!file_exists($bundlesFile)) {
             return;
         }
+        /** @var array<class-string<BundleInterface>, array<string, bool>> $contents */
         $contents = require $bundlesFile;
         foreach ($contents as $class => $envs) {
-            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
-                yield new $class();
+            if (!($envs[$this->environment] ?? $envs['all'] ?? false)) {
+                continue;
             }
+
+            yield new $class();
         }
     }
 
@@ -114,7 +121,9 @@ class Kernel extends BaseKernel
         $routes->import($configDir . '/{routes}/' . $this->environment . '/*.{php,yaml}');
         $routes->import($configDir . '/{routes}/*.{php,yaml}');
 
-        $routes->import(is_file($configDir . '/routes.yaml') ? $configDir . '/routes.yaml' : $configDir . '/{routes}.php');
+        $routes->import(
+            is_file($configDir . '/routes.yaml') ? $configDir . '/routes.yaml' : $configDir . '/{routes}.php',
+        );
 
         $reflection = new ReflectionObject($this);
         if (false !== ($fileName = $reflection->getFileName())) {
