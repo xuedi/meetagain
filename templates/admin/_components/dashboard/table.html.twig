@@ -1,0 +1,34 @@
+<div class="box mb-4">
+    <h2 class="title is-6">{{ tile.title|trans }}</h2>
+    <div class="table-container">
+        <table class="table is-narrow is-fullwidth">
+            {% if tile.headers|length > 0 %}
+                <thead>
+                    <tr>
+                        {% for header in tile.headers %}
+                            <th{% if not loop.first %} class="has-text-right"{% endif %}>{{ header|trans }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+            {% endif %}
+            <tbody>
+                {% for row in tile.rows %}
+                    <tr{% if row.highlight %} class="has-background-light"{% endif %}>
+                        {% for cell in row.cells %}
+                            <td{% if not loop.first %} class="has-text-right"{% endif %}>
+                                {% if row.highlight %}<strong>{{ cell }}</strong>{% else %}{{ cell }}{% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                {% if tile.footerRow %}
+                    <tr class="has-background-light">
+                        {% for cell in tile.footerRow.cells %}
+                            <td{% if not loop.first %} class="has-text-right"{% endif %}><strong>{{ cell }}</strong></td>
+                        {% endfor %}
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

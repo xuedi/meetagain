@@ -1,0 +1,26 @@
+<div class="box mb-4">
+    <h2 class="title is-6">{{ tile.title|trans }}</h2>
+    <div class="table-container">
+        <table class="table is-narrow is-fullwidth">
+            <tbody>
+                {% for check in tile.checks %}
+                    <tr>
+                        <td>
+                            {{ check.label|trans }}
+                            {% if check.detail %}
+                                <span class="is-size-7 has-text-grey">({{ check.detail }})</span>
+                            {% endif %}
+                        </td>
+                        <td class="has-text-right">
+                            {% if check.ok %}
+                                <span class="icon has-text-success"><i class="fa fa-check-circle"></i></span>
+                            {% else %}
+                                <span class="icon has-text-danger"><i class="fa fa-times-circle"></i></span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

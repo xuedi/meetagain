@@ -2,6 +2,7 @@
 
 namespace App\Service\Admin;
 
+use App\Filter\Admin\Dashboard\DashboardScope;
 use App\Repository\CommandExecutionLogRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
@@ -43,9 +44,9 @@ readonly class DashboardActionService
         return $this->userRepo->getStatusBreakdown();
     }
 
-    public function getActiveUsersCount(): int
+    public function getActiveUsersCount(?DashboardScope $scope = null): int
     {
-        return $this->userRepo->getRecentlyActiveCount(7);
+        return $this->userRepo->getRecentlyActiveCount(7, $scope?->userIds());
     }
 
     public function getImageStats(DateTimeImmutable $start, DateTimeImmutable $stop): array
@@ -53,14 +54,14 @@ readonly class DashboardActionService
         return $this->imageRepo->getStorageStats($start, $stop);
     }
 
-    public function getPastEventsWithoutPhotos(int $limit = 5): array
+    public function getPastEventsWithoutPhotos(int $limit = 5, ?DashboardScope $scope = null): array
     {
-        return $this->eventRepo->getPastEventsWithoutPhotos($limit);
+        return $this->eventRepo->getPastEventsWithoutPhotos($limit, $scope?->eventIds());
     }
 
-    public function getRecurringEventsCount(): int
+    public function getRecurringEventsCount(?DashboardScope $scope = null): int
     {
-        return $this->eventRepo->getRecurringCount();
+        return $this->eventRepo->getRecurringCount($scope?->eventIds());
     }
 
     public function getUnverifiedCount(): int
@@ -71,9 +72,26 @@ readonly class DashboardActionService
     /**
      * @return array{total: int, unread: int}
      */
-    public function getMessageStats(): array
+    public function getMessageStats(?DashboardScope $scope = null): array
     {
-        return $this->messageRepo->getSystemStats();
+        return $this->messageRepo->getSystemStats($scope?->userIds());
+    }
+
+    public function getMembersThisWeek(int $year, int $week, ?DashboardScope $scope = null): int
+    {
+        $tmp = new \DateTime();
+        $tmp->setISODate($year, $week);
+        $start = DateTimeImmutable::createFromMutable($tmp);
+
+        return $this->userRepo->countCreatedSince($start, $scope?->userIds());
+    }
+
+    /**
+     * @return array<\App\Entity\Event>
+     */
+    public function getUpcomingEventsLowRsvp(int $daysAhead = 14, int $minYes = 3, ?DashboardScope $scope = null): array
+    {
+        return $this->eventRepo->findUpcomingWithLowRsvp($daysAhead, $minYes, $scope?->eventIds());
     }
 
     /**

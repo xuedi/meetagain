@@ -139,26 +139,39 @@ class MessageRepository extends ServiceEntityRepository
     /**
      * Get system-wide message statistics.
      *
+     * @param array<int>|null $restrictToUserIds Both sender and receiver must be in this set.
      * @return array{total: int, unread: int}
      */
-    public function getSystemStats(): array
+    public function getSystemStats(?array $restrictToUserIds = null): array
     {
-        $total = (int) $this
-            ->createQueryBuilder('m')
-            ->select('COUNT(m.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        if ($restrictToUserIds === []) {
+            return ['total' => 0, 'unread' => 0];
+        }
 
-        $unread = (int) $this
+        $totalQb = $this
+            ->createQueryBuilder('m')
+            ->select('COUNT(m.id)');
+
+        $unreadQb = $this
             ->createQueryBuilder('m')
             ->select('COUNT(m.id)')
-            ->where('m.wasRead = false')
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->where('m.wasRead = false');
+
+        if ($restrictToUserIds !== null) {
+            $totalQb
+                ->andWhere('IDENTITY(m.sender) IN (:userIds)')
+                ->andWhere('IDENTITY(m.receiver) IN (:userIds)')
+                ->setParameter('userIds', $restrictToUserIds);
+
+            $unreadQb
+                ->andWhere('IDENTITY(m.sender) IN (:userIds)')
+                ->andWhere('IDENTITY(m.receiver) IN (:userIds)')
+                ->setParameter('userIds', $restrictToUserIds);
+        }
 
         return [
-            'total' => $total,
-            'unread' => $unread,
+            'total' => (int) $totalQb->getQuery()->getSingleScalarResult(),
+            'unread' => (int) $unreadQb->getQuery()->getSingleScalarResult(),
         ];
     }
 }

@@ -494,32 +494,86 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
-    public function getPastEventsWithoutPhotos(int $limit = 5): array
+    public function getPastEventsWithoutPhotos(int $limit = 5, ?array $restrictToEventIds = null): array
     {
-        return $this
+        if ($restrictToEventIds === []) {
+            return [];
+        }
+
+        $qb = $this
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
             ->addSelect('t')
             ->leftJoin('e.images', 'i')
             ->where('e.start < :date')
             ->andWhere('i.id IS NULL')
-            ->setParameter('date', new DateTime())
-            ->orderBy('e.start', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('date', new DateTime());
+
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->orderBy('e.start', 'DESC')->setMaxResults($limit)->getQuery()->getResult();
     }
 
-    public function getRecurringCount(): int
+    /**
+     * @param array<int>|null $restrictToEventIds Optional event ID filter
+     */
+    public function getRecurringCount(?array $restrictToEventIds = null): int
     {
-        return (int) $this
+        if ($restrictToEventIds === []) {
+            return 0;
+        }
+
+        $qb = $this
             ->createQueryBuilder('e')
             ->select('COUNT(e.id)')
-            ->where('e.recurringRule IS NOT NULL')
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->where('e.recurringRule IS NOT NULL');
+
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Find upcoming events in the next N days that have fewer than $minYes "yes" RSVPs,
+     * optionally restricted to a set of event IDs.
+     *
+     * @param array<int>|null $restrictToEventIds
+     * @return array<Event>
+     */
+    public function findUpcomingWithLowRsvp(int $daysAhead = 14, int $minYes = 3, ?array $restrictToEventIds = null): array
+    {
+        if ($restrictToEventIds === []) {
+            return [];
+        }
+
+        $now = new DateTime();
+        $until = (new DateTime())->modify(sprintf('+%d days', $daysAhead));
+
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.rsvp', 'r')
+            ->where('e.start BETWEEN :now AND :until')
+            ->setParameter('now', $now)
+            ->setParameter('until', $until)
+            ->groupBy('e.id')
+            ->having('COUNT(r.id) < :minYes')
+            ->setParameter('minYes', $minYes)
+            ->orderBy('e.start', 'ASC');
+
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
