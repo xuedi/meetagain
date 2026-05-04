@@ -16,6 +16,10 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api_v1:
+            pattern: ^/api/v1/
+            stateless: true
+            provider: app_user_provider
         main:
             lazy: true
             provider: app_user_provider
