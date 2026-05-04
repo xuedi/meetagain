@@ -2,6 +2,7 @@
 
 namespace App\Service\Admin;
 
+use App\Filter\Admin\Dashboard\DashboardScope;
 use App\Repository\ActivityRepository;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
@@ -72,35 +73,48 @@ readonly class DashboardStatsService
     }
 
     /**
-     * Get RSVP statistics for the week.
-     *
      * @return array{yes: int, no: int, total: int}
      */
-    public function getRsvpStats(int $year, int $week): array
+    public function getRsvpStats(int $year, int $week, ?DashboardScope $scope = null): array
     {
         $dates = $this->calculateDates($year, $week);
-        return $this->activityRepo->getRsvpStats($dates['start'], $dates['stop']);
+        return $this->activityRepo->getRsvpStats($dates['start'], $dates['stop'], $scope?->userIds());
     }
 
     /**
-     * Get login activity trend for the week.
-     *
      * @return array<string, int>
      */
-    public function getLoginTrend(int $year, int $week): array
+    public function getLoginTrend(int $year, int $week, ?DashboardScope $scope = null): array
     {
         $dates = $this->calculateDates($year, $week);
-        return $this->activityRepo->getLoginTrend($dates['start'], $dates['stop']);
+        return $this->activityRepo->getLoginTrend($dates['start'], $dates['stop'], $scope?->userIds());
     }
 
     /**
-     * Get social network statistics.
+     * @return array<string, int>
      */
-    public function getSocialNetworkStats(int $year, int $week): array
+    public function getRsvpYesTrend(int $year, int $week, ?DashboardScope $scope = null): array
+    {
+        $dates = $this->calculateDates($year, $week);
+        return $this->activityRepo->getRsvpYesTrend($dates['start'], $dates['stop'], $scope?->userIds());
+    }
+
+    /**
+     * Multi-series daily counts for the platform activity chart.
+     *
+     * @return array{labels: list<string>, logins: list<int>, rsvps: list<int>, newMembers: list<int>}
+     */
+    public function getActivityTrend(int $year, int $week, ?DashboardScope $scope = null): array
+    {
+        $dates = $this->calculateDates($year, $week);
+        return $this->activityRepo->getActivityTrend($dates['start'], $dates['stop'], $scope?->userIds());
+    }
+
+    public function getSocialNetworkStats(int $year, int $week, ?DashboardScope $scope = null): array
     {
         $dates = $this->calculateDates($year, $week);
 
-        return $this->userRepo->getSocialNetworkStats($dates['start']);
+        return $this->userRepo->getSocialNetworkStats($dates['start'], $scope?->userIds());
     }
 
     public function calculateDates(?int $year, ?int $week): array

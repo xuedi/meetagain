@@ -150,8 +150,9 @@ details.activities-load-more {
 .card-preview-min  { min-height: 80px; }
 .card-preview-img  { max-height: 40px; margin-bottom: 0.25rem; }
 
-// Admin charts
-.chart-container   { max-height: 200px; }
+// Admin charts: canvas fills its wrapper (each dashboard chart partial wraps the
+// <canvas> in a div with explicit height/max-height, so we no longer need a global cap).
+.chart-container   { width: 100%; height: 100%; }
 
 // Messaging
 .chat-layout         { display: flex; flex-direction: column; height: 70vh; }
@@ -321,3 +322,104 @@ details.activities-load-more {
 // FactsRow matches its visual styling (padding + larger icon font-size).
 .cms-facts-row { padding-top: 2rem; padding-bottom: 2rem; }
 .cms-facts-row .icon { font-size: 1.5rem; }
+
+// ── Admin shell ──────────────────────────────────────────────────────────────
+// Mobile-only sticky topbar + slide-in drawer for the admin sidebar.
+// Bulma's $tablet breakpoint is 769px; below that the desktop sidebar column
+// is hidden and the same nav markup is shown via the off-canvas drawer.
+
+.admin-shell-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    height: 3rem;
+    padding: 0 0.75rem;
+    background-color: hsl(0, 0%, 100%);
+    border-bottom: 1px solid hsl(0, 0%, 86%);
+    box-shadow: 0 1px 2px rgba(10, 10, 10, 0.05);
+}
+
+.admin-shell-burger {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    margin-right: 0.5rem;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+
+    span {
+        display: block;
+        width: 1.25rem;
+        height: 2px;
+        background-color: hsl(0, 0%, 21%);
+        transition: transform 0.2s, opacity 0.2s;
+    }
+
+    &.is-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    &.is-active span:nth-child(2) { opacity: 0; }
+    &.is-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+}
+
+.admin-shell-title {
+    font-weight: 600;
+    color: hsl(0, 0%, 21%);
+}
+
+.admin-shell-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    background-color: rgba(10, 10, 10, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+
+    &.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+body.admin-shell-no-scroll {
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .admin-shell-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 40;
+        width: 80vw;
+        max-width: 20rem;
+        height: 100vh;
+        padding: 1.5rem 1rem;
+        background-color: hsl(0, 0%, 100%);
+        box-shadow: 2px 0 6px rgba(10, 10, 10, 0.15);
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease-out;
+
+        &.is-open {
+            transform: translateX(0);
+        }
+
+        .menu-list a {
+            min-height: 2.75rem;
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .admin-shell-backdrop { display: none; }
+}

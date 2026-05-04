@@ -1,0 +1,15 @@
+<div class="box mb-4">
+    <h2 class="title is-6">{{ tile.title|trans }}</h2>
+    <p class="is-size-2-desktop is-size-3-mobile has-text-weight-bold">
+        {% if tile.icon %}<span class="icon"><i class="fa fa-{{ tile.icon }}"></i></span>{% endif %}
+        {{ tile.value }}
+    </p>
+    {% if tile.sublabel %}
+        <p class="is-size-7 has-text-grey">{{ tile.sublabel|trans }}</p>
+    {% endif %}
+    {% if tile.link %}
+        <p class="mt-2">
+            <a href="{{ tile.link }}" class="is-size-7">{{ 'admin_shell.dashboard_view_link'|trans }}</a>
+        </p>
+    {% endif %}
+</div>
