@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Security\Permission;
 
@@ -30,7 +32,8 @@ final class PermissionGateway implements VoterInterface
 
     #[Override]
     public function vote(
-        #[\SensitiveParameter] TokenInterface $token,
+        #[\SensitiveParameter]
+        TokenInterface $token,
         mixed $subject,
         array $attributes,
         ?Vote $vote = null,
@@ -77,7 +80,7 @@ final class PermissionGateway implements VoterInterface
         return true;
     }
 
-    private function buildContext(TokenInterface $token, mixed $subject): PermissionContext
+    private function buildContext(#[\SensitiveParameter] TokenInterface $token, mixed $subject): PermissionContext
     {
         $user = $token->getUser();
 
