@@ -9,7 +9,7 @@ use JsonException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;
 
-readonly class PluginService implements ActivePluginListInterface
+readonly class PluginService
 {
     private string $configDir;
     private string $pluginDir;

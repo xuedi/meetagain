@@ -17,7 +17,6 @@ chrome:
     footer_col_social: 'Social'
     footer_col_legal: 'Gesetzliches'
     nav_contact: 'Kontakt'
-    nav_api: 'API'
     burger_logged_in_label: 'Angemeldet: %name%'
     burger_admin_section: 'Admin'
     notifications_view_all: 'Alle anzeigen'

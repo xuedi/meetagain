@@ -8,14 +8,6 @@ framework:
             policy: 'fixed_window'
             limit: 10
             interval: '1 hour'
-        api_token:
-            policy: 'fixed_window'
-            limit: 10
-            interval: '15 minutes'
-        api_global:
-            policy: 'sliding_window'
-            limit: 600
-            interval: '5 minutes'
         support:
             policy: 'fixed_window'
             limit: 10
@@ -32,14 +24,6 @@ when@test:
                 policy: 'fixed_window'
                 limit: 999999
                 interval: '1 hour'
-            api_token:
-                policy: 'fixed_window'
-                limit: 999999
-                interval: '15 minutes'
-            api_global:
-                policy: 'sliding_window'
-                limit: 999999
-                interval: '5 minutes'
             support:
                 policy: 'fixed_window'
                 limit: 999999

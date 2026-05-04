@@ -72,7 +72,6 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             ['route' => 'app_event_featured', 'params' => [], 'priority' => 0.7, 'changefreq' => 'weekly'],
             // Static utility / docs
             ['route' => 'app_contact', 'params' => [], 'priority' => 0.5, 'changefreq' => 'yearly'],
-            ['route' => 'app_api', 'params' => [], 'priority' => 0.6, 'changefreq' => 'weekly'],
             ['route' => 'app_cookie', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
             // Auth entry points - low priority so they don't steal crawl budget from content
             ['route' => 'app_login', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],

@@ -63,9 +63,4 @@ class Kernel implements Plugin
     {
         return [];
     }
-
-    public function getOpenApiFragment(): array
-    {
-        return [];
-    }
 }
