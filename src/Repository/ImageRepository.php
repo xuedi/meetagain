@@ -94,7 +94,9 @@ class ImageRepository extends ServiceEntityRepository
             ->addSelect('e')
             ->where('i.uploader = :user')
             ->andWhere('i.event IS NOT NULL')
+            ->andWhere('i.type = :type')
             ->setParameter('user', $user)
+            ->setParameter('type', ImageType::EventUpload)
             ->groupBy('i.event')
             ->getQuery()
             ->getResult();

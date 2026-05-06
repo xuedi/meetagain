@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +34,7 @@ class ImageServiceTest extends TestCase
             $filesystemService ?? $this->createStub(ExtendedFilesystem::class),
             $logger ?? $this->createStub(LoggerInterface::class),
             $this->kernelProjectDir,
+            $this->createStub(ImageLocationService::class),
         );
     }
 
@@ -155,6 +157,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ExtendedFilesystem::class),
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
+                $this->createStub(ImageLocationService::class),
             ])
             ->onlyMethods(['createThumbnails'])
             ->getMock();
@@ -187,6 +190,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ExtendedFilesystem::class),
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
+                $this->createStub(ImageLocationService::class),
             ])
             ->onlyMethods(['rotateThumbNail'])
             ->getMock();
@@ -248,6 +252,7 @@ class ImageServiceTest extends TestCase
                 $filesystemMock,
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
+                $this->createStub(ImageLocationService::class),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
@@ -351,6 +356,7 @@ class ImageServiceTest extends TestCase
                 $filesystemMock,
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
+                $this->createStub(ImageLocationService::class),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();

@@ -29,6 +29,7 @@ readonly class ImageService
         private ExtendedFilesystem $filesystem,
         private LoggerInterface $logger,
         private string $kernelProjectDir,
+        private ImageLocationService $imageLocationService,
     ) {}
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
@@ -66,15 +67,21 @@ readonly class ImageService
      */
     public function uploadForEvent(Event $event, array $files, User $user): int
     {
+        $newImages = [];
         foreach ($files as $uploadedFile) {
             $image = $this->upload($uploadedFile, $user, ImageType::EventUpload);
             $this->entityManager->persist($image);
             $this->entityManager->flush();
             $event->addImage($image);
             $this->createThumbnails($image, ImageType::EventUpload);
+            $newImages[] = $image;
         }
         $this->entityManager->persist($event);
         $this->entityManager->flush();
+
+        foreach ($newImages as $image) {
+            $this->imageLocationService->addLocation($image->getId(), ImageType::EventUpload, $event->getId());
+        }
 
         return count($files);
     }
