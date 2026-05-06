@@ -8,6 +8,7 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\PasswordChanged;
 use App\Controller\AbstractController;
 use App\Form\ChangePassword;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\BlockingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -31,9 +32,12 @@ final class ConfigController extends AbstractController
     #[Route('/profile/config', name: 'app_profile_config')]
     public function config(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
+
         $form = $this->createForm(ChangePassword::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted(PermissionAttribute::USER_PASSWORD_UPDATE);
             $user = $this->getAuthedUser();
             $oldPasswordValid = $this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData());
             if ($oldPasswordValid) {
@@ -65,6 +69,8 @@ final class ConfigController extends AbstractController
     ])]
     public function toggle(Request $request, string $type): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_UPDATE_SELF);
+
         $user = $this->getAuthedUser();
         $newStatus = match ($type) {
             'osm' => $user->setOsmConsent(!$user->isOsmConsent())->isOsmConsent(),

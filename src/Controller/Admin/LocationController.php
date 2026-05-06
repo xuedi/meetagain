@@ -15,6 +15,7 @@ use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\LocationType;
 use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -84,6 +85,8 @@ final class LocationController extends AbstractController implements AdminNaviga
     #[Route('/{id}/edit', name: 'app_admin_location_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::LOCATION_UPDATE, $location);
+
         if (!$this->locationFilterService->isLocationAccessible($location->getId())) {
             throw $this->createNotFoundException('Location not found in current context.');
         }
@@ -115,6 +118,8 @@ final class LocationController extends AbstractController implements AdminNaviga
     #[Route('/{id}/delete', name: 'app_admin_location_delete', methods: ['GET'])]
     public function delete(Location $location, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::LOCATION_DELETE, $location);
+
         if (!$this->locationFilterService->isLocationAccessible($location->getId())) {
             throw $this->createNotFoundException('Location not found in current context.');
         }
@@ -143,6 +148,8 @@ final class LocationController extends AbstractController implements AdminNaviga
     #[Route('/add', name: 'app_admin_location_add', methods: ['GET', 'POST'])]
     public function add(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::LOCATION_CREATE);
+
         $location = new Location();
         $form = $this->createForm(LocationType::class, $location);
         $form->handleRequest($request);

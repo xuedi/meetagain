@@ -29,6 +29,7 @@ use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Entity\User;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -145,6 +146,8 @@ final class CmsController extends AbstractController implements AdminNavigationI
     )]
     public function cmsEdit(Request $request, Cms $cms, ?string $locale = null): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::CMS_PAGE_UPDATE, $cms);
+
         if (!$this->adminCmsListFilterService->isCmsAccessible($cms->getId())) {
             $this->logAccessDenied($cms, $request, 'edit');
             throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
@@ -270,6 +273,8 @@ final class CmsController extends AbstractController implements AdminNavigationI
         $id = $request->query->get('id');
         $cmsPage = $this->repo->find($id);
         if ($cmsPage !== null) {
+            $this->denyAccessUnlessGranted(PermissionAttribute::CMS_PAGE_DELETE, $cmsPage);
+
             if (!$this->adminCmsListFilterService->isCmsAccessible($cmsPage->getId())) {
                 $this->logAccessDenied($cmsPage, $request, 'delete');
                 throw $this->createAccessDeniedException('This CMS page is not accessible in the current context');
@@ -291,6 +296,8 @@ final class CmsController extends AbstractController implements AdminNavigationI
     #[Route('/add', name: 'app_admin_cms_add', methods: ['POST'])]
     public function cmsAdd(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::CMS_PAGE_CREATE);
+
         $user = $this->getAuthedUser();
 
         $newPage = new Cms();

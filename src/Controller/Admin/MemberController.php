@@ -10,6 +10,7 @@ use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Repository\UserRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\MemberActionException;
 use App\Service\Member\MemberActionFailure;
 use App\Service\Member\UserService;
@@ -68,6 +69,8 @@ final class MemberController extends AbstractController implements AdminNavigati
     #[Route('/admin/member/edit/{id}', name: 'app_admin_member_edit', methods: ['GET'])]
     public function edit(User $user): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_VIEW, $user);
+
         if (!$this->filterService->isMemberAccessible($user->getId())) {
             throw $this->createNotFoundException('Member not found in current context.');
         }
@@ -82,6 +85,7 @@ final class MemberController extends AbstractController implements AdminNavigati
     #[IsGranted('ROLE_ADMIN')]
     public function delete(User $user): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_DELETE, $user);
         $this->assertAccessible($user);
 
         try {
@@ -97,6 +101,7 @@ final class MemberController extends AbstractController implements AdminNavigati
     #[IsGranted('ROLE_ADMIN')]
     public function setRole(User $user, string $role, Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_ROLE_UPDATE, $user);
         $this->assertAccessible($user);
 
         if (!in_array($role, UserService::ALLOWED_ROLES, true)) {
@@ -122,6 +127,7 @@ final class MemberController extends AbstractController implements AdminNavigati
     #[IsGranted('ROLE_ADMIN')]
     public function toggleFlag(User $user, string $flag, Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_UPDATE, $user);
         $this->assertAccessible($user);
 
         if (!in_array($flag, UserService::ALLOWED_FLAGS, true)) {
@@ -148,6 +154,7 @@ final class MemberController extends AbstractController implements AdminNavigati
     #[IsGranted('ROLE_ADMIN')]
     public function setStatus(User $user, string $status, Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_STATUS_UPDATE, $user);
         $this->assertAccessible($user);
 
         if (!is_numeric($status)) {
