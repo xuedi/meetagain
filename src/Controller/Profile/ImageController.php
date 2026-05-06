@@ -3,6 +3,7 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Enum\ImageType;
 use App\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,7 +28,11 @@ final class ImageController extends AbstractController
                 $image = $this->getAuthedUser()->getImage();
                 break;
             case 'event':
-                $imageList = $this->imageRepo->findBy(['uploader' => $this->getUser(), 'event' => $id]);
+                $imageList = $this->imageRepo->findBy([
+                    'uploader' => $this->getUser(),
+                    'event' => $id,
+                    'type' => ImageType::EventUpload,
+                ]);
                 $image = $imageId === null ? null : $this->imageRepo->findOneBy(['id' => $imageId]);
                 break;
         }
