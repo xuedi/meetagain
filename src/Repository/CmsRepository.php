@@ -109,6 +109,26 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<int> $ids
+     * @return array<Cms>
+     */
+    public function findPublishedByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this
+            ->createQueryBuilder('c')
+            ->where('c.id IN (:ids)')
+            ->andWhere('c.published = true')
+            ->setParameter('ids', $ids)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * IDs are cached in Valkey; entities are fetched fresh on each request to avoid
      * serializing Doctrine proxy objects into the cache.
      *
