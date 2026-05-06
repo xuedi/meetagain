@@ -137,6 +137,7 @@
     }
   },
   "require-dev": {
+    "brianium/paratest": "^7",
     "carthage-software/mago": "^1.0.0",
     "dama/doctrine-test-bundle": "^8.4",
     "phpunit/phpunit": "^13",
