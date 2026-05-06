@@ -7,8 +7,8 @@
 #   git config core.hooksPath .githooks
 #
 # Public/open-source contributors typically have an empty bin/commit-hooks/ and
-# the hook becomes a no-op. Private tooling (e.g. .claude/) can drop scripts
-# there without the core repo needing to know about them.
+# the hook becomes a no-op. Private tooling can drop scripts there without the
+# core repo needing to know about them.
 #
 # Bypass once with: git commit --no-verify
 
