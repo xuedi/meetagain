@@ -97,6 +97,20 @@
                         </p>
                     </div>
 
+                    {% set pluginConfigLinks = get_plugin_profile_config_links() %}
+                    {% if pluginConfigLinks is not empty %}
+                        <div class="box">
+                            <h2 class="title is-5">{{ 'profile_config.section_account_actions'|trans }}</h2>
+                            <div class="buttons">
+                                {% for link in pluginConfigLinks %}
+                                    <a href="{{ link.slug }}" class="button is-link is-light">
+                                        {{ link.name|trans }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <div class="box">
                         <h2 class="title is-5">{{ 'profile_config.section_blocked_users'|trans }}</h2>
                         {% if blockedUsers|length == 0 %}

@@ -258,6 +258,7 @@ profile_config:
     section_privacy: '隐私'
     section_change_password: '修改密码'
     button_change_password: '修改密码'
+    section_account_actions: '账户操作'
     section_blocked_users: '已屏蔽用户'
     toggle_email_notification: '启用电子邮件通知'
     toggle_public_profile: '在网站访客的成员页面上显示我'

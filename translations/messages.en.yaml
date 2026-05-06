@@ -272,6 +272,7 @@ profile_config:
     section_privacy: 'Privacy'
     section_change_password: 'Change Password'
     button_change_password: 'Change password'
+    section_account_actions: 'Account Actions'
     section_blocked_users: 'Blocked Users'
     toggle_email_notification: 'Enable email notification'
     toggle_public_profile: 'Show me on the members page for website guests'

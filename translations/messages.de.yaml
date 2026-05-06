@@ -258,6 +258,7 @@ profile_config:
     section_privacy: 'Privatsphäre'
     section_change_password: 'Passwort ändern'
     button_change_password: 'Passwort ändern'
+    section_account_actions: 'Kontoaktionen'
     section_blocked_users: 'Blockierte Nutzer'
     toggle_email_notification: 'E-Mail-Benachrichtigungen aktivieren'
     toggle_public_profile: 'Auf der Mitgliederseite für Besucher anzeigen'

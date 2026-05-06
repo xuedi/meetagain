@@ -12,6 +12,7 @@ use App\Enum\ImageType;
 use App\Form\SettingsType;
 use App\Form\WebsiteImageType;
 use App\Repository\ImageRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Cms\CmsPageCacheService;
 use App\Service\Config\ConfigService;
 use App\Service\Media\ImageLocationService;
@@ -50,10 +51,13 @@ final class ConfigController extends AbstractSettingsController implements Admin
     #[Route('/config', name: 'app_admin_system_config', methods: ['GET', 'POST'])]
     public function config(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_READ);
+
         $form = $this->createForm(SettingsType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
             $this->configService->saveForm($form->getData());
             $this->addFlash('success', $this->translator->trans('admin_system_config.flash_saved'));
         }
@@ -104,6 +108,8 @@ final class ConfigController extends AbstractSettingsController implements Admin
     #[Route('/boolean/{name}', name: 'app_admin_system_boolean', methods: ['POST'])]
     public function boolean(Request $request, string $name): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
+
         $value = $this->configService->toggleBoolean($name);
 
         if ($request->isXmlHttpRequest()) {

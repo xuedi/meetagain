@@ -11,6 +11,7 @@ use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\CronLog;
 use App\Repository\CronLogRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,6 +52,8 @@ final class CronLogController extends AbstractLogsController implements AdminNav
     #[Route('', name: 'app_admin_cron_log')]
     public function list(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_LOGS_CRON_READ);
+
         $range = $request->query->getString('range', self::DEFAULT_RANGE);
         if (!array_key_exists($range, self::RANGE_OFFSETS)) {
             $range = self::DEFAULT_RANGE;
@@ -102,6 +105,8 @@ final class CronLogController extends AbstractLogsController implements AdminNav
     #[Route('/{id}', name: 'app_admin_cron_log_show')]
     public function show(CronLog $cronLog): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_LOGS_CRON_READ);
+
         $statusValue = $cronLog->getStatus()->value;
         $statusTag = match ($statusValue) {
             'ok' => sprintf(

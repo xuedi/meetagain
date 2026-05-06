@@ -15,6 +15,7 @@ use App\Filter\Admin\Host\AdminHostListFilterService;
 use App\Form\HostType;
 use App\Repository\EventRepository;
 use App\Repository\HostRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,6 +84,8 @@ final class HostController extends AbstractController implements AdminNavigation
     #[Route('/{id}/edit', name: 'app_admin_host_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Host $host, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::HOST_UPDATE, $host);
+
         if (!$this->hostFilterService->isHostAccessible($host->getId())) {
             throw $this->createNotFoundException('Host not found in current context.');
         }
@@ -111,6 +114,8 @@ final class HostController extends AbstractController implements AdminNavigation
     #[Route('/{id}/delete', name: 'app_admin_host_delete', methods: ['GET'])]
     public function delete(Host $host, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::HOST_DELETE, $host);
+
         if (!$this->hostFilterService->isHostAccessible($host->getId())) {
             throw $this->createNotFoundException('Host not found in current context.');
         }
@@ -132,6 +137,8 @@ final class HostController extends AbstractController implements AdminNavigation
     #[Route('/add', name: 'app_admin_host_add', methods: ['GET', 'POST'])]
     public function add(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::HOST_CREATE);
+
         $host = new Host();
         $form = $this->createForm(HostType::class, $host);
         $form->handleRequest($request);

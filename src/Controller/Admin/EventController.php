@@ -28,6 +28,7 @@ use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageLocationService;
@@ -298,6 +299,8 @@ final class EventController extends AbstractController implements AdminNavigatio
     #[Route('/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_UPDATE, $event);
+
         // Validate event is accessible in current context
         if (!$this->eventFilterService->isEventAccessible($event->getId())) {
             throw $this->createAccessDeniedException('This event is not accessible in the current context');
@@ -398,6 +401,8 @@ final class EventController extends AbstractController implements AdminNavigatio
     #[Route('/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
     public function delete(Event $event): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_DELETE, $event);
+
         $this->addFlash('error', $this->translator->trans('admin_event.flash_delete_not_implemented'));
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
@@ -406,6 +411,8 @@ final class EventController extends AbstractController implements AdminNavigatio
     #[Route('/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
     public function cancel(Event $event): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_CANCEL, $event);
+
         $user = $this->getAuthedUser();
         $rsvpCount = $event->getRsvp()->count();
         $this->eventService->cancelEvent($event);
@@ -420,6 +427,8 @@ final class EventController extends AbstractController implements AdminNavigatio
     #[Route('/{id}/uncancel', name: 'app_admin_event_uncancel', methods: ['POST'])]
     public function uncancel(Event $event): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_CANCEL, $event);
+
         $this->eventService->uncancelEvent($event);
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
@@ -438,6 +447,8 @@ final class EventController extends AbstractController implements AdminNavigatio
     #[Route('/new', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_CREATE);
+
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
         $form->remove('createdAt');
