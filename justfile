@@ -230,10 +230,11 @@ plugin-disable name:
 
 
 
-# Run all tests and checks
+# Run all tests and checks (same chain as the pre-commit hook)
 [group('testing')]
-test: testSetup testUnit testFunctional testSmoke
+test:
     {{PHP}} composer validate --strict
+    bin/commit-hooks.sh
     echo "All tests and checks passed successfully"
 
 # Setup test database
@@ -247,6 +248,7 @@ testSetup:
     {{PHP}} php bin/console app:plugin:pre-fixtures --env=test
     {{PHP}} php bin/console app:fixtures:load --env=test -q --append --group=plugin
     {{PHP}} php bin/console app:plugin:post-fixtures --env=test
+    touch tests/config/.test-db.lock
 
 # Run unit tests
 [group('testing')]
