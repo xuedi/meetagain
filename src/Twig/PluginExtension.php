@@ -41,6 +41,7 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
             new TwigFunction('get_plugin_footer_links', $this->getPluginFooterLinks(...)),
             new TwigFunction('get_plugin_profile_dropdown_links', $this->getPluginProfileDropdownLinks(...)),
+            new TwigFunction('get_plugin_profile_config_links', $this->getPluginProfileConfigLinks(...)),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
             new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),
@@ -111,6 +112,20 @@ final class PluginExtension extends AbstractExtension
     {
         /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileDropdownLinks());
+
+        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
+
+        return $links;
+    }
+
+    /**
+     * Returns links contributed by plugins for the profile config page action area, sorted by priority.
+     * @return list<Link>
+     */
+    public function getPluginProfileConfigLinks(): array
+    {
+        /** @var list<Link> $links */
+        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileConfigLinks());
 
         usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
 
