@@ -42,8 +42,9 @@ document.addEventListener('DOMContentLoaded', function () {
             shadowSize: [41, 41]
         });
 
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '<a href="http://osm.org/copyright">OpenStreetMap</a>'
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
 
         const target = L.latLng(mapEl.dataset.lat, mapEl.dataset.lng);

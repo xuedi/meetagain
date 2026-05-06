@@ -20,7 +20,7 @@ class LocationFixture extends AbstractFixture implements DependentFixtureInterfa
     {
         $this->start();
         $importUser = $this->getRefUser(UserFixture::ADMIN);
-        foreach ($this->getData() as [$name, $street, $city, $postcode, $description, $long, $lat]) {
+        foreach ($this->getData() as [$name, $street, $city, $postcode, $description, $lat, $long]) {
             $location = new Location();
             $location->setName($name);
             $location->setStreet($street);
