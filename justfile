@@ -4,7 +4,8 @@
 set dotenv-load
 
 DOCKER := "docker-compose --env-file .env.dist -f docker/docker-compose.yml"
-PHP := DOCKER + " exec -e XDEBUG_MODE=coverage php"
+PHP := DOCKER + " exec -e XDEBUG_MODE=off php"
+PHP_COVERAGE := DOCKER + " exec -e XDEBUG_MODE=coverage php"
 DB := DOCKER + " exec mariadb"
 JUST := just_executable() + " --justfile=" + justfile()
 
@@ -127,8 +128,7 @@ appUpdateBulma version='latest':
 
 
 
-# Activate the local git hook dispatcher and copy bundled commit hooks into bin/commit-hooks/.
-# Run once per clone (and again whenever a new hook is added under tests/config/commit-hooks/).
+# Run once per clone
 [group('development')]
 install:
     git config core.hooksPath .githooks
@@ -233,9 +233,9 @@ plugin-disable name:
 # Run all tests and checks (same chain as the pre-commit hook)
 [group('testing')]
 test:
-    {{PHP}} composer validate --strict
-    bin/commit-hooks.sh
-    echo "All tests and checks passed successfully"
+    @{{PHP}} composer validate --strict --quiet
+    @bin/commit-hooks.sh
+    @echo "All tests and checks passed successfully"
 
 # Setup test database
 [group('testing')]
@@ -253,17 +253,24 @@ testSetup:
 # Run unit tests
 [group('testing')]
 testUnit +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=default --no-progress --log-junit tests/reports/junit.xml {{parameter}}
+    @{{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=default --no-coverage --log-junit tests/reports/junit.xml {{parameter}}
+    @echo
+    @echo
 
 # Run functional tests
 [group('testing')]
 testFunctional +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-progress --log-junit tests/reports/junit.xml {{parameter}}
+    @{{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-coverage --log-junit tests/reports/junit.xml {{parameter}}
+    @echo
+    @echo
 
-# Run smoke tests — hits every discovered GET route, asserts no 5xx (always run last)
+# Run smoke tests - hits every discovered GET route, asserts no 5xx (always run last)
 [group('testing')]
 testSmoke +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=smoke --no-progress --log-junit tests/reports/junit.xml {{parameter}}
+    @{{PHP}} php bin/console cache:warmup --env=test --quiet
+    @{{PHP}} vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=4 --functional --no-coverage --log-junit tests/reports/junit.xml {{parameter}}
+    @echo
+    @echo
 
 # Print AI-readable test results (for Haiku agent)
 [group('testing')]
@@ -273,7 +280,7 @@ testPrintResults +parameter='':
 # Show coverage report
 [group('testing')]
 testCoverage +parameter='':
-    {{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml
+    {{PHP_COVERAGE}} vendor/bin/phpunit -c tests/config/phpunit.xml
     {{PHP}} php bin/console app:badge:generate
     {{PHP}} php bin/console app:test:coverage-report {{parameter}}
 
