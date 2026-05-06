@@ -24,7 +24,6 @@ use Symfony\Component\Routing\RouterInterface;
 class RoutesSmokeTest extends WebTestCase
 {
     private const ADMIN_EMAIL = 'Admin@example.org';
-    private const ADMIN_PASSWORD = '1234';
 
     /**
      * Route name substrings that indicate side-effecting GET endpoints.
@@ -178,14 +177,14 @@ class RoutesSmokeTest extends WebTestCase
 
     private function loginAsAdmin(KernelBrowser $client): void
     {
-        $crawler = $client->request('GET', '/en/login');
-        $form = $crawler
-            ->selectButton('Login')
-            ->form([
-                '_username' => self::ADMIN_EMAIL,
-                '_password' => self::ADMIN_PASSWORD,
-            ]);
-        $client->submit($form);
-        $client->followRedirect();
+        /** @var EntityManagerInterface $em */
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $admin = $em->getRepository(User::class)->findOneBy(['email' => self::ADMIN_EMAIL]);
+
+        if ($admin === null) {
+            self::fail('Admin user not found in test fixtures (' . self::ADMIN_EMAIL . ')');
+        }
+
+        $client->loginUser($admin);
     }
 }
