@@ -1,0 +1,55 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    <div class="container">
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="tabs is-toggle is-small">
+            <ul>
+                {% for key, label in {
+                    'pending': 'admin_security.filter_pending',
+                    'approved': 'admin_security.filter_approved',
+                    'denied': 'admin_security.filter_denied',
+                    'revoked': 'admin_security.filter_revoked',
+                    'all': 'admin_security.filter_all',
+                } %}
+                    <li class="{{ currentStatus == key ? 'is-active' : '' }}">
+                        <a href="{{ path('app_admin_security_developer_apps', {'status': key}) }}">{{ label|trans }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% if apps is empty %}
+            <p class="has-text-grey">{{ 'admin_security.empty_developer_apps'|trans }}</p>
+        {% else %}
+            <table class="table is-fullwidth is-hoverable">
+                <thead>
+                    <tr>
+                        <th>{{ 'admin_security.col_app_name'|trans }}</th>
+                        <th>{{ 'admin_security.col_submitted_by'|trans }}</th>
+                        <th>{{ 'admin_security.col_status'|trans }}</th>
+                        <th>{{ 'admin_security.col_submitted'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in apps %}
+                        <tr>
+                            <td><a href="{{ path('app_admin_security_developer_apps_show', {'id': app.id}) }}">{{ app.appName }}</a></td>
+                            <td>{{ app.submittedBy.name ?? app.submittedBy.email }}</td>
+                            <td><span class="tag {{ app.status.tagClass }}">{{ app.status.label|trans }}</span></td>
+                            <td>{{ app.submittedAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                <a class="button is-small is-light" href="{{ path('app_admin_security_developer_apps_show', {'id': app.id}) }}">
+                                    {{ 'admin_security.button_review'|trans }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

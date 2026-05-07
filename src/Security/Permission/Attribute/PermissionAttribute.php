@@ -79,5 +79,10 @@ final class PermissionAttribute
     public const string USER_MESSAGE_READ = 'user.message.read';
     public const string USER_MESSAGE_SEND = 'user.message.send';
 
+    public const string DEVELOPER_APP_VIEW_SELF = 'developer_app.view.self';
+    public const string DEVELOPER_APP_MANAGE_SELF = 'developer_app.manage.self';
+    public const string DEVELOPER_APP_REVIEW = 'developer_app.review';
+    public const string DEVELOPER_APP_REVOKE = 'developer_app.revoke';
+
     private function __construct() {}
 }
