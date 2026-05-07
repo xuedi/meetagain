@@ -2,25 +2,37 @@
 
 namespace App\Entity;
 
+use App\Repository\NotFoundLogRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: NotFoundLogRepository::class)]
+#[ORM\Table(name: 'logs_not_found')]
 class NotFoundLog
 {
+    private const int URL_MAX = 2048;
+    private const int UA_MAX = 512;
+    private const int REFERER_MAX = 2048;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 2048)]
     private ?string $url = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(length: 16)]
+    #[ORM\Column(length: 45)]
     private ?string $ip = null;
+
+    #[ORM\Column(length: 512, nullable: true)]
+    private ?string $userAgent = null;
+
+    #[ORM\Column(length: 2048, nullable: true)]
+    private ?string $referer = null;
 
     public function getId(): ?int
     {
@@ -34,7 +46,7 @@ class NotFoundLog
 
     public function setUrl(string $url): static
     {
-        $this->url = $url;
+        $this->url = mb_substr($url, 0, self::URL_MAX);
 
         return $this;
     }
@@ -59,6 +71,30 @@ class NotFoundLog
     public function setIp(string $ip): static
     {
         $this->ip = $ip;
+
+        return $this;
+    }
+
+    public function getUserAgent(): ?string
+    {
+        return $this->userAgent;
+    }
+
+    public function setUserAgent(?string $userAgent): static
+    {
+        $this->userAgent = $userAgent === null ? null : mb_substr($userAgent, 0, self::UA_MAX);
+
+        return $this;
+    }
+
+    public function getReferer(): ?string
+    {
+        return $this->referer;
+    }
+
+    public function setReferer(?string $referer): static
+    {
+        $this->referer = $referer === null ? null : mb_substr($referer, 0, self::REFERER_MAX);
 
         return $this;
     }
