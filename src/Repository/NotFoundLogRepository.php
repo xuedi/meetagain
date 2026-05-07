@@ -106,57 +106,35 @@ class NotFoundLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<string>
-     */
-    public function findIpsWithRowsBetween(DateTimeImmutable $after, DateTimeImmutable $before): array
-    {
-        $rows = $this
-            ->createQueryBuilder('n')
-            ->select('DISTINCT n.ip AS ip')
-            ->where('n.createdAt > :after')
-            ->andWhere('n.createdAt <= :before')
-            ->setParameter('after', $after)
-            ->setParameter('before', $before)
-            ->getQuery()
-            ->getArrayResult();
-
-        return array_values(array_map(static fn(array $row): string => (string) $row['ip'], $rows));
-    }
-
-    /**
      * @return list<NotFoundLog>
      */
-    public function findRowsForIpBetween(string $ip, DateTimeImmutable $after, DateTimeImmutable $before): array
+    public function findRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff, int $limit): array
     {
         return array_values(
             $this
                 ->createQueryBuilder('n')
-                ->where('n.ip = :ip')
-                ->andWhere('n.createdAt > :after')
-                ->andWhere('n.createdAt <= :before')
-                ->orderBy('n.createdAt', 'ASC')
-                ->setParameter('ip', $ip)
-                ->setParameter('after', $after)
-                ->setParameter('before', $before)
+                ->where('n.id > :lastId')
+                ->andWhere('n.createdAt <= :cutoff')
+                ->orderBy('n.id', 'ASC')
+                ->setParameter('lastId', $lastId)
+                ->setParameter('cutoff', $cutoff)
+                ->setMaxResults($limit)
                 ->getQuery()
                 ->getResult(),
         );
     }
 
-    public function hasRowForIpAfter(string $ip, DateTimeImmutable $after): bool
+    public function countRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff): int
     {
-        $count = (int) $this
+        return (int) $this
             ->createQueryBuilder('n')
             ->select('COUNT(n.id)')
-            ->where('n.ip = :ip')
-            ->andWhere('n.createdAt > :after')
-            ->setParameter('ip', $ip)
-            ->setParameter('after', $after)
-            ->setMaxResults(1)
+            ->where('n.id > :lastId')
+            ->andWhere('n.createdAt <= :cutoff')
+            ->setParameter('lastId', $lastId)
+            ->setParameter('cutoff', $cutoff)
             ->getQuery()
             ->getSingleScalarResult();
-
-        return $count > 0;
     }
 
     public function findFirstCreatedAtForIpAfter(string $ip, DateTimeImmutable $after): ?DateTimeImmutable

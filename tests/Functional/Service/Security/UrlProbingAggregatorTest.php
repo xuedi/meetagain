@@ -6,6 +6,7 @@ use App\Entity\NotFoundLog;
 use App\Entity\UrlProbingIncident;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UrlProbingIncidentRepository;
+use App\Service\AppStateService;
 use App\Service\Security\UrlProbingAggregator;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +23,7 @@ class UrlProbingAggregatorTest extends KernelTestCase
     private EntityManagerInterface $em;
     private NotFoundLogRepository $notFoundRepo;
     private UrlProbingIncidentRepository $incidentRepo;
+    private AppStateService $appState;
 
     protected function setUp(): void
     {
@@ -30,6 +32,7 @@ class UrlProbingAggregatorTest extends KernelTestCase
         $this->em = $container->get(EntityManagerInterface::class);
         $this->notFoundRepo = $container->get(NotFoundLogRepository::class);
         $this->incidentRepo = $container->get(UrlProbingIncidentRepository::class);
+        $this->appState = $container->get(AppStateService::class);
         $this->purge();
     }
 
@@ -141,6 +144,82 @@ class UrlProbingAggregatorTest extends KernelTestCase
         self::assertSame(1, $this->incidentRepo->countAll());
     }
 
+    public function testWatermarkIsPersistedAndResumesAcrossRuns(): void
+    {
+        // Arrange: settled series for IP_A
+        $base = new DateTimeImmutable('2026-05-07 09:00:00');
+        for ($i = 0; $i < 35; $i++) {
+            $this->seedRow(self::IP_A, '/p-' . $i, $base->modify('+' . ($i * 30) . ' seconds'));
+        }
+        $this->em->flush();
+        $aggregator = $this->aggregator();
+
+        // Act 1: drains backlog and stores watermark
+        $first = $aggregator->aggregate();
+        self::assertSame(1, $first['incidents']);
+        self::assertGreaterThan(0, $first['lastProcessedId']);
+        self::assertSame((string) $first['lastProcessedId'], $this->appState->get(UrlProbingAggregator::KEY_LAST_PROCESSED_ID));
+
+        // Arrange: new settled series for IP_B added later
+        $second = new DateTimeImmutable('2026-05-07 10:00:00');
+        for ($i = 0; $i < 35; $i++) {
+            $this->seedRow(self::IP_B, '/q-' . $i, $second->modify('+' . ($i * 30) . ' seconds'));
+        }
+        $this->em->flush();
+
+        // Act 2: should resume past the stored watermark, only see IP_B rows
+        $stats = $aggregator->aggregate();
+
+        // Assert
+        self::assertSame(1, $stats['incidents']);
+        self::assertSame(1, $stats['ipsProcessed']);
+        self::assertSame(2, $this->incidentRepo->countAll());
+    }
+
+    public function testTailSeriesIsDeferredAndPickedUpWhenContinuationIsGone(): void
+    {
+        // Arrange: 35 settled rows for IP_A within the batch, plus one continuation
+        // row at 11:10 (past cutoff at 11:00, within 30 min of the last in-batch row).
+        $base = new DateTimeImmutable('2026-05-07 10:38:00');
+        for ($i = 0; $i < 35; $i++) {
+            $this->seedRow(self::IP_A, '/p-' . $i, $base->modify('+' . ($i * 30) . ' seconds'));
+        }
+        $this->seedRow(self::IP_A, '/p-live', new DateTimeImmutable('2026-05-07 11:10:00'));
+        $this->em->flush();
+        $firstSeriesMinId = (int) $this->em->createQueryBuilder()
+            ->select('MIN(n.id)')
+            ->from(NotFoundLog::class, 'n')
+            ->where('n.url LIKE :prefix')
+            ->setParameter('prefix', '/p-%')
+            ->andWhere('n.url <> :live')
+            ->setParameter('live', '/p-live')
+            ->getQuery()->getSingleScalarResult();
+
+        // Act 1: defers the only series
+        $first = $this->aggregator()->aggregate();
+        self::assertSame(0, $first['incidents']);
+        self::assertSame(0, $this->incidentRepo->countAll());
+        // Watermark must stay below the first row of the deferred series so the rows
+        // are re-fetched on the next run.
+        $watermarkAfterDefer = (int) ($this->appState->get(UrlProbingAggregator::KEY_LAST_PROCESSED_ID) ?? '0');
+        self::assertLessThan($firstSeriesMinId, $watermarkAfterDefer);
+
+        // Arrange: continuation goes quiet (drop the live row, advance the clock)
+        $this->em->createQueryBuilder()
+            ->delete(NotFoundLog::class, 'n')
+            ->where('n.url = :url')
+            ->setParameter('url', '/p-live')
+            ->getQuery()->execute();
+        $this->em->clear();
+
+        // Act 2: clock advances enough for the prior tail to settle
+        $stats = $this->aggregator('2026-05-07 13:00:00')->aggregate();
+
+        // Assert
+        self::assertSame(1, $stats['incidents']);
+        self::assertSame(1, $this->incidentRepo->countAll());
+    }
+
     public function testPruningRawRowsAfterIncidentDoesNotProduceDuplicates(): void
     {
         // Arrange
@@ -168,13 +247,14 @@ class UrlProbingAggregatorTest extends KernelTestCase
         self::assertSame(1, $this->incidentRepo->countAll());
     }
 
-    private function aggregator(): UrlProbingAggregator
+    private function aggregator(?string $now = null): UrlProbingAggregator
     {
         return new UrlProbingAggregator(
             $this->em,
             $this->notFoundRepo,
             $this->incidentRepo,
-            new MockClock(new DateTimeImmutable(self::NOW)),
+            $this->appState,
+            new MockClock(new DateTimeImmutable($now ?? self::NOW)),
             new NullLogger(),
         );
     }
@@ -196,6 +276,7 @@ class UrlProbingAggregatorTest extends KernelTestCase
             ->where('n.ip IN (:ips)')
             ->setParameter('ips', [self::IP_A, self::IP_B])
             ->getQuery()->execute();
+        $this->appState->remove(UrlProbingAggregator::KEY_LAST_PROCESSED_ID);
         $this->em->clear();
     }
 }
