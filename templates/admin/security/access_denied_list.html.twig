@@ -1,0 +1,41 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-4">
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'admin_security.col_count'|trans }}</th>
+                            <th>{{ 'admin_security.col_url'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in list %}
+                            <tr>
+                                <td>{{ item.number }}</td>
+                                <td>{{ item.url|length > 60 ? item.url|slice(0, 57) ~ '...' : item.url }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column is-8">
+                {% include 'admin/security/_security_recent_table.html.twig' with {
+                    'rows': recent,
+                    'typeKey': 'reason',
+                    'typeColumnLabel': 'admin_security.col_reason',
+                    'emptyLabel': 'admin_security.empty_access_denied',
+                } only %}
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

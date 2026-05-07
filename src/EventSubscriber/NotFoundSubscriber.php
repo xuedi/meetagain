@@ -51,6 +51,8 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
                 $notFoundLog->setCreatedAt(new DateTimeImmutable());
                 $notFoundLog->setIp($ip);
                 $notFoundLog->setUrl($path);
+                $notFoundLog->setUserAgent($event->getRequest()->headers->get('User-Agent'));
+                $notFoundLog->setReferer($event->getRequest()->headers->get('Referer'));
 
                 $this->em->persist($notFoundLog);
                 $this->em->flush();

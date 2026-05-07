@@ -22,6 +22,7 @@ use App\Service\Config\ConfigService;
 use App\Service\Member\CaptchaService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
+use App\Service\Security\RateLimitLogger;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -57,6 +58,7 @@ final class SecurityController extends AbstractController
         private readonly RateLimiterFactory $passwordResetLimiter,
         #[Target('registration')]
         private readonly RateLimiterFactory $registrationLimiter,
+        private readonly RateLimitLogger $rateLimitLogger,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
@@ -102,6 +104,12 @@ final class SecurityController extends AbstractController
     {
         $limiter = $this->registrationLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
+            $submittedEmail = $request->request->all('registration')['email'] ?? null;
+            $this->rateLimitLogger->log(
+                'registration',
+                $request,
+                is_string($submittedEmail) ? $submittedEmail : null,
+            );
             return $this->render(
                 'rate_limited.html.twig',
                 [
@@ -188,6 +196,12 @@ final class SecurityController extends AbstractController
     {
         $limiter = $this->passwordResetLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
+            $submittedEmail = $request->request->all('password_reset')['email'] ?? null;
+            $this->rateLimitLogger->log(
+                'password_reset',
+                $request,
+                is_string($submittedEmail) ? $submittedEmail : null,
+            );
             return $this->render(
                 'rate_limited.html.twig',
                 [

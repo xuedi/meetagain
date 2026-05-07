@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Admin\Logs;
+namespace App\Controller\Admin\Security;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
@@ -8,7 +8,8 @@ use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
-use App\Repository\NotFoundLogRepository;
+use App\Repository\AccessDeniedLogRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,8 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/logs/404')]
-final class NotFoundLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
+#[IsGranted('ROLE_ADMIN'), Route('/admin/security/access-denied')]
+final class AccessDeniedController extends AbstractSecurityController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
 
@@ -31,14 +32,16 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
 
     public function __construct(
         TranslatorInterface $translator,
-        private readonly NotFoundLogRepository $notFoundLogRepo,
+        private readonly AccessDeniedLogRepository $accessDeniedLogRepo,
     ) {
-        parent::__construct($translator, 'not_found');
+        parent::__construct($translator, 'access_denied');
     }
 
-    #[Route('', name: 'app_admin_not_found_log')]
+    #[Route('', name: 'app_admin_security_access_denied')]
     public function list(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_ACCESS_DENIED_READ);
+
         $range = $request->query->getString('range', self::DEFAULT_RANGE);
         if (!array_key_exists($range, self::RANGE_OFFSETS)) {
             $range = self::DEFAULT_RANGE;
@@ -46,74 +49,40 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         $rangeOffset = self::RANGE_OFFSETS[$range];
         $since = $rangeOffset !== null ? new DateTimeImmutable($rangeOffset) : null;
 
-        $ipFilter = $request->query->getString('ip', '');
-        $ipFilter = $ipFilter === '' ? null : $ipFilter;
-        $fromFilter = $this->parseDateParam($request->query->getString('from', ''));
-        $toFilter = $this->parseDateParam($request->query->getString('to', ''));
+        $top = $this->accessDeniedLogRepo->getTop100($since);
+        $recent = $this->accessDeniedLogRepo->getRecent(200, $since);
+        $totalCount = $this->accessDeniedLogRepo->countAll();
+        $rangeCount = $since !== null ? $this->accessDeniedLogRepo->countSince($since) : $totalCount;
 
-        $top = $this->notFoundLogRepo->getTop100($since);
-        $recent = $this->notFoundLogRepo->findFiltered(200, $since, $ipFilter, $fromFilter, $toFilter);
-        $totalCount = $this->notFoundLogRepo->countAll();
-        $rangeCount = $since !== null
-            ? $this->notFoundLogRepo->countSince($since)
-            : $totalCount;
+        $info = [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                $totalCount,
+                $this->translator->trans('admin_security.summary_total_access_denied'),
+            )),
+        ];
+        if ($rangeCount === 0) {
+            $info[] = new AdminTopInfoHtml(sprintf(
+                '<span class="tag is-success is-medium">%s</span>',
+                $this->translator->trans('admin_security.summary_no_access_denied_in_range'),
+            ));
+        } else {
+            $info[] = new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                $rangeCount,
+                $this->translator->trans('admin_security.summary_in_range'),
+            ));
+        }
 
-        $adminTop = new AdminTop(
-            info: $this->buildInfo($totalCount, $rangeCount),
-            actions: [$this->buildRangeDropdown($range)],
-        );
+        $adminTop = new AdminTop(info: $info, actions: [$this->buildRangeDropdown($range)]);
 
-        return $this->render('admin/logs/logs_notFound_list.html.twig', [
-            'active' => 'logs',
-            'activeLog' => '404',
+        return $this->render('admin/security/access_denied_list.html.twig', [
+            'active' => 'security',
             'list' => $top,
             'recent' => $recent,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
-    }
-
-    /**
-     * @return list<AdminTopInfoHtml>
-     */
-    private function buildInfo(int $totalCount, int $rangeCount): array
-    {
-        $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_logs.summary_total_404'),
-            )),
-        ];
-
-        if ($rangeCount === 0) {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                $this->translator->trans('admin_logs.summary_no_404_in_range'),
-            ));
-
-            return $info;
-        }
-
-        $info[] = new AdminTopInfoHtml(sprintf(
-            '<strong>%d</strong>&nbsp;%s',
-            $rangeCount,
-            $this->translator->trans('admin_logs.summary_in_range'),
-        ));
-
-        return $info;
-    }
-
-    private function parseDateParam(string $value): ?DateTimeImmutable
-    {
-        if ($value === '') {
-            return null;
-        }
-        try {
-            return new DateTimeImmutable($value);
-        } catch (\Exception) {
-            return null;
-        }
     }
 
     private function buildRangeDropdown(string $current): AdminTopActionDropdown
@@ -123,7 +92,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
             $params = $key === self::DEFAULT_RANGE ? [] : ['range' => $key];
             $options[] = new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_logs.range_' . $key),
-                target: $this->generateUrl('app_admin_not_found_log', $params),
+                target: $this->generateUrl('app_admin_security_access_denied', $params),
                 isActive: $key === $current,
             );
         }

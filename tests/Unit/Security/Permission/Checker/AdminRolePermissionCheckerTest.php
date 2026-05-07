@@ -74,4 +74,28 @@ class AdminRolePermissionCheckerTest extends TestCase
         self::assertFalse($this->checker->vote(Attr::CMS_PAGE_UPDATE, $ctx));
         self::assertFalse($this->checker->vote(Attr::EVENT_DELETE, $ctx));
     }
+
+    public function testSupportsSecurityAttributes(): void
+    {
+        self::assertTrue($this->checker->supports(Attr::SYSTEM_SECURITY_URL_PROBING_READ, null));
+        self::assertTrue($this->checker->supports(Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ, null));
+        self::assertTrue($this->checker->supports(Attr::SYSTEM_SECURITY_BRUTE_FORCE_READ, null));
+    }
+
+    public function testSecurityAttributesAdminAllowed(): void
+    {
+        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: true);
+        self::assertTrue($this->checker->vote(Attr::SYSTEM_SECURITY_URL_PROBING_READ, $ctx));
+        self::assertTrue($this->checker->vote(Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ, $ctx));
+        self::assertTrue($this->checker->vote(Attr::SYSTEM_SECURITY_BRUTE_FORCE_READ, $ctx));
+    }
+
+    public function testSecurityAttributesNonAdminDenied(): void
+    {
+        $this->security->method('isGranted')->willReturn(true);
+        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: false);
+        self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_URL_PROBING_READ, $ctx));
+        self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ, $ctx));
+        self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_BRUTE_FORCE_READ, $ctx));
+    }
 }
