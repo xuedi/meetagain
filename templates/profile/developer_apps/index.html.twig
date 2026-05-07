@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'developer_apps.page_title'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-4">{{ 'developer_apps.heading'|trans }}</h1>
+            <p class="subtitle is-6">{{ 'developer_apps.intro'|trans }}</p>
+
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="box">
+                        <h2 class="title is-5">{{ 'developer_apps.section_my_apps'|trans }}</h2>
+                        {% if apps is empty %}
+                            <p class="has-text-grey">{{ 'developer_apps.empty_my_apps'|trans }}</p>
+                        {% else %}
+                            <table class="table is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'developer_apps.col_name'|trans }}</th>
+                                        <th>{{ 'developer_apps.col_status'|trans }}</th>
+                                        <th>{{ 'developer_apps.col_submitted'|trans }}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in apps %}
+                                        <tr id="app-{{ app.id }}">
+                                            <td>
+                                                <a href="{{ path('app_profile_developer_apps_show', {'id': app.id}) }}">{{ app.appName }}</a>
+                                                {% if app.hasUnreadOutcome %}
+                                                    <span class="tag is-warning is-small ml-2">{{ 'developer_apps.tag_unread_outcome'|trans }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="tag {{ app.status.tagClass }}">{{ app.status.label|trans }}</span>
+                                            </td>
+                                            <td>{{ app.submittedAt|date('Y-m-d') }}</td>
+                                            <td>
+                                                <a class="button is-small is-light" href="{{ path('app_profile_developer_apps_show', {'id': app.id}) }}">
+                                                    {{ 'developer_apps.button_view'|trans }}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="column is-half">
+                    <div class="box">
+                        <h2 class="title is-5">{{ 'developer_apps.section_register'|trans }}</h2>
+                        <p class="content">{{ 'developer_apps.register_intro'|trans }}</p>
+                        {{ form_start(form) }}
+                            <div class="field">
+                                <label class="label">{{ 'developer_apps.label_name'|trans }}</label>
+                                <div class="control">{{ form_widget(form.appName, {'attr': {'class': 'input', 'maxlength': 80}}) }}</div>
+                                {{ form_errors(form.appName) }}
+                            </div>
+                            <div class="field">
+                                <label class="label">{{ 'developer_apps.label_description'|trans }}</label>
+                                <div class="control">{{ form_widget(form.description, {'attr': {'class': 'textarea', 'rows': 3, 'maxlength': 500}}) }}</div>
+                                {{ form_errors(form.description) }}
+                            </div>
+                            <div class="field">
+                                <label class="label">{{ 'developer_apps.label_homepage'|trans }}</label>
+                                <div class="control">{{ form_widget(form.homepageUrl, {'attr': {'class': 'input'}}) }}</div>
+                                {{ form_errors(form.homepageUrl) }}
+                            </div>
+                            <div class="field">
+                                <label class="label">{{ 'developer_apps.label_redirect_uris'|trans }}</label>
+                                <div class="control">{{ form_widget(form.redirectUrisRaw, {'attr': {'class': 'textarea', 'rows': 3, 'placeholder': 'https://example.com/cb'}}) }}</div>
+                                <p class="help">{{ 'developer_apps.help_redirect_uris'|trans }}</p>
+                                {{ form_errors(form.redirectUrisRaw) }}
+                            </div>
+                            <div class="field">
+                                <label class="label">{{ 'developer_apps.label_grants'|trans }}</label>
+                                <div class="control">{{ form_widget(form.requestedGrants) }}</div>
+                                <p class="help">{{ 'developer_apps.help_grants'|trans }}</p>
+                                {{ form_errors(form.requestedGrants) }}
+                            </div>
+                            <div class="field">
+                                <label class="label">{{ 'developer_apps.label_logo'|trans }}</label>
+                                <div class="control">{{ form_widget(form.logo) }}</div>
+                                {{ form_errors(form.logo) }}
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <button class="button is-primary" type="submit">{{ 'developer_apps.button_submit'|trans }}</button>
+                                </div>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

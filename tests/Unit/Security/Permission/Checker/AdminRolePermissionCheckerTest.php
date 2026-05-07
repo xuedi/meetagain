@@ -98,4 +98,25 @@ class AdminRolePermissionCheckerTest extends TestCase
         self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ, $ctx));
         self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_BRUTE_FORCE_READ, $ctx));
     }
+
+    public function testSupportsDeveloperAppAdminAttributes(): void
+    {
+        self::assertTrue($this->checker->supports(Attr::DEVELOPER_APP_REVIEW, null));
+        self::assertTrue($this->checker->supports(Attr::DEVELOPER_APP_REVOKE, null));
+    }
+
+    public function testDeveloperAppAdminAttributesAdminAllowed(): void
+    {
+        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: true);
+        self::assertTrue($this->checker->vote(Attr::DEVELOPER_APP_REVIEW, $ctx));
+        self::assertTrue($this->checker->vote(Attr::DEVELOPER_APP_REVOKE, $ctx));
+    }
+
+    public function testDeveloperAppAdminAttributesNonAdminDenied(): void
+    {
+        $this->security->method('isGranted')->willReturn(true);
+        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: false);
+        self::assertFalse($this->checker->vote(Attr::DEVELOPER_APP_REVIEW, $ctx));
+        self::assertFalse($this->checker->vote(Attr::DEVELOPER_APP_REVOKE, $ctx));
+    }
 }

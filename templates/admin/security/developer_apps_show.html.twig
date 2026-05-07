@@ -1,0 +1,110 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    <div class="container">
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-two-thirds">
+                <div class="box">
+                    <h2 class="title is-5">{{ 'admin_security.heading_application_details'|trans }}</h2>
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            <tr><th>{{ 'developer_apps.label_name'|trans }}</th><td>{{ app.appName }}</td></tr>
+                            {% if app.description %}
+                                <tr><th>{{ 'developer_apps.label_description'|trans }}</th><td>{{ app.description }}</td></tr>
+                            {% endif %}
+                            {% if app.homepageUrl %}
+                                <tr><th>{{ 'developer_apps.label_homepage'|trans }}</th><td><a href="{{ app.homepageUrl }}" rel="noopener">{{ app.homepageUrl }}</a></td></tr>
+                            {% endif %}
+                            <tr>
+                                <th>{{ 'developer_apps.label_redirect_uris'|trans }}</th>
+                                <td><ul>{% for uri in app.redirectUris %}<li><code>{{ uri }}</code></li>{% endfor %}</ul></td>
+                            </tr>
+                            <tr><th>{{ 'developer_apps.label_grants'|trans }}</th><td>{{ app.requestedGrants|join(', ') }}</td></tr>
+                            <tr><th>{{ 'developer_apps.label_scopes'|trans }}</th><td>{{ app.requestedScopes|join(', ') }}</td></tr>
+                            <tr><th>{{ 'developer_apps.label_submitted_by'|trans }}</th><td>{{ app.submittedBy.name ?? app.submittedBy.email }}</td></tr>
+                            <tr><th>{{ 'developer_apps.label_submitted'|trans }}</th><td>{{ app.submittedAt|date('Y-m-d H:i') }}</td></tr>
+                            {% if app.reviewedAt %}
+                                <tr><th>{{ 'developer_apps.label_reviewed'|trans }}</th><td>{{ app.reviewedAt|date('Y-m-d H:i') }}{% if app.reviewedBy %} - {{ app.reviewedBy.name ?? app.reviewedBy.email }}{% endif %}</td></tr>
+                            {% endif %}
+                            {% if app.clientIdentifier %}
+                                <tr><th>{{ 'developer_apps.label_client_id'|trans }}</th><td><code>{{ app.clientIdentifier }}</code></td></tr>
+                            {% endif %}
+                            {% if app.denyReason %}
+                                <tr><th>{{ 'developer_apps.label_reason'|trans }}</th><td>{{ app.denyReason }}</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if otherApps is not empty %}
+                    <div class="box">
+                        <h2 class="title is-6">{{ 'admin_security.heading_other_apps_by_user'|trans }}</h2>
+                        <table class="table is-fullwidth is-narrow">
+                            <thead><tr><th>{{ 'developer_apps.label_name'|trans }}</th><th>{{ 'developer_apps.label_status'|trans }}</th><th>{{ 'developer_apps.label_submitted'|trans }}</th></tr></thead>
+                            <tbody>
+                                {% for other in otherApps %}
+                                    <tr>
+                                        <td><a href="{{ path('app_admin_security_developer_apps_show', {'id': other.id}) }}">{{ other.appName }}</a></td>
+                                        <td><span class="tag {{ other.status.tagClass }}">{{ other.status.label|trans }}</span></td>
+                                        <td>{{ other.submittedAt|date('Y-m-d') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="column">
+                {% if app.status.value == 'pending' or app.status.value == 'denied' %}
+                    <div class="box">
+                        <h3 class="title is-6">{{ 'admin_security.heading_approve'|trans }}</h3>
+                        <form method="post" action="{{ path('app_admin_security_developer_apps_approve', {'id': app.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('developer_apps_approve_' ~ app.id) }}">
+                            <button class="button is-success is-fullwidth" type="submit">{{ 'admin_security.button_approve'|trans }}</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                {% if app.status.value == 'pending' %}
+                    <div class="box">
+                        <h3 class="title is-6">{{ 'admin_security.heading_deny'|trans }}</h3>
+                        <form method="post" action="{{ path('app_admin_security_developer_apps_deny', {'id': app.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('developer_apps_deny_' ~ app.id) }}">
+                            <div class="field">
+                                <label class="label">{{ 'admin_security.label_deny_reason'|trans }}</label>
+                                <div class="control">
+                                    <textarea class="textarea" name="reason" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            <button class="button is-warning is-fullwidth" type="submit">{{ 'admin_security.button_deny'|trans }}</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                {% if app.status.value == 'approved' %}
+                    <div class="box">
+                        <h3 class="title is-6">{{ 'admin_security.heading_revoke'|trans }}</h3>
+                        <form method="post" action="{{ path('app_admin_security_developer_apps_revoke', {'id': app.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('developer_apps_revoke_' ~ app.id) }}">
+                            <div class="field">
+                                <label class="label">{{ 'admin_security.label_revoke_reason'|trans }}</label>
+                                <div class="control">
+                                    <textarea class="textarea" name="reason" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            <button class="button is-danger is-fullwidth" type="submit">{{ 'admin_security.button_revoke'|trans }}</button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                <a class="button is-light is-fullwidth mt-3" href="{{ path('app_admin_security_developer_apps') }}">
+                    {{ 'global.button_back'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
