@@ -2,7 +2,6 @@
 
 namespace App\Security\Permission\Checker;
 
-use App\Entity\DeveloperAppApplication;
 use App\Entity\User;
 use App\Security\Permission\Attribute\PermissionAttribute as Attr;
 use App\Security\Permission\PermissionCheckerInterface;
@@ -26,13 +25,6 @@ final class UserSelfPermissionChecker implements PermissionCheckerInterface
         Attr::USER_IMAGE_DELETE,
         Attr::USER_MESSAGE_READ,
         Attr::USER_MESSAGE_SEND,
-        Attr::DEVELOPER_APP_VIEW_SELF,
-        Attr::DEVELOPER_APP_MANAGE_SELF,
-    ];
-
-    private const array DEVELOPER_APP_ATTRIBUTES = [
-        Attr::DEVELOPER_APP_VIEW_SELF,
-        Attr::DEVELOPER_APP_MANAGE_SELF,
     ];
 
     private const array ELEVATED_ATTRIBUTES = [
@@ -43,10 +35,6 @@ final class UserSelfPermissionChecker implements PermissionCheckerInterface
     #[Override]
     public function supports(string $attribute, mixed $subject): bool
     {
-        if (in_array($attribute, self::DEVELOPER_APP_ATTRIBUTES, true)) {
-            return $subject === null || $subject instanceof DeveloperAppApplication || $subject instanceof User;
-        }
-
         if (in_array($attribute, self::SELF_ATTRIBUTES, true)) {
             return $subject === null || $subject instanceof User;
         }
@@ -73,10 +61,6 @@ final class UserSelfPermissionChecker implements PermissionCheckerInterface
         $subject = $context->subject;
         if ($subject === null) {
             return true;
-        }
-
-        if ($subject instanceof DeveloperAppApplication) {
-            return $subject->getSubmittedBy()->getId() === $context->actor->getId();
         }
 
         if (!$subject instanceof User) {
