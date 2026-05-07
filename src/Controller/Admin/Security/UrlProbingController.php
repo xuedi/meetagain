@@ -10,8 +10,10 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\UrlProbingIncident;
+use App\Repository\NotFoundLogRepository;
 use App\Repository\UrlProbingIncidentRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\AppStateService;
 use App\Service\Security\UrlProbingAggregator;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +38,8 @@ final class UrlProbingController extends AbstractSecurityController implements A
     public function __construct(
         TranslatorInterface $translator,
         private readonly UrlProbingIncidentRepository $incidentRepo,
-        private readonly UrlProbingAggregator $aggregator,
+        private readonly NotFoundLogRepository $notFoundLogRepo,
+        private readonly AppStateService $appState,
     ) {
         parent::__construct($translator, 'url_probing');
     }
@@ -77,15 +80,19 @@ final class UrlProbingController extends AbstractSecurityController implements A
             ));
         }
 
+        $lastProcessedId = (int) ($this->appState->get(UrlProbingAggregator::KEY_LAST_PROCESSED_ID) ?? '0');
+        $cutoff = (new DateTimeImmutable())->modify('-' . UrlProbingAggregator::SETTLE_MINUTES . ' minutes');
+        $pending = $this->notFoundLogRepo->countRowsAfterIdUpTo($lastProcessedId, $cutoff);
+        $info[] = new AdminTopInfoHtml(sprintf(
+            '<span class="tag %s is-medium">%d %s</span>',
+            $pending > 0 ? 'is-warning' : 'is-light',
+            $pending,
+            $this->translator->trans('admin_security.summary_pending_aggregation'),
+        ));
+
         $adminTop = new AdminTop(
             info: $info,
             actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_security.button_aggregate_now'),
-                    target: $this->generateUrl('app_admin_security_url_probing_aggregate'),
-                    icon: 'sync',
-                    variant: 'is-warning',
-                ),
                 $this->buildRangeDropdown($range),
             ],
         );
@@ -96,23 +103,6 @@ final class UrlProbingController extends AbstractSecurityController implements A
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
-    }
-
-    #[Route('/aggregate', name: 'app_admin_security_url_probing_aggregate', methods: ['GET'])]
-    public function aggregate(): Response
-    {
-        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_URL_PROBING_READ);
-        $stats = $this->aggregator->aggregate();
-        $this->addFlash('success', $this->translator->trans(
-            'admin_security.flash_aggregated',
-            [
-                '%incidents%' => $stats['incidents'],
-                '%dropped%' => $stats['dropped'],
-                '%ips%' => $stats['ipsProcessed'],
-            ],
-        ));
-
-        return $this->redirectToRoute('app_admin_security_url_probing');
     }
 
     #[Route('/{id}', name: 'app_admin_security_url_probing_show', requirements: ['id' => '\d+'])]

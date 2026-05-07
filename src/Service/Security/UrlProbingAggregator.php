@@ -6,7 +6,7 @@ use App\Entity\NotFoundLog;
 use App\Entity\UrlProbingIncident;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UrlProbingIncidentRepository;
-use DateTimeImmutable;
+use App\Service\AppStateService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
@@ -18,8 +18,13 @@ use Throwable;
  *
  * Idempotency invariants - do not change without re-reading the rules:
  *   - The settle window guarantees the aggregator never slices a live series.
- *   - The per-IP MAX(endedAt) watermark guarantees the same series is never
- *     aggregated twice on subsequent runs.
+ *   - Per-run progress is bounded by BATCH_SIZE; the last consumed NotFoundLog id
+ *     is persisted in AppState so the next run resumes from there. Without this
+ *     bound, one click on "Aggregate" had to scan every IP-series in the entire
+ *     firehose, which timed out PHP at ~200k rows.
+ *   - The per-IP MAX(endedAt) watermark is still consulted to drop rows that
+ *     a previous run already absorbed - belt-and-suspenders against double-count
+ *     when the id watermark is rewound (e.g. a deferred series re-fetch).
  *   - There is no FK between logs_not_found and logs_url_probing_incident, so
  *     pruning the firehose only affects what future runs would see; already
  *     written incidents are unaffected.
@@ -30,82 +35,131 @@ readonly class UrlProbingAggregator
     public const int SETTLE_MINUTES = 60;
     public const int MIN_PROBES_PER_INCIDENT = 30;
     public const int MAX_SAMPLE_URLS = 10;
+    public const int BATCH_SIZE = 10000;
+    public const string KEY_LAST_PROCESSED_ID = 'security.url_probing.last_processed_log_id';
 
     public function __construct(
         private EntityManagerInterface $em,
         private NotFoundLogRepository $notFoundLogRepo,
         private UrlProbingIncidentRepository $incidentRepo,
+        private AppStateService $appState,
         private ClockInterface $clock,
         private LoggerInterface $logger,
     ) {}
 
     /**
-     * @return array{considered: int, ipsProcessed: int, incidents: int, dropped: int}
+     * @return array{considered: int, ipsProcessed: int, incidents: int, dropped: int, lastProcessedId: int, hasMore: bool}
      */
     public function aggregate(): array
     {
         $now = $this->clock->now();
         $cutoff = $now->modify('-' . self::SETTLE_MINUTES . ' minutes');
-        $epoch = new DateTimeImmutable('@0');
+        $lastId = (int) ($this->appState->get(self::KEY_LAST_PROCESSED_ID) ?? '0');
 
-        $lastEndedAtPerIp = $this->incidentRepo->findLastEndedAtPerIp();
-
-        $globalAfter = $epoch;
-        if ($lastEndedAtPerIp !== []) {
-            $minTimestamp = PHP_INT_MAX;
-            foreach ($lastEndedAtPerIp as $ts) {
-                $minTimestamp = min($minTimestamp, $ts->getTimestamp());
-            }
-            $globalAfter = (new DateTimeImmutable())->setTimestamp($minTimestamp);
+        $rows = $this->notFoundLogRepo->findRowsAfterIdUpTo($lastId, $cutoff, self::BATCH_SIZE);
+        if ($rows === []) {
+            return [
+                'considered' => 0,
+                'ipsProcessed' => 0,
+                'incidents' => 0,
+                'dropped' => 0,
+                'lastProcessedId' => $lastId,
+                'hasMore' => false,
+            ];
         }
 
-        $ips = $this->notFoundLogRepo->findIpsWithRowsBetween($globalAfter, $cutoff);
+        $batchMaxId = 0;
+        $rowsByIp = [];
+        foreach ($rows as $row) {
+            $id = (int) $row->getId();
+            if ($id > $batchMaxId) {
+                $batchMaxId = $id;
+            }
+            $ip = (string) $row->getIp();
+            $rowsByIp[$ip][] = $row;
+        }
+
+        $perIpWatermark = $this->incidentRepo->findLastEndedAtPerIp();
 
         $considered = 0;
         $incidentsCreated = 0;
         $dropped = 0;
+        $deferredMinId = PHP_INT_MAX;
+        $batchFull = count($rows) >= self::BATCH_SIZE;
 
-        foreach ($ips as $ip) {
-            $watermark = $lastEndedAtPerIp[$ip] ?? $epoch;
-            try {
-                $rows = $this->notFoundLogRepo->findRowsForIpBetween($ip, $watermark, $cutoff);
-                if ($rows === []) {
+        $this->em->beginTransaction();
+        try {
+            foreach ($rowsByIp as $ip => $ipRows) {
+                $watermark = $perIpWatermark[$ip] ?? null;
+                if ($watermark !== null) {
+                    $ipRows = array_values(array_filter(
+                        $ipRows,
+                        static function (NotFoundLog $row) use ($watermark): bool {
+                            $createdAt = $row->getCreatedAt();
+                            return $createdAt !== null && $createdAt > $watermark;
+                        },
+                    ));
+                }
+                if ($ipRows === []) {
                     continue;
                 }
-                $considered += count($rows);
 
-                $this->em->beginTransaction();
-                try {
-                    $result = $this->processIpRows($ip, $rows, $cutoff);
-                    $incidentsCreated += $result['incidents'];
-                    $dropped += $result['dropped'];
-                    $this->em->flush();
-                    $this->em->commit();
-                } catch (Throwable $e) {
-                    $this->em->rollback();
-                    throw $e;
+                $considered += count($ipRows);
+                $result = $this->processIpSeries($ip, $ipRows, $batchFull);
+                $incidentsCreated += $result['incidents'];
+                $dropped += $result['dropped'];
+                if ($result['deferredMinId'] !== null && $result['deferredMinId'] < $deferredMinId) {
+                    $deferredMinId = $result['deferredMinId'];
                 }
-            } catch (Throwable $e) {
-                $this->logger->warning(
-                    sprintf('UrlProbingAggregator failed for IP %s: %s', $ip, $e->getMessage()),
-                    ['exception' => $e],
-                );
             }
+
+            $newWatermark = $deferredMinId !== PHP_INT_MAX
+                ? max($lastId, $deferredMinId - 1)
+                : $batchMaxId;
+
+            // Anti-stall: if the entire batch is one or more deferred series and
+            // the watermark would not move, force the deferral resolution by
+            // accepting the partial series on the *next* run; here we still
+            // advance past the batch so we don't loop forever on the same rows.
+            if ($newWatermark <= $lastId && $batchFull) {
+                $this->logger->warning(sprintf(
+                    'UrlProbingAggregator: batch fully deferred (lastId=%d, batchMaxId=%d) - advancing watermark to unblock progress',
+                    $lastId,
+                    $batchMaxId,
+                ));
+                $newWatermark = $batchMaxId;
+            }
+
+            $this->em->flush();
+            $this->em->commit();
+        } catch (Throwable $e) {
+            $this->em->rollback();
+            $this->logger->error(
+                'UrlProbingAggregator failed: ' . $e->getMessage(),
+                ['exception' => $e],
+            );
+            throw $e;
+        }
+
+        if ($newWatermark > $lastId) {
+            $this->appState->set(self::KEY_LAST_PROCESSED_ID, (string) $newWatermark);
         }
 
         return [
             'considered' => $considered,
-            'ipsProcessed' => count($ips),
+            'ipsProcessed' => count($rowsByIp),
             'incidents' => $incidentsCreated,
             'dropped' => $dropped,
+            'lastProcessedId' => $newWatermark,
+            'hasMore' => $batchFull,
         ];
     }
 
     /**
-     * @param list<NotFoundLog> $rows
-     * @return array{incidents: int, dropped: int}
+     * @param list<NotFoundLog> $ipRows
+     * @return array{incidents: int, dropped: int, deferredMinId: ?int}
      */
-    private function processIpRows(string $ip, array $rows, DateTimeImmutable $cutoff): array
+    private function processIpSeries(string $ip, array $ipRows, bool $batchFull): array
     {
         $gapSeconds = self::GAP_THRESHOLD_MINUTES * 60;
         /** @var list<list<NotFoundLog>> $series */
@@ -113,7 +167,7 @@ readonly class UrlProbingAggregator
         $current = [];
         $previousTs = null;
 
-        foreach ($rows as $row) {
+        foreach ($ipRows as $row) {
             $createdAt = $row->getCreatedAt();
             if ($createdAt === null) {
                 continue;
@@ -132,12 +186,20 @@ readonly class UrlProbingAggregator
 
         $incidents = 0;
         $dropped = 0;
+        $deferredMinId = null;
         $totalSeries = count($series);
 
         foreach ($series as $idx => $seriesRows) {
             $isLastSeries = $idx === $totalSeries - 1;
-            if ($isLastSeries && !$this->isSeriesClosed($ip, $seriesRows, $cutoff)) {
-                continue;
+            if ($isLastSeries && $this->seriesHasContinuation($ip, $seriesRows)) {
+                if (!$batchFull) {
+                    $firstId = (int) $seriesRows[0]->getId();
+                    if ($deferredMinId === null || $firstId < $deferredMinId) {
+                        $deferredMinId = $firstId;
+                    }
+                    continue;
+                }
+                // Batch full + deferral would stall progress: accept partial series.
             }
 
             if (count($seriesRows) < self::MIN_PROBES_PER_INCIDENT) {
@@ -145,33 +207,32 @@ readonly class UrlProbingAggregator
                 continue;
             }
 
-            $incident = $this->buildIncident($ip, $seriesRows);
-            $this->em->persist($incident);
+            $this->em->persist($this->buildIncident($ip, $seriesRows));
             $incidents++;
         }
 
-        return ['incidents' => $incidents, 'dropped' => $dropped];
+        return ['incidents' => $incidents, 'dropped' => $dropped, 'deferredMinId' => $deferredMinId];
     }
 
     /**
      * @param list<NotFoundLog> $seriesRows
      */
-    private function isSeriesClosed(string $ip, array $seriesRows, DateTimeImmutable $cutoff): bool
+    private function seriesHasContinuation(string $ip, array $seriesRows): bool
     {
         $lastRow = $seriesRows[count($seriesRows) - 1];
         $endedAt = $lastRow->getCreatedAt();
         if ($endedAt === null) {
-            return true;
+            return false;
         }
 
-        $firstAfterCutoff = $this->notFoundLogRepo->findFirstCreatedAtForIpAfter($ip, $cutoff);
-        if ($firstAfterCutoff === null) {
-            return true;
+        $next = $this->notFoundLogRepo->findFirstCreatedAtForIpAfter($ip, $endedAt);
+        if ($next === null) {
+            return false;
         }
 
-        $gap = $firstAfterCutoff->getTimestamp() - $endedAt->getTimestamp();
+        $gap = $next->getTimestamp() - $endedAt->getTimestamp();
 
-        return $gap >= (self::GAP_THRESHOLD_MINUTES * 60);
+        return $gap < (self::GAP_THRESHOLD_MINUTES * 60);
     }
 
     /**
