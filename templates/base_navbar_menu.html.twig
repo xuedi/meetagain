@@ -1,24 +1,5 @@
 {% include 'base_navbar_notifications.html.twig' %}
-{% if is_granted('developer_app.review') %}
-    {% set pendingDeveloperApps = pending_developer_app_count() %}
-    {% if pendingDeveloperApps > 0 %}
-        <a href="{{ path('app_admin_security_developer_apps', {'status': 'pending'}) }}"
-           class="navbar-item" title="{{ 'developer_apps.pill_admin_title'|trans }}">
-            <span class="icon"><i class="fa fa-inbox"></i></span>
-            <span class="tag is-warning ml-2">{{ pendingDeveloperApps }}</span>
-        </a>
-    {% endif %}
-{% endif %}
-{% if app.user %}
-    {% set unreadDeveloperAppOutcomes = unread_developer_app_outcome_count() %}
-    {% if unreadDeveloperAppOutcomes > 0 %}
-        <a href="{{ path('app_profile_developer_apps', {'filter': 'unread-outcome'}) }}"
-           class="navbar-item" title="{{ 'developer_apps.pill_user_title'|trans }}">
-            <span class="icon"><i class="fa fa-bell"></i></span>
-            <span class="tag is-info ml-2">{{ unreadDeveloperAppOutcomes }}</span>
-        </a>
-    {% endif %}
-{% endif %}
+{{ get_plugin_navbar_pills_html() }}
 <div class="navbar-item dropdown is-hoverable">
     <div class="dropdown-trigger">
         <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">

@@ -53,12 +53,6 @@ abstract class AbstractSecurityController extends AbstractController
                 icon: 'shield',
                 isActive: $this->activeSecurityTab === 'brute_force',
             ),
-            new AdminTab(
-                label: $this->translator->trans('admin_security.tab_developer_apps'),
-                target: $this->generateUrl('app_admin_security_developer_apps'),
-                icon: 'cubes',
-                isActive: $this->activeSecurityTab === 'developer_apps',
-            ),
         ]);
     }
 }
