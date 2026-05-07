@@ -69,6 +69,8 @@ final class AdminRolePermissionChecker implements PermissionCheckerInterface
         Attr::SYSTEM_SECURITY_URL_PROBING_READ,
         Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ,
         Attr::SYSTEM_SECURITY_BRUTE_FORCE_READ,
+        Attr::DEVELOPER_APP_REVIEW,
+        Attr::DEVELOPER_APP_REVOKE,
     ];
 
     public function __construct(

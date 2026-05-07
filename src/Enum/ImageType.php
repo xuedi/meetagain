@@ -28,6 +28,7 @@ enum ImageType: int
     case GroupPromotion = 13;
     case GroupPreview = 14;
     case WebsiteImage = 15;
+    case DeveloperAppLogo = 16;
 
     public static function getChoices(TranslatorInterface $translator): array
     {
