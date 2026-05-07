@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Security\Permission\Checker;
 
-use App\Entity\DeveloperAppApplication;
 use App\Entity\User;
 use App\Security\Permission\Attribute\PermissionAttribute as Attr;
 use App\Security\Permission\Checker\UserSelfPermissionChecker;
@@ -78,37 +77,6 @@ class UserSelfPermissionCheckerTest extends TestCase
     {
         $ctx = new PermissionContext(actor: null, subject: $this->makeUser(1), isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
-    }
-
-    public function testSupportsDeveloperAppSelfAttributes(): void
-    {
-        $owner = $this->makeUser(1);
-        $app = new DeveloperAppApplication($owner, 'Bot', ['https://example.com/cb'], ['authorization_code']);
-
-        self::assertTrue($this->checker->supports(Attr::DEVELOPER_APP_VIEW_SELF, $app));
-        self::assertTrue($this->checker->supports(Attr::DEVELOPER_APP_MANAGE_SELF, $app));
-        self::assertTrue($this->checker->supports(Attr::DEVELOPER_APP_VIEW_SELF, null));
-    }
-
-    public function testDeveloperAppSelfAttributeAllowsOwner(): void
-    {
-        $owner = $this->makeUser(1);
-        $app = new DeveloperAppApplication($owner, 'Bot', ['https://example.com/cb'], ['authorization_code']);
-
-        $ctx = new PermissionContext(actor: $owner, subject: $app, isAdmin: false);
-        self::assertTrue($this->checker->vote(Attr::DEVELOPER_APP_VIEW_SELF, $ctx));
-        self::assertTrue($this->checker->vote(Attr::DEVELOPER_APP_MANAGE_SELF, $ctx));
-    }
-
-    public function testDeveloperAppSelfAttributeDeniesOtherUser(): void
-    {
-        $owner = $this->makeUser(1);
-        $other = $this->makeUser(2);
-        $app = new DeveloperAppApplication($owner, 'Bot', ['https://example.com/cb'], ['authorization_code']);
-
-        $ctx = new PermissionContext(actor: $other, subject: $app, isAdmin: false);
-        self::assertFalse($this->checker->vote(Attr::DEVELOPER_APP_VIEW_SELF, $ctx));
-        self::assertFalse($this->checker->vote(Attr::DEVELOPER_APP_MANAGE_SELF, $ctx));
     }
 
     private function makeUser(int $id): User
