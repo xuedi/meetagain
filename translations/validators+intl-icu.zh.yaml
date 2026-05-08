@@ -35,3 +35,6 @@ Error: 错误
 'shared.form_image_upload_mime_error': '请上传有效的图片。'
 'shared.form_image_upload_mime_error_square': '请上传有效的图片，最好是正方形格式。'
 'admin_system_language.validator_code_pattern': '语言代码必须是 2 个小写字母（例如 en、de、zh）。'
+
+# Profile messages namespace - message edit window
+'profile_messages.validator_content_max': '消息内容不能超过 {limit} 个字符。'

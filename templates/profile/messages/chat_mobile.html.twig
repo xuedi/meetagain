@@ -51,8 +51,25 @@
 
         <div id="mobile-message-container" class="messages-scroll">
             {% for message in messages %}
-                <div class="box {% if user.id == message.sender.id %}has-background-link-light{% endif %}">
-                    <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small><br>
+                {% set isOwn = user.id == message.sender.id %}
+                {% set editableUntil = (message.createdAt|date('U') + (constant('App\\Entity\\Message::EDIT_WINDOW_MINUTES') * 60)) %}
+                {% set withinWindow = isOwn and editableUntil > 'now'|date('U') %}
+                <div class="box {% if isOwn %}has-background-link-light{% endif %}"
+                     data-message-id="{{ message.id }}"
+                     {% if withinWindow %}data-editable-until="{{ editableUntil }}"{% endif %}>
+                    <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small>
+                    {% if message.editedAt is not null %}
+                        <small class="has-text-grey ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</small>
+                    {% endif %}
+                    {% if withinWindow %}
+                        <a href="#" class="message-edit-trigger ml-1"
+                           title="{{ 'profile_messages.edit_button'|trans }}"
+                           aria-label="{{ 'profile_messages.edit_button'|trans }}"
+                           data-content="{{ message.content }}">
+                            <span class="icon is-small"><i class="fa fa-pen"></i></span>
+                        </a>
+                    {% endif %}
+                    <br>
                     <span class="breakText">{{ message.content }}</span>
                 </div>
             {% endfor %}
@@ -65,13 +82,28 @@
                     {{ 'profile_messages.cannot_message'|trans }}
                 </div>
             {% elseif form %}
-                {{ form_start(form) }}
+                {{ form_start(form, {'attr': {
+                    'id': 'message-form',
+                    'data-edit-url-template': path('app_profile_messages_edit', {'id': '__ID__'}),
+                    'data-csrf-token': csrf_token('message_edit'),
+                    'data-label-send': 'profile_messages.button_send'|trans,
+                    'data-label-save': 'profile_messages.button_save'|trans,
+                    'data-label-cancel': 'profile_messages.cancel_edit'|trans,
+                    'data-edit-window-minutes': constant('App\\Entity\\Message::EDIT_WINDOW_MINUTES'),
+                    'data-error-generic': 'profile_messages.edit_failed'|trans,
+                    'data-error-no-change': 'profile_messages.edit_no_change'|trans,
+                    'data-edited-marker-text': 'profile_messages.edited_marker'|trans,
+                }}) }}
+                <input type="hidden" name="editingMessageId" value="">
                 <div class="field has-addons">
                     <div class="control is-expanded">
                         <input class="input" type="text" name="{{ field_name(form.comment) }}" placeholder="{{ 'profile_messages.input_placeholder'|trans }}" />
                     </div>
                     <div class="control">
-                        <button class="button is-link ml-2">{{ 'profile_messages.button_send'|trans }}</button>
+                        <button type="button" class="button is-light is-small is-hidden cancel-edit">{{ 'profile_messages.cancel_edit'|trans }}</button>
+                    </div>
+                    <div class="control">
+                        <button class="button is-link ml-2 submit-button">{{ 'profile_messages.button_send'|trans }}</button>
                     </div>
                 </div>
                 {{ form_end(form) }}

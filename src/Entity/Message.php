@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class Message
 {
+    public const int EDIT_WINDOW_MINUTES = 10;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -33,6 +35,9 @@ class Message
 
     #[ORM\Column]
     private ?bool $wasRead = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $editedAt = null;
 
     public function getId(): ?int
     {
@@ -107,6 +112,18 @@ class Message
     public function setWasRead(bool $wasRead): static
     {
         $this->wasRead = $wasRead;
+
+        return $this;
+    }
+
+    public function getEditedAt(): ?DateTimeImmutable
+    {
+        return $this->editedAt;
+    }
+
+    public function setEditedAt(?DateTimeImmutable $editedAt): static
+    {
+        $this->editedAt = $editedAt;
 
         return $this;
     }
