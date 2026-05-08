@@ -12,7 +12,10 @@ class MessageFixture extends AbstractFixture implements DependentFixtureInterfac
     public function load(ObjectManager $manager): void
     {
         $this->start();
-        foreach ($this->getData() as [$time, $userSender, $userReceiver, $content, $wasRead]) {
+        foreach ($this->getData() as $row) {
+            [$time, $userSender, $userReceiver, $content, $wasRead] = $row;
+            $editedAt = $row[5] ?? null;
+
             $msg = new Message();
             $msg->setCreatedAt(new DateTimeImmutable($time));
             $msg->setSender($this->getRefUser($userSender));
@@ -20,6 +23,9 @@ class MessageFixture extends AbstractFixture implements DependentFixtureInterfac
             $msg->setContent($content);
             $msg->setDeleted(false);
             $msg->setWasRead($wasRead);
+            if ($editedAt !== null) {
+                $msg->setEditedAt(new DateTimeImmutable($editedAt));
+            }
 
             $manager->persist($msg);
         }
@@ -190,6 +196,21 @@ class MessageFixture extends AbstractFixture implements DependentFixtureInterfac
                 UserFixture::ADMIN,
                 'I left my Go stones last week, were they maybe found?',
                 false,
+            ],
+            [
+                (new DateTimeImmutable('-30 minutes'))->format('Y-m-d H:i:s'),
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'Quick reminder: study session tonight at 7.',
+                true,
+                (new DateTimeImmutable('-25 minutes'))->format('Y-m-d H:i:s'),
+            ],
+            [
+                (new DateTimeImmutable('-2 minutes'))->format('Y-m-d H:i:s'),
+                UserFixture::ADMIN,
+                UserFixture::ABRAHAM_BAKER,
+                'Did you bring the goban?',
+                true,
             ],
         ];
     }

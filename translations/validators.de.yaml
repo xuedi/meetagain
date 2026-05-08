@@ -204,3 +204,6 @@ Error: Fehler
 'shared.form_image_upload_mime_error': 'Bitte laden Sie ein gültiges Bild hoch.'
 'shared.form_image_upload_mime_error_square': 'Bitte laden Sie ein gültiges Bild hoch, vorzugsweise im quadratischen Format.'
 'admin_system_language.validator_code_pattern': 'Sprachcode muss aus 2 Kleinbuchstaben bestehen (z. B. en, de, zh).'
+
+# Profile messages namespace - message edit window
+'profile_messages.validator_content_max': 'Der Nachrichtentext darf nicht länger als {{ limit }} Zeichen sein.'

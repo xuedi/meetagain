@@ -204,3 +204,6 @@ Error: Error
 'shared.form_image_upload_mime_error': 'Please upload a valid image.'
 'shared.form_image_upload_mime_error_square': 'Please upload a valid image, preferably in square format.'
 'admin_system_language.validator_code_pattern': 'Language code must be 2 lowercase letters (e.g., en, de, zh).'
+
+# Profile messages namespace - message edit window
+'profile_messages.validator_content_max': 'Message text cannot be longer than {{ limit }} characters.'
