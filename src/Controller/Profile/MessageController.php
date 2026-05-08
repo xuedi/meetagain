@@ -12,6 +12,8 @@ use App\Repository\UserRepository;
 use App\Service\Member\BlockingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Bundle\TimeBundle\DateTimeFormatter;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,6 +28,7 @@ final class MessageController extends AbstractController
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
         private readonly BlockingService $blockingService,
+        private readonly DateTimeFormatter $dateTimeFormatter,
     ) {}
 
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
@@ -84,6 +87,43 @@ final class MessageController extends AbstractController
             'form' => $form,
             'isBlocked' => $isBlocked,
             'hasBlockedPartner' => $hasBlockedPartner,
+        ]);
+    }
+
+    #[Route('/profile/messages/{id}/edit', name: 'app_profile_messages_edit', methods: ['POST'])]
+    public function edit(Request $request, int $id): JsonResponse
+    {
+        if (!$this->isCsrfTokenValid('message_edit', $request->request->getString('_token'))) {
+            return new JsonResponse(['error' => 'profile_messages.edit_csrf'], 403);
+        }
+
+        $user = $this->getAuthedUser();
+        $message = $this->msgRepo->findEditableForSender($id, $user, new DateTimeImmutable());
+        if ($message === null) {
+            return new JsonResponse(['error' => 'profile_messages.edit_window_expired'], 403);
+        }
+
+        $trimmed = trim($request->request->getString('content'));
+        if ($trimmed === '') {
+            return new JsonResponse(['error' => 'profile_messages.edit_empty'], 400);
+        }
+        if (mb_strlen($trimmed) > 5000) {
+            return new JsonResponse(['error' => 'profile_messages.edit_too_long'], 400);
+        }
+        if ($trimmed === $message->getContent()) {
+            return new JsonResponse(['error' => 'profile_messages.edit_no_change'], 400);
+        }
+
+        $editedAt = new DateTimeImmutable();
+        $message->setContent($trimmed);
+        $message->setEditedAt($editedAt);
+        $this->em->flush();
+
+        return new JsonResponse([
+            'id' => $message->getId(),
+            'content' => $message->getContent(),
+            'editedAt' => $editedAt->format(DateTimeImmutable::ATOM),
+            'editedAtFormatted' => $this->dateTimeFormatter->formatDiff($editedAt),
         ]);
     }
 }

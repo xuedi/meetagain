@@ -81,11 +81,25 @@
                     <div class="pr-3 messages-scroll" id="desktop-message-container">
                         {% for message in messages %}
                             {% if user.id == message.sender.id %}
-                                <div class="level is-block">
+                                {% set editableUntil = (message.createdAt|date('U') + (constant('App\\Entity\\Message::EDIT_WINDOW_MINUTES') * 60)) %}
+                                {% set withinWindow = editableUntil > 'now'|date('U') %}
+                                <div class="level is-block" data-message-id="{{ message.id }}"{% if withinWindow %} data-editable-until="{{ editableUntil }}"{% endif %}>
                                     <div class="level-right">
                                         <div class="level-item">
                                             <div class="box">
-                                                <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
+                                                <small class="is-small">{{ message.createdAt | time_diff }}</small>
+                                                {% if message.editedAt is not null %}
+                                                    <small class="has-text-grey ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</small>
+                                                {% endif %}
+                                                {% if withinWindow %}
+                                                    <a href="#" class="message-edit-trigger ml-1"
+                                                       title="{{ 'profile_messages.edit_button'|trans }}"
+                                                       aria-label="{{ 'profile_messages.edit_button'|trans }}"
+                                                       data-content="{{ message.content }}">
+                                                        <span class="icon is-small"><i class="fa fa-pen"></i></span>
+                                                    </a>
+                                                {% endif %}
+                                                <br>
                                                 <span class="breakText">{{ message.content }}</span>
                                             </div>
                                         </div>
@@ -95,14 +109,18 @@
                                     </div>
                                 </div>
                             {% else %}
-                                <div class="level">
+                                <div class="level" data-message-id="{{ message.id }}">
                                     <div class="level-left">
                                         <div class="level-item">
                                             {% include '_components/image.html.twig' with {'image': message.sender.image, 'size': '50x50'} %}
                                         </div>
                                         <div class="level-item">
                                             <div class="box">
-                                                <small class="is-small">{{ message.createdAt | time_diff }}</small><br>
+                                                <small class="is-small">{{ message.createdAt | time_diff }}</small>
+                                                {% if message.editedAt is not null %}
+                                                    <small class="has-text-grey ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</small>
+                                                {% endif %}
+                                                <br>
                                                 <span class="breakText">{{ message.content }}</span>
                                             </div>
                                         </div>
@@ -126,14 +144,27 @@
                                 {{ 'profile_messages.cannot_message'|trans }}
                             </div>
                         {% elseif form %}
-                            {{ form_start(form) }}
+                            {{ form_start(form, {'attr': {
+                                'id': 'message-form',
+                                'data-edit-url-template': path('app_profile_messages_edit', {'id': '__ID__'}),
+                                'data-csrf-token': csrf_token('message_edit'),
+                                'data-label-send': 'profile_messages.button_send'|trans,
+                                'data-label-save': 'profile_messages.button_save'|trans,
+                                'data-label-cancel': 'profile_messages.cancel_edit'|trans,
+                                'data-edit-window-minutes': constant('App\\Entity\\Message::EDIT_WINDOW_MINUTES'),
+                                'data-error-generic': 'profile_messages.edit_failed'|trans,
+                                'data-error-no-change': 'profile_messages.edit_no_change'|trans,
+                                'data-edited-marker-text': 'profile_messages.edited_marker'|trans,
+                            }}) }}
+                            <input type="hidden" name="editingMessageId" value="">
                             <div class="level">
                                 <div class="level-item">
                                     <input class="input" type="text" name="{{ field_name(form.comment) }}"
                                            placeholder="{{ 'profile_messages.input_placeholder'|trans }}"/>
                                 </div>
                                 <div class="level-right">
-                                    <button class="button is-link ml-2">{{ 'profile_messages.button_send'|trans }}</button>
+                                    <button type="button" class="button is-light is-hidden cancel-edit ml-2">{{ 'profile_messages.cancel_edit'|trans }}</button>
+                                    <button class="button is-link ml-2 submit-button">{{ 'profile_messages.button_send'|trans }}</button>
                                 </div>
                             </div>
                             {{ form_end(form) }}

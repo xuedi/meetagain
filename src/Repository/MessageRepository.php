@@ -81,6 +81,23 @@ class MessageRepository extends ServiceEntityRepository
         return $list;
     }
 
+    public function findEditableForSender(int $messageId, User $sender, DateTimeImmutable $now): ?Message
+    {
+        $cutoff = $now->modify('-' . Message::EDIT_WINDOW_MINUTES . ' minutes');
+
+        return $this
+            ->createQueryBuilder('m')
+            ->where('m.id = :id')
+            ->andWhere('m.sender = :sender')
+            ->andWhere('m.deleted = false')
+            ->andWhere('m.createdAt > :cutoff')
+            ->setParameter('id', $messageId)
+            ->setParameter('sender', $sender)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function getMessages(User $user, ?User $partner = null): ?array
     {
         if (!$partner instanceof User) {
