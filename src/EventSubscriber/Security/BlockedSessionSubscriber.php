@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Throwable;
+use Twig\Environment;
 
 readonly class BlockedSessionSubscriber implements EventSubscriberInterface
 {
@@ -21,36 +22,9 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
         '/security/blocked',
     ];
 
-    /**
-     * Self-contained block-page HTML. Inlined to avoid Twig globals (e.g.
-     * AppVariable::getUser()) that touch the session - this listener fires at
-     * REQUEST priority 240, before SessionListener has populated the session,
-     * so any session-dependent rendering would crash with SessionNotFoundException.
-     */
-    private const string BLOCK_PAGE_HTML = <<<'HTML'
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>Temporarily blocked</title>
-            <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #222; }
-                .card { max-width: 480px; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-                h1 { font-size: 1.4rem; margin-top: 0; }
-                p { line-height: 1.5; color: #444; }
-            </style>
-        </head>
-        <body>
-            <div class="card">
-                <h1>Temporarily blocked</h1>
-                <p>Your session has been temporarily blocked due to suspicious activity. Please try again later.</p>
-            </div>
-        </body>
-        </html>
-        HTML;
-
     public function __construct(
         private BlockedSessionStore $blockStore,
+        private Environment $twig,
         private LoggerInterface $logger,
         private string $environment,
     ) {}
@@ -58,9 +32,15 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
     #[Override]
     public static function getSubscribedEvents(): array
     {
+        // Priority 64: after SessionListener (128) so the session factory is
+        // attached to the Request before we set a 403 response. Otherwise the
+        // dev-mode WebDebugToolbar (kernel.response) injects a Twig toolbar
+        // whose globals call $request->getSession() and crash with
+        // SessionNotFoundException, mangling our 403 into a 400.
+        // Still earlier than Firewall (8) so blocked traffic never hits auth.
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequest', 240],
+                ['onKernelRequest', 64],
             ],
         ];
     }
@@ -105,7 +85,7 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
 
     private function resolveSessionId(Request $request, string $ip): string
     {
-        $sessionId = $this->safeReadSessionId($request);
+        $sessionId = $this->readSessionCookie($request);
         if ($sessionId !== null) {
             return $sessionId;
         }
@@ -113,19 +93,12 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
         return 'ip:' . ($ip !== '' ? $ip : 'unknown');
     }
 
-    private function safeReadSessionId(Request $request): ?string
+    private function readSessionCookie(Request $request): ?string
     {
         try {
-            if (!$request->hasSession(true)) {
-                return null;
-            }
             $session = $request->getSession();
-            if (!$session->isStarted()) {
-                return null;
-            }
-            $id = $session->getId();
-
-            return $id !== '' ? $id : null;
+            $cookieValue = $request->cookies->get($session->getName());
+            return is_string($cookieValue) && $cookieValue !== '' ? $cookieValue : null;
         } catch (Throwable $e) {
             $this->logger->debug('Session read failed in BlockedSessionSubscriber: ' . $e->getMessage());
             return null;
@@ -134,6 +107,13 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
 
     private function buildBlockResponse(): Response
     {
-        return new Response(self::BLOCK_PAGE_HTML, 403, ['Content-Type' => 'text/html; charset=utf-8']);
+        try {
+            $html = $this->twig->render('security/blocked.html.twig');
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to render blocked page template: ' . $e->getMessage());
+            $html = '<!DOCTYPE html><html><body><h1>Temporarily blocked</h1></body></html>';
+        }
+
+        return new Response($html, 403, ['Content-Type' => 'text/html; charset=utf-8']);
     }
 }

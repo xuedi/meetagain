@@ -64,8 +64,8 @@ export function handleSummary(data) {
     const expectations = {
         scenario: SCENARIO,
         expectations: [
-            { kind: 'ipBlocked', ip: '127.0.0.1', expected: true },
-            { kind: 'blockSnapshotPrimaryProvider', ip: '127.0.0.1', expected: 'fuse' },
+            { kind: 'ipBlocked', ip: '172.18.0.1', expected: true },
+            { kind: 'blockSnapshotPrimaryProvider', ip: '172.18.0.1', expected: 'fuse' },
             { kind: 'incidentCount', triggeredBy: 'fuse', since: 'PT5M', expected: 0 },
             { kind: 'logRowCount', table: 'logs_not_found', since: 'PT5M', lessThanOrEqual: FUSE_LIMIT + 10 },
         ],

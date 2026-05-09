@@ -51,7 +51,7 @@ export function handleSummary(data) {
         scenario: SCENARIO,
         expectations: [
             { kind: 'incidentCount', triggeredBy: 'not_found', since: 'PT5M', expected: 1 },
-            { kind: 'ipBlocked', ip: '127.0.0.1', expected: true },
+            { kind: 'ipBlocked', ip: '172.18.0.1', expected: true },
         ],
     };
     return {

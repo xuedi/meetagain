@@ -12,22 +12,26 @@ const REPORTS_DIR = '/reports/attack';
 const SCENARIO = 'accessDeniedScript';
 const BLOCK_MARKER = 'Temporarily blocked';
 
+// Each path must redirect (302) to /en/login when accessed unauthenticated -
+// only those fire AccessDeniedException and reach AccessDeniedSubscriber.
+// AccessDeniedProvider trips at distinctPaths >= 8 && hits >= 15, so we use
+// 15 distinct existing admin GET routes (404s would not record an event).
 const ADMIN_PATHS = [
-    '/en/admin',
     '/en/admin/member',
-    '/en/admin/event',
-    '/en/admin/host',
+    '/en/admin/events',
+    '/en/admin/hosts',
+    '/en/admin/locations',
     '/en/admin/cms',
     '/en/admin/system',
     '/en/admin/security/incidents',
     '/en/admin/security/rate-limiting',
     '/en/admin/security/permissions',
-    '/en/admin/email',
+    '/en/admin/email/announcements',
+    '/en/admin/email/blocklist',
     '/en/admin/logs/cron',
     '/en/admin/logs/access-denied',
-    '/en/admin/logs/not-found',
-    '/en/admin/logs/rate-limiting',
-    '/en/admin/settings/config',
+    '/en/admin/logs/404',
+    '/en/admin/logs/activity',
 ];
 
 export const options = {
@@ -66,7 +70,7 @@ export function handleSummary(data) {
         scenario: SCENARIO,
         expectations: [
             { kind: 'incidentCount', triggeredBy: 'access_denied', since: 'PT5M', expected: 1 },
-            { kind: 'ipBlocked', ip: '127.0.0.1', expected: true },
+            { kind: 'ipBlocked', ip: '172.18.0.1', expected: true },
         ],
     };
     return {
