@@ -336,13 +336,3 @@ admin_system_gallery:
     sample_info_bullet_b: 'Second helpful bullet.'
     sample_info_bullet_c: 'Third helpful bullet.'
     sample_info_link: 'Read more'
-admin_system_permissions:
-    heading: 'Permission Overview'
-    help: 'Routes grouped by minimum required role; method-level overrides class-level.'
-    anon_no_auth: 'no authentication required'
-    anon_min_role: 'minimum required role'
-    routes_count: '%count% routes'
-    perm_any: 'ANY'
-    perm_class_level: 'class-level'
-    perm_method_level: 'method-level'
-    perm_public: 'public'

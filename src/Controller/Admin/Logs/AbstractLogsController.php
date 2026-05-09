@@ -54,6 +54,12 @@ abstract class AbstractLogsController extends AbstractController
                 isActive: $this->activeLogsTab === 'not_found',
             ),
             new AdminTab(
+                label: $this->translator->trans('admin_logs.tab_access_denied'),
+                target: $this->generateUrl('app_admin_access_denied_log'),
+                icon: 'ban',
+                isActive: $this->activeLogsTab === 'access_denied',
+            ),
+            new AdminTab(
                 label: $this->translator->trans('admin_logs.tab_cron'),
                 target: $this->generateUrl('app_admin_cron_log'),
                 icon: 'clock',

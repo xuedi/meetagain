@@ -336,13 +336,3 @@ admin_system_gallery:
     sample_info_bullet_b: 'Zweiter hilfreicher Punkt.'
     sample_info_bullet_c: 'Dritter hilfreicher Punkt.'
     sample_info_link: 'Mehr erfahren'
-admin_system_permissions:
-    heading: 'Berechtigungsübersicht'
-    help: 'Routen nach erforderlicher Mindestrolle gruppiert; Methodenebene überschreibt Klassenebene.'
-    anon_no_auth: 'keine Authentifizierung erforderlich'
-    anon_min_role: 'erforderliche Mindestrolle'
-    routes_count: '%count% Routen'
-    perm_any: 'ALLE'
-    perm_class_level: 'Klassenebene'
-    perm_method_level: 'Methodenebene'
-    perm_public: 'öffentlich'

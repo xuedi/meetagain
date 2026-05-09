@@ -44,7 +44,7 @@ class TranslatorSmokeTest extends WebTestCase
         'admin_system_images',
         'admin_system_import',
         'admin_system_language',
-        'admin_system_permissions',
+        'admin_security_permissions',
         'admin_system_plugins',
         'admin_system_seo',
         'admin_system_sitemap',
