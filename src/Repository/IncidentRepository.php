@@ -84,6 +84,19 @@ class IncidentRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function countSinceByTriggeredBy(DateTimeImmutable $since, string $triggeredBy): int
+    {
+        return (int) $this
+            ->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->where('i.endedAt >= :since')
+            ->andWhere('i.triggeredBy = :triggeredBy')
+            ->setParameter('since', $since)
+            ->setParameter('triggeredBy', $triggeredBy)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     private static function severityRank(IncidentSeverity $severity): int
     {
         return match ($severity) {

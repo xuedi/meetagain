@@ -33,7 +33,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -56,9 +56,9 @@ final class SecurityController extends AbstractController
         private readonly EmailBlocklistRepository $emailBlocklistRepository,
         private readonly TranslatorInterface $translator,
         #[Target('passwordReset')]
-        private readonly RateLimiterFactory $passwordResetLimiter,
+        private readonly RateLimiterFactoryInterface $passwordResetLimiter,
         #[Target('registration')]
-        private readonly RateLimiterFactory $registrationLimiter,
+        private readonly RateLimiterFactoryInterface $registrationLimiter,
         private readonly SecurityService $securityService,
     ) {}
 

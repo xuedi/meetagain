@@ -11,6 +11,10 @@ installed.lock
 /tests/reports/clover.xml
 /tests/reports/junit.xml
 /tests/reports/performance/*
+/tests/reports/load/*
+!/tests/reports/load/.gitkeep
+/tests/reports/attack/*
+!/tests/reports/attack/.gitkeep
 /var/
 /vendor/
 /.idea/
