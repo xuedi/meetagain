@@ -36,9 +36,9 @@ class CronLogControllerTest extends WebTestCase
             'Active tab should link to cron route',
         );
         static::assertSame(
-            4,
+            5,
             $crawler->filter('.tabs.is-boxed li')->count(),
-            'Four logs tabs should be rendered',
+            'Five logs tabs should be rendered',
         );
         static::assertGreaterThan(
             0,
@@ -140,9 +140,9 @@ class CronLogControllerTest extends WebTestCase
             // Assert
             $this->assertResponseIsSuccessful();
             static::assertSame(
-                4,
+                5,
                 $crawler->filter('.tabs.is-boxed li')->count(),
-                'Tab strip should match list page (4 tabs)',
+                'Tab strip should match list page (5 tabs)',
             );
             static::assertSame(
                 1,

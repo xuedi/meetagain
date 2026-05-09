@@ -7,6 +7,7 @@ use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -35,7 +36,7 @@ readonly class CmsService
         $cms = $this->repo->findPublishedBySlug($slug, $cmsFilterResult->getCmsIds());
 
         if ($cms === null) {
-            return $this->createNotFoundPage();
+            throw new NotFoundHttpException();
         }
 
         $blocks = $cms->getLanguageFilteredBlockJsonList($locale);
@@ -82,10 +83,4 @@ readonly class CmsService
         return $response;
     }
 
-    public function createNotFoundPage(): Response
-    {
-        return new Response($this->twig->render('cms/404.html.twig', [
-            'message' => 'cms.error_404_default_message',
-        ]), Response::HTTP_NOT_FOUND);
-    }
 }

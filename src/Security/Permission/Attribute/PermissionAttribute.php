@@ -64,9 +64,10 @@ final class PermissionAttribute
     public const string SYSTEM_REPORTS_READ = 'system.reports.read';
     public const string SYSTEM_SUPPORT_READ = 'system.support.read';
     public const string SYSTEM_INTEGRITY_READ = 'system.integrity.read';
-    public const string SYSTEM_SECURITY_URL_PROBING_READ = 'system.security.url_probing.read';
+    public const string SYSTEM_SECURITY_INCIDENTS_READ = 'system.security.incidents.read';
     public const string SYSTEM_SECURITY_ACCESS_DENIED_READ = 'system.security.access_denied.read';
-    public const string SYSTEM_SECURITY_BRUTE_FORCE_READ = 'system.security.brute_force.read';
+    public const string SYSTEM_SECURITY_RATE_LIMITING_READ = 'system.security.rate_limiting.read';
+    public const string SYSTEM_SECURITY_PERMISSIONS_READ = 'system.security.permissions.read';
 
     public const string USER_VIEW = 'user.view';
     public const string USER_VIEW_SELF = 'user.view.self';

@@ -9,8 +9,10 @@ use Sentry\SentrySdk;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Throwable;
 use Twig\Environment;
 
@@ -23,10 +25,16 @@ final class ErrorController extends AbstractController
     public function show(Throwable $exception, Request $request): Response
     {
         if ($exception instanceof NotFoundHttpException) {
-            return new Response($this->twig->render('cms/404.html.twig', [
+            return new Response($this->twig->render('error/404.html.twig', [
                 '_locale' => $request->getLocale(),
-                'message' => 'cms.error_404_default_message',
+                'message' => 'error.404_default_message',
             ]), Response::HTTP_NOT_FOUND);
+        }
+
+        if ($exception instanceof AccessDeniedHttpException || $exception instanceof AccessDeniedException) {
+            return new Response($this->twig->render('error/403.html.twig', [
+                '_locale' => $request->getLocale(),
+            ]), Response::HTTP_FORBIDDEN);
         }
 
         if ($exception instanceof HttpExceptionInterface) {
@@ -38,7 +46,7 @@ final class ErrorController extends AbstractController
 
             $eventId = SentrySdk::getCurrentHub()->getLastEventId() ?? EventId::generate();
 
-            return new Response($this->twig->render('cms/error.html.twig', [
+            return new Response($this->twig->render('error/500.html.twig', [
                 'errorId' => (string) $eventId,
                 'occurredAt' => (new DateTimeImmutable())->setTimezone(new DateTimeZone('UTC')),
             ]), $status);
@@ -48,7 +56,7 @@ final class ErrorController extends AbstractController
         $errorId = (string) $eventId;
         $occurredAt = (new DateTimeImmutable())->setTimezone(new DateTimeZone('UTC'));
 
-        return new Response($this->twig->render('cms/error.html.twig', [
+        return new Response($this->twig->render('error/500.html.twig', [
             'errorId' => $errorId,
             'occurredAt' => $occurredAt,
         ]), Response::HTTP_INTERNAL_SERVER_ERROR);

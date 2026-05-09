@@ -11,7 +11,9 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Twig\Environment;
 
 /**
@@ -29,9 +31,7 @@ final class ErrorControllerTest extends TestCase
         $twig
             ->expects(static::once())
             ->method('render')
-            ->with('cms/404.html.twig', static::callback(static function (array $context) {
-                return $context['_locale'] === 'de' && is_string($context['message']) && $context['message'] !== '';
-            }))
+            ->with('error/404.html.twig', static::callback(static fn (array $context) => $context['_locale'] === 'de' && is_string($context['message']) && $context['message'] !== ''))
             ->willReturn('<html>404</html>');
 
         $controller = new ErrorController($twig);
@@ -44,6 +44,52 @@ final class ErrorControllerTest extends TestCase
         static::assertSame('<html>404</html>', $response->getContent());
     }
 
+    public function testHttpAccessDeniedExceptionRenders403Template(): void
+    {
+        // Arrange
+        $request = Request::create('/en/admin');
+        $request->setLocale('en');
+
+        $twig = $this->createMock(Environment::class);
+        $twig
+            ->expects(static::once())
+            ->method('render')
+            ->with('error/403.html.twig', static::callback(static fn (array $context) => $context['_locale'] === 'en'))
+            ->willReturn('<html>403</html>');
+
+        $controller = new ErrorController($twig);
+
+        // Act
+        $response = $controller->show(new AccessDeniedHttpException(), $request);
+
+        // Assert
+        static::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        static::assertSame('<html>403</html>', $response->getContent());
+    }
+
+    public function testCoreAccessDeniedExceptionRenders403Template(): void
+    {
+        // Arrange
+        $request = Request::create('/en/admin');
+        $request->setLocale('en');
+
+        $twig = $this->createMock(Environment::class);
+        $twig
+            ->expects(static::once())
+            ->method('render')
+            ->with('error/403.html.twig', static::callback(static fn (array $context) => $context['_locale'] === 'en'))
+            ->willReturn('<html>403</html>');
+
+        $controller = new ErrorController($twig);
+
+        // Act
+        $response = $controller->show(new AccessDeniedException(), $request);
+
+        // Assert
+        static::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        static::assertSame('<html>403</html>', $response->getContent());
+    }
+
     public function testGenericExceptionRendersErrorTemplateWithIdAndTimestamp(): void
     {
         // Arrange
@@ -54,7 +100,7 @@ final class ErrorControllerTest extends TestCase
         $twig
             ->expects(static::once())
             ->method('render')
-            ->with('cms/error.html.twig', static::callback(static function (array $context) use (&$capturedContext) {
+            ->with('error/500.html.twig', static::callback(static function (array $context) use (&$capturedContext) {
                 $capturedContext = $context;
                 return true;
             }))
@@ -80,8 +126,7 @@ final class ErrorControllerTest extends TestCase
     #[AllowMockObjectsWithoutExpectations]
     public function testGenericExceptionFallbackErrorIdIsHex(): void
     {
-        // Arrange — without a Sentry hub the controller falls back to a freshly
-        // generated Sentry event id (32 hex chars, no hyphens).
+        // Arrange
         $request = Request::create('/en/anything');
 
         $capturedContext = null;
