@@ -6,6 +6,7 @@ use App\Emails\EmailQueueInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Emails\Types\AnnouncementEmail;
 use App\Emails\Types\EventReminderEmail;
+use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Emails\Types\NotificationMessageEmail;
 use App\Emails\Types\PasswordResetEmail;
@@ -28,6 +29,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Blocklist enforcement lives in guardCheck() for every email type. A blocked recipient
@@ -90,6 +92,21 @@ final class EmailTypeBlocklistTest extends TestCase
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings(['eventReminder' => true])),
+            'event' => $this->createStub(Event::class),
+        ]));
+    }
+
+    public function testEventUpdateNotificationSkipsBlockedRecipient(): void
+    {
+        $email = new EventUpdateNotificationEmail(
+            $this->blockingChecker,
+            $this->createStub(EmailQueueInterface::class),
+            $this->config,
+            $this->createStub(TranslatorInterface::class),
+        );
+
+        static::assertFalse($email->guardCheck([
+            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings(['attendedEventUpdate' => true])),
             'event' => $this->createStub(Event::class),
         ]));
     }

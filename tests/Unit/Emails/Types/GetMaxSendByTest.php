@@ -6,6 +6,7 @@ use App\Emails\EmailQueueInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Emails\Types\AnnouncementEmail;
 use App\Emails\Types\EventReminderEmail;
+use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Emails\Types\NotificationMessageEmail;
 use App\Emails\Types\PasswordResetEmail;
@@ -25,6 +26,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Regression coverage for each email type's getMaxSendBy() policy. The exact numbers come
@@ -106,6 +108,35 @@ final class GetMaxSendByTest extends TestCase
         );
 
         static::assertSame($expected, $result?->format('Y-m-d H:i:s'));
+    }
+
+    #[DataProvider('cancellationProvider')]
+    public function testEventUpdateNotificationCap(string $eventStart, string $expected): void
+    {
+        $email = new EventUpdateNotificationEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(ConfigService::class),
+            $this->createStub(TranslatorInterface::class),
+        );
+        $result = $email->getMaxSendBy(
+            ['event' => $this->eventStartingAt($eventStart)],
+            new DateTimeImmutable(self::NOW),
+        );
+
+        static::assertSame($expected, $result?->format('Y-m-d H:i:s'));
+    }
+
+    public function testEventUpdateNotificationCapReturnsNullWhenContextMissesEvent(): void
+    {
+        $email = new EventUpdateNotificationEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(ConfigService::class),
+            $this->createStub(TranslatorInterface::class),
+        );
+
+        static::assertNull($email->getMaxSendBy([], new DateTimeImmutable(self::NOW)));
     }
 
     /**
