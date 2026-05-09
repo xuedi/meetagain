@@ -4,24 +4,29 @@ declare(strict_types=1);
 
 namespace App\Service\Security;
 
+use App\CronTaskInterface;
 use App\Entity\Incident;
+use App\Enum\CronTaskStatus;
 use App\Enum\IncidentSeverity;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
 use App\Service\AppStateService;
+use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
-readonly class SecurityService
+readonly class SecurityService implements CronTaskInterface
 {
     public const string KEY_LAST_RETROSPECTIVE_RUN = 'security.retrospective_scan.last_run';
     public const int BLOCK_TTL_SECONDS = 14_400;
     public const string BLOCK_DURATION_LABEL = '4h';
+    private const int RETROSPECTIVE_THROTTLE_SECONDS = 3600;
 
     /**
      * @param iterable<SecurityProviderInterface> $providers
@@ -61,6 +66,7 @@ readonly class SecurityService
             $report = $provider->observe($type, $request, $context, $sessionId, $ip, $readOnly);
             $reports[] = $report;
 
+            // first high-priority provider can blow the fuse, prevent writing DOS
             if ($report->recommendation === SecurityRecommendation::BlockShortCircuit) {
                 $shortCircuited = true;
                 $readOnly = true;
@@ -102,29 +108,57 @@ readonly class SecurityService
         }
     }
 
-    /**
-     * @return list<ProviderReport>
-     */
-    public function runRetrospectiveScan(): array
+    public function getIdentifier(): string
     {
-        $lastRunRaw = $this->appState->get(self::KEY_LAST_RETROSPECTIVE_RUN);
-        $now = $this->clock->now();
-        $from = $lastRunRaw !== null
-            ? new DateTimeImmutable()->setTimestamp((int) $lastRunRaw)
-            : $now->modify('-1 hour');
-        $to = $now;
+        return 'security.retrospective-scan';
+    }
 
-        // TODO(2026-05-09) Aggregated reports are currently observation-only:
-        // hook in admin notification dispatch / threshold alerting once the
-        // notification routing for high retrospective threat levels is decided.
-        $reports = [];
-        foreach ($this->sortedProviders() as $provider) {
-            $reports[] = $provider->scanRetrospective($from, $to);
+    public function runCronTask(OutputInterface $output): CronTaskResult
+    {
+        $now = $this->clock->now();
+        $lastRunRaw = $this->appState->get(self::KEY_LAST_RETROSPECTIVE_RUN);
+
+        if ($lastRunRaw !== null) {
+            $elapsed = $now->getTimestamp() - (int) $lastRunRaw;
+            if ($elapsed < self::RETROSPECTIVE_THROTTLE_SECONDS) {
+                $output->writeln(sprintf(
+                    'SecurityRetrospectiveScan: skipped (last run %d min ago)',
+                    (int) round($elapsed / 60),
+                ));
+                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'Skipped - throttled');
+            }
         }
 
-        $this->appState->set(self::KEY_LAST_RETROSPECTIVE_RUN, (string) $now->getTimestamp());
+        try {
+            $from = $lastRunRaw !== null
+                ? new DateTimeImmutable()->setTimestamp((int) $lastRunRaw)
+                : $now->modify('-1 hour');
 
-        return $reports;
+            // TODO(2026-05-09) Aggregated reports are currently observation-only:
+            // hook in admin notification dispatch / threshold alerting once the
+            // notification routing for high retrospective threat levels is decided.
+            $parts = [];
+            foreach ($this->sortedProviders() as $provider) {
+                $report = $provider->scanRetrospective($from, $now);
+                $parts[] = sprintf(
+                    '%s: threat=%d (%s)',
+                    $report->providerKey,
+                    $report->threatLevel,
+                    $report->summary,
+                );
+            }
+
+            $this->appState->set(self::KEY_LAST_RETROSPECTIVE_RUN, (string) $now->getTimestamp());
+
+            $message = $parts === [] ? 'No providers registered' : implode(' | ', $parts);
+            $output->writeln('SecurityRetrospectiveScan: ' . $message);
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+        } catch (Throwable $e) {
+            $output->writeln('SecurityRetrospectiveScan exception: ' . $e->getMessage());
+
+            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+        }
     }
 
     public function isSessionBlocked(string $sessionId): bool

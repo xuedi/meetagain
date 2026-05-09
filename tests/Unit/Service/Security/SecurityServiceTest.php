@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Service\Security;
 
 use App\Entity\Incident;
+use App\Enum\CronTaskStatus;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
 use App\Service\AppStateService;
@@ -19,6 +20,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpFoundation\Request;
 
 class SecurityServiceTest extends TestCase
@@ -180,10 +182,10 @@ class SecurityServiceTest extends TestCase
         $service = $this->buildService([$detector], appState: $appState);
 
         // Act
-        $reports = $service->runRetrospectiveScan();
+        $result = $service->runCronTask(new NullOutput());
 
         // Assert
-        static::assertCount(1, $reports);
+        static::assertSame(CronTaskStatus::ok, $result->status);
     }
 
     /**
