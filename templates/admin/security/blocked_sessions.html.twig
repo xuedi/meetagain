@@ -1,0 +1,85 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <h3 class="title is-5">{{ 'admin_security.tab_blocked_sessions'|trans }}</h3>
+
+        <div class="columns">
+            <div class="column is-6">
+                <h4 class="subtitle is-6">{{ 'admin_security.heading_blocked_ips'|trans }}</h4>
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'admin_security.col_ip'|trans }}</th>
+                            <th>{{ 'admin_security.col_triggered_by'|trans }}</th>
+                            <th>{{ 'admin_security.col_threat'|trans }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in blockedIps %}
+                            <tr>
+                                <td>{{ entry.key }}</td>
+                                <td>{{ entry.snapshot.primaryProvider ?: '-' }}</td>
+                                <td>{{ entry.snapshot.maxThreatLevel ?? '-' }}</td>
+                                <td>
+                                    <form method="post" action="{{ path('app_admin_security_unblock_ip') }}">
+                                        <input type="hidden" name="ip" value="{{ entry.key }}">
+                                        <button type="submit" class="button is-small is-danger is-light">{{ 'admin_security.button_unblock'|trans }}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="has-text-centered has-text-grey">
+                                    {{ 'admin_security.empty_blocked'|trans }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column is-6">
+                <h4 class="subtitle is-6">{{ 'admin_security.heading_blocked_sessions'|trans }}</h4>
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'admin_security.col_session_id'|trans }}</th>
+                            <th>{{ 'admin_security.col_triggered_by'|trans }}</th>
+                            <th>{{ 'admin_security.col_threat'|trans }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in blockedSessions %}
+                            <tr>
+                                <td><code>{{ entry.key|slice(0, 16) }}{{ entry.key|length > 16 ? '...' : '' }}</code></td>
+                                <td>{{ entry.snapshot.primaryProvider ?: '-' }}</td>
+                                <td>{{ entry.snapshot.maxThreatLevel ?? '-' }}</td>
+                                <td>
+                                    <form method="post" action="{{ path('app_admin_security_unblock_session') }}">
+                                        <input type="hidden" name="sessionId" value="{{ entry.key }}">
+                                        <button type="submit" class="button is-small is-danger is-light">{{ 'admin_security.button_unblock'|trans }}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="has-text-centered has-text-grey">
+                                    {{ 'admin_security.empty_blocked'|trans }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

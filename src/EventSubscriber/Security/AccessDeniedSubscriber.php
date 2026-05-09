@@ -2,7 +2,9 @@
 
 namespace App\EventSubscriber\Security;
 
-use App\Service\Security\AccessDeniedLogger;
+use App\Enum\SecurityEventType;
+use App\Service\Security\Provider\AccessDeniedProvider;
+use App\Service\Security\SecurityService;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -15,15 +17,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  *
  * Runs at priority 16, below NotFoundSubscriber (32) so 404s never reach this code path,
  * above the firewall's own access-denied handler so the response is left untouched.
- *
- * The existing per-controller Monolog warnings (e.g. CmsController::logAccessDenied) stay -
- * Monolog feeds operators/BugSink, this table feeds the admin Security tab. They are
- * complementary, not redundant.
  */
 readonly class AccessDeniedSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AccessDeniedLogger $accessDeniedLogger,
+        private SecurityService $securityService,
     ) {}
 
     #[Override]
@@ -46,6 +44,13 @@ readonly class AccessDeniedSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->accessDeniedLogger->log($exception, $event->getRequest(), $isHttpAccessDenied);
+        $this->securityService->event(
+            SecurityEventType::AccessDenied,
+            $event->getRequest(),
+            [
+                'reason' => AccessDeniedProvider::resolveReason($exception, $isHttpAccessDenied),
+                'isHttpAccessDenied' => $isHttpAccessDenied,
+            ],
+        );
     }
 }

@@ -16,8 +16,16 @@
                             <td>{{ incident.ip }}</td>
                         </tr>
                         <tr>
+                            <th>{{ 'admin_security.col_session_id'|trans }}</th>
+                            <td><code>{{ incident.sessionId }}</code></td>
+                        </tr>
+                        <tr>
                             <th>{{ 'admin_security.col_severity'|trans }}</th>
                             <td><span class="tag {{ incident.severity.tagClass }}">{{ incident.severity.label|trans }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_triggered_by'|trans }}</th>
+                            <td>{{ ('admin_security.provider_label_' ~ incident.triggeredBy)|trans }}</td>
                         </tr>
                         <tr>
                             <th>{{ 'admin_security.col_started'|trans }}</th>
@@ -28,24 +36,8 @@
                             <td>{{ incident.endedAt|date('Y-m-d H:i:s') }}</td>
                         </tr>
                         <tr>
-                            <th>{{ 'admin_security.col_probing_hits'|trans }}</th>
-                            <td>{{ incident.probingHits }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_security.col_access_denied_hits'|trans }}</th>
-                            <td>{{ incident.accessDeniedHits }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_security.col_rate_limit_hits'|trans }}</th>
-                            <td>{{ incident.rateLimitHits }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_security.col_total_hits'|trans }}</th>
-                            <td><strong>{{ incident.totalHits }}</strong></td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_security.col_distinct_paths'|trans }}</th>
-                            <td>{{ incident.distinctPaths }}</td>
+                            <th>{{ 'admin_security.col_blocked_for'|trans }}</th>
+                            <td>{{ incident.blockedUntilDescription }}</td>
                         </tr>
                         <tr>
                             <th>{{ 'admin_security.col_user_agent'|trans }}</th>
@@ -55,20 +47,29 @@
                 </table>
             </div>
             <div class="column is-7">
-                <h3 class="title is-5">{{ 'admin_security.heading_sample_urls'|trans }}</h3>
-                <table class="table is-fullwidth">
-                    <tbody>
-                        {% for url in incident.sampleUrls %}
-                            <tr>
-                                <td>{{ url }}</td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td class="has-text-grey">-</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <h3 class="title is-5">{{ 'admin_security.heading_provider_reports'|trans }}</h3>
+                {% for report in incident.providerReports %}
+                    <div class="box mb-3">
+                        <div class="level mb-2">
+                            <div class="level-left">
+                                <strong>{{ ('admin_security.provider_label_' ~ report.providerKey)|trans }}</strong>
+                            </div>
+                            <div class="level-right">
+                                <span class="tag is-medium">{{ 'admin_security.threat_level_label'|trans }}: {{ report.threatLevel }}</span>
+                            </div>
+                        </div>
+                        <progress class="progress is-small {% if report.threatLevel >= 90 %}is-danger{% elseif report.threatLevel >= 70 %}is-warning{% elseif report.threatLevel >= 40 %}is-info{% else %}is-light{% endif %}" value="{{ report.threatLevel }}" max="100">{{ report.threatLevel }}%</progress>
+                        <p>{{ report.summary }}</p>
+                        {% if report.details is iterable and report.details|length > 0 %}
+                            <details class="mt-2">
+                                <summary class="has-text-grey">{{ 'admin_security.details_label'|trans }}</summary>
+                                <pre class="mt-2">{{ report.details|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                            </details>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="has-text-grey">-</p>
+                {% endfor %}
             </div>
         </div>
 

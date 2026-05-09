@@ -10,16 +10,11 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Incident;
-use App\Repository\AccessDeniedLogRepository;
 use App\Repository\IncidentRepository;
-use App\Repository\NotFoundLogRepository;
-use App\Repository\RateLimitLogRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Service\AppStateService;
-use App\Service\Security\Incident\Sources\AccessDeniedIncidentSource;
-use App\Service\Security\Incident\Sources\RateLimitIncidentSource;
-use App\Service\Security\Incident\Sources\UrlProbingIncidentSource;
+use App\Service\Security\BlockedSessionStore;
 use DateTimeImmutable;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -42,10 +37,7 @@ final class IncidentsController extends AbstractSecurityController implements Ad
     public function __construct(
         TranslatorInterface $translator,
         private readonly IncidentRepository $incidentRepo,
-        private readonly NotFoundLogRepository $notFoundLogRepo,
-        private readonly AccessDeniedLogRepository $accessDeniedLogRepo,
-        private readonly RateLimitLogRepository $rateLimitLogRepo,
-        private readonly AppStateService $appState,
+        private readonly BlockedSessionStore $blockStore,
     ) {
         parent::__construct($translator, 'incidents');
     }
@@ -62,7 +54,7 @@ final class IncidentsController extends AbstractSecurityController implements Ad
         $rangeOffset = self::RANGE_OFFSETS[$range];
         $since = $rangeOffset !== null ? new DateTimeImmutable($rangeOffset) : null;
 
-        $incidents = $this->incidentRepo->getRecent(200, $since);
+        $incidents = $this->incidentRepo->findRecent(200, $since);
         $totalCount = $this->incidentRepo->countAll();
         $rangeCount = $since !== null ? $this->incidentRepo->countSince($since) : $totalCount;
 
@@ -86,8 +78,6 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             ));
         }
 
-        $info[] = new AdminTopInfoHtml($this->buildPendingPerSourceHtml());
-
         $adminTop = new AdminTop(
             info: $info,
             actions: [$this->buildRangeDropdown($range)],
@@ -101,17 +91,69 @@ final class IncidentsController extends AbstractSecurityController implements Ad
         ]);
     }
 
+    #[Route('/blocked', name: 'app_admin_security_blocked')]
+    public function blockedSessions(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
+
+        $blockedSessions = $this->blockStore->listBlockedSessions();
+        $blockedIps = $this->blockStore->listBlockedIps();
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    count($blockedSessions),
+                    $this->translator->trans('admin_security.summary_blocked_sessions'),
+                )),
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%d</strong>&nbsp;%s',
+                    count($blockedIps),
+                    $this->translator->trans('admin_security.summary_blocked_ips'),
+                )),
+            ],
+            actions: [],
+        );
+
+        return $this->render('admin/security/blocked_sessions.html.twig', [
+            'active' => 'security',
+            'blockedSessions' => $blockedSessions,
+            'blockedIps' => $blockedIps,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
+        ]);
+    }
+
+    #[Route('/blocked/session/unblock', name: 'app_admin_security_unblock_session', methods: ['POST'])]
+    public function unblockSession(Request $request): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
+
+        $sessionId = $request->request->getString('sessionId');
+        if ($sessionId !== '') {
+            $this->blockStore->unblockSession($sessionId);
+        }
+
+        return $this->redirectToRoute('app_admin_security_blocked');
+    }
+
+    #[Route('/blocked/ip/unblock', name: 'app_admin_security_unblock_ip', methods: ['POST'])]
+    public function unblockIp(Request $request): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
+
+        $ip = $request->request->getString('ip');
+        if ($ip !== '') {
+            $this->blockStore->unblockIp($ip);
+        }
+
+        return $this->redirectToRoute('app_admin_security_blocked');
+    }
+
     #[Route('/{id}', name: 'app_admin_security_incidents_show', requirements: ['id' => '\d+'])]
     public function show(Incident $incident): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
-
-        $params = [
-            'ip' => $incident->getIp(),
-            'from' => $incident->getStartedAt()->format('Y-m-d H:i:s'),
-            'to' => $incident->getEndedAt()->format('Y-m-d H:i:s'),
-            'range' => 'all',
-        ];
 
         $severity = $incident->getSeverity();
 
@@ -127,27 +169,12 @@ final class IncidentsController extends AbstractSecurityController implements Ad
                     $this->translator->trans($severity->label()),
                 )),
                 new AdminTopInfoHtml(sprintf(
-                    '<span class="has-text-grey">%d %s</span>',
-                    $incident->getTotalHits(),
-                    $this->translator->trans('admin_security.col_total_hits'),
+                    '<span class="has-text-grey">%s: %s</span>',
+                    $this->translator->trans('admin_security.triggered_by_label'),
+                    htmlspecialchars($incident->getTriggeredBy(), ENT_QUOTES),
                 )),
             ],
             actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_security.button_view_raw_404'),
-                    target: $this->generateUrl('app_admin_not_found_log', $params),
-                    icon: 'external-link-alt',
-                ),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_security.button_view_raw_access_denied'),
-                    target: $this->generateUrl('app_admin_access_denied_log', $params),
-                    icon: 'external-link-alt',
-                ),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_security.button_view_raw_rate_limit'),
-                    target: $this->generateUrl('app_admin_security_rate_limiting', $params),
-                    icon: 'external-link-alt',
-                ),
                 new AdminTopActionButton(
                     label: $this->translator->trans('global.button_back'),
                     target: $this->generateUrl('app_admin_security_incidents'),
@@ -162,37 +189,6 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
-    }
-
-    private function buildPendingPerSourceHtml(): string
-    {
-        $now = new DateTimeImmutable();
-
-        $probingLastId = (int) ($this->appState->get(UrlProbingIncidentSource::KEY_LAST_PROCESSED_ID) ?? '0');
-        $probingCutoff = $now->modify('-' . UrlProbingIncidentSource::SETTLE_MINUTES . ' minutes');
-        $probingPending = $this->notFoundLogRepo->countRowsAfterIdUpTo($probingLastId, $probingCutoff);
-
-        $accessDeniedLastId = (int) ($this->appState->get(AccessDeniedIncidentSource::KEY_LAST_PROCESSED_ID) ?? '0');
-        $accessDeniedCutoff = $now->modify('-' . AccessDeniedIncidentSource::SETTLE_MINUTES . ' minutes');
-        $accessDeniedPending = $this->accessDeniedLogRepo->countRowsAfterIdUpTo($accessDeniedLastId, $accessDeniedCutoff);
-
-        $rateLimitLastId = (int) ($this->appState->get(RateLimitIncidentSource::KEY_LAST_PROCESSED_ID) ?? '0');
-        $rateLimitCutoff = $now->modify('-' . RateLimitIncidentSource::SETTLE_MINUTES . ' minutes');
-        $rateLimitPending = $this->rateLimitLogRepo->countRowsAfterIdUpTo($rateLimitLastId, $rateLimitCutoff);
-
-        $totalPending = $probingPending + $accessDeniedPending + $rateLimitPending;
-        $tagClass = $totalPending > 0 ? 'is-warning' : 'is-light';
-
-        return sprintf(
-            '<span class="tag %s is-medium">%d %s | %d %s | %d %s</span>',
-            $tagClass,
-            $accessDeniedPending,
-            $this->translator->trans('admin_security.pending_access_denied'),
-            $rateLimitPending,
-            $this->translator->trans('admin_security.pending_rate_limit'),
-            $probingPending,
-            $this->translator->trans('admin_security.pending_probing'),
-        );
     }
 
     private function buildRangeDropdown(string $current): AdminTopActionDropdown

@@ -21,7 +21,7 @@ class IncidentsControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(3, $crawler->filter('.tabs.is-boxed li')->count(), 'Three security tabs should be rendered');
+        static::assertSame(4, $crawler->filter('.tabs.is-boxed li')->count(), 'Four security tabs should be rendered');
     }
 
     public function testOldUrlProbingRouteIsGone(): void
