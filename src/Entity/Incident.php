@@ -43,9 +43,6 @@ class Incident
     private int $rateLimitHits = 0;
 
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
-    private int $bruteForceHits = 0;
-
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $totalHits = 0;
 
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
@@ -148,18 +145,6 @@ class Incident
     public function setRateLimitHits(int $rateLimitHits): static
     {
         $this->rateLimitHits = $rateLimitHits;
-
-        return $this;
-    }
-
-    public function getBruteForceHits(): int
-    {
-        return $this->bruteForceHits;
-    }
-
-    public function setBruteForceHits(int $bruteForceHits): static
-    {
-        $this->bruteForceHits = $bruteForceHits;
 
         return $this;
     }

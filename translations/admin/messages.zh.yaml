@@ -472,7 +472,6 @@ admin_security:
     col_probing_hits: '探测'
     col_access_denied_hits: '访问被拒'
     col_rate_limit_hits: '限速'
-    col_brute_force_hits: '暴力破解'
     col_total_hits: '合计'
     col_distinct_paths: '不同路径'
     col_user_agent: 'User Agent'

@@ -12,7 +12,6 @@ final readonly class IncidentSourceContribution
     public const string KEY_PROBING = 'url_probing';
     public const string KEY_ACCESS_DENIED = 'access_denied';
     public const string KEY_RATE_LIMIT = 'rate_limit';
-    public const string KEY_BRUTE_FORCE = 'brute_force';
 
     /**
      * @param list<string> $samplePaths
