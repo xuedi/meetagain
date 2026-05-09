@@ -14,16 +14,17 @@ use Override;
 use Symfony\Component\Clock\ClockInterface;
 
 /**
- * Reads non-login rate-limit hits. Login throttling is handled separately by
- * BruteForceIncidentSource (different threshold, different policy weight).
+ * Reads every rate-limit hit (login throttling, comment throttle, registration
+ * throttle, etc.). The `limiter` field on each row preserves which limiter
+ * tripped, in case future scoring wants to weight credential attacks
+ * (login_throttling) higher than other limiters.
  */
 final readonly class RateLimitIncidentSource implements IncidentSourceInterface
 {
     public const string KEY = IncidentSourceContribution::KEY_RATE_LIMIT;
     public const string KEY_LAST_PROCESSED_ID = 'security.incident.rate_limit.last_processed_log_id';
-    public const string LOGIN_LIMITER = 'login_throttling';
     public const int SETTLE_MINUTES = 5;
-    public const int MIN_HITS_PER_INCIDENT = 3;
+    public const int MIN_HITS_PER_INCIDENT = 1;
     public const int BATCH_SIZE = 5000;
     public const int MAX_SAMPLE_URLS = 10;
 
@@ -48,7 +49,7 @@ final readonly class RateLimitIncidentSource implements IncidentSourceInterface
         $cutoff = $now->modify('-' . self::SETTLE_MINUTES . ' minutes');
         $lastId = (int) ($this->appState->get(self::KEY_LAST_PROCESSED_ID) ?? '0');
 
-        $rows = $this->repo->findRowsAfterIdUpToByLimiter($lastId, $cutoff, self::BATCH_SIZE, self::LOGIN_LIMITER, exclude: true);
+        $rows = $this->repo->findRowsAfterIdUpTo($lastId, $cutoff, self::BATCH_SIZE);
         if ($rows === []) {
             return IncidentSourceStats::empty(self::KEY, $lastId);
         }
@@ -65,9 +66,6 @@ final readonly class RateLimitIncidentSource implements IncidentSourceInterface
 
         $incidentsTouched = 0;
         foreach ($rowsByIp as $ip => $ipRows) {
-            if (count($ipRows) < self::MIN_HITS_PER_INCIDENT) {
-                continue;
-            }
             $this->merger->merge($this->buildContribution($ip, $ipRows));
             $incidentsTouched++;
         }

@@ -472,7 +472,6 @@ admin_security:
     col_probing_hits: 'Scans'
     col_access_denied_hits: 'Zugriff verweigert'
     col_rate_limit_hits: 'Rate-Limit'
-    col_brute_force_hits: 'Brute-Force'
     col_total_hits: 'Gesamt'
     col_distinct_paths: 'Eindeutige Pfade'
     col_user_agent: 'User-Agent'

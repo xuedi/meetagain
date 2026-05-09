@@ -116,48 +116,31 @@ class RateLimitLogRepository extends ServiceEntityRepository
     /**
      * @return list<RateLimitLog>
      */
-    public function findRowsAfterIdUpToByLimiter(
-        int $lastId,
-        DateTimeImmutable $cutoff,
-        int $limit,
-        string $limiter,
-        bool $exclude = false,
-    ): array {
-        $op = $exclude ? '<>' : '=';
-
+    public function findRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff, int $limit): array
+    {
         return array_values(
             $this
                 ->createQueryBuilder('r')
                 ->where('r.id > :lastId')
                 ->andWhere('r.createdAt <= :cutoff')
-                ->andWhere('r.limiter ' . $op . ' :limiter')
                 ->orderBy('r.id', 'ASC')
                 ->setParameter('lastId', $lastId)
                 ->setParameter('cutoff', $cutoff)
-                ->setParameter('limiter', $limiter)
                 ->setMaxResults($limit)
                 ->getQuery()
                 ->getResult(),
         );
     }
 
-    public function countRowsAfterIdUpToByLimiter(
-        int $lastId,
-        DateTimeImmutable $cutoff,
-        string $limiter,
-        bool $exclude = false,
-    ): int {
-        $op = $exclude ? '<>' : '=';
-
+    public function countRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff): int
+    {
         return (int) $this
             ->createQueryBuilder('r')
             ->select('COUNT(r.id)')
             ->where('r.id > :lastId')
             ->andWhere('r.createdAt <= :cutoff')
-            ->andWhere('r.limiter ' . $op . ' :limiter')
             ->setParameter('lastId', $lastId)
             ->setParameter('cutoff', $cutoff)
-            ->setParameter('limiter', $limiter)
             ->getQuery()
             ->getSingleScalarResult();
     }
