@@ -8,7 +8,8 @@ use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
 use App\Emails\Types\SupportNotificationEmail;
 use App\Service\Member\CaptchaService;
-use App\Service\Security\RateLimitLogger;
+use App\Enum\SecurityEventType;
+use App\Service\Security\SecurityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -24,7 +25,7 @@ final class SupportController extends AbstractController
         private readonly CaptchaService $captchaService,
         #[Autowire(service: 'limiter.support')]
         private readonly RateLimiterFactory $supportLimiter,
-        private readonly RateLimitLogger $rateLimitLogger,
+        private readonly SecurityService $securityService,
     ) {}
 
     #[Route('/support', name: 'app_support_redirect')]
@@ -38,7 +39,7 @@ final class SupportController extends AbstractController
     {
         $limiter = $this->supportLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
-            $this->rateLimitLogger->log('support', $request);
+            $this->securityService->event(SecurityEventType::RateLimit, $request, ['limiter' => 'support']);
             return $this->render(
                 'rate_limited.html.twig',
                 [

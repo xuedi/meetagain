@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Security\Incident;
+namespace App\Service\Security;
 
 use App\CronTaskInterface;
 use App\Enum\CronTaskStatus;
@@ -10,29 +10,31 @@ use DateTimeImmutable;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-readonly class IncidentAggregatorCronTask implements CronTaskInterface
+// TODO(2026-05-09) Aggregated retrospective reports are observation-only:
+// hook in admin notification dispatch / threshold alerting once the
+// notification routing for high retrospective threat levels is decided.
+readonly class SecurityRetrospectiveCronTask implements CronTaskInterface
 {
-    public const string KEY_LAST_RUN = 'cron.incident_aggregator.last_run';
-    private const int THROTTLE_SECONDS = 8 * 3600;
+    private const int THROTTLE_SECONDS = 3600;
 
     public function __construct(
         private AppStateService $appState,
-        private IncidentAggregator $aggregator,
+        private SecurityService $securityService,
     ) {}
 
     public function getIdentifier(): string
     {
-        return 'security.aggregate-incidents';
+        return 'security.retrospective-scan';
     }
 
     public function runCronTask(OutputInterface $output): CronTaskResult
     {
-        $lastRun = $this->appState->get(self::KEY_LAST_RUN);
+        $lastRun = $this->appState->get(SecurityService::KEY_LAST_RETROSPECTIVE_RUN);
         if ($lastRun !== null) {
             $elapsed = (new DateTimeImmutable())->getTimestamp() - (int) $lastRun;
             if ($elapsed < self::THROTTLE_SECONDS) {
                 $output->writeln(sprintf(
-                    'IncidentAggregator: skipped (last run %d min ago)',
+                    'SecurityRetrospectiveScan: skipped (last run %d min ago)',
                     (int) round($elapsed / 60),
                 ));
                 return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'Skipped - throttled');
@@ -40,25 +42,23 @@ readonly class IncidentAggregatorCronTask implements CronTaskInterface
         }
 
         try {
-            $allStats = $this->aggregator->aggregate();
-            $this->appState->set(self::KEY_LAST_RUN, (string) (new DateTimeImmutable())->getTimestamp());
+            $reports = $this->securityService->runRetrospectiveScan();
 
             $parts = [];
-            foreach ($allStats as $s) {
+            foreach ($reports as $report) {
                 $parts[] = sprintf(
-                    '%s: %d considered / %d ips / %d incidents',
-                    $s->sourceKey,
-                    $s->considered,
-                    $s->ipsTouched,
-                    $s->incidentsTouched,
+                    '%s: threat=%d (%s)',
+                    $report->providerKey,
+                    $report->threatLevel,
+                    $report->summary,
                 );
             }
-            $message = implode(' | ', $parts);
-            $output->writeln('IncidentAggregator: ' . $message);
+            $message = $parts === [] ? 'No providers registered' : implode(' | ', $parts);
+            $output->writeln('SecurityRetrospectiveScan: ' . $message);
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
         } catch (Throwable $e) {
-            $output->writeln('IncidentAggregator exception: ' . $e->getMessage());
+            $output->writeln('SecurityRetrospectiveScan exception: ' . $e->getMessage());
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
         }

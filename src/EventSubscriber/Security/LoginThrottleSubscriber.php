@@ -2,7 +2,8 @@
 
 namespace App\EventSubscriber\Security;
 
-use App\Service\Security\RateLimitLogger;
+use App\Enum\SecurityEventType;
+use App\Service\Security\SecurityService;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
@@ -13,18 +14,11 @@ use Symfony\Component\Security\Http\Event\LoginFailureEvent;
  * Logs every login attempt that Symfony's login throttler refuses with a
  * TooManyLoginAttemptsAuthenticationException, so it shows up in the admin
  * Rate-limiting tab alongside the form-driven rate-limit refusals.
- *
- * Why no rendered page (asymmetry vs the other two security subscribers):
- * LoginFailureEvent fires inside the firewall, before any controller. There
- * is no kernel.exception to intercept and no place for a custom rendered
- * page. The user-facing message reaches the login form via Symfony's
- * `last_authentication_error` mechanism, translated through the `security`
- * domain (`Too many failed login attempts...`).
  */
 readonly class LoginThrottleSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private RateLimitLogger $rateLimitLogger,
+        private SecurityService $securityService,
     ) {}
 
     #[Override]
@@ -50,6 +44,11 @@ readonly class LoginThrottleSubscriber implements EventSubscriberInterface
             }
         }
 
-        $this->rateLimitLogger->log('login_throttling', $event->getRequest(), $identifier);
+        $context = ['limiter' => 'login_throttling'];
+        if ($identifier !== null && $identifier !== '') {
+            $context['userIdentifier'] = $identifier;
+        }
+
+        $this->securityService->event(SecurityEventType::RateLimit, $event->getRequest(), $context);
     }
 }

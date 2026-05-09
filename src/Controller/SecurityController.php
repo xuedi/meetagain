@@ -22,7 +22,8 @@ use App\Service\Config\ConfigService;
 use App\Service\Member\CaptchaService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
-use App\Service\Security\RateLimitLogger;
+use App\Enum\SecurityEventType;
+use App\Service\Security\SecurityService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -58,7 +59,7 @@ final class SecurityController extends AbstractController
         private readonly RateLimiterFactory $passwordResetLimiter,
         #[Target('registration')]
         private readonly RateLimiterFactory $registrationLimiter,
-        private readonly RateLimitLogger $rateLimitLogger,
+        private readonly SecurityService $securityService,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
@@ -77,6 +78,12 @@ final class SecurityController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+
+    #[Route(path: '/security/blocked', name: 'app_security_blocked')]
+    public function blocked(): Response
+    {
+        return $this->render('security/blocked.html.twig', [], new Response('', 403));
     }
 
     #[Route(path: '/logout', name: 'app_security_logout', methods: ['POST'])]
@@ -105,11 +112,11 @@ final class SecurityController extends AbstractController
         $limiter = $this->registrationLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
             $submittedEmail = $request->request->all('registration')['email'] ?? null;
-            $this->rateLimitLogger->log(
-                'registration',
-                $request,
-                is_string($submittedEmail) ? $submittedEmail : null,
-            );
+            $context = ['limiter' => 'registration'];
+            if (is_string($submittedEmail) && $submittedEmail !== '') {
+                $context['userIdentifier'] = $submittedEmail;
+            }
+            $this->securityService->event(SecurityEventType::RateLimit, $request, $context);
             return $this->render(
                 'rate_limited.html.twig',
                 [
@@ -197,11 +204,11 @@ final class SecurityController extends AbstractController
         $limiter = $this->passwordResetLimiter->create($request->getClientIp());
         if (!$limiter->consume()->isAccepted()) {
             $submittedEmail = $request->request->all('password_reset')['email'] ?? null;
-            $this->rateLimitLogger->log(
-                'password_reset',
-                $request,
-                is_string($submittedEmail) ? $submittedEmail : null,
-            );
+            $context = ['limiter' => 'password_reset'];
+            if (is_string($submittedEmail) && $submittedEmail !== '') {
+                $context['userIdentifier'] = $submittedEmail;
+            }
+            $this->securityService->event(SecurityEventType::RateLimit, $request, $context);
             return $this->render(
                 'rate_limited.html.twig',
                 [

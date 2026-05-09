@@ -2,7 +2,8 @@
 
 namespace App\EventSubscriber\Security;
 
-use App\Service\Security\NotFoundLogger;
+use App\Enum\SecurityEventType;
+use App\Service\Security\SecurityService;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 readonly class NotFoundSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private NotFoundLogger $notFoundLogger,
+        private SecurityService $securityService,
     ) {}
 
     #[Override]
@@ -31,6 +32,6 @@ readonly class NotFoundSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->notFoundLogger->log($event->getRequest());
+        $this->securityService->event(SecurityEventType::NotFound, $event->getRequest());
     }
 }
