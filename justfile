@@ -154,6 +154,7 @@ devModeReset plugins='':
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
+    {{PHP}} php bin/console app:security:reset-state
 
 # Full dev environment with demo data (base + plugin fixtures) — complete sample content for testing
 [group('development')]
