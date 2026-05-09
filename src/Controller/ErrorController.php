@@ -48,13 +48,13 @@ final class ErrorController extends AbstractController
 
             return new Response($this->twig->render('error/500.html.twig', [
                 'errorId' => (string) $eventId,
-                'occurredAt' => (new DateTimeImmutable())->setTimezone(new DateTimeZone('UTC')),
+                'occurredAt' => new DateTimeImmutable()->setTimezone(new DateTimeZone('UTC')),
             ]), $status);
         }
 
         $eventId = SentrySdk::getCurrentHub()->getLastEventId() ?? EventId::generate();
         $errorId = (string) $eventId;
-        $occurredAt = (new DateTimeImmutable())->setTimezone(new DateTimeZone('UTC'));
+        $occurredAt = new DateTimeImmutable()->setTimezone(new DateTimeZone('UTC'));
 
         return new Response($this->twig->render('error/500.html.twig', [
             'errorId' => $errorId,
