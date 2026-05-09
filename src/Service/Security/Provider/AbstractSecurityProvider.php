@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Service\Security\Provider;
 
@@ -93,7 +95,8 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
         $stateKey = $this->resolveStateKey($sessionId, $ip);
         $state = $this->loadState($stateKey);
 
-        $alreadyBlocked = ($state['recommendation'] ?? null) === SecurityRecommendation::Block->value
+        $alreadyBlocked =
+            ($state['recommendation'] ?? null) === SecurityRecommendation::Block->value
             || ($state['recommendation'] ?? null) === SecurityRecommendation::BlockShortCircuit->value;
 
         if ($readOnly || !$this->handlesType($type) || $alreadyBlocked) {
@@ -163,6 +166,7 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
             $item->set($state);
             $item->expiresAfter(self::STATE_TTL_SECONDS);
             $this->securityCachePool->save($item);
+            $this->addToIndex($stateKey);
         } catch (Throwable $e) {
             $this->logger->warning('Failed to save security provider state: ' . $e->getMessage(), [
                 'exception' => $e,
@@ -171,10 +175,83 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
         }
     }
 
+    public function clearAllState(): void
+    {
+        try {
+            foreach ($this->loadIndex() as $stateKey => $expiresAt) {
+                $this->securityCachePool->deleteItem($this->cacheKey($stateKey));
+            }
+            $this->securityCachePool->deleteItem($this->indexCacheKey());
+        } catch (Throwable $e) {
+            $this->logger->warning('Failed to clear security provider state: ' . $e->getMessage(), [
+                'exception' => $e,
+                'providerKey' => $this->getKey(),
+            ]);
+        }
+    }
+
+    private function addToIndex(string $stateKey): void
+    {
+        try {
+            $index = $this->loadIndex();
+            $now = time();
+            $index[$stateKey] = $now + self::STATE_TTL_SECONDS;
+            foreach ($index as $key => $expiresAt) {
+                if ($expiresAt >= $now) {
+                    continue;
+                }
+
+                unset($index[$key]);
+            }
+            $item = $this->securityCachePool->getItem($this->indexCacheKey());
+            $item->set($index);
+            $item->expiresAfter(self::STATE_TTL_SECONDS * 2);
+            $this->securityCachePool->save($item);
+        } catch (Throwable $e) {
+            $this->logger->warning('Failed to update security provider index: ' . $e->getMessage(), [
+                'exception' => $e,
+                'providerKey' => $this->getKey(),
+            ]);
+        }
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function loadIndex(): array
+    {
+        try {
+            $item = $this->securityCachePool->getItem($this->indexCacheKey());
+            $value = $item->isHit() ? $item->get() : [];
+        } catch (Throwable) {
+            return [];
+        }
+
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($value as $key => $expiresAt) {
+            if (!(is_string($key) && is_int($expiresAt))) {
+                continue;
+            }
+
+            $result[$key] = $expiresAt;
+        }
+
+        return $result;
+    }
+
     private function cacheKey(string $stateKey): string
     {
         $sanitized = preg_replace('/[^A-Za-z0-9_.\-]/', '_', $stateKey) ?? 'unknown';
 
         return 'security_provider_' . $this->getKey() . '_' . $sanitized;
+    }
+
+    private function indexCacheKey(): string
+    {
+        return 'security_provider_state_index_' . $this->getKey();
     }
 }

@@ -89,6 +89,9 @@
     "psr-4": {
       "App\\": "src/"
     },
+    "classmap": [
+      "src/Service/Security/LoadtestBypass.php"
+    ],
     "files": [
       "plugins/autoload.php"
     ]

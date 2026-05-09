@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 final class SupportController extends AbstractController
 {
@@ -24,7 +24,7 @@ final class SupportController extends AbstractController
         private readonly SupportNotificationEmail $supportNotificationEmail,
         private readonly CaptchaService $captchaService,
         #[Autowire(service: 'limiter.support')]
-        private readonly RateLimiterFactory $supportLimiter,
+        private readonly RateLimiterFactoryInterface $supportLimiter,
         private readonly SecurityService $securityService,
     ) {}
 

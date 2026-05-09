@@ -18,6 +18,39 @@ services:
         exclude:
             - '../src/Kernel.php'
             - '../src/Activity/UnknownActivityMessage.php'
+            - '../src/Service/Security/LoadtestBypass.php'
+
+    # Load-test bypass: when the X-Loadtest-Bypass header is set in non-prod env,
+    # these decorators short-circuit the rate limiters so synthetic load traffic
+    # doesn't lock itself out. Attack-test scripts deliberately omit the header
+    # so the underlying limiters still fire and trigger SecurityService.
+    loadtest_bypass.limiter.password_reset:
+        class: App\Service\Security\LoadtestBypassRateLimiterFactory
+        decorates: limiter.password_reset
+        arguments:
+            $inner: '@.inner'
+            $requestStack: '@request_stack'
+            $environment: '%kernel.environment%'
+    loadtest_bypass.limiter.registration:
+        class: App\Service\Security\LoadtestBypassRateLimiterFactory
+        decorates: limiter.registration
+        arguments:
+            $inner: '@.inner'
+            $requestStack: '@request_stack'
+            $environment: '%kernel.environment%'
+    loadtest_bypass.limiter.support:
+        class: App\Service\Security\LoadtestBypassRateLimiterFactory
+        decorates: limiter.support
+        arguments:
+            $inner: '@.inner'
+            $requestStack: '@request_stack'
+            $environment: '%kernel.environment%'
+    loadtest_bypass.security.login_throttling:
+        class: App\Service\Security\LoadtestBypassRequestRateLimiter
+        decorates: security.login_throttling.main.limiter
+        arguments:
+            $inner: '@.inner'
+            $environment: '%kernel.environment%'
 
     Doctrine\Migrations\DependencyFactory:
         alias: 'doctrine.migrations.dependency_factory'

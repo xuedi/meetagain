@@ -38,7 +38,7 @@ abstract class AbstractSecurityController extends AbstractController
             new AdminTab(
                 label: $this->translator->trans('admin_security.tab_incidents'),
                 target: $this->generateUrl('app_admin_security_incidents'),
-                icon: 'radar',
+                icon: 'triangle-exclamation',
                 isActive: $this->activeSecurityTab === 'incidents',
             ),
             new AdminTab(

@@ -209,6 +209,7 @@ class SecurityServiceTest extends TestCase
             appState: $appState,
             clock: new MockClock(new DateTimeImmutable('2026-05-09 12:00:00')),
             logger: new NullLogger(),
+            environment: 'test',
         );
     }
 

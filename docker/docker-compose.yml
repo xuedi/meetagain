@@ -86,6 +86,20 @@ services:
     profiles:
       - tools
 
+  # Load and attack testing tool (run via: just testLoad / just testAttack)
+  loadtest:
+    image: grafana/k6:0.55.0
+    container_name: "ma-loadtest"
+    network_mode: "host"
+    user: ${HOST_UID}:${HOST_GID}
+    volumes:
+      - ../tests/loadtest:/scripts:ro
+      - ../tests/reports:/reports
+    environment:
+      - K6_WEB_DASHBOARD=true
+    profiles:
+      - tools
+
   # Page speed analyzer (run via: just testPerformance)
   sitespeed:
     image: sitespeedio/sitespeed.io:39.5.0@sha256:444efbcb6dfd48d3d91985da7f7a9f6e09659202bc5a64be5edf9229a6dc3ac9
