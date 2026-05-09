@@ -17,7 +17,6 @@
                     <th>{{ 'admin_security.col_probing_hits'|trans }}</th>
                     <th>{{ 'admin_security.col_access_denied_hits'|trans }}</th>
                     <th>{{ 'admin_security.col_rate_limit_hits'|trans }}</th>
-                    <th>{{ 'admin_security.col_brute_force_hits'|trans }}</th>
                     <th>{{ 'admin_security.col_total_hits'|trans }}</th>
                     <th>{{ 'admin_security.col_user_agent'|trans }}</th>
                     <th></th>
@@ -33,7 +32,6 @@
                         <td>{{ incident.probingHits }}</td>
                         <td>{{ incident.accessDeniedHits }}</td>
                         <td>{{ incident.rateLimitHits }}</td>
-                        <td>{{ incident.bruteForceHits }}</td>
                         <td><strong>{{ incident.totalHits }}</strong></td>
                         <td>{{ incident.userAgent ? (incident.userAgent|length > 50 ? incident.userAgent|slice(0, 47) ~ '...' : incident.userAgent) : '-' }}</td>
                         <td>
@@ -44,7 +42,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="11" class="has-text-centered has-text-grey">
+                        <td colspan="10" class="has-text-centered has-text-grey">
                             {{ 'admin_security.empty_incidents'|trans }}
                         </td>
                     </tr>

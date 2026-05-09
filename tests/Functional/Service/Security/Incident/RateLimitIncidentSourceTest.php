@@ -9,7 +9,6 @@ use App\Repository\RateLimitLogRepository;
 use App\Service\AppStateService;
 use App\Service\Security\Incident\IncidentMerger;
 use App\Service\Security\Incident\IncidentSeverityCalculator;
-use App\Service\Security\Incident\Sources\BruteForceIncidentSource;
 use App\Service\Security\Incident\Sources\RateLimitIncidentSource;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,15 +58,14 @@ class RateLimitIncidentSourceTest extends KernelTestCase
         self::assertSame(1, $stats->incidentsTouched);
         $incidents = $this->incidentRepo->getRecent(10);
         self::assertSame(4, $incidents[0]->getRateLimitHits());
-        self::assertSame(0, $incidents[0]->getBruteForceHits());
     }
 
-    public function testLoginThrottlingRowsAreExcluded(): void
+    public function testLoginThrottlingRowsAlsoFeedRateLimitIncident(): void
     {
         // Arrange
         $base = new DateTimeImmutable('2026-05-07 09:00:00');
         for ($i = 0; $i < 5; $i++) {
-            $this->seed(self::IP_A, BruteForceIncidentSource::LOGIN_LIMITER, '/login', $base->modify('+' . ($i * 60) . ' seconds'));
+            $this->seed(self::IP_A, 'login_throttling', '/login', $base->modify('+' . ($i * 60) . ' seconds'));
         }
         $this->em->flush();
 
@@ -75,8 +73,9 @@ class RateLimitIncidentSourceTest extends KernelTestCase
         $stats = $this->source()->ingest();
 
         // Assert
-        self::assertSame(0, $stats->incidentsTouched);
-        self::assertSame(0, $this->incidentRepo->countAll());
+        self::assertSame(1, $stats->incidentsTouched);
+        $incidents = $this->incidentRepo->getRecent(10);
+        self::assertSame(5, $incidents[0]->getRateLimitHits());
     }
 
     private function source(?string $now = null): RateLimitIncidentSource

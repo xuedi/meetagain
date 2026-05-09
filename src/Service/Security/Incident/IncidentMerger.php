@@ -59,7 +59,6 @@ final readonly class IncidentMerger
             IncidentSourceContribution::KEY_PROBING       => $incident->setProbingHits($incident->getProbingHits() + $c->hits),
             IncidentSourceContribution::KEY_ACCESS_DENIED => $incident->setAccessDeniedHits($incident->getAccessDeniedHits() + $c->hits),
             IncidentSourceContribution::KEY_RATE_LIMIT    => $incident->setRateLimitHits($incident->getRateLimitHits() + $c->hits),
-            IncidentSourceContribution::KEY_BRUTE_FORCE   => $incident->setBruteForceHits($incident->getBruteForceHits() + $c->hits),
             default                                       => throw new \InvalidArgumentException('Unknown source key: ' . $c->sourceKey),
         };
 
@@ -80,8 +79,7 @@ final readonly class IncidentMerger
         $incident->setTotalHits(
             $incident->getProbingHits()
             + $incident->getAccessDeniedHits()
-            + $incident->getRateLimitHits()
-            + $incident->getBruteForceHits(),
+            + $incident->getRateLimitHits(),
         );
 
         if ($c->userAgentCounts !== [] && ($isNew || $incident->getUserAgent() === null)) {
@@ -94,7 +92,6 @@ final readonly class IncidentMerger
             $incident->getProbingHits(),
             $incident->getAccessDeniedHits(),
             $incident->getRateLimitHits(),
-            $incident->getBruteForceHits(),
         ));
 
         if (!$isNew) {

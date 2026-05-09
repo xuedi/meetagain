@@ -17,7 +17,6 @@ use App\Repository\RateLimitLogRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\AppStateService;
 use App\Service\Security\Incident\Sources\AccessDeniedIncidentSource;
-use App\Service\Security\Incident\Sources\BruteForceIncidentSource;
 use App\Service\Security\Incident\Sources\RateLimitIncidentSource;
 use App\Service\Security\Incident\Sources\UrlProbingIncidentSource;
 use DateTimeImmutable;
@@ -179,24 +178,9 @@ final class IncidentsController extends AbstractSecurityController implements Ad
 
         $rateLimitLastId = (int) ($this->appState->get(RateLimitIncidentSource::KEY_LAST_PROCESSED_ID) ?? '0');
         $rateLimitCutoff = $now->modify('-' . RateLimitIncidentSource::SETTLE_MINUTES . ' minutes');
-        $rateLimitPending = $this->rateLimitLogRepo->countRowsAfterIdUpToByLimiter(
-            $rateLimitLastId,
-            $rateLimitCutoff,
-            RateLimitIncidentSource::LOGIN_LIMITER,
-            exclude: true,
-        );
+        $rateLimitPending = $this->rateLimitLogRepo->countRowsAfterIdUpTo($rateLimitLastId, $rateLimitCutoff);
 
-        $bruteForceLastId = (int) ($this->appState->get(BruteForceIncidentSource::KEY_LAST_PROCESSED_ID) ?? '0');
-        $bruteForceCutoff = $now->modify('-' . BruteForceIncidentSource::SETTLE_MINUTES . ' minutes');
-        $bruteForcePending = $this->rateLimitLogRepo->countRowsAfterIdUpToByLimiter(
-            $bruteForceLastId,
-            $bruteForceCutoff,
-            BruteForceIncidentSource::LOGIN_LIMITER,
-            exclude: false,
-        );
-
-        $rateLimitTotalPending = $rateLimitPending + $bruteForcePending;
-        $totalPending = $probingPending + $accessDeniedPending + $rateLimitTotalPending;
+        $totalPending = $probingPending + $accessDeniedPending + $rateLimitPending;
         $tagClass = $totalPending > 0 ? 'is-warning' : 'is-light';
 
         return sprintf(
@@ -204,7 +188,7 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             $tagClass,
             $accessDeniedPending,
             $this->translator->trans('admin_security.pending_access_denied'),
-            $rateLimitTotalPending,
+            $rateLimitPending,
             $this->translator->trans('admin_security.pending_rate_limit'),
             $probingPending,
             $this->translator->trans('admin_security.pending_probing'),
