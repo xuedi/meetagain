@@ -23,7 +23,7 @@ abstract class AbstractSecurityController extends AbstractController
             links: [
                 new AdminLink(
                     label: 'admin_shell.menu_security',
-                    route: 'app_admin_security_url_probing',
+                    route: 'app_admin_security_incidents',
                     active: 'security',
                     role: 'ROLE_ADMIN',
                 ),
@@ -36,22 +36,22 @@ abstract class AbstractSecurityController extends AbstractController
     {
         return new AdminTabs([
             new AdminTab(
-                label: $this->translator->trans('admin_security.tab_url_probing'),
-                target: $this->generateUrl('app_admin_security_url_probing'),
+                label: $this->translator->trans('admin_security.tab_incidents'),
+                target: $this->generateUrl('app_admin_security_incidents'),
                 icon: 'radar',
-                isActive: $this->activeSecurityTab === 'url_probing',
+                isActive: $this->activeSecurityTab === 'incidents',
             ),
             new AdminTab(
-                label: $this->translator->trans('admin_security.tab_access_denied'),
-                target: $this->generateUrl('app_admin_security_access_denied'),
-                icon: 'ban',
-                isActive: $this->activeSecurityTab === 'access_denied',
+                label: $this->translator->trans('admin_security.tab_rate_limiting'),
+                target: $this->generateUrl('app_admin_security_rate_limiting'),
+                icon: 'tachometer-alt',
+                isActive: $this->activeSecurityTab === 'rate_limiting',
             ),
             new AdminTab(
-                label: $this->translator->trans('admin_security.tab_brute_force'),
-                target: $this->generateUrl('app_admin_security_brute_force'),
-                icon: 'shield',
-                isActive: $this->activeSecurityTab === 'brute_force',
+                label: $this->translator->trans('admin_security.tab_permissions'),
+                target: $this->generateUrl('app_admin_security_permissions'),
+                icon: 'shield-alt',
+                isActive: $this->activeSecurityTab === 'permissions',
             ),
         ]);
     }

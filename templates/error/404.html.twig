@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ "error.page_title"|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <div class="columns">
+                <div class="column is-6">
+
+                    <h1 class="title">{{ 'error.404_heading'|trans }}</h1>
+                    <p>{{ message|trans }}</p>
+
+                </div>
+                <div class="column is-6">
+                    <img src="{{ asset('images/404.png') }}" alt="Awesome image by kirkario.com"/>
+                </div>
+            </div>
+
+            <p>{{ 'error.404_sitemap_hint'|trans({'%sitemap_link%': '<a href="/sitemap.xml">' ~ ('error.404_sitemap_link_label'|trans) ~ '</a>'})|raw }}</p>
+
+        </div>
+    </section>
+
+{% endblock %}

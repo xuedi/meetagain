@@ -14,41 +14,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Translation\IdentityTranslator;
 use Twig\Environment;
 
 class CmsServiceTest extends TestCase
 {
-    public function testCreateNotFoundPageReturns404Response(): void
-    {
-        // Arrange: mock Twig to render 404 template
-        $expectedContent = '404 page content';
-
-        $twigMock = $this->createMock(Environment::class);
-        $twigMock
-            ->expects($this->once())
-            ->method('render')
-            ->with('cms/404.html.twig', ['message' => 'cms.error_404_default_message'])
-            ->willReturn($expectedContent);
-
-        $subject = new CmsService(
-            twig: $twigMock,
-            repo: $this->createStub(CmsRepository::class),
-            eventFilterService: $this->createStub(EventFilterService::class),
-            cmsFilterService: $this->createStub(CmsFilterService::class),
-            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
-            security: $this->createStub(Security::class),
-            translator: new IdentityTranslator(),
-        );
-
-        // Act: create not found page
-        $response = $subject->createNotFoundPage();
-
-        // Assert: returns 404 response with rendered content
-        static::assertSame($expectedContent, $response->getContent());
-        static::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
-    }
-
     public function testGetSitesReturnsAllCmsPages(): void
     {
         // Arrange: mock repository to return list of CMS pages
@@ -77,12 +48,11 @@ class CmsServiceTest extends TestCase
         static::assertSame($expectedSites, $result);
     }
 
-    public function testHandleReturns404WhenPageNotFound(): void
+    public function testHandleThrowsNotFoundWhenPageNotFound(): void
     {
-        // Arrange: mock repository to return null (page not found)
+        // Arrange: repository returns null (slug miss)
         $locale = 'en';
         $slug = 'non-existent-page';
-        $expectedContent = '404 page content';
 
         $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
         $cmsFilterServiceMock
@@ -94,11 +64,7 @@ class CmsServiceTest extends TestCase
         $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn(null);
 
         $twigMock = $this->createMock(Environment::class);
-        $twigMock
-            ->expects($this->once())
-            ->method('render')
-            ->with('cms/404.html.twig', static::anything())
-            ->willReturn($expectedContent);
+        $twigMock->expects($this->never())->method('render');
 
         $subject = new CmsService(
             twig: $twigMock,
@@ -110,12 +76,11 @@ class CmsServiceTest extends TestCase
             translator: new IdentityTranslator(),
         );
 
-        // Act: handle request for non-existent page
-        $response = $subject->handle($locale, $slug, new Response());
+        // Assert: handle() throws so the framework error pipeline can render the 404
+        $this->expectException(NotFoundHttpException::class);
 
-        // Assert: returns 404 response
-        static::assertSame($expectedContent, $response->getContent());
-        static::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        // Act
+        $subject->handle($locale, $slug, new Response());
     }
 
     public function testHandleReturns204WhenPageHasNoContentInRequestedLanguage(): void

@@ -84,7 +84,7 @@ final class MemberController extends AbstractController
 
             // If the target user has blocked the current user, deny access
             if ($this->blockingService->hasBlocked($userDetails, $currentUser)) {
-                return $this->render('member/403.html.twig', [], $response);
+                throw $this->createAccessDeniedException();
             }
 
             // Check if current user has blocked the target (to show unblock button)
@@ -101,7 +101,7 @@ final class MemberController extends AbstractController
                 $response,
             );
         } catch (AuthenticationCredentialsNotFoundException) {
-            return $this->render('member/403.html.twig');
+            throw $this->createAccessDeniedException();
         }
     }
 

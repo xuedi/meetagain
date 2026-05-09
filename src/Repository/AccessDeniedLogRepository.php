@@ -77,4 +77,67 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * @return list<AccessDeniedLog>
+     */
+    public function findRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff, int $limit): array
+    {
+        return array_values(
+            $this
+                ->createQueryBuilder('a')
+                ->where('a.id > :lastId')
+                ->andWhere('a.createdAt <= :cutoff')
+                ->orderBy('a.id', 'ASC')
+                ->setParameter('lastId', $lastId)
+                ->setParameter('cutoff', $cutoff)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult(),
+        );
+    }
+
+    public function countRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->where('a.id > :lastId')
+            ->andWhere('a.createdAt <= :cutoff')
+            ->setParameter('lastId', $lastId)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return list<AccessDeniedLog>
+     */
+    public function findFiltered(
+        int $limit,
+        ?DateTimeImmutable $since,
+        ?string $ip = null,
+        ?DateTimeImmutable $from = null,
+        ?DateTimeImmutable $to = null,
+    ): array {
+        $qb = $this
+            ->createQueryBuilder('a')
+            ->orderBy('a.createdAt', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($since !== null) {
+            $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);
+        }
+        if ($ip !== null && $ip !== '') {
+            $qb->andWhere('a.ip = :ip')->setParameter('ip', $ip);
+        }
+        if ($from !== null) {
+            $qb->andWhere('a.createdAt >= :from')->setParameter('from', $from);
+        }
+        if ($to !== null) {
+            $qb->andWhere('a.createdAt <= :to')->setParameter('to', $to);
+        }
+
+        return array_values($qb->getQuery()->getResult());
+    }
 }

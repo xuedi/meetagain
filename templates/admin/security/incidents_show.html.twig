@@ -1,0 +1,81 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-5">
+                <table class="table is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <th>{{ 'admin_security.col_ip'|trans }}</th>
+                            <td>{{ incident.ip }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_severity'|trans }}</th>
+                            <td><span class="tag {{ incident.severity.tagClass }}">{{ incident.severity.label|trans }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_started'|trans }}</th>
+                            <td>{{ incident.startedAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_ended'|trans }}</th>
+                            <td>{{ incident.endedAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_probing_hits'|trans }}</th>
+                            <td>{{ incident.probingHits }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_access_denied_hits'|trans }}</th>
+                            <td>{{ incident.accessDeniedHits }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_rate_limit_hits'|trans }}</th>
+                            <td>{{ incident.rateLimitHits }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_brute_force_hits'|trans }}</th>
+                            <td>{{ incident.bruteForceHits }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_total_hits'|trans }}</th>
+                            <td><strong>{{ incident.totalHits }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_distinct_paths'|trans }}</th>
+                            <td>{{ incident.distinctPaths }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_security.col_user_agent'|trans }}</th>
+                            <td>{{ incident.userAgent ?: '-' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="column is-7">
+                <h3 class="title is-5">{{ 'admin_security.heading_sample_urls'|trans }}</h3>
+                <table class="table is-fullwidth">
+                    <tbody>
+                        {% for url in incident.sampleUrls %}
+                            <tr>
+                                <td>{{ url }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td class="has-text-grey">-</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

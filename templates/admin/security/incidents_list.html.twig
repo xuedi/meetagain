@@ -1,0 +1,57 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'admin_security.col_ip'|trans }}</th>
+                    <th>{{ 'admin_security.col_started'|trans }}</th>
+                    <th>{{ 'admin_security.col_ended'|trans }}</th>
+                    <th>{{ 'admin_security.col_severity'|trans }}</th>
+                    <th>{{ 'admin_security.col_probing_hits'|trans }}</th>
+                    <th>{{ 'admin_security.col_access_denied_hits'|trans }}</th>
+                    <th>{{ 'admin_security.col_rate_limit_hits'|trans }}</th>
+                    <th>{{ 'admin_security.col_brute_force_hits'|trans }}</th>
+                    <th>{{ 'admin_security.col_total_hits'|trans }}</th>
+                    <th>{{ 'admin_security.col_user_agent'|trans }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for incident in incidents %}
+                    <tr>
+                        <td class="is-nowrap">{{ incident.ip }}</td>
+                        <td class="is-nowrap">{{ incident.startedAt|date('Y-m-d H:i:s') }}</td>
+                        <td class="is-nowrap">{{ incident.endedAt|date('Y-m-d H:i:s') }}</td>
+                        <td><span class="tag {{ incident.severity.tagClass }}">{{ incident.severity.label|trans }}</span></td>
+                        <td>{{ incident.probingHits }}</td>
+                        <td>{{ incident.accessDeniedHits }}</td>
+                        <td>{{ incident.rateLimitHits }}</td>
+                        <td>{{ incident.bruteForceHits }}</td>
+                        <td><strong>{{ incident.totalHits }}</strong></td>
+                        <td>{{ incident.userAgent ? (incident.userAgent|length > 50 ? incident.userAgent|slice(0, 47) ~ '...' : incident.userAgent) : '-' }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_security_incidents_show', {'id': incident.id}) }}">
+                                <span class="icon"><i class="fa fa-eye"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="has-text-centered has-text-grey">
+                            {{ 'admin_security.empty_incidents'|trans }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
