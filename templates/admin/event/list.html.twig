@@ -31,7 +31,8 @@
                     {% set textColor = 'has-background-info-light' %}
                 {% endif %}
                 <tr class="{{ textColor }} {% if event.id == nextEvent and not event.canceled %}has-background-warning-light{% endif %}">
-                    <td>{{ event.title(app.locale) }}</td>
+                    {% set title = event.title(app.locale) %}
+                    <td title="{{ title }}">{{ title|length > 20 ? title|slice(0, 20) ~ '...' : title }}</td>
                     <td>{{ event.createdAt|date('Y-m-d') }}</td>
                     <td>{{ event.start|date('Y-m-d') }}</td>
                     <td>
@@ -41,7 +42,8 @@
                             {% if event.recurringRule is null %}{{ 'admin_event.recurring_no'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}
                         {% endif %}
                     </td>
-                    <td>{{ event.location ? event.location.name : '-' }}</td>
+                    {% set locationName = event.location ? event.location.name : '-' %}
+                    <td title="{{ locationName }}">{{ locationName|length > 20 ? locationName|slice(0, 20) ~ '...' : locationName }}</td>
                     <td>
                         {% if event.status.value == 'locked' %}
                             <span class="icon has-text-warning" title="{{ 'events.status_locked'|trans }}"><i class="fa fa-lock"></i></span>
