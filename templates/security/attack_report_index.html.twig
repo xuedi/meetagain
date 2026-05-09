@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attack-test report{% if allPassed %} (all PASS){% else %} (FAILURES){% endif %}</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 2rem; color: #222; }
+        h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+        .meta { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+        .pill { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem; }
+        .pill.pass { background: #d1fadf; color: #027a48; }
+        .pill.fail { background: #fee4e2; color: #b42318; }
+        .scenario { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+        .scenario h2 { font-size: 1.15rem; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 0.75rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid #f3f4f6; }
+        th { background: #f9fafb; font-weight: 600; }
+        td.detail { color: #4b5563; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85rem; }
+        td.verdict-pass { color: #027a48; font-weight: 600; }
+        td.verdict-fail { color: #b42318; font-weight: 600; }
+        .k6-metrics { margin-top: 0.75rem; font-size: 0.85rem; color: #4b5563; }
+        .k6-metrics span { display: inline-block; margin-right: 1.25rem; }
+        .dashboard-link { font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <h1>SecurityService attack-test report</h1>
+    <div class="meta">
+        Generated {{ generatedAt }}
+        &middot;
+        <span class="pill {{ allPassed ? 'pass' : 'fail' }}">{{ allPassed ? 'ALL PASS' : 'FAILURES PRESENT' }}</span>
+        &middot;
+        {{ scenarios|length }} scenarios
+    </div>
+
+    {% for scenario in scenarios %}
+        <div class="scenario">
+            <h2>
+                <span class="pill {{ scenario.allPassed ? 'pass' : 'fail' }}">{{ scenario.allPassed ? 'PASS' : 'FAIL' }}</span>
+                <code>{{ scenario.name }}</code>
+                {% if scenario.dashboard %}
+                    <a class="dashboard-link" href="{{ scenario.dashboard }}">k6 dashboard</a>
+                {% endif %}
+            </h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Verdict</th>
+                        <th>Kind</th>
+                        <th>Detail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for verdict in scenario.verdicts %}
+                        <tr>
+                            <td class="{{ verdict.passed ? 'verdict-pass' : 'verdict-fail' }}">{{ verdict.passed ? 'PASS' : 'FAIL' }}</td>
+                            <td><code>{{ verdict.kind }}</code></td>
+                            <td class="detail">{{ verdict.detail }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% set httpReq = scenario.k6.http_reqs ?? null %}
+            {% set httpDur = scenario.k6.http_req_duration ?? null %}
+            {% set httpFail = scenario.k6.http_req_failed ?? null %}
+            {% if httpReq is not null or httpDur is not null %}
+                <div class="k6-metrics">
+                    {% if httpReq is not null and httpReq.values is defined %}
+                        <span><strong>{{ httpReq.values.count|default(0) }}</strong> requests</span>
+                    {% endif %}
+                    {% if httpDur is not null and httpDur.values is defined %}
+                        <span>avg <strong>{{ httpDur.values.avg|default(0)|number_format(1) }}ms</strong></span>
+                        <span>p95 <strong>{{ httpDur.values['p(95)']|default(0)|number_format(1) }}ms</strong></span>
+                    {% endif %}
+                    {% if httpFail is not null and httpFail.values is defined %}
+                        <span>error rate <strong>{{ (httpFail.values.rate|default(0) * 100)|number_format(2) }}%</strong></span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</body>
+</html>

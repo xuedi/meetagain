@@ -39,6 +39,7 @@ readonly class SecurityService implements CronTaskInterface
         private AppStateService $appState,
         private ClockInterface $clock,
         private LoggerInterface $logger,
+        private string $environment,
     ) {}
 
     /**
@@ -46,6 +47,10 @@ readonly class SecurityService implements CronTaskInterface
      */
     public function event(SecurityEventType $type, Request $request, array $context = []): void
     {
+        if ($this->isLoadtestBypass($request)) {
+            return;
+        }
+
         $ip = $request->getClientIp() ?? '';
         $sessionId = $this->resolveSessionId($request, $ip);
 
@@ -198,6 +203,11 @@ readonly class SecurityService implements CronTaskInterface
             $this->logger->debug('Session read failed in SecurityService: ' . $e->getMessage());
             return null;
         }
+    }
+
+    private function isLoadtestBypass(Request $request): bool
+    {
+        return LoadtestBypass::isActive($request, $this->environment);
     }
 
     /**

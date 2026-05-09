@@ -63,6 +63,18 @@ readonly class BlockedSessionStore
         $this->removeFromIndex(self::IP_INDEX_KEY, $ip);
     }
 
+    public function clearAll(): void
+    {
+        foreach (array_keys($this->loadIndex(self::SESSION_INDEX_KEY)) as $sessionId) {
+            $this->deleteKey($this->sessionKey($sessionId));
+        }
+        foreach (array_keys($this->loadIndex(self::IP_INDEX_KEY)) as $ip) {
+            $this->deleteKey($this->ipKey($ip));
+        }
+        $this->deleteKey(self::SESSION_INDEX_KEY);
+        $this->deleteKey(self::IP_INDEX_KEY);
+    }
+
     /**
      * @return array<string, mixed>|null
      */
