@@ -21,7 +21,7 @@ class RateLimitingControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(3, $crawler->filter('.tabs.is-boxed li')->count());
+        static::assertSame(4, $crawler->filter('.tabs.is-boxed li')->count());
     }
 
     private function loginAsAdmin(KernelBrowser $client): void

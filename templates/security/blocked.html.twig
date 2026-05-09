@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin_security.block_message_title'|trans({}, 'admin') }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-6">
+
+                    <h1 class="title is-4">{{ 'admin_security.block_message_title'|trans({}, 'admin') }}</h1>
+                    <p class="mb-4">{{ 'admin_security.block_message_body'|trans({}, 'admin') }}</p>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

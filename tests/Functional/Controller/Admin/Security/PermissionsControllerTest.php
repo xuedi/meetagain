@@ -21,7 +21,7 @@ class PermissionsControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(3, $crawler->filter('.tabs.is-boxed li')->count());
+        static::assertSame(4, $crawler->filter('.tabs.is-boxed li')->count());
     }
 
     public function testLegacyRouteRedirectsPermanently(): void

@@ -23,7 +23,7 @@ class IncidentRepository extends ServiceEntityRepository
     /**
      * @return list<Incident>
      */
-    public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
+    public function findRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
         $qb = $this->createQueryBuilder('i')->orderBy('i.endedAt', 'DESC')->setMaxResults($limit);
 
@@ -32,6 +32,14 @@ class IncidentRepository extends ServiceEntityRepository
         }
 
         return array_values($qb->getQuery()->getResult());
+    }
+
+    /**
+     * @return list<Incident>
+     */
+    public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
+    {
+        return $this->findRecent($limit, $since);
     }
 
     /**
@@ -74,43 +82,6 @@ class IncidentRepository extends ServiceEntityRepository
             ->setParameter('since', $since)
             ->getQuery()
             ->getSingleScalarResult();
-    }
-
-    /**
-     * @return array<string, DateTimeImmutable>
-     */
-    public function findLastEndedAtPerIp(): array
-    {
-        $rows = $this
-            ->createQueryBuilder('i')
-            ->select('i.ip AS ip', 'MAX(i.endedAt) AS lastEndedAt')
-            ->groupBy('i.ip')
-            ->getQuery()
-            ->getArrayResult();
-
-        $result = [];
-        foreach ($rows as $row) {
-            $value = $row['lastEndedAt'];
-            $result[$row['ip']] = $value instanceof DateTimeImmutable ? $value : new DateTimeImmutable((string) $value);
-        }
-
-        return $result;
-    }
-
-    public function findOpenWindowForIp(string $ip, DateTimeImmutable $minEndedAt): ?Incident
-    {
-        $result = $this
-            ->createQueryBuilder('i')
-            ->where('i.ip = :ip')
-            ->andWhere('i.endedAt >= :minEndedAt')
-            ->setParameter('ip', $ip)
-            ->setParameter('minEndedAt', $minEndedAt)
-            ->orderBy('i.endedAt', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-
-        return $result instanceof Incident ? $result : null;
     }
 
     private static function severityRank(IncidentSeverity $severity): int

@@ -25,6 +25,7 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `SitemapEventVisibilityFilterInterface`       | Suppress event URLs on specific tenants              | `shouldEmitEvents()`                  |
 | `FollowerEventNotificationFilterInterface`    | Drop follower-RSVP email recipients per event        | `isFollowerAllowed()`                 |
 | `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`        |
+| `SecurityProviderInterface`                   | Participate in live security event detection         | `observe()`, `scanRetrospective()`    |
 
 ---
 
@@ -836,3 +837,69 @@ readonly class FixOrphanedThings implements DataHotfixInterface
 Identifiers must be stable - they are AppState row keys. Once a hotfix has shipped, never
 rename its identifier; treat it like a Doctrine migration version. To force a rerun on a single
 environment, delete the `app_state` row with key `data_hotfix.{identifier}`.
+
+---
+
+## Security event detection
+
+Implement `SecurityProviderInterface` to participate in the security pipeline that
+runs on every kernel-level 404, access-denied, and rate-limit event. The core
+dispatches events to every registered provider in priority order; each provider
+returns a `ProviderReport` with a threat level (0 - 100) and a recommendation.
+
+### When to implement
+
+- You want to detect a pattern across multiple events from the same session or IP
+  and recommend a temporary block.
+- You want to feed a separate counter or signal into the existing live-detection
+  pipeline.
+
+The simplest path is to extend `AbstractSecurityProvider`, which handles Redis-backed
+state load/save, the read-only short-circuit path, and the report-building plumbing.
+
+```php
+final class MyPluginProvider extends AbstractSecurityProvider
+{
+    public function getKey(): string
+    {
+        return 'my_plugin';
+    }
+
+    public function getPriority(): int
+    {
+        return 0;
+    }
+
+    protected function handlesType(SecurityEventType $type): bool
+    {
+        return $type === SecurityEventType::AccessDenied;
+    }
+
+    protected function processEvent(
+        SecurityEventType $type,
+        Request $request,
+        array $context,
+        string $ip,
+        array $state,
+    ): array {
+        $hits = (int) ($state['hits'] ?? 0) + 1;
+        $threatLevel = min(100, $hits * 10);
+
+        return [
+            'state' => ['hits' => $hits],
+            'threatLevel' => $threatLevel,
+            'summary' => sprintf('%d events observed', $hits),
+            'details' => ['hits' => $hits],
+        ];
+    }
+
+    protected function scanLogs(DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return ['threatLevel' => 0, 'summary' => '', 'details' => []];
+    }
+}
+```
+
+A `threatLevel` of 100 is interpreted as "block this session" and the core writes
+an `Incident` row plus blocks the session and IP in Redis with a 4h TTL. Lower
+threat levels are recorded but not acted on.

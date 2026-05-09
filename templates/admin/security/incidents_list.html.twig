@@ -11,13 +11,11 @@
             <thead>
                 <tr>
                     <th>{{ 'admin_security.col_ip'|trans }}</th>
-                    <th>{{ 'admin_security.col_started'|trans }}</th>
+                    <th>{{ 'admin_security.col_session_id'|trans }}</th>
                     <th>{{ 'admin_security.col_ended'|trans }}</th>
                     <th>{{ 'admin_security.col_severity'|trans }}</th>
-                    <th>{{ 'admin_security.col_probing_hits'|trans }}</th>
-                    <th>{{ 'admin_security.col_access_denied_hits'|trans }}</th>
-                    <th>{{ 'admin_security.col_rate_limit_hits'|trans }}</th>
-                    <th>{{ 'admin_security.col_total_hits'|trans }}</th>
+                    <th>{{ 'admin_security.col_triggered_by'|trans }}</th>
+                    <th>{{ 'admin_security.col_blocked_for'|trans }}</th>
                     <th>{{ 'admin_security.col_user_agent'|trans }}</th>
                     <th></th>
                 </tr>
@@ -26,13 +24,11 @@
                 {% for incident in incidents %}
                     <tr>
                         <td class="is-nowrap">{{ incident.ip }}</td>
-                        <td class="is-nowrap">{{ incident.startedAt|date('Y-m-d H:i:s') }}</td>
+                        <td class="is-nowrap">{{ incident.sessionId|slice(0, 16) }}{{ incident.sessionId|length > 16 ? '...' : '' }}</td>
                         <td class="is-nowrap">{{ incident.endedAt|date('Y-m-d H:i:s') }}</td>
                         <td><span class="tag {{ incident.severity.tagClass }}">{{ incident.severity.label|trans }}</span></td>
-                        <td>{{ incident.probingHits }}</td>
-                        <td>{{ incident.accessDeniedHits }}</td>
-                        <td>{{ incident.rateLimitHits }}</td>
-                        <td><strong>{{ incident.totalHits }}</strong></td>
+                        <td>{{ ('admin_security.provider_label_' ~ incident.triggeredBy)|trans }}</td>
+                        <td>{{ incident.blockedUntilDescription }}</td>
                         <td>{{ incident.userAgent ? (incident.userAgent|length > 50 ? incident.userAgent|slice(0, 47) ~ '...' : incident.userAgent) : '-' }}</td>
                         <td>
                             <a href="{{ path('app_admin_security_incidents_show', {'id': incident.id}) }}">
@@ -42,7 +38,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="10" class="has-text-centered has-text-grey">
+                        <td colspan="8" class="has-text-centered has-text-grey">
                             {{ 'admin_security.empty_incidents'|trans }}
                         </td>
                     </tr>

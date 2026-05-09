@@ -42,6 +42,12 @@ abstract class AbstractSecurityController extends AbstractController
                 isActive: $this->activeSecurityTab === 'incidents',
             ),
             new AdminTab(
+                label: $this->translator->trans('admin_security.tab_blocked_sessions'),
+                target: $this->generateUrl('app_admin_security_blocked'),
+                icon: 'ban',
+                isActive: $this->activeSecurityTab === 'blocked',
+            ),
+            new AdminTab(
                 label: $this->translator->trans('admin_security.tab_rate_limiting'),
                 target: $this->generateUrl('app_admin_security_rate_limiting'),
                 icon: 'tachometer-alt',

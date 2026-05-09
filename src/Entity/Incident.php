@@ -15,6 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'idx_incident_ended_at', fields: ['endedAt'])]
 #[ORM\Index(name: 'idx_incident_ip_ended_at', fields: ['ip', 'endedAt'])]
 #[ORM\Index(name: 'idx_incident_severity', fields: ['severity'])]
+#[ORM\Index(name: 'idx_incident_session_id', fields: ['sessionId'])]
+#[ORM\Index(name: 'idx_incident_triggered_by', fields: ['triggeredBy'])]
 class Incident
 {
     private const int UA_MAX = 512;
@@ -27,41 +29,32 @@ class Incident
     #[ORM\Column(length: 45)]
     private string $ip;
 
+    #[ORM\Column(length: 128)]
+    private string $sessionId = '';
+
+    #[ORM\Column(length: 32)]
+    private string $triggeredBy = '';
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $startedAt;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $endedAt;
 
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
-    private int $probingHits = 0;
-
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
-    private int $accessDeniedHits = 0;
-
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
-    private int $rateLimitHits = 0;
-
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
-    private int $totalHits = 0;
-
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
-    private int $distinctPaths = 0;
-
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
-    private int $distinctUserAgents = 0;
-
     #[ORM\Column(length: 512, nullable: true)]
     private ?string $userAgent = null;
 
-    /**
-     * @var list<string>
-     */
-    #[ORM\Column(type: Types::JSON)]
-    private array $sampleUrls = [];
-
     #[ORM\Column(type: Types::STRING, length: 16, enumType: IncidentSeverity::class, options: ['default' => 'low'])]
     private IncidentSeverity $severity = IncidentSeverity::Low;
+
+    /**
+     * @var list<array<string, mixed>>
+     */
+    #[ORM\Column(type: Types::JSON)]
+    private array $providerReports = [];
+
+    #[ORM\Column(length: 64)]
+    private string $blockedUntilDescription = '';
 
     #[ORM\Column(length: 2, nullable: true)]
     private ?string $countryCode = null;
@@ -85,6 +78,30 @@ class Incident
     public function setIp(string $ip): static
     {
         $this->ip = $ip;
+
+        return $this;
+    }
+
+    public function getSessionId(): string
+    {
+        return $this->sessionId;
+    }
+
+    public function setSessionId(string $sessionId): static
+    {
+        $this->sessionId = mb_substr($sessionId, 0, 128);
+
+        return $this;
+    }
+
+    public function getTriggeredBy(): string
+    {
+        return $this->triggeredBy;
+    }
+
+    public function setTriggeredBy(string $triggeredBy): static
+    {
+        $this->triggeredBy = mb_substr($triggeredBy, 0, 32);
 
         return $this;
     }
@@ -113,78 +130,6 @@ class Incident
         return $this;
     }
 
-    public function getProbingHits(): int
-    {
-        return $this->probingHits;
-    }
-
-    public function setProbingHits(int $probingHits): static
-    {
-        $this->probingHits = $probingHits;
-
-        return $this;
-    }
-
-    public function getAccessDeniedHits(): int
-    {
-        return $this->accessDeniedHits;
-    }
-
-    public function setAccessDeniedHits(int $accessDeniedHits): static
-    {
-        $this->accessDeniedHits = $accessDeniedHits;
-
-        return $this;
-    }
-
-    public function getRateLimitHits(): int
-    {
-        return $this->rateLimitHits;
-    }
-
-    public function setRateLimitHits(int $rateLimitHits): static
-    {
-        $this->rateLimitHits = $rateLimitHits;
-
-        return $this;
-    }
-
-    public function getTotalHits(): int
-    {
-        return $this->totalHits;
-    }
-
-    public function setTotalHits(int $totalHits): static
-    {
-        $this->totalHits = $totalHits;
-
-        return $this;
-    }
-
-    public function getDistinctPaths(): int
-    {
-        return $this->distinctPaths;
-    }
-
-    public function setDistinctPaths(int $distinctPaths): static
-    {
-        $this->distinctPaths = $distinctPaths;
-
-        return $this;
-    }
-
-    public function getDistinctUserAgents(): int
-    {
-        return $this->distinctUserAgents;
-    }
-
-    public function setDistinctUserAgents(int $distinctUserAgents): static
-    {
-        $this->distinctUserAgents = $distinctUserAgents;
-
-        return $this;
-    }
-
     public function getUserAgent(): ?string
     {
         return $this->userAgent;
@@ -197,24 +142,6 @@ class Incident
         return $this;
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getSampleUrls(): array
-    {
-        return $this->sampleUrls;
-    }
-
-    /**
-     * @param list<string> $sampleUrls
-     */
-    public function setSampleUrls(array $sampleUrls): static
-    {
-        $this->sampleUrls = array_values($sampleUrls);
-
-        return $this;
-    }
-
     public function getSeverity(): IncidentSeverity
     {
         return $this->severity;
@@ -223,6 +150,36 @@ class Incident
     public function setSeverity(IncidentSeverity $severity): static
     {
         $this->severity = $severity;
+
+        return $this;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function getProviderReports(): array
+    {
+        return $this->providerReports;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $providerReports
+     */
+    public function setProviderReports(array $providerReports): static
+    {
+        $this->providerReports = array_values($providerReports);
+
+        return $this;
+    }
+
+    public function getBlockedUntilDescription(): string
+    {
+        return $this->blockedUntilDescription;
+    }
+
+    public function setBlockedUntilDescription(string $blockedUntilDescription): static
+    {
+        $this->blockedUntilDescription = mb_substr($blockedUntilDescription, 0, 64);
 
         return $this;
     }
