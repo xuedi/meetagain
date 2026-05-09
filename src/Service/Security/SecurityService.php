@@ -236,6 +236,8 @@ readonly class SecurityService
             }
         }
 
+        $now = $this->clock->now();
+
         $incident = new Incident();
         $incident->setIp($ip);
         $incident->setSessionId($sessionId);
@@ -244,7 +246,6 @@ readonly class SecurityService
         $incident->setProviderReports($serialised);
         $incident->setBlockedUntilDescription(self::BLOCK_DURATION_LABEL);
         $incident->setUserAgent($request->headers->get('User-Agent'));
-        $now = $this->clock->now();
         $incident->setStartedAt($now);
         $incident->setEndedAt($now);
         $incident->setCreatedAt($now);
