@@ -219,6 +219,8 @@ admin_event:
     warning_uncancel_title: '恢复活动'
     warning_uncancel_content: '<p>您确定要恢复此活动吗？</p>'
     warning_uncancel_button: '是，恢复活动'
+    notice_attendees_rsvpd: '已有 %count% 人决定参加此活动。修改日期或时间时请加以考虑，并考虑是否向他们发送通知。'
+    danger_notify_attendees: '通知 %count% 位成员'
     hint_other_languages: '别忘了其他语言'
     danger_zone: '危险区域'
     danger_update_all_following: '更新所有后续'

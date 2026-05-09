@@ -148,6 +148,24 @@
             </div>
         </div>
 
+        {% if notifiableAttendeeCount > 0 %}
+            <div class="notification is-info is-light mt-4">
+                {{ 'admin_event.notice_attendees_rsvpd'|trans({'%count%': notifiableAttendeeCount}) }}
+                <br><br>
+                <label class="checkbox">
+                    <input type="checkbox"
+                           id="{{ form.notifyAttendees.vars.id }}"
+                           name="{{ form.notifyAttendees.vars.full_name }}"
+                           value="1"
+                           style="margin-right: 0.5rem;">
+                    {{ 'admin_event.danger_notify_attendees'|trans({'%count%': notifiableAttendeeCount}) }}
+                </label>
+                {% do form.notifyAttendees.setRendered %}
+            </div>
+        {% else %}
+            {% do form.notifyAttendees.setRendered %}
+        {% endif %}
+
         {{ form_end(form) }}
 
     </div>

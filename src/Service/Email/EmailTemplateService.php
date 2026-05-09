@@ -27,6 +27,7 @@ readonly class EmailTemplateService
             EmailType::AdminNotification->value => 'Admin: Items require your attention',
             EmailType::EventReminder->value => 'Reminder: {{eventTitle}} is today',
             EmailType::UpcomingEvents->value => 'Upcoming events this week',
+            EmailType::EventUpdateNotification->value => 'Update to event: {{eventTitle}}',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -40,6 +41,7 @@ readonly class EmailTemplateService
             EmailType::AdminNotification->value => 'Admin: Es gibt Punkte, die deine Aufmerksamkeit erfordern',
             EmailType::EventReminder->value => 'Erinnerung: {{eventTitle}} ist heute',
             EmailType::UpcomingEvents->value => 'Deine Veranstaltungen diese Woche',
+            EmailType::EventUpdateNotification->value => 'Änderung an Veranstaltung: {{eventTitle}}',
         ],
         'zh' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -53,6 +55,7 @@ readonly class EmailTemplateService
             EmailType::AdminNotification->value => '管理员：有事项需要您处理',
             EmailType::EventReminder->value => '提醒：{{eventTitle}} 就在今天',
             EmailType::UpcomingEvents->value => '本周即将举行的活动',
+            EmailType::EventUpdateNotification->value => '活动有变更：{{eventTitle}}',
         ],
     ];
 
@@ -110,6 +113,9 @@ readonly class EmailTemplateService
         ],
         EmailType::UpcomingEvents->value => [
             'username', 'eventsHtml', 'host', 'lang', 'greeting',
+        ],
+        EmailType::EventUpdateNotification->value => [
+            'username', 'eventId', 'eventTitle', 'changesHtml', 'host', 'lang', 'greeting',
         ],
     ];
 
@@ -222,6 +228,11 @@ readonly class EmailTemplateService
                 'subject' => $subjects[EmailType::UpcomingEvents->value],
                 'body' => $this->loadTemplateBody(EmailType::UpcomingEvents, $language),
                 'variables' => self::VARIABLES[EmailType::UpcomingEvents->value],
+            ],
+            EmailType::EventUpdateNotification->value => [
+                'subject' => $subjects[EmailType::EventUpdateNotification->value],
+                'body' => $this->loadTemplateBody(EmailType::EventUpdateNotification, $language),
+                'variables' => self::VARIABLES[EmailType::EventUpdateNotification->value],
             ],
         ];
     }

@@ -17,6 +17,8 @@ class NotificationSettings implements JsonSerializable
 
     public bool $upcomingEvents;
 
+    public bool $attendedEventUpdate;
+
     public static function fromJson(?array $notificationSettings): self
     {
         if ($notificationSettings === null) {
@@ -33,6 +35,7 @@ class NotificationSettings implements JsonSerializable
         $this->receivedMessage = $data['receivedMessage'] ?? true;
         $this->eventReminder = $data['eventReminder'] ?? true;
         $this->upcomingEvents = $data['upcomingEvents'] ?? true;
+        $this->attendedEventUpdate = $data['attendedEventUpdate'] ?? true;
     }
 
     public function jsonSerialize(): array
@@ -43,6 +46,7 @@ class NotificationSettings implements JsonSerializable
             'receivedMessage' => $this->receivedMessage,
             'eventReminder' => $this->eventReminder,
             'upcomingEvents' => $this->upcomingEvents,
+            'attendedEventUpdate' => $this->attendedEventUpdate,
         ];
     }
 
@@ -52,27 +56,32 @@ class NotificationSettings implements JsonSerializable
             [
                 'key' => 'announcements',
                 'value' => $this->announcements,
-                'label' => '--> General meetup announcements',
+                'label' => 'profile_config.toggle_announcements',
             ],
             [
                 'key' => 'followingUpdates',
                 'value' => $this->followingUpdates,
-                'label' => '--> Updates from people i follow',
+                'label' => 'profile_config.toggle_following_updates',
             ],
             [
                 'key' => 'receivedMessage',
                 'value' => $this->receivedMessage,
-                'label' => '--> When i received a message',
+                'label' => 'profile_config.toggle_received_message',
             ],
             [
                 'key' => 'eventReminder',
                 'value' => $this->eventReminder,
-                'label' => '--> Event day reminder',
+                'label' => 'profile_config.toggle_event_reminder',
             ],
             [
                 'key' => 'upcomingEvents',
                 'value' => $this->upcomingEvents,
-                'label' => '--> Weekly upcoming events',
+                'label' => 'profile_config.toggle_upcoming_events',
+            ],
+            [
+                'key' => 'attendedEventUpdate',
+                'value' => $this->attendedEventUpdate,
+                'label' => 'profile_config.toggle_event_update',
             ],
         ];
     }
@@ -95,6 +104,9 @@ class NotificationSettings implements JsonSerializable
             case 'upcomingEvents':
                 $this->upcomingEvents = !$this->upcomingEvents;
                 break;
+            case 'attendedEventUpdate':
+                $this->attendedEventUpdate = !$this->attendedEventUpdate;
+                break;
             default:
                 throw new Exception(sprintf("Invalid type: '%s'", $type));
         }
@@ -110,6 +122,7 @@ class NotificationSettings implements JsonSerializable
             'receivedMessage' => $this->receivedMessage,
             'eventReminder' => $this->eventReminder,
             'upcomingEvents' => $this->upcomingEvents,
+            'attendedEventUpdate' => $this->attendedEventUpdate,
             default => throw new Exception(sprintf("Invalid type: '%s'", $type)),
         };
     }

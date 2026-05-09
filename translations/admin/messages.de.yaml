@@ -219,6 +219,8 @@ admin_event:
     warning_uncancel_title: 'Absage rückgängig machen'
     warning_uncancel_content: '<p>Sind Sie sicher, dass Sie die Absage dieses Events rückgängig machen möchten?</p>'
     warning_uncancel_button: 'Ja, Absage rückgängig machen'
+    notice_attendees_rsvpd: '%count% Personen haben bereits zugesagt, an dieser Veranstaltung teilzunehmen. Berücksichtige das bei Datums- oder Zeitänderungen und überlege, ob du ihnen eine Benachrichtigung schicken willst.'
+    danger_notify_attendees: '%count% informieren'
     hint_other_languages: 'Vergessen Sie nicht die anderen Sprachen'
     danger_zone: 'Gefahrenzone'
     danger_update_all_following: 'Alle folgenden aktualisieren'

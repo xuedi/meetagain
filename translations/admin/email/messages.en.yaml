@@ -40,6 +40,7 @@ admin_email_templates:
     trigger_admin_notification: 'on admin signal'
     trigger_event_reminder: 'up to 5h before event'
     trigger_upcoming_events: 'Sunday 12:00'
+    trigger_event_update_notification: 'when admin edits event start, location or cancellation'
 admin_email_sendlog:
     col_subject: 'Subject'
     page_title: 'Email Send Log'

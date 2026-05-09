@@ -9,6 +9,7 @@ use App\Emails\EmailQueueInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Emails\Types\AnnouncementEmail;
 use App\Emails\Types\EventReminderEmail;
+use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Emails\Types\NotificationMessageEmail;
 use App\Emails\Types\PasswordResetEmail;
@@ -26,6 +27,7 @@ use App\Service\Email\BlocklistCheckerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTypesTest extends TestCase
 {
@@ -49,6 +51,7 @@ class EmailTypesTest extends TestCase
             'AdminNotification' => new AdminNotificationEmail($this->blocklist, $this->queue, $this->config),
             'Announcement' => new AnnouncementEmail($this->blocklist, $this->queue, $this->config),
             'EventReminder' => new EventReminderEmail($this->blocklist, $this->queue, $this->config, $eventRepo, $em),
+            'EventUpdateNotification' => new EventUpdateNotificationEmail($this->blocklist, $this->queue, $this->config, $this->createStub(TranslatorInterface::class)),
             'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->blocklist, $this->queue, $this->config),
             'NotificationMessage' => new NotificationMessageEmail($this->blocklist, $this->queue, $this->config, new \Symfony\Component\Clock\MockClock()),
             'PasswordReset' => new PasswordResetEmail($this->blocklist, $this->queue, $this->config),
@@ -75,6 +78,7 @@ class EmailTypesTest extends TestCase
         yield 'AdminNotification' => ['AdminNotification'];
         yield 'Announcement' => ['Announcement'];
         yield 'EventReminder' => ['EventReminder'];
+        yield 'EventUpdateNotification' => ['EventUpdateNotification'];
         yield 'NotificationEventCanceled' => ['NotificationEventCanceled'];
         yield 'NotificationMessage' => ['NotificationMessage'];
         yield 'PasswordReset' => ['PasswordReset'];
