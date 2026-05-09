@@ -129,6 +129,12 @@ class EventType extends AbstractType
                 'data' => false,
                 'mapped' => false,
                 'required' => false,
+            ])
+            ->add('notifyAttendees', CheckboxType::class, [
+                'label' => false,
+                'data' => false,
+                'mapped' => false,
+                'required' => false,
             ]);
 
         $eventId = $event?->getId();

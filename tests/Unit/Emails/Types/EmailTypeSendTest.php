@@ -6,6 +6,7 @@ use App\Emails\EmailQueueInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Emails\Types\AnnouncementEmail;
 use App\Emails\Types\EventReminderEmail;
+use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Emails\Types\NotificationMessageEmail;
 use App\Emails\Types\PasswordResetEmail;
@@ -34,6 +35,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTypeSendTest extends TestCase
 {
@@ -190,6 +192,35 @@ class EmailTypeSendTest extends TestCase
 
         (new WelcomeEmail($this->blocklist, $queue, $this->config))->send([
             'user' => $this->makeUser(),
+        ]);
+    }
+
+    public function testEventUpdateNotificationSend(): void
+    {
+        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue->expects($this->once())->method('enqueue')
+            ->with($this->anything(), $this->anything(), EmailType::EventUpdateNotification, $this->anything());
+
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturn('changed line');
+
+        (new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $translator))->send([
+            'user' => $this->makeUser(),
+            'event' => $this->makeEvent(),
+            'before' => [
+                'start' => 1700000000,
+                'startFormatted' => '2023-11-14 22:13',
+                'locationId' => 7,
+                'locationName' => 'Old Hall',
+                'canceled' => false,
+            ],
+            'after' => [
+                'start' => 1700000999,
+                'startFormatted' => '2023-11-14 22:29',
+                'locationId' => 7,
+                'locationName' => 'Old Hall',
+                'canceled' => false,
+            ],
         ]);
     }
 

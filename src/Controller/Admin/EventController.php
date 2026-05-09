@@ -14,6 +14,7 @@ use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Host;
@@ -33,6 +34,7 @@ use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -77,6 +79,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly ActivityService $activityService,
         private readonly ImageLocationService $imageLocationService,
         private readonly TranslatorInterface $translator,
+        private readonly EventUpdateNotificationEmail $eventUpdateNotificationEmail,
     ) {}
 
     #[Route('', name: 'app_admin_event')]
@@ -314,6 +317,8 @@ final class EventController extends AbstractController implements AdminNavigatio
             $form->get('host')->setData($event->getHost());
         }
 
+        $beforeSnapshot = $this->captureEventSnapshot($event);
+
         // TODO: simplify with vanilla symfony components now the cascading flush effect is fixed
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -371,6 +376,11 @@ final class EventController extends AbstractController implements AdminNavigatio
             $this->activityService->log(AdminEventEdited::TYPE, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
 
+            if ($form->get('notifyAttendees')->getData() === true) {
+                $afterSnapshot = $this->captureEventSnapshot($event);
+                $this->dispatchEventUpdateNotifications($event, $user, $beforeSnapshot, $afterSnapshot);
+            }
+
             // create thumbnail and update location index
             if ($image instanceof Image) {
                 $this->imageService->createThumbnails($image, ImageType::EventTeaser);
@@ -395,7 +405,79 @@ final class EventController extends AbstractController implements AdminNavigatio
             'event' => $event,
             'form' => $form,
             'adminTop' => $this->buildBackOnlyTop(),
+            'notifiableAttendeeCount' => $this->countNotifiableAttendees($event),
         ]);
+    }
+
+    /**
+     * @return array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool}
+     */
+    private function captureEventSnapshot(Event $event): array
+    {
+        return [
+            'start' => $event->getStart()->getTimestamp(),
+            'startFormatted' => $event->getStart()->format('Y-m-d H:i'),
+            'locationId' => $event->getLocation()?->getId(),
+            'locationName' => $event->getLocation()?->getName() ?? '',
+            'canceled' => $event->isCanceled(),
+        ];
+    }
+
+    /**
+     * Cancellation via the dedicated cancel route is handled by NotificationEventCanceledEmail
+     * inside EventService::cancelEvent(); this diff path only fires on the form-edit save and
+     * therefore never double-sends.
+     *
+     * @param array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool} $before
+     * @param array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool} $after
+     */
+    private function dispatchEventUpdateNotifications(Event $event, User $editor, array $before, array $after): void
+    {
+        if ($before === $after) {
+            return;
+        }
+        if ($event->getStart() <= new DateTime()) {
+            return;
+        }
+
+        foreach ($event->getRsvp() as $recipient) {
+            if (!$recipient instanceof User) {
+                continue;
+            }
+            if ($recipient->getId() === $editor->getId()) {
+                continue;
+            }
+            $this->eventUpdateNotificationEmail->send([
+                'user' => $recipient,
+                'event' => $event,
+                'before' => $before,
+                'after' => $after,
+            ]);
+        }
+    }
+
+    private function countNotifiableAttendees(Event $event): int
+    {
+        if ($event->getStart() <= new DateTime()) {
+            return 0;
+        }
+
+        $creatorId = $event->getUser()?->getId();
+        $count = 0;
+        foreach ($event->getRsvp() as $recipient) {
+            if (!$recipient instanceof User) {
+                continue;
+            }
+            if ($recipient->getId() === $creatorId) {
+                continue;
+            }
+            if (!$recipient->getNotificationSettings()->isActive('attendedEventUpdate')) {
+                continue;
+            }
+            $count++;
+        }
+
+        return $count;
     }
 
     #[Route('/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
@@ -456,6 +538,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         $form->remove('user');
         $form->remove('status');
         $form->remove('allFollowing');
+        $form->remove('notifyAttendees');
         $form->remove('featured');
         $form->handleRequest($request);
 

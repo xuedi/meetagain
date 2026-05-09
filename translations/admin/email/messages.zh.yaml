@@ -40,6 +40,7 @@ admin_email_templates:
     trigger_admin_notification: '管理员触发时'
     trigger_event_reminder: '活动前 5 小时内'
     trigger_upcoming_events: '周日 12:00'
+    trigger_event_update_notification: '管理员修改活动开始时间、地点或取消状态时'
 admin_email_sendlog:
     col_subject: '主题'
     page_title: '邮件发送日志'

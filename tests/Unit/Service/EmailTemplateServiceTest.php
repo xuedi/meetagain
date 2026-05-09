@@ -183,7 +183,7 @@ class EmailTemplateServiceTest extends TestCase
         $templates = $this->subject->getDefaultTemplates();
 
         // Assert
-        static::assertCount(11, $templates);
+        static::assertCount(12, $templates);
         static::assertArrayHasKey('verification_request', $templates);
         static::assertArrayHasKey('welcome', $templates);
         static::assertArrayHasKey('password_reset_request', $templates);
@@ -195,6 +195,7 @@ class EmailTemplateServiceTest extends TestCase
         static::assertArrayHasKey('admin_notification', $templates);
         static::assertArrayHasKey('event_reminder', $templates);
         static::assertArrayHasKey('upcoming_events', $templates);
+        static::assertArrayHasKey('event_update_notification', $templates);
     }
 
     public function testGetDefaultTemplatesContainsRequiredKeys(): void
