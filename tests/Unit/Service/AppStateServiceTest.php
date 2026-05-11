@@ -91,4 +91,33 @@ class AppStateServiceTest extends TestCase
         // Assert: value was mutated on the existing entity
         static::assertSame('updated_value', $existing->getValue());
     }
+
+    public function testRemoveDeletesExistingRow(): void
+    {
+        // Arrange
+        $existing = new AppState('to_remove', 'value', new DateTimeImmutable());
+        $this->repository->method('findByKey')->willReturn($existing);
+
+        /** @var EntityManagerInterface&MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('remove')->with($existing);
+        $em->expects($this->once())->method('flush');
+
+        // Act
+        $this->makeService($em)->remove('to_remove');
+    }
+
+    public function testRemoveIsNoOpWhenKeyMissing(): void
+    {
+        // Arrange
+        $this->repository->method('findByKey')->willReturn(null);
+
+        /** @var EntityManagerInterface&MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->never())->method('remove');
+        $em->expects($this->never())->method('flush');
+
+        // Act
+        $this->makeService($em)->remove('missing');
+    }
 }
