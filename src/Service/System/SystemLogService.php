@@ -180,6 +180,7 @@ readonly class SystemLogService
         $deleted = 0;
         $pattern = '/^' . preg_quote($this->environment, '/') . '-(\d{4}-\d{2}-\d{2})\.log$/';
         foreach ($this->resolveAllLogFiles() as $file) {
+            $m = [];
             if (!preg_match($pattern, basename($file), $m)) {
                 continue;
             }
