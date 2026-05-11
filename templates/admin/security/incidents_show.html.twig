@@ -36,8 +36,15 @@
                             <td>{{ incident.endedAt|date('Y-m-d H:i:s') }}</td>
                         </tr>
                         <tr>
-                            <th>{{ 'admin_security.col_blocked_for'|trans }}</th>
-                            <td>{{ incident.blockedUntilDescription }}</td>
+                            <th>{{ 'admin_security.col_blocked'|trans }}</th>
+                            <td>
+                                {{ incident.blockedUntilDescription }}
+                                {% if blockedUntil %}
+                                    <span class="has-text-grey">- {{ 'admin_security.release_label'|trans }}: {{ blockedUntil|time_diff }}</span>
+                                {% else %}
+                                    <span class="has-text-grey">- {{ 'admin_security.block_expired'|trans }}</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         <tr>
                             <th>{{ 'admin_security.col_user_agent'|trans }}</th>
