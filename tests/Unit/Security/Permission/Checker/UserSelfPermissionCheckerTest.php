@@ -79,6 +79,12 @@ class UserSelfPermissionCheckerTest extends TestCase
         self::assertFalse($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
     }
 
+    public function testNonUserSubjectIsDenied(): void
+    {
+        $ctx = new PermissionContext(actor: $this->makeUser(1), subject: new \stdClass(), isAdmin: false);
+        self::assertFalse($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
+    }
+
     private function makeUser(int $id): User
     {
         $user = new User();

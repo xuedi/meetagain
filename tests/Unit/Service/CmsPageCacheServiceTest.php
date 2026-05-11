@@ -221,6 +221,20 @@ class CmsPageCacheServiceTest extends TestCase
         $service->invalidatePage(5);
     }
 
+    // ---- invalidateAll() ----
+
+    public function testInvalidateAllCallsInvalidateTagsWithGlobalTag(): void
+    {
+        // Arrange
+        $cacheMock = $this->createMock(TagAwareCacheInterface::class);
+        $cacheMock->expects($this->once())->method('invalidateTags')->with(['cms_page_all']);
+
+        $service = $this->createService($cacheMock, $this->createStub(CmsBlockRepository::class));
+
+        // Act
+        $service->invalidateAll();
+    }
+
     // ---- invalidateMenuCaches() ----
 
     public function testInvalidateMenuCachesCallsInvalidateTagsWithMenuTag(): void

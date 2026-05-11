@@ -2,6 +2,9 @@
 
 namespace App\Security\Permission\Attribute;
 
+use PHPUnit\Framework\Attributes\CodeCoverageIgnore;
+
+#[CodeCoverageIgnore]
 final class PermissionAttribute
 {
     public const string EVENT_VIEW = 'event.view';
