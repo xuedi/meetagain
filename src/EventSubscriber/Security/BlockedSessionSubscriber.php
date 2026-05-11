@@ -4,6 +4,7 @@ namespace App\EventSubscriber\Security;
 
 use App\Service\Security\BlockedSessionStore;
 use App\Service\Security\LoadtestBypass;
+use App\Service\Security\RequestIdentityResolver;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,6 +28,7 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
         private Environment $twig,
         private LoggerInterface $logger,
         private string $environment,
+        private RequestIdentityResolver $identityResolver,
     ) {}
 
     #[Override]
@@ -71,7 +73,7 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $sessionId = $this->resolveSessionId($request, $ip);
+        $sessionId = $this->identityResolver->resolveSessionKey($request, $ip);
         if ($this->blockStore->isSessionBlocked($sessionId)) {
             $event->setResponse($this->buildBlockResponse());
             $event->stopPropagation();
@@ -81,28 +83,6 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
     private function isLoadtestBypass(Request $request): bool
     {
         return LoadtestBypass::isActive($request, $this->environment);
-    }
-
-    private function resolveSessionId(Request $request, string $ip): string
-    {
-        $sessionId = $this->readSessionCookie($request);
-        if ($sessionId !== null) {
-            return $sessionId;
-        }
-
-        return 'ip:' . ($ip !== '' ? $ip : 'unknown');
-    }
-
-    private function readSessionCookie(Request $request): ?string
-    {
-        try {
-            $session = $request->getSession();
-            $cookieValue = $request->cookies->get($session->getName());
-            return is_string($cookieValue) && $cookieValue !== '' ? $cookieValue : null;
-        } catch (Throwable $e) {
-            $this->logger->debug('Session read failed in BlockedSessionSubscriber: ' . $e->getMessage());
-            return null;
-        }
     }
 
     private function buildBlockResponse(): Response

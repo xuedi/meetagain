@@ -44,6 +44,7 @@ readonly class SecurityService implements CronTaskInterface
         private string $environment,
         private NotFoundLogRepository $notFoundLogRepository,
         private AccessDeniedLogRepository $accessDeniedLogRepository,
+        private RequestIdentityResolver $identityResolver,
     ) {}
 
     /**
@@ -56,7 +57,7 @@ readonly class SecurityService implements CronTaskInterface
         }
 
         $ip = $request->getClientIp() ?? '';
-        $sessionId = $this->resolveSessionId($request, $ip);
+        $sessionId = $this->identityResolver->resolveSessionKey($request, $ip);
 
         if ($ip !== '' && $this->blockStore->isIpBlocked($ip)) {
             return;
@@ -178,35 +179,6 @@ readonly class SecurityService implements CronTaskInterface
     public function isIpBlocked(string $ip): bool
     {
         return $this->blockStore->isIpBlocked($ip);
-    }
-
-    private function resolveSessionId(Request $request, string $ip): string
-    {
-        $sessionId = $this->safeReadSessionId($request);
-        if ($sessionId !== null) {
-            return $sessionId;
-        }
-
-        return 'ip:' . ($ip !== '' ? $ip : 'unknown');
-    }
-
-    private function safeReadSessionId(Request $request): ?string
-    {
-        try {
-            if (!$request->hasSession(true)) {
-                return null;
-            }
-            $session = $request->getSession();
-            if (!$session->isStarted()) {
-                return null;
-            }
-            $id = $session->getId();
-
-            return $id !== '' ? $id : null;
-        } catch (Throwable $e) {
-            $this->logger->debug('Session read failed in SecurityService: ' . $e->getMessage());
-            return null;
-        }
     }
 
     private function isLoadtestBypass(Request $request): bool
