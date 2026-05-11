@@ -21,6 +21,13 @@ final class NotFoundProvider extends AbstractSecurityProvider
 
     private const int RECENT_PATHS_CAP = 10;
     private const int BLOCK_AT_PROBES = 30;
+    private const int BLOCK_AT_ASSET_HITS = 300;
+
+    /** @var list<string> */
+    private const array ASSET_PATH_PREFIXES = [
+        '/assets/',
+        '/media/',
+    ];
 
     /** @var list<string> */
     private const array SUSPICIOUS_PATTERNS = [
@@ -78,6 +85,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
         $totalHits = (int) ($state['totalHits'] ?? 0) + 1;
         $apiHits = (int) ($state['apiHits'] ?? 0);
         $probeHits = (int) ($state['probeHits'] ?? 0);
+        $assetHits = (int) ($state['assetHits'] ?? 0);
         $recentPaths = is_array($state['recentPaths'] ?? null) ? $state['recentPaths'] : [];
         $waveTimestamps = is_array($state['waveTimestamps'] ?? null) ? $state['waveTimestamps'] : [];
 
@@ -87,7 +95,25 @@ final class NotFoundProvider extends AbstractSecurityProvider
         }
         $distinctPaths = count(array_unique($recentPaths));
 
-        if ($isApi) {
+        $isAsset = false;
+        foreach (self::ASSET_PATH_PREFIXES as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                $isAsset = true;
+                break;
+            }
+        }
+
+        if ($isAsset) {
+            // Asset 404s are normal after a redeploy (stale browser cache, old importmap hashes).
+            // They still accumulate threat but at 1/10 the weight of regular probes so that a
+            // browser clearing stale assets after a deploy never blocks a real user, while a
+            // scanner hammering /assets/* at scale still eventually trips the threshold.
+            ++$assetHits;
+            $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
+            $assetWeight = $assetHits * (100 / self::BLOCK_AT_ASSET_HITS);
+            $threatLevel = (int) min(100, $probeWeight + $assetWeight);
+            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
+        } elseif ($isApi) {
             ++$apiHits;
             if ($distinctPaths <= 3 && $apiHits <= 2000) {
                 $threatLevel = (int) min($apiHits / 20, 30);
@@ -106,8 +132,10 @@ final class NotFoundProvider extends AbstractSecurityProvider
                 $base += 5;
                 break;
             }
-            $threatLevel = (int) min(100, $base + ($probeHits * (100 / self::BLOCK_AT_PROBES)));
-            $summary = sprintf('%d probe 404s (distinct paths: %d)', $probeHits, $distinctPaths);
+            $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
+            $assetWeight = (int) ($state['assetHits'] ?? 0) * (100 / self::BLOCK_AT_ASSET_HITS);
+            $threatLevel = (int) min(100, $base + $probeWeight + $assetWeight);
+            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
         }
 
         $previousThreat = (int) ($state['threatLevel'] ?? 0);
@@ -122,6 +150,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
             'totalHits' => $totalHits,
             'apiHits' => $apiHits,
             'probeHits' => $probeHits,
+            'assetHits' => $assetHits,
             'distinctPaths' => $distinctPaths,
             'recentPaths' => array_values($recentPaths),
             'waveCount' => count($waveTimestamps),
@@ -132,6 +161,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
                 'totalHits' => $totalHits,
                 'apiHits' => $apiHits,
                 'probeHits' => $probeHits,
+                'assetHits' => $assetHits,
                 'distinctPaths' => $distinctPaths,
                 'recentPaths' => array_values($recentPaths),
                 'waveTimestamps' => array_values($waveTimestamps),
