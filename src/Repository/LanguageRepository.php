@@ -17,7 +17,7 @@ class LanguageRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return string[] Array of enabled language codes ordered by sortOrder
+     * @return list<string> Array of enabled language codes ordered by sortOrder
      */
     public function getEnabledCodes(): array
     {

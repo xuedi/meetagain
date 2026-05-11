@@ -23,7 +23,7 @@ readonly class LanguageService
     ) {}
 
     /**
-     * @return string[] Array of enabled language codes ordered by sortOrder
+     * @return list<string> Array of enabled language codes ordered by sortOrder
      */
     public function getEnabledCodes(): array
     {
@@ -111,7 +111,7 @@ readonly class LanguageService
      * Get enabled language codes filtered by current context.
      * This applies any registered language filters (e.g., from plugins).
      *
-     * @return string[] Array of filtered language codes
+     * @return list<string> Array of filtered language codes
      */
     public function getFilteredEnabledCodes(): array
     {
@@ -144,7 +144,7 @@ readonly class LanguageService
      * Get enabled language codes filtered for admin context.
      * This applies admin-specific language filters (e.g., group language restrictions in admin forms).
      *
-     * @return string[] Array of filtered language codes
+     * @return list<string> Array of filtered language codes
      */
     public function getAdminFilteredEnabledCodes(): array
     {

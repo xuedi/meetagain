@@ -184,7 +184,7 @@ final class LanguageController extends AbstractSettingsController implements
         ];
         if ($isEdit && $language !== null) {
             $info[] = new AdminTopInfoHtml(sprintf('<span class="tag is-light">%s</span>', htmlspecialchars(
-                (string) $language->getCode(),
+                $language->getCode(),
                 ENT_QUOTES | ENT_HTML5,
                 'UTF-8',
             )));

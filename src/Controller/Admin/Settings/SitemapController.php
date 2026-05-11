@@ -268,7 +268,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
         }
 
         $path = parse_url($url->loc, PHP_URL_PATH);
-        if (is_string($path) && $path !== '') {
+        if (is_string($path)) {
             return $path;
         }
 
