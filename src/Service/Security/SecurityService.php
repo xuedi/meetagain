@@ -26,8 +26,8 @@ use Throwable;
 readonly class SecurityService implements CronTaskInterface
 {
     public const string KEY_LAST_RETROSPECTIVE_RUN = 'security.retrospective_scan.last_run';
-    public const int BLOCK_TTL_SECONDS = 14_400;
-    public const string BLOCK_DURATION_LABEL = '4h';
+    public const int BLOCK_TTL_SECONDS = 43_200;
+    public const string BLOCK_DURATION_LABEL = '12h';
     private const int RETROSPECTIVE_THROTTLE_SECONDS = 3600;
 
     /**
@@ -103,8 +103,9 @@ readonly class SecurityService implements CronTaskInterface
             return;
         }
 
+        $incidentId = null;
         try {
-            $this->writeIncident($request, $sessionId, $ip, $blockingReport->providerKey, $reports);
+            $incidentId = $this->writeIncident($request, $sessionId, $ip, $blockingReport->providerKey, $reports);
         } catch (Throwable $e) {
             $this->logger->warning('Failed to write security incident: ' . $e->getMessage(), [
                 'exception' => $e,
@@ -112,6 +113,9 @@ readonly class SecurityService implements CronTaskInterface
         }
 
         $snapshot = $this->buildSnapshot('provider', $reports);
+        if ($incidentId !== null) {
+            $snapshot['incidentId'] = $incidentId;
+        }
         $this->blockStore->blockSession($sessionId, $snapshot, self::BLOCK_TTL_SECONDS);
         if ($ip !== '') {
             $this->blockStore->blockIp($ip, $snapshot, self::BLOCK_TTL_SECONDS);
@@ -246,7 +250,7 @@ readonly class SecurityService implements CronTaskInterface
         string $ip,
         string $triggeredBy,
         array $reports,
-    ): void {
+    ): ?int {
         $maxThreat = 0;
         $serialised = [];
         foreach ($reports as $report) {
@@ -275,6 +279,8 @@ readonly class SecurityService implements CronTaskInterface
         $this->em->flush();
 
         $this->stampLogRow($incident, $sessionId, $ip, $triggeredBy);
+
+        return $incident->getId();
     }
 
     private function stampLogRow(Incident $incident, string $sessionId, string $ip, string $triggeredBy): void
