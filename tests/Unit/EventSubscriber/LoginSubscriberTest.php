@@ -110,4 +110,29 @@ class LoginSubscriberTest extends TestCase
         static::assertContains('consent_cookies_osm', $cookieNames);
         static::assertContains('consent_cookies', $cookieNames);
     }
+
+    public function testOnLoginSuccessReturnsEarlyWhenResponseIsNull(): void
+    {
+        // Arrange - osm consent path runs but response is null; must not crash
+        $subscriber = new LoginSubscriber();
+
+        $user = new User();
+        $user->setLocale('en');
+        $user->setOsmConsent(true);
+
+        $session = $this->createStub(SessionInterface::class);
+        $session->method('get')->willReturn(null);
+
+        $request = new Request();
+        $request->setSession($session);
+
+        $event = $this->createStub(LoginSuccessEvent::class);
+        $event->method('getUser')->willReturn($user);
+        $event->method('getRequest')->willReturn($request);
+        $event->method('getResponse')->willReturn(null);
+
+        // Act / Assert - completes without throwing
+        $subscriber->onLoginSuccess($event);
+        static::assertTrue(true);
+    }
 }
