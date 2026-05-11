@@ -15,6 +15,7 @@ use App\Repository\NotFoundLogRepository;
 use App\Service\AppStateService;
 use App\Service\Security\BlockedSessionStore;
 use App\Service\Security\ProviderReport;
+use App\Service\Security\RequestIdentityResolver;
 use App\Service\Security\SecurityProviderInterface;
 use App\Service\Security\SecurityService;
 use DateTimeImmutable;
@@ -329,6 +330,7 @@ class SecurityServiceTest extends TestCase
             environment: 'test',
             notFoundLogRepository: $notFoundLogRepository,
             accessDeniedLogRepository: $accessDeniedLogRepository,
+            identityResolver: new RequestIdentityResolver(new NullLogger()),
         );
     }
 
