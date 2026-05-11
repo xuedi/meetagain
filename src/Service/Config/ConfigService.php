@@ -8,6 +8,7 @@ use App\Entity\Config;
 use App\Enum\ConfigType;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
+use App\ExtendedFilesystem;
 use App\Publisher\ImageThumbnail\ImageThumbnailSizeProviderInterface;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
@@ -34,6 +35,7 @@ readonly class ConfigService
         private CacheInterface $cache,
         private KernelInterface $kernel,
         private AppStateService $appState,
+        private ExtendedFilesystem $fs,
         #[AutowireIterator(ImageThumbnailSizeProviderInterface::class)]
         private iterable $thumbnailSizeProviders = [],
     ) {}
@@ -306,7 +308,10 @@ readonly class ConfigService
     public function saveColors(array $colors): void
     {
         $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
-        $content = file_get_contents($path);
+        $content = $this->fs->getFileContents($path);
+        if ($content === false) {
+            return;
+        }
 
         $scssToKey = [
             'primary' => 'color_primary',
@@ -336,14 +341,19 @@ readonly class ConfigService
             );
         }
 
-        file_put_contents($path, $content);
+        if (is_string($content)) {
+            $this->fs->putFileContents($path, $content);
+        }
         $this->cache->delete(self::CACHE_KEY_THEME_COLORS);
     }
 
     private function parseConfigScss(): array
     {
         $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
-        $content = file_get_contents($path);
+        $content = $this->fs->getFileContents($path);
+        if ($content === false) {
+            return [];
+        }
 
         $scssToKey = [
             'primary' => 'color_primary',
