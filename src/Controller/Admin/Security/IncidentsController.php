@@ -14,6 +14,7 @@ use App\Repository\IncidentRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Security\BlockedSessionStore;
 use DateTimeImmutable;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -95,7 +96,11 @@ final class IncidentsController extends AbstractSecurityController implements Ad
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
 
-        $severity = $incident->getSeverity();
+        $sessionBlockedUntil = $this->blockStore->getSessionBlockExpiresAt($incident->getSessionId());
+        $ipBlockedUntil = $incident->getIp() !== ''
+            ? $this->blockStore->getIpBlockExpiresAt($incident->getIp())
+            : null;
+        $blockedUntil = $this->latestExpiry($sessionBlockedUntil, $ipBlockedUntil);
 
         $adminTop = new AdminTop(
             info: [
@@ -104,30 +109,26 @@ final class IncidentsController extends AbstractSecurityController implements Ad
                     htmlspecialchars($incident->getIp(), ENT_QUOTES),
                 )),
                 new AdminTopInfoHtml(sprintf(
-                    '<span class="tag %s is-medium">%s</span>',
-                    $severity->tagClass(),
-                    $this->translator->trans($severity->label()),
-                )),
-                new AdminTopInfoHtml(sprintf(
                     '<span class="has-text-grey">%s: %s</span>',
                     $this->translator->trans('admin_security.triggered_by_label'),
                     htmlspecialchars($incident->getTriggeredBy(), ENT_QUOTES),
                 )),
             ],
-            actions: [
+            actions: array_values(array_filter([
+                $blockedUntil !== null
+                    ? new AdminTopActionButton(
+                        label: $this->translator->trans('admin_security.button_unblock'),
+                        target: $this->generateUrl('app_admin_security_incidents_unblock', ['id' => $incident->getId()]),
+                        icon: 'unlock',
+                    )
+                    : null,
                 new AdminTopActionButton(
                     label: $this->translator->trans('global.button_back'),
                     target: $this->generateUrl('app_admin_security_incidents'),
                     icon: 'arrow-left',
                 ),
-            ],
+            ])),
         );
-
-        $sessionBlockedUntil = $this->blockStore->getSessionBlockExpiresAt($incident->getSessionId());
-        $ipBlockedUntil = $incident->getIp() !== ''
-            ? $this->blockStore->getIpBlockExpiresAt($incident->getIp())
-            : null;
-        $blockedUntil = $this->latestExpiry($sessionBlockedUntil, $ipBlockedUntil);
 
         return $this->render('admin/security/incidents_show.html.twig', [
             'active' => 'security',
@@ -136,6 +137,21 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    #[Route('/{id}/unblock', name: 'app_admin_security_incidents_unblock', requirements: ['id' => '\d+'])]
+    public function unblock(Incident $incident): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
+
+        if ($incident->getSessionId() !== '') {
+            $this->blockStore->unblockSession($incident->getSessionId());
+        }
+        if ($incident->getIp() !== '') {
+            $this->blockStore->unblockIp($incident->getIp());
+        }
+
+        return $this->redirectToRoute('app_admin_security_incidents_show', ['id' => $incident->getId()]);
     }
 
     private function latestExpiry(?DateTimeImmutable $a, ?DateTimeImmutable $b): ?DateTimeImmutable

@@ -11,7 +11,7 @@ use Throwable;
 
 readonly class BlockedSessionStore
 {
-    public const int DEFAULT_TTL_SECONDS = 14_400;
+    public const int DEFAULT_TTL_SECONDS = 43_200;
 
     private const string SESSION_INDEX_KEY = 'security_blocked_sessions_index';
     private const string IP_INDEX_KEY = 'security_blocked_ips_index';

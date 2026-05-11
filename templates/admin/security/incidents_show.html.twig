@@ -20,10 +20,6 @@
                             <td><code>{{ incident.sessionId }}</code></td>
                         </tr>
                         <tr>
-                            <th>{{ 'admin_security.col_severity'|trans }}</th>
-                            <td><span class="tag {{ incident.severity.tagClass }}">{{ incident.severity.label|trans }}</span></td>
-                        </tr>
-                        <tr>
                             <th>{{ 'admin_security.col_triggered_by'|trans }}</th>
                             <td>{{ ('admin_security.provider_label_' ~ incident.triggeredBy)|trans }}</td>
                         </tr>
