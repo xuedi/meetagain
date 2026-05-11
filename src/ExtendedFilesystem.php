@@ -100,4 +100,36 @@ class ExtendedFilesystem extends SymfonyFilesystem
             return false;
         }
     }
+
+    public function getFileSize(string $path): int|false
+    {
+        return filesize($path);
+    }
+
+    public function makeDirectory(string $path, int $mode = 0o755, bool $recursive = true): bool
+    {
+        try {
+            $this->mkdir($path, $mode);
+            return true;
+        } catch (Exception $e) {
+            $this->logger->error(sprintf("Error creating directory '%s': %s", $path, $e->getMessage()));
+            return false;
+        }
+    }
+
+    public function removeDirectory(string $path): bool
+    {
+        try {
+            $this->remove($path);
+            return true;
+        } catch (Exception $e) {
+            $this->logger->error(sprintf("Error removing directory '%s': %s", $path, $e->getMessage()));
+            return false;
+        }
+    }
+
+    public function getFileHash(string $path, string $algorithm = 'sha1'): string|false
+    {
+        return hash_file($algorithm, $path);
+    }
 }

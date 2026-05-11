@@ -4,6 +4,7 @@ namespace Tests\Unit\Service;
 
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
+use App\ExtendedFilesystem;
 use App\Publisher\ImageThumbnail\ImageThumbnailSizeProviderInterface;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
@@ -34,6 +35,7 @@ class ConfigServiceImageTypeProviderTest extends TestCase
             cache: $cache,
             kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
             thumbnailSizeProviders: $provider !== null ? [$provider] : [],
         );
     }

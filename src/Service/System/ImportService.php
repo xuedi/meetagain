@@ -22,6 +22,7 @@ use App\Enum\ImageType;
 use App\Enum\MenuLocation;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
+use App\ExtendedFilesystem;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use DateTime;
@@ -36,6 +37,7 @@ readonly class ImportService
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private LocationRepository $locationRepository,
+        private ExtendedFilesystem $fs,
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
     ) {}
@@ -43,7 +45,7 @@ readonly class ImportService
     public function import(string $zipPath): ImportSummary
     {
         $tempDir = sys_get_temp_dir() . '/meetagain-import-' . uniqid('', true);
-        mkdir($tempDir, 0o755, true);
+        $this->fs->makeDirectory($tempDir);
 
         try {
             $zip = new ZipArchive();
@@ -54,11 +56,11 @@ readonly class ImportService
             $zip->close();
 
             $jsonPath = $tempDir . '/export.json';
-            if (!file_exists($jsonPath)) {
+            if (!$this->fs->fileExists($jsonPath)) {
                 throw new \RuntimeException('Invalid export: export.json not found in ZIP');
             }
 
-            $data = json_decode((string) file_get_contents($jsonPath), true);
+            $data = json_decode((string) $this->fs->getFileContents($jsonPath), true);
             if (!is_array($data) || ($data['format'] ?? '') !== 'meetagain-group-export') {
                 throw new \RuntimeException('Invalid export format');
             }
@@ -347,11 +349,11 @@ readonly class ImportService
 
     private function importImage(string $imagePath, ImageType $type, User $uploader): ?Image
     {
-        if (!file_exists($imagePath)) {
+        if (!$this->fs->fileExists($imagePath)) {
             return null;
         }
 
-        $content = (string) file_get_contents($imagePath);
+        $content = (string) $this->fs->getFileContents($imagePath);
         $hash = sha1($content);
 
         $existing = $this->em->getRepository(Image::class)->findOneBy(['hash' => $hash]);
@@ -368,11 +370,11 @@ readonly class ImportService
         $mimeType = $finfo->buffer($content) ?: 'application/octet-stream';
 
         $targetDir = $this->projectDir . '/data/images/';
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0o755, true);
+        if (!$this->fs->isDirectory($targetDir)) {
+            $this->fs->makeDirectory($targetDir);
         }
 
-        file_put_contents($targetDir . $hash . '.' . $extension, $content);
+        $this->fs->putFileContents($targetDir . $hash . '.' . $extension, $content);
 
         $image = new Image();
         $image->setHash($hash);
@@ -432,24 +434,23 @@ readonly class ImportService
 
     private function removeDirectory(string $dir): void
     {
-        if (!is_dir($dir)) {
+        if (!$this->fs->isDirectory($dir)) {
             return;
         }
 
-        $files = (array) scandir($dir);
-        foreach ($files as $file) {
+        foreach ($this->fs->scanDirectory($dir) as $file) {
             if ($file === '.' || $file === '..') {
                 continue;
             }
 
             $path = $dir . '/' . $file;
-            if (is_dir($path)) {
+            if ($this->fs->isDirectory($path)) {
                 $this->removeDirectory($path);
                 continue;
             }
-            unlink($path);
+            $this->fs->deleteFile($path);
         }
 
-        rmdir($dir);
+        $this->fs->removeDirectory($dir);
     }
 }

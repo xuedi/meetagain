@@ -2,6 +2,7 @@
 
 namespace App\Service\System;
 
+use App\ExtendedFilesystem;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Throwable;
 
@@ -9,6 +10,7 @@ readonly class HealthCheckService
 {
     public function __construct(
         private TagAwareCacheInterface $appCache,
+        private ExtendedFilesystem $fs,
         private string $kernelProjectDir,
     ) {}
 
@@ -40,13 +42,16 @@ readonly class HealthCheckService
     private function testLogSize(): array
     {
         $logFile = $this->kernelProjectDir . '/var/log/dev.log';
-        $maxSize = 50 * 1024 * 1024; // 50MB
+        $maxSize = 50 * 1024 * 1024;
 
-        if (!file_exists($logFile)) {
+        if (!$this->fs->fileExists($logFile)) {
             return ['ok' => true, 'size' => 0, 'maxSize' => $maxSize];
         }
 
-        $size = filesize($logFile);
+        $size = $this->fs->getFileSize($logFile);
+        if ($size === false) {
+            $size = 0;
+        }
 
         return [
             'ok' => $size < $maxSize,
