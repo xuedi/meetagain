@@ -185,7 +185,7 @@ final class AdminController extends AbstractController
             $lowRsvpItems = [];
             foreach ($lowRsvpEvents as $event) {
                 $lowRsvpItems[] = new TileListItem(
-                    label: $event->getTitle($locale) ?? $event->getTitle('en') ?? '#' . $event->getId(),
+                    label: $event->getTitle($locale) ?: $event->getTitle('en') ?: '#' . $event->getId(),
                     sublabel: $event->getStart()->format('Y-m-d'),
                     link: $this->generateUrl('app_event_details', ['id' => $event->getId()]),
                 );
@@ -212,7 +212,7 @@ final class AdminController extends AbstractController
                     $sublabelParts[] = $location;
                 }
                 $pastItems[] = new TileListItem(
-                    label: $event->getTitle($locale) ?? $event->getTitle('en') ?? '#' . $event->getId(),
+                    label: $event->getTitle($locale) ?: $event->getTitle('en') ?: '#' . $event->getId(),
                     sublabel: implode(' · ', $sublabelParts),
                     link: $this->generateUrl('app_event_details', ['id' => $event->getId()]),
                 );

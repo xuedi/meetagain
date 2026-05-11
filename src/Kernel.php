@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use ReflectionClass;
 use ReflectionObject;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -58,6 +59,9 @@ class Kernel extends BaseKernel
         $contents = require $bundlesFile;
         foreach ($contents as $class => $envs) {
             if (!($envs[$this->environment] ?? $envs['all'] ?? false)) {
+                continue;
+            }
+            if ((new ReflectionClass($class))->isAbstract()) {
                 continue;
             }
 
