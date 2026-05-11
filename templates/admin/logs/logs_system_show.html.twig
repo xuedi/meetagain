@@ -1,0 +1,39 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <th class="is-nowrap">{{ 'admin_logs.col_created_at'|trans }}</th>
+                    <td class="is-nowrap">{{ entry.date|date('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_logs.col_type'|trans }}</th>
+                    <td><code>{{ entry.type }}</code></td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_logs.col_level'|trans }}</th>
+                    <td>{{ entry.level }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_logs.col_message'|trans }}</th>
+                    <td>{{ entry.message }}</td>
+                </tr>
+                {% for chunk in entry.contextChunks %}
+                    <tr>
+                        <th>{{ 'admin_logs.col_context'|trans }}</th>
+                        <td><pre class="is-size-7" style="white-space: pre-wrap; word-break: break-word;">{% if chunk is iterable %}{{ chunk|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE')) }}{% else %}{{ chunk }}{% endif %}</pre></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

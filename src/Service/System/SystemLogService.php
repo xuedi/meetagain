@@ -156,6 +156,17 @@ readonly class SystemLogService
         }));
     }
 
+    public function findByHash(string $hash): ?LogEntry
+    {
+        foreach ($this->getAllEntries() as $entry) {
+            if ($entry->getHash() === $hash) {
+                return $entry;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param list<LogEntry> $entries
      * @param list<string> $levels

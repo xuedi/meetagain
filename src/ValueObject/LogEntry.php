@@ -3,6 +3,7 @@
 namespace App\ValueObject;
 
 use DateTimeImmutable;
+use Throwable;
 
 class LogEntry
 {
@@ -59,6 +60,89 @@ class LogEntry
     public function getJson(): ?string
     {
         return $this->json;
+    }
+
+    public function getHash(): string
+    {
+        return substr(
+            hash('sha256', $this->date->format('c') . '|' . $this->type . '|' . $this->level . '|' . $this->message . '|' . ($this->json ?? '')),
+            0,
+            16,
+        );
+    }
+
+    /**
+     * Splits the raw json tail (Monolog's `{context} {extra}` shape) into individual
+     * top-level JSON blocks and decodes each. Skips empty `[]` / `{}` extras and
+     * undecodable fragments. On any unexpected error, falls back to returning the
+     * raw tail as a single string element so the caller can still display it.
+     *
+     * @return list<mixed>
+     */
+    public function getContextChunks(): array
+    {
+        if ($this->json === null) {
+            return [];
+        }
+
+        try {
+            $chunks = [];
+            $depth = 0;
+            $inString = false;
+            $escape = false;
+            $start = null;
+            $length = strlen($this->json);
+
+            for ($i = 0; $i < $length; $i++) {
+                $char = $this->json[$i];
+
+                if ($escape) {
+                    $escape = false;
+                    continue;
+                }
+                if ($char === '\\') {
+                    $escape = true;
+                    continue;
+                }
+                if ($char === '"') {
+                    $inString = !$inString;
+                    continue;
+                }
+                if ($inString) {
+                    continue;
+                }
+                if ($char === '{' || $char === '[') {
+                    if ($depth === 0) {
+                        $start = $i;
+                    }
+                    $depth++;
+                    continue;
+                }
+                if (($char === '}' || $char === ']') && $depth > 0) {
+                    $depth--;
+                    if ($depth === 0 && $start !== null) {
+                        $chunks[] = substr($this->json, $start, $i - $start + 1);
+                        $start = null;
+                    }
+                }
+            }
+
+            $decoded = [];
+            foreach ($chunks as $chunk) {
+                $value = json_decode($chunk, true);
+                if ($value === null && $chunk !== 'null') {
+                    continue;
+                }
+                if (is_array($value) && $value === []) {
+                    continue;
+                }
+                $decoded[] = $value;
+            }
+
+            return $decoded;
+        } catch (Throwable) {
+            return [$this->json];
+        }
     }
 
     public function toArray(): array
