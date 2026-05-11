@@ -159,6 +159,19 @@ class NotFoundLogRepository extends ServiceEntityRepository
         return $value instanceof DateTimeImmutable ? $value : new DateTimeImmutable((string) $value);
     }
 
+    public function findLatestUnlinkedForOffender(string $ip, ?string $sessionId): ?NotFoundLog
+    {
+        return $this
+            ->createQueryBuilder('n')
+            ->where('n.ip = :ip')
+            ->andWhere('n.incident IS NULL')
+            ->orderBy('n.createdAt', 'DESC')
+            ->setParameter('ip', $ip)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * @return list<NotFoundLog>
      */

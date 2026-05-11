@@ -34,6 +34,10 @@ class NotFoundLog
     #[ORM\Column(length: 2048, nullable: true)]
     private ?string $referer = null;
 
+    #[ORM\ManyToOne(targetEntity: Incident::class)]
+    #[ORM\JoinColumn(name: 'incident_id', nullable: true, onDelete: 'SET NULL')]
+    private ?Incident $incident = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +99,18 @@ class NotFoundLog
     public function setReferer(?string $referer): static
     {
         $this->referer = $referer === null ? null : mb_substr($referer, 0, self::REFERER_MAX);
+
+        return $this;
+    }
+
+    public function getIncident(): ?Incident
+    {
+        return $this->incident;
+    }
+
+    public function setIncident(?Incident $incident): static
+    {
+        $this->incident = $incident;
 
         return $this;
     }
