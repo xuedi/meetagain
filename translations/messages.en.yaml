@@ -505,6 +505,7 @@ global:
     button_back: 'Back'
     button_create: 'Create'
     button_delete: 'Delete'
+    button_clear: 'Clear'
     button_discard: 'Discard'
     button_yes: 'Yes'
     button_no: 'No'

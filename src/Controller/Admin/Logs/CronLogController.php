@@ -13,6 +13,8 @@ use App\Entity\CronLog;
 use App\Repository\CronLogRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use DateTimeImmutable;
+use Doctrine\DBAL\Connection;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -45,6 +47,7 @@ final class CronLogController extends AbstractLogsController implements AdminNav
     public function __construct(
         TranslatorInterface $translator,
         private readonly CronLogRepository $cronLogRepository,
+        private readonly Connection $connection,
     ) {
         parent::__construct($translator, 'cron');
     }
@@ -92,7 +95,18 @@ final class CronLogController extends AbstractLogsController implements AdminNav
         $statusDropdown = $this->buildStatusDropdown($status, $range, $since);
         $rangeDropdown = $this->buildRangeDropdown($range, $status);
 
-        $adminTop = new AdminTop(info: $info, actions: [$statusDropdown, $rangeDropdown]);
+        $actions = [];
+        if ($totalCount > 0) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('global.button_clear'),
+                target: $this->generateUrl('app_admin_cron_log_clear'),
+                icon: 'trash',
+            );
+        }
+        $actions[] = $statusDropdown;
+        $actions[] = $rangeDropdown;
+
+        $adminTop = new AdminTop(info: $info, actions: $actions);
 
         return $this->render('admin/logs/logs_cron_list.html.twig', [
             'active' => 'logs',
@@ -102,7 +116,17 @@ final class CronLogController extends AbstractLogsController implements AdminNav
         ]);
     }
 
-    #[Route('/{id}', name: 'app_admin_cron_log_show')]
+    #[Route('/clear', name: 'app_admin_cron_log_clear')]
+    public function clear(): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_LOGS_CRON_READ);
+
+        $this->connection->executeStatement('DELETE FROM cron_log');
+
+        return $this->redirectToRoute('app_admin_cron_log');
+    }
+
+    #[Route('/{id}', name: 'app_admin_cron_log_show', requirements: ['id' => '\d+'])]
     public function show(CronLog $cronLog): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_LOGS_CRON_READ);

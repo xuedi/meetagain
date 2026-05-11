@@ -495,6 +495,7 @@ global:
     button_back: '返回'
     button_create: '创建'
     button_delete: '删除'
+    button_clear: '清空'
     button_discard: '放弃'
     button_yes: '是'
     button_no: '否'
