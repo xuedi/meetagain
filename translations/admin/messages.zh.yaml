@@ -295,6 +295,7 @@ admin_logs:
     col_type: '类型'
     col_message: '消息'
     col_level: '级别'
+    col_context: '上下文'
     col_id: 'ID'
     col_date: '日期'
     col_meta: '元数据'

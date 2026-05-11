@@ -295,6 +295,7 @@ admin_logs:
     col_type: 'Type'
     col_message: 'Message'
     col_level: 'Level'
+    col_context: 'Context'
     col_id: 'ID'
     col_date: 'Date'
     col_meta: 'Meta'

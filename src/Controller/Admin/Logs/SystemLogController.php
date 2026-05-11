@@ -14,6 +14,7 @@ use App\ValueObject\LogEntry;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -85,6 +86,47 @@ final class SystemLogController extends AbstractLogsController implements AdminN
             'active' => 'logs',
             'activeLog' => 'logs',
             'logs' => $filteredEntries,
+            'adminTop' => $adminTop,
+            'adminTabs' => $this->getTabs(),
+        ]);
+    }
+
+    #[Route('/{hash}', name: 'app_admin_system_log_show', requirements: ['hash' => '[a-f0-9]{16}'])]
+    public function show(string $hash): Response
+    {
+        $entry = $this->systemLogService->findByHash($hash);
+        if ($entry === null) {
+            throw new NotFoundHttpException();
+        }
+
+        $adminTop = new AdminTop(
+            info: [
+                new AdminTopInfoHtml(sprintf(
+                    '<strong>%s</strong>',
+                    htmlspecialchars($entry->getDate()->format('Y-m-d H:i:s'), ENT_QUOTES),
+                )),
+                new AdminTopInfoHtml(sprintf(
+                    '<span class="tag is-medium">%s</span>',
+                    htmlspecialchars($entry->getLevel(), ENT_QUOTES),
+                )),
+                new AdminTopInfoHtml(sprintf(
+                    '<span class="has-text-grey">%s</span>',
+                    htmlspecialchars($entry->getType(), ENT_QUOTES),
+                )),
+            ],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_system_log'),
+                    icon: 'arrow-left',
+                ),
+            ],
+        );
+
+        return $this->render('admin/logs/logs_system_show.html.twig', [
+            'active' => 'logs',
+            'activeLog' => 'logs',
+            'entry' => $entry,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
