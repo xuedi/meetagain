@@ -5,6 +5,7 @@ namespace App\Service\Email;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
 use App\Enum\EmailType;
+use App\ExtendedFilesystem;
 use App\Repository\EmailTemplateRepository;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -121,6 +122,7 @@ readonly class EmailTemplateService
 
     public function __construct(
         private EmailTemplateRepository $repo,
+        private ExtendedFilesystem $fs,
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
     ) {}
@@ -239,16 +241,14 @@ readonly class EmailTemplateService
 
     private function loadTemplateBody(EmailType $type, string $language = self::DEFAULT_LANGUAGE): string
     {
-        // Try language-specific file first
         $langPath = $this->projectDir . self::TEMPLATE_PATH . $language . '/' . $type->value . '.html';
-        if (file_exists($langPath)) {
-            return file_get_contents($langPath) ?: '';
+        if ($this->fs->fileExists($langPath)) {
+            return $this->fs->getFileContents($langPath) ?: '';
         }
 
-        // Fall back to default (English) template
         $defaultPath = $this->projectDir . self::TEMPLATE_PATH . $type->value . '.html';
-        if (file_exists($defaultPath)) {
-            return file_get_contents($defaultPath) ?: '';
+        if ($this->fs->fileExists($defaultPath)) {
+            return $this->fs->getFileContents($defaultPath) ?: '';
         }
 
         throw new RuntimeException(sprintf('Email template file not found: %s', $defaultPath));

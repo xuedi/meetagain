@@ -7,6 +7,7 @@ namespace Tests\Unit\Service;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
 use App\Enum\EmailType;
+use App\ExtendedFilesystem;
 use App\Repository\EmailTemplateRepository;
 use App\Service\Email\EmailTemplateService;
 use DateTimeImmutable;
@@ -26,7 +27,14 @@ class EmailTemplateServiceTest extends TestCase
     {
         $this->repoStub = $this->createStub(EmailTemplateRepository::class);
         $projectDir = dirname(__DIR__, 3);
-        $this->subject = new EmailTemplateService(repo: $this->repoStub, projectDir: $projectDir);
+        $fs = $this->createStub(ExtendedFilesystem::class);
+        $fs->method('fileExists')->willReturn(true);
+        $fs->method('getFileContents')->willReturn('');
+        $this->subject = new EmailTemplateService(
+            repo: $this->repoStub,
+            fs: $fs,
+            projectDir: $projectDir,
+        );
     }
 
     public function testGetTemplateReturnsTemplateWhenFound(): void
