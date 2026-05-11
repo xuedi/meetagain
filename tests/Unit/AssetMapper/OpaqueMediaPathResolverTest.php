@@ -4,17 +4,14 @@ namespace Tests\Unit\AssetMapper;
 
 use App\AssetMapper\OpaqueMediaPathResolver;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
 class OpaqueMediaPathResolverTest extends TestCase
 {
-    private PublicAssetsPathResolverInterface $inner;
     private OpaqueMediaPathResolver $resolver;
 
     protected function setUp(): void
     {
-        $this->inner = $this->createStub(PublicAssetsPathResolverInterface::class);
-        $this->resolver = new OpaqueMediaPathResolver($this->inner);
+        $this->resolver = new OpaqueMediaPathResolver();
     }
 
     public function testResolvesImageToOpaqueMediaUrl(): void
@@ -69,49 +66,43 @@ class OpaqueMediaPathResolverTest extends TestCase
         $this->assertSame(OpaqueMediaPathResolver::HASH_LENGTH, strlen($hash));
     }
 
-    public function testJsFileDelegatesToInnerResolver(): void
+    public function testJsFileResolvesToOpaqueMediaUrl(): void
     {
         // Arrange
-        $logicalPath = 'js/app.js';
-        $inner = $this->createMock(PublicAssetsPathResolverInterface::class);
-        $inner->expects($this->once())
-            ->method('resolvePublicPath')
-            ->with($logicalPath)
-            ->willReturn('/assets/js/app-abc123.js');
-        $resolver = new OpaqueMediaPathResolver($inner);
+        $logicalPath = 'js/event-details.js';
 
-        // Act & Assert
-        $this->assertSame('/assets/js/app-abc123.js', $resolver->resolvePublicPath($logicalPath));
+        // Act
+        $result = $this->resolver->resolvePublicPath($logicalPath);
+
+        // Assert
+        $this->assertStringStartsWith('/media/', $result);
+        $this->assertStringEndsWith('.js', $result);
     }
 
-    public function testMjsFileDelegatesToInnerResolver(): void
+    public function testMjsExtensionIsNormalizedToJs(): void
     {
-        // Arrange
+        // Arrange: .mjs is served as JavaScript; URL normalizes to .js to match MediaCompileCommand output
         $logicalPath = 'js/module.mjs';
-        $inner = $this->createMock(PublicAssetsPathResolverInterface::class);
-        $inner->expects($this->once())
-            ->method('resolvePublicPath')
-            ->with($logicalPath)
-            ->willReturn('/assets/js/module-xyz.mjs');
-        $resolver = new OpaqueMediaPathResolver($inner);
 
-        // Act & Assert
-        $this->assertSame('/assets/js/module-xyz.mjs', $resolver->resolvePublicPath($logicalPath));
+        // Act
+        $result = $this->resolver->resolvePublicPath($logicalPath);
+
+        // Assert
+        $this->assertStringEndsWith('.js', $result);
+        $this->assertStringStartsWith('/media/', $result);
     }
 
-    public function testMapFileDelegatesToInnerResolver(): void
+    public function testMapFileKeepsMapExtension(): void
     {
         // Arrange
         $logicalPath = 'js/app.js.map';
-        $inner = $this->createMock(PublicAssetsPathResolverInterface::class);
-        $inner->expects($this->once())
-            ->method('resolvePublicPath')
-            ->with($logicalPath)
-            ->willReturn('/assets/js/app.js.map');
-        $resolver = new OpaqueMediaPathResolver($inner);
 
-        // Act & Assert
-        $this->assertSame('/assets/js/app.js.map', $resolver->resolvePublicPath($logicalPath));
+        // Act
+        $result = $this->resolver->resolvePublicPath($logicalPath);
+
+        // Assert
+        $this->assertStringStartsWith('/media/', $result);
+        $this->assertStringEndsWith('.map', $result);
     }
 
     public function testMissingExtensionFallsToBin(): void

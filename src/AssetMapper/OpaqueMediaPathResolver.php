@@ -9,17 +9,9 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
     public const int HASH_LENGTH = 16;
     private const string SECRET_SALT = 'meetagain-media-v1';
 
-    public function __construct(private readonly PublicAssetsPathResolverInterface $inner) {}
-
     public function resolvePublicPath(string $logicalPath): string
     {
         $ext = pathinfo($logicalPath, PATHINFO_EXTENSION);
-
-        // JS, module, and source map files are version-stamped by asset-mapper — delegate directly
-        if (in_array($ext, ['js', 'mjs', 'map'], true)) {
-            return $this->inner->resolvePublicPath($logicalPath);
-        }
-
         $stablePath = preg_replace('/-[A-Za-z0-9_-]{7}(\.\w+)$/', '$1', $logicalPath);
 
         return '/media/' . self::hashLogicalPath($stablePath) . '.' . self::normalizeExtension($ext);
