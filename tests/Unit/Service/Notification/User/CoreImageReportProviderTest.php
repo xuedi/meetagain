@@ -4,10 +4,12 @@ namespace Tests\Unit\Service\Notification\User;
 
 use App\Entity\ImageReport;
 use App\Entity\User;
+use App\Enum\ImageReportStatus;
 use App\Repository\ImageReportRepository;
 use App\Service\Notification\User\CoreImageReportProvider;
 use App\Service\Notification\User\ReviewNotificationItem;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -96,5 +98,98 @@ class CoreImageReportProviderTest extends TestCase
 
         // Act
         $provider->denyItem($user, '1');
+    }
+
+    public function testGetIdentifierIsStable(): void
+    {
+        static::assertSame('core.image_report', $this->makeProvider()->getIdentifier());
+    }
+
+    public function testApproveItemThrowsWhenReportNotFound(): void
+    {
+        // Arrange - admin but repo finds nothing
+        $repo = $this->createStub(ImageReportRepository::class);
+        $repo->method('find')->willReturn(null);
+
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(true);
+
+        $provider = new CoreImageReportProvider(
+            $repo,
+            $this->createStub(EntityManagerInterface::class),
+            $security,
+        );
+
+        // Assert
+        $this->expectException(InvalidArgumentException::class);
+
+        // Act
+        $provider->approveItem($this->createStub(User::class), '404');
+    }
+
+    public function testDenyItemThrowsWhenReportNotFound(): void
+    {
+        // Arrange
+        $repo = $this->createStub(ImageReportRepository::class);
+        $repo->method('find')->willReturn(null);
+
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(true);
+
+        $provider = new CoreImageReportProvider(
+            $repo,
+            $this->createStub(EntityManagerInterface::class),
+            $security,
+        );
+
+        // Assert
+        $this->expectException(InvalidArgumentException::class);
+
+        // Act
+        $provider->denyItem($this->createStub(User::class), '404');
+    }
+
+    public function testApproveItemResolvesAndPersistsReport(): void
+    {
+        // Arrange
+        $report = $this->createMock(ImageReport::class);
+        $report->expects($this->once())->method('setStatus')->with(ImageReportStatus::Resolved);
+
+        $repo = $this->createStub(ImageReportRepository::class);
+        $repo->method('find')->willReturn($report);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('persist')->with($report);
+        $em->expects($this->once())->method('flush');
+
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(true);
+
+        $provider = new CoreImageReportProvider($repo, $em, $security);
+
+        // Act
+        $provider->approveItem($this->createStub(User::class), '1');
+    }
+
+    public function testDenyItemResolvesAndPersistsReport(): void
+    {
+        // Arrange - deny and approve share the same body in this provider
+        $report = $this->createMock(ImageReport::class);
+        $report->expects($this->once())->method('setStatus')->with(ImageReportStatus::Resolved);
+
+        $repo = $this->createStub(ImageReportRepository::class);
+        $repo->method('find')->willReturn($report);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('persist')->with($report);
+        $em->expects($this->once())->method('flush');
+
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(true);
+
+        $provider = new CoreImageReportProvider($repo, $em, $security);
+
+        // Act
+        $provider->denyItem($this->createStub(User::class), '1');
     }
 }
