@@ -2,79 +2,65 @@
 
 namespace App\Service\System;
 
+use App\ExtendedFilesystem;
 use App\ValueObject\LogEntry;
 use DateTimeImmutable;
-use SplFileObject;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Throwable;
 
 readonly class SystemLogService
 {
     public const int MAX_LIMIT = 1000;
-    private const int READ_MULTIPLIER = 10;
 
     public function __construct(
+        private ExtendedFilesystem $fs,
         #[Autowire('%kernel.logs_dir%')]
         private string $logsDir,
         #[Autowire('%kernel.environment%')]
         private string $environment,
     ) {}
 
-    /** @return LogEntry[] */
+    /** @return list<LogEntry> */
     public function getRecentEntries(int $limit = 100, ?string $level = null, ?string $channel = null): array
     {
         $limit = min(max($limit, 1), self::MAX_LIMIT);
         $logFile = $this->getLogFilePath();
 
-        if (!file_exists($logFile)) {
+        if (!$this->fs->fileExists($logFile)) {
             return [];
         }
 
-        $rawLimit = $level !== null || $channel !== null ? $limit * self::READ_MULTIPLIER : $limit;
-
-        $lines = $this->readTail($logFile, $rawLimit);
-        $entries = [];
-
-        foreach ($lines as $line) {
-            if ($line === '') {
-                continue;
-            }
-
-            try {
-                $entry = LogEntry::fromString($line);
-            } catch (Throwable) {
-                continue;
-            }
-
+        $entries = array_reverse($this->readEntriesFrom($logFile));
+        $result = [];
+        foreach ($entries as $entry) {
             if ($level !== null && strtoupper($entry->getLevel()) !== strtoupper($level)) {
                 continue;
             }
             if ($channel !== null && strtolower($entry->getType()) !== strtolower($channel)) {
                 continue;
             }
-
-            $entries[] = $entry;
-
-            if (count($entries) >= $limit) {
+            $result[] = $entry;
+            if (count($result) >= $limit) {
                 break;
             }
         }
 
-        return $entries;
+        return $result;
     }
 
     public function countLines(): int
     {
         $logFile = $this->getLogFilePath();
-
-        if (!file_exists($logFile)) {
+        if (!$this->fs->fileExists($logFile)) {
             return 0;
         }
 
-        $file = new SplFileObject($logFile, 'r');
-        $file->seek(PHP_INT_MAX);
+        $content = $this->fs->getFileContents($logFile);
+        if ($content === false || $content === '') {
+            return 0;
+        }
 
-        return $file->key();
+        return substr_count($content, "\n") + (str_ends_with($content, "\n") ? 0 : 1);
     }
 
     public function getLatestTimestamp(): ?DateTimeImmutable
@@ -89,11 +75,10 @@ readonly class SystemLogService
 
     public function getLogFilePath(): string
     {
-        $pattern = $this->logsDir . '/' . $this->environment . '-*.log';
-        $files = glob($pattern);
+        $files = $this->fs->glob($this->logsDir . '/' . $this->environment . '-*.log');
 
         if ($files !== []) {
-            usort($files, static fn ($a, $b) => filemtime($b) <=> filemtime($a));
+            usort($files, fn ($a, $b) => ($this->fs->getFileModifiedTime($b) ?: 0) <=> ($this->fs->getFileModifiedTime($a) ?: 0));
             return $files[0];
         }
 
@@ -111,22 +96,8 @@ readonly class SystemLogService
     {
         $entries = [];
         foreach ($this->resolveAllLogFiles() as $file) {
-            if (!is_readable($file)) {
-                continue;
-            }
-            $content = file_get_contents($file);
-            if ($content === false) {
-                continue;
-            }
-            foreach (explode("\n", $content) as $line) {
-                if ($line === '' || $line === '0') {
-                    continue;
-                }
-                try {
-                    $entries[] = LogEntry::fromString($line);
-                } catch (Throwable) {
-                    continue;
-                }
+            foreach ($this->readEntriesFrom($file) as $entry) {
+                $entries[] = $entry;
             }
         }
 
@@ -200,7 +171,7 @@ readonly class SystemLogService
             } catch (Throwable) {
                 continue;
             }
-            if ($fileDate < $cutoff && file_exists($file) && unlink($file)) {
+            if ($fileDate < $cutoff && $this->fs->fileExists($file) && $this->fs->deleteFile($file)) {
                 $deleted++;
             }
         }
@@ -215,40 +186,38 @@ readonly class SystemLogService
     {
         $files = [];
         $single = $this->logsDir . '/' . $this->environment . '.log';
-        if (is_file($single)) {
+        if ($this->fs->isFile($single)) {
             $files[] = $single;
         }
-        $rotated = glob($this->logsDir . '/' . $this->environment . '-*.log') ?: [];
+        $rotated = $this->fs->glob($this->logsDir . '/' . $this->environment . '-*.log');
         $files = [...$files, ...$rotated];
         sort($files);
 
         return $files;
     }
 
-    /** @return string[] Lines in reverse chronological order (newest first) */
-    private function readTail(string $filePath, int $lineCount): array
+    /**
+     * @return list<LogEntry>
+     */
+    private function readEntriesFrom(string $file): array
     {
-        $file = new SplFileObject($filePath, 'r');
-        $file->seek(PHP_INT_MAX);
-        $totalLines = $file->key();
-
-        if ($totalLines === 0) {
+        $content = $this->fs->getFileContents($file);
+        if ($content === false) {
             return [];
         }
 
-        $startLine = max(0, $totalLines - $lineCount);
-        $lines = [];
-
-        $file->seek($startLine);
-        while (!$file->eof()) {
-            $current = $file->current();
-            $line = rtrim(is_string($current) ? $current : '', "\n\r");
-            if ($line !== '') {
-                $lines[] = $line;
+        $entries = [];
+        foreach (explode("\n", $content) as $line) {
+            if ($line === '' || $line === '0') {
+                continue;
             }
-            $file->next();
+            try {
+                $entries[] = LogEntry::fromString($line);
+            } catch (Throwable) {
+                continue;
+            }
         }
 
-        return array_reverse($lines);
+        return $entries;
     }
 }

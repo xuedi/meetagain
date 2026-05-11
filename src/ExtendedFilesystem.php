@@ -84,4 +84,20 @@ class ExtendedFilesystem extends SymfonyFilesystem
     {
         return dirname($path, $levels);
     }
+
+    public function getFileModifiedTime(string $path): int|false
+    {
+        return filemtime($path);
+    }
+
+    public function deleteFile(string $path): bool
+    {
+        try {
+            $this->remove($path);
+            return true;
+        } catch (Exception $e) {
+            $this->logger->error(sprintf("Error deleting file '%s': %s", $path, $e->getMessage()));
+            return false;
+        }
+    }
 }
