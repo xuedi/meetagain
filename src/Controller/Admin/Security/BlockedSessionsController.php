@@ -4,10 +4,12 @@ namespace App\Controller\Admin\Security;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Security\BlockedSessionStore;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -36,6 +38,15 @@ final class BlockedSessionsController extends AbstractSecurityController impleme
             $entries[] = ['type' => 'session', 'key' => $entry['key'], 'snapshot' => $entry['snapshot']];
         }
 
+        $actions = [];
+        if (count($entries) > 0) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('global.button_clear'),
+                target: $this->generateUrl('app_admin_security_blocked_clear'),
+                icon: 'trash',
+            );
+        }
+
         $adminTop = new AdminTop(
             info: [
                 new AdminTopInfoHtml(sprintf(
@@ -44,7 +55,7 @@ final class BlockedSessionsController extends AbstractSecurityController impleme
                     $this->translator->trans('admin_security.summary_blocked_total'),
                 )),
             ],
-            actions: [],
+            actions: $actions,
         );
 
         return $this->render('admin/security/blocked_sessions.html.twig', [
@@ -55,4 +66,13 @@ final class BlockedSessionsController extends AbstractSecurityController impleme
         ]);
     }
 
+    #[Route('/clear', name: 'app_admin_security_blocked_clear')]
+    public function clear(): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
+
+        $this->blockStore->clearAll();
+
+        return $this->redirectToRoute('app_admin_security_blocked');
+    }
 }

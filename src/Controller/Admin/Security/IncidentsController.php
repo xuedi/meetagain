@@ -14,6 +14,7 @@ use App\Repository\IncidentRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Security\BlockedSessionStore;
 use DateTimeImmutable;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +39,7 @@ final class IncidentsController extends AbstractSecurityController implements Ad
         TranslatorInterface $translator,
         private readonly IncidentRepository $incidentRepo,
         private readonly BlockedSessionStore $blockStore,
+        private readonly Connection $connection,
     ) {
         parent::__construct($translator, 'incidents');
     }
@@ -78,9 +80,19 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             ));
         }
 
+        $actions = [];
+        if ($totalCount > 0) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('global.button_clear'),
+                target: $this->generateUrl('app_admin_security_incidents_clear'),
+                icon: 'trash',
+            );
+        }
+        $actions[] = $this->buildRangeDropdown($range);
+
         $adminTop = new AdminTop(
             info: $info,
-            actions: [$this->buildRangeDropdown($range)],
+            actions: $actions,
         );
 
         return $this->render('admin/security/incidents_list.html.twig', [
@@ -137,6 +149,16 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    #[Route('/clear', name: 'app_admin_security_incidents_clear')]
+    public function clear(): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
+
+        $this->connection->executeStatement('DELETE FROM logs_incident');
+
+        return $this->redirectToRoute('app_admin_security_incidents');
     }
 
     #[Route('/{id}/unblock', name: 'app_admin_security_incidents_unblock', requirements: ['id' => '\d+'])]

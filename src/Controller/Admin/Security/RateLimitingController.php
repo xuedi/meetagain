@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Security;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
@@ -11,7 +12,9 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Repository\RateLimitLogRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use DateTimeImmutable;
+use Doctrine\DBAL\Connection;
 use Exception;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -34,6 +37,7 @@ final class RateLimitingController extends AbstractSecurityController implements
     public function __construct(
         TranslatorInterface $translator,
         private readonly RateLimitLogRepository $rateLimitLogRepo,
+        private readonly Connection $connection,
     ) {
         parent::__construct($translator, 'rate_limiting');
     }
@@ -88,7 +92,17 @@ final class RateLimitingController extends AbstractSecurityController implements
             ));
         }
 
-        $adminTop = new AdminTop(info: $info, actions: [$this->buildRangeDropdown($range)]);
+        $actions = [];
+        if ($totalCount > 0) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('global.button_clear'),
+                target: $this->generateUrl('app_admin_security_rate_limiting_clear'),
+                icon: 'trash',
+            );
+        }
+        $actions[] = $this->buildRangeDropdown($range);
+
+        $adminTop = new AdminTop(info: $info, actions: $actions);
 
         return $this->render('admin/security/rate_limiting_list.html.twig', [
             'active' => 'security',
@@ -97,6 +111,16 @@ final class RateLimitingController extends AbstractSecurityController implements
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    #[Route('/clear', name: 'app_admin_security_rate_limiting_clear')]
+    public function clear(): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_RATE_LIMITING_READ);
+
+        $this->connection->executeStatement('DELETE FROM logs_rate_limit');
+
+        return $this->redirectToRoute('app_admin_security_rate_limiting');
     }
 
     private function parseDateParam(string $value): ?DateTimeImmutable
