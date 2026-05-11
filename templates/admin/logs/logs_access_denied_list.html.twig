@@ -7,59 +7,45 @@
         {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-        <div class="columns">
-            <div class="column is-4">
-                <table class="table is-fullwidth">
-                    <thead>
-                        <tr>
-                            <th>{{ 'admin_logs.col_count'|trans }}</th>
-                            <th>{{ 'admin_logs.col_url'|trans }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in list %}
-                            <tr>
-                                <td>{{ item.number }}</td>
-                                <td>{{ item.url|length > 60 ? item.url|slice(0, 57) ~ '...' : item.url }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="column is-8">
-                <table class="table is-fullwidth">
-                    <thead>
-                        <tr>
-                            <th>{{ 'admin_logs.col_time'|trans }}</th>
-                            <th>{{ 'admin_logs.col_ip'|trans }}</th>
-                            <th>{{ 'admin_logs.col_url'|trans }}</th>
-                            <th>{{ 'admin_logs.col_reason'|trans }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for entry in recent %}
-                            <tr>
-                                <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
-                                <td class="is-nowrap">{{ entry.ip }}</td>
-                                <td>{{ entry.url|length > 60 ? entry.url|slice(0, 57) ~ '...' : entry.url }}</td>
-                                <td>
-                                    <span class="tag is-light">{{ entry.reason }}</span>
-                                    {% if entry.user %}
-                                        <span class="has-text-grey">{{ entry.user.name }}</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="has-text-centered has-text-grey">
-                                    {{ 'admin_logs.empty_access_denied'|trans }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'admin_logs.col_time'|trans }}</th>
+                    <th>{{ 'admin_logs.col_ip'|trans }}</th>
+                    <th>{{ 'admin_logs.col_url'|trans }}</th>
+                    <th>{{ 'admin_logs.col_reason'|trans }}</th>
+                    <th>{{ 'admin_logs.col_incident'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in recent %}
+                    <tr>
+                        <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
+                        <td class="is-nowrap">{{ entry.ip }}</td>
+                        <td>{{ entry.url|length > 60 ? entry.url|slice(0, 57) ~ '...' : entry.url }}</td>
+                        <td>
+                            <span class="tag is-light">{{ entry.reason }}</span>
+                            {% if entry.user %}
+                                <span class="has-text-grey">{{ entry.user.name }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if entry.incident %}
+                                <a href="{{ path('app_admin_security_incidents_show', {'id': entry.incident.id}) }}">
+                                    <span class="icon"><i class="fa fa-shield-halved"></i></span>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="has-text-centered has-text-grey">
+                            {{ 'admin_logs.empty_access_denied'|trans }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
     </div>
 

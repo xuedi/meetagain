@@ -51,7 +51,6 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         $fromFilter = $this->parseDateParam($request->query->getString('from', ''));
         $toFilter = $this->parseDateParam($request->query->getString('to', ''));
 
-        $top = $this->notFoundLogRepo->getTop100($since);
         $recent = $this->notFoundLogRepo->findFiltered(200, $since, $ipFilter, $fromFilter, $toFilter);
         $totalCount = $this->notFoundLogRepo->countAll();
         $rangeCount = $since !== null
@@ -66,7 +65,6 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         return $this->render('admin/logs/logs_notFound_list.html.twig', [
             'active' => 'logs',
             'activeLog' => '404',
-            'list' => $top,
             'recent' => $recent,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),

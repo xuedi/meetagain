@@ -110,6 +110,19 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function findLatestUnlinkedForOffender(string $ip): ?AccessDeniedLog
+    {
+        return $this
+            ->createQueryBuilder('a')
+            ->where('a.ip = :ip')
+            ->andWhere('a.incident IS NULL')
+            ->orderBy('a.createdAt', 'DESC')
+            ->setParameter('ip', $ip)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * @return list<AccessDeniedLog>
      */

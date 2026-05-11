@@ -300,6 +300,7 @@ admin_logs:
     col_meta: 'Meta'
     col_related: 'Related'
     col_count: '#'
+    col_incident: 'Incident'
     col_url: 'URL'
     col_time: 'Time'
     col_ip: 'IP'

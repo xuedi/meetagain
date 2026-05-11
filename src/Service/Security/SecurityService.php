@@ -10,6 +10,8 @@ use App\Enum\CronTaskStatus;
 use App\Enum\IncidentSeverity;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
+use App\Repository\AccessDeniedLogRepository;
+use App\Repository\NotFoundLogRepository;
 use App\Service\AppStateService;
 use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
@@ -40,6 +42,8 @@ readonly class SecurityService implements CronTaskInterface
         private ClockInterface $clock,
         private LoggerInterface $logger,
         private string $environment,
+        private NotFoundLogRepository $notFoundLogRepository,
+        private AccessDeniedLogRepository $accessDeniedLogRepository,
     ) {}
 
     /**
@@ -297,6 +301,30 @@ readonly class SecurityService implements CronTaskInterface
 
         $this->em->persist($incident);
         $this->em->flush();
+
+        $this->stampLogRow($incident, $sessionId, $ip, $triggeredBy);
+    }
+
+    private function stampLogRow(Incident $incident, string $sessionId, string $ip, string $triggeredBy): void
+    {
+        try {
+            $log = match ($triggeredBy) {
+                'not_found' => $this->notFoundLogRepository->findLatestUnlinkedForOffender($ip, $sessionId),
+                'access_denied' => $this->accessDeniedLogRepository->findLatestUnlinkedForOffender($ip),
+                default => null,
+            };
+
+            if ($log === null) {
+                return;
+            }
+
+            $log->setIncident($incident);
+            $this->em->flush();
+        } catch (Throwable $e) {
+            $this->logger->warning('Failed to stamp log row with incident id: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+        }
     }
 
     private function severityFor(int $threatLevel): IncidentSeverity

@@ -300,6 +300,7 @@ admin_logs:
     col_meta: '元数据'
     col_related: '关联'
     col_count: '#'
+    col_incident: '事件'
     col_url: 'URL'
     col_time: '时间'
     col_ip: 'IP'

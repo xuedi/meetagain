@@ -5,7 +5,7 @@ namespace Tests\Functional\Controller\Admin\Logs;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AccessDeniedLogControllerTest extends WebTestCase
+class NotFoundLogControllerTest extends WebTestCase
 {
     private const string ADMIN_EMAIL = 'Admin@example.org';
     private const string ADMIN_PASSWORD = '1234';
@@ -17,7 +17,7 @@ class AccessDeniedLogControllerTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/logs/access-denied');
+        $crawler = $client->request('GET', '/en/admin/logs/404');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -31,7 +31,7 @@ class AccessDeniedLogControllerTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/logs/access-denied');
+        $crawler = $client->request('GET', '/en/admin/logs/404');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -47,7 +47,7 @@ class AccessDeniedLogControllerTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/logs/access-denied');
+        $crawler = $client->request('GET', '/en/admin/logs/404');
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -61,7 +61,7 @@ class AccessDeniedLogControllerTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/en/admin/logs/access-denied');
+        $client->request('GET', '/en/admin/logs/404');
 
         // Assert
         static::assertTrue(

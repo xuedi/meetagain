@@ -55,7 +55,6 @@ final class AccessDeniedLogController extends AbstractLogsController implements 
         $fromFilter = $this->parseDateParam($request->query->getString('from', ''));
         $toFilter = $this->parseDateParam($request->query->getString('to', ''));
 
-        $top = $this->accessDeniedLogRepo->getTop100($since);
         $recent = $this->accessDeniedLogRepo->findFiltered(200, $since, $ipFilter, $fromFilter, $toFilter);
         $totalCount = $this->accessDeniedLogRepo->countAll();
         $rangeCount = $since !== null ? $this->accessDeniedLogRepo->countSince($since) : $totalCount;
@@ -85,7 +84,6 @@ final class AccessDeniedLogController extends AbstractLogsController implements 
         return $this->render('admin/logs/logs_access_denied_list.html.twig', [
             'active' => 'logs',
             'activeLog' => 'access_denied',
-            'list' => $top,
             'recent' => $recent,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),

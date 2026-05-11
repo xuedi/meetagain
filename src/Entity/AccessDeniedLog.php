@@ -34,6 +34,10 @@ class AccessDeniedLog
     #[ORM\JoinColumn(name: 'user_id', nullable: true, onDelete: 'SET NULL')]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(targetEntity: Incident::class)]
+    #[ORM\JoinColumn(name: 'incident_id', nullable: true, onDelete: 'SET NULL')]
+    private ?Incident $incident = null;
+
     #[ORM\Column(length: 64)]
     private string $reason;
 
@@ -113,6 +117,18 @@ class AccessDeniedLog
     public function setUserAgent(?string $userAgent): static
     {
         $this->userAgent = $userAgent === null ? null : mb_substr($userAgent, 0, self::UA_MAX);
+
+        return $this;
+    }
+
+    public function getIncident(): ?Incident
+    {
+        return $this->incident;
+    }
+
+    public function setIncident(?Incident $incident): static
+    {
+        $this->incident = $incident;
 
         return $this;
     }
