@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use App\Service\Member\UserService;
 use App\Service\Notification\User\CoreMemberApprovalProvider;
 use App\Service\Notification\User\ReviewNotificationItem;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -97,5 +98,90 @@ class CoreMemberApprovalProviderTest extends TestCase
 
         // Act
         $provider->denyItem($user, '1');
+    }
+
+    public function testGetIdentifierIsStable(): void
+    {
+        static::assertSame('core.member_approval', $this->makeProvider()->getIdentifier());
+    }
+
+    public function testApproveItemThrowsWhenUserNotFound(): void
+    {
+        $provider = $this->makeProvider(findResult: null, isAdmin: true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $provider->approveItem($this->createStub(User::class), '404');
+    }
+
+    public function testApproveItemThrowsWhenUserHasWrongStatus(): void
+    {
+        // Arrange - user exists but is already Active, not EmailVerified
+        $wrong = $this->makeUser(1, 'X', UserStatus::Active);
+        $provider = $this->makeProvider(findResult: $wrong, isAdmin: true);
+
+        // Act / Assert
+        $this->expectException(InvalidArgumentException::class);
+        $provider->approveItem($this->createStub(User::class), '1');
+    }
+
+    public function testApproveItemTransitionsPendingUserToActive(): void
+    {
+        // Arrange
+        $pending = $this->makeUser(1, 'Pending', UserStatus::EmailVerified);
+
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('find')->willReturn($pending);
+
+        $userService = $this->createMock(UserService::class);
+        $userService->expects($this->once())
+            ->method('transitionStatus')
+            ->with(static::isInstanceOf(User::class), $pending, UserStatus::Active);
+
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(true);
+
+        $provider = new CoreMemberApprovalProvider($userRepo, $userService, $security);
+
+        // Act
+        $provider->approveItem($this->createStub(User::class), '1');
+    }
+
+    public function testDenyItemThrowsWhenUserNotFound(): void
+    {
+        $provider = $this->makeProvider(findResult: null, isAdmin: true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $provider->denyItem($this->createStub(User::class), '404');
+    }
+
+    public function testDenyItemThrowsWhenUserHasWrongStatus(): void
+    {
+        $wrong = $this->makeUser(1, 'X', UserStatus::Active);
+        $provider = $this->makeProvider(findResult: $wrong, isAdmin: true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $provider->denyItem($this->createStub(User::class), '1');
+    }
+
+    public function testDenyItemTransitionsPendingUserToDenied(): void
+    {
+        // Arrange
+        $pending = $this->makeUser(1, 'Pending', UserStatus::EmailVerified);
+
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('find')->willReturn($pending);
+
+        $userService = $this->createMock(UserService::class);
+        $userService->expects($this->once())
+            ->method('transitionStatus')
+            ->with(static::isInstanceOf(User::class), $pending, UserStatus::Denied);
+
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(true);
+
+        $provider = new CoreMemberApprovalProvider($userRepo, $userService, $security);
+
+        // Act
+        $provider->denyItem($this->createStub(User::class), '1');
     }
 }

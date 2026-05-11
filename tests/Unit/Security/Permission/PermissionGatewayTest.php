@@ -142,6 +142,48 @@ class PermissionGatewayTest extends TestCase
         self::assertTrue($captured->isAdmin);
     }
 
+    public function testNonStringAttributesAreSkipped(): void
+    {
+        // Arrange - a checker that would grant for strings; with non-string attrs it should never be consulted
+        $gateway = $this->makeGateway(false, $this->fixedChecker(supports: true, decision: true));
+
+        // Act
+        $result = $gateway->vote($this->makeToken(), null, [42, ['nested']]);
+
+        // Assert
+        self::assertSame(VoterInterface::ACCESS_ABSTAIN, $result);
+    }
+
+    public function testSupportsAttributeReturnsTrueWhenAnyCheckerSupports(): void
+    {
+        // Arrange
+        $gateway = $this->makeGateway(
+            false,
+            $this->fixedChecker(supports: false, decision: null),
+            $this->fixedChecker(supports: true, decision: null),
+        );
+
+        // Act / Assert
+        self::assertTrue($gateway->supportsAttribute('anything'));
+    }
+
+    public function testSupportsAttributeReturnsFalseWhenNoCheckerSupports(): void
+    {
+        // Arrange
+        $gateway = $this->makeGateway(false, $this->fixedChecker(supports: false, decision: null));
+
+        // Act / Assert
+        self::assertFalse($gateway->supportsAttribute('anything'));
+    }
+
+    public function testSupportsTypeIsAlwaysTrue(): void
+    {
+        $gateway = $this->makeGateway(false);
+
+        self::assertTrue($gateway->supportsType('anything'));
+        self::assertTrue($gateway->supportsType(User::class));
+    }
+
     public function testContextActorIsNullWhenTokenHasNoUser(): void
     {
         // Arrange
