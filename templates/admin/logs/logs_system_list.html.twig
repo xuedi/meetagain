@@ -22,7 +22,7 @@
                     <td>{{ log.date | date('Y-m-d  H:i') }}</td>
                     <td>{{ log.type }}</td>
                     <td>{{ log.level }}</td>
-                    <td>{{ log.message }}</td>
+                    <td title="{{ log.message }}">{{ log.message|length > 80 ? log.message|slice(0, 80) ~ '...' : log.message }}</td>
                 </tr>
             {% endfor %}
             </tbody>

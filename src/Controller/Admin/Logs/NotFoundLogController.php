@@ -4,12 +4,15 @@ namespace App\Controller\Admin\Logs;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Repository\NotFoundLogRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Connection;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -32,6 +35,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
     public function __construct(
         TranslatorInterface $translator,
         private readonly NotFoundLogRepository $notFoundLogRepo,
+        private readonly Connection $connection,
     ) {
         parent::__construct($translator, 'not_found');
     }
@@ -57,9 +61,19 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
             ? $this->notFoundLogRepo->countSince($since)
             : $totalCount;
 
+        $actions = [];
+        if ($totalCount > 0) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('global.button_clear'),
+                target: $this->generateUrl('app_admin_not_found_log_clear'),
+                icon: 'trash',
+            );
+        }
+        $actions[] = $this->buildRangeDropdown($range);
+
         $adminTop = new AdminTop(
             info: $this->buildInfo($totalCount, $rangeCount),
-            actions: [$this->buildRangeDropdown($range)],
+            actions: $actions,
         );
 
         return $this->render('admin/logs/logs_notFound_list.html.twig', [
@@ -69,6 +83,14 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    #[Route('/clear', name: 'app_admin_not_found_log_clear')]
+    public function clear(): RedirectResponse
+    {
+        $this->connection->executeStatement('DELETE FROM logs_not_found');
+
+        return $this->redirectToRoute('app_admin_not_found_log');
     }
 
     /**

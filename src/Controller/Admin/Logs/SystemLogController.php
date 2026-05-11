@@ -71,13 +71,13 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         $adminTop = new AdminTop(
             info: $this->buildInfo($totalCount, $allEntries, $since),
             actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_clear'),
+                    target: $this->generateUrl('app_admin_system_log_cleanup'),
+                    icon: 'trash',
+                ),
                 $this->buildLevelDropdown($level, $range, $allEntries, $since),
                 $this->buildRangeDropdown($range, $level, $allEntries, $levels),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_logs.action_cleanup'),
-                    target: $this->generateUrl('app_admin_system_log_cleanup'),
-                    icon: 'broom',
-                ),
             ],
         );
 
