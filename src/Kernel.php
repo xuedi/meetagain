@@ -61,10 +61,12 @@ class Kernel extends BaseKernel
             if (!($envs[$this->environment] ?? $envs['all'] ?? false)) {
                 continue;
             }
-            if ((new ReflectionClass($class))->isAbstract()) {
+            $reflection = new ReflectionClass($class);
+            if ($reflection->isAbstract() || $reflection->isInterface()) {
                 continue;
             }
 
+            // @mago-expect analyzer:unsafe-instantiation
             yield new $class();
         }
     }
