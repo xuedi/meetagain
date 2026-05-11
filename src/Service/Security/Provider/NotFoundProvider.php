@@ -97,10 +97,12 @@ final class NotFoundProvider extends AbstractSecurityProvider
 
         $isAsset = false;
         foreach (self::ASSET_PATH_PREFIXES as $prefix) {
-            if (str_starts_with($path, $prefix)) {
-                $isAsset = true;
-                break;
+            if (!str_starts_with($path, $prefix)) {
+                continue;
             }
+
+            $isAsset = true;
+            break;
         }
 
         if ($isAsset) {
@@ -112,7 +114,12 @@ final class NotFoundProvider extends AbstractSecurityProvider
             $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
             $assetWeight = $assetHits * (100 / self::BLOCK_AT_ASSET_HITS);
             $threatLevel = (int) min(100, $probeWeight + $assetWeight);
-            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
+            $summary = sprintf(
+                '%d probe 404s, %d asset 404s (distinct paths: %d)',
+                $probeHits,
+                $assetHits,
+                $distinctPaths,
+            );
         } elseif ($isApi) {
             ++$apiHits;
             if ($distinctPaths <= 3 && $apiHits <= 2000) {
@@ -135,7 +142,12 @@ final class NotFoundProvider extends AbstractSecurityProvider
             $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
             $assetWeight = (int) ($state['assetHits'] ?? 0) * (100 / self::BLOCK_AT_ASSET_HITS);
             $threatLevel = (int) min(100, $base + $probeWeight + $assetWeight);
-            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
+            $summary = sprintf(
+                '%d probe 404s, %d asset 404s (distinct paths: %d)',
+                $probeHits,
+                $assetHits,
+                $distinctPaths,
+            );
         }
 
         $previousThreat = (int) ($state['threatLevel'] ?? 0);
