@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\Security;
 
+use DateTimeImmutable;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -89,6 +90,26 @@ readonly class BlockedSessionStore
     public function getIpSnapshot(string $ip): ?array
     {
         return $this->readBlock($this->ipKey($ip));
+    }
+
+    public function getSessionBlockExpiresAt(string $sessionId): ?DateTimeImmutable
+    {
+        return $this->lookupExpiry(self::SESSION_INDEX_KEY, $sessionId);
+    }
+
+    public function getIpBlockExpiresAt(string $ip): ?DateTimeImmutable
+    {
+        return $this->lookupExpiry(self::IP_INDEX_KEY, $ip);
+    }
+
+    private function lookupExpiry(string $indexKey, string $entry): ?DateTimeImmutable
+    {
+        $expiresAt = $this->loadIndex($indexKey)[$entry] ?? null;
+        if ($expiresAt === null || $expiresAt < time()) {
+            return null;
+        }
+
+        return new DateTimeImmutable('@' . $expiresAt);
     }
 
     /**

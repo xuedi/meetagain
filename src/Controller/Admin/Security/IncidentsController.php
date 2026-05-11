@@ -12,6 +12,7 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Incident;
 use App\Repository\IncidentRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Security\BlockedSessionStore;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +36,7 @@ final class IncidentsController extends AbstractSecurityController implements Ad
     public function __construct(
         TranslatorInterface $translator,
         private readonly IncidentRepository $incidentRepo,
+        private readonly BlockedSessionStore $blockStore,
     ) {
         parent::__construct($translator, 'incidents');
     }
@@ -121,12 +123,31 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             ],
         );
 
+        $sessionBlockedUntil = $this->blockStore->getSessionBlockExpiresAt($incident->getSessionId());
+        $ipBlockedUntil = $incident->getIp() !== ''
+            ? $this->blockStore->getIpBlockExpiresAt($incident->getIp())
+            : null;
+        $blockedUntil = $this->latestExpiry($sessionBlockedUntil, $ipBlockedUntil);
+
         return $this->render('admin/security/incidents_show.html.twig', [
             'active' => 'security',
             'incident' => $incident,
+            'blockedUntil' => $blockedUntil,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    private function latestExpiry(?DateTimeImmutable $a, ?DateTimeImmutable $b): ?DateTimeImmutable
+    {
+        if ($a === null) {
+            return $b;
+        }
+        if ($b === null) {
+            return $a;
+        }
+
+        return $a >= $b ? $a : $b;
     }
 
     private function buildRangeDropdown(string $current): AdminTopActionDropdown
