@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Service\Security;
 
+use App\Entity\AccessDeniedLog;
 use App\Entity\Incident;
+use App\Entity\NotFoundLog;
 use App\Enum\CronTaskStatus;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
+use App\Repository\AccessDeniedLogRepository;
+use App\Repository\NotFoundLogRepository;
 use App\Service\AppStateService;
 use App\Service\Security\BlockedSessionStore;
 use App\Service\Security\ProviderReport;
@@ -148,9 +152,13 @@ class SecurityServiceTest extends TestCase
             ->willReturnCallback(static function (object $entity) use (&$persistedIncident): void {
                 $persistedIncident = $entity;
             });
-        $em->expects($this->once())->method('flush');
+        $em->expects($this->exactly(2))->method('flush');
 
-        $service = $this->buildService([$detector], $blockStore, em: $em);
+        $notFoundLog = new NotFoundLog();
+        $notFoundRepo = $this->createStub(NotFoundLogRepository::class);
+        $notFoundRepo->method('findLatestUnlinkedForOffender')->willReturn($notFoundLog);
+
+        $service = $this->buildService([$detector], $blockStore, em: $em, notFoundLogRepository: $notFoundRepo);
         $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
 
         // Act
@@ -161,6 +169,111 @@ class SecurityServiceTest extends TestCase
         static::assertSame('not_found', $persistedIncident->getTriggeredBy());
         static::assertTrue($blockStore->isIpBlocked('1.2.3.4'));
         static::assertTrue($blockStore->isSessionBlocked('ip:1.2.3.4'));
+        static::assertSame($persistedIncident, $notFoundLog->getIncident());
+    }
+
+    public function testNotFoundBlockStampsLatestNotFoundLogRow(): void
+    {
+        // Arrange
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
+
+        $logRow = new NotFoundLog();
+        $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
+        $notFoundRepo
+            ->expects($this->once())
+            ->method('findLatestUnlinkedForOffender')
+            ->with('1.2.3.4', 'ip:1.2.3.4')
+            ->willReturn($logRow);
+
+        $accessDeniedRepo = $this->createStub(AccessDeniedLogRepository::class);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('persist');
+        $em->expects($this->exactly(2))->method('flush');
+
+        $service = $this->buildService(
+            [$detector],
+            $blockStore,
+            em: $em,
+            notFoundLogRepository: $notFoundRepo,
+            accessDeniedLogRepository: $accessDeniedRepo,
+        );
+        $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
+
+        // Act
+        $service->event(SecurityEventType::NotFound, $request);
+
+        // Assert
+        static::assertInstanceOf(Incident::class, $logRow->getIncident());
+    }
+
+    public function testAccessDeniedBlockStampsLatestAccessDeniedLogRow(): void
+    {
+        // Arrange
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $detector = $this->makeProvider('access_denied', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
+
+        $logRow = new AccessDeniedLog();
+        $accessDeniedRepo = $this->createMock(AccessDeniedLogRepository::class);
+        $accessDeniedRepo
+            ->expects($this->once())
+            ->method('findLatestUnlinkedForOffender')
+            ->with('1.2.3.4')
+            ->willReturn($logRow);
+
+        $notFoundRepo = $this->createStub(NotFoundLogRepository::class);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('persist');
+        $em->expects($this->exactly(2))->method('flush');
+
+        $service = $this->buildService(
+            [$detector],
+            $blockStore,
+            em: $em,
+            notFoundLogRepository: $notFoundRepo,
+            accessDeniedLogRepository: $accessDeniedRepo,
+        );
+        $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
+
+        // Act
+        $service->event(SecurityEventType::AccessDenied, $request);
+
+        // Assert
+        static::assertInstanceOf(Incident::class, $logRow->getIncident());
+    }
+
+    public function testUnrecognisedTriggeredByDoesNotStampAnyLogRow(): void
+    {
+        // Arrange
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $detector = $this->makeProvider('rate_limit', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
+
+        $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
+        $notFoundRepo->expects($this->never())->method('findLatestUnlinkedForOffender');
+
+        $accessDeniedRepo = $this->createMock(AccessDeniedLogRepository::class);
+        $accessDeniedRepo->expects($this->never())->method('findLatestUnlinkedForOffender');
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('persist');
+        $em->expects($this->once())->method('flush');
+
+        $service = $this->buildService(
+            [$detector],
+            $blockStore,
+            em: $em,
+            notFoundLogRepository: $notFoundRepo,
+            accessDeniedLogRepository: $accessDeniedRepo,
+        );
+        $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
+
+        // Act
+        $service->event(SecurityEventType::RateLimit, $request);
+
+        // Assert - no stamping repos were called
+        static::assertTrue($blockStore->isIpBlocked('1.2.3.4'));
     }
 
     public function testRetrospectiveScanUpdatesAppState(): void
@@ -197,10 +310,14 @@ class SecurityServiceTest extends TestCase
         ?CacheItemPoolInterface $cache = null,
         ?EntityManagerInterface $em = null,
         ?AppStateService $appState = null,
+        ?NotFoundLogRepository $notFoundLogRepository = null,
+        ?AccessDeniedLogRepository $accessDeniedLogRepository = null,
     ): SecurityService {
         $blockStore ??= new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
         $em ??= $this->createStub(EntityManagerInterface::class);
         $appState ??= $this->createStub(AppStateService::class);
+        $notFoundLogRepository ??= $this->createStub(NotFoundLogRepository::class);
+        $accessDeniedLogRepository ??= $this->createStub(AccessDeniedLogRepository::class);
 
         return new SecurityService(
             providers: $providers,
@@ -210,6 +327,8 @@ class SecurityServiceTest extends TestCase
             clock: new MockClock(new DateTimeImmutable('2026-05-09 12:00:00')),
             logger: new NullLogger(),
             environment: 'test',
+            notFoundLogRepository: $notFoundLogRepository,
+            accessDeniedLogRepository: $accessDeniedLogRepository,
         );
     }
 
