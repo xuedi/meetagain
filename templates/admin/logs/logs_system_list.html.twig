@@ -14,6 +14,7 @@
                 <th>{{ 'admin_logs.col_type'|trans }}</th>
                 <th>{{ 'admin_logs.col_level'|trans }}</th>
                 <th>{{ 'admin_logs.col_message'|trans }}</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -23,6 +24,11 @@
                     <td>{{ log.type }}</td>
                     <td>{{ log.level }}</td>
                     <td title="{{ log.message }}">{{ log.message|length > 80 ? log.message|slice(0, 80) ~ '...' : log.message }}</td>
+                    <td>
+                        <a href="{{ path('app_admin_system_log_show', {hash: log.hash}) }}">
+                            <span class="icon"><i class="fa fa-eye"></i></span>
+                        </a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
