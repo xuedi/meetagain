@@ -40,6 +40,17 @@ class FilmSelectionRepository extends ServiceEntityRepository
     }
 
     /** @return FilmSelection[] */
+    public function findByFilm(int $filmId): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.film = :filmId')
+            ->setParameter('filmId', $filmId)
+            ->orderBy('s.selectedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return FilmSelection[] */
     public function findHistory(?array $allowedIds = null): array
     {
         if ($allowedIds === []) {
