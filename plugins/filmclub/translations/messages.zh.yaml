@@ -1,5 +1,27 @@
 filmclub:
     menu_main: '电影俱乐部'
+    landing_title: '电影俱乐部'
+    landing_no_active_poll: '目前没有进行中的投票。'
+    landing_poll_closes: '投票将在 %days% 天后结束。'
+    landing_no_last_film: '还没有观看记录。'
+    landing_no_wishlist: '你的愿望清单是空的。'
+    wishlist_wanted_count: '被期待 %count% 次'
+    sidebar:
+        section_films: '电影'
+        browse: '浏览'
+        history: '观看历史'
+        section_suggestions: '推荐'
+        suggestion_browse: '浏览'
+        suggestion_new: '提交推荐'
+        pending_approvals: '待审批'
+        section_polls: '投票'
+        poll_current: '当前'
+        poll_past: '历史投票'
+        poll_create: '新建'
+        section_wishlist: '愿望清单'
+        wishlist_mine: '我的'
+        wishlist_group: '全组'
+        settings: '设置'
 
 filmclub_film:
     page_title_list: '电影列表'
