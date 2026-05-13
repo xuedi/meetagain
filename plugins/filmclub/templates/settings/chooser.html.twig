@@ -1,22 +1,18 @@
-{% extends 'base.html.twig' %}
+{% extends '@Filmclub/base_filmclub.html.twig' %}
 
 {% block title %}{{ 'filmclub_settings.chooser_title'|trans }}{% endblock %}
 
-{% block body %}
-<section class="section">
-    <div class="container">
-        <h1 class="title">{{ 'filmclub_settings.chooser_title'|trans }}</h1>
-        <p class="mb-4">{{ 'filmclub_settings.chooser_intro'|trans }}</p>
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_settings.chooser_title'|trans }}</h1>
+<p class="mb-4">{{ 'filmclub_settings.chooser_intro'|trans }}</p>
 
-        <ul>
-            {% for groupId in groupIds %}
-            <li>
-                <a href="{{ path('app_plugin_filmclub_settings_edit', {groupId: groupId}) }}">
-                    {{ 'filmclub_settings.chooser_group_label'|trans({'%id%': groupId}) }}
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-</section>
+<ul>
+    {% for groupId in groupIds %}
+    <li>
+        <a href="{{ path('app_plugin_filmclub_settings_edit', {groupId: groupId}) }}">
+            {{ 'filmclub_settings.chooser_group_label'|trans({'%id%': groupId}) }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
 {% endblock %}

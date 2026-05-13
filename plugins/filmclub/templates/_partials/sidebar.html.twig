@@ -1,0 +1,42 @@
+{% set currentRoute = app.request.attributes.get('_route') %}
+
+<aside class="menu">
+    <p class="menu-label">{{ 'filmclub.sidebar.section_films'|trans }}</p>
+    <ul class="menu-list">
+        <li><a class="{{ currentRoute starts with 'app_filmclub_film' ? 'is-active' : '' }}" href="{{ path('app_filmclub_filmlist') }}">{{ 'filmclub.sidebar.browse'|trans }}</a></li>
+        <li><a href="#">{{ 'filmclub.sidebar.history'|trans }}</a></li>
+    </ul>
+
+    {% if is_granted('ROLE_USER') %}
+    <p class="menu-label">{{ 'filmclub.sidebar.section_suggestions'|trans }}</p>
+    <ul class="menu-list">
+        <li><a href="#">{{ 'filmclub.sidebar.suggestion_browse'|trans }}</a></li>
+        <li><a href="#">{{ 'filmclub.sidebar.suggestion_new'|trans }}</a></li>
+        {% if is_granted('ROLE_ORGANIZER') %}
+        <li><a href="#">{{ 'filmclub.sidebar.pending_approvals'|trans }}</a></li>
+        {% endif %}
+    </ul>
+
+    <p class="menu-label">{{ 'filmclub.sidebar.section_polls'|trans }}</p>
+    <ul class="menu-list">
+        <li><a href="#">{{ 'filmclub.sidebar.poll_current'|trans }}</a></li>
+        <li><a href="#">{{ 'filmclub.sidebar.poll_past'|trans }}</a></li>
+        {% if is_granted('ROLE_ORGANIZER') %}
+        <li><a href="#">{{ 'filmclub.sidebar.poll_create'|trans }}</a></li>
+        {% endif %}
+    </ul>
+
+    <p class="menu-label">{{ 'filmclub.sidebar.section_wishlist'|trans }}</p>
+    <ul class="menu-list">
+        <li><a href="#">{{ 'filmclub.sidebar.wishlist_mine'|trans }}</a></li>
+        <li><a href="#">{{ 'filmclub.sidebar.wishlist_group'|trans }}</a></li>
+    </ul>
+    {% endif %}
+
+    {% if is_granted('ROLE_STEWARD') %}
+    <p class="menu-label">&nbsp;</p>
+    <ul class="menu-list">
+        <li><a class="{{ currentRoute starts with 'app_plugin_filmclub_settings' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_settings_chooser') }}">{{ 'filmclub.sidebar.settings'|trans }}</a></li>
+    </ul>
+    {% endif %}
+</aside>
