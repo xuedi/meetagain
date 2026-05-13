@@ -20,6 +20,7 @@
     "ext-imagick": "*",
     "ext-redis": "*",
     "ext-zip": "*",
+    "ext-sodium": "*",
     "beberlei/doctrineextensions": "^1.5",
     "doctrine/data-fixtures": "^2",
     "doctrine/dbal": "^4",
