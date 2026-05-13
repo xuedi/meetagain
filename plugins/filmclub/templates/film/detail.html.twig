@@ -1,0 +1,64 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ film.title }}{% endblock %}
+
+{% block filmclub_body %}
+<div class="columns">
+    <div class="column is-4-tablet is-12-mobile">
+        {% if film.posterImage %}
+        <figure class="image" style="border: 1px solid #e0e0e0">
+            <img src="{{ film.posterImage.publicPath ?? '' }}" alt="{{ film.title }}">
+        </figure>
+        {% else %}
+        <div class="box has-text-centered has-text-grey" style="min-height: 240px; display:flex; align-items:center; justify-content:center">
+            <span>{{ 'filmclub_film.no_poster'|trans }}</span>
+        </div>
+        {% endif %}
+    </div>
+    <div class="column">
+        <h1 class="title">{{ film.title }}</h1>
+        {% if film.originalTitle and film.originalTitle != film.title %}
+        <p class="subtitle has-text-grey">{{ film.originalTitle }}</p>
+        {% endif %}
+
+        <table class="table is-narrow">
+            {% if film.year %}
+            <tr>
+                <th>{{ 'filmclub_film.col_year'|trans }}</th>
+                <td>{{ film.year }}</td>
+            </tr>
+            {% endif %}
+            {% if film.runtime %}
+            <tr>
+                <th>{{ 'filmclub_film.col_runtime'|trans }}</th>
+                <td>{{ film.runtime }} min</td>
+            </tr>
+            {% endif %}
+            {% if film.genres is not empty %}
+            <tr>
+                <th>{{ 'filmclub_film.col_genres'|trans }}</th>
+                <td>
+                    {% for genre in film.genres %}
+                    <span class="tag">{{ genre }}</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+        </table>
+
+        {% if film.description %}
+        <p class="mt-3">{{ film.description }}</p>
+        {% endif %}
+
+        {% if is_granted('ROLE_USER') %}
+        <div class="mt-4">
+            <form method="POST" action="{{ path('app_plugin_filmclub_suggest', {filmId: film.id}) }}" style="display: inline">
+                <button type="submit" class="button is-small">
+                    {{ 'filmclub_suggestion.button_suggest'|trans }}
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

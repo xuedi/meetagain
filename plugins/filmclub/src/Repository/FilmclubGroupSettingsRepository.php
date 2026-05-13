@@ -39,6 +39,16 @@ class FilmclubGroupSettingsRepository extends ServiceEntityRepository
         return $this->findOneBy(['groupId' => $groupId]);
     }
 
+    public function findFirstWithAdapter(): ?FilmclubGroupSettings
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.adapter IS NOT NULL AND s.adapter != :manual')
+            ->setParameter('manual', 'manual')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function countWithEncryptedCredentials(): int
     {
         return (int) $this->createQueryBuilder('s')

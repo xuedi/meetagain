@@ -1,0 +1,89 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_suggestion.page_title'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_suggestion.page_title'|trans }}</h1>
+
+<h2 class="subtitle">{{ 'filmclub_suggestion.heading_pending'|trans }}</h2>
+
+{% if suggestions is empty %}
+<p class="has-text-grey">{{ 'filmclub_suggestion.empty'|trans }}</p>
+{% else %}
+<table class="table is-fullwidth is-striped">
+    <thead>
+        <tr>
+            <th>{{ 'filmclub_suggestion.col_film'|trans }}</th>
+            <th>{{ 'filmclub_suggestion.col_suggested_by'|trans }}</th>
+            <th>{{ 'filmclub_suggestion.col_since'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for suggestion in suggestions %}
+        <tr>
+            <td>
+                <a href="{{ path('app_plugin_filmclub_film_show', {id: suggestion.film.id}) }}">
+                    {{ suggestion.film.title }}
+                    {% if suggestion.film.year %}<span class="has-text-grey is-size-7">({{ suggestion.film.year }})</span>{% endif %}
+                </a>
+            </td>
+            <td>{{ get_user_name(suggestion.suggestedBy) }}</td>
+            <td>{{ suggestion.suggestedAt|date('Y-m-d') }}</td>
+            <td>
+                {% if suggestion.suggestedBy == app.user.id %}
+                <form method="POST" action="{{ path('app_plugin_filmclub_suggestion_withdraw', {suggestionId: suggestion.id}) }}" style="display: inline">
+                    <button type="submit" class="button is-small is-warning">
+                        {{ 'filmclub_suggestion.button_withdraw'|trans }}
+                    </button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<hr>
+
+<h2 class="subtitle">{{ 'filmclub_suggestion.heading_suggest_existing'|trans }}</h2>
+
+{% if approvedFilms is empty %}
+<p class="has-text-grey">{{ 'filmclub_suggestion.no_films_to_suggest'|trans }}</p>
+{% else %}
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>{{ 'filmclub_suggestion.col_film'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for film in approvedFilms %}
+        <tr>
+            <td>
+                <a href="{{ path('app_plugin_filmclub_film_show', {id: film.id}) }}">
+                    {{ film.title }}
+                    {% if film.year %}<span class="has-text-grey is-size-7">({{ film.year }})</span>{% endif %}
+                </a>
+            </td>
+            <td>
+                <form method="POST" action="{{ path('app_plugin_filmclub_suggest', {filmId: film.id}) }}" style="display: inline">
+                    <button type="submit" class="button is-small">
+                        {{ 'filmclub_suggestion.button_suggest'|trans }}
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<p class="mt-4">
+    <a href="{{ path('app_plugin_filmclub_film_lookup') }}" class="button is-small">
+        {{ 'filmclub_suggestion.button_submit_new'|trans }}
+    </a>
+</p>
+{% endblock %}
