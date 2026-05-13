@@ -60,4 +60,30 @@ class FilmPollVoteRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * @return array<int, int> suggestion_id => vote_count
+     */
+    public function countVotesPerSuggestion(int $pollId): array
+    {
+        $rows = $this->createQueryBuilder('v')
+            ->select('IDENTITY(v.suggestion) AS suggestion_id, COUNT(v.id) AS vote_count')
+            ->where('v.poll = :pollId')
+            ->setParameter('pollId', $pollId)
+            ->groupBy('v.suggestion')
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[(int) $row['suggestion_id']] = (int) $row['vote_count'];
+        }
+
+        return $result;
+    }
+
+    public function hasUserVoted(int $pollId, int $userId): bool
+    {
+        return $this->count(['poll' => $pollId, 'userId' => $userId]) > 0;
+    }
 }

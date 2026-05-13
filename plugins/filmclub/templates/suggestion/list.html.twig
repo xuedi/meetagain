@@ -74,6 +74,15 @@
                         {{ 'filmclub_suggestion.button_suggest'|trans }}
                     </button>
                 </form>
+                {% if film.id not in wishlistFilmIds %}
+                <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_add', {filmId: film.id}) }}" style="display: inline">
+                    <button type="submit" class="button is-small">
+                        {{ 'filmclub_wishlist.button_add'|trans }}
+                    </button>
+                </form>
+                {% else %}
+                <span class="is-size-7 has-text-grey">{{ 'filmclub_wishlist.already_added'|trans }}</span>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

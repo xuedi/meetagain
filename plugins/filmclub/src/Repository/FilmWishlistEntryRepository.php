@@ -89,4 +89,34 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
     {
         return $this->findBy(['film' => $filmId]);
     }
+
+    /** @return FilmWishlistEntry[] */
+    public function findAllForGroupView(?array $allowedIds = null): array
+    {
+        if ($allowedIds === []) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('w')
+            ->innerJoin('w.film', 'f')
+            ->addSelect('f')
+            ->orderBy('w.userId', 'ASC')
+            ->addOrderBy('w.priorityCounter', 'DESC');
+
+        if ($allowedIds !== null) {
+            $qb->where('w.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countWantersForFilm(int $filmId): int
+    {
+        return (int) $this->createQueryBuilder('w')
+            ->select('COUNT(DISTINCT w.userId)')
+            ->where('w.film = :filmId')
+            ->setParameter('filmId', $filmId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

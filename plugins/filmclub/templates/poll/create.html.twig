@@ -1,0 +1,40 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_poll.page_title_create'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_poll.page_title_create'|trans }}</h1>
+
+{% if event %}
+<div class="box mb-4">
+    <p class="subtitle">{{ event.title(app.request.locale) }}</p>
+    <p class="has-text-grey is-size-7">{{ event.start|date('d.m.Y') }}</p>
+</div>
+{% endif %}
+
+{{ form_start(form) }}
+{{ form_errors(form) }}
+
+<div class="field">
+    {{ form_label(form.suggestions) }}
+    <div class="control">
+        {{ form_widget(form.suggestions) }}
+    </div>
+    {{ form_errors(form.suggestions) }}
+</div>
+
+<div class="field">
+    {{ form_label(form.endDate) }}
+    <div class="control">
+        {{ form_widget(form.endDate) }}
+    </div>
+    {{ form_errors(form.endDate) }}
+</div>
+
+<div class="field mt-4">
+    {{ form_widget(form.submit) }}
+    <a href="{{ path('app_plugin_filmclub_poll_list') }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}
