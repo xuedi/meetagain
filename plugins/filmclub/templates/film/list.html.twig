@@ -14,8 +14,7 @@
                 <th>{{ 'filmclub_film.col_year'|trans }}</th>
                 <th>{{ 'filmclub_film.col_runtime'|trans }}</th>
                 <th>{{ 'filmclub_film.col_genres'|trans }}</th>
-                <th>{{ 'filmclub_film.col_event'|trans }}</th>
-                <th><a href="{{ path('app_filmclub_film_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -23,18 +22,11 @@
                 <tr>
                     <td>{{ film.title }}</td>
                     <td>{{ film.year }}</td>
-                    <td>{{ film.runtime }} min</td>
+                    <td>{% if film.runtime %}{{ film.runtime }} min{% endif %}</td>
                     <td>
                         {% for genre in film.genres %}
-                            <span class="tag is-info">{{ genre.label()|trans }}</span>
+                            <span class="tag">{{ genre }}</span>
                         {% endfor %}
-                    </td>
-                    <td>
-                        {% if filmEvents[film.id] is defined %}
-                            <a href="{{ path('app_event_details', {'id': filmEvents[film.id].id}) }}">
-                                {{ filmEvents[film.id].title(app.locale) }}
-                            </a>
-                        {% endif %}
                     </td>
                     <td></td>
                 </tr>
