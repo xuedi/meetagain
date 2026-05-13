@@ -12,7 +12,7 @@ class FilmCreateTest extends WebTestCase
     public function testFilmListIsAccessible(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/en/films/');
+        $client->request('GET', '/en/filmclub/film');
 
         $this->assertResponseIsSuccessful();
     }

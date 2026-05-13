@@ -21,6 +21,27 @@ readonly class FilmLookupResolver
         private LoggerInterface $logger,
     ) {}
 
+    /**
+     * Resolves an adapter from filter-derived allowed settings IDs.
+     * Pass FilmGroupFilterService::getAllowedSettingsIds() as $allowedSettingsIds.
+     *
+     * @param int[]|null $allowedSettingsIds
+     */
+    public function resolveForRequest(?array $allowedSettingsIds): ?FilmMetadataLookupInterface
+    {
+        if ($allowedSettingsIds === []) {
+            return null;
+        }
+
+        if ($allowedSettingsIds !== null) {
+            return $this->resolve($allowedSettingsIds[0] ?? null);
+        }
+
+        $settings = $this->settingsRepository->findFirstWithAdapter();
+
+        return $settings !== null ? $this->resolveFromSettings($settings) : null;
+    }
+
     public function resolve(?int $groupId): ?FilmMetadataLookupInterface
     {
         if ($groupId === null) {
@@ -32,10 +53,15 @@ readonly class FilmLookupResolver
             return null;
         }
 
+        return $this->resolveFromSettings($settings);
+    }
+
+    private function resolveFromSettings(FilmclubGroupSettings $settings): ?FilmMetadataLookupInterface
+    {
         return match ($settings->getAdapter()) {
             ExternalSource::Tmdb => $this->createTmdb($settings),
             ExternalSource::Omdb => $this->createOmdb($settings),
-            ExternalSource::Manual => null,
+            default => null,
         };
     }
 

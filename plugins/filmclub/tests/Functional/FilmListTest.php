@@ -9,7 +9,7 @@ class FilmListTest extends WebTestCase
     public function testFilmListRenders(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/en/films/');
+        $crawler = $client->request('GET', '/en/filmclub/film');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1.title', 'Film list');

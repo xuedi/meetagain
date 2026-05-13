@@ -1,0 +1,54 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_manage.page_title'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_manage.page_title'|trans }}</h1>
+
+{% if films is empty %}
+<p class="has-text-grey">{{ 'filmclub_manage.empty'|trans }}</p>
+{% else %}
+<table class="table is-fullwidth is-striped">
+    <thead>
+        <tr>
+            <th>{{ 'filmclub_manage.col_film'|trans }}</th>
+            <th>{{ 'filmclub_manage.col_submitted_by'|trans }}</th>
+            <th>{{ 'filmclub_manage.col_submitted_at'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for film in films %}
+        <tr>
+            <td>
+                <p class="has-text-weight-semibold">{{ film.title }}</p>
+                {% if film.year %}<p class="is-size-7 has-text-grey">{{ film.year }}</p>{% endif %}
+                {% if film.genres is not empty %}
+                <p class="is-size-7 has-text-grey">{{ film.genres|join(', ') }}</p>
+                {% endif %}
+                {% if film.description %}
+                <p class="is-size-7 mt-1">{{ film.description|u.truncate(120, '...') }}</p>
+                {% endif %}
+            </td>
+            <td>{{ get_user_name(film.createdBy) }}</td>
+            <td>{{ film.createdAt|date('Y-m-d') }}</td>
+            <td class="is-narrow">
+                <div class="buttons is-right are-small">
+                    <form method="POST" action="{{ path('app_plugin_filmclub_manage_approve', {filmId: film.id}) }}" style="display: inline">
+                        <button type="submit" class="button">
+                            {{ 'filmclub_manage.button_approve'|trans }}
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ path('app_plugin_filmclub_manage_reject', {filmId: film.id}) }}" style="display: inline">
+                        <button type="submit" class="button is-warning">
+                            {{ 'filmclub_manage.button_reject'|trans }}
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
