@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Service\Security;
 
@@ -52,18 +54,18 @@ class BlockedSessionStoreTest extends TestCase
     public static function provideAxisCases(): iterable
     {
         yield 'session axis' => [
-            fn (BlockedSessionStore $s, string $k, array $v): mixed => $s->blockSession($k, $v),
-            fn (BlockedSessionStore $s, string $k): bool => $s->isSessionBlocked($k),
-            fn (BlockedSessionStore $s, string $k): ?array => $s->getSessionSnapshot($k),
-            fn (BlockedSessionStore $s, string $k): mixed => $s->unblockSession($k),
-            fn (BlockedSessionStore $s): array => $s->listBlockedSessions(),
+            static fn(BlockedSessionStore $s, string $k, array $v): mixed => $s->blockSession($k, $v),
+            static fn(BlockedSessionStore $s, string $k): bool => $s->isSessionBlocked($k),
+            static fn(BlockedSessionStore $s, string $k): ?array => $s->getSessionSnapshot($k),
+            static fn(BlockedSessionStore $s, string $k): mixed => $s->unblockSession($k),
+            static fn(BlockedSessionStore $s): array => $s->listBlockedSessions(),
         ];
         yield 'ip axis' => [
-            fn (BlockedSessionStore $s, string $k, array $v): mixed => $s->blockIp($k, $v),
-            fn (BlockedSessionStore $s, string $k): bool => $s->isIpBlocked($k),
-            fn (BlockedSessionStore $s, string $k): ?array => $s->getIpSnapshot($k),
-            fn (BlockedSessionStore $s, string $k): mixed => $s->unblockIp($k),
-            fn (BlockedSessionStore $s): array => $s->listBlockedIps(),
+            static fn(BlockedSessionStore $s, string $k, array $v): mixed => $s->blockIp($k, $v),
+            static fn(BlockedSessionStore $s, string $k): bool => $s->isIpBlocked($k),
+            static fn(BlockedSessionStore $s, string $k): ?array => $s->getIpSnapshot($k),
+            static fn(BlockedSessionStore $s, string $k): mixed => $s->unblockIp($k),
+            static fn(BlockedSessionStore $s): array => $s->listBlockedIps(),
         ];
     }
 
@@ -238,19 +240,19 @@ class BlockedSessionStoreTest extends TestCase
         yield 'non-array snapshot returns null' => [
             'security_blocked_session_garbage',
             'not-an-array',
-            static fn (BlockedSessionStore $s): ?array => $s->getSessionSnapshot('garbage'),
+            static fn(BlockedSessionStore $s): ?array => $s->getSessionSnapshot('garbage'),
             null,
         ];
         yield 'non-array snapshot is reported as not blocked' => [
             'security_blocked_session_garbage',
             'not-an-array',
-            static fn (BlockedSessionStore $s): bool => $s->isSessionBlocked('garbage'),
+            static fn(BlockedSessionStore $s): bool => $s->isSessionBlocked('garbage'),
             false,
         ];
         yield 'non-array index falls back to empty list' => [
             'security_blocked_sessions_index',
             'not-an-index',
-            static fn (BlockedSessionStore $s): array => $s->listBlockedSessions(),
+            static fn(BlockedSessionStore $s): array => $s->listBlockedSessions(),
             [],
         ];
     }
@@ -261,9 +263,9 @@ class BlockedSessionStoreTest extends TestCase
         $pool = new ArrayAdapter();
         $item = $pool->getItem('security_blocked_sessions_index');
         $item->set([
-            'good'  => time() + 3600,
-            123     => time() + 3600,
-            'bad'   => 'not-an-int',
+            'good' => time() + 3600,
+            123 => time() + 3600,
+            'bad' => 'not-an-int',
         ]);
         $pool->save($item);
         $snap = $pool->getItem('security_blocked_session_good');
@@ -334,11 +336,11 @@ class BlockedSessionStoreTest extends TestCase
             true,
         ];
         yield 'getSessionSnapshot returns null on pool exception' => [
-            static fn (BlockedSessionStore $s): ?array => $s->getSessionSnapshot('abc'),
+            static fn(BlockedSessionStore $s): ?array => $s->getSessionSnapshot('abc'),
             null,
         ];
         yield 'isSessionBlocked reports false on pool exception' => [
-            static fn (BlockedSessionStore $s): bool => $s->isSessionBlocked('abc'),
+            static fn(BlockedSessionStore $s): bool => $s->isSessionBlocked('abc'),
             false,
         ];
         yield 'unblockSession swallows pool exception' => [
@@ -356,11 +358,11 @@ class BlockedSessionStoreTest extends TestCase
             true,
         ];
         yield 'listBlockedSessions returns empty on pool exception' => [
-            static fn (BlockedSessionStore $s): array => $s->listBlockedSessions(),
+            static fn(BlockedSessionStore $s): array => $s->listBlockedSessions(),
             [],
         ];
         yield 'listBlockedIps returns empty on pool exception' => [
-            static fn (BlockedSessionStore $s): array => $s->listBlockedIps(),
+            static fn(BlockedSessionStore $s): array => $s->listBlockedIps(),
             [],
         ];
     }
