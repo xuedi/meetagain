@@ -102,6 +102,12 @@ final class MemberController extends AbstractController implements AdminNavigati
     public function setRole(User $user, string $role, Request $request): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_ROLE_UPDATE, $user);
+
+        // No self modification
+        if ($user->getId() === $this->getAuthedUser()->getId()) {
+            return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
+        }
+
         $this->assertAccessible($user);
 
         if (!in_array($role, UserService::ALLOWED_ROLES, true)) {
