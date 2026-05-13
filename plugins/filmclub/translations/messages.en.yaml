@@ -1,3 +1,6 @@
+filmclub:
+    menu_main: 'Filmclub'
+
 filmclub_film:
     page_title_list: 'Film list'
     browser_title_list: 'Filmlist'
@@ -70,6 +73,27 @@ filmclub_vote:
     flash_invalid_film: 'Please select a valid film'
     flash_vote_recorded: 'Your vote has been recorded'
     flash_vote_closed: 'Vote has been closed'
+filmclub_settings:
+    page_title: 'Filmclub Settings'
+    adapter_label: 'External data source'
+    adapter_none: 'None (manual entry only)'
+    adapter_tmdb: 'TMDB (The Movie Database)'
+    adapter_omdb: 'OMDb (Open Movie Database)'
+    adapter_manual: 'Manual entry'
+    section_api_keys: 'API Keys'
+    tmdb_key_label: 'TMDB API key'
+    omdb_key_label: 'OMDb API key'
+    key_already_set: 'Key is set - leave empty to keep, tick Clear to remove'
+    clear_key_label: 'Clear this key'
+    section_poll_defaults: 'Poll defaults'
+    poll_duration_label: 'Default poll duration (days)'
+    poll_duration_help: 'Used as the default when creating a new poll.'
+    button_save: 'Save settings'
+    flash_saved: 'Filmclub settings saved.'
+    chooser_title: 'Select group'
+    chooser_intro: 'Select a group to configure:'
+    chooser_group_label: 'Group %id%'
+
 filmclub_tile:
     heading: 'Film Night'
     voting_open: 'Voting is open!'

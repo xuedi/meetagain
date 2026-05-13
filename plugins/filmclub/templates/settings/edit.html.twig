@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'filmclub_settings.page_title'|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb">
+            <ul>
+                <li><a href="{{ path('app_plugin_filmclub_landing') }}">{{ 'filmclub.menu_main'|trans }}</a></li>
+                <li class="is-active"><a>{{ 'filmclub_settings.page_title'|trans }}</a></li>
+            </ul>
+        </nav>
+
+        <h1 class="title">{{ 'filmclub_settings.page_title'|trans }}</h1>
+
+        <div class="columns">
+            <div class="column is-7">
+                {{ form_start(form) }}
+
+                <div class="box">
+                    <h2 class="subtitle">{{ 'filmclub_settings.adapter_label'|trans }}</h2>
+                    <div class="field">
+                        {{ form_widget(form.adapter) }}
+                        {{ form_errors(form.adapter) }}
+                    </div>
+                </div>
+
+                <div class="box">
+                    <h2 class="subtitle">{{ 'filmclub_settings.section_api_keys'|trans }}</h2>
+
+                    <div class="field">
+                        {{ form_label(form.tmdbKey, null, {'label_attr': {'class': 'label'}}) }}
+                        <div class="control">
+                            {{ form_widget(form.tmdbKey, {'attr': {'class': 'input'}}) }}
+                        </div>
+                        {{ form_errors(form.tmdbKey) }}
+                    </div>
+                    {% if settings.encryptedTmdbKey is not null %}
+                    <div class="field">
+                        <label class="checkbox">
+                            {{ form_widget(form.clearTmdbKey) }}
+                            {{ form_label(form.clearTmdbKey) }}
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <div class="field mt-4">
+                        {{ form_label(form.omdbKey, null, {'label_attr': {'class': 'label'}}) }}
+                        <div class="control">
+                            {{ form_widget(form.omdbKey, {'attr': {'class': 'input'}}) }}
+                        </div>
+                        {{ form_errors(form.omdbKey) }}
+                    </div>
+                    {% if settings.encryptedOmdbKey is not null %}
+                    <div class="field">
+                        <label class="checkbox">
+                            {{ form_widget(form.clearOmdbKey) }}
+                            {{ form_label(form.clearOmdbKey) }}
+                        </label>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="box">
+                    <h2 class="subtitle">{{ 'filmclub_settings.section_poll_defaults'|trans }}</h2>
+                    <div class="field">
+                        {{ form_label(form.defaultPollDurationDays, null, {'label_attr': {'class': 'label'}}) }}
+                        <div class="control">
+                            {{ form_widget(form.defaultPollDurationDays, {'attr': {'class': 'input', 'style': 'max-width: 8rem'}}) }}
+                        </div>
+                        {{ form_errors(form.defaultPollDurationDays) }}
+                        <p class="help">{{ 'filmclub_settings.poll_duration_help'|trans }}</p>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button">
+                            {{ 'filmclub_settings.button_save'|trans }}
+                        </button>
+                    </div>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

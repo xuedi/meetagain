@@ -1,3 +1,6 @@
+filmclub:
+    menu_main: '电影俱乐部'
+
 filmclub_film:
     page_title_list: '电影列表'
     browser_title_list: '电影列表'
@@ -70,6 +73,27 @@ filmclub_vote:
     flash_invalid_film: '请选择有效的电影'
     flash_vote_recorded: '您的投票已记录'
     flash_vote_closed: '投票已关闭'
+filmclub_settings:
+    page_title: '电影俱乐部设置'
+    adapter_label: '外部数据源'
+    adapter_none: '无（仅手动输入）'
+    adapter_tmdb: 'TMDB（电影数据库）'
+    adapter_omdb: 'OMDb（开放电影数据库）'
+    adapter_manual: '手动输入'
+    section_api_keys: 'API密钥'
+    tmdb_key_label: 'TMDB API密钥'
+    omdb_key_label: 'OMDb API密钥'
+    key_already_set: '密钥已设置 - 留空保留，勾选清除以删除'
+    clear_key_label: '清除此密钥'
+    section_poll_defaults: '投票默认值'
+    poll_duration_label: '默认投票时长（天）'
+    poll_duration_help: '创建新投票时作为默认值使用。'
+    button_save: '保存设置'
+    flash_saved: '电影俱乐部设置已保存。'
+    chooser_title: '选择群组'
+    chooser_intro: '选择要配置的群组：'
+    chooser_group_label: '群组 %id%'
+
 filmclub_tile:
     heading: '电影之夜'
     voting_open: '投票进行中！'
