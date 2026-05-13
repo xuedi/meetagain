@@ -1,0 +1,52 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_manage.page_title_select'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_manage.page_title_select'|trans }}</h1>
+
+{% if event %}
+<div class="box mb-4">
+    <p class="subtitle">{{ event.title(app.request.locale) }}</p>
+    <p class="has-text-grey is-size-7">{{ event.start|date('d.m.Y') }}</p>
+</div>
+{% endif %}
+
+{% if currentSelection %}
+<div class="notification mb-4">
+    {{ 'filmclub_manage.already_selected'|trans }}: <strong>{{ currentSelection.film.title }}</strong>
+</div>
+{% endif %}
+
+{% if films is empty %}
+<p class="has-text-grey">{{ 'filmclub_film.empty_state'|trans }}</p>
+{% else %}
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>{{ 'filmclub_manage.col_film'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for film in films %}
+        <tr>
+            <td>
+                <a href="{{ path('app_plugin_filmclub_film_show', {id: film.id}) }}">
+                    {{ film.title }}
+                    {% if film.year %}<span class="has-text-grey is-size-7">({{ film.year }})</span>{% endif %}
+                </a>
+            </td>
+            <td>
+                <form method="POST" action="{{ path('app_plugin_filmclub_manage_select_film', {eventId: event.id, filmId: film.id}) }}" style="display: inline">
+                    <button type="submit" class="button is-small">
+                        {{ 'filmclub_manage.button_select'|trans }}
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

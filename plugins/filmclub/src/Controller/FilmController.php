@@ -11,6 +11,8 @@ use Plugin\Filmclub\Form\FilmLookupType;
 use Plugin\Filmclub\Form\FilmManualType;
 use Plugin\Filmclub\Service\FilmLookupResolver;
 use Plugin\Filmclub\Service\FilmService;
+use Plugin\Filmclub\Service\NoteService;
+use Plugin\Filmclub\Service\WishlistService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +27,8 @@ final class FilmController extends AbstractController
         private readonly FilmService $filmService,
         private readonly FilmLookupResolver $lookupResolver,
         private readonly FilmGroupFilterService $filterService,
+        private readonly WishlistService $wishlistService,
+        private readonly NoteService $noteService,
         private readonly ActivityService $activityService,
         private readonly TranslatorInterface $translator,
     ) {}
@@ -45,8 +49,18 @@ final class FilmController extends AbstractController
             throw $this->createNotFoundException('Film not found');
         }
 
+        $user = $this->getUser();
+        $isWishlisted = $user !== null && $this->wishlistService->isWishlisted($film, $user->getId());
+        $wanterCount = $this->wishlistService->getWanterCountForFilm($film);
+        $userNote = $user !== null ? $this->noteService->getNoteForUser($user->getId(), $film) : null;
+        $revealedNotes = $user !== null ? $this->noteService->getRevealedForFilm($film) : [];
+
         return $this->render('@Filmclub/film/detail.html.twig', [
             'film' => $film,
+            'isWishlisted' => $isWishlisted,
+            'wanterCount' => $wanterCount,
+            'userNote' => $userNote,
+            'revealedNotes' => $revealedNotes,
         ]);
     }
 

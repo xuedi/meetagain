@@ -1,1 +1,33 @@
-{# Film event tile - full version rendered in Phase 9 #}
+{% if selection %}
+<div class="mt-2">
+    <p class="is-size-7 has-text-weight-semibold">{{ 'filmclub_tile.heading'|trans }}</p>
+    {% if selection.film.posterImage %}
+    <figure class="image is-32x32 mb-1">
+        <img src="{{ selection.film.posterImage.publicPath ?? '' }}" alt="{{ selection.film.title }}" style="object-fit: cover">
+    </figure>
+    {% endif %}
+    <p class="is-size-7">
+        <a href="{{ path('app_plugin_filmclub_film_show', {id: selection.film.id}) }}">{{ selection.film.title }}</a>
+    </p>
+    {% if is_granted('ROLE_USER') and not isWishlisted %}
+    <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_add', {filmId: selection.film.id}) }}" style="display: inline">
+        <button type="submit" class="button is-small is-text is-size-7">{{ 'filmclub_tile.button_add_wishlist'|trans }}</button>
+    </form>
+    {% endif %}
+</div>
+{% elseif activePoll %}
+<div class="mt-2">
+    <p class="is-size-7 has-text-weight-semibold">{{ 'filmclub_tile.heading'|trans }}</p>
+    <p class="is-size-7">{{ 'filmclub_tile.poll_closes_in'|trans({'%date%': activePoll.endDate|date('Y-m-d')}) }}</p>
+    <a href="{{ path('app_plugin_filmclub_poll_vote', {id: activePoll.id}) }}" class="button is-small is-link mt-1">
+        {{ 'filmclub_tile.button_vote_now'|trans }}
+    </a>
+</div>
+{% elseif is_granted('ROLE_ORGANIZER') %}
+<div class="mt-2">
+    <p class="is-size-7 has-text-weight-semibold">{{ 'filmclub_tile.heading'|trans }}</p>
+    <a href="{{ path('app_plugin_filmclub_poll_create', {eventId: eventId}) }}" class="is-size-7">{{ 'filmclub_tile.link_create_poll'|trans }}</a>
+    &middot;
+    <a href="{{ path('app_plugin_filmclub_manage_select', {eventId: eventId}) }}" class="is-size-7">{{ 'filmclub_tile.link_pick_film'|trans }}</a>
+</div>
+{% endif %}
