@@ -25,4 +25,8 @@ enum EntityAction: string
     case DeleteBook = 'delete_book';
     case CreateHost = 'create_host';
     case DeleteHost = 'delete_host';
+    case CreateFilm = 'create_film';
+    case DeleteFilm = 'delete_film';
+    case CreateFilmSuggestion = 'create_film_suggestion';
+    case DeleteFilmSuggestion = 'delete_film_suggestion';
 }
