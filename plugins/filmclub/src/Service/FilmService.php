@@ -4,6 +4,8 @@ namespace Plugin\Filmclub\Service;
 
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Enum\ImageType;
+use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Filmclub\Entity\ExternalSource;
@@ -23,6 +25,8 @@ readonly class FilmService
         private FilmSuggestionRepository $suggestionRepo,
         private FilmGroupFilterService $groupFilter,
         private EntityActionDispatcher $dispatcher,
+        private PosterImageService $posterImageService,
+        private ImageLocationService $imageLocationService,
     ) {}
 
     public function createFromMetadata(FilmMetadata $metadata, int $userId, bool $isManager): Film
@@ -47,6 +51,16 @@ readonly class FilmService
 
         $this->em->persist($film);
         $this->em->flush();
+
+        if ($metadata->posterUrl !== null) {
+            $poster = $this->posterImageService->downloadAndSave($metadata->posterUrl, $userId);
+            if ($poster !== null) {
+                $film->setPosterImage($poster);
+                $this->em->persist($film);
+                $this->em->flush();
+                $this->imageLocationService->addLocation($poster->getId(), ImageType::PluginFilmclubPoster, $film->getId());
+            }
+        }
 
         $this->dispatcher->dispatch(EntityAction::CreateFilm, $film->getId());
 

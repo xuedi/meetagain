@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Plugin\Filmclub\Controller;
 
@@ -9,7 +11,6 @@ use Plugin\Filmclub\Activity\Messages\PollClosed;
 use Plugin\Filmclub\Activity\Messages\PollCreated;
 use Plugin\Filmclub\Activity\Messages\PollVoteCast;
 use Plugin\Filmclub\Form\PollCreateType;
-use Plugin\Filmclub\Repository\FilmSuggestionRepository;
 use Plugin\Filmclub\Service\PollService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,6 @@ final class PollController extends AbstractController
     public function __construct(
         private readonly PollService $pollService,
         private readonly EventRepository $eventRepo,
-        private readonly FilmSuggestionRepository $suggestionRepo,
         private readonly ActivityService $activityService,
     ) {}
 
@@ -33,7 +33,7 @@ final class PollController extends AbstractController
         $activePolls = $this->pollService->getActivePolls();
         $closedPolls = $this->pollService->getClosedPolls();
 
-        if (empty($activePolls) && empty($closedPolls)) {
+        if ($activePolls === [] && $closedPolls === []) {
             return $this->render('@Filmclub/poll/none.html.twig');
         }
 
@@ -133,12 +133,13 @@ final class PollController extends AbstractController
         $userVotedIds = array_map(static fn($v) => $v->getSuggestion()?->getId(), $userVotes);
 
         if ($request->isMethod('POST')) {
-            $selectedIds = array_map('intval', (array) $request->request->all('suggestions'));
+            $selectedIds = array_map('intval', $request->request->all('suggestions'));
 
-            $selectedSuggestions = array_values(array_filter(
-                $poll->getSuggestions()->toArray(),
-                static fn($s) => in_array($s->getId(), $selectedIds, true),
-            ));
+            $selectedSuggestions = array_values(array_filter($poll->getSuggestions()->toArray(), static fn($s) => in_array(
+                $s->getId(),
+                $selectedIds,
+                true,
+            )));
 
             try {
                 $this->pollService->castVote($user->getId(), $poll, $selectedSuggestions);
@@ -175,10 +176,12 @@ final class PollController extends AbstractController
 
             $chosen = null;
             foreach ($poll->getSuggestions() as $suggestion) {
-                if ($suggestion->getId() === $chosenId) {
-                    $chosen = $suggestion;
-                    break;
+                if ($suggestion->getId() !== $chosenId) {
+                    continue;
                 }
+
+                $chosen = $suggestion;
+                break;
             }
 
             if ($chosen === null) {
@@ -205,9 +208,11 @@ final class PollController extends AbstractController
         $tiedSuggestions = [];
         if ($poll->getTiedSuggestions() !== null) {
             foreach ($poll->getSuggestions() as $suggestion) {
-                if (in_array($suggestion->getId(), $poll->getTiedSuggestions(), true)) {
-                    $tiedSuggestions[] = $suggestion;
+                if (!in_array($suggestion->getId(), $poll->getTiedSuggestions(), true)) {
+                    continue;
                 }
+
+                $tiedSuggestions[] = $suggestion;
             }
         } else {
             $tiedSuggestions = $poll->getSuggestions()->toArray();

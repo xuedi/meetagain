@@ -44,6 +44,7 @@ filmclub_film:
     no_results: 'Keine Ergebnisse gefunden.'
     link_manual_entry: 'Film stattdessen manuell hinzufuegen'
     label_title: 'Titel'
+    label_year: 'Jahr'
     label_description: 'Beschreibung'
     label_genres: 'Genres'
     label_runtime: 'Laufzeit (Min.)'
@@ -66,6 +67,7 @@ filmclub_film:
     genre_mystery: 'Mystery'
     genre_romance: 'Romantik'
     genre_western: 'Western'
+    heading_watched_history: 'Gesehene Filme'
 filmclub_suggestion:
     page_title: 'Filmvorschlaege'
     heading_pending: 'Ausstehende Vorschlaege'
@@ -270,3 +272,11 @@ filmclub_tile:
     button_add_wishlist: 'Zur Wunschliste'
     link_create_poll: 'Abstimmung erstellen'
     link_pick_film: 'Film auswaehlen'
+
+filmclub_notifications:
+    section_pending_suggestions: 'Filmclub-Vorschlaege'
+    open_poll_vote: 'Filmclub: Abstimmen in der laufenden Abstimmung'
+    review_pending_film: 'Film ''%title%'' wartet auf Freigabe'
+
+filmclub_admin_secretbox:
+    consumer_settings: 'Filmclub API-Schlussel'

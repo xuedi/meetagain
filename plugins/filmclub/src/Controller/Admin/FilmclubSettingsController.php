@@ -71,13 +71,13 @@ final class FilmclubSettingsController extends AbstractController
 
             if ($clearTmdb) {
                 $settings->setEncryptedTmdbKey(null);
-            } elseif (!empty($tmdbKey)) {
+            } elseif ($tmdbKey !== null && $tmdbKey !== '') {
                 $settings->setEncryptedTmdbKey($this->settingsService->encryptKey($tmdbKey));
             }
 
             if ($clearOmdb) {
                 $settings->setEncryptedOmdbKey(null);
-            } elseif (!empty($omdbKey)) {
+            } elseif ($omdbKey !== null && $omdbKey !== '') {
                 $settings->setEncryptedOmdbKey($this->settingsService->encryptKey($omdbKey));
             }
 

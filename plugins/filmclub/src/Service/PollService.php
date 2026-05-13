@@ -13,7 +13,6 @@ use Plugin\Filmclub\Entity\SuggestionStatus;
 use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Repository\FilmPollRepository;
 use Plugin\Filmclub\Repository\FilmPollVoteRepository;
-use Plugin\Filmclub\Repository\FilmSelectionRepository;
 use Plugin\Filmclub\Repository\FilmSuggestionRepository;
 use Plugin\Filmclub\ValueObject\PollClosure;
 use RuntimeException;
@@ -25,7 +24,6 @@ readonly class PollService
         private FilmPollRepository $pollRepo,
         private FilmPollVoteRepository $voteRepo,
         private FilmSuggestionRepository $suggestionRepo,
-        private FilmSelectionRepository $selectionRepo,
         private WishlistService $wishlistService,
         private FilmGroupFilterService $groupFilter,
     ) {}

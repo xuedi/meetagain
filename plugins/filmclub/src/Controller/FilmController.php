@@ -4,6 +4,7 @@ namespace Plugin\Filmclub\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Entity\User;
 use Plugin\Filmclub\Activity\Messages\FilmAdded;
 use Plugin\Filmclub\Activity\Messages\SuggestionCreated;
 use Plugin\Filmclub\Filter\FilmGroupFilterService;
@@ -12,13 +13,13 @@ use Plugin\Filmclub\Form\FilmManualType;
 use Plugin\Filmclub\Service\FilmLookupResolver;
 use Plugin\Filmclub\Service\FilmService;
 use Plugin\Filmclub\Service\NoteService;
+use Plugin\Filmclub\Service\SelectionService;
 use Plugin\Filmclub\Service\WishlistService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/filmclub/film')]
 final class FilmController extends AbstractController
@@ -29,8 +30,8 @@ final class FilmController extends AbstractController
         private readonly FilmGroupFilterService $filterService,
         private readonly WishlistService $wishlistService,
         private readonly NoteService $noteService,
+        private readonly SelectionService $selectionService,
         private readonly ActivityService $activityService,
-        private readonly TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_filmclub_filmlist', methods: ['GET'])]
@@ -50,10 +51,12 @@ final class FilmController extends AbstractController
         }
 
         $user = $this->getUser();
-        $isWishlisted = $user !== null && $this->wishlistService->isWishlisted($film, $user->getId());
+        $authedUser = $user instanceof User ? $user : null;
+        $isWishlisted = $authedUser !== null && $this->wishlistService->isWishlisted($film, $authedUser->getId());
         $wanterCount = $this->wishlistService->getWanterCountForFilm($film);
-        $userNote = $user !== null ? $this->noteService->getNoteForUser($user->getId(), $film) : null;
-        $revealedNotes = $user !== null ? $this->noteService->getRevealedForFilm($film) : [];
+        $userNote = $authedUser !== null ? $this->noteService->getNoteForUser($authedUser->getId(), $film) : null;
+        $revealedNotes = $authedUser !== null ? $this->noteService->getRevealedForFilm($film) : [];
+        $selections = $this->selectionService->getSelectionsForFilm($film);
 
         return $this->render('@Filmclub/film/detail.html.twig', [
             'film' => $film,
@@ -61,6 +64,7 @@ final class FilmController extends AbstractController
             'wanterCount' => $wanterCount,
             'userNote' => $userNote,
             'revealedNotes' => $revealedNotes,
+            'selections' => $selections,
         ]);
     }
 
@@ -103,10 +107,10 @@ final class FilmController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function import(Request $request): Response
     {
-        $externalId = $request->request->get('externalId');
-        $source = $request->request->get('source');
+        $externalId = (string) $request->request->get('externalId', '');
+        $source = (string) $request->request->get('source', '');
 
-        if ($externalId === null || $source === null) {
+        if ($externalId === '' || $source === '') {
             throw $this->createNotFoundException();
         }
 

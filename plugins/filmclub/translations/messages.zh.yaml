@@ -44,6 +44,7 @@ filmclub_film:
     no_results: '未找到结果。'
     link_manual_entry: '改为手动添加电影'
     label_title: '标题'
+    label_year: '年份'
     label_description: '简介'
     label_genres: '类型'
     label_runtime: '时长（分钟）'
@@ -66,6 +67,7 @@ filmclub_film:
     genre_mystery: '悬疑'
     genre_romance: '爱情'
     genre_western: '西部'
+    heading_watched_history: '观看历史'
 filmclub_suggestion:
     page_title: '电影推荐'
     heading_pending: '待审推荐'
@@ -270,3 +272,11 @@ filmclub_tile:
     button_add_wishlist: '加入愿望清单'
     link_create_poll: '创建投票'
     link_pick_film: '选择电影'
+
+filmclub_notifications:
+    section_pending_suggestions: '电影俱乐部建议'
+    open_poll_vote: '电影俱乐部：在当前投票中投票'
+    review_pending_film: '电影''%title%''待审批'
+
+filmclub_admin_secretbox:
+    consumer_settings: '电影俱乐部API密钥'
