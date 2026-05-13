@@ -2,6 +2,8 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+        bind:
+            $kernelProjectDir: '%kernel.project_dir%'
 
     Plugin\Filmclub\:
         resource: '../src/'

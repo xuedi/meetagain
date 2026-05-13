@@ -92,6 +92,6 @@ class FilmSuggestionRepository extends ServiceEntityRepository
 
         $result = $qb->getQuery()->getSingleScalarResult();
 
-        return $result !== null ? new DateTimeImmutable($result) : null;
+        return $result !== null ? new DateTimeImmutable((string) $result) : null;
     }
 }

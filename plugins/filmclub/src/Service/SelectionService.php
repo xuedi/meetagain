@@ -43,6 +43,12 @@ readonly class SelectionService
     }
 
     /** @return FilmSelection[] */
+    public function getSelectionsForFilm(Film $film): array
+    {
+        return $this->selectionRepo->findByFilm($film->getId());
+    }
+
+    /** @return FilmSelection[] */
     public function getHistory(): array
     {
         return $this->selectionRepo->findHistoryFilteredByEvents(

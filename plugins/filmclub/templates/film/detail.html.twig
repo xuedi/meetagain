@@ -86,6 +86,16 @@
     </div>
 </div>
 
+{% if selections is not empty %}
+<hr>
+<h2 class="subtitle">{{ 'filmclub_film.heading_watched_history'|trans }}</h2>
+<ul>
+    {% for selection in selections %}
+    <li>{{ selection.selectedAt|date('Y-m-d') }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 {% if revealedNotes is not empty %}
 <hr>
 <h2 class="subtitle">{{ 'filmclub_note.heading_revealed'|trans }}</h2>
