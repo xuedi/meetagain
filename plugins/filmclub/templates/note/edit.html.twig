@@ -1,0 +1,36 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_note.page_title_edit'|trans({'%title%': film.title}) }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_note.page_title_edit'|trans({'%title%': film.title}) }}</h1>
+
+{{ form_start(form) }}
+{{ form_errors(form) }}
+
+<div class="field">
+    {{ form_label(form.body) }}
+    <div class="control">
+        {{ form_widget(form.body, {attr: {class: 'textarea'}}) }}
+    </div>
+    {{ form_errors(form.body) }}
+</div>
+
+<div class="field">
+    <div class="control">
+        <label class="checkbox">
+            {{ form_widget(form.revealToGroup) }}
+            {{ form_label(form.revealToGroup) }}
+        </label>
+    </div>
+    <p class="help">{{ 'filmclub_note.help_reveal'|trans }}</p>
+    {{ form_errors(form.revealToGroup) }}
+</div>
+
+<div class="field mt-4">
+    {{ form_widget(form.submit) }}
+    <a href="{{ path('app_plugin_filmclub_film_show', {id: film.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

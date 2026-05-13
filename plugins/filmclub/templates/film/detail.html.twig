@@ -50,15 +50,52 @@
         <p class="mt-3">{{ film.description }}</p>
         {% endif %}
 
+        {% if wanterCount > 0 %}
+        <p class="mt-3">
+            {{ include('@Filmclub/_components/wishlist_counter.html.twig', {count: wanterCount}) }}
+        </p>
+        {% endif %}
+
         {% if is_granted('ROLE_USER') %}
         <div class="mt-4">
+            {% if isWishlisted %}
+            <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: film.id}) }}" style="display: inline">
+                <button type="submit" class="button is-small">
+                    {{ 'filmclub_wishlist.button_remove'|trans }}
+                </button>
+            </form>
+            {% else %}
+            <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_add', {filmId: film.id}) }}" style="display: inline">
+                <button type="submit" class="button is-small">
+                    {{ 'filmclub_wishlist.button_add'|trans }}
+                </button>
+            </form>
+            {% endif %}
+
             <form method="POST" action="{{ path('app_plugin_filmclub_suggest', {filmId: film.id}) }}" style="display: inline">
                 <button type="submit" class="button is-small">
                     {{ 'filmclub_suggestion.button_suggest'|trans }}
                 </button>
             </form>
+
+            <a href="{{ path('app_plugin_filmclub_note_edit', {filmId: film.id}) }}" class="ml-2">
+                {{ userNote ? 'filmclub_note.link_edit_note'|trans : 'filmclub_note.link_add_note'|trans }}
+            </a>
         </div>
         {% endif %}
     </div>
 </div>
+
+{% if revealedNotes is not empty %}
+<hr>
+<h2 class="subtitle">{{ 'filmclub_note.heading_revealed'|trans }}</h2>
+{% for note in revealedNotes %}
+<blockquote class="mb-3" style="border-left: 3px solid #dbdbdb; padding-left: 1rem">
+    <p>{{ note.body }}</p>
+    <footer class="has-text-grey is-size-7">
+        {{ get_user_name(note.userId) }} &middot; {{ note.createdAt|date('Y-m-d') }}
+    </footer>
+</blockquote>
+{% endfor %}
+{% endif %}
 {% endblock %}

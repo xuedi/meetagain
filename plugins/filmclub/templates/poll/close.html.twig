@@ -1,0 +1,44 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_poll.page_title_close'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_poll.page_title_close'|trans }}</h1>
+
+{% if poll.status.value == 2 and poll.tiedSuggestions is not empty and poll.winningSuggestion is null %}
+<div class="notification is-warning mb-4">
+    {{ 'filmclub_poll.tie_notice'|trans }}
+</div>
+{% else %}
+<p class="mb-4 has-text-grey">{{ 'filmclub_poll.close_intro'|trans }}</p>
+{% endif %}
+
+<form method="POST" action="{{ path('app_plugin_filmclub_poll_close', {id: poll.id}) }}">
+    <div class="mb-4">
+        {% for suggestion in tiedSuggestions %}
+        {% if suggestion.film %}
+        <div class="box mb-2">
+            <label class="radio" style="display: flex; align-items: center; gap: 1rem; cursor: pointer">
+                <input type="radio" name="chosen_suggestion_id" value="{{ suggestion.id }}" required>
+                {% if suggestion.film.posterImage %}
+                <img src="{{ suggestion.film.posterImage.publicPath ?? '' }}" alt="{{ suggestion.film.title }}" style="height: 50px; width: auto">
+                {% endif %}
+                <div>
+                    <p class="has-text-weight-semibold">{{ suggestion.film.title }}</p>
+                    {% if suggestion.film.year %}
+                    <p class="is-size-7 has-text-grey">{{ suggestion.film.year }}</p>
+                    {% endif %}
+                    {% if voteCounts[suggestion.id] is defined %}
+                    <p class="is-size-7">{{ voteCounts[suggestion.id] }} {{ 'filmclub_poll.col_votes'|trans }}</p>
+                    {% endif %}
+                </div>
+            </label>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="button is-primary">{{ 'filmclub_poll.button_commit_outcome'|trans }}</button>
+    <a href="{{ path('app_plugin_filmclub_poll_show', {id: poll.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+</form>
+{% endblock %}

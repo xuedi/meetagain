@@ -8,6 +8,7 @@ use Plugin\Filmclub\Activity\Messages\SuggestionCreated;
 use Plugin\Filmclub\Activity\Messages\SuggestionWithdrawn;
 use Plugin\Filmclub\Service\FilmService;
 use Plugin\Filmclub\Service\SuggestionService;
+use Plugin\Filmclub\Service\WishlistService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,6 +21,7 @@ final class SuggestionController extends AbstractController
     public function __construct(
         private readonly SuggestionService $suggestionService,
         private readonly FilmService $filmService,
+        private readonly WishlistService $wishlistService,
         private readonly ActivityService $activityService,
     ) {}
 
@@ -30,11 +32,14 @@ final class SuggestionController extends AbstractController
 
         $userSuggestions = $this->suggestionService->getUserPendingSuggestions($user->getId());
         $suggestedFilmIds = array_map(static fn($s) => $s->getFilm()->getId(), $userSuggestions);
+        $userWishlistEntries = $this->wishlistService->listForUser($user->getId());
+        $wishlistFilmIds = array_map(static fn($e) => $e->getFilm()->getId(), $userWishlistEntries);
 
         return $this->render('@Filmclub/suggestion/list.html.twig', [
             'suggestions' => $this->suggestionService->getPendingSuggestions(),
             'userSuggestions' => $userSuggestions,
             'suggestedFilmIds' => $suggestedFilmIds,
+            'wishlistFilmIds' => $wishlistFilmIds,
             'approvedFilms' => array_filter(
                 $this->filmService->getApprovedList(),
                 static fn($f) => !in_array($f->getId(), $suggestedFilmIds, true),

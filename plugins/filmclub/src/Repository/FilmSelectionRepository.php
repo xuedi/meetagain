@@ -55,4 +55,21 @@ class FilmSelectionRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /** @return FilmSelection[] */
+    public function findHistoryFilteredByEvents(?array $allowedEventIds = null): array
+    {
+        if ($allowedEventIds === []) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('s')
+            ->orderBy('s.selectedAt', 'DESC');
+
+        if ($allowedEventIds !== null) {
+            $qb->where('s.eventId IN (:eventIds)')->setParameter('eventIds', $allowedEventIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -1,0 +1,36 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_views.page_title_history'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_views.page_title_history'|trans }}</h1>
+
+{% if selections is empty %}
+<p class="has-text-grey">{{ 'filmclub_views.empty'|trans }}</p>
+{% else %}
+<div class="columns is-multiline">
+    {% for selection in selections %}
+    <div class="column is-4-tablet is-6-mobile">
+        <div class="card">
+            {% if selection.film.posterImage %}
+            <div class="card-image">
+                <figure class="image is-2by3">
+                    <img src="{{ selection.film.posterImage.publicPath ?? '' }}" alt="{{ selection.film.title }}">
+                </figure>
+            </div>
+            {% endif %}
+            <div class="card-content">
+                <p class="title is-6">
+                    <a href="{{ path('app_plugin_filmclub_film_show', {id: selection.film.id}) }}">{{ selection.film.title }}</a>
+                </p>
+                {% if selection.film.year %}
+                <p class="subtitle is-7 has-text-grey">{{ selection.film.year }}</p>
+                {% endif %}
+                <p class="is-size-7 has-text-grey">{{ selection.selectedAt|date('Y-m-d') }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

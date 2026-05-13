@@ -83,4 +83,23 @@ class FilmPollRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getOneOrNullResult();
     }
+
+    /** @return FilmPoll[] */
+    public function findClosed(?array $allowedIds = null): array
+    {
+        if ($allowedIds === []) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.status = :status')
+            ->setParameter('status', PollStatus::Closed)
+            ->orderBy('p.closedAt', 'DESC');
+
+        if ($allowedIds !== null) {
+            $qb->andWhere('p.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

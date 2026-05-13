@@ -1,0 +1,49 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_wishlist.page_title_mine'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_wishlist.page_title_mine'|trans }}</h1>
+
+{% if entries is empty %}
+<p class="has-text-grey">{{ 'filmclub_wishlist.empty_mine'|trans }}</p>
+{% else %}
+<table class="table is-fullwidth is-striped">
+    <thead>
+        <tr>
+            <th>{{ 'filmclub_wishlist.col_film'|trans }}</th>
+            <th>{{ 'filmclub_wishlist.col_priority'|trans }}</th>
+            <th>{{ 'filmclub_wishlist.col_since'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>
+                <a href="{{ path('app_plugin_filmclub_film_show', {id: entry.film.id}) }}">
+                    {{ entry.film.title }}
+                    {% if entry.film.year %}<span class="has-text-grey is-size-7">({{ entry.film.year }})</span>{% endif %}
+                </a>
+            </td>
+            <td>
+                {% if entry.priorityCounter > 0 %}
+                <span class="has-text-grey-dark">{{ 'filmclub_wishlist.priority_label'|trans({'%count%': entry.priorityCounter}) }}</span>
+                {% else %}
+                <span class="has-text-grey">-</span>
+                {% endif %}
+            </td>
+            <td>{{ entry.createdAt|date('Y-m-d') }}</td>
+            <td>
+                <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: entry.film.id}) }}" style="display: inline">
+                    <button type="submit" class="button is-small">
+                        {{ 'filmclub_wishlist.button_remove'|trans }}
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
