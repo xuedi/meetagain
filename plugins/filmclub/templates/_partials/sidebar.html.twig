@@ -10,10 +10,10 @@
     {% if is_granted('ROLE_USER') %}
     <p class="menu-label">{{ 'filmclub.sidebar.section_suggestions'|trans }}</p>
     <ul class="menu-list">
-        <li><a href="#">{{ 'filmclub.sidebar.suggestion_browse'|trans }}</a></li>
-        <li><a href="#">{{ 'filmclub.sidebar.suggestion_new'|trans }}</a></li>
+        <li><a class="{{ currentRoute starts with 'app_plugin_filmclub_suggestion' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_suggestion_list') }}">{{ 'filmclub.sidebar.suggestion_browse'|trans }}</a></li>
+        <li><a class="{{ currentRoute == 'app_plugin_filmclub_film_lookup' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_film_lookup') }}">{{ 'filmclub.sidebar.suggestion_new'|trans }}</a></li>
         {% if is_granted('ROLE_ORGANIZER') %}
-        <li><a href="#">{{ 'filmclub.sidebar.pending_approvals'|trans }}</a></li>
+        <li><a class="{{ currentRoute == 'app_plugin_filmclub_manage_pending' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_manage_pending') }}">{{ 'filmclub.sidebar.pending_approvals'|trans }}</a></li>
         {% endif %}
     </ul>
 
