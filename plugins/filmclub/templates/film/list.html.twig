@@ -1,42 +1,38 @@
-{% extends 'base.html.twig' %}
+{% extends '@Filmclub/base_filmclub.html.twig' %}
 
 {% block title %}{{ 'filmclub_film.browser_title_list'|trans }}{% endblock %}
 
-{% block body %}
-<section class="section">
-    <div class="container">
-        <h1 class="title">{{ 'filmclub_film.page_title_list'|trans }}</h1>
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub_film.page_title_list'|trans }}</h1>
 
-        <table class="table is-fullwidth">
-            <thead>
-            <tr>
-                <th>{{ 'filmclub_film.col_title'|trans }}</th>
-                <th>{{ 'filmclub_film.col_year'|trans }}</th>
-                <th>{{ 'filmclub_film.col_runtime'|trans }}</th>
-                <th>{{ 'filmclub_film.col_genres'|trans }}</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for film in films %}
-                <tr>
-                    <td>{{ film.title }}</td>
-                    <td>{{ film.year }}</td>
-                    <td>{% if film.runtime %}{{ film.runtime }} min{% endif %}</td>
-                    <td>
-                        {% for genre in film.genres %}
-                            <span class="tag">{{ genre }}</span>
-                        {% endfor %}
-                    </td>
-                    <td></td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="5">{{ 'filmclub_film.empty_state'|trans }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</section>
+<table class="table is-fullwidth">
+    <thead>
+    <tr>
+        <th>{{ 'filmclub_film.col_title'|trans }}</th>
+        <th>{{ 'filmclub_film.col_year'|trans }}</th>
+        <th>{{ 'filmclub_film.col_runtime'|trans }}</th>
+        <th>{{ 'filmclub_film.col_genres'|trans }}</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for film in films %}
+        <tr>
+            <td>{{ film.title }}</td>
+            <td>{{ film.year }}</td>
+            <td>{% if film.runtime %}{{ film.runtime }} min{% endif %}</td>
+            <td>
+                {% for genre in film.genres %}
+                    <span class="tag">{{ genre }}</span>
+                {% endfor %}
+            </td>
+            <td></td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="5">{{ 'filmclub_film.empty_state'|trans }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

@@ -1,0 +1,11 @@
+{#
+    WishlistCounter -- Numeric badge showing how many times a film has been wishlisted.
+
+    Renders a plain text counter with a translated string. Used wherever the aggregate
+    wishlist demand for a film needs to be surfaced inline without a visual bar or chart.
+
+    Used in:    @Filmclub/film/detail.html.twig, @Filmclub/wishlist/group.html.twig
+    Parameters:
+        - count (int, required)   -- total wishlist entries for this film
+#}
+<span class="has-text-grey-dark">{{ 'filmclub.wishlist_wanted_count'|trans({'%count%': count}) }}</span>

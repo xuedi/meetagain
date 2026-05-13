@@ -1,5 +1,27 @@
 filmclub:
     menu_main: 'Filmclub'
+    landing_title: 'Filmclub'
+    landing_no_active_poll: 'Gerade keine aktive Abstimmung.'
+    landing_poll_closes: 'Abstimmung endet in %days% Tagen.'
+    landing_no_last_film: 'Noch keine Filme geschaut.'
+    landing_no_wishlist: 'Deine Wunschliste ist leer.'
+    wishlist_wanted_count: '%count% mal gewuenscht'
+    sidebar:
+        section_films: 'Filme'
+        browse: 'Durchsuchen'
+        history: 'Gesehene Filme'
+        section_suggestions: 'Vorschlaege'
+        suggestion_browse: 'Durchsuchen'
+        suggestion_new: 'Neuen vorschlagen'
+        pending_approvals: 'Ausstehende Freigaben'
+        section_polls: 'Abstimmungen'
+        poll_current: 'Aktuell'
+        poll_past: 'Vergangene'
+        poll_create: 'Neue erstellen'
+        section_wishlist: 'Wunschliste'
+        wishlist_mine: 'Meine'
+        wishlist_group: 'Gruppe'
+        settings: 'Einstellungen'
 
 filmclub_film:
     page_title_list: 'Filmliste'

@@ -1,0 +1,21 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub.landing_title'|trans }}{% endblock %}
+
+{% block filmclub_body %}
+<h1 class="title">{{ 'filmclub.landing_title'|trans }}</h1>
+
+<div class="block">
+    <p class="has-text-grey">{{ 'filmclub.landing_no_active_poll'|trans }}</p>
+</div>
+
+<div class="block">
+    <p class="has-text-grey">{{ 'filmclub.landing_no_last_film'|trans }}</p>
+</div>
+
+{% if is_granted('ROLE_USER') %}
+<div class="block">
+    <p class="has-text-grey">{{ 'filmclub.landing_no_wishlist'|trans }}</p>
+</div>
+{% endif %}
+{% endblock %}

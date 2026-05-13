@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
  * Multiple implementations compose with AND logic.
  *
  * Conventions:
- *   null      = no opinion; bypasses filtering (main-host or single-tenant)
+ *   null      = no opinion; bypasses filtering (no filter implementation registered)
  *   []        = block all; repository MUST return empty result, not omit the clause
  *   int[]     = restrict to these IDs
  */

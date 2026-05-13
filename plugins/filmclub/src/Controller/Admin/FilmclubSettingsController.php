@@ -41,7 +41,7 @@ final class FilmclubSettingsController extends AbstractController
             ]);
         }
 
-        // No filter active (single-tenant): redirect to edit for group 1
+        // No filter active (null = no opinion): redirect to edit for group 1
         return $this->redirectToRoute('app_plugin_filmclub_settings_edit', ['groupId' => 1]);
     }
 
