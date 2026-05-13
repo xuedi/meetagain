@@ -1,3 +1,6 @@
+filmclub:
+    menu_main: 'Filmclub'
+
 filmclub_film:
     page_title_list: 'Filmliste'
     browser_title_list: 'Filmliste'
@@ -70,6 +73,27 @@ filmclub_vote:
     flash_invalid_film: 'Bitte waehlen Sie einen gueltigen Film'
     flash_vote_recorded: 'Ihre Stimme wurde erfasst'
     flash_vote_closed: 'Abstimmung wurde geschlossen'
+filmclub_settings:
+    page_title: 'Filmclub-Einstellungen'
+    adapter_label: 'Externe Datenquelle'
+    adapter_none: 'Keine (nur manuelle Eingabe)'
+    adapter_tmdb: 'TMDB (The Movie Database)'
+    adapter_omdb: 'OMDb (Open Movie Database)'
+    adapter_manual: 'Manuelle Eingabe'
+    section_api_keys: 'API-Schlussel'
+    tmdb_key_label: 'TMDB-API-Schlussel'
+    omdb_key_label: 'OMDb-API-Schlussel'
+    key_already_set: 'Schlussel ist gesetzt - leer lassen zum Behalten, Loschen ankreuzen zum Entfernen'
+    clear_key_label: 'Diesen Schlussel loschen'
+    section_poll_defaults: 'Abstimmungs-Standardwerte'
+    poll_duration_label: 'Standard-Abstimmungsdauer (Tage)'
+    poll_duration_help: 'Wird beim Erstellen einer neuen Abstimmung als Standard verwendet.'
+    button_save: 'Einstellungen speichern'
+    flash_saved: 'Filmclub-Einstellungen gespeichert.'
+    chooser_title: 'Gruppe auswaehlen'
+    chooser_intro: 'Waehlen Sie eine Gruppe zum Konfigurieren:'
+    chooser_group_label: 'Gruppe %id%'
+
 filmclub_tile:
     heading: 'Filmabend'
     voting_open: 'Abstimmung laueft!'
