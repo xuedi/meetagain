@@ -8,7 +8,6 @@ use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Filmclub\Entity\Film;
-use Plugin\Filmclub\Entity\FilmGenre;
 
 class FilmFixture extends AbstractFixture implements FixtureGroupInterface
 {
@@ -70,6 +69,12 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
         'Alien',
     ];
 
+    private const array GENRES = [
+        'drama', 'comedy', 'action', 'thriller', 'horror',
+        'sci-fi', 'documentary', 'animation', 'fantasy', 'mystery',
+        'romance', 'western',
+    ];
+
     public function __construct(
         private readonly UserRepository $userRepository,
     ) {}
@@ -78,7 +83,6 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
     {
         echo 'Creating films ... ';
 
-        // Get all users from database
         $users = $this->userRepository->findAll();
         if ($users === []) {
             echo 'SKIP (no users found)' . PHP_EOL;
@@ -94,11 +98,11 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
             $film->setTitle($title);
             $film->setYear(rand(1950, 2024));
             $film->setRuntime(rand(80, 200));
+            $film->setApproved(true);
 
-            $genres = FilmGenre::cases();
+            $genres = self::GENRES;
             shuffle($genres);
-            $selectedGenres = array_slice($genres, 0, rand(1, 3));
-            $film->setGenres($selectedGenres);
+            $film->setGenres(array_slice($genres, 0, rand(1, 3)));
 
             $randomUser = $users[array_rand($users)];
             $film->setCreatedBy($randomUser->getId());
