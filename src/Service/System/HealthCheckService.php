@@ -63,8 +63,8 @@ readonly class HealthCheckService
     private function testDiskSpace(): array
     {
         $path = $this->kernelProjectDir;
-        $free = disk_free_space($path);
-        $total = disk_total_space($path);
+        $free = $this->fs->getDiskFreeSpace($path);
+        $total = $this->fs->getDiskTotalSpace($path);
 
         if ($free === false || $total === false) {
             return ['ok' => false, 'error' => 'Could not determine disk space'];
