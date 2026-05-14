@@ -26,7 +26,7 @@ Firefox uses its own certificate store and doesn't trust system certificates by 
 3. Scroll down to `Certificates` → Click `View Certificates`
 4. Click the `Authorities` tab
 5. Click `Import...`
-6. Navigate to `/home/xuedi/Projects/meetAgain/docker/certs/`
+6. Navigate to the `docker/certs/` directory in this project
 7. Select `meetagain.local.crt`
 8. Check: ✅ `Trust this CA to identify websites`
 9. Click `OK`
@@ -35,9 +35,11 @@ Now all `*.meetagain.local` domains will work without warnings!
 
 ### Method 2: System-wide Trust (Linux)
 
+Run from the project root:
+
 ```bash
 # Copy certificate to system store
-sudo cp /home/xuedi/Projects/meetAgain/docker/certs/meetagain.local.crt /usr/local/share/ca-certificates/
+sudo cp docker/certs/meetagain.local.crt /usr/local/share/ca-certificates/
 
 # Update certificate store
 sudo update-ca-certificates
@@ -47,10 +49,12 @@ Note: This works for most browsers except Firefox (which needs Method 1).
 
 ### Method 3: System-wide Trust (macOS)
 
+Run from the project root:
+
 ```bash
 sudo security add-trusted-cert -d -r trustRoot \
     -k /Library/Keychains/System.keychain \
-    /home/xuedi/Projects/meetAgain/docker/certs/meetagain.local.crt
+    docker/certs/meetagain.local.crt
 ```
 
 ## Regenerating Certificates
