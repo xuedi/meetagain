@@ -17,13 +17,7 @@ class HealthCheckServiceTest extends TestCase
     public function testTestLogSizeReportsZeroSizeWhenLogFileMissing(): void
     {
         // Arrange
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturn(false);
-        $service = new HealthCheckService(
-            new TagAwareAdapter(new ArrayAdapter()),
-            $fs,
-            self::PROJECT_DIR,
-        );
+        $service = $this->makeService(logExists: false);
 
         // Act
         $result = $service->runAll()['logSize'];
@@ -41,14 +35,7 @@ class HealthCheckServiceTest extends TestCase
     public function testTestLogSizeReportsCorrectOkFlagForSize(int $size, bool $expectedOk): void
     {
         // Arrange
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturn(true);
-        $fs->method('getFileSize')->willReturn($size);
-        $service = new HealthCheckService(
-            new TagAwareAdapter(new ArrayAdapter()),
-            $fs,
-            self::PROJECT_DIR,
-        );
+        $service = $this->makeService(logExists: true, logSize: $size);
 
         // Act
         $result = $service->runAll()['logSize'];
@@ -70,14 +57,7 @@ class HealthCheckServiceTest extends TestCase
     public function testTestLogSizeTreatsFalseSizeAsZero(): void
     {
         // Arrange - fileExists true but filesize() returns false (race / permissions)
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturn(true);
-        $fs->method('getFileSize')->willReturn(false);
-        $service = new HealthCheckService(
-            new TagAwareAdapter(new ArrayAdapter()),
-            $fs,
-            self::PROJECT_DIR,
-        );
+        $service = $this->makeService(logExists: true, logSize: false);
 
         // Act
         $result = $service->runAll()['logSize'];
@@ -85,5 +65,22 @@ class HealthCheckServiceTest extends TestCase
         // Assert
         static::assertTrue($result['ok']);
         static::assertSame(0, $result['size']);
+    }
+
+    private function makeService(bool $logExists, int|false $logSize = 0): HealthCheckService
+    {
+        $fs = $this->createStub(ExtendedFilesystem::class);
+        $fs->method('fileExists')->willReturn($logExists);
+        $fs->method('getFileSize')->willReturn($logSize);
+        // Stub disk-space lookups so runAll() never touches the real filesystem
+        // (PROJECT_DIR is a sentinel that may not exist on the test host).
+        $fs->method('getDiskFreeSpace')->willReturn(50.0 * 1024 * 1024 * 1024);
+        $fs->method('getDiskTotalSpace')->willReturn(100.0 * 1024 * 1024 * 1024);
+
+        return new HealthCheckService(
+            new TagAwareAdapter(new ArrayAdapter()),
+            $fs,
+            self::PROJECT_DIR,
+        );
     }
 }
