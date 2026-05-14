@@ -108,6 +108,16 @@ class ExtendedFilesystem extends SymfonyFilesystem
         return filesize($path);
     }
 
+    public function getDiskFreeSpace(string $path): float|false
+    {
+        return disk_free_space($path);
+    }
+
+    public function getDiskTotalSpace(string $path): float|false
+    {
+        return disk_total_space($path);
+    }
+
     public function makeDirectory(string $path, int $mode = 0o755, bool $recursive = true): bool
     {
         try {
