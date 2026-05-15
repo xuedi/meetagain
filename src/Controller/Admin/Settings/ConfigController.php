@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Settings;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Entity\Image;
@@ -92,6 +93,14 @@ final class ConfigController extends AbstractSettingsController implements Admin
 
         $adminTop = new AdminTop(
             info: [new AdminTopInfoText($this->translator->trans('admin_system_config.intro'))],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_system_config.button_clear_cms_cache'),
+                    target: $this->generateUrl('app_admin_system_cms_cache_clear'),
+                    icon: 'broom',
+                    confirm: $this->translator->trans('admin_system_config.confirm_clear_cms_cache'),
+                ),
+            ],
         );
 
         return $this->render('admin/system/config/index.html.twig', [
@@ -103,6 +112,17 @@ final class ConfigController extends AbstractSettingsController implements Admin
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
+    }
+
+    #[Route('/cms-cache/clear', name: 'app_admin_system_cms_cache_clear', methods: ['GET'])]
+    public function clearCmsCache(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
+
+        $this->cmsPageCacheService->invalidateAll();
+        $this->addFlash('success', $this->translator->trans('admin_system_config.flash_cms_cache_cleared'));
+
+        return $this->redirectToRoute('app_admin_system_config');
     }
 
     #[Route('/boolean/{name}', name: 'app_admin_system_boolean', methods: ['POST'])]
