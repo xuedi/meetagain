@@ -99,6 +99,11 @@ final class ConfigController extends AbstractSettingsController implements Admin
                     target: $this->generateUrl('app_admin_system_cms_cache_clear'),
                     icon: 'broom',
                 ),
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_system_config.button_view_redis_cache'),
+                    target: $this->generateUrl('app_admin_system_redis_cache'),
+                    icon: 'database',
+                ),
             ],
         );
 
