@@ -38,6 +38,12 @@ body {
 .flex-shrink-0   { flex-shrink: 0; }
 .breakText       { display: block; max-width: 720px !important; word-break: break-all; }
 
+// Appends a unit suffix via pseudo-element so the cell's textContent stays
+// purely numeric — lets JSTable (and any other sorter that reads textContent)
+// treat the column as numeric instead of lexicographic.
+// Usage: <td class="has-unit" data-unit="ms">123</td>  →  rendered as "123 ms"
+.has-unit::after { content: " " attr(data-unit); }
+
 // ── Forms ────────────────────────────────────────────────────────────────────
 
 .fieldset-warning  { border: 2px solid #f14668; border-radius: 4px; }
