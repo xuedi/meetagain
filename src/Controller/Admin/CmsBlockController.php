@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ORGANIZER'), Route('/admin/cms')]
+#[IsGranted('ROLE_STEWARD'), Route('/admin/cms')]
 final class CmsBlockController extends AbstractController
 {
     public function __construct(

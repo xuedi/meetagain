@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ORGANIZER')]
+#[IsGranted('ROLE_STEWARD')]
 final class MemberController extends AbstractController implements AdminNavigationInterface
 {
     public function __construct(
@@ -36,7 +36,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(label: 'admin_shell.menu_member', route: 'app_admin_member', active: 'member', role: 'ROLE_ORGANIZER'),
+                new AdminLink(label: 'admin_shell.menu_member', route: 'app_admin_member', active: 'member', role: 'ROLE_STEWARD'),
             ],
             sectionPriority: 50,
         );
