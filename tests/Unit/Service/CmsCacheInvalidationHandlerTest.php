@@ -46,4 +46,19 @@ class CmsCacheInvalidationHandlerTest extends TestCase
 
         // Assert: expectations verified automatically
     }
+
+    public function testOnEntityActionInvalidatesPageOnlyForBlockUpdate(): void
+    {
+        // Arrange: block edits must NOT bust the menu cache - block content doesn't affect menu placement
+        $cmsServiceMock = $this->createMock(CmsService::class);
+        $cmsServiceMock->expects($this->once())->method('invalidatePage')->with(7);
+        $cmsServiceMock->expects($this->never())->method('invalidateMenuCaches');
+
+        $handler = new CmsCacheInvalidationHandler($cmsServiceMock);
+
+        // Act
+        $handler->onEntityAction(EntityAction::UpdateCmsBlock, 7);
+
+        // Assert: expectations verified automatically
+    }
 }
