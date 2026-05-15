@@ -31,7 +31,7 @@
                             <span class="tag is-danger is-dark">{{ 'admin_logs.status_exception'|trans }}</span>
                         {% endif %}
                     </td>
-                    <td class="has-text-grey">{{ task.duration_ms }} ms</td>
+                    <td class="has-text-grey has-unit" data-unit="ms">{{ task.duration_ms }}</td>
                     <td>{{ task.message }}</td>
                 </tr>
             {% endfor %}

@@ -33,7 +33,7 @@
                         {% endif %}
                     </td>
                     <td>{{ log.tasks | length }}</td>
-                    <td class="has-text-grey">{{ log.durationMs }} ms</td>
+                    <td class="has-text-grey has-unit" data-unit="ms">{{ log.durationMs }}</td>
                     <td>
                         <a href="{{ path('app_admin_cron_log_show', {'id': log.id}) }}">
                             <span class="icon"><i class="fa fa-eye"></i></span>
