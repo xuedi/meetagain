@@ -15,4 +15,12 @@ class EventTranslationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, EventTranslation::class);
     }
+
+    /**
+     * @return iterable<EventTranslation>
+     */
+    public function iterateAll(): iterable
+    {
+        return $this->createQueryBuilder('t')->getQuery()->toIterable();
+    }
 }
