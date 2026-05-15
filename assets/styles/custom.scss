@@ -424,8 +424,23 @@ body.admin-shell-no-scroll {
     .admin-shell-backdrop { display: none; }
 }
 
-.quill-editor-wrapper .ql-editor {
-    min-height: 22rem;
+.quill-editor-wrapper {
+    .ql-editor,
+    .quill-source-area {
+        min-height: 22rem;
+    }
+
+    .quill-source-area {
+        font-family: monospace;
+        font-size: 0.85rem;
+        border-top: 0;
+        border-radius: 0;
+    }
+
+    .quill-source-toggle {
+        margin-top: 0.5rem;
+        text-align: right;
+    }
 }
 
 .cms-block-preview,
