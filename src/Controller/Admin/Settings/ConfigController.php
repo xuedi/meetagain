@@ -95,11 +95,6 @@ final class ConfigController extends AbstractSettingsController implements Admin
             info: [new AdminTopInfoText($this->translator->trans('admin_system_config.intro'))],
             actions: [
                 new AdminTopActionButton(
-                    label: $this->translator->trans('admin_system_config.button_clear_cms_cache'),
-                    target: $this->generateUrl('app_admin_system_cms_cache_clear'),
-                    icon: 'broom',
-                ),
-                new AdminTopActionButton(
                     label: $this->translator->trans('admin_system_config.button_view_redis_cache'),
                     target: $this->generateUrl('app_admin_system_redis_cache'),
                     icon: 'database',
@@ -116,17 +111,6 @@ final class ConfigController extends AbstractSettingsController implements Admin
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
-    }
-
-    #[Route('/cms-cache/clear', name: 'app_admin_system_cms_cache_clear', methods: ['GET'])]
-    public function clearCmsCache(): Response
-    {
-        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
-
-        $this->cmsService->invalidateAll();
-        $this->addFlash('success', $this->translator->trans('admin_system_config.flash_cms_cache_cleared'));
-
-        return $this->redirectToRoute('app_admin_system_config');
     }
 
     #[Route('/boolean/{name}', name: 'app_admin_system_boolean', methods: ['POST'])]

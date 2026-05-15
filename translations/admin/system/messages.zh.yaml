@@ -168,10 +168,9 @@ admin_system_config:
     field_website_image_label: '上传新图片'
     usage_website_image: '当有人在社交媒体或聊天应用中分享此站点的页面时，将显示为链接预览。'
     flash_website_image_saved: '网站图片已保存'
-    button_clear_cms_cache: '清除 CMS 缓存'
     button_view_redis_cache: '查看 Redis 缓存'
-    flash_cms_cache_cleared: 'CMS 页面缓存已清除。'
 admin_system_cache:
+    flash_cleared: 'Redis 缓存已清除。'
     col_key: '键'
     col_prefix: '前缀'
     col_type: '类型'
