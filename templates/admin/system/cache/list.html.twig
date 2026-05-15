@@ -1,0 +1,52 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'admin_system_cache.col_key'|trans }}</th>
+                    <th>{{ 'admin_system_cache.col_prefix'|trans }}</th>
+                    <th>{{ 'admin_system_cache.col_type'|trans }}</th>
+                    <th>{{ 'admin_system_cache.col_ttl'|trans }}</th>
+                    <th>{{ 'admin_system_cache.col_size'|trans }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in keys %}
+                    <tr>
+                        <td class="is-family-monospace is-size-7">{{ entry.key }}</td>
+                        <td><span class="tag is-light">{{ entry.prefix }}</span></td>
+                        <td>{{ entry.type }}</td>
+                        <td class="has-text-grey">
+                            {%- if entry.ttl == -1 -%}
+                                {{ 'admin_system_cache.ttl_none'|trans }}
+                            {%- elseif entry.ttl == -2 -%}
+                                {{ 'admin_system_cache.ttl_expired'|trans }}
+                            {%- else -%}
+                                {{ entry.ttl }}s
+                            {%- endif -%}
+                        </td>
+                        <td class="has-text-grey">{{ entry.size }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_system_redis_cache_show', {'key': entry.key, 'prefix': activePrefix}) }}">
+                                <span class="icon"><i class="fa fa-eye"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="has-text-centered has-text-grey">{{ 'admin_system_cache.empty'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

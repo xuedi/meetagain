@@ -1,0 +1,30 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {% if entry is null %}
+            <p class="has-text-grey">{{ 'admin_system_cache.flash_key_missing'|trans }}</p>
+        {% else %}
+            <div class="content">
+                <h2 class="title is-6">{{ 'admin_system_cache.heading_raw_value'|trans }}</h2>
+                <pre class="is-size-7" style="max-height: 24em; overflow:auto;">{{ entry.value }}</pre>
+
+                {% if entry.decoded is not null %}
+                    <h2 class="title is-6">{{ 'admin_system_cache.heading_decoded'|trans }}</h2>
+                    <pre class="is-size-7" style="max-height: 24em; overflow:auto;">{{ entry.decoded }}</pre>
+                {% endif %}
+
+                {% if entry.members is not null %}
+                    <h2 class="title is-6">{{ 'admin_system_cache.heading_members'|trans }}</h2>
+                    <p class="has-text-grey is-size-7">{{ 'admin_system_cache.help_members'|trans }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}
