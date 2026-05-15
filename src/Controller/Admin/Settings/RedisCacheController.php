@@ -11,8 +11,10 @@ use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Cache\RedisCacheService;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -23,6 +25,8 @@ final class RedisCacheController extends AbstractSettingsController implements A
     public function __construct(
         TranslatorInterface $translator,
         private readonly RedisCacheService $redisCacheService,
+        #[Autowire(service: 'cache.global_clearer')]
+        private readonly Psr6CacheClearer $cacheClearer,
     ) {
         parent::__construct($translator, 'config');
     }
@@ -64,14 +68,20 @@ final class RedisCacheController extends AbstractSettingsController implements A
             ));
         }
 
-        $actions = [
-            $this->buildPrefixDropdown($prefix, $prefixes),
-            new AdminTopActionButton(
-                label: $this->translator->trans('global.button_back'),
-                target: $this->generateUrl('app_admin_system_config'),
-                icon: 'arrow-left',
-            ),
-        ];
+        $actions = [];
+        if ($totalKeys > 0) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('global.button_clear'),
+                target: $this->generateUrl('app_admin_system_redis_cache_clear'),
+                icon: 'trash',
+            );
+        }
+        $actions[] = $this->buildPrefixDropdown($prefix, $prefixes);
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_system_config'),
+            icon: 'arrow-left',
+        );
 
         $adminTop = new AdminTop(info: $info, actions: $actions);
 
@@ -82,6 +92,17 @@ final class RedisCacheController extends AbstractSettingsController implements A
             'keys' => $result['keys'],
             'activePrefix' => $prefix,
         ]);
+    }
+
+    #[Route('/clear', name: 'app_admin_system_redis_cache_clear', methods: ['GET'])]
+    public function clear(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
+
+        $this->cacheClearer->clear('');
+        $this->addFlash('success', $this->translator->trans('admin_system_cache.flash_cleared'));
+
+        return $this->redirectToRoute('app_admin_system_redis_cache');
     }
 
     #[Route('/show', name: 'app_admin_system_redis_cache_show', methods: ['GET'])]
