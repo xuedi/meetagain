@@ -7,6 +7,7 @@ enum EntityAction: string
     case CreateCms = 'create_cms';
     case UpdateCms = 'update_cms';
     case DeleteCms = 'delete_cms';
+    case UpdateCmsBlock = 'update_cms_block';
     case CreateEvent = 'create_event';
     case UpdateEvent = 'update_event';
     case DeleteEvent = 'delete_event';
