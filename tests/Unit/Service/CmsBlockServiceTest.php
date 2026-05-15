@@ -11,9 +11,20 @@ use App\Service\Cms\CmsBlockService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
 class CmsBlockServiceTest extends TestCase
 {
+    private function makeHydrator(): BlockHydrator
+    {
+        $sanitizer = new class implements HtmlSanitizerInterface {
+            public function sanitize(string $input): string { return $input; }
+            public function sanitizeFor(string $context, string $input): string { return $input; }
+        };
+
+        return new BlockHydrator($sanitizer);
+    }
+
     public function testCreateBlockPersistsNewBlock(): void
     {
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -24,7 +35,7 @@ class CmsBlockServiceTest extends TestCase
         // flush called twice: once after persist, once in reorderBlocks
         $emMock->expects($this->exactly(2))->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
+        $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator());
 
         $pageMock = $this->createStub(Cms::class);
         $pageMock->method('getId')->willReturn(1);
@@ -47,7 +58,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($block);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
+        $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator());
         $result = $subject->updateBlock(42, CmsBlockType::Text, ['title' => 'new', 'content' => 'new content']);
 
         static::assertSame($block, $result);
@@ -59,7 +70,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
         $blockRepoStub->method('find')->willReturn(null);
 
-        $subject = new CmsBlockService($emStub, $blockRepoStub, new BlockHydrator());
+        $subject = new CmsBlockService($emStub, $blockRepoStub, $this->makeHydrator());
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not load block');
@@ -78,7 +89,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->once())->method('remove')->with($block);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
+        $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator());
         $subject->deleteBlock(42);
     }
 
@@ -88,7 +99,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
         $blockRepoStub->method('find')->willReturn(null);
 
-        $subject = new CmsBlockService($emStub, $blockRepoStub, new BlockHydrator());
+        $subject = new CmsBlockService($emStub, $blockRepoStub, $this->makeHydrator());
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not load block');
@@ -110,7 +121,7 @@ class CmsBlockServiceTest extends TestCase
         $emMock->expects($this->exactly(2))->method('persist');
         $emMock->expects($this->exactly(2))->method('flush');
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
+        $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator());
         $subject->moveBlockDown(1, 42, 'en');
 
         static::assertSame(1.0, $block->getPriority());
@@ -135,7 +146,7 @@ class CmsBlockServiceTest extends TestCase
 
         $blockRepoStub->method('find')->willReturn($block);
 
-        $subject = new CmsBlockService($emMock, $blockRepoStub, new BlockHydrator());
+        $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator());
 
         // Test when imageRight is missing from payload (unchecked)
         $payload = [
