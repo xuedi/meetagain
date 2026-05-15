@@ -14,7 +14,7 @@ use App\Form\SettingsType;
 use App\Form\WebsiteImageType;
 use App\Repository\ImageRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Service\Cms\CmsPageCacheService;
+use App\Service\Cms\CmsService;
 use App\Service\Config\ConfigService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
@@ -38,7 +38,7 @@ final class ConfigController extends AbstractSettingsController implements Admin
         private readonly ImageLocationService $imageLocationService,
         private readonly ImageRepository $imageRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly CmsPageCacheService $cmsPageCacheService,
+        private readonly CmsService $cmsService,
     ) {
         parent::__construct($translator, 'config');
     }
@@ -79,7 +79,7 @@ final class ConfigController extends AbstractSettingsController implements Admin
                         $this->imageLocationService->removeLocation($oldId, ImageType::WebsiteImage, 0);
                     }
                     $this->imageLocationService->addLocation($image->getId(), ImageType::WebsiteImage, 0);
-                    $this->cmsPageCacheService->invalidateAll();
+                    $this->cmsService->invalidateAll();
                     $this->addFlash('success', $this->translator->trans('admin_system_config.flash_website_image_saved'));
                 }
             }
@@ -98,7 +98,6 @@ final class ConfigController extends AbstractSettingsController implements Admin
                     label: $this->translator->trans('admin_system_config.button_clear_cms_cache'),
                     target: $this->generateUrl('app_admin_system_cms_cache_clear'),
                     icon: 'broom',
-                    confirm: $this->translator->trans('admin_system_config.confirm_clear_cms_cache'),
                 ),
             ],
         );
@@ -119,7 +118,7 @@ final class ConfigController extends AbstractSettingsController implements Admin
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
 
-        $this->cmsPageCacheService->invalidateAll();
+        $this->cmsService->invalidateAll();
         $this->addFlash('success', $this->translator->trans('admin_system_config.flash_cms_cache_cleared'));
 
         return $this->redirectToRoute('app_admin_system_config');

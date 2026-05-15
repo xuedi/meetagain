@@ -7,8 +7,9 @@ use App\EntityActionDispatcher;
 use App\Enum\CronTaskStatus;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
+use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
-use App\Service\Cms\CmsPageCacheService;
+use App\Service\Cms\CmsService;
 use App\Service\Event\RecurringEventService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,7 +38,8 @@ class RecurringEventServiceTest extends TestCase
             repo: $repo,
             em: $em,
             entityActionDispatcher: $this->createStub(EntityActionDispatcher::class),
-            cmsPageCacheService: $this->createStub(CmsPageCacheService::class),
+            cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
+            cmsService: $this->createStub(CmsService::class),
         );
     }
 

@@ -14,7 +14,7 @@ use App\Form\EventUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
 use App\Service\Cms\CmsBlockService;
-use App\Service\Cms\CmsPageCacheService;
+use App\Service\Cms\CmsService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
@@ -39,7 +39,7 @@ final class CmsBlockController extends AbstractController
         private readonly CmsBlockRepository $blockRepo,
         private readonly CmsBlockService $blockService,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
-        private readonly CmsPageCacheService $cmsPageCacheService,
+        private readonly CmsService $cmsService,
         private readonly LoggerInterface $logger,
         private readonly ImageService $imageService,
         private readonly ValidatorInterface $validator,
@@ -108,7 +108,7 @@ final class CmsBlockController extends AbstractController
         $this->em->persist($block);
         $this->em->flush();
 
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        $this->cmsService->invalidatePage($block->getPage()->getId());
 
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
@@ -138,7 +138,7 @@ final class CmsBlockController extends AbstractController
             $this->imageLocationService->removeLocation($oldImageId, ImageType::CmsBlock, $blockId);
         }
 
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        $this->cmsService->invalidatePage($block->getPage()->getId());
 
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
@@ -160,7 +160,7 @@ final class CmsBlockController extends AbstractController
 
         try {
             $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
-            $this->cmsPageCacheService->invalidatePage($id);
+            $this->cmsService->invalidatePage($id);
         } catch (BlockValidationException $e) {
             $this->addFlash('error', $this->translator->trans('admin_cms.flash_block_validation_error'));
         }
@@ -179,7 +179,7 @@ final class CmsBlockController extends AbstractController
         $locale = $request->query->get('locale');
 
         $this->blockService->moveBlockDown($pageId, $blockId, $locale);
-        $this->cmsPageCacheService->invalidatePage($pageId);
+        $this->cmsService->invalidatePage($pageId);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $pageId,
@@ -195,7 +195,7 @@ final class CmsBlockController extends AbstractController
         $locale = $request->query->get('locale');
 
         $this->blockService->moveBlockUp($pageId, $blockId, $locale);
-        $this->cmsPageCacheService->invalidatePage($pageId);
+        $this->cmsService->invalidatePage($pageId);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $pageId,
@@ -211,7 +211,7 @@ final class CmsBlockController extends AbstractController
 
         try {
             $block = $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
-            $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+            $this->cmsService->invalidatePage($block->getPage()->getId());
         } catch (BlockValidationException $e) {
             $this->addFlash('error', $this->translator->trans('admin_cms.flash_block_validation_error'));
         }
@@ -223,7 +223,7 @@ final class CmsBlockController extends AbstractController
     public function cmsBlockDelete(Request $request): Response
     {
         $this->blockService->deleteBlock((int) $request->query->get('blockId'));
-        $this->cmsPageCacheService->invalidatePage((int) $request->query->get('id'));
+        $this->cmsService->invalidatePage((int) $request->query->get('id'));
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $request->query->get('id'),
@@ -295,7 +295,7 @@ final class CmsBlockController extends AbstractController
             }
         }
 
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        $this->cmsService->invalidatePage($block->getPage()->getId());
 
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
@@ -325,7 +325,7 @@ final class CmsBlockController extends AbstractController
             }
         }
 
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        $this->cmsService->invalidatePage($block->getPage()->getId());
 
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
@@ -385,7 +385,7 @@ final class CmsBlockController extends AbstractController
             }
         }
 
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        $this->cmsService->invalidatePage($block->getPage()->getId());
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $block->getPage()->getId(),
@@ -412,7 +412,7 @@ final class CmsBlockController extends AbstractController
 
         $this->imageLocationService->removeLocation($imageId, ImageType::CmsGallery, $blockId);
 
-        $this->cmsPageCacheService->invalidatePage($block->getPage()->getId());
+        $this->cmsService->invalidatePage($block->getPage()->getId());
 
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $block->getPage()->getId(),

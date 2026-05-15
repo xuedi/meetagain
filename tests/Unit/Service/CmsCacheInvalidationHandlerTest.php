@@ -4,7 +4,7 @@ namespace Tests\Unit\Service;
 
 use App\Enum\EntityAction;
 use App\Service\Cms\CmsCacheInvalidationHandler;
-use App\Service\Cms\CmsPageCacheService;
+use App\Service\Cms\CmsService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -14,11 +14,11 @@ class CmsCacheInvalidationHandlerTest extends TestCase
     public function testOnEntityActionInvalidatesCmsPageAndMenus(EntityAction $action): void
     {
         // Arrange
-        $cacheServiceMock = $this->createMock(CmsPageCacheService::class);
-        $cacheServiceMock->expects($this->once())->method('invalidatePage')->with(7);
-        $cacheServiceMock->expects($this->once())->method('invalidateMenuCaches');
+        $cmsServiceMock = $this->createMock(CmsService::class);
+        $cmsServiceMock->expects($this->once())->method('invalidatePage')->with(7);
+        $cmsServiceMock->expects($this->once())->method('invalidateMenuCaches');
 
-        $handler = new CmsCacheInvalidationHandler($cacheServiceMock);
+        $handler = new CmsCacheInvalidationHandler($cmsServiceMock);
 
         // Act
         $handler->onEntityAction($action, 7);
@@ -35,11 +35,11 @@ class CmsCacheInvalidationHandlerTest extends TestCase
     public function testOnEntityActionIgnoresUnrelatedActions(): void
     {
         // Arrange
-        $cacheServiceMock = $this->createMock(CmsPageCacheService::class);
-        $cacheServiceMock->expects($this->never())->method('invalidatePage');
-        $cacheServiceMock->expects($this->never())->method('invalidateMenuCaches');
+        $cmsServiceMock = $this->createMock(CmsService::class);
+        $cmsServiceMock->expects($this->never())->method('invalidatePage');
+        $cmsServiceMock->expects($this->never())->method('invalidateMenuCaches');
 
-        $handler = new CmsCacheInvalidationHandler($cacheServiceMock);
+        $handler = new CmsCacheInvalidationHandler($cmsServiceMock);
 
         // Act
         $handler->onEntityAction(EntityAction::UpdateEvent, 7);
