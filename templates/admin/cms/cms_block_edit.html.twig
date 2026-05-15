@@ -7,12 +7,7 @@
 
 {% block content %}
 
-    <div class="mb-4">
-        <a class="button is-small" href="{{ path('app_admin_cms_edit', {'id': cms.id, 'locale': block.language}) }}">
-            <span class="icon"><i class="fa fa-arrow-left"></i></span>
-            <span>{{ 'global.button_back'|trans }}</span>
-        </a>
-    </div>
+    {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
     {% set removeImageUrl = blockImage is not null
         ? path('app_admin_cms_block_image_remove', {'blockId': block.id})
@@ -103,5 +98,9 @@
     {% endif %}
     {% if block.type.name == 'FactsRow' %}
     <script src="{{ asset('js/admin/cms-facts-row-editor.js') }}" defer></script>
+    {% endif %}
+    {% if block.type.name == 'Text' %}
+    <script src="{{ asset('js/vendor/quill.min.js') }}"></script>
+    <script src="{{ asset('js/admin/quill-editor.js') }}" defer></script>
     {% endif %}
 {% endblock %}

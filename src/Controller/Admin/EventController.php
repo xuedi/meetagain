@@ -38,6 +38,7 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
@@ -80,6 +81,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly ImageLocationService $imageLocationService,
         private readonly TranslatorInterface $translator,
         private readonly EventUpdateNotificationEmail $eventUpdateNotificationEmail,
+        private readonly HtmlSanitizerInterface $cmsContent,
     ) {}
 
     #[Route('', name: 'app_admin_event')]
@@ -365,7 +367,8 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $translation->setLanguage($languageCode);
                 $translation->setTitle($form->get("title-{$languageCode}")->getData() ?? '');
                 $translation->setTeaser($form->get("teaser-{$languageCode}")->getData() ?? '');
-                $translation->setDescription($form->get("description-{$languageCode}")->getData() ?? '');
+                $description = $form->get("description-{$languageCode}")->getData() ?? '';
+                $translation->setDescription($this->cmsContent->sanitize($description));
 
                 $this->entityManager->persist($translation);
             }
@@ -404,7 +407,21 @@ final class EventController extends AbstractController implements AdminNavigatio
             'active' => 'event',
             'event' => $event,
             'form' => $form,
-            'adminTop' => $this->buildBackOnlyTop(),
+            'adminTop' => new AdminTop(
+                actions: [
+                    new AdminTopActionButton(
+                        label: $this->translator->trans('global.button_view'),
+                        target: $this->generateUrl('app_event_details', ['id' => $event->getId()]),
+                        icon: 'eye',
+                        newTab: true,
+                    ),
+                    new AdminTopActionButton(
+                        label: $this->translator->trans('global.button_back'),
+                        target: $this->generateUrl('app_admin_event'),
+                        icon: 'arrow-left',
+                    ),
+                ],
+            ),
             'notifiableAttendeeCount' => $this->countNotifiableAttendees($event),
         ]);
     }

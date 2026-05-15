@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\AdminTop;
 use App\Entity\User;
 use App\Exception\BlockValidationException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -58,12 +60,29 @@ final class CmsBlockController extends AbstractController
             throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
         }
 
+        $cms = $block->getPage();
+        $actions = [];
+        if ($cms->getSlug() !== null && $cms->getSlug() !== '') {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('global.button_view'),
+                target: $this->generateUrl('app_catch_all', ['page' => $cms->getSlug(), '_locale' => $block->getLanguage()]),
+                icon: 'eye',
+                newTab: true,
+            );
+        }
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_cms_edit', ['id' => $cms->getId(), 'locale' => $block->getLanguage()]),
+            icon: 'arrow-left',
+        );
+
         return $this->render('admin/cms/cms_block_edit.html.twig', [
             'active' => 'cms',
             'block' => $block,
             'blockObject' => $block->getBlockObject(),
             'blockImage' => $block->getImage(),
-            'cms' => $block->getPage(),
+            'cms' => $cms,
+            'adminTop' => new AdminTop(actions: $actions),
         ]);
     }
 

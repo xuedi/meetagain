@@ -11,5 +11,6 @@ readonly class FieldDefinition
         public FieldType $type,
         public bool $required = true,
         public string|bool|array|null $default = null,
+        public bool $richText = false,
     ) {}
 }

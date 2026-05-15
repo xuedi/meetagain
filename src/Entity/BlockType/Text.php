@@ -28,7 +28,7 @@ class Text implements BlockType
     {
         return [
             new FieldDefinition('title', FieldType::String, required: false, default: ''),
-            new FieldDefinition('content', FieldType::Text),
+            new FieldDefinition('content', FieldType::Text, richText: true),
             new FieldDefinition('imageRight', FieldType::Boolean, required: false, default: false),
         ];
     }

@@ -9,6 +9,7 @@ use App\Enum\CmsBlock\CmsBlockType;
 use App\Exception\BlockValidationException;
 use App\Service\Cms\BlockHydrator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
 class BlockHydratorTest extends TestCase
 {
@@ -16,7 +17,16 @@ class BlockHydratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->hydrator = new BlockHydrator();
+        $this->hydrator = new BlockHydrator($this->makeSanitizer());
+    }
+
+    private function makeSanitizer(string $prefix = ''): HtmlSanitizerInterface
+    {
+        return new class ($prefix) implements HtmlSanitizerInterface {
+            public function __construct(private readonly string $prefix) {}
+            public function sanitize(string $input): string { return $this->prefix . $input; }
+            public function sanitizeFor(string $context, string $input): string { return $this->prefix . $input; }
+        };
     }
 
     // --- Arrange / Act / Assert ---
@@ -116,5 +126,31 @@ class BlockHydratorTest extends TestCase
         // Assert
         static::assertInstanceOf(Headline::class, $result);
         static::assertSame('My Title', $result->title);
+    }
+
+    public function testSanitizesRichTextFields(): void
+    {
+        // Arrange
+        $hydrator = new BlockHydrator($this->makeSanitizer('SANITIZED:'));
+        $payload = ['content' => '<p>Body</p>'];
+
+        // Act
+        $result = $hydrator->hydrate(CmsBlockType::Text, $payload);
+
+        // Assert
+        static::assertSame('SANITIZED:<p>Body</p>', $result->content);
+    }
+
+    public function testDoesNotSanitizePlainFields(): void
+    {
+        // Arrange
+        $hydrator = new BlockHydrator($this->makeSanitizer('SANITIZED:'));
+        $payload = ['title' => 'Plain Title', 'content' => 'Body'];
+
+        // Act
+        $result = $hydrator->hydrate(CmsBlockType::Text, $payload);
+
+        // Assert
+        static::assertSame('Plain Title', $result->title);
     }
 }

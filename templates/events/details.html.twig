@@ -37,7 +37,7 @@
             <div class="columns">
                 <div class="column is-9">
                     <div class="content">
-                        {{ event.description(app.locale)|safe_html }}
+                        {{ event.description(app.locale)|sanitize_html('cms.content') }}
                     </div>
                     {% if is_granted('ROLE_USER') %}
                         <div class="mt-5 box">

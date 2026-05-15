@@ -493,6 +493,7 @@ global:
     button_cancel: 'Abbrechen'
     button_save: 'Speichern'
     button_back: 'Zurück'
+    button_view: 'Ansehen'
     button_create: 'Erstellen'
     button_delete: 'Löschen'
     button_clear: 'Leeren'

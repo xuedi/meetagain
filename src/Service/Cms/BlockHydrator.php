@@ -7,9 +7,15 @@ use App\Entity\Image as ImageEntity;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\CmsBlock\FieldType;
 use App\Exception\BlockValidationException;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
 readonly class BlockHydrator
 {
+    public function __construct(
+        private HtmlSanitizerInterface $cmsContent,
+    ) {}
+
+
     /**
      * Validates $data against the block type's field definitions, applies defaults
      * for optional missing fields, then calls fromJson() to build the block object.
@@ -38,6 +44,10 @@ readonly class BlockHydrator
                 FieldType::ImageList => is_array($data[$field->name]) ? $data[$field->name] : [],
                 default              => (string) $data[$field->name],
             };
+
+            if ($field->richText && is_string($resolved[$field->name])) {
+                $resolved[$field->name] = $this->cmsContent->sanitize($resolved[$field->name]);
+            }
         }
 
         if ($errors !== []) {

@@ -423,3 +423,11 @@ body.admin-shell-no-scroll {
 @media (min-width: 769px) {
     .admin-shell-backdrop { display: none; }
 }
+
+.quill-editor-wrapper .ql-editor {
+    min-height: 22rem;
+}
+
+.cms-block-preview {
+    overflow-wrap: anywhere;
+}
