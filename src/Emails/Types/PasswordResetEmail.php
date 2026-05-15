@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Http\RequestHostResolver;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class PasswordResetEmail extends EmailAbstract
@@ -18,6 +19,7 @@ readonly class PasswordResetEmail extends EmailAbstract
         BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
+        private RequestHostResolver $host,
     ) {
         parent::__construct($blocklist);
     }
@@ -63,7 +65,7 @@ readonly class PasswordResetEmail extends EmailAbstract
         $email->to((string) $user->getEmail());
         $email->locale($user->getLocale());
         $email->context([
-            'host' => $this->config->getHost(),
+            'host' => $this->host->getSchemeAndHost(),
             'token' => $user->getRegcode(),
             'lang' => $user->getLocale(),
             'username' => $user->getName(),

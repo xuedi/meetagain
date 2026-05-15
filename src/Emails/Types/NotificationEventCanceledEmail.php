@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -22,6 +23,7 @@ readonly class NotificationEventCanceledEmail extends EmailAbstract
         BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
+        private RequestHostResolver $host,
     ) {
         parent::__construct($blocklist);
     }
@@ -80,7 +82,7 @@ readonly class NotificationEventCanceledEmail extends EmailAbstract
             'eventDate' => $event->getStart()->format('Y-m-d'),
             'eventId' => $event->getId(),
             'eventTitle' => $event->getTitle($language),
-            'host' => $this->config->getHost(),
+            'host' => $this->host->getSchemeAndHost(),
             'lang' => $language,
         ]);
 

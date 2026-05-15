@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Http\RequestHostResolver;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -22,6 +23,7 @@ class EventUpdateNotificationEmailTest extends TestCase
     private ConfigService $config;
     private BlocklistCheckerInterface $blocklist;
     private TranslatorInterface $translator;
+    private RequestHostResolver $host;
 
     protected function setUp(): void
     {
@@ -33,6 +35,9 @@ class EventUpdateNotificationEmailTest extends TestCase
 
         $this->translator = $this->createStub(TranslatorInterface::class);
         $this->translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+
+        $this->host = $this->createStub(RequestHostResolver::class);
+        $this->host->method('getSchemeAndHost')->willReturn('https://example.com');
     }
 
     public function testSendEnqueuesWhenStartChanged(): void
@@ -51,7 +56,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -74,7 +79,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -97,7 +102,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -120,7 +125,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -137,7 +142,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -156,6 +161,7 @@ class EventUpdateNotificationEmailTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             $this->translator,
+            $this->host,
         );
         $user = $this->makeUser(settings: new NotificationSettings(['attendedEventUpdate' => false]));
 
@@ -174,6 +180,7 @@ class EventUpdateNotificationEmailTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             $this->translator,
+            $this->host,
         );
         $user = $this->makeUser(settings: new NotificationSettings(['attendedEventUpdate' => true]));
 
@@ -191,6 +198,7 @@ class EventUpdateNotificationEmailTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             $this->translator,
+            $this->host,
         );
 
         static::assertSame(EmailType::EventUpdateNotification->value, $email->getIdentifier());

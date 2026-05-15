@@ -16,6 +16,7 @@ use App\Service\Cms\AnnouncementService;
 use App\Service\Config\ConfigService;
 use App\Emails\Types\AnnouncementEmail;
 use App\Service\Email\EmailTemplateService;
+use App\Service\Http\RequestHostResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -35,6 +36,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $this->createStub(ConfigService::class),
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Assert: expect exception
@@ -58,6 +60,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $this->createStub(ConfigService::class),
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Assert: expect exception
@@ -130,6 +133,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $announcementEmailMock,
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: send announcement
@@ -187,6 +191,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $announcementEmailMock,
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: send announcement
@@ -226,6 +231,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: get preview context
@@ -258,6 +264,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: get preview context
@@ -285,6 +292,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: get preview context
@@ -314,6 +322,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $this->createStub(ConfigService::class),
             templateService: $templateServiceMock,
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Assert: expect exception
@@ -368,6 +377,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $templateServiceMock,
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: render preview
@@ -411,6 +421,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: get preview context to trigger renderContent
@@ -456,6 +467,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: get preview context for English
@@ -495,6 +507,7 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
         // Act: get preview context for English (which has no content)

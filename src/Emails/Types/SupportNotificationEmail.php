@@ -8,8 +8,10 @@ use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestPresentRule;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
+use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class SupportNotificationEmail extends EmailAbstract
@@ -18,6 +20,8 @@ readonly class SupportNotificationEmail extends EmailAbstract
         BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
+        private UserRepository $userRepository,
+        private LoggerInterface $logger,
     ) {
         parent::__construct($blocklist);
     }
@@ -58,18 +62,28 @@ readonly class SupportNotificationEmail extends EmailAbstract
         /** @var SupportRequest $request */
         $request = $context['request'];
 
-        $email = new TemplatedEmail();
-        $email->from($this->config->getMailerAddress());
-        $email->to($this->config->getMailerAddress());
-        $email->locale('en');
-        $email->context([
-            'contactType' => $request->getContactType()->label(),
-            'name' => $request->getName(),
-            'email' => $request->getEmail(),
-            'message' => $request->getMessage(),
-            'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
-        ]);
+        $admins = $this->userRepository->findAdminUsers();
+        if ($admins === []) {
+            $this->logger->warning('Support ticket received but no active admin recipients found', [
+                'support_request_id' => $request->getId(),
+            ]);
+            return;
+        }
 
-        $this->queue->enqueue($this, $email, EmailType::SupportNotification, $context);
+        foreach ($admins as $admin) {
+            $email = new TemplatedEmail();
+            $email->from($this->config->getMailerAddress());
+            $email->to((string) $admin->getEmail());
+            $email->locale('en');
+            $email->context([
+                'contactType' => $request->getContactType()->label(),
+                'name' => $request->getName(),
+                'email' => $request->getEmail(),
+                'message' => $request->getMessage(),
+                'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
+            ]);
+
+            $this->queue->enqueue($this, $email, EmailType::SupportNotification, $context);
+        }
     }
 }

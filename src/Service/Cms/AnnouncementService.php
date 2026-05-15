@@ -17,6 +17,7 @@ use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Emails\Types\AnnouncementEmail;
 use App\Service\Email\EmailTemplateService;
+use App\Service\Http\RequestHostResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -29,6 +30,7 @@ readonly class AnnouncementService
         private ConfigService $configService,
         private EmailTemplateService $templateService,
         private AnnouncementEmail $announcementEmail,
+        private RequestHostResolver $hostResolver,
     ) {}
 
     public function send(Announcement $announcement): int
@@ -46,7 +48,7 @@ readonly class AnnouncementService
 
         $subscribers = $this->getAnnouncementSubscribers();
         $recipientCount = 0;
-        $announcementUrl = $this->configService->getHost() . '/announcement/' . $announcement->getLinkHash();
+        $announcementUrl = $this->hostResolver->getSchemeAndHost() . '/announcement/' . $announcement->getLinkHash();
 
         foreach ($subscribers as $subscriber) {
             $renderedContent = $this->renderContent($cmsPage, $subscriber->getLocale());

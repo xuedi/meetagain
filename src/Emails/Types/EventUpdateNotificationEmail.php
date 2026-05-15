@@ -14,6 +14,7 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -26,6 +27,7 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private TranslatorInterface $translator,
+        private RequestHostResolver $host,
     ) {
         parent::__construct($blocklist);
     }
@@ -91,7 +93,7 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
             'username' => $user->getName(),
             'eventId' => $event->getId(),
             'eventTitle' => $event->getTitle($language),
-            'host' => $this->config->getHost(),
+            'host' => $this->host->getSchemeAndHost(),
             'lang' => $language,
             'changesHtml' => $changesHtml,
         ]);

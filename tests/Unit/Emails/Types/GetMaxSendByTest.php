@@ -21,7 +21,9 @@ use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Http\RequestHostResolver;
 use DateTime;
+use Psr\Log\LoggerInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -101,6 +103,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            $this->createStub(RequestHostResolver::class),
         );
         $result = $email->getMaxSendBy(
             ['event' => $this->eventStartingAt($eventStart)],
@@ -118,6 +121,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(TranslatorInterface::class),
+            $this->createStub(RequestHostResolver::class),
         );
         $result = $email->getMaxSendBy(
             ['event' => $this->eventStartingAt($eventStart)],
@@ -134,6 +138,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(TranslatorInterface::class),
+            $this->createStub(RequestHostResolver::class),
         );
 
         static::assertNull($email->getMaxSendBy([], new DateTimeImmutable(self::NOW)));
@@ -197,6 +202,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             new \Symfony\Component\Clock\MockClock(),
+            $this->createStub(RequestHostResolver::class),
         );
 
         $result = $email->getMaxSendBy([], new DateTimeImmutable(self::NOW));
@@ -223,6 +229,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            $this->createStub(RequestHostResolver::class),
         );
 
         $result = $email->getMaxSendBy([], new DateTimeImmutable(self::NOW));
@@ -236,6 +243,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            $this->createStub(RequestHostResolver::class),
         );
 
         $result = $email->getMaxSendBy([], new DateTimeImmutable(self::NOW));
@@ -253,6 +261,8 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            $this->createStub(UserRepository::class),
+            $this->createStub(LoggerInterface::class),
         );
 
         static::assertNull($email->getMaxSendBy([], new DateTimeImmutable(self::NOW)));
@@ -264,6 +274,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            $this->createStub(RequestHostResolver::class),
         );
 
         static::assertNull($email->getMaxSendBy([], new DateTimeImmutable(self::NOW)));
@@ -275,6 +286,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            $this->createStub(RequestHostResolver::class),
         );
 
         static::assertNull($email->getMaxSendBy([], new DateTimeImmutable(self::NOW)));
