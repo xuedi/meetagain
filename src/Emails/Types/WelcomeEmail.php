@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -20,6 +21,7 @@ readonly class WelcomeEmail extends EmailAbstract
         BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
+        private RequestHostResolver $host,
     ) {
         parent::__construct($blocklist);
     }
@@ -64,8 +66,8 @@ readonly class WelcomeEmail extends EmailAbstract
         $email->to((string) $user->getEmail());
         $email->locale($user->getLocale());
         $email->context([
-            'url' => $this->config->getUrl(),
-            'host' => $this->config->getHost(),
+            'url' => $this->host->getHost(),
+            'host' => $this->host->getSchemeAndHost(),
             'lang' => $user->getLocale(),
         ]);
 

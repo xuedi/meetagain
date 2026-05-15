@@ -24,7 +24,9 @@ use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Http\RequestHostResolver;
 use DateTime;
+use Psr\Log\LoggerInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -39,6 +41,7 @@ final class EmailTypeBlocklistTest extends TestCase
 {
     private ConfigService $config;
     private BlocklistCheckerInterface $blockingChecker;
+    private RequestHostResolver $host;
 
     protected function setUp(): void
     {
@@ -49,6 +52,8 @@ final class EmailTypeBlocklistTest extends TestCase
 
         $this->blockingChecker = $this->createStub(BlocklistCheckerInterface::class);
         $this->blockingChecker->method('isBlocked')->willReturn(true);
+
+        $this->host = $this->createStub(RequestHostResolver::class);
     }
 
     public function testAdminNotificationSkipsBlockedRecipient(): void
@@ -71,6 +76,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
+            $this->host,
         );
 
         static::assertFalse($email->guardCheck([
@@ -103,6 +109,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             $this->createStub(TranslatorInterface::class),
+            $this->host,
         );
 
         static::assertFalse($email->guardCheck([
@@ -117,6 +124,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
+            $this->host,
         );
 
         static::assertFalse($email->guardCheck([
@@ -132,6 +140,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             new \Symfony\Component\Clock\MockClock(),
+            $this->host,
         );
 
         static::assertFalse($email->guardCheck([
@@ -146,6 +155,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
+            $this->host,
         );
 
         static::assertFalse($email->guardCheck([
@@ -176,6 +186,8 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
+            $this->createStub(UserRepository::class),
+            $this->createStub(LoggerInterface::class),
         );
 
         static::assertFalse($email->guardCheck([
@@ -208,6 +220,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
+            $this->host,
         );
 
         static::assertFalse($email->guardCheck([
@@ -221,6 +234,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
+            $this->host,
         );
 
         static::assertFalse($email->guardCheck([
