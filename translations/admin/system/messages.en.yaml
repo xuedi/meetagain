@@ -168,6 +168,9 @@ admin_system_config:
     field_website_image_label: 'Upload new image'
     usage_website_image: 'Shown as the link preview when someone shares a page from this site on social media or in chat apps.'
     flash_website_image_saved: 'Website image saved'
+    button_clear_cms_cache: 'Clear CMS cache'
+    confirm_clear_cms_cache: 'Flush ALL cached CMS pages? Next anonymous visit re-renders every page.'
+    flash_cms_cache_cleared: 'CMS page cache cleared.'
 admin_system_theme:
     intro: 'Customise the site logo and colour palette. Saving the colours rebuilds the CSS bundle.'
     heading_colors: 'Theme Colors'
