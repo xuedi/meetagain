@@ -169,7 +169,6 @@ admin_system_config:
     usage_website_image: 'Wird als Link-Vorschau angezeigt, wenn jemand eine Seite dieser Site in sozialen Medien oder Chat-Apps teilt.'
     flash_website_image_saved: 'Website-Bild gespeichert'
     button_clear_cms_cache: 'CMS-Cache leeren'
-    confirm_clear_cms_cache: 'ALLE zwischengespeicherten CMS-Seiten verwerfen? Anonyme Besucher rendern jede Seite neu.'
     flash_cms_cache_cleared: 'CMS-Seiten-Cache geleert.'
 admin_system_theme:
     intro: 'Logo und Farbpalette der Website anpassen. Beim Speichern der Farben wird das CSS-Bundle neu gebaut.'
