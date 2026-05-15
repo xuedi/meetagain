@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Enum\ImageType;
+use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
@@ -40,6 +41,7 @@ final class ImageUploadController extends AbstractController
         private readonly CmsBlockRepository $cmsBlockRepo,
         private readonly ActivityService $activityService,
         private readonly ImageGalleryFilterService $imageGalleryFilterService,
+        private readonly AdminCmsListFilterService $adminCmsListFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ImageLocationService $imageLocationService,
         private readonly Security $security,
@@ -220,11 +222,17 @@ final class ImageUploadController extends AbstractController
                 $extendedGallery = $this->buildSelectableGallery($rawGallery, $image, $entityString, $id);
                 break;
             case 'cmsBlock':
-                if (!$this->security->isGranted('ROLE_ADMIN')) {
+                if (!$this->security->isGranted('ROLE_STEWARD')) {
                     throw new AccessDeniedException();
                 }
                 $imageType = ImageType::CmsBlock;
                 $entity = $this->em->getRepository(CmsBlock::class)->findOneBy(['id' => $id]);
+                if ($entity === null) {
+                    throw $this->createNotFoundException('Block not found');
+                }
+                if (!$this->adminCmsListFilterService->isCmsAccessible($entity->getPage()->getId())) {
+                    throw new AccessDeniedException();
+                }
                 $image = $entity->getImage();
                 $rawGallery = $this->em->getRepository(Image::class)->findBy(['type' => ImageType::CmsBlock]);
                 $rawGallery = $this->imageGalleryFilterService->applyFilter($rawGallery, $imageType);
