@@ -4,7 +4,9 @@ namespace App\Service\Cms;
 
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
+use App\EntityActionDispatcher;
 use App\Enum\CmsBlock\CmsBlockType;
+use App\Enum\EntityAction;
 use App\Repository\CmsBlockRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
@@ -15,6 +17,7 @@ readonly class CmsBlockService
         private EntityManagerInterface $em,
         private CmsBlockRepository $blockRepo,
         private BlockHydrator $hydrator,
+        private EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     public function createBlock(Cms $page, string $locale, CmsBlockType $type, array $payload): CmsBlock
@@ -32,6 +35,7 @@ readonly class CmsBlockService
         $this->em->flush();
 
         $this->reorderBlocks($page->getId(), $locale);
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $page->getId());
 
         return $block;
     }
@@ -47,6 +51,8 @@ readonly class CmsBlockService
         $this->em->persist($block);
         $this->em->flush();
 
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $block->getPage()->getId());
+
         return $block;
     }
 
@@ -57,8 +63,11 @@ readonly class CmsBlockService
             throw new RuntimeException('Could not load block');
         }
 
+        $pageId = $block->getPage()->getId();
         $this->em->remove($block);
         $this->em->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $pageId);
     }
 
     public function moveBlockUp(int $pageId, int $blockId, string $locale): void
@@ -83,6 +92,7 @@ readonly class CmsBlockService
         $this->em->flush();
 
         $this->reorderBlocks($pageId, $locale);
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $pageId);
     }
 
     private function reorderBlocks(int $pageId, string $locale): void

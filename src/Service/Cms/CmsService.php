@@ -43,11 +43,13 @@ readonly class CmsService
             throw new NotFoundHttpException();
         }
 
+        // build a cache key
         $pageId = (int) $cms->getId();
         $host = $this->requestStack->getCurrentRequest()?->getHost() ?? '';
         $eventIds = $this->eventFilterService->getEventIdFilter()->getEventIds();
         $cacheKey = $this->getCacheKey($pageId, $locale, $slug, $host, $eventIds);
 
+        // check if we can deliver a cached version of this page
         $body = $this->getCachedBody($cacheKey);
         if ($body === null) {
             // collect the blocks in order
@@ -62,6 +64,7 @@ readonly class CmsService
             $this->storeCachedBody($cacheKey, $pageId, $body);
         }
 
+        // actual return of page
         $content = $this->twig->render('cms/index.html.twig', [
             'title' => $cms->getPageTitle($locale) ?? $this->translator->trans('cms.page_no_title_fallback'),
             'body' => $body,
@@ -121,10 +124,6 @@ readonly class CmsService
     private function getCachedBody(string $cacheKey): ?string
     {
         $miss = false;
-
-        // On a cache miss the callback is invoked; on a hit it is skipped.
-        // The 1s sentinel TTL keeps the miss marker from polluting the cache;
-        // storeCachedBody() uses beta=INF to overwrite it immediately with the real HTML.
         $body = $this->cache->get($cacheKey, static function (ItemInterface $item) use (&$miss): string {
             $miss = true;
             $item->expiresAfter(1);
