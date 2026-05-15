@@ -8,7 +8,7 @@ use App\Enum\EntityAction;
 readonly class CmsCacheInvalidationHandler implements EntityActionInterface
 {
     public function __construct(
-        private CmsPageCacheService $cmsPageCacheService,
+        private CmsService $cmsService,
     ) {}
 
     public function onEntityAction(EntityAction $action, int $entityId): void
@@ -21,7 +21,7 @@ readonly class CmsCacheInvalidationHandler implements EntityActionInterface
 
     private function invalidateCmsAndMenus(int $entityId): void
     {
-        $this->cmsPageCacheService->invalidatePage($entityId);
-        $this->cmsPageCacheService->invalidateMenuCaches();
+        $this->cmsService->invalidatePage($entityId);
+        $this->cmsService->invalidateMenuCaches();
     }
 }

@@ -1,0 +1,15 @@
+{% for block in blocks %}
+    {% if block.type.value == 8 %}
+        {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block} only %}
+    {% endif %}
+{% endfor %}
+
+<section class="section">
+    <div class="container">
+        {% for block in blocks %}
+            {% if block.type.value != 8 %}
+                {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block} only %}
+            {% endif %}
+        {% endfor %}
+    </div>
+</section>

@@ -169,7 +169,6 @@ admin_system_config:
     usage_website_image: '当有人在社交媒体或聊天应用中分享此站点的页面时，将显示为链接预览。'
     flash_website_image_saved: '网站图片已保存'
     button_clear_cms_cache: '清除 CMS 缓存'
-    confirm_clear_cms_cache: '确认清除所有 CMS 页面缓存吗？匿名访客下次访问时将重新渲染每个页面。'
     flash_cms_cache_cleared: 'CMS 页面缓存已清除。'
 admin_system_theme:
     intro: '自定义站点 Logo 与配色方案。保存颜色后会重新构建 CSS 包。'

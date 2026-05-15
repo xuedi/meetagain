@@ -4,14 +4,16 @@ namespace App\Service\Event;
 
 use App\CronTaskInterface;
 use App\Entity\Event;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\CronTaskStatus;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
-use App\Service\Cms\CmsPageCacheService;
+use App\Service\Cms\CmsService;
 use App\ValueObject\CronTaskResult;
 use DateTime;
 use DateTimeImmutable;
@@ -26,7 +28,8 @@ readonly class RecurringEventService implements CronTaskInterface
         private EventRepository $repo,
         private EntityManagerInterface $em,
         private EntityActionDispatcher $entityActionDispatcher,
-        private CmsPageCacheService $cmsPageCacheService,
+        private CmsBlockRepository $cmsBlockRepository,
+        private CmsService $cmsService,
     ) {}
 
     public function getIdentifier(): string
@@ -55,8 +58,8 @@ readonly class RecurringEventService implements CronTaskInterface
         }
 
         if ($totalCreated > 0) {
-            foreach ($this->cmsPageCacheService->findEventTeaserPageIds() as $pageId) {
-                $this->cmsPageCacheService->invalidatePage($pageId);
+            foreach ($this->cmsBlockRepository->findPageIdsWithType(CmsBlockType::EventTeaser) as $pageId) {
+                $this->cmsService->invalidatePage($pageId);
             }
         }
 
