@@ -13,6 +13,7 @@ final readonly class AdminTopActionButton implements AdminTopActionInterface
         public ?string $variant = null,
         public ?string $confirm = null,
         public ?string $toggleId = null,
+        public bool $newTab = false,
     ) {}
 
     public function getTemplate(): string

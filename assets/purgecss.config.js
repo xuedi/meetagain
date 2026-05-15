@@ -47,6 +47,7 @@ module.exports = {
             /^fancybox/,      // Fancybox v4 (legacy fancybox-* selectors)
             /^f-/,            // Fancybox v5 (f-button, f-carousel, f-spinner, ...)
             /^dt-/,           // JSTable (dt-container, dt-pagination, ...) - injected by JS
+            /^ql-/,           // Quill editor (ql-toolbar, ql-editor, ql-picker, ...) - injected by JS
             /^chart-/,        // chart.js styled containers (chart-container)
             /^sr-only/,       // Font Awesome accessibility helper (sr-only, sr-only-focusable)
         ],
