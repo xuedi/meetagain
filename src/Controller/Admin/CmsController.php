@@ -44,7 +44,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ORGANIZER'), Route('/admin/cms')]
+#[IsGranted('ROLE_STEWARD'), Route('/admin/cms')]
 final class CmsController extends AbstractController implements AdminNavigationInterface
 {
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -52,7 +52,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(label: 'admin_shell.menu_cms', route: 'app_admin_cms', active: 'cms', role: 'ROLE_ORGANIZER'),
+                new AdminLink(label: 'admin_shell.menu_cms', route: 'app_admin_cms', active: 'cms', role: 'ROLE_STEWARD'),
             ],
             sectionPriority: 50,
         );
