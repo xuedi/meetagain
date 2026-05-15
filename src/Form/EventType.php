@@ -152,7 +152,7 @@ class EventType extends AbstractType
                     'data' => $translation?->getDescription() ?? '',
                     'mapped' => false,
                     'required' => false,
-                    'attr' => ['rows' => 15],
+                    'attr' => ['rows' => 15, 'data-rich' => 'true'],
                 ]);
                 $builder->add("teaser-{$languageCode}", TextareaType::class, [
                     'label' => $this->translator->trans('admin_event.form_label_teaser', ['%locale%' => $languageCode]),

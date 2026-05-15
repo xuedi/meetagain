@@ -108,7 +108,7 @@
                                 {% if event.teaser(app.locale) is not null and event.teaser(app.locale) is not empty %}
                                     {{ event.teaser(app.locale) }}
                                 {% else %}
-                                    {{ event.description(app.locale)|slice(0, 240) }} ...
+                                    {{ event.description(app.locale)|striptags|slice(0, 240) }} ...
                                 {% endif %}
                                 {# Admin edit link removed - depends on adminTables plugin
                                 {% if is_granted('ROLE_ADMIN') %}
