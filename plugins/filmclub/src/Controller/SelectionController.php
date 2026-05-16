@@ -68,8 +68,18 @@ final class SelectionController extends AbstractController
     #[IsGranted('PUBLIC_ACCESS')]
     public function history(): Response
     {
+        $selections = $this->selectionService->getHistory();
+        $films = [];
+        $shownAtByFilmId = [];
+        foreach ($selections as $selection) {
+            $film = $selection->getFilm();
+            $films[] = $film;
+            $shownAtByFilmId[$film->getId()] = $selection->getSelectedAt();
+        }
+
         return $this->render('@Filmclub/views/list.html.twig', [
-            'selections' => $this->selectionService->getHistory(),
+            'films' => $films,
+            'shownAtByFilmId' => $shownAtByFilmId,
         ]);
     }
 }

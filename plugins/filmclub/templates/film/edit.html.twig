@@ -1,0 +1,82 @@
+{% extends '@Filmclub/base_filmclub.html.twig' %}
+
+{% block title %}{{ 'filmclub_film.page_title_edit'|trans({'%title%': film.title}) }}{% endblock %}
+
+{% block filmclub_body %}
+<style>
+    .poster-file-input input[type="file"] { color: transparent; width: 100%; }
+    .poster-file-input input[type="file"]::file-selector-button { color: initial; }
+    .poster-file-input input[type="file"]::-webkit-file-upload-button { color: initial; }
+</style>
+
+<h1 class="title">{{ 'filmclub_film.page_title_edit'|trans({'%title%': film.title}) }}</h1>
+
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+<div class="columns">
+    <div class="column is-3-tablet is-12-mobile">
+        <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
+            <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'filmclub_film.label_poster'|trans }}</legend>
+            {% if film.posterImage %}
+                <p class="has-text-grey-light is-size-7 mb-2">{{ 'filmclub_film.current_poster_label'|trans }}</p>
+                <img src="/images/thumbnails/{{ film.posterImage.hash }}_400x600.webp{% if film.posterImage.updatedAt %}?v{{ film.posterImage.updatedAt|date('YmdHis') }}{% endif %}" alt="{{ film.title }}" style="max-width: 100%; height: auto;" class="mb-3">
+            {% else %}
+                <p class="has-text-grey-light is-size-7 mb-2">{{ 'filmclub_film.no_poster'|trans }}</p>
+            {% endif %}
+            <div class="poster-file-input">
+                {{ form_row(form.posterFile, {'label': false}) }}
+            </div>
+            <p class="has-text-grey is-size-7 mt-2">{{ 'filmclub_film.help_poster'|trans }}</p>
+        </fieldset>
+    </div>
+    <div class="column is-8">
+        <div class="field">
+            {{ form_label(form.title, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.title) }}</div>
+            {{ form_errors(form.title) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.originalTitle, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.originalTitle) }}</div>
+            {{ form_errors(form.originalTitle) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.year, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.year) }}</div>
+            {{ form_errors(form.year) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.runtime, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.runtime) }}</div>
+            {{ form_errors(form.runtime) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.description, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.description) }}</div>
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.genresCsv, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.genresCsv) }}</div>
+            <p class="help">{{ 'filmclub_film.help_genres'|trans }}</p>
+            {{ form_errors(form.genresCsv) }}
+        </div>
+
+        <div class="field is-grouped mt-4">
+            <div class="control">{{ form_widget(form.submit) }}</div>
+            <div class="control">
+                <a href="{{ path('app_plugin_filmclub_film_show', {id: film.id}) }}" class="button">
+                    {{ 'filmclub_film.button_cancel'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

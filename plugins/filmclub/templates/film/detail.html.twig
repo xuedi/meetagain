@@ -6,13 +6,15 @@
 <div class="columns">
     <div class="column is-4-tablet is-12-mobile">
         {% if film.posterImage %}
-        <figure class="image" style="border: 1px solid #e0e0e0">
-            <img src="{{ film.posterImage.publicPath ?? '' }}" alt="{{ film.title }}">
+        <figure class="image is-2by3" style="border: 1px solid #e0e0e0">
+            <img src="/images/thumbnails/{{ film.posterImage.hash }}_400x600.webp{% if film.posterImage.updatedAt %}?v{{ film.posterImage.updatedAt|date('YmdHis') }}{% endif %}" alt="{{ film.title }}">
         </figure>
         {% else %}
-        <div class="box has-text-centered has-text-grey" style="min-height: 240px; display:flex; align-items:center; justify-content:center">
-            <span>{{ 'filmclub_film.no_poster'|trans }}</span>
-        </div>
+        <figure class="image is-2by3">
+            <div class="box has-text-centered has-text-grey" style="height: 100%; display:flex; align-items:center; justify-content:center">
+                <span>{{ 'filmclub_film.no_poster'|trans }}</span>
+            </div>
+        </figure>
         {% endif %}
     </div>
     <div class="column">
@@ -61,25 +63,34 @@
             {% if isWishlisted %}
             <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: film.id}) }}" style="display: inline">
                 <button type="submit" class="button is-small">
-                    {{ 'filmclub_wishlist.button_remove'|trans }}
+                    <span class="icon"><i class="fa fa-heart-broken"></i></span>
+                    <span>{{ 'filmclub_wishlist.button_remove'|trans }}</span>
                 </button>
             </form>
             {% else %}
             <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_add', {filmId: film.id}) }}" style="display: inline">
                 <button type="submit" class="button is-small">
-                    {{ 'filmclub_wishlist.button_add'|trans }}
+                    <span class="icon"><i class="fa fa-heart"></i></span>
+                    <span>{{ 'filmclub_wishlist.button_add'|trans }}</span>
                 </button>
             </form>
             {% endif %}
 
             <form method="POST" action="{{ path('app_plugin_filmclub_suggest', {filmId: film.id}) }}" style="display: inline">
                 <button type="submit" class="button is-small">
-                    {{ 'filmclub_suggestion.button_suggest'|trans }}
+                    <span class="icon"><i class="fa fa-thumbs-up"></i></span>
+                    <span>{{ 'filmclub_suggestion.button_suggest'|trans }}</span>
                 </button>
             </form>
 
-            <a href="{{ path('app_plugin_filmclub_note_edit', {filmId: film.id}) }}" class="ml-2">
-                {{ userNote ? 'filmclub_note.link_edit_note'|trans : 'filmclub_note.link_add_note'|trans }}
+            <a href="{{ path('app_plugin_filmclub_note_edit', {filmId: film.id}) }}" class="button is-small">
+                <span class="icon"><i class="fa fa-sticky-note"></i></span>
+                <span>{{ userNote ? 'filmclub_note.link_edit_note'|trans : 'filmclub_note.link_add_note'|trans }}</span>
+            </a>
+
+            <a href="{{ path('app_plugin_filmclub_film_edit', {id: film.id}) }}" class="button is-small">
+                <span class="icon"><i class="fa fa-edit"></i></span>
+                <span>{{ 'filmclub_film.button_edit'|trans }}</span>
             </a>
         </div>
         {% endif %}

@@ -21,6 +21,30 @@ readonly class PosterImageService
         private string $kernelProjectDir,
     ) {}
 
+    public function uploadFromFile(UploadedFile $file, int $userId): ?Image
+    {
+        $user = $this->userRepository->find($userId);
+        if ($user === null) {
+            $this->logger->error('User not found for poster image upload', ['userId' => $userId]);
+            return null;
+        }
+
+        try {
+            $image = $this->imageService->upload($file, $user, ImageType::PluginFilmclubPoster);
+
+            if ($image !== null) {
+                $this->imageService->createThumbnails($image, ImageType::PluginFilmclubPoster);
+            }
+
+            return $image;
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to store uploaded poster image: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+            return null;
+        }
+    }
+
     public function downloadAndSave(string $url, int $userId): ?Image
     {
         $user = $this->userRepository->find($userId);

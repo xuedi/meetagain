@@ -7,13 +7,16 @@ use App\Controller\AbstractController;
 use App\Entity\User;
 use Plugin\Filmclub\Activity\Messages\FilmAdded;
 use Plugin\Filmclub\Activity\Messages\SuggestionCreated;
+use Plugin\Filmclub\Enum\ViewType;
 use Plugin\Filmclub\Filter\FilmGroupFilterService;
+use Plugin\Filmclub\Form\FilmEditType;
 use Plugin\Filmclub\Form\FilmLookupType;
 use Plugin\Filmclub\Form\FilmManualType;
 use Plugin\Filmclub\Service\FilmLookupResolver;
 use Plugin\Filmclub\Service\FilmService;
 use Plugin\Filmclub\Service\NoteService;
 use Plugin\Filmclub\Service\SelectionService;
+use Plugin\Filmclub\Service\ViewTypeResolver;
 use Plugin\Filmclub\Service\WishlistService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +35,7 @@ final class FilmController extends AbstractController
         private readonly NoteService $noteService,
         private readonly SelectionService $selectionService,
         private readonly ActivityService $activityService,
+        private readonly ViewTypeResolver $viewTypeResolver,
     ) {}
 
     #[Route('', name: 'app_filmclub_filmlist', methods: ['GET'])]
@@ -39,6 +43,9 @@ final class FilmController extends AbstractController
     {
         return $this->render('@Filmclub/film/list.html.twig', [
             'films' => $this->filmService->getApprovedList(),
+            'viewContext' => 'films',
+            'currentView' => $this->viewTypeResolver->get('films', ViewType::List),
+            'availableViews' => ViewType::cases(),
         ]);
     }
 
@@ -149,6 +156,46 @@ final class FilmController extends AbstractController
             $this->addFlash('error', $e->getMessage());
             return $this->redirectToRoute('app_plugin_filmclub_film_lookup');
         }
+    }
+
+    #[Route('/{id}/edit', name: 'app_plugin_filmclub_film_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    #[IsGranted('ROLE_USER')]
+    public function edit(int $id, Request $request): Response
+    {
+        $film = $this->filmService->get($id);
+        if ($film === null) {
+            throw $this->createNotFoundException('Film not found');
+        }
+
+        $form = $this->createForm(FilmEditType::class, $film, [
+            'data' => $film,
+            'attr' => ['enctype' => 'multipart/form-data'],
+        ]);
+        $form->get('genresCsv')->setData(implode(', ', $film->getGenres()));
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getAuthedUser();
+            try {
+                $this->filmService->update(
+                    film: $film,
+                    genresCsv: $form->get('genresCsv')->getData(),
+                    posterFile: $form->get('posterFile')->getData(),
+                    userId: $user->getId(),
+                );
+                $this->addFlash('success', 'filmclub_film.flash_updated');
+
+                return $this->redirectToRoute('app_plugin_filmclub_film_show', ['id' => $film->getId()]);
+            } catch (RuntimeException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+        }
+
+        return $this->render('@Filmclub/film/edit.html.twig', [
+            'form' => $form,
+            'film' => $film,
+        ]);
     }
 
     #[Route('/manual', name: 'app_plugin_filmclub_film_manual', methods: ['GET', 'POST'])]

@@ -16,6 +16,7 @@ use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Repository\FilmRepository;
 use Plugin\Filmclub\Repository\FilmSuggestionRepository;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 readonly class FilmService
 {
@@ -103,6 +104,59 @@ readonly class FilmService
         }
 
         return $film;
+    }
+
+    public function update(Film $film, ?string $genresCsv, ?UploadedFile $posterFile, int $userId): Film
+    {
+        $film->setGenres($this->parseGenres($genresCsv));
+
+        $previousPosterId = null;
+        $newPoster = null;
+        if ($posterFile !== null) {
+            $previousPoster = $film->getPosterImage();
+            $previousPosterId = $previousPoster?->getId();
+            $newPoster = $this->posterImageService->uploadFromFile($posterFile, $userId);
+            if ($newPoster === null) {
+                throw new RuntimeException('filmclub_film.flash_invalid_image');
+            }
+            $film->setPosterImage($newPoster);
+        }
+
+        $this->em->persist($film);
+        $this->em->flush();
+
+        if ($newPoster !== null) {
+            if ($previousPosterId !== null && $previousPosterId !== $newPoster->getId()) {
+                $this->imageLocationService->removeLocation(
+                    $previousPosterId,
+                    ImageType::PluginFilmclubPoster,
+                    $film->getId(),
+                );
+            }
+
+            $this->imageLocationService->addLocation(
+                $newPoster->getId(),
+                ImageType::PluginFilmclubPoster,
+                $film->getId(),
+            );
+        }
+
+        $this->dispatcher->dispatch(EntityAction::UpdateFilm, $film->getId());
+
+        return $film;
+    }
+
+    /** @return string[] */
+    private function parseGenres(?string $csv): array
+    {
+        if ($csv === null || trim($csv) === '') {
+            return [];
+        }
+
+        $parts = array_map(static fn(string $g) => strtolower(trim($g)), explode(',', $csv));
+        $parts = array_filter($parts, static fn(string $g) => $g !== '');
+
+        return array_values(array_unique($parts));
     }
 
     public function approve(int $filmId): void
