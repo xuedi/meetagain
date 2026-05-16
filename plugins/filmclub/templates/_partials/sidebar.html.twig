@@ -4,14 +4,15 @@
     <p class="menu-label">{{ 'filmclub.sidebar.section_films'|trans }}</p>
     <ul class="menu-list">
         <li><a class="{{ currentRoute starts with 'app_filmclub_film' ? 'is-active' : '' }}" href="{{ path('app_filmclub_filmlist') }}">{{ 'filmclub.sidebar.browse'|trans }}</a></li>
-        <li><a class="{{ currentRoute == 'app_plugin_filmclub_views_list' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_views_list') }}">{{ 'filmclub.sidebar.history'|trans }}</a></li>
+        {% if is_granted('ROLE_USER') %}
+        <li><a class="{{ currentRoute == 'app_plugin_filmclub_film_lookup' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_film_lookup') }}">{{ 'filmclub.sidebar.add_new'|trans }}</a></li>
+        {% endif %}
     </ul>
 
     {% if is_granted('ROLE_USER') %}
     <p class="menu-label">{{ 'filmclub.sidebar.section_suggestions'|trans }}</p>
     <ul class="menu-list">
         <li><a class="{{ currentRoute starts with 'app_plugin_filmclub_suggestion' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_suggestion_list') }}">{{ 'filmclub.sidebar.suggestion_browse'|trans }}</a></li>
-        <li><a class="{{ currentRoute == 'app_plugin_filmclub_film_lookup' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_film_lookup') }}">{{ 'filmclub.sidebar.suggestion_new'|trans }}</a></li>
         {% if is_granted('ROLE_ORGANIZER') %}
         <li><a class="{{ currentRoute == 'app_plugin_filmclub_manage_pending' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_manage_pending') }}">{{ 'filmclub.sidebar.pending_approvals'|trans }}</a></li>
         {% endif %}
@@ -26,6 +27,11 @@
     <ul class="menu-list">
         <li><a class="{{ currentRoute == 'app_plugin_filmclub_wishlist_mine' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_wishlist_mine') }}">{{ 'filmclub.sidebar.wishlist_mine'|trans }}</a></li>
         <li><a class="{{ currentRoute == 'app_plugin_filmclub_wishlist_group' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_wishlist_group') }}">{{ 'filmclub.sidebar.wishlist_group'|trans }}</a></li>
+    </ul>
+
+    <p class="menu-label">{{ 'filmclub.sidebar.section_activity'|trans }}</p>
+    <ul class="menu-list">
+        <li><a class="{{ currentRoute == 'app_plugin_filmclub_views_list' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_views_list') }}">{{ 'filmclub.sidebar.history'|trans }}</a></li>
     </ul>
     {% endif %}
 
