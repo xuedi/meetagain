@@ -33,6 +33,12 @@ admin_system_plugins:
     summary_available: '可用'
     summary_installed: '已安装'
     summary_enabled: '已启用'
+    action_settings: '设置'
+admin_system_plugin_settings:
+    page_title: '插件设置'
+    empty_state: '没有插件提供设置。'
+    flash_saved: '设置已保存。'
+    flash_unknown_provider: '未知的设置部分。'
 admin_system_sitemap:
     col_section: '分区'
     col_locale: '语言'

@@ -4,8 +4,8 @@ namespace Plugin\Filmclub\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
 use Plugin\Filmclub\Entity\ExternalSource;
-use Plugin\Filmclub\Entity\FilmclubGroupSettings;
-use Plugin\Filmclub\Repository\FilmclubGroupSettingsRepository;
+use Plugin\Filmclub\Entity\FilmclubSettings;
+use Plugin\Filmclub\Repository\FilmclubSettingsRepository;
 use Plugin\Filmclub\Service\FilmLookupResolver;
 use Plugin\Filmclub\Service\FilmclubSettingsService;
 use Plugin\Filmclub\Service\OmdbLookup;
@@ -15,27 +15,15 @@ use Symfony\Component\HttpClient\MockHttpClient;
 
 class FilmLookupResolverTest extends TestCase
 {
-    public function testResolveReturnsNullWhenGroupIdIsNull(): void
-    {
-        // Arrange
-        $resolver = $this->makeResolver();
-
-        // Act
-        $result = $resolver->resolve(null);
-
-        // Assert
-        static::assertNull($result);
-    }
-
     public function testResolveReturnsNullWhenNoSettingsRow(): void
     {
         // Arrange
-        $repo = $this->createStub(FilmclubGroupSettingsRepository::class);
-        $repo->method('findByGroupId')->willReturn(null);
+        $repo = $this->createStub(FilmclubSettingsRepository::class);
+        $repo->method('findGlobal')->willReturn(null);
         $resolver = $this->makeResolver(repo: $repo);
 
         // Act
-        $result = $resolver->resolve(1);
+        $result = $resolver->resolve();
 
         // Assert
         static::assertNull($result);
@@ -44,15 +32,14 @@ class FilmLookupResolverTest extends TestCase
     public function testResolveReturnsNullWhenAdapterIsNull(): void
     {
         // Arrange
-        $settings = new FilmclubGroupSettings();
-        $settings->setGroupId(1);
+        $settings = new FilmclubSettings();
         // adapter stays null
-        $repo = $this->createStub(FilmclubGroupSettingsRepository::class);
-        $repo->method('findByGroupId')->willReturn($settings);
+        $repo = $this->createStub(FilmclubSettingsRepository::class);
+        $repo->method('findGlobal')->willReturn($settings);
         $resolver = $this->makeResolver(repo: $repo);
 
         // Act
-        $result = $resolver->resolve(1);
+        $result = $resolver->resolve();
 
         // Assert
         static::assertNull($result);
@@ -61,15 +48,14 @@ class FilmLookupResolverTest extends TestCase
     public function testResolveReturnsNullForManualAdapter(): void
     {
         // Arrange
-        $settings = new FilmclubGroupSettings();
-        $settings->setGroupId(1);
+        $settings = new FilmclubSettings();
         $settings->setAdapter(ExternalSource::Manual);
-        $repo = $this->createStub(FilmclubGroupSettingsRepository::class);
-        $repo->method('findByGroupId')->willReturn($settings);
+        $repo = $this->createStub(FilmclubSettingsRepository::class);
+        $repo->method('findGlobal')->willReturn($settings);
         $resolver = $this->makeResolver(repo: $repo);
 
         // Act
-        $result = $resolver->resolve(1);
+        $result = $resolver->resolve();
 
         // Assert
         static::assertNull($result);
@@ -78,13 +64,12 @@ class FilmLookupResolverTest extends TestCase
     public function testResolveReturnsTmdbLookupWhenTmdbConfigured(): void
     {
         // Arrange
-        $settings = new FilmclubGroupSettings();
-        $settings->setGroupId(1);
+        $settings = new FilmclubSettings();
         $settings->setAdapter(ExternalSource::Tmdb);
         $settings->setEncryptedTmdbKey('encrypted-key');
 
-        $repo = $this->createStub(FilmclubGroupSettingsRepository::class);
-        $repo->method('findByGroupId')->willReturn($settings);
+        $repo = $this->createStub(FilmclubSettingsRepository::class);
+        $repo->method('findGlobal')->willReturn($settings);
 
         $settingsService = $this->createStub(FilmclubSettingsService::class);
         $settingsService->method('getTmdbKey')->willReturn('cleartext-api-key');
@@ -92,7 +77,7 @@ class FilmLookupResolverTest extends TestCase
         $resolver = $this->makeResolver(repo: $repo, settingsService: $settingsService);
 
         // Act
-        $result = $resolver->resolve(1);
+        $result = $resolver->resolve();
 
         // Assert
         static::assertInstanceOf(TmdbLookup::class, $result);
@@ -101,13 +86,12 @@ class FilmLookupResolverTest extends TestCase
     public function testResolveReturnsOmdbLookupWhenOmdbConfigured(): void
     {
         // Arrange
-        $settings = new FilmclubGroupSettings();
-        $settings->setGroupId(1);
+        $settings = new FilmclubSettings();
         $settings->setAdapter(ExternalSource::Omdb);
         $settings->setEncryptedOmdbKey('encrypted-key');
 
-        $repo = $this->createStub(FilmclubGroupSettingsRepository::class);
-        $repo->method('findByGroupId')->willReturn($settings);
+        $repo = $this->createStub(FilmclubSettingsRepository::class);
+        $repo->method('findGlobal')->willReturn($settings);
 
         $settingsService = $this->createStub(FilmclubSettingsService::class);
         $settingsService->method('getOmdbKey')->willReturn('cleartext-api-key');
@@ -115,7 +99,7 @@ class FilmLookupResolverTest extends TestCase
         $resolver = $this->makeResolver(repo: $repo, settingsService: $settingsService);
 
         // Act
-        $result = $resolver->resolve(1);
+        $result = $resolver->resolve();
 
         // Assert
         static::assertInstanceOf(OmdbLookup::class, $result);
@@ -124,13 +108,12 @@ class FilmLookupResolverTest extends TestCase
     public function testResolveReturnsNullWhenTmdbKeyIsMissing(): void
     {
         // Arrange
-        $settings = new FilmclubGroupSettings();
-        $settings->setGroupId(1);
+        $settings = new FilmclubSettings();
         $settings->setAdapter(ExternalSource::Tmdb);
         // No encrypted key set
 
-        $repo = $this->createStub(FilmclubGroupSettingsRepository::class);
-        $repo->method('findByGroupId')->willReturn($settings);
+        $repo = $this->createStub(FilmclubSettingsRepository::class);
+        $repo->method('findGlobal')->willReturn($settings);
 
         $settingsService = $this->createStub(FilmclubSettingsService::class);
         $settingsService->method('getTmdbKey')->willReturn(null);
@@ -138,18 +121,18 @@ class FilmLookupResolverTest extends TestCase
         $resolver = $this->makeResolver(repo: $repo, settingsService: $settingsService);
 
         // Act
-        $result = $resolver->resolve(1);
+        $result = $resolver->resolve();
 
         // Assert
         static::assertNull($result);
     }
 
     private function makeResolver(
-        ?FilmclubGroupSettingsRepository $repo = null,
+        ?FilmclubSettingsRepository $repo = null,
         ?FilmclubSettingsService $settingsService = null,
     ): FilmLookupResolver {
         return new FilmLookupResolver(
-            settingsRepository: $repo ?? $this->createStub(FilmclubGroupSettingsRepository::class),
+            settingsRepository: $repo ?? $this->createStub(FilmclubSettingsRepository::class),
             settingsService: $settingsService ?? $this->createStub(FilmclubSettingsService::class),
             httpClient: new MockHttpClient(),
             logger: new NullLogger(),

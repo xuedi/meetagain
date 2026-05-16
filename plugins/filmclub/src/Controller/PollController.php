@@ -88,15 +88,12 @@ final class PollController extends AbstractController
             $user = $this->getAuthedUser();
 
             try {
-                $endDateRaw = $form->get('endDate')->getData();
-                $endDate = $endDateRaw instanceof \DateTimeImmutable
-                    ? $endDateRaw
-                    : \DateTimeImmutable::createFromMutable($endDateRaw);
+                $durationDays = (int) $form->get('durationDays')->getData();
 
                 $poll = $this->pollService->create(
                     $eventId,
                     $form->get('suggestions')->getData()->toArray(),
-                    $endDate,
+                    $durationDays,
                     $user->getId(),
                 );
 

@@ -34,11 +34,4 @@
         <li><a class="{{ currentRoute == 'app_plugin_filmclub_views_list' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_views_list') }}">{{ 'filmclub.sidebar.history'|trans }}</a></li>
     </ul>
     {% endif %}
-
-    {% if is_granted('ROLE_STEWARD') %}
-    <p class="menu-label">&nbsp;</p>
-    <ul class="menu-list">
-        <li><a class="{{ currentRoute starts with 'app_plugin_filmclub_settings' ? 'is-active' : '' }}" href="{{ path('app_plugin_filmclub_settings_chooser') }}">{{ 'filmclub.sidebar.settings'|trans }}</a></li>
-    </ul>
-    {% endif %}
 </aside>

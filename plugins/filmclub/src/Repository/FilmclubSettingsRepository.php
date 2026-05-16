@@ -4,19 +4,19 @@ namespace Plugin\Filmclub\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Plugin\Filmclub\Entity\FilmclubGroupSettings;
+use Plugin\Filmclub\Entity\FilmclubSettings;
 
 /**
- * @extends ServiceEntityRepository<FilmclubGroupSettings>
+ * @extends ServiceEntityRepository<FilmclubSettings>
  */
-class FilmclubGroupSettingsRepository extends ServiceEntityRepository
+class FilmclubSettingsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, FilmclubGroupSettings::class);
+        parent::__construct($registry, FilmclubSettings::class);
     }
 
-    public function save(FilmclubGroupSettings $entity, bool $flush = false): void
+    public function save(FilmclubSettings $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -25,7 +25,7 @@ class FilmclubGroupSettingsRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(FilmclubGroupSettings $entity, bool $flush = false): void
+    public function remove(FilmclubSettings $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -34,16 +34,9 @@ class FilmclubGroupSettingsRepository extends ServiceEntityRepository
         }
     }
 
-    public function findByGroupId(int $groupId): ?FilmclubGroupSettings
-    {
-        return $this->findOneBy(['groupId' => $groupId]);
-    }
-
-    public function findFirstWithAdapter(): ?FilmclubGroupSettings
+    public function findGlobal(): ?FilmclubSettings
     {
         return $this->createQueryBuilder('s')
-            ->where('s.adapter IS NOT NULL AND s.adapter != :manual')
-            ->setParameter('manual', 'manual')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

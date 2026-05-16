@@ -33,7 +33,4 @@ interface FilmGroupFilterInterface
 
     /** @return int[]|null */
     public function getAllowedWishlistEntryIds(): ?array;
-
-    /** @return int[]|null */
-    public function getAllowedSettingsIds(): ?array;
 }

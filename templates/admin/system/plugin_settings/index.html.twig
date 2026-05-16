@@ -1,0 +1,29 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="notification is-{{ type }}">{{ message|trans }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        {% for key, provider in providers %}
+            <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
+                <legend class="px-2 has-text-weight-semibold is-size-7">{{ provider.titleKey|trans }}</legend>
+                {{ form_start(forms[key], {'action': path('app_admin_plugin_settings', {'provider': key})}) }}
+                {{ form_widget(forms[key]) }}
+                <div class="field">
+                    <button type="submit" class="button is-primary">{{ 'global.button_save'|trans }}</button>
+                </div>
+                {{ form_end(forms[key]) }}
+            </fieldset>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

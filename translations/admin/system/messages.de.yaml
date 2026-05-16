@@ -33,6 +33,12 @@ admin_system_plugins:
     summary_available: 'verfügbar'
     summary_installed: 'installiert'
     summary_enabled: 'aktiviert'
+    action_settings: 'Einstellungen'
+admin_system_plugin_settings:
+    page_title: 'Plugin-Einstellungen'
+    empty_state: 'Kein Plugin trägt Einstellungen bei.'
+    flash_saved: 'Einstellungen gespeichert.'
+    flash_unknown_provider: 'Unbekannter Einstellungsbereich.'
 admin_system_sitemap:
     col_section: 'Abschnitt'
     col_locale: 'Sprache'

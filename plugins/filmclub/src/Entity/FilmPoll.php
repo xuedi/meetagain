@@ -27,6 +27,9 @@ class FilmPoll
     #[ORM\Column]
     private ?DateTimeImmutable $endDate = null;
 
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $durationDays = 7;
+
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $closedAt = null;
 
@@ -100,6 +103,18 @@ class FilmPoll
     public function setEndDate(DateTimeImmutable $endDate): static
     {
         $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    public function getDurationDays(): int
+    {
+        return $this->durationDays;
+    }
+
+    public function setDurationDays(int $durationDays): static
+    {
+        $this->durationDays = $durationDays;
 
         return $this;
     }

@@ -4,29 +4,23 @@ namespace Plugin\Filmclub\Service;
 
 use App\Service\Security\SecretBox;
 use Doctrine\ORM\EntityManagerInterface;
-use Plugin\Filmclub\Entity\FilmclubGroupSettings;
-use Plugin\Filmclub\Repository\FilmclubGroupSettingsRepository;
+use Plugin\Filmclub\Entity\FilmclubSettings;
+use Plugin\Filmclub\Repository\FilmclubSettingsRepository;
 
 readonly class FilmclubSettingsService
 {
     public function __construct(
-        private FilmclubGroupSettingsRepository $settingsRepository,
+        private FilmclubSettingsRepository $settingsRepository,
         private EntityManagerInterface $em,
         private SecretBox $secretBox,
     ) {}
 
-    public function getOrCreate(int $groupId): FilmclubGroupSettings
+    public function getOrCreateGlobal(): FilmclubSettings
     {
-        $settings = $this->settingsRepository->findByGroupId($groupId);
-        if ($settings === null) {
-            $settings = new FilmclubGroupSettings();
-            $settings->setGroupId($groupId);
-        }
-
-        return $settings;
+        return $this->settingsRepository->findGlobal() ?? new FilmclubSettings();
     }
 
-    public function save(FilmclubGroupSettings $settings): void
+    public function save(FilmclubSettings $settings): void
     {
         $this->em->persist($settings);
         $this->em->flush();
@@ -37,7 +31,7 @@ readonly class FilmclubSettingsService
         return $this->secretBox->encrypt($cleartext);
     }
 
-    public function getTmdbKey(FilmclubGroupSettings $settings): ?string
+    public function getTmdbKey(FilmclubSettings $settings): ?string
     {
         if ($settings->getEncryptedTmdbKey() === null) {
             return null;
@@ -46,7 +40,7 @@ readonly class FilmclubSettingsService
         return $this->secretBox->decrypt($settings->getEncryptedTmdbKey());
     }
 
-    public function getOmdbKey(FilmclubGroupSettings $settings): ?string
+    public function getOmdbKey(FilmclubSettings $settings): ?string
     {
         if ($settings->getEncryptedOmdbKey() === null) {
             return null;

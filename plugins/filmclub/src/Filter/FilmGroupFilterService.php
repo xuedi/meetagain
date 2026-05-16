@@ -53,12 +53,6 @@ readonly class FilmGroupFilterService
     }
 
     /** @return int[]|null */
-    public function getAllowedSettingsIds(): ?array
-    {
-        return $this->intersect(static fn(FilmGroupFilterInterface $f) => $f->getAllowedSettingsIds());
-    }
-
-    /** @return int[]|null */
     private function intersect(callable $getter): ?array
     {
         $result = null;

@@ -3,11 +3,10 @@
 namespace Plugin\Filmclub\Form;
 
 use Plugin\Filmclub\Entity\ExternalSource;
-use Plugin\Filmclub\Entity\FilmclubGroupSettings;
+use Plugin\Filmclub\Entity\FilmclubSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -63,17 +62,13 @@ class FilmclubSettingsType extends AbstractType
                 'label' => 'filmclub_settings.clear_key_label',
                 'mapped' => false,
                 'required' => false,
-            ])
-            ->add('defaultPollDurationDays', IntegerType::class, [
-                'label' => 'filmclub_settings.poll_duration_label',
-                'attr' => ['min' => 1, 'max' => 365],
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => FilmclubGroupSettings::class,
+            'data_class' => FilmclubSettings::class,
             'tmdb_key_set' => false,
             'omdb_key_set' => false,
         ]);

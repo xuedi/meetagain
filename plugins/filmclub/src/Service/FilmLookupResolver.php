@@ -3,52 +3,23 @@
 namespace Plugin\Filmclub\Service;
 
 use Plugin\Filmclub\Entity\ExternalSource;
-use Plugin\Filmclub\Entity\FilmclubGroupSettings;
-use Plugin\Filmclub\Repository\FilmclubGroupSettingsRepository;
+use Plugin\Filmclub\Entity\FilmclubSettings;
+use Plugin\Filmclub\Repository\FilmclubSettingsRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-/**
- * Resolves the configured FilmMetadataLookupInterface for a given group.
- * Never injects GroupContextService - callers pass the group ID they already hold.
- */
 readonly class FilmLookupResolver
 {
     public function __construct(
-        private FilmclubGroupSettingsRepository $settingsRepository,
+        private FilmclubSettingsRepository $settingsRepository,
         private FilmclubSettingsService $settingsService,
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
     ) {}
 
-    /**
-     * Resolves an adapter from filter-derived allowed settings IDs.
-     * Pass FilmGroupFilterService::getAllowedSettingsIds() as $allowedSettingsIds.
-     *
-     * @param int[]|null $allowedSettingsIds
-     */
-    public function resolveForRequest(?array $allowedSettingsIds): ?FilmMetadataLookupInterface
+    public function resolve(): ?FilmMetadataLookupInterface
     {
-        if ($allowedSettingsIds === []) {
-            return null;
-        }
-
-        if ($allowedSettingsIds !== null) {
-            return $this->resolve($allowedSettingsIds[0] ?? null);
-        }
-
-        $settings = $this->settingsRepository->findFirstWithAdapter();
-
-        return $settings !== null ? $this->resolveFromSettings($settings) : null;
-    }
-
-    public function resolve(?int $groupId): ?FilmMetadataLookupInterface
-    {
-        if ($groupId === null) {
-            return null;
-        }
-
-        $settings = $this->settingsRepository->findByGroupId($groupId);
+        $settings = $this->settingsRepository->findGlobal();
         if ($settings === null || $settings->getAdapter() === null) {
             return null;
         }
@@ -56,7 +27,7 @@ readonly class FilmLookupResolver
         return $this->resolveFromSettings($settings);
     }
 
-    private function resolveFromSettings(FilmclubGroupSettings $settings): ?FilmMetadataLookupInterface
+    private function resolveFromSettings(FilmclubSettings $settings): ?FilmMetadataLookupInterface
     {
         return match ($settings->getAdapter()) {
             ExternalSource::Tmdb => $this->createTmdb($settings),
@@ -65,7 +36,7 @@ readonly class FilmLookupResolver
         };
     }
 
-    private function createTmdb(FilmclubGroupSettings $settings): ?FilmMetadataLookupInterface
+    private function createTmdb(FilmclubSettings $settings): ?FilmMetadataLookupInterface
     {
         $key = $this->settingsService->getTmdbKey($settings);
         if ($key === null) {
@@ -75,7 +46,7 @@ readonly class FilmLookupResolver
         return new TmdbLookup($this->httpClient, $this->logger, $key);
     }
 
-    private function createOmdb(FilmclubGroupSettings $settings): ?FilmMetadataLookupInterface
+    private function createOmdb(FilmclubSettings $settings): ?FilmMetadataLookupInterface
     {
         $key = $this->settingsService->getOmdbKey($settings);
         if ($key === null) {

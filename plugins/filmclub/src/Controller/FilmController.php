@@ -8,7 +8,6 @@ use App\Entity\User;
 use Plugin\Filmclub\Activity\Messages\FilmAdded;
 use Plugin\Filmclub\Activity\Messages\SuggestionCreated;
 use Plugin\Filmclub\Enum\ViewType;
-use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Form\FilmEditType;
 use Plugin\Filmclub\Form\FilmLookupType;
 use Plugin\Filmclub\Form\FilmManualType;
@@ -30,7 +29,6 @@ final class FilmController extends AbstractController
     public function __construct(
         private readonly FilmService $filmService,
         private readonly FilmLookupResolver $lookupResolver,
-        private readonly FilmGroupFilterService $filterService,
         private readonly WishlistService $wishlistService,
         private readonly NoteService $noteService,
         private readonly SelectionService $selectionService,
@@ -79,9 +77,7 @@ final class FilmController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function lookup(Request $request): Response
     {
-        $adapter = $this->lookupResolver->resolveForRequest(
-            $this->filterService->getAllowedSettingsIds(),
-        );
+        $adapter = $this->lookupResolver->resolve();
 
         if ($adapter === null) {
             $this->addFlash('info', 'filmclub_film.flash_no_adapter');
@@ -121,9 +117,7 @@ final class FilmController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $adapter = $this->lookupResolver->resolveForRequest(
-            $this->filterService->getAllowedSettingsIds(),
-        );
+        $adapter = $this->lookupResolver->resolve();
 
         if ($adapter === null) {
             $this->addFlash('error', 'filmclub_film.flash_no_adapter');
