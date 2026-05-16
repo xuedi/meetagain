@@ -7,7 +7,7 @@ namespace Plugin\Filmclub\Form;
 use Plugin\Filmclub\Entity\FilmSuggestion;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,10 +29,11 @@ class PollCreateType extends AbstractType
             'expanded' => true,
             'label' => $this->translator->trans('filmclub_poll.label_suggestions'),
             'required' => true,
-        ])->add('endDate', DateType::class, [
-            'label' => $this->translator->trans('filmclub_poll.label_end_date'),
-            'widget' => 'single_text',
-            'data' => new \DateTime('+7 days'),
+        ])->add('durationDays', IntegerType::class, [
+            'label' => $this->translator->trans('filmclub_poll.label_duration_days'),
+            'help' => $this->translator->trans('filmclub_poll.help_duration_days'),
+            'data' => 7,
+            'attr' => ['min' => 1, 'max' => 365],
             'required' => true,
         ])->add('submit', SubmitType::class, [
             'label' => $this->translator->trans('filmclub_poll.button_create'),

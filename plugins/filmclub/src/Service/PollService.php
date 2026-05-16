@@ -31,17 +31,19 @@ readonly class PollService
     /**
      * @param FilmSuggestion[] $suggestions
      */
-    public function create(int $eventId, array $suggestions, DateTimeImmutable $endDate, int $createdBy): FilmPoll
+    public function create(int $eventId, array $suggestions, int $durationDays, int $createdBy): FilmPoll
     {
         if ($suggestions === []) {
             throw new RuntimeException('filmclub_poll.flash_no_suggestions');
         }
 
+        $createdAt = new DateTimeImmutable();
         $poll = new FilmPoll();
         $poll->setEventId($eventId);
         $poll->setCreatedBy($createdBy);
-        $poll->setCreatedAt(new DateTimeImmutable());
-        $poll->setEndDate($endDate);
+        $poll->setCreatedAt($createdAt);
+        $poll->setDurationDays($durationDays);
+        $poll->setEndDate($createdAt->modify('+' . $durationDays . ' days'));
         $poll->setStatus(PollStatus::Active);
 
         $this->em->persist($poll);
