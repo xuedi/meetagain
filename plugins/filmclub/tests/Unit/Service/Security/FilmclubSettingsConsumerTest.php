@@ -3,16 +3,16 @@
 namespace Plugin\Filmclub\Tests\Unit\Service\Security;
 
 use PHPUnit\Framework\TestCase;
-use Plugin\Filmclub\Repository\FilmclubGroupSettingsRepository;
-use Plugin\Filmclub\Service\Security\FilmclubGroupSettingsConsumer;
+use Plugin\Filmclub\Repository\FilmclubSettingsRepository;
+use Plugin\Filmclub\Service\Security\FilmclubSettingsConsumer;
 
-class FilmclubGroupSettingsConsumerTest extends TestCase
+class FilmclubSettingsConsumerTest extends TestCase
 {
     public function testGetKeyReturnsExpectedTranslationKey(): void
     {
         // Arrange
-        $consumer = new FilmclubGroupSettingsConsumer(
-            $this->createStub(FilmclubGroupSettingsRepository::class),
+        $consumer = new FilmclubSettingsConsumer(
+            $this->createStub(FilmclubSettingsRepository::class),
         );
 
         // Act
@@ -25,10 +25,10 @@ class FilmclubGroupSettingsConsumerTest extends TestCase
     public function testCountDelegatesToRepository(): void
     {
         // Arrange
-        $repo = $this->createStub(FilmclubGroupSettingsRepository::class);
+        $repo = $this->createStub(FilmclubSettingsRepository::class);
         $repo->method('countWithEncryptedCredentials')->willReturn(7);
 
-        $consumer = new FilmclubGroupSettingsConsumer($repo);
+        $consumer = new FilmclubSettingsConsumer($repo);
 
         // Act
         $count = $consumer->count();

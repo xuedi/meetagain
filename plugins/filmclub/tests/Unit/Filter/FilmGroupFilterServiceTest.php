@@ -131,7 +131,6 @@ class FilmGroupFilterServiceTest extends TestCase
         static::assertNull($service->getAllowedPollIds());
         static::assertNull($service->getAllowedNoteIds());
         static::assertNull($service->getAllowedWishlistEntryIds());
-        static::assertNull($service->getAllowedSettingsIds());
     }
 
     public function testAllMethodsForwardToImplementation(): void
@@ -143,7 +142,6 @@ class FilmGroupFilterServiceTest extends TestCase
         $filter->method('getAllowedPollIds')->willReturn([30]);
         $filter->method('getAllowedNoteIds')->willReturn([40]);
         $filter->method('getAllowedWishlistEntryIds')->willReturn([50]);
-        $filter->method('getAllowedSettingsIds')->willReturn([60]);
 
         $service = new FilmGroupFilterService([$filter]);
 
@@ -153,6 +151,5 @@ class FilmGroupFilterServiceTest extends TestCase
         static::assertSame([30], $service->getAllowedPollIds());
         static::assertSame([40], $service->getAllowedNoteIds());
         static::assertSame([50], $service->getAllowedWishlistEntryIds());
-        static::assertSame([60], $service->getAllowedSettingsIds());
     }
 }

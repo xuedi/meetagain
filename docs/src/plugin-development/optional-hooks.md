@@ -26,6 +26,7 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `FollowerEventNotificationFilterInterface`    | Drop follower-RSVP email recipients per event        | `isFollowerAllowed()`                 |
 | `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`        |
 | `SecurityProviderInterface`                   | Participate in live security event detection         | `observe()`, `scanRetrospective()`    |
+| `PluginSettingsProviderInterface`             | Add a settings section to `/admin/plugin/settings`   | `getKey()`, `getFormType()`, `loadData()`, `save()` |
 
 ---
 
@@ -903,3 +904,50 @@ final class MyPluginProvider extends AbstractSecurityProvider
 A `threatLevel` of 100 is interpreted as "block this session" and the core writes
 an `Incident` row plus blocks the session and IP in Redis with a 4h TTL. Lower
 threat levels are recorded but not acted on.
+
+---
+
+## Plugin settings page
+
+Offer a configuration UI to operators without shipping your own admin chrome.
+Core renders all registered providers as framed fieldsets on a single page at
+`/admin/plugin/settings`, reached from a "Settings" button on `/admin/plugin`.
+
+### When to implement
+
+- Your plugin needs operator-managed settings (API keys, defaults, integration
+  toggles) and you do not want to maintain your own admin controller, sidebar
+  entry, and template.
+
+### What you implement
+
+```php
+final class MyPluginSettingsProvider implements PluginSettingsProviderInterface
+{
+    public function getKey(): string { return 'my_plugin'; }
+    public function getTitleKey(): string { return 'my_plugin_settings.page_title'; }
+    public function getFormType(): string { return MyPluginSettingsType::class; }
+    public function loadData(): object { /* fetch entity / DTO */ }
+    public function getFormOptions(): array { return []; }
+    public function save(object $data, FormInterface $form): void { /* persist */ }
+    public function getPriority(): int { return 0; }
+}
+```
+
+`getKey()` must be unique across plugins; the form submit posts to
+`/admin/plugin/settings?provider=<key>` and the controller dispatches the bound
+data back to the matching provider's `save()`.
+
+`getFormOptions()` lets you pass options derived from the loaded data (e.g.
+`'tmdb_key_set' => $data->getEncryptedTmdbKey() !== null`). Memoise the result of
+`loadData()` on the provider instance so `getFormOptions()` can reuse it without
+hitting the repository twice.
+
+`save()` receives both the bound data object and the `FormInterface` so providers
+can read unmapped form fields (a common pattern when a password field never round-trips
+the stored value back into the form).
+
+`getPriority()` controls display order on the page (higher first).
+
+See `plugins/filmclub/src/Publisher/PluginSettings/FilmclubSettingsProvider.php`
+for a working reference implementation.

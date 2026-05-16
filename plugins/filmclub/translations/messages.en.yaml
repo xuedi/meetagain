@@ -22,7 +22,6 @@ filmclub:
         section_activity: 'Activity'
         wishlist_mine: 'Mine'
         wishlist_group: 'Group'
-        settings: 'Settings'
 
 filmclub_film:
     page_title_list: 'Film list'
@@ -181,14 +180,8 @@ filmclub_settings:
     omdb_key_label: 'OMDb API key'
     key_already_set: 'Key is set - leave empty to keep, tick Clear to remove'
     clear_key_label: 'Clear this key'
-    section_poll_defaults: 'Poll defaults'
-    poll_duration_label: 'Default poll duration (days)'
-    poll_duration_help: 'Used as the default when creating a new poll.'
     button_save: 'Save settings'
     flash_saved: 'Filmclub settings saved.'
-    chooser_title: 'Select group'
-    chooser_intro: 'Select a group to configure:'
-    chooser_group_label: 'Group %id%'
 
 filmclub_note:
     page_title_list: 'My reviews'
@@ -225,7 +218,8 @@ filmclub_poll:
     col_film: 'Film'
     col_votes: 'Votes'
     label_suggestions: 'Select films for this poll'
-    label_end_date: 'Poll closes on'
+    label_duration_days: 'Duration (days)'
+    help_duration_days: 'Number of days this poll runs.'
     button_create: 'Create poll'
     button_vote: 'Vote'
     button_cast_votes: 'Cast votes'

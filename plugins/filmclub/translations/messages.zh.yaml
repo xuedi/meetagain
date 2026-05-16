@@ -22,7 +22,6 @@ filmclub:
         section_activity: '动态'
         wishlist_mine: '我的'
         wishlist_group: '全组'
-        settings: '设置'
 
 filmclub_film:
     page_title_list: '电影列表'
@@ -181,14 +180,8 @@ filmclub_settings:
     omdb_key_label: 'OMDb API密钥'
     key_already_set: '密钥已设置 - 留空保留，勾选清除以删除'
     clear_key_label: '清除此密钥'
-    section_poll_defaults: '投票默认值'
-    poll_duration_label: '默认投票时长（天）'
-    poll_duration_help: '创建新投票时作为默认值使用。'
     button_save: '保存设置'
     flash_saved: '电影俱乐部设置已保存。'
-    chooser_title: '选择群组'
-    chooser_intro: '选择要配置的群组：'
-    chooser_group_label: '群组 %id%'
 
 filmclub_note:
     page_title_list: '我的评价'
@@ -225,7 +218,8 @@ filmclub_poll:
     col_film: '电影'
     col_votes: '票数'
     label_suggestions: '选择本次投票的电影'
-    label_end_date: '投票截止日期'
+    label_duration_days: '时长（天）'
+    help_duration_days: '本次投票持续天数。'
     button_create: '创建投票'
     button_vote: '投票'
     button_cast_votes: '提交投票'

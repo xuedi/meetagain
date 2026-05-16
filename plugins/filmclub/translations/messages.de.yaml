@@ -22,7 +22,6 @@ filmclub:
         section_activity: 'Aktivitaet'
         wishlist_mine: 'Meine'
         wishlist_group: 'Gruppe'
-        settings: 'Einstellungen'
 
 filmclub_film:
     page_title_list: 'Filmliste'
@@ -181,14 +180,8 @@ filmclub_settings:
     omdb_key_label: 'OMDb-API-Schlussel'
     key_already_set: 'Schlussel ist gesetzt - leer lassen zum Behalten, Loschen ankreuzen zum Entfernen'
     clear_key_label: 'Diesen Schlussel loschen'
-    section_poll_defaults: 'Abstimmungs-Standardwerte'
-    poll_duration_label: 'Standard-Abstimmungsdauer (Tage)'
-    poll_duration_help: 'Wird beim Erstellen einer neuen Abstimmung als Standard verwendet.'
     button_save: 'Einstellungen speichern'
     flash_saved: 'Filmclub-Einstellungen gespeichert.'
-    chooser_title: 'Gruppe auswaehlen'
-    chooser_intro: 'Waehlen Sie eine Gruppe zum Konfigurieren:'
-    chooser_group_label: 'Gruppe %id%'
 
 filmclub_note:
     page_title_list: 'Meine Rezensionen'
@@ -225,7 +218,8 @@ filmclub_poll:
     col_film: 'Film'
     col_votes: 'Stimmen'
     label_suggestions: 'Filme fuer diese Abstimmung auswaehlen'
-    label_end_date: 'Abstimmung endet am'
+    label_duration_days: 'Laufzeit (Tage)'
+    help_duration_days: 'Anzahl Tage, in denen die Abstimmung laeuft.'
     button_create: 'Abstimmung erstellen'
     button_vote: 'Abstimmen'
     button_cast_votes: 'Stimmen abgeben'

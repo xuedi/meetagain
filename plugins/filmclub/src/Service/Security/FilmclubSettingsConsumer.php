@@ -3,12 +3,12 @@
 namespace Plugin\Filmclub\Service\Security;
 
 use App\Service\Security\SecretBoxConsumerInterface;
-use Plugin\Filmclub\Repository\FilmclubGroupSettingsRepository;
+use Plugin\Filmclub\Repository\FilmclubSettingsRepository;
 
-readonly class FilmclubGroupSettingsConsumer implements SecretBoxConsumerInterface
+readonly class FilmclubSettingsConsumer implements SecretBoxConsumerInterface
 {
     public function __construct(
-        private FilmclubGroupSettingsRepository $settingsRepository,
+        private FilmclubSettingsRepository $settingsRepository,
     ) {}
 
     public function getKey(): string
