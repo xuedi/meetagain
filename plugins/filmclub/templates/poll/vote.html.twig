@@ -17,7 +17,9 @@
                 {{ film.id in userVotedFilmIds ? 'checked' : '' }}
                 onchange="updateCounter()">
             {% if film.posterImage %}
-            <img src="{{ film.posterImage.publicPath ?? '' }}" alt="{{ film.title }}" style="height: 60px; width: auto">
+            <figure class="image" style="width: 40px; margin: 0; flex-shrink: 0">
+                {% include '_components/image.html.twig' with {'image': film.posterImage, 'size': '100x150', 'alt': film.title} %}
+            </figure>
             {% endif %}
             <div>
                 <p class="has-text-weight-semibold">{{ film.title }}</p>

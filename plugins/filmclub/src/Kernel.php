@@ -11,6 +11,7 @@ use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Repository\FilmPollRepository;
 use Plugin\Filmclub\Repository\FilmSelectionRepository;
 use Plugin\Filmclub\Repository\FilmWishlistEntryRepository;
+use Plugin\Filmclub\Service\PollService;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -26,6 +27,7 @@ class Kernel implements Plugin
         private readonly FilmWishlistEntryRepository $wishlistRepo,
         private readonly FilmGroupFilterService $groupFilter,
         private readonly TokenStorageInterface $tokenStorage,
+        private readonly PollService $pollService,
     ) {}
 
     public function getPluginKey(): string
@@ -52,6 +54,7 @@ class Kernel implements Plugin
         $isWishlisted = false;
         $canCreatePoll = false;
         $wishlistPoolCount = 0;
+        $hasUserVoted = false;
         $token = $this->tokenStorage->getToken();
         $user = $token?->getUser();
 
@@ -61,6 +64,10 @@ class Kernel implements Plugin
                     $user->getId(),
                     $selection->getFilm()->getId(),
                 ) !== null;
+            }
+
+            if ($activePoll !== null) {
+                $hasUserVoted = $this->pollService->hasUserVoted($activePoll, $user->getId());
             }
 
             if (method_exists($user, 'getRoles')) {
@@ -81,6 +88,7 @@ class Kernel implements Plugin
             'selection' => $selection,
             'activePoll' => $activePoll,
             'isWishlisted' => $isWishlisted,
+            'hasUserVoted' => $hasUserVoted,
             'canCreatePoll' => $canCreatePoll,
             'wishlistPoolCount' => $wishlistPoolCount,
         ]);

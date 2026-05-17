@@ -259,6 +259,9 @@ filmclub_tile:
     no_vote_yet: 'No vote started yet'
     button_create_vote: 'Create vote'
     poll_closes_in: 'Poll closes on %date%'
+    status_voted: "You've voted"
+    status_not_voted: "You haven't voted yet"
+    no_film_selected_yet: 'No film selected yet'
     button_add_wishlist: 'Add to wishlist'
     link_create_poll: 'Create poll'
     link_pick_film: 'Pick film'
