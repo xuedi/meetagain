@@ -8,7 +8,9 @@ use App\Repository\EventRepository;
 use Plugin\Filmclub\Activity\Messages\FilmSelectedForEvent;
 use Plugin\Filmclub\Service\FilmService;
 use Plugin\Filmclub\Service\SelectionService;
+use Plugin\Filmclub\Service\WishlistService;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -22,6 +24,7 @@ final class SelectionController extends AbstractController
         private readonly FilmService $filmService,
         private readonly EventRepository $eventRepo,
         private readonly ActivityService $activityService,
+        private readonly WishlistService $wishlistService,
     ) {}
 
     #[Route('/select/{eventId}', name: 'app_plugin_filmclub_manage_select', methods: ['GET'])]
@@ -34,7 +37,7 @@ final class SelectionController extends AbstractController
 
         return $this->render('@Filmclub/manage/select.html.twig', [
             'event' => $event,
-            'films' => $this->filmService->getApprovedList(),
+            'films' => $this->filmService->getList(),
             'currentSelection' => $this->selectionService->getForEvent($eventId),
         ]);
     }
@@ -43,7 +46,7 @@ final class SelectionController extends AbstractController
     public function select(int $eventId, int $filmId): Response
     {
         $film = $this->filmService->get($filmId);
-        if ($film === null || !$film->isApproved()) {
+        if ($film === null) {
             throw $this->createNotFoundException('Film not found');
         }
 
@@ -57,6 +60,52 @@ final class SelectionController extends AbstractController
                 'event_id' => $eventId,
             ]);
             $this->addFlash('success', 'filmclub_manage.flash_film_selected');
+        } catch (RuntimeException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_plugin_filmclub_views_list');
+    }
+
+    #[Route('/choose-directly/{eventId}', name: 'app_plugin_filmclub_choose_directly', methods: ['GET'])]
+    public function chooseDirectlyForm(int $eventId): Response
+    {
+        $event = $this->eventRepo->find($eventId);
+        if ($event === null) {
+            throw $this->createNotFoundException('Event not found');
+        }
+
+        $poolFilms = array_column($this->wishlistService->aggregateByFilm(), 'film');
+
+        return $this->render('@Filmclub/manage/choose_directly.html.twig', [
+            'event' => $event,
+            'films' => $poolFilms,
+        ]);
+    }
+
+    #[Route('/choose-directly/{eventId}/{filmId}', name: 'app_plugin_filmclub_choose_directly_submit', methods: ['POST'])]
+    public function chooseDirectly(int $eventId, int $filmId, Request $request): Response
+    {
+        $event = $this->eventRepo->find($eventId);
+        if ($event === null) {
+            throw $this->createNotFoundException('Event not found');
+        }
+
+        $film = $this->filmService->get($filmId);
+        if ($film === null) {
+            throw $this->createNotFoundException('Film not found');
+        }
+
+        $user = $this->getAuthedUser();
+
+        try {
+            $this->selectionService->chooseDirectly($event, $film, $user->getId());
+            $this->activityService->log(FilmSelectedForEvent::TYPE, $user, [
+                'film_id' => $film->getId(),
+                'film_title' => $film->getTitle(),
+                'event_id' => $eventId,
+            ]);
+            $this->addFlash('success', 'filmclub_tile.flash_chosen');
         } catch (RuntimeException $e) {
             $this->addFlash('error', $e->getMessage());
         }

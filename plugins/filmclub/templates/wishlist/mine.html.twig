@@ -33,7 +33,12 @@
                 <span class="has-text-grey">-</span>
                 {% endif %}
             </td>
-            <td>{{ entry.createdAt|date('Y-m-d') }}</td>
+            <td>
+                {{ entry.createdAt|date('Y-m-d') }}
+                {% if waitingSince[entry.id] is defined %}
+                <br><span class="is-size-7 has-text-grey">{{ 'filmclub_wishlist.waiting_since'|trans({'%count%': waitingSince[entry.id]}) }}</span>
+                {% endif %}
+            </td>
             <td>
                 <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: entry.film.id}) }}" style="display: inline">
                     <button type="submit" class="button is-small">

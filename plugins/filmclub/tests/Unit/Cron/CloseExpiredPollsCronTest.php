@@ -5,8 +5,8 @@ namespace Plugin\Filmclub\Tests\Unit\Cron;
 use App\Enum\CronTaskStatus;
 use PHPUnit\Framework\TestCase;
 use Plugin\Filmclub\Cron\CloseExpiredPollsCron;
+use Plugin\Filmclub\Entity\Film;
 use Plugin\Filmclub\Entity\FilmPoll;
-use Plugin\Filmclub\Entity\FilmSuggestion;
 use Plugin\Filmclub\Repository\FilmPollRepository;
 use Plugin\Filmclub\Service\PollService;
 use Plugin\Filmclub\ValueObject\PollClosure;
@@ -49,7 +49,7 @@ class CloseExpiredPollsCronTest extends TestCase
         $poll = $this->createStub(FilmPoll::class);
         $poll->method('getId')->willReturn(1);
 
-        $winner = $this->createStub(FilmSuggestion::class);
+        $winner = $this->createStub(Film::class);
         $closure = new PollClosure($winner, []);
 
         $repo = $this->createStub(FilmPollRepository::class);
@@ -76,8 +76,8 @@ class CloseExpiredPollsCronTest extends TestCase
         $poll = $this->createStub(FilmPoll::class);
         $poll->method('getId')->willReturn(2);
 
-        $tiedA = $this->createStub(FilmSuggestion::class);
-        $tiedB = $this->createStub(FilmSuggestion::class);
+        $tiedA = $this->createStub(Film::class);
+        $tiedB = $this->createStub(Film::class);
         $closure = new PollClosure(null, [$tiedA, $tiedB]);
 
         $repo = $this->createStub(FilmPollRepository::class);
@@ -133,7 +133,7 @@ class CloseExpiredPollsCronTest extends TestCase
         $pollFail = $this->createStub(FilmPoll::class);
         $pollFail->method('getId')->willReturn(11);
 
-        $winner = $this->createStub(FilmSuggestion::class);
+        $winner = $this->createStub(Film::class);
         $closure = new PollClosure($winner, []);
 
         $repo = $this->createStub(FilmPollRepository::class);

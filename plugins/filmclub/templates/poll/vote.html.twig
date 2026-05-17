@@ -10,29 +10,27 @@
 </p>
 
 <form method="POST" action="{{ path('app_plugin_filmclub_poll_vote', {id: poll.id}) }}" id="vote-form">
-    {% for suggestion in poll.suggestions %}
-    {% if suggestion.film %}
+    {% for film in poll.films %}
     <div class="box mb-3">
         <label class="checkbox" style="display: flex; align-items: center; gap: 1rem; cursor: pointer">
-            <input type="checkbox" name="suggestions[]" value="{{ suggestion.id }}"
-                {{ suggestion.id in userVotedIds ? 'checked' : '' }}
+            <input type="checkbox" name="films[]" value="{{ film.id }}"
+                {{ film.id in userVotedFilmIds ? 'checked' : '' }}
                 onchange="updateCounter()">
-            {% if suggestion.film.posterImage %}
-            <img src="{{ suggestion.film.posterImage.publicPath ?? '' }}" alt="{{ suggestion.film.title }}" style="height: 60px; width: auto">
+            {% if film.posterImage %}
+            <img src="{{ film.posterImage.publicPath ?? '' }}" alt="{{ film.title }}" style="height: 60px; width: auto">
             {% endif %}
             <div>
-                <p class="has-text-weight-semibold">{{ suggestion.film.title }}</p>
-                {% if suggestion.film.year %}
-                <p class="is-size-7 has-text-grey">{{ suggestion.film.year }}</p>
+                <p class="has-text-weight-semibold">{{ film.title }}</p>
+                {% if film.year %}
+                <p class="is-size-7 has-text-grey">{{ film.year }}</p>
                 {% endif %}
             </div>
         </label>
     </div>
-    {% endif %}
     {% endfor %}
 
     <p class="mb-3">
-        <span id="selection-counter">{{ 'filmclub_poll.selected_count'|trans({'%selected%': userVotedIds|length, '%total%': poll.suggestions|length}) }}</span>
+        <span id="selection-counter">{{ 'filmclub_poll.selected_count'|trans({'%selected%': userVotedFilmIds|length, '%total%': poll.films|length}) }}</span>
     </p>
 
     <button type="submit" class="button is-primary">{{ 'filmclub_poll.button_cast_votes'|trans }}</button>
@@ -41,8 +39,8 @@
 
 <script>
 function updateCounter() {
-    const total = document.querySelectorAll('[name="suggestions[]"]').length;
-    const selected = document.querySelectorAll('[name="suggestions[]"]:checked').length;
+    const total = document.querySelectorAll('[name="films[]"]').length;
+    const selected = document.querySelectorAll('[name="films[]"]:checked').length;
     const tpl = {{ ('filmclub_poll.selected_count'|trans({'%selected%': '__SEL__', '%total%': '__TOT__'}))|json_encode|raw }};
     document.getElementById('selection-counter').textContent = tpl.replace('__SEL__', selected).replace('__TOT__', total);
 }

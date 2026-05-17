@@ -126,7 +126,6 @@ class FilmGroupFilterServiceTest extends TestCase
         $service = new FilmGroupFilterService([]);
 
         // Act + Assert
-        static::assertNull($service->getAllowedSuggestionIds());
         static::assertNull($service->getAllowedEventIds());
         static::assertNull($service->getAllowedPollIds());
         static::assertNull($service->getAllowedNoteIds());
@@ -137,7 +136,6 @@ class FilmGroupFilterServiceTest extends TestCase
     {
         // Arrange
         $filter = $this->createStub(FilmGroupFilterInterface::class);
-        $filter->method('getAllowedSuggestionIds')->willReturn([10]);
         $filter->method('getAllowedEventIds')->willReturn([20]);
         $filter->method('getAllowedPollIds')->willReturn([30]);
         $filter->method('getAllowedNoteIds')->willReturn([40]);
@@ -146,7 +144,6 @@ class FilmGroupFilterServiceTest extends TestCase
         $service = new FilmGroupFilterService([$filter]);
 
         // Act + Assert
-        static::assertSame([10], $service->getAllowedSuggestionIds());
         static::assertSame([20], $service->getAllowedEventIds());
         static::assertSame([30], $service->getAllowedPollIds());
         static::assertSame([40], $service->getAllowedNoteIds());

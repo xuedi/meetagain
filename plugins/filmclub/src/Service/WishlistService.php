@@ -2,10 +2,10 @@
 
 namespace Plugin\Filmclub\Service;
 
+use App\Repository\EventRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Filmclub\Entity\Film;
-use Plugin\Filmclub\Entity\FilmPoll;
 use Plugin\Filmclub\Entity\FilmWishlistEntry;
 use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Repository\FilmRepository;
@@ -18,6 +18,7 @@ readonly class WishlistService
         private FilmWishlistEntryRepository $wishlistRepo,
         private FilmRepository $filmRepo,
         private FilmGroupFilterService $groupFilter,
+        private EventRepository $eventRepo,
     ) {}
 
     public function add(Film $film, int $userId): FilmWishlistEntry
@@ -66,9 +67,6 @@ readonly class WishlistService
     }
 
     /**
-     * Returns aggregated wishlist data sorted by distinct-wanter count (descending).
-     * Each row: film entity, wanterCount (distinct users), totalPriority (sum of priorityCounter).
-     *
      * @return array<array{film: Film, wanterCount: int, totalPriority: int}>
      */
     public function aggregateByFilm(): array
@@ -102,8 +100,6 @@ readonly class WishlistService
     }
 
     /**
-     * Returns all wishlist entries grouped by userId, sorted by priorityCounter descending within each group.
-     *
      * @return array<int, FilmWishlistEntry[]>
      */
     public function groupByMember(): array
@@ -117,25 +113,32 @@ readonly class WishlistService
         return $grouped;
     }
 
-    /**
-     * Increments priorityCounter for every wishlist entry whose film was in the poll
-     * but was NOT the winning film. Called at poll outcome commitment (Phase 7).
-     */
-    public function incrementForLosers(FilmPoll $poll, Film $winner): void
+    public function countPastEventsInGroupSince(DateTimeImmutable $since): int
     {
-        foreach ($poll->getSuggestions() as $suggestion) {
-            $film = $suggestion->getFilm();
-            if ($film === null || $film->getId() === $winner->getId()) {
-                continue;
-            }
-
-            $entries = $this->wishlistRepo->findByFilmForIncrement($film->getId());
-            foreach ($entries as $entry) {
-                $entry->setPriorityCounter($entry->getPriorityCounter() + 1);
-                $this->em->persist($entry);
-            }
+        $allowedEventIds = $this->groupFilter->getAllowedEventIds();
+        if ($allowedEventIds === []) {
+            return 0;
         }
 
-        $this->em->flush();
+        $qb = $this->eventRepo->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.start >= :since')
+            ->andWhere('e.start < :now')
+            ->setParameter('since', $since)
+            ->setParameter('now', new DateTimeImmutable());
+
+        if ($allowedEventIds !== null) {
+            $qb->andWhere('e.id IN (:ids)')->setParameter('ids', $allowedEventIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function onPollOutcome(Film $winner): void
+    {
+        $allowedIds = $this->groupFilter->getAllowedWishlistEntryIds();
+
+        $this->wishlistRepo->incrementAllExceptWinner($winner->getId(), $allowedIds);
+        $this->wishlistRepo->deleteByFilmInGroup($winner->getId(), $allowedIds);
     }
 }

@@ -35,36 +35,17 @@ class FilmRepository extends ServiceEntityRepository
     }
 
     /** @return Film[] */
-    public function findApproved(?array $allowedIds = null): array
+    public function findAll(?array $allowedIds = null): array
     {
         if ($allowedIds === []) {
             return [];
         }
 
         $qb = $this->createQueryBuilder('f')
-            ->where('f.approved = true')
             ->orderBy('f.title', 'ASC');
 
         if ($allowedIds !== null) {
-            $qb->andWhere('f.id IN (:ids)')->setParameter('ids', $allowedIds);
-        }
-
-        return $qb->getQuery()->getResult();
-    }
-
-    /** @return Film[] */
-    public function findPendingApproval(?array $allowedIds = null): array
-    {
-        if ($allowedIds === []) {
-            return [];
-        }
-
-        $qb = $this->createQueryBuilder('f')
-            ->where('f.approved = false')
-            ->orderBy('f.createdAt', 'ASC');
-
-        if ($allowedIds !== null) {
-            $qb->andWhere('f.id IN (:ids)')->setParameter('ids', $allowedIds);
+            $qb->where('f.id IN (:ids)')->setParameter('ids', $allowedIds);
         }
 
         return $qb->getQuery()->getResult();

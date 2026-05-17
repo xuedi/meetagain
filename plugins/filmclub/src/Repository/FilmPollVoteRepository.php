@@ -86,4 +86,25 @@ class FilmPollVoteRepository extends ServiceEntityRepository
     {
         return $this->count(['poll' => $pollId, 'userId' => $userId]) > 0;
     }
+
+    /**
+     * @return array<int, int> film_id => vote_count
+     */
+    public function countVotesPerFilm(int $pollId): array
+    {
+        $rows = $this->createQueryBuilder('v')
+            ->select('IDENTITY(v.film) AS film_id, COUNT(v.id) AS vote_count')
+            ->where('v.poll = :pollId')
+            ->setParameter('pollId', $pollId)
+            ->groupBy('v.film')
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[(int) $row['film_id']] = (int) $row['vote_count'];
+        }
+
+        return $result;
+    }
 }

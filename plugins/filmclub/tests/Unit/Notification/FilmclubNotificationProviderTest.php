@@ -2,16 +2,12 @@
 
 namespace Plugin\Filmclub\Tests\Unit\Notification;
 
-use App\Activity\ActivityService;
 use App\Entity\User;
 use App\Service\Notification\User\NotificationItem;
 use PHPUnit\Framework\TestCase;
 use Plugin\Filmclub\Entity\FilmPoll;
 use Plugin\Filmclub\Notification\FilmclubNotificationProvider;
-use Plugin\Filmclub\Service\FilmService;
 use Plugin\Filmclub\Service\PollService;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FilmclubNotificationProviderTest extends TestCase
@@ -93,52 +89,12 @@ class FilmclubNotificationProviderTest extends TestCase
         static::assertSame([], $result);
     }
 
-    public function testGetReviewItemsReturnsEmptyWhenNotOrganizer(): void
-    {
-        // Arrange
-        $security = $this->createStub(Security::class);
-        $security->method('isGranted')->willReturn(false);
-
-        $user = $this->createStub(User::class);
-
-        $provider = $this->makeProvider(security: $security);
-
-        // Act
-        $result = $provider->getReviewItems($user);
-
-        // Assert
-        static::assertSame([], $result);
-    }
-
-    public function testApproveItemThrowsWhenNotOrganizer(): void
-    {
-        // Arrange
-        $security = $this->createStub(Security::class);
-        $security->method('isGranted')->willReturn(false);
-
-        $user = $this->createStub(User::class);
-
-        $provider = $this->makeProvider(security: $security);
-
-        // Assert
-        $this->expectException(AccessDeniedException::class);
-
-        // Act
-        $provider->approveItem($user, '1');
-    }
-
     private function makeProvider(
         ?PollService $pollService = null,
-        ?FilmService $filmService = null,
-        ?ActivityService $activityService = null,
-        ?Security $security = null,
         ?TranslatorInterface $translator = null,
     ): FilmclubNotificationProvider {
         return new FilmclubNotificationProvider(
             pollService: $pollService ?? $this->createStub(PollService::class),
-            filmService: $filmService ?? $this->createStub(FilmService::class),
-            activityService: $activityService ?? $this->createStub(ActivityService::class),
-            security: $security ?? $this->createStub(Security::class),
             translator: $translator ?? $this->createStub(TranslatorInterface::class),
         );
     }

@@ -20,9 +20,32 @@
 {% if byFilm is empty %}
 <p class="has-text-grey">{{ 'filmclub_wishlist.empty'|trans }}</p>
 {% else %}
+
+{% if is_granted('ROLE_ORGANIZER') %}
+<form method="POST" action="{{ path('app_plugin_filmclub_poll_create_from_pool') }}" id="pool-form">
+    <div class="field is-grouped mb-4">
+        <div class="control">
+            <div class="select">
+                <select name="event_id" required>
+                    <option value="">{{ 'filmclub_pool.flash_no_event'|trans }}</option>
+                    {% for event in upcomingEvents %}
+                    <option value="{{ event.id }}">{{ event.title(app.request.locale) }} - {{ event.start|date('Y-m-d') }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="control">
+            <button type="submit" class="button is-primary">{{ 'filmclub_pool.button_create_poll'|trans }}</button>
+        </div>
+    </div>
+{% endif %}
+
 <table class="table is-fullwidth is-striped">
     <thead>
         <tr>
+            {% if is_granted('ROLE_ORGANIZER') %}
+            <th>{{ 'filmclub_pool.col_select'|trans }}</th>
+            {% endif %}
             <th>{{ 'filmclub_wishlist.col_film'|trans }}</th>
             <th>{{ 'filmclub_wishlist.col_wanter_count'|trans }}</th>
             <th>{{ 'filmclub_wishlist.col_priority'|trans }}</th>
@@ -31,6 +54,9 @@
     <tbody>
         {% for row in byFilm %}
         <tr>
+            {% if is_granted('ROLE_ORGANIZER') %}
+            <td><input type="checkbox" name="films[]" value="{{ row.film.id }}"></td>
+            {% endif %}
             <td>
                 <a href="{{ path('app_plugin_filmclub_film_show', {id: row.film.id}) }}">
                     {% if row.film.posterImage %}
@@ -52,6 +78,11 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% if is_granted('ROLE_ORGANIZER') %}
+</form>
+{% endif %}
+
 {% endif %}
 </div>
 
