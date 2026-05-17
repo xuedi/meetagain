@@ -2,6 +2,7 @@
 
 namespace Plugin\Filmclub\Service;
 
+use App\Entity\Event;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Filmclub\Entity\Film;
@@ -16,6 +17,7 @@ readonly class SelectionService
         private EntityManagerInterface $em,
         private FilmSelectionRepository $selectionRepo,
         private FilmGroupFilterService $groupFilter,
+        private WishlistService $wishlistService,
     ) {}
 
     public function selectForEvent(int $eventId, Film $film, int $selectedBy): FilmSelection
@@ -54,5 +56,26 @@ readonly class SelectionService
         return $this->selectionRepo->findHistoryFilteredByEvents(
             $this->groupFilter->getAllowedEventIds(),
         );
+    }
+
+    public function chooseDirectly(Event $event, Film $film, int $userId): FilmSelection
+    {
+        $existing = $this->selectionRepo->findByEvent($event->getId());
+        if ($existing !== null) {
+            throw new RuntimeException('filmclub_manage.flash_already_selected');
+        }
+
+        $selection = new FilmSelection();
+        $selection->setFilm($film);
+        $selection->setEventId($event->getId());
+        $selection->setSelectedBy($userId);
+        $selection->setSelectedAt(new DateTimeImmutable());
+
+        $this->em->persist($selection);
+        $this->em->flush();
+
+        $this->wishlistService->onPollOutcome($film);
+
+        return $selection;
     }
 }

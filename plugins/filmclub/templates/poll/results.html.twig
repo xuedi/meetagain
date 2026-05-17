@@ -13,11 +13,11 @@
     {% endif %}
 </p>
 
-{% if poll.winningSuggestion %}
+{% if poll.winningFilm %}
 <div class="notification">
-    {{ 'filmclub_poll.winner_label'|trans }}: <strong>{{ poll.winningSuggestion.film.title }}</strong>
+    {{ 'filmclub_poll.winner_label'|trans }}: <strong>{{ poll.winningFilm.title }}</strong>
 </div>
-{% elseif poll.status.value != 1 and poll.tiedSuggestions is not empty %}
+{% elseif poll.status.value != 1 and poll.tiedFilmIds is not empty %}
 <div class="notification is-warning">
     {{ 'filmclub_poll.awaiting_disambiguation'|trans }}
     {% if is_granted('ROLE_ORGANIZER') %}
@@ -39,13 +39,12 @@
         </tr>
     </thead>
     <tbody>
-        {% for suggestion in poll.suggestions %}
-        {% if suggestion.film %}
-        {% set voteCount = voteCounts[suggestion.id] ?? 0 %}
-        <tr{% if poll.winningSuggestion and poll.winningSuggestion.id == suggestion.id %} style="font-weight: bold"{% endif %}>
+        {% for film in poll.films %}
+        {% set voteCount = voteCounts[film.id] ?? 0 %}
+        <tr{% if poll.winningFilm and poll.winningFilm.id == film.id %} style="font-weight: bold"{% endif %}>
             <td>
-                <a href="{{ path('app_plugin_filmclub_film_show', {id: suggestion.film.id}) }}">{{ suggestion.film.title }}</a>
-                {% if suggestion.id in userVotedSuggestionIds %}
+                <a href="{{ path('app_plugin_filmclub_film_show', {id: film.id}) }}">{{ film.title }}</a>
+                {% if film.id in userVotedFilmIds %}
                 <span class="tag is-light ml-1">{{ 'filmclub_poll.your_vote'|trans }}</span>
                 {% endif %}
             </td>
@@ -56,7 +55,6 @@
                 {% endif %}
             </td>
         </tr>
-        {% endif %}
         {% endfor %}
     </tbody>
 </table>

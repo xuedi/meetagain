@@ -50,14 +50,29 @@ class Kernel implements Plugin
         $activePoll = $this->pollRepo->findActiveForEvent($eventId, $this->groupFilter->getAllowedPollIds());
 
         $isWishlisted = false;
-        if ($selection !== null) {
-            $token = $this->tokenStorage->getToken();
-            $user = $token?->getUser();
-            if ($user !== null && method_exists($user, 'getId')) {
+        $canCreatePoll = false;
+        $wishlistPoolCount = 0;
+        $token = $this->tokenStorage->getToken();
+        $user = $token?->getUser();
+
+        if ($user !== null && method_exists($user, 'getId')) {
+            if ($selection !== null) {
                 $isWishlisted = $this->wishlistRepo->findByUserAndFilm(
                     $user->getId(),
                     $selection->getFilm()->getId(),
                 ) !== null;
+            }
+
+            if (method_exists($user, 'getRoles')) {
+                $roles = $user->getRoles();
+                $canCreatePoll = in_array('ROLE_ORGANIZER', $roles, true)
+                    || in_array('ROLE_STEWARD', $roles, true);
+            }
+
+            if ($canCreatePoll) {
+                $wishlistPoolCount = count(
+                    $this->wishlistRepo->aggregateByFilm($this->groupFilter->getAllowedWishlistEntryIds()),
+                );
             }
         }
 
@@ -66,6 +81,8 @@ class Kernel implements Plugin
             'selection' => $selection,
             'activePoll' => $activePoll,
             'isWishlisted' => $isWishlisted,
+            'canCreatePoll' => $canCreatePoll,
+            'wishlistPoolCount' => $wishlistPoolCount,
         ]);
     }
 

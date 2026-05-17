@@ -4,7 +4,9 @@ namespace Plugin\Filmclub\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Repository\EventRepository;
 use Plugin\Filmclub\Activity\Messages\WishlistAdded;
+use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Service\FilmService;
 use Plugin\Filmclub\Service\WishlistService;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,24 +21,42 @@ final class WishlistController extends AbstractController
         private readonly WishlistService $wishlistService,
         private readonly FilmService $filmService,
         private readonly ActivityService $activityService,
+        private readonly EventRepository $eventRepo,
+        private readonly FilmGroupFilterService $groupFilter,
     ) {}
 
     #[Route('/mine', name: 'app_plugin_filmclub_wishlist_mine', methods: ['GET'])]
     public function mine(): Response
     {
         $user = $this->getAuthedUser();
+        $entries = $this->wishlistService->listForUser($user->getId());
+
+        $waitingSince = [];
+        foreach ($entries as $entry) {
+            if ($entry->getCreatedAt() !== null) {
+                $waitingSince[$entry->getId()] = $this->wishlistService->countPastEventsInGroupSince(
+                    $entry->getCreatedAt(),
+                );
+            } else {
+                $waitingSince[$entry->getId()] = 0;
+            }
+        }
 
         return $this->render('@Filmclub/wishlist/mine.html.twig', [
-            'entries' => $this->wishlistService->listForUser($user->getId()),
+            'entries' => $entries,
+            'waitingSince' => $waitingSince,
         ]);
     }
 
     #[Route('/group', name: 'app_plugin_filmclub_wishlist_group', methods: ['GET'])]
     public function group(): Response
     {
+        $upcomingEvents = $this->eventRepo->getUpcomingEvents(10, $this->groupFilter->getAllowedEventIds());
+
         return $this->render('@Filmclub/wishlist/group.html.twig', [
             'byFilm' => $this->wishlistService->aggregateByFilm(),
             'byMember' => $this->wishlistService->groupByMember(),
+            'upcomingEvents' => $upcomingEvents,
         ]);
     }
 
@@ -44,7 +64,7 @@ final class WishlistController extends AbstractController
     public function add(int $filmId): Response
     {
         $film = $this->filmService->get($filmId);
-        if ($film === null || !$film->isApproved()) {
+        if ($film === null) {
             throw $this->createNotFoundException('Film not found');
         }
 

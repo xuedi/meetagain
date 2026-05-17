@@ -2,6 +2,7 @@
 
 namespace Plugin\Filmclub\Entity;
 
+use App\Entity\Event;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,8 +16,9 @@ class FilmPoll
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $eventId = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Event $event = null;
 
     #[ORM\Column]
     private ?int $createdBy = null;
@@ -37,21 +39,25 @@ class FilmPoll
     private PollStatus $status = PollStatus::Active;
 
     #[ORM\ManyToOne]
-    private ?FilmSuggestion $winningSuggestion = null;
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Film $winningFilm = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
-    private ?array $tiedSuggestions = null;
-
-    #[ORM\OneToMany(targetEntity: FilmSuggestion::class, mappedBy: 'poll')]
-    private Collection $suggestions;
+    private ?array $tiedFilmIds = null;
 
     #[ORM\OneToMany(targetEntity: FilmPollVote::class, mappedBy: 'poll', cascade: ['remove'])]
     private Collection $votes;
 
+    #[ORM\ManyToMany(targetEntity: Film::class)]
+    #[ORM\JoinTable(name: 'film_poll_films')]
+    #[ORM\JoinColumn(name: 'poll_id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'film_id', onDelete: 'CASCADE')]
+    private Collection $films;
+
     public function __construct()
     {
-        $this->suggestions = new ArrayCollection();
         $this->votes = new ArrayCollection();
+        $this->films = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -59,16 +65,21 @@ class FilmPoll
         return $this->id;
     }
 
-    public function getEventId(): ?int
+    public function getEvent(): ?Event
     {
-        return $this->eventId;
+        return $this->event;
     }
 
-    public function setEventId(int $eventId): static
+    public function setEvent(Event $event): static
     {
-        $this->eventId = $eventId;
+        $this->event = $event;
 
         return $this;
+    }
+
+    public function getEventId(): ?int
+    {
+        return $this->event?->getId();
     }
 
     public function getCreatedBy(): ?int
@@ -143,39 +154,55 @@ class FilmPoll
         return $this;
     }
 
-    public function getWinningSuggestion(): ?FilmSuggestion
+    public function getWinningFilm(): ?Film
     {
-        return $this->winningSuggestion;
+        return $this->winningFilm;
     }
 
-    public function setWinningSuggestion(?FilmSuggestion $winningSuggestion): static
+    public function setWinningFilm(?Film $winningFilm): static
     {
-        $this->winningSuggestion = $winningSuggestion;
+        $this->winningFilm = $winningFilm;
 
         return $this;
     }
 
-    public function getTiedSuggestions(): ?array
+    public function getTiedFilmIds(): ?array
     {
-        return $this->tiedSuggestions;
+        return $this->tiedFilmIds;
     }
 
-    public function setTiedSuggestions(?array $tiedSuggestions): static
+    public function setTiedFilmIds(?array $tiedFilmIds): static
     {
-        $this->tiedSuggestions = $tiedSuggestions;
+        $this->tiedFilmIds = $tiedFilmIds;
 
         return $this;
-    }
-
-    /** @return Collection<int, FilmSuggestion> */
-    public function getSuggestions(): Collection
-    {
-        return $this->suggestions;
     }
 
     /** @return Collection<int, FilmPollVote> */
     public function getVotes(): Collection
     {
         return $this->votes;
+    }
+
+    /** @return Collection<int, Film> */
+    public function getFilms(): Collection
+    {
+        return $this->films;
+    }
+
+    public function addFilm(Film $film): static
+    {
+        if (!$this->films->contains($film)) {
+            $this->films->add($film);
+        }
+
+        return $this;
+    }
+
+    public function removeFilm(Film $film): static
+    {
+        $this->films->removeElement($film);
+
+        return $this;
     }
 }

@@ -23,11 +23,19 @@
         {{ 'filmclub_tile.button_vote_now'|trans }}
     </a>
 </div>
-{% elseif is_granted('ROLE_ORGANIZER') %}
+{% else %}
 <div class="mt-2">
     <p class="is-size-7 has-text-weight-semibold">{{ 'filmclub_tile.heading'|trans }}</p>
-    <a href="{{ path('app_plugin_filmclub_poll_create', {eventId: eventId}) }}" class="is-size-7">{{ 'filmclub_tile.link_create_poll'|trans }}</a>
-    &middot;
-    <a href="{{ path('app_plugin_filmclub_manage_select', {eventId: eventId}) }}" class="is-size-7">{{ 'filmclub_tile.link_pick_film'|trans }}</a>
+    {% if canCreatePoll %}
+        {% if wishlistPoolCount > 0 %}
+        <a href="{{ path('app_plugin_filmclub_wishlist_group') }}?event_id={{ eventId }}" class="is-size-7 mr-2">{{ 'filmclub_tile.button_create_poll'|trans }}</a>
+        &middot;
+        {% endif %}
+        <a href="{{ path('app_plugin_filmclub_choose_directly', {eventId: eventId}) }}" class="is-size-7">{{ 'filmclub_tile.button_choose_directly'|trans }}</a>
+    {% else %}
+        <a href="{{ path('app_plugin_filmclub_poll_create', {eventId: eventId}) }}" class="is-size-7">{{ 'filmclub_tile.link_create_poll'|trans }}</a>
+        &middot;
+        <a href="{{ path('app_plugin_filmclub_manage_select', {eventId: eventId}) }}" class="is-size-7">{{ 'filmclub_tile.link_pick_film'|trans }}</a>
+    {% endif %}
 </div>
 {% endif %}
