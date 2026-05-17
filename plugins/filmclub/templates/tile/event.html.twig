@@ -2,8 +2,8 @@
 <div class="mt-2">
     <p class="is-size-7 has-text-weight-semibold">{{ 'filmclub_tile.heading'|trans }}</p>
     {% if selection.film.posterImage %}
-    <figure class="image is-32x32 mb-1">
-        <img src="{{ selection.film.posterImage.publicPath ?? '' }}" alt="{{ selection.film.title }}" style="object-fit: cover">
+    <figure class="image mb-1">
+        {% include '_components/image.html.twig' with {'image': selection.film.posterImage, 'size': '100x150', 'alt': selection.film.title} %}
     </figure>
     {% endif %}
     <p class="is-size-7">
