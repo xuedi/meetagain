@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Plugin\Filmclub\ValueObject;
 
-use Plugin\Filmclub\Entity\FilmSuggestion;
+use Plugin\Filmclub\Entity\Film;
 
 final readonly class PollClosure
 {
     /**
-     * @param FilmSuggestion[] $tiedSuggestions Non-empty only when the vote was a tie.
+     * @param Film[] $tiedFilms Non-empty only when the vote was a tie.
      */
     public function __construct(
-        public ?FilmSuggestion $winningSuggestion,
-        public array $tiedSuggestions,
+        public ?Film $winningFilm,
+        public array $tiedFilms,
     ) {}
 
     public function isTie(): bool
     {
-        return $this->winningSuggestion === null && $this->tiedSuggestions !== [];
+        return $this->winningFilm === null && $this->tiedFilms !== [];
     }
 }

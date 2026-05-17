@@ -98,7 +98,6 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
             $film->setTitle($title);
             $film->setYear(rand(1950, 2024));
             $film->setRuntime(rand(80, 200));
-            $film->setApproved(true);
 
             $genres = self::GENRES;
             shuffle($genres);

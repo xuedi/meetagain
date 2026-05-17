@@ -20,9 +20,6 @@ interface FilmGroupFilterInterface
     public function getAllowedFilmIds(): ?array;
 
     /** @return int[]|null */
-    public function getAllowedSuggestionIds(): ?array;
-
-    /** @return int[]|null */
     public function getAllowedEventIds(): ?array;
 
     /** @return int[]|null */

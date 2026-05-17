@@ -2,12 +2,11 @@
 
 namespace Plugin\Filmclub\Tests\Unit\Service;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\EventRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Plugin\Filmclub\Entity\Film;
-use Plugin\Filmclub\Entity\FilmPoll;
-use Plugin\Filmclub\Entity\FilmSuggestion;
 use Plugin\Filmclub\Entity\FilmWishlistEntry;
 use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Repository\FilmRepository;
@@ -59,42 +58,67 @@ class WishlistServiceTest extends TestCase
         // Assert — mock verifies findByUser called with correct userId and allowedIds
     }
 
-    public function testIncrementForLosersSkipsWinner(): void
+    public function testOnPollOutcomeIncrementsAllGroupEntriesExceptWinner(): void
     {
         // Arrange
-        $winnerFilm = $this->createStub(Film::class);
-        $winnerFilm->method('getId')->willReturn(1);
+        $winner = $this->createStub(Film::class);
+        $winner->method('getId')->willReturn(5);
 
-        $loserFilm = $this->createStub(Film::class);
-        $loserFilm->method('getId')->willReturn(2);
+        $groupFilter = $this->createStub(FilmGroupFilterService::class);
+        $groupFilter->method('getAllowedWishlistEntryIds')->willReturn([1, 2, 3]);
 
-        $winningSuggestion = $this->createStub(FilmSuggestion::class);
-        $winningSuggestion->method('getFilm')->willReturn($winnerFilm);
+        $wishlistRepo = $this->createMock(FilmWishlistEntryRepository::class);
+        $wishlistRepo->expects(static::once())
+            ->method('incrementAllExceptWinner')
+            ->with(5, [1, 2, 3]);
+        $wishlistRepo->expects(static::once())
+            ->method('deleteByFilmInGroup')
+            ->with(5, [1, 2, 3]);
 
-        $loserSuggestion = $this->createStub(FilmSuggestion::class);
-        $loserSuggestion->method('getFilm')->willReturn($loserFilm);
-
-        $poll = $this->createStub(FilmPoll::class);
-        $poll->method('getSuggestions')->willReturn(new ArrayCollection([$winningSuggestion, $loserSuggestion]));
-
-        $calledWith = [];
-        $wishlistRepo = $this->createStub(FilmWishlistEntryRepository::class);
-        $wishlistRepo->method('findByFilmForIncrement')->willReturnCallback(
-            static function (int $filmId) use (&$calledWith): array {
-                $calledWith[] = $filmId;
-
-                return [];
-            },
-        );
-
-        $service = $this->makeService(wishlistRepo: $wishlistRepo);
+        $service = $this->makeService(wishlistRepo: $wishlistRepo, groupFilter: $groupFilter);
 
         // Act
-        $service->incrementForLosers($poll, $winnerFilm);
+        $service->onPollOutcome($winner);
+
+        // Assert — mock expectations verified
+    }
+
+    public function testOnPollOutcomeDeletesEntriesForWinningFilmAcrossGroup(): void
+    {
+        // Arrange
+        $winner = $this->createStub(Film::class);
+        $winner->method('getId')->willReturn(10);
+
+        $groupFilter = $this->createStub(FilmGroupFilterService::class);
+        $groupFilter->method('getAllowedWishlistEntryIds')->willReturn(null);
+
+        $wishlistRepo = $this->createMock(FilmWishlistEntryRepository::class);
+        $wishlistRepo->expects(static::once())
+            ->method('deleteByFilmInGroup')
+            ->with(10, null);
+        $wishlistRepo->method('incrementAllExceptWinner');
+
+        $service = $this->makeService(wishlistRepo: $wishlistRepo, groupFilter: $groupFilter);
+
+        // Act
+        $service->onPollOutcome($winner);
+
+        // Assert — mock expectations verified
+    }
+
+    public function testCountPastEventsInGroupSinceReturnsZeroWhenAllowedIdsEmpty(): void
+    {
+        // Arrange
+        $groupFilter = $this->createStub(FilmGroupFilterService::class);
+        $groupFilter->method('getAllowedEventIds')->willReturn([]);
+
+        $service = $this->makeService(groupFilter: $groupFilter);
+
+        // Act
+        $result = $service->countPastEventsInGroupSince(new DateTimeImmutable());
 
         // Assert
-        static::assertNotContains(1, $calledWith, 'findByFilmForIncrement must not be called for the winner (film id 1)');
-        static::assertContains(2, $calledWith, 'findByFilmForIncrement must be called for the loser (film id 2)');
+        static::assertSame(0, $result);
     }
 
     private function makeService(
@@ -102,12 +126,14 @@ class WishlistServiceTest extends TestCase
         ?FilmWishlistEntryRepository $wishlistRepo = null,
         ?FilmRepository $filmRepo = null,
         ?FilmGroupFilterService $groupFilter = null,
+        ?EventRepository $eventRepo = null,
     ): WishlistService {
         return new WishlistService(
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             wishlistRepo: $wishlistRepo ?? $this->createStub(FilmWishlistEntryRepository::class),
             filmRepo: $filmRepo ?? $this->createStub(FilmRepository::class),
             groupFilter: $groupFilter ?? $this->createStub(FilmGroupFilterService::class),
+            eventRepo: $eventRepo ?? $this->createStub(EventRepository::class),
         );
     }
 }

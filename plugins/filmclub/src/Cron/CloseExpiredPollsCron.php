@@ -34,8 +34,8 @@ readonly class CloseExpiredPollsCron implements CronTaskInterface
             try {
                 $closure = $this->pollService->close($poll);
 
-                if ($closure->winningSuggestion !== null) {
-                    $this->pollService->commitOutcome($poll, $closure->winningSuggestion);
+                if ($closure->winningFilm !== null) {
+                    $this->pollService->commitOutcome($poll, $closure->winningFilm);
                 }
 
                 $closed++;

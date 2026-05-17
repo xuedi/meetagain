@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Plugin\Filmclub\Form;
 
-use Plugin\Filmclub\Entity\FilmSuggestion;
+use Plugin\Filmclub\Entity\Film;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -21,13 +21,13 @@ class PollCreateType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('suggestions', EntityType::class, [
-            'class' => FilmSuggestion::class,
-            'choices' => $options['available_suggestions'],
-            'choice_label' => static fn(FilmSuggestion $s) => $s->getFilm()?->getTitle() ?? '?',
+        $builder->add('films', EntityType::class, [
+            'class' => Film::class,
+            'choices' => $options['available_films'],
+            'choice_label' => static fn(Film $f) => $f->getTitle() ?? '?',
             'multiple' => true,
             'expanded' => true,
-            'label' => $this->translator->trans('filmclub_poll.label_suggestions'),
+            'label' => $this->translator->trans('filmclub_poll.label_films'),
             'required' => true,
         ])->add('durationDays', IntegerType::class, [
             'label' => $this->translator->trans('filmclub_poll.label_duration_days'),
@@ -44,7 +44,7 @@ class PollCreateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'available_suggestions' => [],
+            'available_films' => [],
         ]);
     }
 }

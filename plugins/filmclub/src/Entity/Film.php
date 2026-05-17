@@ -44,16 +44,10 @@ class Film
     private ?Image $posterImage = null;
 
     #[ORM\Column]
-    private bool $approved = false;
-
-    #[ORM\Column]
     private ?int $createdBy = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
-
-    #[ORM\OneToMany(targetEntity: FilmSuggestion::class, mappedBy: 'film')]
-    private Collection $suggestions;
 
     #[ORM\OneToMany(targetEntity: FilmNote::class, mappedBy: 'film')]
     private Collection $notes;
@@ -63,7 +57,6 @@ class Film
 
     public function __construct()
     {
-        $this->suggestions = new ArrayCollection();
         $this->notes = new ArrayCollection();
         $this->wishlistEntries = new ArrayCollection();
     }
@@ -181,18 +174,6 @@ class Film
         return $this;
     }
 
-    public function isApproved(): bool
-    {
-        return $this->approved;
-    }
-
-    public function setApproved(bool $approved): static
-    {
-        $this->approved = $approved;
-
-        return $this;
-    }
-
     public function getCreatedBy(): ?int
     {
         return $this->createdBy;
@@ -215,12 +196,6 @@ class Film
         $this->createdAt = $createdAt;
 
         return $this;
-    }
-
-    /** @return Collection<int, FilmSuggestion> */
-    public function getSuggestions(): Collection
-    {
-        return $this->suggestions;
     }
 
     /** @return Collection<int, FilmNote> */

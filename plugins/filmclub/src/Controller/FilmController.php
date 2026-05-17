@@ -6,7 +6,6 @@ use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Entity\User;
 use Plugin\Filmclub\Activity\Messages\FilmAdded;
-use Plugin\Filmclub\Activity\Messages\SuggestionCreated;
 use Plugin\Filmclub\Enum\ViewType;
 use Plugin\Filmclub\Form\FilmEditType;
 use Plugin\Filmclub\Form\FilmLookupType;
@@ -40,7 +39,7 @@ final class FilmController extends AbstractController
     public function list(): Response
     {
         return $this->render('@Filmclub/film/list.html.twig', [
-            'films' => $this->filmService->getApprovedList(),
+            'films' => $this->filmService->getList(),
             'viewContext' => 'films',
             'currentView' => $this->viewTypeResolver->get('films', ViewType::List),
             'availableViews' => ViewType::cases(),
@@ -51,7 +50,7 @@ final class FilmController extends AbstractController
     public function show(int $id): Response
     {
         $film = $this->filmService->get($id);
-        if ($film === null || !$film->isApproved()) {
+        if ($film === null) {
             throw $this->createNotFoundException('Film not found');
         }
 
@@ -131,19 +130,16 @@ final class FilmController extends AbstractController
         }
 
         $user = $this->getAuthedUser();
-        $isManager = $this->isGranted('ROLE_ORGANIZER');
 
         try {
-            $film = $this->filmService->createFromMetadata($metadata, $user->getId(), $isManager);
+            $film = $this->filmService->createFromMetadata($metadata, $user->getId());
 
-            $activityType = $isManager ? FilmAdded::TYPE : SuggestionCreated::TYPE;
-            $this->activityService->log($activityType, $user, [
+            $this->activityService->log(FilmAdded::TYPE, $user, [
                 'film_id' => $film->getId(),
                 'film_title' => $film->getTitle(),
             ]);
 
-            $flashKey = $isManager ? 'filmclub_film.flash_added' : 'filmclub_film.flash_submitted';
-            $this->addFlash('success', $flashKey);
+            $this->addFlash('success', 'filmclub_film.flash_added');
 
             return $this->redirectToRoute('app_plugin_filmclub_film_show', ['id' => $film->getId()]);
         } catch (RuntimeException $e) {
@@ -201,7 +197,6 @@ final class FilmController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getAuthedUser();
-            $isManager = $this->isGranted('ROLE_ORGANIZER');
 
             try {
                 $film = $this->filmService->createManual(
@@ -211,17 +206,14 @@ final class FilmController extends AbstractController
                     description: $form->get('description')->getData(),
                     genres: [],
                     userId: $user->getId(),
-                    isManager: $isManager,
                 );
 
-                $activityType = $isManager ? FilmAdded::TYPE : SuggestionCreated::TYPE;
-                $this->activityService->log($activityType, $user, [
+                $this->activityService->log(FilmAdded::TYPE, $user, [
                     'film_id' => $film->getId(),
                     'film_title' => $film->getTitle(),
                 ]);
 
-                $flashKey = $isManager ? 'filmclub_film.flash_added' : 'filmclub_film.flash_submitted';
-                $this->addFlash('success', $flashKey);
+                $this->addFlash('success', 'filmclub_film.flash_added');
 
                 return $this->redirectToRoute('app_filmclub_filmlist');
             } catch (RuntimeException $e) {

@@ -2,18 +2,17 @@
 
 namespace Plugin\Filmclub\Service;
 
+use App\Entity\Event;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Plugin\Filmclub\Entity\Film;
 use Plugin\Filmclub\Entity\FilmPoll;
 use Plugin\Filmclub\Entity\FilmPollVote;
 use Plugin\Filmclub\Entity\FilmSelection;
-use Plugin\Filmclub\Entity\FilmSuggestion;
 use Plugin\Filmclub\Entity\PollStatus;
-use Plugin\Filmclub\Entity\SuggestionStatus;
 use Plugin\Filmclub\Filter\FilmGroupFilterService;
 use Plugin\Filmclub\Repository\FilmPollRepository;
 use Plugin\Filmclub\Repository\FilmPollVoteRepository;
-use Plugin\Filmclub\Repository\FilmSuggestionRepository;
 use Plugin\Filmclub\ValueObject\PollClosure;
 use RuntimeException;
 
@@ -23,37 +22,33 @@ readonly class PollService
         private EntityManagerInterface $em,
         private FilmPollRepository $pollRepo,
         private FilmPollVoteRepository $voteRepo,
-        private FilmSuggestionRepository $suggestionRepo,
         private WishlistService $wishlistService,
         private FilmGroupFilterService $groupFilter,
     ) {}
 
     /**
-     * @param FilmSuggestion[] $suggestions
+     * @param Film[] $films
      */
-    public function create(int $eventId, array $suggestions, int $durationDays, int $createdBy): FilmPoll
+    public function create(Event $event, array $films, int $durationDays, int $createdBy): FilmPoll
     {
-        if ($suggestions === []) {
-            throw new RuntimeException('filmclub_poll.flash_no_suggestions');
+        if ($films === []) {
+            throw new RuntimeException('filmclub_poll.flash_no_films');
         }
 
         $createdAt = new DateTimeImmutable();
         $poll = new FilmPoll();
-        $poll->setEventId($eventId);
+        $poll->setEvent($event);
         $poll->setCreatedBy($createdBy);
         $poll->setCreatedAt($createdAt);
         $poll->setDurationDays($durationDays);
         $poll->setEndDate($createdAt->modify('+' . $durationDays . ' days'));
         $poll->setStatus(PollStatus::Active);
 
-        $this->em->persist($poll);
-
-        foreach ($suggestions as $suggestion) {
-            $suggestion->setPoll($poll);
-            $suggestion->setStatus(SuggestionStatus::InPoll);
-            $this->em->persist($suggestion);
+        foreach ($films as $film) {
+            $poll->addFilm($film);
         }
 
+        $this->em->persist($poll);
         $this->em->flush();
 
         return $poll;
@@ -62,9 +57,9 @@ readonly class PollService
     /**
      * Replaces the user's full vote set in one transaction.
      *
-     * @param FilmSuggestion[] $selectedSuggestions
+     * @param Film[] $selectedFilms
      */
-    public function castVote(int $userId, FilmPoll $poll, array $selectedSuggestions): void
+    public function castVote(int $userId, FilmPoll $poll, array $selectedFilms): void
     {
         if ($poll->getStatus() !== PollStatus::Active) {
             throw new RuntimeException('filmclub_poll.flash_poll_closed');
@@ -72,11 +67,11 @@ readonly class PollService
 
         $this->voteRepo->deleteByPollAndUser($poll->getId(), $userId);
 
-        foreach ($selectedSuggestions as $suggestion) {
+        foreach ($selectedFilms as $film) {
             $vote = new FilmPollVote();
             $vote->setPoll($poll);
             $vote->setUserId($userId);
-            $vote->setSuggestion($suggestion);
+            $vote->setFilm($film);
             $vote->setVotedAt(new DateTimeImmutable());
             $this->em->persist($vote);
         }
@@ -93,7 +88,7 @@ readonly class PollService
         $poll->setStatus(PollStatus::Closed);
         $poll->setClosedAt(new DateTimeImmutable());
 
-        $voteCounts = $this->voteRepo->countVotesPerSuggestion($poll->getId());
+        $voteCounts = $this->voteRepo->countVotesPerFilm($poll->getId());
 
         if ($voteCounts === []) {
             $this->em->persist($poll);
@@ -103,60 +98,51 @@ readonly class PollService
         }
 
         $maxVotes = max($voteCounts);
-        $leadingIds = array_keys(array_filter($voteCounts, static fn($c) => $c === $maxVotes));
+        $leadingFilmIds = array_keys(array_filter($voteCounts, static fn($c) => $c === $maxVotes));
 
-        $suggestions = $poll->getSuggestions();
-        $leadingSuggestions = array_values(array_filter(
-            $suggestions->toArray(),
-            static fn(FilmSuggestion $s) => in_array($s->getId(), $leadingIds, true),
+        $films = $poll->getFilms();
+        $leadingFilms = array_values(array_filter(
+            $films->toArray(),
+            static fn(Film $f) => in_array($f->getId(), $leadingFilmIds, true),
         ));
 
-        if (count($leadingSuggestions) === 1) {
-            $winner = $leadingSuggestions[0];
-            $poll->setWinningSuggestion($winner);
-            $poll->setTiedSuggestions(null);
+        if (count($leadingFilms) === 1) {
+            $winner = $leadingFilms[0];
+            $poll->setWinningFilm($winner);
+            $poll->setTiedFilmIds(null);
             $this->em->persist($poll);
             $this->em->flush();
 
             return new PollClosure($winner, []);
         }
 
-        $poll->setWinningSuggestion(null);
-        $poll->setTiedSuggestions(array_map(static fn($s) => $s->getId(), $leadingSuggestions));
+        $poll->setWinningFilm(null);
+        $poll->setTiedFilmIds(array_map(static fn(Film $f) => $f->getId(), $leadingFilms));
         $this->em->persist($poll);
         $this->em->flush();
 
-        return new PollClosure(null, $leadingSuggestions);
+        return new PollClosure(null, $leadingFilms);
     }
 
     /**
      * Commits the outcome after a tie-break or clean single-winner close.
-     * Writes FilmSelection, sets poll winningSuggestion, increments wishlist counters for losers.
-     * This is the single point of counter mutation.
+     * Writes FilmSelection, sets poll winningFilm, calls group-wide wishlist outcome.
      */
-    public function commitOutcome(FilmPoll $poll, FilmSuggestion $chosen): void
+    public function commitOutcome(FilmPoll $poll, Film $chosen): void
     {
-        $film = $chosen->getFilm();
-        if ($film === null) {
-            throw new RuntimeException('filmclub_poll.flash_missing_film');
-        }
-
         $selection = new FilmSelection();
-        $selection->setFilm($film);
+        $selection->setFilm($chosen);
         $selection->setEventId($poll->getEventId());
         $selection->setSelectedBy($poll->getCreatedBy());
         $selection->setSelectedAt(new DateTimeImmutable());
 
-        $chosen->setStatus(SuggestionStatus::Selected);
-
-        $poll->setWinningSuggestion($chosen);
+        $poll->setWinningFilm($chosen);
 
         $this->em->persist($selection);
-        $this->em->persist($chosen);
         $this->em->persist($poll);
         $this->em->flush();
 
-        $this->wishlistService->incrementForLosers($poll, $film);
+        $this->wishlistService->onPollOutcome($chosen);
     }
 
     /** @return FilmPoll[] */
@@ -178,13 +164,7 @@ readonly class PollService
 
     public function getVoteCounts(FilmPoll $poll): array
     {
-        return $this->voteRepo->countVotesPerSuggestion($poll->getId());
-    }
-
-    /** @return FilmSuggestion[] */
-    public function getPendingSuggestionsForPoll(): array
-    {
-        return $this->suggestionRepo->findAllPending($this->groupFilter->getAllowedSuggestionIds());
+        return $this->voteRepo->countVotesPerFilm($poll->getId());
     }
 
     public function hasUserVoted(FilmPoll $poll, int $userId): bool

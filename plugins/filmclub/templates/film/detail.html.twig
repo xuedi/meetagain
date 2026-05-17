@@ -76,13 +76,6 @@
             </form>
             {% endif %}
 
-            <form method="POST" action="{{ path('app_plugin_filmclub_suggest', {filmId: film.id}) }}" style="display: inline">
-                <button type="submit" class="button is-small">
-                    <span class="icon"><i class="fa fa-thumbs-up"></i></span>
-                    <span>{{ 'filmclub_suggestion.button_suggest'|trans }}</span>
-                </button>
-            </form>
-
             <a href="{{ path('app_plugin_filmclub_note_edit', {filmId: film.id}) }}" class="button is-small">
                 <span class="icon"><i class="fa fa-sticky-note"></i></span>
                 <span>{{ userNote ? 'filmclub_note.link_edit_note'|trans : 'filmclub_note.link_add_note'|trans }}</span>

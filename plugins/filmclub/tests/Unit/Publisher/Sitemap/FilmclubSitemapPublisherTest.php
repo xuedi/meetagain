@@ -83,7 +83,7 @@ class FilmclubSitemapPublisherTest extends TestCase
     private function makePublisher(array $locales, array $films, bool $pluginActive = true): FilmclubSitemapPublisher
     {
         $filmService = $this->createStub(FilmService::class);
-        $filmService->method('getApprovedList')->willReturn($films);
+        $filmService->method('getList')->willReturn($films);
 
         $selectionService = $this->createStub(SelectionService::class);
         $selectionService->method('getSelectionsForFilm')->willReturn([]);

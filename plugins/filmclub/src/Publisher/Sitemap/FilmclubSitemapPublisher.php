@@ -12,8 +12,8 @@ use Plugin\Filmclub\Service\SelectionService;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Adds the public film list and a detail entry per approved film to the sitemap.
- * Routes through FilmService::getApprovedList() so the filter chain restricts
+ * Adds the public film list and a detail entry per film to the sitemap.
+ * Routes through FilmService::getList() so the filter chain restricts
  * the result set when a FilmGroupFilterInterface implementation narrows visibility.
  */
 final readonly class FilmclubSitemapPublisher implements SitemapPublisherInterface
@@ -87,7 +87,7 @@ final readonly class FilmclubSitemapPublisher implements SitemapPublisherInterfa
      */
     private function collectFilms(array $locales): array
     {
-        $films = $this->filmService->getApprovedList();
+        $films = $this->filmService->getList();
         if ($films === []) {
             return [];
         }

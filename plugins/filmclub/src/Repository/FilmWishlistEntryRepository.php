@@ -119,4 +119,41 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function incrementAllExceptWinner(int $winnerFilmId, ?array $allowedIds = null): void
+    {
+        if ($allowedIds === []) {
+            return;
+        }
+
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->update(FilmWishlistEntry::class, 'w')
+            ->set('w.priorityCounter', 'w.priorityCounter + 1')
+            ->where('w.film != :winnerFilmId')
+            ->setParameter('winnerFilmId', $winnerFilmId);
+
+        if ($allowedIds !== null) {
+            $qb->andWhere('w.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        $qb->getQuery()->execute();
+    }
+
+    public function deleteByFilmInGroup(int $filmId, ?array $allowedIds = null): void
+    {
+        if ($allowedIds === []) {
+            return;
+        }
+
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->delete(FilmWishlistEntry::class, 'w')
+            ->where('w.film = :filmId')
+            ->setParameter('filmId', $filmId);
+
+        if ($allowedIds !== null) {
+            $qb->andWhere('w.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        $qb->getQuery()->execute();
+    }
 }

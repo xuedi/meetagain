@@ -38,7 +38,7 @@ final class NoteController extends AbstractController
     public function edit(int $filmId, Request $request): Response
     {
         $film = $this->filmService->get($filmId);
-        if ($film === null || !$film->isApproved()) {
+        if ($film === null) {
             throw $this->createNotFoundException('Film not found');
         }
 

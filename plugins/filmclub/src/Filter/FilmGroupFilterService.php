@@ -23,12 +23,6 @@ readonly class FilmGroupFilterService
     }
 
     /** @return int[]|null */
-    public function getAllowedSuggestionIds(): ?array
-    {
-        return $this->intersect(static fn(FilmGroupFilterInterface $f) => $f->getAllowedSuggestionIds());
-    }
-
-    /** @return int[]|null */
     public function getAllowedEventIds(): ?array
     {
         return $this->intersect(static fn(FilmGroupFilterInterface $f) => $f->getAllowedEventIds());

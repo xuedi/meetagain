@@ -72,7 +72,7 @@ class FilmPollRepository extends ServiceEntityRepository
         }
 
         $qb = $this->createQueryBuilder('p')
-            ->where('p.eventId = :eventId AND p.status = :status')
+            ->where('p.event = :eventId AND p.status = :status')
             ->setParameter('eventId', $eventId)
             ->setParameter('status', PollStatus::Active)
             ->setMaxResults(1);

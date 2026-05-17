@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Filmclub\Repository\FilmPollVoteRepository;
 
 #[ORM\Entity(repositoryClass: FilmPollVoteRepository::class)]
-#[ORM\UniqueConstraint(name: 'unique_poll_user_suggestion', columns: ['poll_id', 'user_id', 'suggestion_id'])]
+#[ORM\UniqueConstraint(name: 'unique_poll_user_film', columns: ['poll_id', 'user_id', 'film_id'])]
 class FilmPollVote
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
@@ -21,8 +21,8 @@ class FilmPollVote
     private ?int $userId = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?FilmSuggestion $suggestion = null;
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Film $film = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $votedAt = null;
@@ -56,14 +56,14 @@ class FilmPollVote
         return $this;
     }
 
-    public function getSuggestion(): ?FilmSuggestion
+    public function getFilm(): ?Film
     {
-        return $this->suggestion;
+        return $this->film;
     }
 
-    public function setSuggestion(FilmSuggestion $suggestion): static
+    public function setFilm(Film $film): static
     {
-        $this->suggestion = $suggestion;
+        $this->film = $film;
 
         return $this;
     }
