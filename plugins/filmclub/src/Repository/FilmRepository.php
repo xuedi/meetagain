@@ -34,7 +34,7 @@ class FilmRepository extends ServiceEntityRepository
         }
     }
 
-    /** @return Film[] */
+    /** @return list<Film> */
     public function findAll(?array $allowedIds = null): array
     {
         if ($allowedIds === []) {
