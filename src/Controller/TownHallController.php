@@ -42,21 +42,26 @@ final class TownHallController extends AbstractController
         ]);
     }
 
-    #[Route('/townhall/wall', name: 'app_townhall_wall', methods: ['GET'])]
+    #[Route('/townhall/wall/{postId}', name: 'app_townhall_wall_topic', methods: ['GET'], requirements: ['postId' => '\d+'])]
     #[IsGranted('ROLE_USER')]
-    public function wall(Request $request): Response
+    public function topic(int $postId): Response
     {
         $this->guardEnabled();
 
-        $page = max(1, $request->query->getInt('page', 1));
-        $perPage = 20;
+        $post = $this->wallPostRepo->find($postId);
+        if ($post === null) {
+            throw $this->createNotFoundException();
+        }
 
-        return $this->render('town_hall/wall.html.twig', [
-            'wallPosts' => $this->townHallService->getPaginatedWallPosts($page, $perPage),
-            'page' => $page,
-            'perPage' => $perPage,
-            'total' => $this->townHallService->countWallPosts(),
-            'maxContentLength' => WallPost::MAX_CONTENT_LENGTH,
+        $upcoming = $this->townHallService->getUpcomingEvents();
+
+        return $this->render('town_hall/wall_topic.html.twig', [
+            'post' => $post,
+            'upcomingEvents' => $upcoming,
+            'pastEvents' => $this->townHallService->getRecentPastEvents(),
+            'comments' => $this->townHallService->getLatestEventComments(),
+            'images' => $this->townHallService->getLatestEventImages(),
+            'stats' => $this->townHallService->getStats(),
         ]);
     }
 
@@ -112,7 +117,10 @@ final class TownHallController extends AbstractController
             $this->addFlash('success', 'town_hall.flash.wall_reply_created');
         }
 
-        return $this->redirectToRoute('app_townhall_wall', ['_locale' => $request->getLocale()]);
+        return $this->redirectToRoute('app_townhall_wall_topic', [
+            '_locale' => $request->getLocale(),
+            'postId' => $postId,
+        ]);
     }
 
     #[Route('/townhall/wall/{postId}/delete', name: 'app_townhall_wall_delete', methods: ['POST'])]
