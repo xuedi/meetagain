@@ -85,7 +85,7 @@ class BookPollRepository extends ServiceEntityRepository
 
     /**
      * @param int[]|null $allowedEventIds null = no restriction
-     * @return BookPoll[]
+     * @return list<BookPoll>
      */
     public function findAll(?array $allowedEventIds = null): array
     {
