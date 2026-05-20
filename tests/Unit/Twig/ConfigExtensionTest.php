@@ -25,14 +25,25 @@ class ConfigExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(5, $functions);
+        static::assertCount(6, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('is_show_frontpage', $functionNames);
+        static::assertContains('is_show_town_hall', $functionNames);
         static::assertContains('get_date_format', $functionNames);
         static::assertContains('get_date_format_flatpickr', $functionNames);
         static::assertContains('get_footer_column_title', $functionNames);
         static::assertContains('site_logo_url', $functionNames);
+    }
+
+    public function testIsShowTownHallDelegatesToConfigService(): void
+    {
+        $this->configServiceStub->method('isShowTownHall')->willReturn(true);
+
+        $functions = $this->subject->getFunctions();
+        $fn = $this->findFunction($functions, 'is_show_town_hall');
+
+        static::assertTrue($fn->getCallable()());
     }
 
     public function testIsShowFrontpageDelegatesToConfigService(): void
