@@ -521,6 +521,8 @@ email_event_update:
 town_hall:
     page_title: 'Town Hall'
     wall_page_title: 'Message Topics'
+    topic_page_title: 'Topic'
+    back_to_topics: 'Back to topics'
     gallery_page_title: 'Photo Gallery'
     back_to_hub: 'Back to Town Hall'
     tile_wall_heading: 'Message Topics'

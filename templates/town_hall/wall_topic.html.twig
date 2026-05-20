@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'town_hall.topic_page_title'|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <p class="block">
+            <a href="{{ path('app_townhall', { _locale: app.request.locale }) }}">
+                &laquo; {{ 'town_hall.back_to_hub'|trans }}
+            </a>
+        </p>
+
+        <div class="columns">
+            <div class="column is-8">
+                <article class="box">
+                    <header>
+                        <p class="mb-2">
+                            <strong>{{ post.author ? post.author.name : 'town_hall.deleted_user'|trans }}</strong>
+                            <small class="has-text-grey ml-2">{{ post.createdAt|date(get_date_format()) }}</small>
+                        </p>
+                    </header>
+                    <div class="content">
+                        {{ post.content|nl2br }}
+                    </div>
+
+                    {% if post.author and app.user and post.author.id == app.user.id %}
+                        <form method="post" action="{{ path('app_townhall_wall_delete', { _locale: app.request.locale, postId: post.id }) }}" style="display:inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('town_hall_wall_delete_' ~ post.id) }}">
+                            <button class="button is-small is-light is-danger" type="submit">{{ 'town_hall.wall_delete'|trans }}</button>
+                        </form>
+                    {% endif %}
+                </article>
+
+                <h2 class="title is-5">
+                    {{ 'town_hall.wall_replies_count'|trans({'%count%': post.replies|length}) }}
+                </h2>
+
+                {% for reply in post.replies %}
+                    <article class="box ml-5">
+                        <p class="mb-2">
+                            <strong>{{ reply.author ? reply.author.name : 'town_hall.deleted_user'|trans }}</strong>
+                            <small class="has-text-grey ml-2">{{ reply.createdAt|date(get_date_format()) }}</small>
+                        </p>
+                        <div class="content">
+                            {{ reply.content|nl2br }}
+                        </div>
+                    </article>
+                {% else %}
+                    <p class="has-text-grey ml-5 mb-4">{{ 'town_hall.wall_no_replies'|trans }}</p>
+                {% endfor %}
+
+                <hr>
+
+                <div class="box">
+                    <h2 class="title is-5">{{ 'town_hall.wall_reply_submit'|trans }}</h2>
+                    <form method="post" action="{{ path('app_townhall_wall_reply', { _locale: app.request.locale, postId: post.id }) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('town_hall_wall_reply_' ~ post.id) }}">
+                        <div class="field">
+                            <div class="control">
+                                <textarea class="textarea" name="content" rows="3" maxlength="1000"
+                                          placeholder="{{ 'town_hall.wall_reply_placeholder'|trans }}" required></textarea>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <button type="submit" class="button is-link">{{ 'town_hall.wall_reply_submit'|trans }}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="column is-4">
+                {% include 'town_hall/_tile_stats.html.twig' with { stats: stats } %}
+                {% if upcomingEvents|length > 0 %}
+                    {% include 'town_hall/_tile_upcoming.html.twig' with { events: upcomingEvents } %}
+                {% endif %}
+                {% include 'town_hall/_tile_past.html.twig' with { events: pastEvents } %}
+                {% include 'town_hall/_tile_comments.html.twig' with { comments: comments } %}
+                {% include 'town_hall/_tile_images.html.twig' with { images: images } %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
