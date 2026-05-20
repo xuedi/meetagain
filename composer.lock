@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d5c4c14d91d412cdd486886d8c7608e1",
+    "content-hash": "2629b3eb4ed640f1776970f8c085bbec",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -8928,16 +8928,16 @@
         },
         {
             "name": "symfonycasts/sass-bundle",
-            "version": "v0.9.0",
+            "version": "v0.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SymfonyCasts/sass-bundle.git",
-                "reference": "3472f2018417b4f7258095089b327a7ba79018ad"
+                "reference": "eedf6ace11e5323344726d2b6e0ba1635cf12bb5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SymfonyCasts/sass-bundle/zipball/3472f2018417b4f7258095089b327a7ba79018ad",
-                "reference": "3472f2018417b4f7258095089b327a7ba79018ad",
+                "url": "https://api.github.com/repos/SymfonyCasts/sass-bundle/zipball/eedf6ace11e5323344726d2b6e0ba1635cf12bb5",
+                "reference": "eedf6ace11e5323344726d2b6e0ba1635cf12bb5",
                 "shasum": ""
             },
             "require": {
@@ -8945,6 +8945,7 @@
                 "symfony/asset-mapper": "^6.3|^7.0|^8.0",
                 "symfony/console": "^5.4|^6.3|^7.0|^8.0",
                 "symfony/filesystem": "^5.4|^6.3|^7.0|^8.0",
+                "symfony/finder": "^5.4|^6.3|^7.0|^8.0",
                 "symfony/http-client": "^5.4|^6.3|^7.0|^8.0",
                 "symfony/process": "^5.4|^6.3|^7.0|^8.0"
             },
@@ -8977,9 +8978,9 @@
             ],
             "support": {
                 "issues": "https://github.com/SymfonyCasts/sass-bundle/issues",
-                "source": "https://github.com/SymfonyCasts/sass-bundle/tree/v0.9.0"
+                "source": "https://github.com/SymfonyCasts/sass-bundle/tree/v0.10.0"
             },
-            "time": "2025-11-29T13:44:16+00:00"
+            "time": "2026-04-09T11:29:28+00:00"
         },
         {
             "name": "symfonycasts/verify-email-bundle",
