@@ -3,9 +3,11 @@
 namespace App\CorePlugins\Navigation;
 
 use App\Entity\Link;
+use App\Entity\User;
 use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\Service\TownHall\TownHallAccessService;
 use App\ValueObject\LinkCollection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,6 +20,7 @@ readonly class NavigationPlugin implements Plugin
         private RouterInterface $router,
         private RequestStack $requestStack,
         private Security $security,
+        private TownHallAccessService $townHallAccess,
     ) {}
 
     public function getPluginKey(): string
@@ -40,6 +43,15 @@ readonly class NavigationPlugin implements Plugin
 
         if ($this->security->isGranted('ROLE_ORGANIZER')) {
             $links[] = new Link(slug: $this->router->generate('app_admin'), name: 'chrome.menu_admin', priority: 300);
+        }
+
+        $user = $this->security->getUser();
+        if ($user instanceof User && $this->townHallAccess->canAccess($user)) {
+            $links[] = new Link(
+                slug: $this->router->generate('app_townhall', ['_locale' => $locale]),
+                name: 'chrome.menu_town_hall',
+                priority: 150,
+            );
         }
 
         return LinkCollection::empty()->withNavLinks($links);

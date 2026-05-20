@@ -1,0 +1,78 @@
+<div class="box">
+    <h2 class="title is-5">
+        {{ 'town_hall.tile_wall_heading'|trans }}
+        <a class="is-pulled-right is-size-7" href="{{ path('app_townhall_wall', { _locale: app.request.locale }) }}">
+            {{ 'town_hall.tile_wall_link_full'|trans }}
+        </a>
+    </h2>
+
+    {% if wallPosts is empty %}
+        <p class="has-text-grey mb-4">{{ 'town_hall.wall_empty_state'|trans }}</p>
+    {% else %}
+        {% for post in wallPosts|reverse %}
+            <article class="card mb-4">
+                <header class="card-header">
+                    <div class="card-header-title is-block">
+                        <p class="mb-0">
+                            <strong>{{ post.author ? post.author.name : 'town_hall.deleted_user'|trans }}</strong>
+                            <small class="has-text-grey ml-2">{{ post.createdAt|date(get_date_format()) }}</small>
+                        </p>
+                    </div>
+                </header>
+                <div class="card-content py-3">
+                    <div class="content">
+                        {{ post.content|nl2br }}
+                    </div>
+
+                    {% if post.replies|length > 0 %}
+                        <div class="ml-5 pl-3" style="border-left: 2px solid #eee;">
+                            {% for reply in post.replies %}
+                                <article class="media is-small">
+                                    <div class="media-content">
+                                        <p class="mb-1">
+                                            <strong class="is-size-7">{{ reply.author ? reply.author.name : 'town_hall.deleted_user'|trans }}</strong>
+                                            <small class="has-text-grey">{{ reply.createdAt|date(get_date_format()) }}</small>
+                                        </p>
+                                        <p class="is-size-7">{{ reply.content|nl2br }}</p>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <footer class="card-footer">
+                    <form method="post" action="{{ path('app_townhall_wall_reply', { _locale: app.request.locale, postId: post.id }) }}" class="card-footer-item">
+                        <input type="hidden" name="_token" value="{{ csrf_token('town_hall_wall_reply_' ~ post.id) }}">
+                        <div class="field has-addons is-flex-grow-1 mb-0">
+                            <div class="control is-expanded">
+                                <input class="input is-small" type="text" name="content" maxlength="1000"
+                                       placeholder="{{ 'town_hall.wall_reply_placeholder'|trans }}" required>
+                            </div>
+                            <div class="control">
+                                <button class="button is-link is-small" type="submit">{{ 'town_hall.wall_reply_submit'|trans }}</button>
+                            </div>
+                        </div>
+                    </form>
+                </footer>
+            </article>
+        {% endfor %}
+    {% endif %}
+
+    <hr>
+    <form method="post" action="{{ path('app_townhall_wall_post', { _locale: app.request.locale }) }}" class="mt-4">
+        <input type="hidden" name="_token" value="{{ csrf_token('town_hall_wall_post') }}">
+        <div class="field">
+            <div class="control">
+                <textarea class="textarea" name="content" rows="2" maxlength="{{ maxContentLength }}"
+                          placeholder="{{ 'town_hall.wall_post_placeholder'|trans }}" required></textarea>
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <button type="submit" class="button is-link is-small">
+                    {{ 'town_hall.wall_post_submit'|trans }}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

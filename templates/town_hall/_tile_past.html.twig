@@ -1,0 +1,17 @@
+<div class="box">
+    <h2 class="title is-5">{{ 'town_hall.tile_past_heading'|trans }}</h2>
+    {% if events is empty %}
+        <p class="has-text-grey">{{ 'town_hall.empty_state'|trans }}</p>
+    {% else %}
+        <ul>
+            {% for event in events %}
+                <li>
+                    <a href="{{ path('app_event_details', { _locale: app.request.locale, id: event.id }) }}">
+                        {{ event.title(app.locale) }}
+                    </a>
+                    <small class="has-text-grey">{{ event.start|date(get_date_format()) }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

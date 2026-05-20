@@ -29,4 +29,6 @@ enum EntityAction: string
     case CreateFilm = 'create_film';
     case UpdateFilm = 'update_film';
     case DeleteFilm = 'delete_film';
+    case CreateWallPost = 'create_wall_post';
+    case DeleteWallPost = 'delete_wall_post';
 }
