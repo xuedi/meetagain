@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'town_hall.page_title'|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-3">{{ 'town_hall.page_title'|trans }}</h1>
+
+        <div class="columns">
+            <div class="column is-8">
+                {% include 'town_hall/_tile_wall.html.twig' with { wallPosts: wallPosts, maxContentLength: maxContentLength } %}
+            </div>
+
+            <div class="column is-4">
+                {% include 'town_hall/_tile_stats.html.twig' with { stats: stats } %}
+                {% if upcomingEvents|length > 0 %}
+                    {% include 'town_hall/_tile_upcoming.html.twig' with { events: upcomingEvents } %}
+                {% endif %}
+                {% include 'town_hall/_tile_past.html.twig' with { events: pastEvents } %}
+                {% include 'town_hall/_tile_comments.html.twig' with { comments: comments } %}
+                {% include 'town_hall/_tile_images.html.twig' with { images: images } %}
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column is-12">
+                {% include 'town_hall/_tile_members.html.twig' with { members: newMembers } %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

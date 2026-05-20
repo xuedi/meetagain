@@ -363,6 +363,35 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * @param array<int>|null $restrictToUserIds
+     * @return array<User>
+     */
+    public function findActiveCreatedSince(
+        DateTimeImmutable $since,
+        int $limit,
+        ?array $restrictToUserIds = null,
+    ): array {
+        if ($restrictToUserIds === []) {
+            return [];
+        }
+
+        $qb = $this
+            ->createQueryBuilder('u')
+            ->where('u.createdAt >= :since')
+            ->andWhere('u.status = :status')
+            ->setParameter('since', $since)
+            ->setParameter('status', UserStatus::Active)
+            ->orderBy('u.createdAt', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($restrictToUserIds !== null) {
+            $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Count users stuck in EmailVerified status (verified but not approved).
      */
     public function getUnverifiedCount(): int

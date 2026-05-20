@@ -151,6 +151,7 @@ admin_system_config:
     heading_on_off_settings: 'On/Off settings'
     flash_saved: 'Settings saved'
     option_show_frontpage: 'Show language frontpage'
+    option_show_town_hall: 'Show Town Hall'
     option_automatic_registration: 'Automatic registration'
     option_send_rsvp_notifications: 'Send RSVP notifications'
     option_send_event_reminders: 'Event reminder emails'

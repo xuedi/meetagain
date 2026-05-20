@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'town_hall.gallery_page_title'|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <h1 class="title is-3">{{ 'town_hall.gallery_page_title'|trans }}</h1>
+        <p class="block">
+            <a href="{{ path('app_townhall', { _locale: app.request.locale }) }}">
+                &laquo; {{ 'town_hall.back_to_hub'|trans }}
+            </a>
+        </p>
+
+        {% if images is empty %}
+            <p class="has-text-grey">{{ 'town_hall.gallery_empty_state'|trans }}</p>
+        {% else %}
+            <div class="columns is-multiline is-mobile">
+                {% for image in images %}
+                    <div class="column is-half-mobile is-one-third-tablet is-one-quarter-desktop">
+                        <div class="card">
+                            <div class="card-image">
+                                <a href="{{ path('app_event_details', { _locale: app.request.locale, id: image.event.id }) }}">
+                                    <figure class="image is-4by3">
+                                        <img src="/images/thumbnails/{{ image.hash }}_350x263.webp" alt="{{ image.event.title(app.locale) }}">
+                                    </figure>
+                                </a>
+                            </div>
+                            <div class="card-content py-2 px-3">
+                                <p class="is-size-7">
+                                    <a href="{{ path('app_event_details', { _locale: app.request.locale, id: image.event.id }) }}">
+                                        {{ image.event.title(app.locale) }}
+                                    </a>
+                                </p>
+                                <p class="is-size-7 has-text-grey">
+                                    {{ image.createdAt|date(get_date_format()) }}
+                                    &middot;
+                                    <a href="{{ path('app_report_image', { id: image.id }) }}">
+                                        {{ 'town_hall.gallery_report'|trans }}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
