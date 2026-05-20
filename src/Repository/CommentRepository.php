@@ -33,4 +33,29 @@ class CommentRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @param array<int>|null $restrictToEventIds null = no restriction
+     * @return array<Comment>
+     */
+    public function findRecentAcrossEvents(int $limit, ?array $restrictToEventIds = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->leftJoin('c.user', 'u')
+            ->addSelect('u')
+            ->leftJoin('c.event', 'e')
+            ->addSelect('e')
+            ->orderBy('c.created_at', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return [];
+            }
+            $qb->andWhere('c.event IN (:eventIds)')
+                ->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

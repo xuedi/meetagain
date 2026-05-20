@@ -114,6 +114,58 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<int>|null $restrictToEventIds null = no restriction
+     * @return array<Image>
+     */
+    public function findRecentEventUploads(int $limit, ?array $restrictToEventIds = null): array
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->leftJoin('i.event', 'e')
+            ->addSelect('e')
+            ->where('i.type = :type')
+            ->andWhere('i.event IS NOT NULL')
+            ->setParameter('type', ImageType::EventUpload)
+            ->orderBy('i.createdAt', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return [];
+            }
+            $qb->andWhere('i.event IN (:eventIds)')
+                ->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds null = no restriction
+     * @return array<Image>
+     */
+    public function findAllEventUploadsChronological(?array $restrictToEventIds = null, int $limit = 500): array
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->leftJoin('i.event', 'e')
+            ->addSelect('e')
+            ->where('i.type = :type')
+            ->andWhere('i.event IS NOT NULL')
+            ->setParameter('type', ImageType::EventUpload)
+            ->orderBy('i.createdAt', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($restrictToEventIds !== null) {
+            if ($restrictToEventIds === []) {
+                return [];
+            }
+            $qb->andWhere('i.event IN (:eventIds)')
+                ->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @return Image[]
      */
     public function findFiltered(?ImageType $type, ?DateTimeImmutable $since): array

@@ -51,6 +51,11 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 ConfigType::Boolean,
             ],
             [
+                'show_town_hall',
+                'false',
+                ConfigType::Boolean,
+            ],
+            [
                 'send_rsvp_notifications',
                 'true',
                 ConfigType::Boolean,

@@ -207,6 +207,11 @@ readonly class ConfigService
         return $this->getBoolean('show_frontpage', true);
     }
 
+    public function isShowTownHall(): bool
+    {
+        return $this->getBoolean('show_town_hall', false);
+    }
+
     public function isAutomaticRegistration(): bool
     {
         return $this->getBoolean('automatic_registration', false);
