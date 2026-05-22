@@ -10,6 +10,7 @@ installed.lock
 /public/bundles/
 /tests/reports/clover.xml
 /tests/reports/junit.xml
+/tests/reports/query-profile.json
 /tests/reports/performance/*
 /tests/reports/load/*
 !/tests/reports/load/.gitkeep
