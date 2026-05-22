@@ -82,5 +82,4 @@ interface Plugin
      * @return list<string>
      */
     public function getJavascripts(): array;
-
 }

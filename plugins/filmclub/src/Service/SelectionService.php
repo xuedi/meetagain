@@ -53,9 +53,7 @@ readonly class SelectionService
     /** @return FilmSelection[] */
     public function getHistory(): array
     {
-        return $this->selectionRepo->findHistoryFilteredByEvents(
-            $this->groupFilter->getAllowedEventIds(),
-        );
+        return $this->selectionRepo->findHistoryFilteredByEvents($this->groupFilter->getAllowedEventIds());
     }
 
     public function chooseDirectly(Event $event, Film $film, int $userId): FilmSelection

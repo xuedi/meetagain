@@ -26,10 +26,10 @@ use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use DateTime;
-use Psr\Log\LoggerInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -80,7 +80,9 @@ final class EmailTypeBlocklistTest extends TestCase
         );
 
         static::assertFalse($email->guardCheck([
-            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings(['announcements' => true])),
+            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings([
+                'announcements' => true,
+            ])),
             'renderedContent' => ['title' => 't', 'content' => 'c'],
             'announcementUrl' => 'https://example.com/a/1',
         ]));
@@ -97,7 +99,9 @@ final class EmailTypeBlocklistTest extends TestCase
         );
 
         static::assertFalse($email->guardCheck([
-            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings(['eventReminder' => true])),
+            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings([
+                'eventReminder' => true,
+            ])),
             'event' => $this->createStub(Event::class),
         ]));
     }
@@ -113,7 +117,9 @@ final class EmailTypeBlocklistTest extends TestCase
         );
 
         static::assertFalse($email->guardCheck([
-            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings(['attendedEventUpdate' => true])),
+            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings([
+                'attendedEventUpdate' => true,
+            ])),
             'event' => $this->createStub(Event::class),
         ]));
     }
@@ -174,7 +180,9 @@ final class EmailTypeBlocklistTest extends TestCase
         );
 
         static::assertFalse($email->guardCheck([
-            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings(['followingUpdates' => true])),
+            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings([
+                'followingUpdates' => true,
+            ])),
             'event' => $this->createStub(Event::class),
             'attendeeMap' => [],
         ]));
@@ -208,7 +216,9 @@ final class EmailTypeBlocklistTest extends TestCase
         );
 
         static::assertFalse($email->guardCheck([
-            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings(['upcomingEvents' => true])),
+            'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings([
+                'upcomingEvents' => true,
+            ])),
             'weekStart' => new DateTimeImmutable('2026-01-01'),
             'weekEnd' => new DateTimeImmutable('2026-01-08'),
         ]));
@@ -248,7 +258,9 @@ final class EmailTypeBlocklistTest extends TestCase
         $user->method('getEmail')->willReturn($email);
         $user->method('isNotification')->willReturn(true);
         $user->method('getLastLogin')->willReturn(new DateTime('-24 hours'));
-        $user->method('getNotificationSettings')->willReturn($settings ?? new NotificationSettings(['receivedMessage' => true]));
+        $user->method('getNotificationSettings')->willReturn(
+            $settings ?? new NotificationSettings(['receivedMessage' => true]),
+        );
 
         return $user;
     }

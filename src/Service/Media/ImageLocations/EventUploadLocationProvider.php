@@ -22,9 +22,9 @@ final class EventUploadLocationProvider extends AbstractImageLocationProvider
             'SELECT id AS image_id, event_id AS location_id FROM image WHERE event_id IS NOT NULL',
         );
 
-        return array_map(
-            static fn(array $r) => ['imageId' => (int) $r['image_id'], 'locationId' => (int) $r['location_id']],
-            $rows,
-        );
+        return array_map(static fn(array $r) => [
+            'imageId' => (int) $r['image_id'],
+            'locationId' => (int) $r['location_id'],
+        ], $rows);
     }
 }

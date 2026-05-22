@@ -2,10 +2,10 @@
 
 namespace App\Entity\BlockType;
 
+use App\Entity\Image as ImageEntity;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\CmsBlock\FieldType;
 use App\Enum\CmsBlock\ImageSupport;
-use App\Entity\Image as ImageEntity;
 use Override;
 
 class Text implements BlockType

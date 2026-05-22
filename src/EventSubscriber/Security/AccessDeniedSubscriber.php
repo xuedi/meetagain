@@ -44,13 +44,9 @@ readonly class AccessDeniedSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->securityService->event(
-            SecurityEventType::AccessDenied,
-            $event->getRequest(),
-            [
-                'reason' => AccessDeniedProvider::resolveReason($exception, $isHttpAccessDenied),
-                'isHttpAccessDenied' => $isHttpAccessDenied,
-            ],
-        );
+        $this->securityService->event(SecurityEventType::AccessDenied, $event->getRequest(), [
+            'reason' => AccessDeniedProvider::resolveReason($exception, $isHttpAccessDenied),
+            'isHttpAccessDenied' => $isHttpAccessDenied,
+        ]);
     }
 }

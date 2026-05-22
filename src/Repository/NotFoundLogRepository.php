@@ -63,10 +63,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('n')
-            ->orderBy('n.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->where('n.createdAt >= :since')->setParameter('since', $since);
@@ -77,11 +74,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function countAll(): int
     {
-        return (int) $this
-            ->createQueryBuilder('n')
-            ->select('COUNT(n.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return (int) $this->createQueryBuilder('n')->select('COUNT(n.id)')->getQuery()->getSingleScalarResult();
     }
 
     public function countSince(DateTimeImmutable $since): int
@@ -182,10 +175,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
         ?DateTimeImmutable $from = null,
         ?DateTimeImmutable $to = null,
     ): array {
-        $qb = $this
-            ->createQueryBuilder('n')
-            ->orderBy('n.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('n.createdAt >= :since')->setParameter('since', $since);

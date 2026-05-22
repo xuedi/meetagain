@@ -16,9 +16,11 @@ includes = ["vendor"]
 excludes = []
 
 [formatter]
-print-width = 120
+print-width = 160
 tab-width = 4
 use-tabs = false
+opening-tag-on-own-line = false
+empty-line-after-opening-tag = false
 
 [linter]
 integrations = ["symfony", "php-unit"]

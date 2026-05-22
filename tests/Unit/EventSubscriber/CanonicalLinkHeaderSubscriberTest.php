@@ -87,11 +87,6 @@ class CanonicalLinkHeaderSubscriberTest extends TestCase
 
     private function createEvent(Response $response, int $type = HttpKernelInterface::MAIN_REQUEST): ResponseEvent
     {
-        return new ResponseEvent(
-            $this->createStub(HttpKernelInterface::class),
-            Request::create('/'),
-            $type,
-            $response,
-        );
+        return new ResponseEvent($this->createStub(HttpKernelInterface::class), Request::create('/'), $type, $response);
     }
 }

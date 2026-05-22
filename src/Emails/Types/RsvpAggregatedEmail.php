@@ -144,10 +144,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
                 continue;
             }
             $potentialRecipients = array_column($attendeeMap, 'recipient');
-            $contexts[] = new DueContext(
-                ['event' => $event, 'attendeeMap' => $attendeeMap],
-                $potentialRecipients,
-            );
+            $contexts[] = new DueContext(['event' => $event, 'attendeeMap' => $attendeeMap], $potentialRecipients);
         }
 
         return $contexts;
@@ -186,11 +183,15 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
                 }
             }
 
-            $expectedTime = max($from, DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT48H')));
+            $expectedTime = max(
+                $from,
+                DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT48H')),
+            );
 
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::NotificationRsvpAggregated->value,
-                label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
+                label: 'Event: '
+                . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
                 expectedTime: $expectedTime,
                 expectedRecipients: $eligibleCount,
             );

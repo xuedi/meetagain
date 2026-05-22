@@ -46,5 +46,4 @@ abstract readonly class EmailAbstract implements EmailInterface
 
         return true;
     }
-
 }

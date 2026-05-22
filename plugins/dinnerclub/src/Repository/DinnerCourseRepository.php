@@ -19,13 +19,14 @@ class DinnerCourseRepository extends ServiceEntityRepository
 
     public function getNextSortOrder(Dinner $dinner): int
     {
-        $result = $this->createQueryBuilder('c')
+        $result = $this
+            ->createQueryBuilder('c')
             ->select('MAX(c.sortOrder)')
             ->where('c.dinner = :dinner')
             ->setParameter('dinner', $dinner)
             ->getQuery()
             ->getSingleScalarResult();
 
-        return ((int) ($result ?? -1)) + 1;
+        return (int) ($result ?? -1) + 1;
     }
 }

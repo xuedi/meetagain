@@ -20,6 +20,7 @@
                                 {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'notification'}),
                                     'status': user.isNotification,
+                                    'csrfTokenId': 'app_profile_config_togglenotification',
                                     'noAjax': true
                                 } %}
                             </div>
@@ -32,6 +33,7 @@
                                         {% include '_components/toggle.html.twig' with {
                                             'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
                                             'status': notification.value,
+                                            'csrfTokenId': 'app_profile_config_toggle_notification' ~ notification.key,
                                         } %}
                                     </div>
                                 </div>
@@ -46,7 +48,8 @@
                             <div class="control">
                                 {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'public'}),
-                                    'status': user.isPublic
+                                    'status': user.isPublic,
+                                    'csrfTokenId': 'app_profile_config_togglepublic',
                                 } %}
                             </div>
                         </div>
@@ -55,7 +58,8 @@
                             <div class="control">
                                 {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'tagging'}),
-                                    'status': user.isTagging
+                                    'status': user.isTagging,
+                                    'csrfTokenId': 'app_profile_config_toggletagging',
                                 } %}
                             </div>
                         </div>
@@ -64,7 +68,8 @@
                             <div class="control">
                                 {% include '_components/toggle.html.twig' with {
                                     'link': path('app_profile_config_toggle', {'type': 'osm'}),
-                                    'status': user.isOsmConsent
+                                    'status': user.isOsmConsent,
+                                    'csrfTokenId': 'app_profile_config_toggleosm',
                                 } %}
                             </div>
                         </div>

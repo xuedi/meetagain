@@ -2,12 +2,23 @@
 
 {% block content %}
 
+    {% set deleteFormHtml %}
+        <p>If you delete this page, all of its connected blocks and images and so on will be also removed. Also, all language variation! Please consider to set this Page just offline.</p>
+        <div class="has-text-right mt-3">
+            <form method="post" action="{{ path('app_admin_cms_delete') }}" class="is-inline">
+                <input type="hidden" name="id" value="{{ cms.id }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin_cms_delete' ~ cms.id) }}">
+                <button type="submit" class="button">
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                    <span>Yes, Delete</span>
+                </button>
+            </form>
+        </div>
+    {% endset %}
     {% include '_components/warning_box.html.twig' with {
         'id': 'cms-delete-warning',
         'title': 'Delete the Page',
-        'content': '<p>If you delete this page, all of its connected blocks and images and so on will be also removed. Also, all language variation! Please consider to set this Page just offline.</p>',
-        'buttonLabel': 'Yes, Delete',
-        'buttonUrl': path('app_admin_cms_delete', {'id': cms.id}),
+        'content': deleteFormHtml,
         'type': 'danger'
     } %}
 
@@ -35,10 +46,9 @@
             <div class="column">
                 <div class="buttons is-right">
                     <button class="button">{{ 'global.button_save'|trans }}</button>
-                    <a class="button is-danger toggleTrigger" data-id="cms-delete-warning"
-                       href="{{ path('app_admin_cms_delete', {'id': cms.id}) }}">
+                    <button type="button" class="button is-danger toggleTrigger" data-id="cms-delete-warning">
                         <span class="icon"><i class="fa fa-trash"></i></span>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -72,13 +82,23 @@
 
     <div class="container">
         {% for block in blocks %}
-            {% set moveDownLink = path('app_admin_cms_edit_block_down', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
-            {% set moveUpLink = path('app_admin_cms_edit_block_up', {'id': cms.id, 'blockId': block.id, 'locale': editLocale}) %}
             {% set editBlockLink = path('app_admin_cms_block_edit', {'blockId': block.id}) %}
             <div class="mb-4 is-relative cms-block-preview">
                 <div class="float-box-menu">
-                    <a href="{{ moveDownLink }}"><span class="icon"><i class="fa fa-angle-down"></i></span></a>
-                    <a href="{{ moveUpLink }}"><span class="icon"><i class="fa fa-angle-up"></i></span></a>
+                    <form method="post" action="{{ path('app_admin_cms_edit_block_down') }}" class="is-inline">
+                        <input type="hidden" name="id" value="{{ cms.id }}">
+                        <input type="hidden" name="blockId" value="{{ block.id }}">
+                        <input type="hidden" name="locale" value="{{ editLocale }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_admin_cms_edit_block_down' ~ block.id) }}">
+                        <button type="submit" class="button-as-icon"><span class="icon"><i class="fa fa-angle-down"></i></span></button>
+                    </form>
+                    <form method="post" action="{{ path('app_admin_cms_edit_block_up') }}" class="is-inline">
+                        <input type="hidden" name="id" value="{{ cms.id }}">
+                        <input type="hidden" name="blockId" value="{{ block.id }}">
+                        <input type="hidden" name="locale" value="{{ editLocale }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_admin_cms_edit_block_up' ~ block.id) }}">
+                        <button type="submit" class="button-as-icon"><span class="icon"><i class="fa fa-angle-up"></i></span></button>
+                    </form>
                     <a href="{{ editBlockLink }}"><span class="icon"><i class="fa fa-edit"></i></span></a>
                 </div>
                 {% include 'cms/blocks/_preview/' ~ block.type.name ~ '.html.twig' with {

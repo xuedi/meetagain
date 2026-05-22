@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Service\Notification\User;
 
@@ -14,7 +12,6 @@ readonly class UserNotificationProvider implements NotificationProviderInterface
         private MessageRepository $messageRepo,
         private TranslatorInterface $translator,
     ) {}
-
 
     public function getNotifications(User $user): array
     {

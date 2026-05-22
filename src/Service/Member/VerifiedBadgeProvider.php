@@ -21,11 +21,7 @@ readonly class VerifiedBadgeProvider implements UserBadgeProviderInterface
         }
 
         return [
-            new UserBadge(
-                icon: 'fa-regular fa-user-check',
-                title: 'Verified',
-                color: 'has-text-success',
-            ),
+            new UserBadge(icon: 'fa-regular fa-user-check', title: 'Verified', color: 'has-text-success'),
         ];
     }
 }

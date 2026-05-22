@@ -36,9 +36,6 @@ class EmailBlocklistRepository extends ServiceEntityRepository
      */
     public function findAllOrdered(): array
     {
-        return $this->createQueryBuilder('b')
-            ->orderBy('b.addedAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('b')->orderBy('b.addedAt', 'DESC')->getQuery()->getResult();
     }
 }

@@ -165,14 +165,8 @@ class MessageRepository extends ServiceEntityRepository
             return ['total' => 0, 'unread' => 0];
         }
 
-        $totalQb = $this
-            ->createQueryBuilder('m')
-            ->select('COUNT(m.id)');
-
-        $unreadQb = $this
-            ->createQueryBuilder('m')
-            ->select('COUNT(m.id)')
-            ->where('m.wasRead = false');
+        $totalQb = $this->createQueryBuilder('m')->select('COUNT(m.id)');
+        $unreadQb = $this->createQueryBuilder('m')->select('COUNT(m.id)')->where('m.wasRead = false');
 
         if ($restrictToUserIds !== null) {
             $totalQb

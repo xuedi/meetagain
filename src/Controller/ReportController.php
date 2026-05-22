@@ -35,7 +35,7 @@ final class ReportController extends AbstractController
             $reason = $form->get('reported')->getData();
             $remarks = $form->get('remarks')->getData();
 
-            $report = (new ImageReport())
+            $report = new ImageReport()
                 ->setImage($image)
                 ->setReporter($user)
                 ->setReason($reason)

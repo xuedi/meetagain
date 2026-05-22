@@ -25,11 +25,7 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
      */
     public function getLastExecutionsByCommand(): array
     {
-        $logs = $this
-            ->createQueryBuilder('c')
-            ->orderBy('c.startedAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $logs = $this->createQueryBuilder('c')->orderBy('c.startedAt', 'DESC')->getQuery()->getResult();
 
         $result = [];
         foreach ($logs as $log) {

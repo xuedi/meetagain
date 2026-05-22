@@ -38,7 +38,10 @@ readonly class DataHotfixRunner implements CronTaskInterface
         $worst = CronTaskStatus::ok;
 
         $sorted = is_array($this->hotfixes) ? $this->hotfixes : iterator_to_array($this->hotfixes);
-        usort($sorted, static fn(DataHotfixInterface $a, DataHotfixInterface $b) => strcmp($a->getIdentifier(), $b->getIdentifier()));
+        usort($sorted, static fn(DataHotfixInterface $a, DataHotfixInterface $b) => strcmp(
+            $a->getIdentifier(),
+            $b->getIdentifier(),
+        ));
 
         foreach ($sorted as $hotfix) {
             $key = self::KEY_PREFIX . $hotfix->getIdentifier();

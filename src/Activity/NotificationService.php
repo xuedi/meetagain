@@ -4,13 +4,13 @@ namespace App\Activity;
 
 use App\Activity\Messages\RsvpYes;
 use App\Activity\Messages\SendMessage;
+use App\Emails\EmailGuardOutcome;
+use App\Emails\Guard\EmailGuardEvaluator;
+use App\Emails\Types\NotificationMessageEmail;
 use App\Entity\Activity;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Emails\EmailGuardOutcome;
-use App\Emails\Guard\EmailGuardEvaluator;
-use App\Emails\Types\NotificationMessageEmail;
 use InvalidArgumentException;
 use Psr\Cache\InvalidArgumentException as CacheInvalidArgumentException;
 use Psr\Log\LoggerInterface;

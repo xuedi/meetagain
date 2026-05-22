@@ -40,7 +40,11 @@ class RsvpYes extends MessageAbstract
             return $this->translator->trans('profile_social.activity_rsvp_yes_deleted');
         }
 
-        $link = sprintf('<a href="%s">%s</a>', $this->router->generate('app_event_details', ['id' => $eventId]), $this->escapeHtml($eventName));
+        $link = sprintf(
+            '<a href="%s">%s</a>',
+            $this->router->generate('app_event_details', ['id' => $eventId]),
+            $this->escapeHtml($eventName),
+        );
 
         return $this->translator->trans('profile_social.activity_rsvp_yes', ['%event%' => $link]);
     }

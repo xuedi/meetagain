@@ -50,20 +50,19 @@ final class DebuggingController extends AbstractEmailController implements Admin
         $defaultLanguage = $languages[0];
 
         $typeValue = $request->query->getString('type');
-        $currentType = $typeValue !== '' ? (EmailType::tryFrom($typeValue) ?? $defaultType) : $defaultType;
+        $currentType = $typeValue !== '' ? EmailType::tryFrom($typeValue) ?? $defaultType : $defaultType;
 
         $langValue = $request->query->getString('lang');
         $currentLanguage = in_array($langValue, $languages, true) ? $langValue : $defaultLanguage;
 
         $context = $this->resolveMockContext($currentType);
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_email_debugging.intro'))],
-            actions: [
-                $this->buildTypeDropdown($currentType, $currentLanguage),
-                $this->buildLanguageDropdown($currentLanguage, $currentType, $languages),
-            ],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
+            'admin_email_debugging.intro',
+        ))], actions: [
+            $this->buildTypeDropdown($currentType, $currentLanguage),
+            $this->buildLanguageDropdown($currentLanguage, $currentType, $languages),
+        ]);
 
         return $this->render('admin/email/debugging/index.html.twig', [
             'active' => 'email',
@@ -97,7 +96,10 @@ final class DebuggingController extends AbstractEmailController implements Admin
 
             $this->mailer->send($email);
 
-            $this->addFlash('success', $this->translator->trans('admin_email_debugging.flash_sent', ['%subject%' => $subject, '%recipient%' => $recipient]));
+            $this->addFlash('success', $this->translator->trans('admin_email_debugging.flash_sent', [
+                '%subject%' => $subject,
+                '%recipient%' => $recipient,
+            ]));
         } catch (TransportExceptionInterface $e) {
             $this->addFlash('error', $this->translator->trans('admin_email_debugging.flash_failed'));
         } catch (Throwable $e) {
@@ -167,11 +169,7 @@ final class DebuggingController extends AbstractEmailController implements Admin
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_email_debugging.field_language') . ':',
-                $current,
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_email_debugging.field_language') . ':', $current),
             options: $options,
             icon: 'language',
         );

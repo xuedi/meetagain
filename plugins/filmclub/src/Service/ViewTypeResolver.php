@@ -18,7 +18,7 @@ readonly class ViewTypeResolver
         $session = $this->requestStack->getSession();
         $stored = $session->get(self::SESSION_PREFIX . $context);
 
-        return $stored !== null ? (ViewType::tryFrom($stored) ?? $default) : $default;
+        return $stored !== null ? ViewType::tryFrom($stored) ?? $default : $default;
     }
 
     public function set(string $context, ViewType $type): void

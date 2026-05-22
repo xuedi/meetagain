@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service\Security;
 
@@ -177,7 +175,12 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
-        $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
+        $detector = $this->makeProvider(
+            'not_found',
+            priority: 0,
+            recommendation: SecurityRecommendation::Block,
+            threatLevel: 80,
+        );
 
         $logRow = new NotFoundLog();
         $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
@@ -213,7 +216,12 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
-        $detector = $this->makeProvider('access_denied', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
+        $detector = $this->makeProvider(
+            'access_denied',
+            priority: 0,
+            recommendation: SecurityRecommendation::Block,
+            threatLevel: 80,
+        );
 
         $logRow = new AccessDeniedLog();
         $accessDeniedRepo = $this->createMock(AccessDeniedLogRepository::class);
@@ -249,7 +257,12 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
-        $detector = $this->makeProvider('rate_limit', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
+        $detector = $this->makeProvider(
+            'rate_limit',
+            priority: 0,
+            recommendation: SecurityRecommendation::Block,
+            threatLevel: 80,
+        );
 
         $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
         $notFoundRepo->expects($this->never())->method('findLatestUnlinkedForOffender');

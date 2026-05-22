@@ -6,7 +6,9 @@ use App\Admin\Top\AdminTopInfoInterface;
 
 final readonly class AdminTopInfoText implements AdminTopInfoInterface
 {
-    public function __construct(public string $text) {}
+    public function __construct(
+        public string $text,
+    ) {}
 
     public function getTemplate(): string
     {

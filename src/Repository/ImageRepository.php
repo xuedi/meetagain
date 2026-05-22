@@ -119,7 +119,8 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function findRecentEventUploads(int $limit, ?array $restrictToEventIds = null): array
     {
-        $qb = $this->createQueryBuilder('i')
+        $qb = $this
+            ->createQueryBuilder('i')
             ->leftJoin('i.event', 'e')
             ->addSelect('e')
             ->where('i.type = :type')
@@ -132,8 +133,7 @@ class ImageRepository extends ServiceEntityRepository
             if ($restrictToEventIds === []) {
                 return [];
             }
-            $qb->andWhere('i.event IN (:eventIds)')
-                ->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('i.event IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
         return $qb->getQuery()->getResult();
@@ -145,7 +145,8 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function findAllEventUploadsChronological(?array $restrictToEventIds = null, int $limit = 500): array
     {
-        $qb = $this->createQueryBuilder('i')
+        $qb = $this
+            ->createQueryBuilder('i')
             ->leftJoin('i.event', 'e')
             ->addSelect('e')
             ->where('i.type = :type')
@@ -158,8 +159,7 @@ class ImageRepository extends ServiceEntityRepository
             if ($restrictToEventIds === []) {
                 return [];
             }
-            $qb->andWhere('i.event IN (:eventIds)')
-                ->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('i.event IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
         return $qb->getQuery()->getResult();
@@ -204,21 +204,19 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function findHighUsageMissingAlt(int $limit = 10): array
     {
-        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative(
-            'SELECT i.id AS id, COUNT(il.id) AS cnt
+        $rows = $this
+            ->getEntityManager()
+            ->getConnection()
+            ->fetchAllAssociative('SELECT i.id AS id, COUNT(il.id) AS cnt
              FROM image i
              INNER JOIN image_location il ON il.image_id = i.id
              WHERE i.alt IS NULL OR i.alt = ""
              GROUP BY i.id
              HAVING cnt > 1
              ORDER BY cnt DESC, i.id ASC
-             LIMIT ' . $limit,
-        );
+             LIMIT ' . $limit);
 
-        return array_map(
-            static fn(array $r) => ['id' => (int) $r['id'], 'count' => (int) $r['cnt']],
-            $rows,
-        );
+        return array_map(static fn(array $r) => ['id' => (int) $r['id'], 'count' => (int) $r['cnt']], $rows);
     }
 
     public function getFileList(): array

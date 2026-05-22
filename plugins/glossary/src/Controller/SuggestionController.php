@@ -7,7 +7,9 @@ use Plugin\Glossary\Activity\Messages\SuggestionApproved;
 use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\SuggestionField;
 use Plugin\Glossary\Service\GlossaryService;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -32,9 +34,14 @@ final class SuggestionController extends AbstractGlossaryController
         ]);
     }
 
-    #[Route('/apply/{id}/{hash}', name: 'app_plugin_glossary_suggestion_apply', methods: ['GET'])]
-    public function suggestionApply(int $id, string $hash): Response
+    #[Route('/apply/{id}/{hash}', name: 'app_plugin_glossary_suggestion_apply', methods: ['POST'])]
+    public function suggestionApply(Request $request, int $id, string $hash): Response
     {
+        $key = 'glossary_suggestion_apply' . $id . $hash;
+        if (!$this->isCsrfTokenValid($key, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $item = $this->service->get($id);
         $leftOver = $this->service->applySuggestion($id, $hash);
 
@@ -51,9 +58,14 @@ final class SuggestionController extends AbstractGlossaryController
         return $this->redirectToRoute('app_plugin_glossary_suggestion_list', ['id' => $id]);
     }
 
-    #[Route('/delete/{id}/{hash}', name: 'app_plugin_glossary_suggestion_delete', methods: ['GET'])]
-    public function suggestionDelete(int $id, string $hash): Response
+    #[Route('/delete/{id}/{hash}', name: 'app_plugin_glossary_suggestion_delete', methods: ['POST'])]
+    public function suggestionDelete(Request $request, int $id, string $hash): Response
     {
+        $key = 'glossary_suggestion_delete' . $id . $hash;
+        if (!$this->isCsrfTokenValid($key, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $leftOver = $this->service->denySuggestion($id, $hash);
 
         if ($leftOver === 0) {

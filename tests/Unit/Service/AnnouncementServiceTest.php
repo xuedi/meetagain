@@ -2,19 +2,19 @@
 
 namespace Tests\Unit\Service;
 
+use App\Emails\Types\AnnouncementEmail;
 use App\Entity\Announcement;
-use App\Enum\AnnouncementStatus;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlock\CmsBlockType;
 use App\Entity\EmailTemplate;
 use App\Entity\NotificationSettings;
 use App\Entity\User;
+use App\Enum\AnnouncementStatus;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
 use App\Repository\UserRepository;
 use App\Service\Cms\AnnouncementService;
 use App\Service\Config\ConfigService;
-use App\Emails\Types\AnnouncementEmail;
 use App\Service\Email\EmailTemplateService;
 use App\Service\Http\RequestHostResolver;
 use Doctrine\Common\Collections\ArrayCollection;

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Form;
 
@@ -21,26 +19,23 @@ class EmailBlocklistType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('email', EmailType::class, [
-                'label' => 'admin_email_blocklist.field_email',
-                'constraints' => [
-                    new NotBlank(),
-                    new EmailConstraint(),
-                    new Length(max: 255),
-                ],
-            ])
-            ->add('reason', TextType::class, [
-                'label' => 'admin_email_blocklist.field_reason',
-                'constraints' => [
-                    new NotBlank(),
-                    new Length(max: 255),
-                ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'admin_email_blocklist.button_add',
-                'attr' => ['class' => 'button is-primary'],
-            ]);
+        $builder->add('email', EmailType::class, [
+            'label' => 'admin_email_blocklist.field_email',
+            'constraints' => [
+                new NotBlank(),
+                new EmailConstraint(),
+                new Length(max: 255),
+            ],
+        ])->add('reason', TextType::class, [
+            'label' => 'admin_email_blocklist.field_reason',
+            'constraints' => [
+                new NotBlank(),
+                new Length(max: 255),
+            ],
+        ])->add('submit', SubmitType::class, [
+            'label' => 'admin_email_blocklist.button_add',
+            'attr' => ['class' => 'button is-primary'],
+        ]);
     }
 
     #[Override]

@@ -2,8 +2,8 @@
 
 namespace App\DataFixtures;
 
-use App\Enum\ImageType;
 use App\Entity\User;
+use App\Enum\ImageType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Service\Media\ImageService;

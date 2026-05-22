@@ -22,10 +22,6 @@ final class IndexNowController extends AbstractController
             return new Response('', Response::HTTP_NOT_FOUND);
         }
 
-        return new Response(
-            $configuredKey,
-            Response::HTTP_OK,
-            ['Content-Type' => 'text/plain'],
-        );
+        return new Response($configuredKey, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 }

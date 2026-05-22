@@ -39,17 +39,19 @@ class AdminNavigationSectionMergeTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         // Assert - count sidebar section headings with text "System"
-        $systemHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(
-            static fn($node): bool => trim($node->text()) === 'System',
-        );
+        $systemHeadings = $crawler
+            ->filter('aside.menu p.menu-label')
+            ->reduce(static fn($node): bool => trim($node->text()) === 'System');
 
         static::assertCount(
             1,
             $systemHeadings,
-            'Sidebar must show exactly one "System" section heading. ' .
-            'Found: ' . $systemHeadings->count() . '. ' .
-            'Duplicate sections indicate a plugin is using a raw English section string ' .
-            'instead of the admin_shell.section_system translation key.',
+            'Sidebar must show exactly one "System" section heading. '
+            . 'Found: '
+            . $systemHeadings->count()
+            . '. '
+            . 'Duplicate sections indicate a plugin is using a raw English section string '
+            . 'instead of the admin_shell.section_system translation key.',
         );
     }
 
@@ -64,17 +66,19 @@ class AdminNavigationSectionMergeTest extends WebTestCase
 
         // Assert - the "Content" section heading must never appear twice. A plugin may move
         // its links into a different section, so the heading may also be absent.
-        $contentHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(
-            static fn($node): bool => trim($node->text()) === 'Content',
-        );
+        $contentHeadings = $crawler
+            ->filter('aside.menu p.menu-label')
+            ->reduce(static fn($node): bool => trim($node->text()) === 'Content');
 
         static::assertLessThanOrEqual(
             1,
             $contentHeadings->count(),
-            'Sidebar must show at most one "Content" section heading. ' .
-            'Found: ' . $contentHeadings->count() . '. ' .
-            'Duplicate sections indicate a plugin is using a raw English section string ' .
-            'instead of the admin_shell.section_content translation key.',
+            'Sidebar must show at most one "Content" section heading. '
+            . 'Found: '
+            . $contentHeadings->count()
+            . '. '
+            . 'Duplicate sections indicate a plugin is using a raw English section string '
+            . 'instead of the admin_shell.section_content translation key.',
         );
     }
 }

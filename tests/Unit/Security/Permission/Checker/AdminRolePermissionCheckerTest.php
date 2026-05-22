@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Tests\Unit\Security\Permission\Checker;
 
@@ -98,5 +96,4 @@ class AdminRolePermissionCheckerTest extends TestCase
         self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ, $ctx));
         self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_RATE_LIMITING_READ, $ctx));
     }
-
 }

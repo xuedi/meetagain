@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\BlockType\Text;
-use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Headline;
+use App\Entity\BlockType\Hero;
+use App\Entity\BlockType\Text;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Exception\BlockValidationException;
 use App\Service\Cms\BlockHydrator;
@@ -22,10 +22,20 @@ class BlockHydratorTest extends TestCase
 
     private function makeSanitizer(string $prefix = ''): HtmlSanitizerInterface
     {
-        return new class ($prefix) implements HtmlSanitizerInterface {
-            public function __construct(private readonly string $prefix) {}
-            public function sanitize(string $input): string { return $this->prefix . $input; }
-            public function sanitizeFor(string $context, string $input): string { return $this->prefix . $input; }
+        return new class($prefix) implements HtmlSanitizerInterface {
+            public function __construct(
+                private readonly string $prefix,
+            ) {}
+
+            public function sanitize(string $input): string
+            {
+                return $this->prefix . $input;
+            }
+
+            public function sanitizeFor(string $context, string $input): string
+            {
+                return $this->prefix . $input;
+            }
         };
     }
 
@@ -100,11 +110,11 @@ class BlockHydratorTest extends TestCase
     {
         // Arrange
         $payload = [
-            'headline'    => 'H',
+            'headline' => 'H',
             'subHeadline' => 'S',
-            'text'        => 'T',
-            'buttonLink'  => '/link',
-            'buttonText'  => 'Click',
+            'text' => 'T',
+            'buttonLink' => '/link',
+            'buttonText' => 'Click',
         ];
 
         // Act

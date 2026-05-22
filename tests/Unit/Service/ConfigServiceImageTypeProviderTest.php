@@ -25,9 +25,9 @@ class ConfigServiceImageTypeProviderTest extends TestCase
     private function build(?ImageThumbnailSizeProviderInterface $provider = null): ConfigService
     {
         $cache = $this->createStub(CacheInterface::class);
-        $cache->method('get')->willReturnCallback(
-            fn(string $key, callable $cb): mixed => $cb($this->createStub(ItemInterface::class)),
-        );
+        $cache
+            ->method('get')
+            ->willReturnCallback(fn(string $key, callable $cb): mixed => $cb($this->createStub(ItemInterface::class)));
 
         return new ConfigService(
             repo: $this->createStub(ConfigRepository::class),

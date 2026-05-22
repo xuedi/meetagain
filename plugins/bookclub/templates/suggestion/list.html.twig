@@ -63,9 +63,12 @@
                                     </td>
                                     <td class="has-text-right">
                                         {% if suggestion.id in userSuggestionIds %}
-                                            <a href="{{ path('app_plugin_bookclub_withdraw', {suggestionId: suggestion.id}) }}">
-                                                <span class="icon"><i class="fa fa-trash"></i></span>
-                                            </a>
+                                            <form method="post" action="{{ path('app_plugin_bookclub_withdraw', {suggestionId: suggestion.id}) }}" class="is-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_bookclub_withdraw' ~ suggestion.id) }}">
+                                                <button type="submit" class="button is-ghost p-0">
+                                                    <span class="icon"><i class="fa fa-trash"></i></span>
+                                                </button>
+                                            </form>
                                         {% endif %}
                                     </td>
                                 </tr>

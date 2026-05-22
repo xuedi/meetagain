@@ -9,7 +9,9 @@ final readonly class AdminTopInfoHtml implements AdminTopInfoInterface
     // The renderer outputs $html with |raw. Callers MUST pass strings already composed from
     // translator output (auto-safe) plus htmlspecialchars-escaped user data; never feed raw user
     // input through this class. AdminTopInfoText is the default-safe path.
-    public function __construct(public string $html) {}
+    public function __construct(
+        public string $html,
+    ) {}
 
     public function getTemplate(): string
     {

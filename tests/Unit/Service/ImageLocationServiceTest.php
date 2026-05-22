@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\CmsBlock;
 use App\Entity\Cms;
+use App\Entity\CmsBlock;
 use App\Entity\Image;
 use App\Entity\ImageLocation;
 use App\Entity\User;
@@ -12,8 +12,8 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageLocationRepository;
 use App\Repository\UserRepository;
-use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageLocations\ImageLocationProviderInterface;
+use App\Service\Media\ImageLocationService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Tests\Unit\Stubs\EventStub;
@@ -44,7 +44,8 @@ class ImageLocationServiceTest extends TestCase
     {
         // Arrange
         $repoMock = $this->createMock(ImageLocationRepository::class);
-        $repoMock->expects($this->once())
+        $repoMock
+            ->expects($this->once())
             ->method('insertForType')
             ->with(ImageType::EventTeaser, [['imageId' => 10, 'locationId' => 20]]);
 
@@ -58,7 +59,8 @@ class ImageLocationServiceTest extends TestCase
     {
         // Arrange
         $repoMock = $this->createMock(ImageLocationRepository::class);
-        $repoMock->expects($this->once())
+        $repoMock
+            ->expects($this->once())
             ->method('deleteByTypeAndPairs')
             ->with(ImageType::ProfilePicture, [['imageId' => 5, 'locationId' => 7]]);
 
@@ -186,7 +188,10 @@ class ImageLocationServiceTest extends TestCase
         // Arrange: Image linked to an Event; Event::getName() doesn't exist on entity,
         // so we mock the Event via the Image mock
         $eventStub = new class extends EventStub {
-            public function getTitle(string $language): string { return 'Summer Party'; }
+            public function getTitle(string $language): string
+            {
+                return 'Summer Party';
+            }
         };
         $eventStub->setId(7);
 
@@ -272,7 +277,10 @@ class ImageLocationServiceTest extends TestCase
         $image->method('getType')->willReturn(ImageType::EventTeaser);
 
         $event = new class extends EventStub {
-            public function getTitle(string $language): string { return 'Go Tournament'; }
+            public function getTitle(string $language): string
+            {
+                return 'Go Tournament';
+            }
         };
         $event->setId(11);
 

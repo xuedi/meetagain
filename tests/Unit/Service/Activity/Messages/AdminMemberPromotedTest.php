@@ -54,7 +54,9 @@ class AdminMemberPromotedTest extends TestCase
     public function testCanCatchMissingUserId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_promoted"));
+        $this->expectExceptionObject(
+            new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_promoted"),
+        );
 
         $subject = new AdminMemberPromoted();
         $subject->injectServices($this->router, $this->imageService, $this->translator, []);

@@ -12,34 +12,31 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FilmManualType extends AbstractType
 {
-    public function __construct(private readonly TranslatorInterface $translator) {}
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('title', TextType::class, [
-                'label' => $this->translator->trans('filmclub_film.label_title'),
-                'required' => true,
-                'attr' => ['class' => 'input'],
-            ])
-            ->add('year', IntegerType::class, [
-                'label' => $this->translator->trans('filmclub_film.label_year'),
-                'required' => false,
-                'attr' => ['class' => 'input'],
-            ])
-            ->add('runtime', IntegerType::class, [
-                'label' => $this->translator->trans('filmclub_film.label_runtime'),
-                'required' => false,
-                'attr' => ['class' => 'input'],
-            ])
-            ->add('description', TextareaType::class, [
-                'label' => $this->translator->trans('filmclub_film.label_description'),
-                'required' => false,
-                'attr' => ['class' => 'textarea', 'rows' => 4],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => $this->translator->trans('filmclub_film.button_submit'),
-                'attr' => ['class' => 'button'],
-            ]);
+        $builder->add('title', TextType::class, [
+            'label' => $this->translator->trans('filmclub_film.label_title'),
+            'required' => true,
+            'attr' => ['class' => 'input'],
+        ])->add('year', IntegerType::class, [
+            'label' => $this->translator->trans('filmclub_film.label_year'),
+            'required' => false,
+            'attr' => ['class' => 'input'],
+        ])->add('runtime', IntegerType::class, [
+            'label' => $this->translator->trans('filmclub_film.label_runtime'),
+            'required' => false,
+            'attr' => ['class' => 'input'],
+        ])->add('description', TextareaType::class, [
+            'label' => $this->translator->trans('filmclub_film.label_description'),
+            'required' => false,
+            'attr' => ['class' => 'textarea', 'rows' => 4],
+        ])->add('submit', SubmitType::class, [
+            'label' => $this->translator->trans('filmclub_film.button_submit'),
+            'attr' => ['class' => 'button'],
+        ]);
     }
 }

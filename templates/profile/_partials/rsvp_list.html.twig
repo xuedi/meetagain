@@ -17,7 +17,8 @@
             {% else %}
                 {% include '_components/toggle.html.twig' with {
                     'link': path('app_profile_toggle_rsvp', {event: event.id}),
-                    'status': event.rsvp.contains(user)
+                    'status': event.rsvp.contains(user),
+                    'csrfTokenId': 'app_profile_toggle_rsvp' ~ event.id,
                 } %}
             {% endif %}
         </div>

@@ -50,7 +50,9 @@ class BlockedSessionSubscriberTest extends TestCase
         $blockStore->expects($this->never())->method('isIpBlocked');
         $blockStore->expects($this->never())->method('isSessionBlocked');
 
-        $request = Request::create('/', server: ['HTTP_' . str_replace('-', '_', strtoupper(LoadtestBypass::HEADER)) => '1']);
+        $request = Request::create('/', server: [
+            'HTTP_' . str_replace('-', '_', strtoupper(LoadtestBypass::HEADER)) => '1',
+        ]);
         $subscriber = $this->createSubscriber(blockStore: $blockStore, environment: 'dev');
 
         // Act
@@ -122,11 +124,7 @@ class BlockedSessionSubscriberTest extends TestCase
         $twig = $this->createStub(Environment::class);
         $twig->method('render')->willReturn('blocked');
 
-        $subscriber = $this->createSubscriber(
-            blockStore: $blockStore,
-            twig: $twig,
-            resolver: $resolver,
-        );
+        $subscriber = $this->createSubscriber(blockStore: $blockStore, twig: $twig, resolver: $resolver);
         $event = $this->createEvent(Request::create('/some-page', server: ['REMOTE_ADDR' => '203.0.113.8']));
 
         // Act

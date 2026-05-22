@@ -86,14 +86,19 @@ final class AccessDeniedProvider extends AbstractSecurityProvider
         }
 
         if (($byReason['csrf'] ?? 0) > 0) {
-            $threatLevel = (int) min(100, $threatLevel + 5 * ((int) $byReason['csrf']));
+            $threatLevel = (int) min(100, $threatLevel + (5 * (int) $byReason['csrf']));
         }
 
         if ($distinctPaths >= 8 && $hits >= 15) {
             $threatLevel = 100;
         }
 
-        $summary = sprintf('%d access-denied (distinct paths: %d, csrf: %d)', $hits, $distinctPaths, (int) ($byReason['csrf'] ?? 0));
+        $summary = sprintf(
+            '%d access-denied (distinct paths: %d, csrf: %d)',
+            $hits,
+            $distinctPaths,
+            (int) ($byReason['csrf'] ?? 0),
+        );
         $details = [
             'hits' => $hits,
             'byReason' => $byReason,

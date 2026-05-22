@@ -36,15 +36,13 @@ class FilmclubSettingsRepository extends ServiceEntityRepository
 
     public function findGlobal(): ?FilmclubSettings
     {
-        return $this->createQueryBuilder('s')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->createQueryBuilder('s')->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }
 
     public function countWithEncryptedCredentials(): int
     {
-        return (int) $this->createQueryBuilder('s')
+        return (int) $this
+            ->createQueryBuilder('s')
             ->select('COUNT(s.id)')
             ->where('s.encryptedTmdbKey IS NOT NULL OR s.encryptedOmdbKey IS NOT NULL')
             ->getQuery()

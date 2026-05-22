@@ -21,19 +21,15 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
     {
         return match ($ext) {
             'scss', 'sass' => 'css',
-            'mjs'          => 'js',
-            ''             => 'bin',
-            default        => $ext,
+            'mjs' => 'js',
+            '' => 'bin',
+            default => $ext,
         };
     }
 
     public static function hashLogicalPath(string $logicalPath): string
     {
-        return substr(
-            hash('sha256', self::SECRET_SALT . '|' . $logicalPath),
-            0,
-            self::HASH_LENGTH,
-        );
+        return substr(hash('sha256', self::SECRET_SALT . '|' . $logicalPath), 0, self::HASH_LENGTH);
     }
 
     /** Public path of the compiled global JS bundle under /media/. */

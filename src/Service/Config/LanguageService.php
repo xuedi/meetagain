@@ -98,7 +98,7 @@ readonly class LanguageService
 
         return array_values(array_filter(
             $this->getEnabledLanguages(),
-            static fn (Language $language): bool => isset($allowedCodes[$language->getCode()]),
+            static fn(Language $language): bool => isset($allowedCodes[$language->getCode()]),
         ));
     }
 

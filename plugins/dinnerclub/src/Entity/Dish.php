@@ -162,21 +162,21 @@ class Dish
     {
         $first = $this->translations->first();
 
-        return $first !== false ? ($first->getName() ?? '') : '';
+        return $first !== false ? $first->getName() ?? '' : '';
     }
 
     public function getAnyTranslatedDescription(): string
     {
         $first = $this->translations->first();
 
-        return $first !== false ? ($first->getDescription() ?? '') : '';
+        return $first !== false ? $first->getDescription() ?? '' : '';
     }
 
     public function getAnyTranslatedRecipe(): string
     {
         $first = $this->translations->first();
 
-        return $first !== false ? ($first->getRecipe() ?? '') : '';
+        return $first !== false ? $first->getRecipe() ?? '' : '';
     }
 
     public function getCreatedAt(): ?DateTimeImmutable

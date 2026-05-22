@@ -27,9 +27,9 @@ readonly class UserService
     public const array ALLOWED_FLAGS = ['verified', 'restricted'];
     private const array ALLOWED_STATUS_TRANSITIONS = [
         UserStatus::EmailVerified->value => [UserStatus::Active, UserStatus::Denied],
-        UserStatus::Active->value        => [UserStatus::Blocked],
-        UserStatus::Blocked->value       => [UserStatus::Active],
-        UserStatus::Registered->value    => [UserStatus::Denied],
+        UserStatus::Active->value => [UserStatus::Blocked],
+        UserStatus::Blocked->value => [UserStatus::Active],
+        UserStatus::Registered->value => [UserStatus::Denied],
     ];
 
     public function __construct(

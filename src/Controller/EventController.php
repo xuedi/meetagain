@@ -10,8 +10,8 @@ use App\Entity\Comment;
 use App\Entity\Event;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
-use App\Enum\EventTimeFilter;
 use App\Enum\EventTileLocation;
+use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\FeaturedEventProviderInterface;
 use App\Filter\Event\EventFilterService;
@@ -23,15 +23,17 @@ use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\EventService;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 final class EventController extends AbstractController
 {
     public const string ROUTE_EVENT = 'app_event';
@@ -137,14 +139,30 @@ final class EventController extends AbstractController
             [
                 'commentForm' => $form,
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
-                'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],
+                'pluginBottomSidebarTiles' => $id
+                    ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar)
+                    : [],
                 'comments' => $this->comments->findByEventWithUser($id),
                 'event' => $event,
                 'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
                 'breadcrumbs' => [
-                    ['label' => 'Home', 'url' => $this->generateUrl('app_default', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL)],
-                    ['label' => 'Events', 'url' => $this->generateUrl('app_event', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL)],
+                    [
+                        'label' => 'Home',
+                        'url' => $this->generateUrl(
+                            'app_default',
+                            ['_locale' => $locale],
+                            UrlGeneratorInterface::ABSOLUTE_URL,
+                        ),
+                    ],
+                    [
+                        'label' => 'Events',
+                        'url' => $this->generateUrl(
+                            'app_event',
+                            ['_locale' => $locale],
+                            UrlGeneratorInterface::ABSOLUTE_URL,
+                        ),
+                    ],
                     ['label' => $event->getTitle($locale)],
                 ],
             ],
@@ -208,9 +226,15 @@ final class EventController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp')]
-    public function toggleRsvp(Event $event, EntityManagerInterface $em): Response
+    #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp', methods: ['POST'])]
+    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_event_toggle_rsvp' . $event->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
         if ($event->isCanceled()) {
             $this->addFlash('error', 'events.flash_rsvp_canceled');
 
@@ -238,9 +262,17 @@ final class EventController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/event/{event}/deleteComment/{id}', name: 'app_event_delete_comment', requirements: ['id' => '\d+'])]
-    public function deleteComment(Event $event, EntityManagerInterface $em, ?int $id = null): Response
+    #[Route(
+        '/event/{event}/deleteComment/{id}',
+        name: 'app_event_delete_comment',
+        requirements: ['id' => '\d+'],
+        methods: ['POST'],
+    )]
+    public function deleteComment(Request $request, Event $event, EntityManagerInterface $em, ?int $id = null): Response
     {
+        if (!$this->isCsrfTokenValid('app_event_delete_comment' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
         $commentRepo = $em->getRepository(Comment::class);
         $comment = $commentRepo->findOneBy(['id' => $id, 'user' => $this->getAuthedUser()]);
         if ($comment !== null) {

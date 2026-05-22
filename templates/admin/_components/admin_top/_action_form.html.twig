@@ -1,0 +1,11 @@
+<form method="post" action="{{ action.target }}" class="is-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token(action.csrfTokenId) }}">
+    <button type="submit"
+            class="button is-small{% if action.variant %} {{ action.variant }}{% endif %}"
+            {%- if action.confirm %} onclick="return confirm({{ action.confirm|json_encode|e('html_attr') }});"{% endif %}>
+        {% if action.icon %}
+            <span class="icon is-small"><i class="fa fa-{{ action.icon }}"></i></span>
+        {% endif %}
+        <span>{{ action.label }}</span>
+    </button>
+</form>

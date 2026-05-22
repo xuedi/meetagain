@@ -116,7 +116,7 @@ class SystemLogServiceTest extends TestCase
             self::LOGS_DIR . '/prod-2026-05-10.log',
             self::LOGS_DIR . '/prod-2026-05-12.log',
         ]);
-        $fs->method('getFileModifiedTime')->willReturnCallback(static fn (string $p): int => match ($p) {
+        $fs->method('getFileModifiedTime')->willReturnCallback(static fn(string $p): int => match ($p) {
             '/var/log/prod-2026-05-10.log' => 100,
             '/var/log/prod-2026-05-12.log' => 200,
             default => 0,
@@ -205,9 +205,9 @@ class SystemLogServiceTest extends TestCase
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('isFile')->willReturn(true);
         $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log']);
-        $fs->method('getFileContents')->willReturnCallback(static fn (string $p): string => match ($p) {
-            '/var/log/prod.log' => "[2026-05-12T10:00:00+00:00] app.INFO: today",
-            '/var/log/prod-2026-05-11.log' => "[2026-05-11T10:00:00+00:00] app.INFO: yesterday",
+        $fs->method('getFileContents')->willReturnCallback(static fn(string $p): string => match ($p) {
+            '/var/log/prod.log' => '[2026-05-12T10:00:00+00:00] app.INFO: today',
+            '/var/log/prod-2026-05-11.log' => '[2026-05-11T10:00:00+00:00] app.INFO: yesterday',
             default => '',
         });
         $service = new SystemLogService($fs, self::LOGS_DIR, self::ENV);
@@ -217,7 +217,7 @@ class SystemLogServiceTest extends TestCase
 
         // Assert - both files contribute one entry each
         static::assertCount(2, $entries);
-        $messages = array_map(static fn ($e) => $e->getMessage(), $entries);
+        $messages = array_map(static fn($e) => $e->getMessage(), $entries);
         static::assertContains('today', $messages);
         static::assertContains('yesterday', $messages);
     }

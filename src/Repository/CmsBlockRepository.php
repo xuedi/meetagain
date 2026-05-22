@@ -21,11 +21,7 @@ class CmsBlockRepository extends ServiceEntityRepository
     public function getMaxPriority(): float
     {
         try {
-            return $this
-                ->createQueryBuilder('b')
-                ->select('MAX(b.priority)')
-                ->getQuery()
-                ->getSingleScalarResult();
+            return $this->createQueryBuilder('b')->select('MAX(b.priority)')->getQuery()->getSingleScalarResult();
         } catch (Throwable) {
             return 1;
         }

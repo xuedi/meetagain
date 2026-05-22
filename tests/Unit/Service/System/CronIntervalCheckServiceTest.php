@@ -33,15 +33,13 @@ class CronIntervalCheckServiceTest extends TestCase
     }
 
     #[DataProvider('gapProvider')]
-    public function testGapClassification(string $previousRunAt, CronTaskStatus $expected, string $expectedMessagePart): void
-    {
+    public function testGapClassification(
+        string $previousRunAt,
+        CronTaskStatus $expected,
+        string $expectedMessagePart,
+    ): void {
         // Arrange
-        $previousLog = new CronLog(
-            new DateTimeImmutable($previousRunAt),
-            CronTaskStatus::ok,
-            0,
-            [],
-        );
+        $previousLog = new CronLog(new DateTimeImmutable($previousRunAt), CronTaskStatus::ok, 0, []);
 
         $repo = $this->createStub(CronLogRepository::class);
         $repo->method('findMostRecent')->willReturn($previousLog);
@@ -61,23 +59,30 @@ class CronIntervalCheckServiceTest extends TestCase
         // NOW = 2026-04-21 22:43:30. Thresholds: ok <=600s, warning 601-1200s, error >1200s.
         yield '30s ago - healthy tight interval' => ['2026-04-21 22:43:00', CronTaskStatus::ok, 'gap: 30s'];
         yield '5 min ago - normal cadence' => ['2026-04-21 22:38:30', CronTaskStatus::ok, 'gap: 300s'];
-        yield '10 min ago - exactly on warning threshold, still ok' => ['2026-04-21 22:33:30', CronTaskStatus::ok, 'gap: 600s'];
+        yield '10 min ago - exactly on warning threshold, still ok' => [
+            '2026-04-21 22:33:30',
+            CronTaskStatus::ok,
+            'gap: 600s',
+        ];
         yield '10 min 1s ago - warning' => ['2026-04-21 22:33:29', CronTaskStatus::warning, 'warning threshold: 600s'];
         yield '15 min ago - mid-warning band' => ['2026-04-21 22:28:30', CronTaskStatus::warning, 'warning threshold'];
-        yield '20 min ago - exactly on error threshold, still warning' => ['2026-04-21 22:23:30', CronTaskStatus::warning, 'warning threshold'];
+        yield '20 min ago - exactly on error threshold, still warning' => [
+            '2026-04-21 22:23:30',
+            CronTaskStatus::warning,
+            'warning threshold',
+        ];
         yield '20 min 1s ago - error' => ['2026-04-21 22:23:29', CronTaskStatus::error, 'error threshold: 1200s'];
-        yield '4h gap (the production incident on 2026-04-21)' => ['2026-04-21 18:32:16', CronTaskStatus::error, '15074s'];
+        yield '4h gap (the production incident on 2026-04-21)' => [
+            '2026-04-21 18:32:16',
+            CronTaskStatus::error,
+            '15074s',
+        ];
     }
 
     public function testWarningMessageIncludesThreshold(): void
     {
         // Arrange: 11 min gap (inside warning band)
-        $previousLog = new CronLog(
-            new DateTimeImmutable('2026-04-21 22:32:30'),
-            CronTaskStatus::ok,
-            0,
-            [],
-        );
+        $previousLog = new CronLog(new DateTimeImmutable('2026-04-21 22:32:30'), CronTaskStatus::ok, 0, []);
 
         $repo = $this->createStub(CronLogRepository::class);
         $repo->method('findMostRecent')->willReturn($previousLog);
@@ -95,12 +100,7 @@ class CronIntervalCheckServiceTest extends TestCase
     public function testErrorMessageIncludesThreshold(): void
     {
         // Arrange: 30 min gap (past error threshold)
-        $previousLog = new CronLog(
-            new DateTimeImmutable('2026-04-21 22:13:30'),
-            CronTaskStatus::ok,
-            0,
-            [],
-        );
+        $previousLog = new CronLog(new DateTimeImmutable('2026-04-21 22:13:30'), CronTaskStatus::ok, 0, []);
 
         $repo = $this->createStub(CronLogRepository::class);
         $repo->method('findMostRecent')->willReturn($previousLog);
@@ -117,10 +117,7 @@ class CronIntervalCheckServiceTest extends TestCase
 
     public function testIdentifierIsStable(): void
     {
-        $service = new CronIntervalCheckService(
-            $this->createStub(CronLogRepository::class),
-            new MockClock(),
-        );
+        $service = new CronIntervalCheckService($this->createStub(CronLogRepository::class), new MockClock());
 
         static::assertSame('cron-interval-check', $service->getIdentifier());
     }

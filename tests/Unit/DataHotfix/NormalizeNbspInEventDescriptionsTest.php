@@ -22,10 +22,7 @@ class NormalizeNbspInEventDescriptionsTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())->method('flush');
 
-        $subject = new NormalizeNbspInEventDescriptions(
-            $this->makeRepoReturning([$translation]),
-            $em,
-        );
+        $subject = new NormalizeNbspInEventDescriptions($this->makeRepoReturning([$translation]), $em);
 
         // Act
         $subject->execute();
@@ -48,10 +45,7 @@ class NormalizeNbspInEventDescriptionsTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())->method('flush');
 
-        $subject = new NormalizeNbspInEventDescriptions(
-            $this->makeRepoReturning([$clean]),
-            $em,
-        );
+        $subject = new NormalizeNbspInEventDescriptions($this->makeRepoReturning([$clean]), $em);
 
         // Act
         $subject->execute();

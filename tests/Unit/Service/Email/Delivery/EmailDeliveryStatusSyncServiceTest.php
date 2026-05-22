@@ -53,13 +53,13 @@ class EmailDeliveryStatusSyncServiceTest extends TestCase
 
         $provider = $this->createStub(EmailDeliveryProviderInterface::class);
         $provider->method('isAvailable')->willReturn(true);
-        $provider->method('getLogByMessageId')->willReturnCallback(
-            static fn(string $id) => match ($id) {
+        $provider
+            ->method('getLogByMessageId')
+            ->willReturnCallback(static fn(string $id) => match ($id) {
                 'tx-1' => self::makeLog('delivered'),
                 'tx-2' => self::makeLog('bounced'),
                 default => null,
-            },
-        );
+            });
 
         $repo = $this->createStub(EmailQueueRepository::class);
         $repo->method('findWithProviderMessageIdAndNoStatus')->willReturn([$email1, $email2]);
@@ -88,9 +88,9 @@ class EmailDeliveryStatusSyncServiceTest extends TestCase
 
         $provider = $this->createStub(EmailDeliveryProviderInterface::class);
         $provider->method('isAvailable')->willReturn(true);
-        $provider->method('getLogByMessageId')->willReturnCallback(
-            static fn(string $id) => $id === 'tx-1' ? self::makeLog('delivered') : null,
-        );
+        $provider->method('getLogByMessageId')->willReturnCallback(static fn(string $id) => $id === 'tx-1'
+            ? self::makeLog('delivered')
+            : null);
 
         $repo = $this->createStub(EmailQueueRepository::class);
         $repo->method('findWithProviderMessageIdAndNoStatus')->willReturn([$email1, $email2]);
@@ -175,8 +175,7 @@ class EmailDeliveryStatusSyncServiceTest extends TestCase
     {
         // Arrange - config throws
         $config = $this->createStub(ConfigService::class);
-        $config->method('isEmailDeliverySyncEnabled')
-            ->willThrowException(new RuntimeException('config blew up'));
+        $config->method('isEmailDeliverySyncEnabled')->willThrowException(new RuntimeException('config blew up'));
 
         $service = $this->makeService(configService: $config);
         $output = new BufferedOutput();

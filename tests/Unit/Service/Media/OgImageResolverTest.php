@@ -74,7 +74,10 @@ class OgImageResolverTest extends TestCase
 
         // Assert
         static::assertNotNull($result);
-        static::assertSame('https://example.test/images/thumbnails/sysHash_1200x630.webp?v20260503120000', $result->absoluteUrl);
+        static::assertSame(
+            'https://example.test/images/thumbnails/sysHash_1200x630.webp?v20260503120000',
+            $result->absoluteUrl,
+        );
         static::assertSame(1200, $result->width);
         static::assertSame(630, $result->height);
         static::assertSame('Default Alt', $result->altText);

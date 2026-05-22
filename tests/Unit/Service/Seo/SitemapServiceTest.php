@@ -73,7 +73,10 @@ class SitemapServiceTest extends TestCase
         self::assertStringContainsString('<lastmod>2026-04-19</lastmod>', $xml);
         self::assertStringContainsString('<changefreq>daily</changefreq>', $xml);
         self::assertStringContainsString('<priority>0.8</priority>', $xml);
-        self::assertStringContainsString('<xhtml:link rel="alternate" hreflang="en" href="https://example.com/en/page"/>', $xml);
+        self::assertStringContainsString(
+            '<xhtml:link rel="alternate" hreflang="en" href="https://example.com/en/page"/>',
+            $xml,
+        );
         self::assertStringContainsString('xmlns:xhtml="http://www.w3.org/1999/xhtml"', $xml);
     }
 

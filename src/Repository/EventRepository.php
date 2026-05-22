@@ -7,8 +7,8 @@ use App\Entity\Host;
 use App\Entity\User;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
-use App\Enum\EventTimeFilter;
 use App\Enum\EventStatus;
+use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use DateTime;
 use DateTimeInterface;
@@ -49,14 +49,16 @@ class EventRepository extends ServiceEntityRepository
             ->andWhere('e.status IN (:statuses)')
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
 
-        $cutoff = (new DateTime())->modify('-' . self::IN_PROGRESS_GRACE_HOURS . ' hours');
+        $cutoff = new DateTime()->modify('-' . self::IN_PROGRESS_GRACE_HOURS . ' hours');
         match ($time) {
-            EventTimeFilter::Past => $qb
-                ->andWhere('COALESCE(e.stop, e.start) < :cutoff')
-                ->setParameter('cutoff', $cutoff),
-            EventTimeFilter::Future => $qb
-                ->andWhere('COALESCE(e.stop, e.start) >= :cutoff')
-                ->setParameter('cutoff', $cutoff),
+            EventTimeFilter::Past => $qb->andWhere('COALESCE(e.stop, e.start) < :cutoff')->setParameter(
+                'cutoff',
+                $cutoff,
+            ),
+            EventTimeFilter::Future => $qb->andWhere('COALESCE(e.stop, e.start) >= :cutoff')->setParameter(
+                'cutoff',
+                $cutoff,
+            ),
             EventTimeFilter::All => null,
         };
 
@@ -173,11 +175,8 @@ class EventRepository extends ServiceEntityRepository
      *
      * @return array<Event>
      */
-    public function findUpcomingEventsNotRsvpdByUser(
-        DateTimeInterface $from,
-        DateTimeInterface $to,
-        User $user,
-    ): array {
+    public function findUpcomingEventsNotRsvpdByUser(DateTimeInterface $from, DateTimeInterface $to, User $user): array
+    {
         return $this
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
@@ -528,10 +527,7 @@ class EventRepository extends ServiceEntityRepository
             return 0;
         }
 
-        $qb = $this
-            ->createQueryBuilder('e')
-            ->select('COUNT(e.id)')
-            ->where('e.recurringRule IS NOT NULL');
+        $qb = $this->createQueryBuilder('e')->select('COUNT(e.id)')->where('e.recurringRule IS NOT NULL');
 
         if ($restrictToEventIds !== null) {
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
@@ -547,14 +543,17 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds
      * @return array<Event>
      */
-    public function findUpcomingWithLowRsvp(int $daysAhead = 14, int $minYes = 3, ?array $restrictToEventIds = null): array
-    {
+    public function findUpcomingWithLowRsvp(
+        int $daysAhead = 14,
+        int $minYes = 3,
+        ?array $restrictToEventIds = null,
+    ): array {
         if ($restrictToEventIds === []) {
             return [];
         }
 
         $now = new DateTime();
-        $until = (new DateTime())->modify(sprintf('+%d days', $daysAhead));
+        $until = new DateTime()->modify(sprintf('+%d days', $daysAhead));
 
         $qb = $this
             ->createQueryBuilder('e')

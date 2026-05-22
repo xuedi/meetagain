@@ -7,5 +7,7 @@ final readonly class AdminTabs
     /**
      * @param list<AdminTab> $tabs
      */
-    public function __construct(public array $tabs = []) {}
+    public function __construct(
+        public array $tabs = [],
+    ) {}
 }

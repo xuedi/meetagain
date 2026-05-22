@@ -39,8 +39,7 @@ final class UserSelfPermissionChecker implements PermissionCheckerInterface
             return $subject === null || $subject instanceof User;
         }
 
-        return in_array($attribute, self::ELEVATED_ATTRIBUTES, true)
-            && ($subject === null || $subject instanceof User);
+        return in_array($attribute, self::ELEVATED_ATTRIBUTES, true) && ($subject === null || $subject instanceof User);
     }
 
     #[Override]

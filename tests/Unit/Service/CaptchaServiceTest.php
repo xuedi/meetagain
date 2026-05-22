@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -81,10 +79,7 @@ class CaptchaServiceTest extends TestCase
         $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
         $this->sessionMock->method('get')->willReturn('hgfw');
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('remove')
-            ->with('captcha_attempts');
+        $this->sessionMock->expects($this->once())->method('remove')->with('captcha_attempts');
 
         // Act
         $result = $this->subject->isValid('hgfw');
@@ -107,10 +102,7 @@ class CaptchaServiceTest extends TestCase
                 ['captcha_text',     null, 'jrdf'],
                 ['captcha_attempts', 0,    0],
             ]);
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('set')
-            ->with('captcha_attempts', 1);
+        $this->sessionMock->expects($this->once())->method('set')->with('captcha_attempts', 1);
 
         // Act
         $result = $this->subject->isValid('hgfw');
@@ -152,11 +144,7 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
         $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('get')
-            ->with('captcha_refresh')
-            ->willReturn([]);
+        $this->sessionMock->expects($this->once())->method('get')->with('captcha_refresh')->willReturn([]);
 
         // Act: get refresh time
         $result = $this->subject->getRefreshTime();
@@ -200,11 +188,7 @@ class CaptchaServiceTest extends TestCase
             new DateTimeImmutable('-20 seconds'),
         ];
 
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('get')
-            ->with('captcha_refresh')
-            ->willReturn($refreshHistory);
+        $this->sessionMock->expects($this->once())->method('get')->with('captcha_refresh')->willReturn($refreshHistory);
 
         // Act: get refresh time
         $result = $this->subject->getRefreshTime();
@@ -222,15 +206,8 @@ class CaptchaServiceTest extends TestCase
         $this->requestStackMock->method('getSession')->willReturn($this->sessionMock);
         $this->subject = new CaptchaService($this->requestStackMock, self::PROJECT_DIR);
 
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('get')
-            ->with('captcha_refresh')
-            ->willReturn($refreshHistory);
-        $this->sessionMock
-            ->expects($this->once())
-            ->method('set')
-            ->with('captcha_refresh');
+        $this->sessionMock->expects($this->once())->method('get')->with('captcha_refresh')->willReturn($refreshHistory);
+        $this->sessionMock->expects($this->once())->method('set')->with('captcha_refresh');
 
         // Act: get refresh count
         $result = $this->subject->getRefreshCount();

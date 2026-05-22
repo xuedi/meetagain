@@ -99,9 +99,7 @@ class RateLimitLog
 
     public function setUserIdentifier(?string $userIdentifier): static
     {
-        $this->userIdentifier = $userIdentifier === null
-            ? null
-            : mb_substr(strtolower($userIdentifier), 0, 255);
+        $this->userIdentifier = $userIdentifier === null ? null : mb_substr(strtolower($userIdentifier), 0, 255);
 
         return $this;
     }

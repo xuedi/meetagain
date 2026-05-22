@@ -36,7 +36,9 @@ class SupportNotificationEmailTest extends TestCase
 
         $enqueuedEmails = [];
         $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->exactly(2))->method('enqueue')
+        $queue
+            ->expects($this->exactly(2))
+            ->method('enqueue')
             ->with(
                 $this->anything(),
                 $this->callback(static function (TemplatedEmail $email) use (&$enqueuedEmails): bool {
@@ -79,11 +81,10 @@ class SupportNotificationEmailTest extends TestCase
         $queue->expects($this->never())->method('enqueue');
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')
-            ->with(
-                'Support ticket received but no active admin recipients found',
-                $this->anything(),
-            );
+        $logger
+            ->expects($this->once())
+            ->method('warning')
+            ->with('Support ticket received but no active admin recipients found', $this->anything());
 
         $request = $this->makeRequest();
 

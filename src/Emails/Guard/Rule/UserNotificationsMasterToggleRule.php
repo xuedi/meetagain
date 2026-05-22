@@ -35,10 +35,7 @@ final readonly class UserNotificationsMasterToggleRule implements EmailGuardRule
         }
 
         if (!$user->isNotification()) {
-            return EmailGuardResult::skip(
-                $this->getName(),
-                'User has globally disabled email notifications.',
-            );
+            return EmailGuardResult::skip($this->getName(), 'User has globally disabled email notifications.');
         }
 
         return EmailGuardResult::pass($this->getName());

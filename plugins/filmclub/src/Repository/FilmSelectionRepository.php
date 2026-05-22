@@ -42,7 +42,8 @@ class FilmSelectionRepository extends ServiceEntityRepository
     /** @return FilmSelection[] */
     public function findByFilm(int $filmId): array
     {
-        return $this->createQueryBuilder('s')
+        return $this
+            ->createQueryBuilder('s')
             ->where('s.film = :filmId')
             ->setParameter('filmId', $filmId)
             ->orderBy('s.selectedAt', 'DESC')
@@ -57,8 +58,7 @@ class FilmSelectionRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('s')
-            ->orderBy('s.selectedAt', 'DESC');
+        $qb = $this->createQueryBuilder('s')->orderBy('s.selectedAt', 'DESC');
 
         if ($allowedIds !== null) {
             $qb->where('s.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -74,8 +74,7 @@ class FilmSelectionRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('s')
-            ->orderBy('s.selectedAt', 'DESC');
+        $qb = $this->createQueryBuilder('s')->orderBy('s.selectedAt', 'DESC');
 
         if ($allowedEventIds !== null) {
             $qb->where('s.eventId IN (:eventIds)')->setParameter('eventIds', $allowedEventIds);

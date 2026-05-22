@@ -124,10 +124,7 @@ class EventSchemaServiceTest extends TestCase
         $schema = $subject->buildSchema($event, self::CANONICAL_URL, 'en');
 
         // Assert
-        static::assertSame(
-            [self::PLATFORM_HOST . '/images/thumbnails/abc123_600x400.webp'],
-            $schema['image'],
-        );
+        static::assertSame([self::PLATFORM_HOST . '/images/thumbnails/abc123_600x400.webp'], $schema['image']);
     }
 
     public function testImageUsesProviderLogoWhenNoPreviewImage(): void
@@ -170,10 +167,7 @@ class EventSchemaServiceTest extends TestCase
     public function testDescriptionFallsBackToStrippedDescription(): void
     {
         // Arrange
-        $event = $this->makeEvent(
-            title: 'Coffee chat',
-            description: '<p>Long description body</p>',
-        );
+        $event = $this->makeEvent(title: 'Coffee chat', description: '<p>Long description body</p>');
         $subject = $this->makeService();
 
         // Act

@@ -41,7 +41,8 @@ class FilmNoteRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('n')
+        $qb = $this
+            ->createQueryBuilder('n')
             ->where('n.film = :filmId AND n.revealToGroup = true')
             ->setParameter('filmId', $filmId)
             ->orderBy('n.createdAt', 'DESC');

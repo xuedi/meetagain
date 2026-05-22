@@ -76,12 +76,15 @@ document.addEventListener('change', function (event) {
         .catch(() => location.reload());
 });
 
-// File actions: delegated — select/rotate via ajax and reload (works on dynamically injected modal content)
+// File actions: delegated — select/rotate via POST with CSRF token and reload (works on dynamically injected modal content)
 document.addEventListener('click', function (event) {
     const trigger = event.target.closest('.fileSelectTrigger, .fileRotateTrigger');
     if (!trigger) return;
     event.preventDefault();
     const url = trigger.getAttribute('href');
     if (!url) return;
-    maFetch(url).then(() => location.reload());
+    const token = trigger.dataset.csrfToken || '';
+    const formData = new FormData();
+    formData.append('_token', token);
+    maFetch(url, false, formData).then(() => location.reload());
 });

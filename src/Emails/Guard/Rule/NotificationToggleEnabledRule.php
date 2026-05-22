@@ -36,10 +36,10 @@ final readonly class NotificationToggleEnabledRule implements EmailGuardRuleInte
         }
 
         if (!$user->getNotificationSettings()->isActive($this->toggle)) {
-            return EmailGuardResult::skip(
-                $this->getName(),
-                sprintf("User has disabled the '%s' notification preference.", $this->toggle),
-            );
+            return EmailGuardResult::skip($this->getName(), sprintf(
+                "User has disabled the '%s' notification preference.",
+                $this->toggle,
+            ));
         }
 
         return EmailGuardResult::pass($this->getName());

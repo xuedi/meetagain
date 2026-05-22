@@ -18,9 +18,7 @@ final class SiteLogoLocationProvider extends AbstractImageLocationProvider
 
     public function discoverImageIds(): array
     {
-        $row = $this->connection->fetchAssociative(
-            "SELECT value FROM config WHERE name = 'site_logo_id' LIMIT 1",
-        );
+        $row = $this->connection->fetchAssociative("SELECT value FROM config WHERE name = 'site_logo_id' LIMIT 1");
 
         if ($row === false) {
             return [];

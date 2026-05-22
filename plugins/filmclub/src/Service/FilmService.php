@@ -54,7 +54,11 @@ readonly class FilmService
                 $film->setPosterImage($poster);
                 $this->em->persist($film);
                 $this->em->flush();
-                $this->imageLocationService->addLocation($poster->getId(), ImageType::PluginFilmclubPoster, $film->getId());
+                $this->imageLocationService->addLocation(
+                    $poster->getId(),
+                    ImageType::PluginFilmclubPoster,
+                    $film->getId(),
+                );
             }
         }
 

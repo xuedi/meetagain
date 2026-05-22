@@ -39,14 +39,16 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{{ path('app_admin_language_toggle', {'id': language.id}) }}"
-                           title="{{ language.enabled ? 'admin_system_language.button_disable'|trans : 'admin_system_language.button_enable'|trans }}">
-                            {% if language.enabled %}
-                                <span class="tag is-success">{{ 'admin_system_language.status_enabled'|trans }}</span>
-                            {% else %}
-                                <span class="tag">{{ 'admin_system_language.status_disabled'|trans }}</span>
-                            {% endif %}
-                        </a>
+                        <form method="post" action="{{ path('app_admin_language_toggle', {'id': language.id}) }}" class="is-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_admin_language_toggle' ~ language.id) }}">
+                            <button type="submit" class="button-as-icon" title="{{ language.enabled ? 'admin_system_language.button_disable'|trans : 'admin_system_language.button_enable'|trans }}">
+                                {% if language.enabled %}
+                                    <span class="tag is-success">{{ 'admin_system_language.status_enabled'|trans }}</span>
+                                {% else %}
+                                    <span class="tag">{{ 'admin_system_language.status_disabled'|trans }}</span>
+                                {% endif %}
+                            </button>
+                        </form>
                     </td>
                     <td>{{ language.sortOrder }}</td>
                     <td>

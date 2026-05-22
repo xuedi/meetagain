@@ -72,8 +72,11 @@ class PluginSettingsServiceTest extends TestCase
 
     private function makeProvider(string $key, int $priority = 0): PluginSettingsProviderInterface
     {
-        return new class ($key, $priority) implements PluginSettingsProviderInterface {
-            public function __construct(private readonly string $key, private readonly int $priority) {}
+        return new class($key, $priority) implements PluginSettingsProviderInterface {
+            public function __construct(
+                private readonly string $key,
+                private readonly int $priority,
+            ) {}
 
             public function getKey(): string
             {
@@ -100,9 +103,7 @@ class PluginSettingsServiceTest extends TestCase
                 return [];
             }
 
-            public function save(object $data, FormInterface $form): void
-            {
-            }
+            public function save(object $data, FormInterface $form): void {}
 
             public function getPriority(): int
             {

@@ -29,19 +29,43 @@ class LogEntryTest extends TestCase
     {
         yield 'plain message' => [
             '[2026-05-11T12:00:00+00:00] app.INFO: hello world',
-            ['date' => '2026-05-11 12:00:00', 'type' => 'app', 'level' => 'INFO', 'message' => 'hello world', 'json' => null],
+            [
+                'date' => '2026-05-11 12:00:00',
+                'type' => 'app',
+                'level' => 'INFO',
+                'message' => 'hello world',
+                'json' => null,
+            ],
         ];
         yield 'with context object' => [
             '[2026-05-11T12:00:00+00:00] app.ERROR: kaboom {"foo":"bar"}',
-            ['date' => '2026-05-11 12:00:00', 'type' => 'app', 'level' => 'ERROR', 'message' => 'kaboom', 'json' => '{"foo":"bar"}'],
+            [
+                'date' => '2026-05-11 12:00:00',
+                'type' => 'app',
+                'level' => 'ERROR',
+                'message' => 'kaboom',
+                'json' => '{"foo":"bar"}',
+            ],
         ];
         yield 'monolog default with context and empty extra' => [
             '[2026-05-11T12:00:00+00:00] console.CRITICAL: oh no {"exception":"trace"} []',
-            ['date' => '2026-05-11 12:00:00', 'type' => 'console', 'level' => 'CRITICAL', 'message' => 'oh no', 'json' => '{"exception":"trace"} []'],
+            [
+                'date' => '2026-05-11 12:00:00',
+                'type' => 'console',
+                'level' => 'CRITICAL',
+                'message' => 'oh no',
+                'json' => '{"exception":"trace"} []',
+            ],
         ];
         yield 'message containing colon' => [
             '[2026-05-11T12:00:00+00:00] http.INFO: GET: /foo returned 200',
-            ['date' => '2026-05-11 12:00:00', 'type' => 'http', 'level' => 'INFO', 'message' => 'GET: /foo returned 200', 'json' => null],
+            [
+                'date' => '2026-05-11 12:00:00',
+                'type' => 'http',
+                'level' => 'INFO',
+                'message' => 'GET: /foo returned 200',
+                'json' => null,
+            ],
         ];
     }
 
@@ -134,15 +158,15 @@ class LogEntryTest extends TestCase
             'b' => '[2026-05-11T12:00:01+00:00] app.INFO: same message',
         ]];
         yield 'different levels' => [[
-            'info'  => '[2026-05-11T12:00:00+00:00] app.INFO: same message',
+            'info' => '[2026-05-11T12:00:00+00:00] app.INFO: same message',
             'error' => '[2026-05-11T12:00:00+00:00] app.ERROR: same message',
         ]];
         yield 'different channels' => [[
-            'app'     => '[2026-05-11T12:00:00+00:00] app.INFO: same message',
+            'app' => '[2026-05-11T12:00:00+00:00] app.INFO: same message',
             'console' => '[2026-05-11T12:00:00+00:00] console.INFO: same message',
         ]];
         yield 'different messages' => [[
-            'first'  => '[2026-05-11T12:00:00+00:00] app.INFO: hello',
+            'first' => '[2026-05-11T12:00:00+00:00] app.INFO: hello',
             'second' => '[2026-05-11T12:00:00+00:00] app.INFO: world',
         ]];
         yield 'different json tails' => [[

@@ -26,10 +26,7 @@ class BookIsbnType extends AbstractType
             ],
             'constraints' => [
                 new NotBlank(),
-                new Regex(
-                    pattern: '/^[\d\-\s X]+$/i',
-                    message: 'bookclub_book.error_isbn_invalid',
-                ),
+                new Regex(pattern: '/^[\d\-\s X]+$/i', message: 'bookclub_book.error_isbn_invalid'),
             ],
         ]);
     }

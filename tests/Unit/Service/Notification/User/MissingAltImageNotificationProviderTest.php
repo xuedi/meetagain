@@ -56,15 +56,19 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $security->method('isGranted')->willReturn(true);
 
         $imageRepo = $this->createStub(ImageRepository::class);
-        $imageRepo->method('findHighUsageMissingAlt')->willReturn([
-            ['id' => 11, 'count' => 4],
-            ['id' => 22, 'count' => 7],
-        ]);
+        $imageRepo
+            ->method('findHighUsageMissingAlt')
+            ->willReturn([
+                ['id' => 11, 'count' => 4],
+                ['id' => 22, 'count' => 7],
+            ]);
 
         $translator = $this->createStub(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(
-            static fn(string $key, array $params) => $key . ':' . $params['%id%'] . ':' . $params['%count%'],
-        );
+        $translator
+            ->method('trans')
+            ->willReturnCallback(
+                static fn(string $key, array $params) => $key . ':' . $params['%id%'] . ':' . $params['%count%'],
+            );
 
         $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $translator);
 

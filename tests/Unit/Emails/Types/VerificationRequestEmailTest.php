@@ -27,7 +27,9 @@ class VerificationRequestEmailTest extends TestCase
 
         $capturedEmail = null;
         $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->once())->method('enqueue')
+        $queue
+            ->expects($this->once())
+            ->method('enqueue')
             ->with(
                 $this->anything(),
                 $this->callback(static function (TemplatedEmail $email) use (&$capturedEmail): bool {

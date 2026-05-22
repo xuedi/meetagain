@@ -9,7 +9,9 @@ use App\Service\Member\CaptchaService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+
 final class AjaxController extends AbstractController
 {
     public function __construct(
@@ -22,12 +24,16 @@ final class AjaxController extends AbstractController
         return $this->render('_non_locale/ajax.html.twig');
     }
 
-    #[Route('/ajax/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['GET'])]
+    #[Route('/ajax/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['POST'])]
     public function acceptCookiesIndex(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('cookie_accept', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $consent = Consent::getBySession($request->getSession());
         $consent->setCookies(ConsentType::Granted);
-        $consent->setOsm($request->query->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
+        $consent->setOsm($request->request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
         $consent->save($request->getSession());
 
         $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
@@ -38,9 +44,13 @@ final class AjaxController extends AbstractController
         return $response;
     }
 
-    #[Route('/ajax/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['GET'])]
+    #[Route('/ajax/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['POST'])]
     public function denyCookiesIndex(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('cookie_deny', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $consent = Consent::getBySession($request->getSession());
         $consent->setCookies(ConsentType::Denied);
         $consent->setOsm(ConsentType::Denied);

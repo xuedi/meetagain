@@ -7,6 +7,7 @@ use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\CronLog;
@@ -17,6 +18,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -97,9 +99,10 @@ final class CronLogController extends AbstractLogsController implements AdminNav
 
         $actions = [];
         if ($totalCount > 0) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('global.button_clear'),
                 target: $this->generateUrl('app_admin_cron_log_clear'),
+                csrfTokenId: 'admin_cron_log_clear',
                 icon: 'trash',
             );
         }
@@ -116,10 +119,14 @@ final class CronLogController extends AbstractLogsController implements AdminNav
         ]);
     }
 
-    #[Route('/clear', name: 'app_admin_cron_log_clear')]
-    public function clear(): RedirectResponse
+    #[Route('/clear', name: 'app_admin_cron_log_clear', methods: ['POST'])]
+    public function clear(Request $request): RedirectResponse
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_LOGS_CRON_READ);
+
+        if (!$this->isCsrfTokenValid('admin_cron_log_clear', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $this->connection->executeStatement('DELETE FROM cron_log');
 
@@ -151,27 +158,21 @@ final class CronLogController extends AbstractLogsController implements AdminNav
             ),
         };
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%s</strong>',
-                    $cronLog->getRunAt()->format('Y-m-d H:i:s'),
-                )),
-                new AdminTopInfoHtml($statusTag),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="has-text-grey">%d %s</span>',
-                    $cronLog->getDurationMs(),
-                    $this->translator->trans('admin_logs.duration_ms_total'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_logs.back'),
-                    target: $this->generateUrl('app_admin_cron_log'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', $cronLog->getRunAt()->format('Y-m-d H:i:s'))),
+            new AdminTopInfoHtml($statusTag),
+            new AdminTopInfoHtml(sprintf(
+                '<span class="has-text-grey">%d %s</span>',
+                $cronLog->getDurationMs(),
+                $this->translator->trans('admin_logs.duration_ms_total'),
+            )),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_logs.back'),
+                target: $this->generateUrl('app_admin_cron_log'),
+                icon: 'arrow-left',
+            ),
+        ]);
 
         return $this->render('admin/logs/logs_cron_show.html.twig', [
             'active' => 'logs',
@@ -181,8 +182,11 @@ final class CronLogController extends AbstractLogsController implements AdminNav
         ]);
     }
 
-    private function buildStatusDropdown(string $current, string $range, ?DateTimeImmutable $since): AdminTopActionDropdown
-    {
+    private function buildStatusDropdown(
+        string $current,
+        string $range,
+        ?DateTimeImmutable $since,
+    ): AdminTopActionDropdown {
         $options = [];
         foreach (array_keys(self::STATUS_FILTERS) as $key) {
             $params = [];

@@ -199,12 +199,15 @@
                                             <span class="icon is-small"><i class="fa-solid fa-star"></i></span>
                                         </a>
                                         {% if isOrganizer %}
-                                        <a href="{{ path('plugin_dinnerclub_image_delete', {'dishImageId': dishImage.id}) }}?returnUrl={{ returnUrl|url_encode }}"
-                                           class="is-size-7 has-text-danger"
-                                           title="{{ 'dinnerclub.title_remove_gallery'|trans }}"
-                                           onclick="return confirm('{{ 'dinnerclub.confirm_remove_gallery'|trans|escape('js') }}')">
-                                            <span class="icon is-small"><i class="fa-solid fa-trash"></i></span>
-                                        </a>
+                                        <form method="post" action="{{ path('plugin_dinnerclub_image_delete', {'dishImageId': dishImage.id}) }}" class="is-inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('plugin_dinnerclub_image_delete' ~ dishImage.id) }}">
+                                            <input type="hidden" name="returnUrl" value="{{ returnUrl }}">
+                                            <button type="submit" class="button-as-icon is-size-7 has-text-danger"
+                                                    title="{{ 'dinnerclub.title_remove_gallery'|trans }}"
+                                                    onclick="return confirm({{ 'dinnerclub.confirm_remove_gallery'|trans|json_encode|e('html_attr') }});">
+                                                <span class="icon is-small"><i class="fa-solid fa-trash"></i></span>
+                                            </button>
+                                        </form>
                                         {% endif %}
                                     </div>
                                     {% endif %}

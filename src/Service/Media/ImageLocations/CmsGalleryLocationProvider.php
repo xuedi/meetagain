@@ -19,10 +19,9 @@ final class CmsGalleryLocationProvider extends AbstractImageLocationProvider
 
     public function discoverImageIds(): array
     {
-        $rows = $this->connection->fetchAllAssociative(
-            'SELECT id, json FROM cms_block WHERE type = ?',
-            [CmsBlockType::Gallery->value],
-        );
+        $rows = $this->connection->fetchAllAssociative('SELECT id, json FROM cms_block WHERE type = ?', [
+            CmsBlockType::Gallery->value,
+        ]);
 
         $pairs = [];
         foreach ($rows as $row) {

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -30,11 +28,7 @@ class EmailTemplateServiceTest extends TestCase
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
         $fs->method('getFileContents')->willReturn('');
-        $this->subject = new EmailTemplateService(
-            repo: $this->repoStub,
-            fs: $fs,
-            projectDir: $projectDir,
-        );
+        $this->subject = new EmailTemplateService(repo: $this->repoStub, fs: $fs, projectDir: $projectDir);
     }
 
     public function testGetTemplateReturnsTemplateWhenFound(): void

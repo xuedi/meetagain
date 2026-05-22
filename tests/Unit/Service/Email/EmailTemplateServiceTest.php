@@ -21,41 +21,37 @@ class EmailTemplateServiceTest extends TestCase
         // Arrange - language-prefixed paths exist; default paths also exist as fallback
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
-        $fs->method('getFileContents')->willReturnCallback(
-            static fn (string $p): string => str_contains($p, '/de/') ? '<de>body:' . basename($p) : '<en>body:' . basename($p),
-        );
-        $service = new EmailTemplateService(
-            $this->createStub(EmailTemplateRepository::class),
-            $fs,
-            self::PROJECT_DIR,
-        );
+        $fs->method('getFileContents')->willReturnCallback(static fn(string $p): string => str_contains($p, '/de/')
+            ? '<de>body:' . basename($p)
+            : '<en>body:' . basename($p));
+        $service = new EmailTemplateService($this->createStub(EmailTemplateRepository::class), $fs, self::PROJECT_DIR);
 
         // Act
         $templates = $service->getDefaultTemplates('de');
 
         // Assert
-        static::assertSame('<de>body:' . EmailType::Welcome->value . '.html', $templates[EmailType::Welcome->value]['body']);
+        static::assertSame(
+            '<de>body:' . EmailType::Welcome->value . '.html',
+            $templates[EmailType::Welcome->value]['body'],
+        );
     }
 
     public function testGetDefaultTemplatesFallsBackToDefaultTemplateWhenLanguageFileMissing(): void
     {
         // Arrange - only default (non-language) paths exist
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturnCallback(static fn (string $p): bool => !str_contains($p, '/de/'));
-        $fs->method('getFileContents')->willReturnCallback(
-            static fn (string $p): string => '<en>body:' . basename($p),
-        );
-        $service = new EmailTemplateService(
-            $this->createStub(EmailTemplateRepository::class),
-            $fs,
-            self::PROJECT_DIR,
-        );
+        $fs->method('fileExists')->willReturnCallback(static fn(string $p): bool => !str_contains($p, '/de/'));
+        $fs->method('getFileContents')->willReturnCallback(static fn(string $p): string => '<en>body:' . basename($p));
+        $service = new EmailTemplateService($this->createStub(EmailTemplateRepository::class), $fs, self::PROJECT_DIR);
 
         // Act
         $templates = $service->getDefaultTemplates('de');
 
         // Assert
-        static::assertSame('<en>body:' . EmailType::Welcome->value . '.html', $templates[EmailType::Welcome->value]['body']);
+        static::assertSame(
+            '<en>body:' . EmailType::Welcome->value . '.html',
+            $templates[EmailType::Welcome->value]['body'],
+        );
     }
 
     public function testGetDefaultTemplatesThrowsWhenNeitherFileExists(): void
@@ -63,11 +59,7 @@ class EmailTemplateServiceTest extends TestCase
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(false);
-        $service = new EmailTemplateService(
-            $this->createStub(EmailTemplateRepository::class),
-            $fs,
-            self::PROJECT_DIR,
-        );
+        $service = new EmailTemplateService($this->createStub(EmailTemplateRepository::class), $fs, self::PROJECT_DIR);
 
         // Assert
         $this->expectException(RuntimeException::class);
@@ -82,11 +74,7 @@ class EmailTemplateServiceTest extends TestCase
         $template = $this->buildTemplate('de', 'Betreff', '<de>body');
         $repo = $this->createStub(EmailTemplateRepository::class);
         $repo->method('findByIdentifier')->willReturn($template);
-        $service = new EmailTemplateService(
-            $repo,
-            $this->createStub(ExtendedFilesystem::class),
-            self::PROJECT_DIR,
-        );
+        $service = new EmailTemplateService($repo, $this->createStub(ExtendedFilesystem::class), self::PROJECT_DIR);
 
         // Act
         $content = $service->getTemplateContent(EmailType::Welcome, 'de');
@@ -101,11 +89,7 @@ class EmailTemplateServiceTest extends TestCase
         $template = $this->buildTemplate('en', 'Welcome', '<en>body');
         $repo = $this->createStub(EmailTemplateRepository::class);
         $repo->method('findByIdentifier')->willReturn($template);
-        $service = new EmailTemplateService(
-            $repo,
-            $this->createStub(ExtendedFilesystem::class),
-            self::PROJECT_DIR,
-        );
+        $service = new EmailTemplateService($repo, $this->createStub(ExtendedFilesystem::class), self::PROJECT_DIR);
 
         // Act
         $content = $service->getTemplateContent(EmailType::Welcome, 'de');
@@ -119,11 +103,7 @@ class EmailTemplateServiceTest extends TestCase
         // Arrange
         $repo = $this->createStub(EmailTemplateRepository::class);
         $repo->method('findByIdentifier')->willReturn(null);
-        $service = new EmailTemplateService(
-            $repo,
-            $this->createStub(ExtendedFilesystem::class),
-            self::PROJECT_DIR,
-        );
+        $service = new EmailTemplateService($repo, $this->createStub(ExtendedFilesystem::class), self::PROJECT_DIR);
 
         // Assert
         $this->expectException(RuntimeException::class);
@@ -139,11 +119,7 @@ class EmailTemplateServiceTest extends TestCase
         $template->setIdentifier(EmailType::Welcome->value);
         $repo = $this->createStub(EmailTemplateRepository::class);
         $repo->method('findByIdentifier')->willReturn($template);
-        $service = new EmailTemplateService(
-            $repo,
-            $this->createStub(ExtendedFilesystem::class),
-            self::PROJECT_DIR,
-        );
+        $service = new EmailTemplateService($repo, $this->createStub(ExtendedFilesystem::class), self::PROJECT_DIR);
 
         // Assert
         $this->expectException(RuntimeException::class);
