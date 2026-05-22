@@ -30,11 +30,7 @@ class TranslationScanCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this->addArgument(
-            self::ARG_KEYS,
-            InputArgument::REQUIRED,
-            'Comma-separated translation keys to find',
-        );
+        $this->addArgument(self::ARG_KEYS, InputArgument::REQUIRED, 'Comma-separated translation keys to find');
         $this->addOption(
             self::OPT_PATHS,
             'p',
@@ -87,13 +83,7 @@ class TranslationScanCommand extends Command
                     if (!$this->lineMentionsKey($line, $key)) {
                         continue;
                     }
-                    $output->writeln(sprintf(
-                        '%s:%d  [%s]  %s',
-                        $relPath,
-                        $i + 1,
-                        $key,
-                        trim($line),
-                    ));
+                    $output->writeln(sprintf('%s:%d  [%s]  %s', $relPath, $i + 1, $key, trim($line)));
                     ++$totalHits;
                     ++$hitsByKey[$key];
                 }

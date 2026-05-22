@@ -18,9 +18,7 @@ final class WebsiteImageLocationProvider extends AbstractImageLocationProvider
 
     public function discoverImageIds(): array
     {
-        $row = $this->connection->fetchAssociative(
-            "SELECT value FROM config WHERE name = 'website_image_id' LIMIT 1",
-        );
+        $row = $this->connection->fetchAssociative("SELECT value FROM config WHERE name = 'website_image_id' LIMIT 1");
 
         if ($row === false) {
             return [];

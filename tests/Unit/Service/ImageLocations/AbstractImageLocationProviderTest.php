@@ -36,10 +36,7 @@ class AbstractImageLocationProviderTest extends TestCase
 {
     private function makeProvider(ImageLocationRepository $repo): TestLocationProvider
     {
-        return new TestLocationProvider(
-            repo: $repo,
-            connection: $this->createStub(Connection::class),
-        );
+        return new TestLocationProvider(repo: $repo, connection: $this->createStub(Connection::class));
     }
 
     // ---- sync(): DataProvider for insert/delete/no-op scenarios ----
@@ -56,16 +53,15 @@ class AbstractImageLocationProviderTest extends TestCase
         $repoMock->method('findPairsByType')->willReturn($currentPairs);
 
         if ($expectedToInsert !== []) {
-            $repoMock->expects($this->once())
-                ->method('insertForType')
-                ->with(ImageType::EventTeaser, $expectedToInsert);
+            $repoMock->expects($this->once())->method('insertForType')->with(ImageType::EventTeaser, $expectedToInsert);
         }
         if ($expectedToInsert === []) {
             $repoMock->expects($this->never())->method('insertForType');
         }
 
         if ($expectedToDelete !== []) {
-            $repoMock->expects($this->once())
+            $repoMock
+                ->expects($this->once())
                 ->method('deleteByTypeAndPairs')
                 ->with(ImageType::EventTeaser, $expectedToDelete);
         }
@@ -83,35 +79,35 @@ class AbstractImageLocationProviderTest extends TestCase
     public static function syncProvider(): iterable
     {
         yield 'empty discovered, empty current → no inserts, no deletes' => [
-            'currentPairs'    => [],
+            'currentPairs' => [],
             'discoveredPairs' => [],
             'expectedToInsert' => [],
             'expectedToDelete' => [],
         ];
 
         yield 'new pair discovered → insert called' => [
-            'currentPairs'    => [],
+            'currentPairs' => [],
             'discoveredPairs' => [['imageId' => 1, 'locationId' => 10]],
             'expectedToInsert' => [['imageId' => 1, 'locationId' => 10]],
             'expectedToDelete' => [],
         ];
 
         yield 'existing pair still discovered → no change' => [
-            'currentPairs'    => [['imageId' => 1, 'locationId' => 10]],
+            'currentPairs' => [['imageId' => 1, 'locationId' => 10]],
             'discoveredPairs' => [['imageId' => 1, 'locationId' => 10]],
             'expectedToInsert' => [],
             'expectedToDelete' => [],
         ];
 
         yield 'pair in DB but not discovered → delete called' => [
-            'currentPairs'    => [['imageId' => 2, 'locationId' => 20]],
+            'currentPairs' => [['imageId' => 2, 'locationId' => 20]],
             'discoveredPairs' => [],
             'expectedToInsert' => [],
             'expectedToDelete' => [['imageId' => 2, 'locationId' => 20]],
         ];
 
         yield 'mix: 1 new to insert, 1 to delete, 1 unchanged' => [
-            'currentPairs'    => [
+            'currentPairs' => [
                 ['imageId' => 1, 'locationId' => 10],
                 ['imageId' => 2, 'locationId' => 20],
             ],

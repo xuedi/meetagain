@@ -7,8 +7,8 @@ use App\Enum\EventTileLocation;
 use App\Enum\EventType;
 use App\Enum\WarmCacheType;
 use App\Plugin;
-use App\ValueObject\LinkCollection;
 use App\Repository\EventRepository;
+use App\ValueObject\LinkCollection;
 use Plugin\Dinnerclub\Repository\DinnerRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -54,9 +54,7 @@ class Kernel implements Plugin
         ]);
     }
 
-    public function loadPostExtendFixtures(OutputInterface $output): void
-    {
-    }
+    public function loadPostExtendFixtures(OutputInterface $output): void {}
 
     public function preFixtures(OutputInterface $output): void
     {
@@ -78,10 +76,7 @@ class Kernel implements Plugin
         return [];
     }
 
-    public function warmCache(WarmCacheType $type, array $ids): void
-    {
-    }
-
+    public function warmCache(WarmCacheType $type, array $ids): void {}
 
     public function getStylesheets(): array
     {

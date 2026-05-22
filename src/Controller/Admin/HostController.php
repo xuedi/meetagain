@@ -6,6 +6,7 @@ use App\Admin\Navigation\AdminLink;
 use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Host;
@@ -20,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -57,22 +59,19 @@ final class HostController extends AbstractController implements AdminNavigation
         $filterResult = $this->hostFilterService->getHostIdFilter();
         $hosts = $this->repo->findAllForAdmin($filterResult->getHostIds());
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%d</strong>&nbsp;%s',
-                    count($hosts),
-                    $this->translator->trans('admin_host.summary_total'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_host.page_title_create'),
-                    target: $this->generateUrl('app_admin_host_add'),
-                    icon: 'plus',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($hosts),
+                $this->translator->trans('admin_host.summary_total'),
+            )),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_host.page_title_create'),
+                target: $this->generateUrl('app_admin_host_add'),
+                icon: 'plus',
+            ),
+        ]);
 
         return $this->render('admin/host/list.html.twig', [
             'active' => 'host',
@@ -111,13 +110,17 @@ final class HostController extends AbstractController implements AdminNavigation
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_admin_host_delete', methods: ['GET'])]
-    public function delete(Host $host, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'app_admin_host_delete', methods: ['POST'])]
+    public function delete(Request $request, Host $host, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::HOST_DELETE, $host);
 
         if (!$this->hostFilterService->isHostAccessible($host->getId())) {
             throw $this->createNotFoundException('Host not found in current context.');
+        }
+
+        if (!$this->isCsrfTokenValid('admin_host_delete' . $host->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
         // Safe to delete regardless of events: the event_host join table has ON DELETE CASCADE,
@@ -167,16 +170,11 @@ final class HostController extends AbstractController implements AdminNavigation
         $isNew = $host->getId() === null;
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%s</strong>',
-                htmlspecialchars(
-                    $isNew
-                        ? $this->translator->trans('admin_host.page_title_create')
-                        : ($host->getName() ?? ''),
-                    ENT_QUOTES | ENT_HTML5,
-                    'UTF-8',
-                ),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+                $isNew ? $this->translator->trans('admin_host.page_title_create') : $host->getName() ?? '',
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
         ];
 
         if (!$isNew && $eventsUsingCount > 0) {
@@ -189,9 +187,10 @@ final class HostController extends AbstractController implements AdminNavigation
 
         $actions = [];
         if (!$isNew) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('global.button_delete'),
                 target: $this->generateUrl('app_admin_host_delete', ['id' => $host->getId()]),
+                csrfTokenId: 'admin_host_delete' . $host->getId(),
                 icon: 'trash',
                 variant: 'is-danger',
                 confirm: $this->translator->trans('admin_host.warning_delete_confirm'),

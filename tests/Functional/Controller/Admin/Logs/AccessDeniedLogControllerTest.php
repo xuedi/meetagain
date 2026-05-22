@@ -51,7 +51,11 @@ class AccessDeniedLogControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(0, $crawler->filter('.container .column.is-4')->count(), 'The top-100 sidebar column should be gone');
+        static::assertSame(
+            0,
+            $crawler->filter('.container .column.is-4')->count(),
+            'The top-100 sidebar column should be gone',
+        );
         static::assertSame(1, $crawler->filter('.container table')->count(), 'Only one table should remain');
     }
 
@@ -64,10 +68,7 @@ class AccessDeniedLogControllerTest extends WebTestCase
         $client->request('GET', '/en/admin/logs/access-denied');
 
         // Assert
-        static::assertTrue(
-            $client->getResponse()->isRedirect()
-                || $client->getResponse()->getStatusCode() === 403,
-        );
+        static::assertTrue($client->getResponse()->isRedirect() || $client->getResponse()->getStatusCode() === 403);
     }
 
     private function loginAsAdmin(KernelBrowser $client): void

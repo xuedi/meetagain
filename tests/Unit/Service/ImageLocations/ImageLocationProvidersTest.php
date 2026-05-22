@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service\ImageLocations;
 
@@ -270,10 +268,12 @@ class ImageLocationProvidersTest extends TestCase
         $conn->method('fetchAllAssociative')->willReturn([
             [
                 'id' => '3',
-                'json' => json_encode(['cards' => [
-                    ['image' => ['id' => 20]],
-                    ['image' => ['id' => 21]],
-                ]]),
+                'json' => json_encode([
+                    'cards' => [
+                        ['image' => ['id' => 20]],
+                        ['image' => ['id' => 21]],
+                    ],
+                ]),
             ],
         ]);
 
@@ -297,11 +297,13 @@ class ImageLocationProvidersTest extends TestCase
         $conn->method('fetchAllAssociative')->willReturn([
             [
                 'id' => '2',
-                'json' => json_encode(['cards' => [
-                    ['image' => null],
-                    ['image' => ['no_id' => true]],
-                    [],
-                ]]),
+                'json' => json_encode([
+                    'cards' => [
+                        ['image' => null],
+                        ['image' => ['no_id' => true]],
+                        [],
+                    ],
+                ]),
             ],
         ]);
 

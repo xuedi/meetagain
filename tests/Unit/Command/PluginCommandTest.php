@@ -77,15 +77,9 @@ class PluginCommandTest extends TestCase
     public function testEnablePluginCallsService(): void
     {
         // Arrange: expect install and enable to be called
-        $this->pluginService
-            ->expects($this->once())
-            ->method('install')
-            ->with('demo');
+        $this->pluginService->expects($this->once())->method('install')->with('demo');
 
-        $this->pluginService
-            ->expects($this->once())
-            ->method('enable')
-            ->with('demo');
+        $this->pluginService->expects($this->once())->method('enable')->with('demo');
 
         // Act: enable a plugin
         $exitCode = $this->commandTester->execute([
@@ -100,10 +94,7 @@ class PluginCommandTest extends TestCase
     public function testDisablePluginCallsService(): void
     {
         // Arrange: expect disable to be called
-        $this->pluginService
-            ->expects($this->once())
-            ->method('disable')
-            ->with('demo');
+        $this->pluginService->expects($this->once())->method('disable')->with('demo');
 
         // Act: disable a plugin
         $exitCode = $this->commandTester->execute([
@@ -118,10 +109,7 @@ class PluginCommandTest extends TestCase
     public function testDisableAllClearsConfig(): void
     {
         // Arrange: expect setPluginConfig to be called with empty array
-        $this->pluginService
-            ->expects($this->once())
-            ->method('setPluginConfig')
-            ->with([]);
+        $this->pluginService->expects($this->once())->method('setPluginConfig')->with([]);
 
         // Act: disable all plugins
         $exitCode = $this->commandTester->execute([

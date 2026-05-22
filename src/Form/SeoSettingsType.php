@@ -24,7 +24,11 @@ class SeoSettingsType extends AbstractType
             'label' => 'admin_system_seo.field_default',
             'required' => false,
             'data' => $this->configService->getSeoDescription('default'),
-            'attr' => ['rows' => 3, 'maxlength' => 160, 'placeholder' => $this->translator->trans('admin_system_seo.placeholder_default')],
+            'attr' => [
+                'rows' => 3,
+                'maxlength' => 160,
+                'placeholder' => $this->translator->trans('admin_system_seo.placeholder_default'),
+            ],
         ])->add('seoDescriptionEvents', TextareaType::class, [
             'label' => 'admin_system_seo.field_events',
             'required' => false,

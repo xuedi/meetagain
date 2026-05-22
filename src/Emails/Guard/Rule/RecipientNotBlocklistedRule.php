@@ -37,10 +37,7 @@ final readonly class RecipientNotBlocklistedRule implements EmailGuardRuleInterf
         }
 
         if ($this->blocklist->isBlocked((string) $user->getEmail())) {
-            return EmailGuardResult::skip(
-                $this->getName(),
-                'Recipient address is on the global email blocklist.',
-            );
+            return EmailGuardResult::skip($this->getName(), 'Recipient address is on the global email blocklist.');
         }
 
         return EmailGuardResult::pass($this->getName());

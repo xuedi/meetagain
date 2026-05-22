@@ -21,10 +21,10 @@ class ImageReportReasonTest extends TestCase
 
     public static function provideLabelCases(): iterable
     {
-        yield 'privacy'       => [ImageReportReason::Privacy,       'report.reason_privacy'];
-        yield 'copyright'     => [ImageReportReason::Copyright,     'report.reason_copyright'];
+        yield 'privacy' => [ImageReportReason::Privacy, 'report.reason_privacy'];
+        yield 'copyright' => [ImageReportReason::Copyright, 'report.reason_copyright'];
         yield 'inappropriate' => [ImageReportReason::Inappropriate, 'report.reason_inappropriate'];
-        yield 'irrelevant'    => [ImageReportReason::Irrelevant,    'report.reason_irrelevant'];
+        yield 'irrelevant' => [ImageReportReason::Irrelevant, 'report.reason_irrelevant'];
     }
 
     public function testGetChoicesReturnsAllCasesKeyedByTranslationKey(): void
@@ -36,10 +36,10 @@ class ImageReportReasonTest extends TestCase
         $choices = ImageReportReason::getChoices($translator);
 
         // Assert
-        static::assertSame(ImageReportReason::Privacy,       $choices['report.reason_privacy']);
-        static::assertSame(ImageReportReason::Copyright,     $choices['report.reason_copyright']);
+        static::assertSame(ImageReportReason::Privacy, $choices['report.reason_privacy']);
+        static::assertSame(ImageReportReason::Copyright, $choices['report.reason_copyright']);
         static::assertSame(ImageReportReason::Inappropriate, $choices['report.reason_inappropriate']);
-        static::assertSame(ImageReportReason::Irrelevant,    $choices['report.reason_irrelevant']);
+        static::assertSame(ImageReportReason::Irrelevant, $choices['report.reason_irrelevant']);
         static::assertCount(4, $choices);
     }
 
@@ -52,9 +52,9 @@ class ImageReportReasonTest extends TestCase
         $list = ImageReportReason::getTranslatedList($translator);
 
         // Assert - keyed by enum value (int), value is the translation key
-        static::assertSame('report.reason_privacy',       $list[ImageReportReason::Privacy->value]);
-        static::assertSame('report.reason_copyright',     $list[ImageReportReason::Copyright->value]);
+        static::assertSame('report.reason_privacy', $list[ImageReportReason::Privacy->value]);
+        static::assertSame('report.reason_copyright', $list[ImageReportReason::Copyright->value]);
         static::assertSame('report.reason_inappropriate', $list[ImageReportReason::Inappropriate->value]);
-        static::assertSame('report.reason_irrelevant',    $list[ImageReportReason::Irrelevant->value]);
+        static::assertSame('report.reason_irrelevant', $list[ImageReportReason::Irrelevant->value]);
     }
 }

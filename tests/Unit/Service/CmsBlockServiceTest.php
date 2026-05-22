@@ -20,8 +20,15 @@ class CmsBlockServiceTest extends TestCase
     private function makeHydrator(): BlockHydrator
     {
         $sanitizer = new class implements HtmlSanitizerInterface {
-            public function sanitize(string $input): string { return $input; }
-            public function sanitizeFor(string $context, string $input): string { return $input; }
+            public function sanitize(string $input): string
+            {
+                return $input;
+            }
+
+            public function sanitizeFor(string $context, string $input): string
+            {
+                return $input;
+            }
         };
 
         return new BlockHydrator($sanitizer);

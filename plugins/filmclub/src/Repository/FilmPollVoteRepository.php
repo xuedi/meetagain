@@ -42,7 +42,8 @@ class FilmPollVoteRepository extends ServiceEntityRepository
 
     public function countByPoll(int $pollId): int
     {
-        return (int) $this->createQueryBuilder('v')
+        return (int) $this
+            ->createQueryBuilder('v')
             ->select('COUNT(DISTINCT v.userId)')
             ->where('v.poll = :pollId')
             ->setParameter('pollId', $pollId)
@@ -52,7 +53,8 @@ class FilmPollVoteRepository extends ServiceEntityRepository
 
     public function deleteByPollAndUser(int $pollId, int $userId): void
     {
-        $this->createQueryBuilder('v')
+        $this
+            ->createQueryBuilder('v')
             ->delete()
             ->where('v.poll = :pollId AND v.userId = :userId')
             ->setParameter('pollId', $pollId)
@@ -66,7 +68,8 @@ class FilmPollVoteRepository extends ServiceEntityRepository
      */
     public function countVotesPerSuggestion(int $pollId): array
     {
-        $rows = $this->createQueryBuilder('v')
+        $rows = $this
+            ->createQueryBuilder('v')
             ->select('IDENTITY(v.suggestion) AS suggestion_id, COUNT(v.id) AS vote_count')
             ->where('v.poll = :pollId')
             ->setParameter('pollId', $pollId)
@@ -92,7 +95,8 @@ class FilmPollVoteRepository extends ServiceEntityRepository
      */
     public function countVotesPerFilm(int $pollId): array
     {
-        $rows = $this->createQueryBuilder('v')
+        $rows = $this
+            ->createQueryBuilder('v')
             ->select('IDENTITY(v.film) AS film_id, COUNT(v.id) AS vote_count')
             ->where('v.poll = :pollId')
             ->setParameter('pollId', $pollId)

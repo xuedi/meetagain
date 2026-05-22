@@ -122,16 +122,26 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
     {
         $lines = [];
         if ($before['start'] !== $after['start']) {
-            $lines[] = $this->translator->trans('email_event_update.line_start', [
-                '%before%' => $before['startFormatted'],
-                '%after%' => $after['startFormatted'],
-            ], 'messages', $language);
+            $lines[] = $this->translator->trans(
+                'email_event_update.line_start',
+                [
+                    '%before%' => $before['startFormatted'],
+                    '%after%' => $after['startFormatted'],
+                ],
+                'messages',
+                $language,
+            );
         }
         if ($before['locationId'] !== $after['locationId']) {
-            $lines[] = $this->translator->trans('email_event_update.line_location', [
-                '%before%' => htmlspecialchars($before['locationName']),
-                '%after%' => htmlspecialchars($after['locationName']),
-            ], 'messages', $language);
+            $lines[] = $this->translator->trans(
+                'email_event_update.line_location',
+                [
+                    '%before%' => htmlspecialchars($before['locationName']),
+                    '%after%' => htmlspecialchars($after['locationName']),
+                ],
+                'messages',
+                $language,
+            );
         }
         if ($before['canceled'] !== $after['canceled']) {
             $lines[] = $this->translator->trans(

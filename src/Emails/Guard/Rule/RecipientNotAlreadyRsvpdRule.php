@@ -40,10 +40,7 @@ final readonly class RecipientNotAlreadyRsvpdRule implements EmailGuardRuleInter
         }
 
         if ($event->hasRsvp($user)) {
-            return EmailGuardResult::skip(
-                $this->getName(),
-                "User already RSVP'd for this event.",
-            );
+            return EmailGuardResult::skip($this->getName(), "User already RSVP'd for this event.");
         }
 
         return EmailGuardResult::pass($this->getName());

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Service\Notification\User;
 
@@ -19,7 +17,6 @@ readonly class CoreImageReportProvider implements ReviewNotificationProviderInte
         private EntityManagerInterface $em,
         private Security $security,
     ) {}
-
 
     public function getIdentifier(): string
     {

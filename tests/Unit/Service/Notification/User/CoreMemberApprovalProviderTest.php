@@ -133,7 +133,8 @@ class CoreMemberApprovalProviderTest extends TestCase
         $userRepo->method('find')->willReturn($pending);
 
         $userService = $this->createMock(UserService::class);
-        $userService->expects($this->once())
+        $userService
+            ->expects($this->once())
             ->method('transitionStatus')
             ->with(static::isInstanceOf(User::class), $pending, UserStatus::Active);
 
@@ -172,7 +173,8 @@ class CoreMemberApprovalProviderTest extends TestCase
         $userRepo->method('find')->willReturn($pending);
 
         $userService = $this->createMock(UserService::class);
-        $userService->expects($this->once())
+        $userService
+            ->expects($this->once())
             ->method('transitionStatus')
             ->with(static::isInstanceOf(User::class), $pending, UserStatus::Denied);
 

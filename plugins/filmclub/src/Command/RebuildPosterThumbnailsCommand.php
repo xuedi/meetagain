@@ -51,7 +51,12 @@ final class RebuildPosterThumbnailsCommand extends Command
             }
         }
 
-        $io->success(sprintf('Built thumbnails for %d film(s); skipped %d (no poster); failed %d.', $built, $skipped, $failed));
+        $io->success(sprintf(
+            'Built thumbnails for %d film(s); skipped %d (no poster); failed %d.',
+            $built,
+            $skipped,
+            $failed,
+        ));
 
         return Command::SUCCESS;
     }

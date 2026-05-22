@@ -134,10 +134,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         $weekEnd = $now->modify('+8 days');
         $allUsers = $this->userRepo->findAnnouncementSubscribers();
 
-        return [new DueContext(
-            ['week' => $weekKey, 'weekStart' => $weekStart, 'weekEnd' => $weekEnd],
-            $allUsers,
-        )];
+        return [new DueContext(['week' => $weekKey, 'weekStart' => $weekStart, 'weekEnd' => $weekEnd], $allUsers)];
     }
 
     public function getPreviewContexts(DateTimeImmutable $for): array
@@ -147,10 +144,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         $weekEnd = $for->modify('+8 days');
         $allUsers = $this->userRepo->findAnnouncementSubscribers();
 
-        return [new DueContext(
-            ['week' => $weekKey, 'weekStart' => $weekStart, 'weekEnd' => $weekEnd],
-            $allUsers,
-        )];
+        return [new DueContext(['week' => $weekKey, 'weekStart' => $weekStart, 'weekEnd' => $weekEnd], $allUsers)];
     }
 
     public function markContextSent(DueContext $context): void
@@ -246,11 +240,15 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
             $url = sprintf('%s/%s/event/%s', $host, $lang, $event->getId());
 
             $html .= sprintf(
-                '<div style="margin-bottom:16px;padding:12px;border:1px solid #ddd;">' .
-                '<p><b>%s</b></p><p>%s - %s</p>' .
-                '<p><a href="%s">More Info</a> &nbsp; <a href="%s#rsvp">I Want to Go</a></p>' .
-                '</div>',
-                $title, $date, $location, $url, $url,
+                '<div style="margin-bottom:16px;padding:12px;border:1px solid #ddd;">'
+                . '<p><b>%s</b></p><p>%s - %s</p>'
+                . '<p><a href="%s">More Info</a> &nbsp; <a href="%s#rsvp">I Want to Go</a></p>'
+                . '</div>',
+                $title,
+                $date,
+                $location,
+                $url,
+                $url,
             );
         }
 

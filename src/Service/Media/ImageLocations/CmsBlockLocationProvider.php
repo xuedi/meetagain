@@ -22,9 +22,9 @@ final class CmsBlockLocationProvider extends AbstractImageLocationProvider
             'SELECT image_id, id AS location_id FROM cms_block WHERE image_id IS NOT NULL',
         );
 
-        return array_map(
-            static fn(array $r) => ['imageId' => (int) $r['image_id'], 'locationId' => (int) $r['location_id']],
-            $rows,
-        );
+        return array_map(static fn(array $r) => [
+            'imageId' => (int) $r['image_id'],
+            'locationId' => (int) $r['location_id'],
+        ], $rows);
     }
 }

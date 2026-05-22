@@ -23,11 +23,7 @@ class EmailQueueRepository extends ServiceEntityRepository
 
     public function countAll(): int
     {
-        return (int) $this
-            ->createQueryBuilder('eq')
-            ->select('COUNT(eq.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return (int) $this->createQueryBuilder('eq')->select('COUNT(eq.id)')->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -41,9 +37,7 @@ class EmailQueueRepository extends ServiceEntityRepository
         ?string $recipient = null,
         ?array $statuses = null,
     ): array {
-        $qb = $this->createQueryBuilder('eq')
-            ->orderBy('eq.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('eq')->orderBy('eq.createdAt', 'DESC')->setMaxResults($limit);
         $this->applyFilters($qb, $since, $template, $recipient, $statuses);
 
         return $qb->getQuery()->getResult();

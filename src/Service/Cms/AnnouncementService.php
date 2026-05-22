@@ -1,9 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Service\Cms;
 
+use App\Emails\Types\AnnouncementEmail;
 use App\Entity\Announcement;
 use App\Entity\BlockType\Gallery as GalleryType;
 use App\Entity\BlockType\Text as TextType;
@@ -15,7 +14,6 @@ use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
-use App\Emails\Types\AnnouncementEmail;
 use App\Service\Email\EmailTemplateService;
 use App\Service\Http\RequestHostResolver;
 use DateTimeImmutable;

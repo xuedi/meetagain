@@ -9,6 +9,7 @@ use Plugin\Dinnerclub\Service\DishListService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -119,9 +120,16 @@ final class ListController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'plugin_dinnerclub_lists_delete', methods: ['GET'])]
-    public function delete(int $id): Response
+    #[Route('/delete/{id}', name: 'plugin_dinnerclub_lists_delete', methods: ['POST'])]
+    public function delete(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'plugin_dinnerclub_lists_delete' . $id,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $user = $this->getAuthedUser();
 
         try {

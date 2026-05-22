@@ -26,10 +26,6 @@ final class RobotsController extends AbstractController
 
         $lines[] = 'Sitemap: ' . $sitemapUrl;
 
-        return new Response(
-            implode("\n", $lines) . "\n",
-            Response::HTTP_OK,
-            ['Content-Type' => 'text/plain'],
-        );
+        return new Response(implode("\n", $lines) . "\n", Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 }

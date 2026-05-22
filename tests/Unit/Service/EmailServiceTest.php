@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -230,7 +228,9 @@ final class EmailServiceTest extends TestCase
         $mailerMock->expects($this->never())->method('send');
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('error')
+        $loggerMock
+            ->expects($this->once())
+            ->method('error')
             ->with('Email dispatch skipped: past max_send_by cutoff', static::anything());
         $loggerMock->expects($this->once())->method('warning');
 

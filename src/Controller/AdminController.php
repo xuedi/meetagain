@@ -60,7 +60,16 @@ final class AdminController extends AbstractController
         if ($isAdmin && $isPlatform) {
             $this->buildAdminPlatform($year, $week, $centerTiles, $sideTiles);
         } else {
-            $this->buildScopedTiles($year, $week, $scope, $isOrganizer, $isSteward, $request->getLocale(), $centerTiles, $sideTiles);
+            $this->buildScopedTiles(
+                $year,
+                $week,
+                $scope,
+                $isOrganizer,
+                $isSteward,
+                $request->getLocale(),
+                $centerTiles,
+                $sideTiles,
+            );
         }
 
         return $this->render('admin/index.html.twig', [
@@ -83,9 +92,21 @@ final class AdminController extends AbstractController
             canvasId: 'platformActivityChart',
             labels: $activity['labels'],
             datasets: [
-                new TileDataset($this->translator->trans('admin_shell.dashboard_series_logins'), $activity['logins'], 'rgba(54, 162, 235, 1)'),
-                new TileDataset($this->translator->trans('admin_shell.dashboard_series_rsvps'), $activity['rsvps'], 'rgba(75, 192, 75, 1)'),
-                new TileDataset($this->translator->trans('admin_shell.dashboard_series_new_members'), $activity['newMembers'], 'rgba(255, 159, 64, 1)'),
+                new TileDataset(
+                    $this->translator->trans('admin_shell.dashboard_series_logins'),
+                    $activity['logins'],
+                    'rgba(54, 162, 235, 1)',
+                ),
+                new TileDataset(
+                    $this->translator->trans('admin_shell.dashboard_series_rsvps'),
+                    $activity['rsvps'],
+                    'rgba(75, 192, 75, 1)',
+                ),
+                new TileDataset(
+                    $this->translator->trans('admin_shell.dashboard_series_new_members'),
+                    $activity['newMembers'],
+                    'rgba(255, 159, 64, 1)',
+                ),
             ],
         );
 
@@ -104,7 +125,11 @@ final class AdminController extends AbstractController
         $details = $this->dashboardStats->getDetails($year, $week);
         $statsRows = [];
         foreach ($details as $key => $data) {
-            $statsRows[] = new TileRow([$this->translator->trans('admin_shell.dashboard_stats_metric_' . $key), (int) $data['count'], (int) $data['week']]);
+            $statsRows[] = new TileRow([
+                $this->translator->trans('admin_shell.dashboard_stats_metric_' . $key),
+                (int) $data['count'],
+                (int) $data['week'],
+            ]);
         }
         $statsRows[] = new TileRow([
             $this->translator->trans('admin_shell.dashboard_stats_active'),
@@ -127,45 +152,56 @@ final class AdminController extends AbstractController
         );
 
         $actionItems = $this->dashboardAction->getActionItems();
-        $sideTiles[] = new TableTile(
-            title: 'admin_shell.dashboard_action_items_title',
-            rows: [
-                new TileRow([$this->translator->trans('admin_shell.dashboard_action_reported_images'), $actionItems['reportedImages']]),
-                new TileRow([$this->translator->trans('admin_shell.dashboard_action_stale_emails'), $actionItems['staleEmails']]),
-                new TileRow([$this->translator->trans('admin_shell.dashboard_action_pending_emails'), $actionItems['pendingEmails']]),
-            ],
-        );
+        $sideTiles[] = new TableTile(title: 'admin_shell.dashboard_action_items_title', rows: [
+            new TileRow([
+                $this->translator->trans('admin_shell.dashboard_action_reported_images'),
+                $actionItems['reportedImages'],
+            ]),
+            new TileRow([
+                $this->translator->trans('admin_shell.dashboard_action_stale_emails'),
+                $actionItems['staleEmails'],
+            ]),
+            new TileRow([
+                $this->translator->trans('admin_shell.dashboard_action_pending_emails'),
+                $actionItems['pendingEmails'],
+            ]),
+        ]);
 
         $tests = $this->healthCheckService->runAll();
-        $sideTiles[] = new HealthTile(
-            title: 'admin_shell.dashboard_health_title',
-            checks: [
-                new TileHealthCheck('admin_shell.dashboard_health_cache', (bool) ($tests['cache']['ok'] ?? false)),
-                new TileHealthCheck(
-                    'admin_shell.dashboard_health_log_size',
-                    (bool) ($tests['logSize']['ok'] ?? false),
-                    sprintf('%.1fMB', ($tests['logSize']['size'] ?? 0) / 1024 / 1024),
-                ),
-                new TileHealthCheck(
-                    'admin_shell.dashboard_health_disk_space',
-                    (bool) ($tests['diskSpace']['ok'] ?? false),
-                    ($tests['diskSpace']['percentFree'] ?? 0) . '% free',
-                ),
-                new TileHealthCheck(
-                    'admin_shell.dashboard_health_php_version',
-                    true,
-                    $tests['phpVersion']['version'] ?? '',
-                ),
-            ],
-        );
+        $sideTiles[] = new HealthTile(title: 'admin_shell.dashboard_health_title', checks: [
+            new TileHealthCheck('admin_shell.dashboard_health_cache', (bool) ($tests['cache']['ok'] ?? false)),
+            new TileHealthCheck(
+                'admin_shell.dashboard_health_log_size',
+                (bool) ($tests['logSize']['ok'] ?? false),
+                sprintf('%.1fMB', (($tests['logSize']['size'] ?? 0) / 1024) / 1024),
+            ),
+            new TileHealthCheck(
+                'admin_shell.dashboard_health_disk_space',
+                (bool) ($tests['diskSpace']['ok'] ?? false),
+                ($tests['diskSpace']['percentFree'] ?? 0) . '% free',
+            ),
+            new TileHealthCheck(
+                'admin_shell.dashboard_health_php_version',
+                true,
+                $tests['phpVersion']['version'] ?? '',
+            ),
+        ]);
     }
 
     /**
      * @param list<DashboardTile> $centerTiles
      * @param list<DashboardTile> $sideTiles
      */
-    private function buildScopedTiles(int $year, int $week, DashboardScope $scope, bool $isOrganizer, bool $isSteward, string $locale, array &$centerTiles, array &$sideTiles): void
-    {
+    private function buildScopedTiles(
+        int $year,
+        int $week,
+        DashboardScope $scope,
+        bool $isOrganizer,
+        bool $isSteward,
+        string $locale,
+        array &$centerTiles,
+        array &$sideTiles,
+    ): void {
         if ($isOrganizer) {
             $rsvpYesTrend = $this->dashboardStats->getRsvpYesTrend($year, $week, $scope);
             $rsvpDataset = [];
@@ -242,12 +278,12 @@ final class AdminController extends AbstractController
 
         $messageStats = $this->dashboardAction->getMessageStats($scope);
         $socialStats = $this->dashboardStats->getSocialNetworkStats($year, $week, $scope);
-        $sideTiles[] = new TableTile(
-            title: 'admin_shell.dashboard_activity_title',
-            rows: [
-                new TileRow([$this->translator->trans('admin_shell.dashboard_activity_connections'), $socialStats['total']]),
-                new TileRow([$this->translator->trans('admin_shell.dashboard_activity_messages'), $messageStats['total']]),
-            ],
-        );
+        $sideTiles[] = new TableTile(title: 'admin_shell.dashboard_activity_title', rows: [
+            new TileRow([
+                $this->translator->trans('admin_shell.dashboard_activity_connections'),
+                $socialStats['total'],
+            ]),
+            new TileRow([$this->translator->trans('admin_shell.dashboard_activity_messages'), $messageStats['total']]),
+        ]);
     }
 }

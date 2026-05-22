@@ -18,25 +18,25 @@ class TrioCardsTest extends TestCase
             'headline' => 'Need more reasons?',
             'cards' => [
                 [
-                    'image'       => ['id' => 42, 'hash' => 'abc123'],
+                    'image' => ['id' => 42, 'hash' => 'abc123'],
                     'subHeadline' => 'Easy Integration',
-                    'text'        => 'Drop-in replacement...',
-                    'buttonText'  => 'Learn more',
-                    'buttonLink'  => '/features',
+                    'text' => 'Drop-in replacement...',
+                    'buttonText' => 'Learn more',
+                    'buttonLink' => '/features',
                 ],
                 [
-                    'image'       => null,
+                    'image' => null,
                     'subHeadline' => 'Lightning Fast',
-                    'text'        => 'Average delivery time under 1 second...',
-                    'buttonText'  => '',
-                    'buttonLink'  => '',
+                    'text' => 'Average delivery time under 1 second...',
+                    'buttonText' => '',
+                    'buttonLink' => '',
                 ],
                 [
-                    'image'       => ['id' => 43, 'hash' => 'def456'],
+                    'image' => ['id' => 43, 'hash' => 'def456'],
                     'subHeadline' => 'Great Support',
-                    'text'        => 'Real humans respond within the hour...',
-                    'buttonText'  => 'Contact us',
-                    'buttonLink'  => '/contact',
+                    'text' => 'Real humans respond within the hour...',
+                    'buttonText' => 'Contact us',
+                    'buttonLink' => '/contact',
                 ],
             ],
         ];
@@ -97,7 +97,13 @@ class TrioCardsTest extends TestCase
         $json = [
             'headline' => 'Test',
             'cards' => [
-                ['image' => ['id' => 1, 'hash' => 'hash1'], 'subHeadline' => 'A', 'text' => 'B', 'buttonText' => 'C', 'buttonLink' => '/c'],
+                [
+                    'image' => ['id' => 1, 'hash' => 'hash1'],
+                    'subHeadline' => 'A',
+                    'text' => 'B',
+                    'buttonText' => 'C',
+                    'buttonLink' => '/c',
+                ],
                 ['image' => null, 'subHeadline' => 'D', 'text' => 'E', 'buttonText' => '', 'buttonLink' => ''],
                 ['image' => null, 'subHeadline' => 'F', 'text' => 'G', 'buttonText' => 'H', 'buttonLink' => '/h'],
             ],

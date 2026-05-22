@@ -34,7 +34,6 @@
                     {% if is_granted('ROLE_USER') %}
                         <div class="level-right">
                             {% if comment.user.id == user.id %}
-                                {% set delete = path('app_event_delete_comment', {'id': comment.id, 'event': event.id}) %}
                                 {#
                                 <a class="level-item">
                                     <span class="icon is-small">
@@ -42,11 +41,14 @@
                                     </span>
                                 </a>
                                 #}
-                                <a class="level-item" href="{{ delete }}">
-                                    <span class="icon is-small">
-                                        <i class="fas fa-trash" aria-hidden="true"></i>
-                                    </span>
-                                </a>
+                                <form method="post" action="{{ path('app_event_delete_comment', {'id': comment.id, 'event': event.id}) }}" class="level-item is-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('app_event_delete_comment' ~ comment.id) }}">
+                                    <button type="submit" class="button is-ghost p-0">
+                                        <span class="icon is-small">
+                                            <i class="fas fa-trash" aria-hidden="true"></i>
+                                        </span>
+                                    </button>
+                                </form>
                             {% else %}
                                 <a class="level-item replyButton" data-comment="{{ comment.content }}">
                                     <span class="icon is-small">

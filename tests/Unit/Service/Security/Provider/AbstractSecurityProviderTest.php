@@ -46,13 +46,7 @@ class AbstractSecurityProviderTest extends TestCase
         $provider->processEventShouldFail = true;
 
         // Act
-        $report = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/'),
-            [],
-            'sess',
-            '1.2.3.4',
-        );
+        $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4');
 
         // Assert - returns baseline report without invoking processEvent
         static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
@@ -71,13 +65,7 @@ class AbstractSecurityProviderTest extends TestCase
         ];
 
         // Act
-        $report = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/foo'),
-            [],
-            'sess',
-            '1.2.3.4',
-        );
+        $report = $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
 
         // Assert - report carries fresh values
         static::assertSame(50, $report->threatLevel);
@@ -99,25 +87,13 @@ class AbstractSecurityProviderTest extends TestCase
             'details' => [],
         ];
         // First call: writes Block to state
-        $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/foo'),
-            [],
-            'sess',
-            '1.2.3.4',
-        );
+        $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
 
         // Now flip processEvent to a tripwire and call again
         $provider->processEventShouldFail = true;
 
         // Act - second observe must short-circuit
-        $report = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/foo'),
-            [],
-            'sess',
-            '1.2.3.4',
-        );
+        $report = $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
 
         // Assert - replays cached state
         static::assertSame(100, $report->threatLevel);
@@ -136,13 +112,7 @@ class AbstractSecurityProviderTest extends TestCase
         ];
 
         // Act
-        $report = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/'),
-            [],
-            'sess',
-            '1.2.3.4',
-        );
+        $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4');
 
         // Assert
         static::assertSame(SecurityRecommendation::Block, $report->recommendation);
@@ -185,13 +155,7 @@ class AbstractSecurityProviderTest extends TestCase
         ];
 
         // Act - loadState swallows, processEvent runs anyway
-        $report = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/'),
-            [],
-            'sess',
-            '1.2.3.4',
-        );
+        $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4');
 
         // Assert
         static::assertSame(10, $report->threatLevel);
@@ -211,13 +175,7 @@ class AbstractSecurityProviderTest extends TestCase
             'details' => [],
         ];
         foreach (['sess-a', 'sess-b'] as $sess) {
-            $provider->observe(
-                SecurityEventType::NotFound,
-                Request::create('/'),
-                [],
-                $sess,
-                '1.2.3.4',
-            );
+            $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], $sess, '1.2.3.4');
         }
 
         // Sanity: state keys exist
@@ -261,13 +219,7 @@ class AbstractSecurityProviderTest extends TestCase
         ];
 
         // Act - use a session id with slashes and colons
-        $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/'),
-            [],
-            'weird:session/key',
-            '1.2.3.4',
-        );
+        $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'weird:session/key', '1.2.3.4');
 
         // Assert - sanitised key was written
         static::assertTrue($cache->getItem('security_provider_fake_weird_session_key')->isHit());
@@ -317,12 +269,14 @@ class FakeSecurityProvider extends AbstractSecurityProvider
         }
         $this->lastLoadedState = $state;
 
-        return $this->nextResult ?? [
-            'state' => [],
-            'threatLevel' => 0,
-            'summary' => 'noop',
-            'details' => [],
-        ];
+        return (
+            $this->nextResult ?? [
+                'state' => [],
+                'threatLevel' => 0,
+                'summary' => 'noop',
+                'details' => [],
+            ]
+        );
     }
 
     #[Override]

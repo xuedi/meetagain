@@ -47,12 +47,14 @@
                         type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_accept') }}"
+                        data-token="{{ csrf_token('cookie_accept') }}"
                         aria-label="{{ "cookie.button_accept" | trans }}"
                     >{{ "cookie.button_accept" | trans }}</button>
                     <button
                         type="button"
                         class="button mr-2 cookieTrigger"
                         data-url="{{ path('app_ajax_cookie_deny') }}"
+                        data-token="{{ csrf_token('cookie_deny') }}"
                         aria-label="{{ "cookie.button_deny" | trans }}"
                     >{{ "cookie.button_deny" | trans }}</button>
                     <a

@@ -4,9 +4,9 @@ namespace App\Controller\Admin\Logs;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
-use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Repository\NotFoundLogRepository;
@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -57,24 +58,20 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
 
         $recent = $this->notFoundLogRepo->findFiltered(200, $since, $ipFilter, $fromFilter, $toFilter);
         $totalCount = $this->notFoundLogRepo->countAll();
-        $rangeCount = $since !== null
-            ? $this->notFoundLogRepo->countSince($since)
-            : $totalCount;
+        $rangeCount = $since !== null ? $this->notFoundLogRepo->countSince($since) : $totalCount;
 
         $actions = [];
         if ($totalCount > 0) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('global.button_clear'),
                 target: $this->generateUrl('app_admin_not_found_log_clear'),
+                csrfTokenId: 'admin_not_found_log_clear',
                 icon: 'trash',
             );
         }
         $actions[] = $this->buildRangeDropdown($range);
 
-        $adminTop = new AdminTop(
-            info: $this->buildInfo($totalCount, $rangeCount),
-            actions: $actions,
-        );
+        $adminTop = new AdminTop(info: $this->buildInfo($totalCount, $rangeCount), actions: $actions);
 
         return $this->render('admin/logs/logs_notFound_list.html.twig', [
             'active' => 'logs',
@@ -85,9 +82,13 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         ]);
     }
 
-    #[Route('/clear', name: 'app_admin_not_found_log_clear')]
-    public function clear(): RedirectResponse
+    #[Route('/clear', name: 'app_admin_not_found_log_clear', methods: ['POST'])]
+    public function clear(Request $request): RedirectResponse
     {
+        if (!$this->isCsrfTokenValid('admin_not_found_log_clear', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $this->connection->executeStatement('DELETE FROM logs_not_found');
 
         return $this->redirectToRoute('app_admin_not_found_log');

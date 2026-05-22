@@ -25,11 +25,7 @@ class ImageHtmlRendererTest extends TestCase
     public function testRenderThumbnail(): void
     {
         $image = new Image();
-        $this->imageRepo
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => 123])
-            ->willReturn($image);
+        $this->imageRepo->expects($this->once())->method('findOneBy')->with(['id' => 123])->willReturn($image);
 
         $this->twig
             ->expects($this->once())
@@ -47,11 +43,7 @@ class ImageHtmlRendererTest extends TestCase
     public function testRenderThumbnailWithDefaultSize(): void
     {
         $image = null;
-        $this->imageRepo
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => 456])
-            ->willReturn($image);
+        $this->imageRepo->expects($this->once())->method('findOneBy')->with(['id' => 456])->willReturn($image);
 
         $this->twig
             ->expects($this->once())

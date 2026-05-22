@@ -82,7 +82,7 @@ class EventsPageTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/en/event/toggleRsvp/1/');
+        $client->request('POST', '/en/event/toggleRsvp/1/', ['_token' => '']);
 
         $this->assertResponseRedirects();
     }
@@ -93,7 +93,9 @@ class EventsPageTest extends WebTestCase
 
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
-        $client->request('GET', '/en/event/toggleRsvp/1/');
+        $crawler = $client->request('GET', '/en/event/1');
+        $token = $crawler->filter('form[action*="toggleRsvp"] input[name="_token"]')->attr('value');
+        $client->request('POST', '/en/event/toggleRsvp/1/', ['_token' => $token]);
 
         $this->assertResponseRedirects();
     }
@@ -152,8 +154,12 @@ class EventsPageTest extends WebTestCase
 
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
-        // Try to delete a non-existent comment on existing event - should redirect back
-        $client->request('GET', '/en/event/1/deleteComment/999');
+        $rawToken = 'test-csrf-delete-comment-999';
+        $session = $client->getSession();
+        $session->set('_csrf/app_event_delete_comment999', $rawToken);
+        $session->save();
+
+        $client->request('POST', '/en/event/1/deleteComment/999', ['_token' => $rawToken]);
 
         $this->assertResponseRedirects();
     }

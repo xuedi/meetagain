@@ -15,15 +15,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class ConfigServiceTest extends TestCase
 {
     private const string SCSS_FIXTURE = <<<'SCSS'
-$primary: #abcdef;
-$link: #123456;
-$info: #aabbcc;
-$success: #00ff00;
-$warning: #ffaa00;
-$danger: #ff0000;
-$text-grey: #888888;
-$text-grey-light: #cccccc;
-SCSS;
+        $primary: #abcdef;
+        $link: #123456;
+        $info: #aabbcc;
+        $success: #00ff00;
+        $warning: #ffaa00;
+        $danger: #ff0000;
+        $text-grey: #888888;
+        $text-grey-light: #cccccc;
+        SCSS;
 
     public function testGetThemeColorsParsesAllRegisteredKeys(): void
     {
@@ -36,16 +36,19 @@ SCSS;
         $colors = $service->getThemeColors();
 
         // Assert
-        static::assertSame([
-            'color_primary' => '#abcdef',
-            'color_link' => '#123456',
-            'color_info' => '#aabbcc',
-            'color_success' => '#00ff00',
-            'color_warning' => '#ffaa00',
-            'color_danger' => '#ff0000',
-            'color_text_grey' => '#888888',
-            'color_text_grey_light' => '#cccccc',
-        ], $colors);
+        static::assertSame(
+            [
+                'color_primary' => '#abcdef',
+                'color_link' => '#123456',
+                'color_info' => '#aabbcc',
+                'color_success' => '#00ff00',
+                'color_warning' => '#ffaa00',
+                'color_danger' => '#ff0000',
+                'color_text_grey' => '#888888',
+                'color_text_grey_light' => '#cccccc',
+            ],
+            $colors,
+        );
     }
 
     public function testGetThemeColorsReturnsEmptyArrayWhenScssUnreadable(): void
@@ -86,7 +89,9 @@ SCSS;
         $written = null;
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('getFileContents')->willReturn(self::SCSS_FIXTURE);
-        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (&$written): bool {
+        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (
+            &$written,
+        ): bool {
             $written = $data;
             return true;
         });
@@ -114,7 +119,9 @@ SCSS;
         $written = null;
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('getFileContents')->willReturn(self::SCSS_FIXTURE);
-        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (&$written): bool {
+        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (
+            &$written,
+        ): bool {
             $written = $data;
             return true;
         });

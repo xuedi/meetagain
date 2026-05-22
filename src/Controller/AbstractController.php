@@ -38,7 +38,7 @@ abstract class AbstractController extends AbstractSymfonyController
         $assetMapper = $this->container->get(AssetMapperInterface::class);
 
         $preloads = [
-            'styles/app.scss'          => ['as' => 'style'],
+            'styles/app.scss' => ['as' => 'style'],
             'fonts/fa-solid-900.woff2' => ['as' => 'font', 'crossorigin' => 'anonymous'],
         ];
 

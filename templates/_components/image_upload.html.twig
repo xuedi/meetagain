@@ -37,20 +37,33 @@
             </a>
             {% if rotate %}
                 <a class="button is-link fileRotateTrigger"
-                   href="{{ path('app_image_rotate', {'entity': entity, 'id': id}) }}">
+                   href="{{ path('app_image_rotate', {'entity': entity, 'id': id}) }}"
+                   data-csrf-token="{{ csrf_token('app_image_rotate' ~ id) }}">
                     <span class="icon">
                         <i class="fa fa-rotate-right"></i>
                     </span>
                 </a>
             {% endif %}
             {% if removeImageUrl is defined and removeImageUrl is not null %}
-                <a class="button is-danger"
-                   href="{{ removeImageUrl }}"
-                   title="{{ 'shared.image_upload_remove_title'|trans }}">
-                    <span class="icon">
-                        <i class="fa fa-times"></i>
-                    </span>
-                </a>
+                {% if removeImageCsrfToken is defined and removeImageCsrfToken is not null %}
+                    <form method="post" action="{{ removeImageUrl }}" class="is-inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token(removeImageCsrfToken) }}">
+                        <button type="submit" class="button is-danger"
+                                title="{{ 'shared.image_upload_remove_title'|trans }}">
+                            <span class="icon">
+                                <i class="fa fa-times"></i>
+                            </span>
+                        </button>
+                    </form>
+                {% else %}
+                    <a class="button is-danger"
+                       href="{{ removeImageUrl }}"
+                       title="{{ 'shared.image_upload_remove_title'|trans }}">
+                        <span class="icon">
+                            <i class="fa fa-times"></i>
+                        </span>
+                    </a>
+                {% endif %}
             {% endif %}
         </div>
     </div>

@@ -23,7 +23,10 @@ class ChangedUsername extends MessageAbstract
 
     protected function renderText(): string
     {
-        return $this->translator->trans('profile_social.activity_changed_username', ['%old%' => $this->meta['old'], '%new%' => $this->meta['new']]);
+        return $this->translator->trans('profile_social.activity_changed_username', [
+            '%old%' => $this->meta['old'],
+            '%new%' => $this->meta['new'],
+        ]);
     }
 
     protected function renderHtml(): string

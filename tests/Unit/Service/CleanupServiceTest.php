@@ -64,7 +64,10 @@ class CleanupServiceTest extends TestCase
         // Arrange: mock user to return activities collection and ID
         $userMock = $this->createMock(User::class);
         $userMock->method('getId')->willReturn(42);
-        $userMock->expects($this->once())->method('getActivities')->willReturn(new ArrayCollection([$activityStub]));
+        $userMock
+            ->expects($this->once())
+            ->method('getActivities')
+            ->willReturn(new ArrayCollection([$activityStub]));
 
         // Arrange: mock user repository to return old registrations
         $userRepoMock = $this->createMock(UserRepository::class);

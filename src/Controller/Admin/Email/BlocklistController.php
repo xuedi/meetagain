@@ -15,6 +15,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -35,22 +36,19 @@ final class BlocklistController extends AbstractEmailController implements Admin
     {
         $entries = $this->repo->findAllOrdered();
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%d</strong>&nbsp;%s',
-                    count($entries),
-                    $this->translator->trans('admin_email_blocklist.summary_total'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_email_blocklist.button_add'),
-                    target: $this->generateUrl('app_admin_email_blocklist_add'),
-                    icon: 'plus',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($entries),
+                $this->translator->trans('admin_email_blocklist.summary_total'),
+            )),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_email_blocklist.button_add'),
+                target: $this->generateUrl('app_admin_email_blocklist_add'),
+                icon: 'plus',
+            ),
+        ]);
 
         return $this->render('admin/email/blocklist/list.html.twig', [
             'active' => 'email',
@@ -106,9 +104,16 @@ final class BlocklistController extends AbstractEmailController implements Admin
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_admin_email_blocklist_delete', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function delete(EmailBlocklistEntry $entry): Response
+    #[Route('/{id}/delete', name: 'app_admin_email_blocklist_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function delete(Request $request, EmailBlocklistEntry $entry): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_email_blocklist_delete' . $entry->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $removed = $entry->getEmail();
         $this->em->remove($entry);
         $this->em->flush();
@@ -122,20 +127,18 @@ final class BlocklistController extends AbstractEmailController implements Admin
 
     private function buildAddAdminTop(): AdminTop
     {
-        return new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%s</strong>',
-                    htmlspecialchars($this->translator->trans('admin_email_blocklist.add_title'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_email_blocklist'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        return new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+                $this->translator->trans('admin_email_blocklist.add_title'),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_email_blocklist'),
+                icon: 'arrow-left',
+            ),
+        ]);
     }
 }

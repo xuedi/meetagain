@@ -129,11 +129,7 @@ class ActivityServiceTest extends TestCase
 
         // Arrange: mock repository to return latest 250 activities sorted by date descending
         $repoMock = $this->createMock(ActivityRepository::class);
-        $repoMock
-            ->expects($this->once())
-            ->method('findRecentForAdmin')
-            ->with(250, null, null)
-            ->willReturn($activities);
+        $repoMock->expects($this->once())->method('findRecentForAdmin')->with(250, null, null)->willReturn($activities);
 
         // Arrange: mock MessageInterface instances that render messages for admin view (without links)
         $message1 = $this->createMock(MessageInterface::class);

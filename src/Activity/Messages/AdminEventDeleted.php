@@ -24,7 +24,9 @@ class AdminEventDeleted extends MessageAbstract
 
     protected function renderText(): string
     {
-        return $this->translator->trans('profile_social.activity_admin_event_deleted', ['%event%' => $this->meta['event_name']]);
+        return $this->translator->trans('profile_social.activity_admin_event_deleted', [
+            '%event%' => $this->meta['event_name'],
+        ]);
     }
 
     protected function renderHtml(): string

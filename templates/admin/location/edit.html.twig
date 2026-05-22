@@ -19,13 +19,24 @@
                 {% endif %}
             {% endset %}
 
+            {% set warningBoxContent %}
+                {{ warningContent }}
+                {% if events_using_location|length == 0 %}
+                    <div class="has-text-right mt-3">
+                        <form method="post" action="{{ path('app_admin_location_delete', {'id': location.id}) }}" class="is-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin_location_delete' ~ location.id) }}">
+                            <button type="submit" class="button">
+                                <span class="icon"><i class="fa fa-trash"></i></span>
+                                <span>{{ 'admin_location.warning_delete_button'|trans }}</span>
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            {% endset %}
             {% include '_components/warning_box.html.twig' with {
                 'id': 'location-delete-warning',
                 'title': 'admin_location.warning_delete_title'|trans,
-                'content': warningContent,
-                'buttonLabel': 'admin_location.warning_delete_button'|trans,
-                'buttonUrl': path('app_admin_location_delete', {'id': location.id}),
-                'showButton': events_using_location|length == 0,
+                'content': warningBoxContent,
                 'type': 'danger'
             } %}
         {% endif %}
@@ -71,11 +82,10 @@
                     <fieldset class="mt-5 p-4 fieldset-warning">
                         <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">{{ 'admin_location.danger_zone'|trans }}</legend>
 
-                        <a class="button is-light is-fullwidth toggleTrigger" data-id="location-delete-warning"
-                           href="{{ path('app_admin_location_delete', {'id': location.id}) }}">
+                        <button type="button" class="button is-light is-fullwidth toggleTrigger" data-id="location-delete-warning">
                             <span class="icon"><i class="fa fa-trash"></i></span>
                             <span>{{ 'admin_location.danger_delete_location'|trans }}</span>
-                        </a>
+                        </button>
                     </fieldset>
                 {% endif %}
             </div>

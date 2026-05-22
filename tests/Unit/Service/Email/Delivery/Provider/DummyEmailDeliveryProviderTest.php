@@ -10,13 +10,13 @@ class DummyEmailDeliveryProviderTest extends TestCase
 {
     public function testIsAvailableIsAlwaysFalse(): void
     {
-        static::assertFalse((new DummyEmailDeliveryProvider())->isAvailable());
+        static::assertFalse(new DummyEmailDeliveryProvider()->isAvailable());
     }
 
     public function testGetLogsReturnsEmptyCollection(): void
     {
         // Act
-        $collection = (new DummyEmailDeliveryProvider())->getLogs(new EmailDeliveryLogFilter());
+        $collection = new DummyEmailDeliveryProvider()->getLogs(new EmailDeliveryLogFilter());
 
         // Assert
         static::assertTrue($collection->isEmpty());
@@ -25,6 +25,6 @@ class DummyEmailDeliveryProviderTest extends TestCase
 
     public function testGetLogByMessageIdReturnsNull(): void
     {
-        static::assertNull((new DummyEmailDeliveryProvider())->getLogByMessageId('any-id'));
+        static::assertNull(new DummyEmailDeliveryProvider()->getLogByMessageId('any-id'));
     }
 }

@@ -23,7 +23,11 @@ final class ThemeControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertGreaterThan(15, $crawler->filter('.admin-section')->count(), 'All gallery sections should render');
+        static::assertGreaterThan(
+            15,
+            $crawler->filter('.admin-section')->count(),
+            'All gallery sections should render',
+        );
     }
 
     public function testGalleryFilterByCategoryHidesOtherCategories(): void
@@ -67,7 +71,11 @@ final class ThemeControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertGreaterThan(15, $crawler->filter('.admin-section')->count(), 'Full gallery should render on unknown category');
+        static::assertGreaterThan(
+            15,
+            $crawler->filter('.admin-section')->count(),
+            'Full gallery should render on unknown category',
+        );
     }
 
     public function testGalleryFallsBackForUnknownPageWithinCategory(): void
@@ -99,9 +107,7 @@ final class ThemeControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $body = (string) $client->getResponse()->getContent();
-        $visible = strip_tags(
-            (string) preg_replace('#<(script|style)[^>]*>.*?</\1>#is', ' ', $body),
-        );
+        $visible = strip_tags((string) preg_replace('#<(script|style)[^>]*>.*?</\1>#is', ' ', $body));
         if (preg_match('/\badmin_system_gallery\.[a-z][a-z0-9_]*\b/', $visible, $match) === 1) {
             static::fail("Gallery leaked a raw translation key in {$locale}: '{$match[0]}'");
         }

@@ -198,15 +198,15 @@ class MessageFixture extends AbstractFixture implements DependentFixtureInterfac
                 false,
             ],
             [
-                (new DateTimeImmutable('-30 minutes'))->format('Y-m-d H:i:s'),
+                new DateTimeImmutable('-30 minutes')->format('Y-m-d H:i:s'),
                 UserFixture::ADMIN,
                 UserFixture::ABRAHAM_BAKER,
                 'Quick reminder: study session tonight at 7.',
                 true,
-                (new DateTimeImmutable('-25 minutes'))->format('Y-m-d H:i:s'),
+                new DateTimeImmutable('-25 minutes')->format('Y-m-d H:i:s'),
             ],
             [
-                (new DateTimeImmutable('-2 minutes'))->format('Y-m-d H:i:s'),
+                new DateTimeImmutable('-2 minutes')->format('Y-m-d H:i:s'),
                 UserFixture::ADMIN,
                 UserFixture::ABRAHAM_BAKER,
                 'Did you bring the goban?',

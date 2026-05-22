@@ -7,6 +7,7 @@ use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Security\Permission\Attribute\PermissionAttribute;
@@ -15,12 +16,15 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system/cache')]
-final class RedisCacheController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
+final class RedisCacheController extends AbstractSettingsController implements
+    AdminNavigationInterface,
+    AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -70,9 +74,10 @@ final class RedisCacheController extends AbstractSettingsController implements A
 
         $actions = [];
         if ($totalKeys > 0) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('global.button_clear'),
                 target: $this->generateUrl('app_admin_system_redis_cache_clear'),
+                csrfTokenId: 'admin_system_redis_cache_clear',
                 icon: 'trash',
             );
         }
@@ -94,10 +99,14 @@ final class RedisCacheController extends AbstractSettingsController implements A
         ]);
     }
 
-    #[Route('/clear', name: 'app_admin_system_redis_cache_clear', methods: ['GET'])]
-    public function clear(): Response
+    #[Route('/clear', name: 'app_admin_system_redis_cache_clear', methods: ['POST'])]
+    public function clear(Request $request): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
+
+        if (!$this->isCsrfTokenValid('admin_system_redis_cache_clear', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $this->cacheClearer->clear('');
         $this->addFlash('success', $this->translator->trans('admin_system_cache.flash_cleared'));
@@ -120,14 +129,16 @@ final class RedisCacheController extends AbstractSettingsController implements A
         $adminTop = new AdminTop(
             info: $entry !== null
                 ? [
-                    new AdminTopInfoHtml(sprintf(
-                        '<strong>%s</strong>',
-                        htmlspecialchars($entry['key'], ENT_QUOTES, 'UTF-8'),
-                    )),
-                    new AdminTopInfoHtml(sprintf(
-                        '<span class="tag is-light is-medium">%s</span>',
-                        htmlspecialchars($entry['type'], ENT_QUOTES, 'UTF-8'),
-                    )),
+                    new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+                        $entry['key'],
+                        ENT_QUOTES,
+                        'UTF-8',
+                    ))),
+                    new AdminTopInfoHtml(sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
+                        $entry['type'],
+                        ENT_QUOTES,
+                        'UTF-8',
+                    ))),
                     new AdminTopInfoHtml(sprintf(
                         '<span class="has-text-grey">%s</span>',
                         $this->formatTtl($entry['ttl']),

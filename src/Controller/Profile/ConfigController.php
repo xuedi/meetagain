@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Profile;
 
@@ -15,6 +13,7 @@ use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -64,11 +63,20 @@ final class ConfigController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/config/toggle/{type}', name: 'app_profile_config_toggle', requirements: [
-        'type' => 'osm|tagging|notification|public',
-    ])]
+    #[Route(
+        '/profile/config/toggle/{type}',
+        name: 'app_profile_config_toggle',
+        requirements: [
+            'type' => 'osm|tagging|notification|public',
+        ],
+        methods: ['POST'],
+    )]
     public function toggle(Request $request, string $type): Response
     {
+        if (!$this->isCsrfTokenValid('app_profile_config_toggle' . $type, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $this->denyAccessUnlessGranted(PermissionAttribute::USER_UPDATE_SELF);
 
         $user = $this->getAuthedUser();
@@ -89,9 +97,20 @@ final class ConfigController extends AbstractController
         return $this->redirectToRoute('app_profile_config');
     }
 
-    #[Route('/profile/config/toggleNotification/{type}', name: 'app_profile_config_toggle_notification')]
+    #[Route(
+        '/profile/config/toggleNotification/{type}',
+        name: 'app_profile_config_toggle_notification',
+        methods: ['POST'],
+    )]
     public function toggleNotification(Request $request, string $type): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_profile_config_toggle_notification' . $type,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $user = $this->getAuthedUser();
         $setting = $user->getNotificationSettings()->toggle($type);
         $user->setNotificationSettings($setting);

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Twig;
 
@@ -183,10 +181,10 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             $schema = $provider->getOrganizationSchema();
             if ($schema !== null) {
                 return (
-                    json_encode(array_merge(
-                        ['@context' => 'https://schema.org'],
-                        is_array($schema) ? $schema : [],
-                    ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''
+                    json_encode(
+                        array_merge(['@context' => 'https://schema.org'], is_array($schema) ? $schema : []),
+                        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
+                    ) ?: ''
                 );
             }
         }

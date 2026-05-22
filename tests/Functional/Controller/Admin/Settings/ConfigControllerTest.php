@@ -25,7 +25,11 @@ final class ConfigControllerTest extends WebTestCase
         $bodyText = $crawler->filter('body')->text();
         static::assertStringContainsString('Website image', $bodyText);
         static::assertStringContainsString('Recommended 1200 x 630', $bodyText);
-        static::assertSame(1, $crawler->filter('input[type=file]')->count(), 'Website image upload field should render');
+        static::assertSame(
+            1,
+            $crawler->filter('input[type=file]')->count(),
+            'Website image upload field should render',
+        );
     }
 
     private function loginAsAdmin(KernelBrowser $client): void

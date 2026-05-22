@@ -23,11 +23,11 @@ use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use DateTime;
-use Psr\Log\LoggerInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -51,7 +51,10 @@ final class GetMaxSendByTest extends TestCase
         // budget = 3h, clock = 2026-04-21 10:00:00 -> now+3h = 2026-04-21 13:00:00
         yield 'event far in future uses 3h budget' => ['2026-04-21 18:00:00', '2026-04-21 13:00:00'];
         yield 'event soon (under 3h) clamps to event start' => ['2026-04-21 11:30:00', '2026-04-21 11:30:00'];
-        yield 'event already started returns past cap (real incident path)' => ['2026-04-21 08:00:00', '2026-04-21 08:00:00'];
+        yield 'event already started returns past cap (real incident path)' => [
+            '2026-04-21 08:00:00',
+            '2026-04-21 08:00:00',
+        ];
     }
 
     #[DataProvider('eventReminderProvider')]
@@ -64,10 +67,9 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
         );
-        $result = $email->getMaxSendBy(
-            ['event' => $this->eventStartingAt($eventStart)],
-            new DateTimeImmutable(self::NOW),
-        );
+        $result = $email->getMaxSendBy([
+            'event' => $this->eventStartingAt($eventStart),
+        ], new DateTimeImmutable(self::NOW));
 
         static::assertSame($expected, $result?->format('Y-m-d H:i:s'));
     }
@@ -105,10 +107,9 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
         );
-        $result = $email->getMaxSendBy(
-            ['event' => $this->eventStartingAt($eventStart)],
-            new DateTimeImmutable(self::NOW),
-        );
+        $result = $email->getMaxSendBy([
+            'event' => $this->eventStartingAt($eventStart),
+        ], new DateTimeImmutable(self::NOW));
 
         static::assertSame($expected, $result?->format('Y-m-d H:i:s'));
     }
@@ -123,10 +124,9 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(TranslatorInterface::class),
             $this->createStub(RequestHostResolver::class),
         );
-        $result = $email->getMaxSendBy(
-            ['event' => $this->eventStartingAt($eventStart)],
-            new DateTimeImmutable(self::NOW),
-        );
+        $result = $email->getMaxSendBy([
+            'event' => $this->eventStartingAt($eventStart),
+        ], new DateTimeImmutable(self::NOW));
 
         static::assertSame($expected, $result?->format('Y-m-d H:i:s'));
     }
@@ -165,10 +165,9 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
         );
-        $result = $email->getMaxSendBy(
-            ['event' => $this->eventStartingAt($eventStart)],
-            new DateTimeImmutable(self::NOW),
-        );
+        $result = $email->getMaxSendBy([
+            'event' => $this->eventStartingAt($eventStart),
+        ], new DateTimeImmutable(self::NOW));
 
         static::assertSame($expected, $result?->format('Y-m-d H:i:s'));
     }

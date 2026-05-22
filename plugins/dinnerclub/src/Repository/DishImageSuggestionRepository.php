@@ -28,10 +28,7 @@ class DishImageSuggestionRepository extends ServiceEntityRepository
 
     public function getLatestCreatedAt(): ?DateTimeImmutable
     {
-        $result = $this->createQueryBuilder('s')
-            ->select('MAX(s.createdAt)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $result = $this->createQueryBuilder('s')->select('MAX(s.createdAt)')->getQuery()->getSingleScalarResult();
 
         return $result !== null ? new DateTimeImmutable((string) $result) : null;
     }
@@ -39,7 +36,8 @@ class DishImageSuggestionRepository extends ServiceEntityRepository
     /** @return Dish[] */
     public function findDishesWithPendingSuggestions(): array
     {
-        $rows = $this->createQueryBuilder('s')
+        $rows = $this
+            ->createQueryBuilder('s')
             ->select('DISTINCT IDENTITY(s.dish) as dish_id')
             ->getQuery()
             ->getScalarResult();
@@ -50,8 +48,6 @@ class DishImageSuggestionRepository extends ServiceEntityRepository
 
         $dishIds = array_column($rows, 'dish_id');
 
-        return $this->getEntityManager()
-            ->getRepository(Dish::class)
-            ->findBy(['id' => $dishIds]);
+        return $this->getEntityManager()->getRepository(Dish::class)->findBy(['id' => $dishIds]);
     }
 }

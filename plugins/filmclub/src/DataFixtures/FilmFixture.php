@@ -70,9 +70,18 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
     ];
 
     private const array GENRES = [
-        'drama', 'comedy', 'action', 'thriller', 'horror',
-        'sci-fi', 'documentary', 'animation', 'fantasy', 'mystery',
-        'romance', 'western',
+        'drama',
+        'comedy',
+        'action',
+        'thriller',
+        'horror',
+        'sci-fi',
+        'documentary',
+        'animation',
+        'fantasy',
+        'mystery',
+        'romance',
+        'western',
     ];
 
     public function __construct(

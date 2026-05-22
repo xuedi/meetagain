@@ -16,10 +16,8 @@ final class SitemapController extends AbstractController
     #[Route('/sitemap.xml', name: 'app_sitemap')]
     public function index(): Response
     {
-        return new Response(
-            $this->sitemapService->renderXml(),
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/xml; charset=UTF-8'],
-        );
+        return new Response($this->sitemapService->renderXml(), Response::HTTP_OK, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+        ]);
     }
 }

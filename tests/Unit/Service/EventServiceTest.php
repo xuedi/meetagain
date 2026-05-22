@@ -3,10 +3,10 @@
 namespace Tests\Unit\Service;
 
 use App\Emails\Types\NotificationEventCanceledEmail;
+use App\Enum\EventInterval;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
-use App\Enum\EventInterval;
 use App\Enum\EventType;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
@@ -360,5 +360,4 @@ class EventServiceTest extends TestCase
         // Act & Assert
         static::assertSame(0, $subject->updateRecurringEvents($child));
     }
-
 }

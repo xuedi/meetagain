@@ -40,7 +40,11 @@ class BlockedUser extends MessageAbstract
             return $this->translator->trans('profile_social.activity_blocked_user_deleted');
         }
 
-        $link = sprintf('<a href="%s">%s</a>', $this->router->generate('app_member_view', ['id' => $userId]), $this->escapeHtml($userName));
+        $link = sprintf(
+            '<a href="%s">%s</a>',
+            $this->router->generate('app_member_view', ['id' => $userId]),
+            $this->escapeHtml($userName),
+        );
 
         return $this->translator->trans('profile_social.activity_blocked_user', ['%user%' => $link]);
     }

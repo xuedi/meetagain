@@ -16,12 +16,12 @@ enum UserStatus: int
     public function label(): string
     {
         return match ($this) {
-            self::Registered    => 'admin_member.status_registered',
+            self::Registered => 'admin_member.status_registered',
             self::EmailVerified => 'admin_member.status_email_verified',
-            self::Active        => 'admin_member.status_active',
-            self::Blocked       => 'admin_member.status_blocked',
-            self::Deleted       => 'admin_member.status_deleted',
-            self::Denied        => 'admin_member.status_denied',
+            self::Active => 'admin_member.status_active',
+            self::Blocked => 'admin_member.status_blocked',
+            self::Deleted => 'admin_member.status_deleted',
+            self::Denied => 'admin_member.status_denied',
         };
     }
 

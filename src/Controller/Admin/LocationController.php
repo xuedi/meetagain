@@ -21,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -58,22 +59,19 @@ final class LocationController extends AbstractController implements AdminNaviga
         $filterResult = $this->locationFilterService->getLocationIdFilter();
         $locations = $this->repo->findAllForAdmin($filterResult->getLocationIds());
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%d</strong>&nbsp;%s',
-                    count($locations),
-                    $this->translator->trans('admin_location.summary_total'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_location.page_title_create'),
-                    target: $this->generateUrl('app_admin_location_add'),
-                    icon: 'plus',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                count($locations),
+                $this->translator->trans('admin_location.summary_total'),
+            )),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_location.page_title_create'),
+                target: $this->generateUrl('app_admin_location_add'),
+                icon: 'plus',
+            ),
+        ]);
 
         return $this->render('admin/location/list.html.twig', [
             'active' => 'location',
@@ -115,9 +113,16 @@ final class LocationController extends AbstractController implements AdminNaviga
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_admin_location_delete', methods: ['GET'])]
-    public function delete(Location $location, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'app_admin_location_delete', methods: ['POST'])]
+    public function delete(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_location_delete' . $location->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $this->denyAccessUnlessGranted(PermissionAttribute::LOCATION_DELETE, $location);
 
         if (!$this->locationFilterService->isLocationAccessible($location->getId())) {
@@ -126,10 +131,9 @@ final class LocationController extends AbstractController implements AdminNaviga
 
         $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
         if (count($eventsUsingLocation) > 0) {
-            $this->addFlash(
-                'error',
-                $this->translator->trans('admin_location.flash_delete_blocked', ['%count%' => count($eventsUsingLocation)]),
-            );
+            $this->addFlash('error', $this->translator->trans('admin_location.flash_delete_blocked', [
+                '%count%' => count($eventsUsingLocation),
+            ]));
 
             return $this->redirectToRoute('app_admin_location_edit', ['id' => $location->getId()]);
         }
@@ -182,16 +186,11 @@ final class LocationController extends AbstractController implements AdminNaviga
         $isNew = $location->getId() === null;
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%s</strong>',
-                htmlspecialchars(
-                    $isNew
-                        ? $this->translator->trans('admin_location.page_title_create')
-                        : ($location->getName() ?? ''),
-                    ENT_QUOTES | ENT_HTML5,
-                    'UTF-8',
-                ),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+                $isNew ? $this->translator->trans('admin_location.page_title_create') : $location->getName() ?? '',
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
         ];
 
         if (!$isNew && $eventsUsingCount > 0) {
@@ -202,15 +201,12 @@ final class LocationController extends AbstractController implements AdminNaviga
             ));
         }
 
-        return new AdminTop(
-            info: $info,
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_location'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        return new AdminTop(info: $info, actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_location'),
+                icon: 'arrow-left',
+            ),
+        ]);
     }
 }

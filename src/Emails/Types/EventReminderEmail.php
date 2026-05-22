@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Emails\Types;
 
@@ -164,7 +162,8 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
 
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::EventReminder->value,
-                label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
+                label: 'Event: '
+                . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
                 expectedTime: DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT5H')),
                 expectedRecipients: $eligibleCount,
             );

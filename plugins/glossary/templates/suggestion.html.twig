@@ -26,14 +26,18 @@
                                 <b>{{ suggestion.field.value }}</b> to '<b>{{ value }}</b>'
                             </p>
                             <div class="has-text-right mt-4">
-                                {% set applyLink = path('app_plugin_glossary_suggestion_apply', {id: editItem.id, hash: suggestion.hash}) %}
-                                {% set denyLink = path('app_plugin_glossary_suggestion_delete', {id: editItem.id, hash: suggestion.hash}) %}
-                                <a class="button is-success is-small" href="{{ applyLink }}">
-                                    <i class="fas fa-check"></i>
-                                </a>
-                                <a class="button is-danger is-small" href="{{ denyLink }}">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                <form method="post" action="{{ path('app_plugin_glossary_suggestion_apply', {id: editItem.id, hash: suggestion.hash}) }}" class="is-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('glossary_suggestion_apply' ~ editItem.id ~ suggestion.hash) }}">
+                                    <button type="submit" class="button is-success is-small">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form method="post" action="{{ path('app_plugin_glossary_suggestion_delete', {id: editItem.id, hash: suggestion.hash}) }}" class="is-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('glossary_suggestion_delete' ~ editItem.id ~ suggestion.hash) }}">
+                                    <button type="submit" class="button is-danger is-small">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         {% endfor %}

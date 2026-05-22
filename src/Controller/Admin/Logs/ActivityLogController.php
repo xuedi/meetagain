@@ -71,10 +71,9 @@ final class ActivityLogController extends AbstractLogsController implements Admi
         $actions = [$this->buildRangeDropdown($range, $resolvedUserId)];
         if ($userFilter !== null) {
             $actions[] = new AdminTopActionButton(
-                label: $this->translator->trans(
-                    'admin_logs.remove_user_filter',
-                    ['%email%' => (string) $userFilter->getEmail()],
-                ),
+                label: $this->translator->trans('admin_logs.remove_user_filter', [
+                    '%email%' => (string) $userFilter->getEmail(),
+                ]),
                 target: $this->generateUrl('app_admin_activity_log', $this->preserveRangeParams($range)),
                 icon: 'xmark',
             );
@@ -105,25 +104,20 @@ final class ActivityLogController extends AbstractLogsController implements Admi
             throw $this->createNotFoundException();
         }
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%s</strong>',
-                    $activity->getCreatedAt()->format('Y-m-d H:i:s'),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="tag is-light is-medium">%s</span>',
-                    htmlspecialchars($activity->getType() ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_logs.back'),
-                    target: $this->generateUrl('app_admin_activity_log'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', $activity->getCreatedAt()->format('Y-m-d H:i:s'))),
+            new AdminTopInfoHtml(sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
+                $activity->getType() ?? '',
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_logs.back'),
+                target: $this->generateUrl('app_admin_activity_log'),
+                icon: 'arrow-left',
+            ),
+        ]);
 
         return $this->render('admin/logs/logs_activity_show.html.twig', [
             'active' => 'logs',

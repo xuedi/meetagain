@@ -7,6 +7,7 @@ use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Service\System\SystemLogService;
@@ -14,6 +15,7 @@ use App\ValueObject\LogEntry;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -69,18 +71,16 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         $totalCount = count($allEntries);
         $filteredEntries = $this->systemLogService->filterEntries($allEntries, $since, $levels);
 
-        $adminTop = new AdminTop(
-            info: $this->buildInfo($totalCount, $allEntries, $since),
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_clear'),
-                    target: $this->generateUrl('app_admin_system_log_cleanup'),
-                    icon: 'trash',
-                ),
-                $this->buildLevelDropdown($level, $range, $allEntries, $since),
-                $this->buildRangeDropdown($range, $level, $allEntries, $levels),
-            ],
-        );
+        $adminTop = new AdminTop(info: $this->buildInfo($totalCount, $allEntries, $since), actions: [
+            new AdminTopActionForm(
+                label: $this->translator->trans('global.button_clear'),
+                target: $this->generateUrl('app_admin_system_log_cleanup'),
+                csrfTokenId: 'admin_system_log_cleanup',
+                icon: 'trash',
+            ),
+            $this->buildLevelDropdown($level, $range, $allEntries, $since),
+            $this->buildRangeDropdown($range, $level, $allEntries, $levels),
+        ]);
 
         return $this->render('admin/logs/logs_system_list.html.twig', [
             'active' => 'logs',
@@ -99,29 +99,26 @@ final class SystemLogController extends AbstractLogsController implements AdminN
             throw new NotFoundHttpException();
         }
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%s</strong>',
-                    htmlspecialchars($entry->getDate()->format('Y-m-d H:i:s'), ENT_QUOTES),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="tag is-medium">%s</span>',
-                    htmlspecialchars($entry->getLevel(), ENT_QUOTES),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="has-text-grey">%s</span>',
-                    htmlspecialchars($entry->getType(), ENT_QUOTES),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_system_log'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+                $entry->getDate()->format('Y-m-d H:i:s'),
+                ENT_QUOTES,
+            ))),
+            new AdminTopInfoHtml(sprintf('<span class="tag is-medium">%s</span>', htmlspecialchars(
+                $entry->getLevel(),
+                ENT_QUOTES,
+            ))),
+            new AdminTopInfoHtml(sprintf('<span class="has-text-grey">%s</span>', htmlspecialchars(
+                $entry->getType(),
+                ENT_QUOTES,
+            ))),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_system_log'),
+                icon: 'arrow-left',
+            ),
+        ]);
 
         return $this->render('admin/logs/logs_system_show.html.twig', [
             'active' => 'logs',
@@ -132,14 +129,15 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         ]);
     }
 
-    #[Route('/cleanup', name: 'app_admin_system_log_cleanup')]
-    public function cleanup(): Response
+    #[Route('/cleanup', name: 'app_admin_system_log_cleanup', methods: ['POST'])]
+    public function cleanup(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('admin_system_log_cleanup', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $deleted = $this->systemLogService->deleteOlderThan(new DateTimeImmutable('-1 month'));
-        $this->addFlash('success', $this->translator->trans(
-            'admin_logs.flash_cleanup_done',
-            ['%count%' => $deleted],
-        ));
+        $this->addFlash('success', $this->translator->trans('admin_logs.flash_cleanup_done', ['%count%' => $deleted]));
 
         return $this->redirectToRoute('app_admin_system_log');
     }
@@ -161,7 +159,12 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         $rangeEntries = $since !== null
             ? $this->systemLogService->filterEntries($allEntries, $since, null)
             : $allEntries;
-        $errorCount = $this->systemLogService->countByLevels($rangeEntries, ['ERROR', 'CRITICAL', 'ALERT', 'EMERGENCY']);
+        $errorCount = $this->systemLogService->countByLevels($rangeEntries, [
+            'ERROR',
+            'CRITICAL',
+            'ALERT',
+            'EMERGENCY',
+        ]);
         $warningCount = $this->systemLogService->countByLevels($rangeEntries, ['WARNING']);
 
         if ($since !== null) {
@@ -197,8 +200,12 @@ final class SystemLogController extends AbstractLogsController implements AdminN
     /**
      * @param list<LogEntry> $allEntries
      */
-    private function buildLevelDropdown(string $current, string $range, array $allEntries, ?DateTimeImmutable $since): AdminTopActionDropdown
-    {
+    private function buildLevelDropdown(
+        string $current,
+        string $range,
+        array $allEntries,
+        ?DateTimeImmutable $since,
+    ): AdminTopActionDropdown {
         $rangeEntries = $this->systemLogService->filterEntries($allEntries, $since, null);
         $options = [];
         foreach (self::LEVEL_FILTERS as $key => $levels) {
@@ -236,8 +243,12 @@ final class SystemLogController extends AbstractLogsController implements AdminN
      * @param list<LogEntry> $allEntries
      * @param list<string>|null $levels
      */
-    private function buildRangeDropdown(string $current, string $level, array $allEntries, ?array $levels): AdminTopActionDropdown
-    {
+    private function buildRangeDropdown(
+        string $current,
+        string $level,
+        array $allEntries,
+        ?array $levels,
+    ): AdminTopActionDropdown {
         $options = [];
         foreach (self::RANGE_OFFSETS as $key => $offset) {
             $params = [];

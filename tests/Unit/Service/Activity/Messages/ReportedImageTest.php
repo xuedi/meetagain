@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Service\Activity\Messages;
 
-use App\Enum\ImageReportReason;
 use App\Activity\MessageInterface;
 use App\Activity\Messages\ReportedImage;
+use App\Enum\ImageReportReason;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -67,7 +67,9 @@ class ReportedImageTest extends TestCase
         $this->expectExceptionObject(new InvalidArgumentException("Missing 'image_id' in meta in core.reported_image"));
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, $this->translator, ['reason' => ImageReportReason::Privacy->value]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, [
+            'reason' => ImageReportReason::Privacy->value,
+        ]);
         $subject->validate();
     }
 
@@ -101,7 +103,10 @@ class ReportedImageTest extends TestCase
         );
 
         $subject = new ReportedImage();
-        $subject->injectServices($this->router, $this->imageService, $this->translator, ['image_id' => 42, 'reason' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, [
+            'image_id' => 42,
+            'reason' => 'not-a-number',
+        ]);
         $subject->validate();
     }
 }

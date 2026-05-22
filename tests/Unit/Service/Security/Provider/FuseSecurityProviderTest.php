@@ -18,13 +18,7 @@ class FuseSecurityProviderTest extends TestCase
         $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
 
         // Act
-        $report = $provider->observe(
-            SecurityEventType::NotFound,
-            new Request(),
-            [],
-            'session-1',
-            '1.2.3.4',
-        );
+        $report = $provider->observe(SecurityEventType::NotFound, new Request(), [], 'session-1', '1.2.3.4');
 
         // Assert
         static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
@@ -37,7 +31,7 @@ class FuseSecurityProviderTest extends TestCase
 
         // Act
         $finalReport = null;
-        for ($i = 0; $i < FuseSecurityProvider::EVENTS_PER_IP_FUSE + 1; ++$i) {
+        for ($i = 0; $i < (FuseSecurityProvider::EVENTS_PER_IP_FUSE + 1); ++$i) {
             $finalReport = $provider->observe(
                 SecurityEventType::NotFound,
                 new Request(),
@@ -60,7 +54,7 @@ class FuseSecurityProviderTest extends TestCase
 
         // Act - cycle through many sessions on the same IP
         $finalReport = null;
-        for ($i = 0; $i < FuseSecurityProvider::EVENTS_PER_IP_FUSE + 1; ++$i) {
+        for ($i = 0; $i < (FuseSecurityProvider::EVENTS_PER_IP_FUSE + 1); ++$i) {
             $finalReport = $provider->observe(
                 SecurityEventType::NotFound,
                 new Request(),
@@ -84,8 +78,22 @@ class FuseSecurityProviderTest extends TestCase
         }
 
         // Act - read-only should return cached state without incrementing
-        $report1 = $provider->observe(SecurityEventType::NotFound, new Request(), [], 'sess', '9.9.9.9', readOnly: true);
-        $report2 = $provider->observe(SecurityEventType::NotFound, new Request(), [], 'sess', '9.9.9.9', readOnly: true);
+        $report1 = $provider->observe(
+            SecurityEventType::NotFound,
+            new Request(),
+            [],
+            'sess',
+            '9.9.9.9',
+            readOnly: true,
+        );
+        $report2 = $provider->observe(
+            SecurityEventType::NotFound,
+            new Request(),
+            [],
+            'sess',
+            '9.9.9.9',
+            readOnly: true,
+        );
 
         // Assert - threat level didn't grow despite multiple observe calls
         static::assertSame($report1->threatLevel, $report2->threatLevel);

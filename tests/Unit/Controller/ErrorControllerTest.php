@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Tests\Unit\Controller;
 
@@ -31,7 +29,16 @@ final class ErrorControllerTest extends TestCase
         $twig
             ->expects(static::once())
             ->method('render')
-            ->with('error/404.html.twig', static::callback(static fn (array $context) => $context['_locale'] === 'de' && is_string($context['message']) && $context['message'] !== ''))
+            ->with(
+                'error/404.html.twig',
+                static::callback(
+                    static fn(array $context) => (
+                        $context['_locale'] === 'de'
+                        && is_string($context['message'])
+                        && $context['message'] !== ''
+                    ),
+                ),
+            )
             ->willReturn('<html>404</html>');
 
         $controller = new ErrorController($twig);
@@ -54,7 +61,7 @@ final class ErrorControllerTest extends TestCase
         $twig
             ->expects(static::once())
             ->method('render')
-            ->with('error/403.html.twig', static::callback(static fn (array $context) => $context['_locale'] === 'en'))
+            ->with('error/403.html.twig', static::callback(static fn(array $context) => $context['_locale'] === 'en'))
             ->willReturn('<html>403</html>');
 
         $controller = new ErrorController($twig);
@@ -77,7 +84,7 @@ final class ErrorControllerTest extends TestCase
         $twig
             ->expects(static::once())
             ->method('render')
-            ->with('error/403.html.twig', static::callback(static fn (array $context) => $context['_locale'] === 'en'))
+            ->with('error/403.html.twig', static::callback(static fn(array $context) => $context['_locale'] === 'en'))
             ->willReturn('<html>403</html>');
 
         $controller = new ErrorController($twig);

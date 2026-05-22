@@ -28,9 +28,21 @@ class MemberControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(0, $crawler->filter('input[name="user[name]"]')->count(), 'Name field should not be editable');
-        static::assertSame(0, $crawler->filter('textarea[name="user[bio]"]')->count(), 'Bio field should not be editable');
-        static::assertGreaterThan(0, $crawler->filter('form[action*="set-role"]')->count(), 'Role action form should exist');
+        static::assertSame(
+            0,
+            $crawler->filter('input[name="user[name]"]')->count(),
+            'Name field should not be editable',
+        );
+        static::assertSame(
+            0,
+            $crawler->filter('textarea[name="user[bio]"]')->count(),
+            'Bio field should not be editable',
+        );
+        static::assertGreaterThan(
+            0,
+            $crawler->filter('form[action*="set-role"]')->count(),
+            'Role action form should exist',
+        );
     }
 
     public function testSetRolePromotesUserToAdmin(): void
@@ -166,7 +178,11 @@ class MemberControllerTest extends WebTestCase
         $this->assertResponseRedirects();
         $em->clear();
         $reloaded = $em->getRepository(User::class)->find($target->getId());
-        static::assertSame(UserStatus::Active, $reloaded->getStatus(), 'Status must not change on disallowed transition');
+        static::assertSame(
+            UserStatus::Active,
+            $reloaded->getStatus(),
+            'Status must not change on disallowed transition',
+        );
     }
 
     private function loginAsAdmin(KernelBrowser $client): void
@@ -201,10 +217,12 @@ class MemberControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/en/admin/member/edit/' . $userId);
         $this->assertResponseIsSuccessful();
 
-        $forms = $crawler->filter('form')->reduce(static function ($form) use ($actionFragment): bool {
-            $action = (string) $form->attr('action');
-            return str_contains($action, $actionFragment);
-        });
+        $forms = $crawler
+            ->filter('form')
+            ->reduce(static function ($form) use ($actionFragment): bool {
+                $action = (string) $form->attr('action');
+                return str_contains($action, $actionFragment);
+            });
         static::assertGreaterThan(0, $forms->count(), "Form with action containing '{$actionFragment}' should exist");
 
         $token = $forms->first()->filter('input[name="_token"]')->attr('value');

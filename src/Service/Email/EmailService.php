@@ -6,12 +6,12 @@ use App\CronTaskInterface;
 use App\EmailContextEnricherInterface;
 use App\Emails\EmailInterface;
 use App\Emails\EmailQueueInterface;
-use App\Enum\CronTaskStatus;
-use App\ValueObject\CronTaskResult;
 use App\Entity\EmailQueue;
+use App\Enum\CronTaskStatus;
 use App\Enum\EmailQueueStatus;
 use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
+use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -85,7 +85,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         try {
             $result = $this->sendQueue();
             $output->writeln('EmailService: ' . $result);
-            $status = (str_contains($result, '(Failed:') || str_contains($result, '(Late:'))
+            $status = str_contains($result, '(Failed:') || str_contains($result, '(Late:')
                 ? CronTaskStatus::warning
                 : CronTaskStatus::ok;
 
@@ -145,7 +145,9 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 
         if ($failed > 0 || $late > 0) {
             $this->logger->warning('Email queue processed with issues', [
-                'sent' => $send, 'failed' => $failed, 'late' => $late,
+                'sent' => $send,
+                'failed' => $failed,
+                'late' => $late,
             ]);
 
             $parts = [];
