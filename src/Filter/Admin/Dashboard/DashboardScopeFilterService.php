@@ -68,13 +68,7 @@ readonly class DashboardScopeFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                DashboardScopeFilterInterface $a,
-                DashboardScopeFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(DashboardScopeFilterInterface $a, DashboardScopeFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

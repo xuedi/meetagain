@@ -25,33 +25,17 @@ class CronLogControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(
-            1,
-            $crawler->filter('.tabs.is-boxed li.is-active')->count(),
-            'Exactly one tab should be active',
-        );
+        static::assertSame(1, $crawler->filter('.tabs.is-boxed li.is-active')->count(), 'Exactly one tab should be active');
         static::assertStringContainsString(
             '/admin/logs/cron',
             (string) $crawler->filter('.tabs.is-boxed li.is-active a')->attr('href'),
             'Active tab should link to cron route',
         );
         static::assertSame(5, $crawler->filter('.tabs.is-boxed li')->count(), 'Five logs tabs should be rendered');
-        static::assertGreaterThan(
-            0,
-            $crawler->filter('.box .level .level-left strong')->count(),
-            'Top box should contain a <strong> info item',
-        );
+        static::assertGreaterThan(0, $crawler->filter('.box .level .level-left strong')->count(), 'Top box should contain a <strong> info item');
         $rightText = $crawler->filter('.box .level .level-right')->text();
-        static::assertStringContainsString(
-            'Status: All',
-            $rightText,
-            'Default status dropdown trigger should read "Status: All"',
-        );
-        static::assertStringContainsString(
-            'Range: 1 hour',
-            $rightText,
-            'Default range dropdown trigger should read "Range: 1 hour"',
-        );
+        static::assertStringContainsString('Status: All', $rightText, 'Default status dropdown trigger should read "Status: All"');
+        static::assertStringContainsString('Range: 1 hour', $rightText, 'Default range dropdown trigger should read "Range: 1 hour"');
     }
 
     public function testCronListPageRendersTwoDropdownsWithExpectedOptions(): void
@@ -72,22 +56,12 @@ class CronLogControllerTest extends WebTestCase
         );
         $items = $crawler->filter('.box .level .level-right .dropdown-item');
         $itemTexts = $items->each(static fn($node) => trim($node->text()));
-        $hasItemContaining =
-            static fn(string $needle): bool => array_any($itemTexts, static fn(string $text): bool => str_contains(
-                $text,
-                $needle,
-            ));
+        $hasItemContaining = static fn(string $needle): bool => array_any($itemTexts, static fn(string $text): bool => str_contains($text, $needle));
         foreach (['All', 'All problems', 'Warnings', 'Errors', 'Exceptions'] as $expected) {
-            static::assertTrue(
-                $hasItemContaining($expected),
-                sprintf('Status option "%s" should be present', $expected),
-            );
+            static::assertTrue($hasItemContaining($expected), sprintf('Status option "%s" should be present', $expected));
         }
         foreach (['1 hour', '6 hours', '24 hours', '1 week'] as $expected) {
-            static::assertTrue(
-                $hasItemContaining($expected),
-                sprintf('Range option "%s" should be present', $expected),
-            );
+            static::assertTrue($hasItemContaining($expected), sprintf('Range option "%s" should be present', $expected));
         }
     }
 
@@ -119,14 +93,9 @@ class CronLogControllerTest extends WebTestCase
         $this->loginAsAdmin($client);
         $em = $client->getContainer()->get(EntityManagerInterface::class);
 
-        $log = new CronLog(
-            runAt: new DateTimeImmutable('2026-04-30 12:00:00'),
-            status: CronTaskStatus::ok,
-            durationMs: 1234,
-            tasks: [
-                ['identifier' => 'task.x', 'status' => 'ok', 'message' => '', 'duration_ms' => 1200],
-            ],
-        );
+        $log = new CronLog(runAt: new DateTimeImmutable('2026-04-30 12:00:00'), status: CronTaskStatus::ok, durationMs: 1234, tasks: [
+            ['identifier' => 'task.x', 'status' => 'ok', 'message' => '', 'duration_ms' => 1200],
+        ]);
         $em->persist($log);
         $em->flush();
 
@@ -136,35 +105,15 @@ class CronLogControllerTest extends WebTestCase
 
             // Assert
             $this->assertResponseIsSuccessful();
-            static::assertSame(
-                5,
-                $crawler->filter('.tabs.is-boxed li')->count(),
-                'Tab strip should match list page (5 tabs)',
-            );
-            static::assertSame(
-                1,
-                $crawler->filter('.tabs.is-boxed li.is-active')->count(),
-                'Cron tab should be active',
-            );
+            static::assertSame(5, $crawler->filter('.tabs.is-boxed li')->count(), 'Tab strip should match list page (5 tabs)');
+            static::assertSame(1, $crawler->filter('.tabs.is-boxed li.is-active')->count(), 'Cron tab should be active');
             $strong = $crawler->filter('.box .level .level-left strong');
             static::assertGreaterThan(0, $strong->count(), 'Timestamp should appear in <strong>');
-            static::assertStringContainsString(
-                '2026-04-30 12:00:00',
-                $strong->text(),
-                'Formatted timestamp should appear in info item',
-            );
-            static::assertStringContainsString(
-                'ms total',
-                $crawler->filter('.box .level .level-left')->text(),
-                'Duration suffix should appear in info area',
-            );
+            static::assertStringContainsString('2026-04-30 12:00:00', $strong->text(), 'Formatted timestamp should appear in info item');
+            static::assertStringContainsString('ms total', $crawler->filter('.box .level .level-left')->text(), 'Duration suffix should appear in info area');
             $back = $crawler->filter('.box .level .level-right a');
             static::assertGreaterThan(0, $back->count(), 'Back action button should be present');
-            static::assertStringContainsString(
-                '/admin/logs/cron',
-                (string) $back->attr('href'),
-                'Back button should target the list',
-            );
+            static::assertStringContainsString('/admin/logs/cron', (string) $back->attr('href'), 'Back button should target the list');
         } finally {
             $em->clear();
             $reloaded = $em->getRepository(CronLog::class)->find($log->getId());

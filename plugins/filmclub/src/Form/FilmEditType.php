@@ -65,11 +65,7 @@ class FilmEditType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'constraints' => [
-                    new File(
-                        maxSize: '8000k',
-                        mimeTypes: ['image/*'],
-                        mimeTypesMessage: $this->translator->trans('filmclub_film.flash_invalid_image'),
-                    ),
+                    new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('filmclub_film.flash_invalid_image')),
                 ],
             ])
             ->add('submit', SubmitType::class, [

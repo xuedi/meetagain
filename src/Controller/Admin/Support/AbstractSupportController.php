@@ -19,12 +19,7 @@ abstract class AbstractSupportController extends AbstractController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(section: 'admin_shell.section_system', links: [
-            new AdminLink(
-                label: 'admin_shell.menu_support',
-                route: 'app_admin_support_list',
-                active: 'support',
-                role: 'ROLE_ADMIN',
-            ),
+            new AdminLink(label: 'admin_shell.menu_support', route: 'app_admin_support_list', active: 'support', role: 'ROLE_ADMIN'),
         ]);
     }
 

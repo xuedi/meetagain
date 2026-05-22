@@ -57,12 +57,7 @@ abstract class AbstractFixture extends Fixture implements FixtureGroupInterface
                     return $this->getReference($key, $entityClass);
                 } catch (Throwable $exception) {
                     throw new RuntimeException(
-                        sprintf(
-                            "Error retrieving reference '%s::%s' [%s]",
-                            $entityName,
-                            $params[0],
-                            $exception->getMessage(),
-                        ),
+                        sprintf("Error retrieving reference '%s::%s' [%s]", $entityName, $params[0], $exception->getMessage()),
                         (int) $exception->getCode(),
                         $exception,
                     );

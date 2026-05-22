@@ -45,22 +45,11 @@ class DishSuggestion implements JsonSerializable
 
     public static function create(int $createdBy, DishSuggestionField $field, string $language, string $value): self
     {
-        return new self(
-            createdBy: $createdBy,
-            createdAt: new DateTimeImmutable(),
-            field: $field,
-            language: $language,
-            value: $value,
-        );
+        return new self(createdBy: $createdBy, createdAt: new DateTimeImmutable(), field: $field, language: $language, value: $value);
     }
 
-    private function __construct(
-        int $createdBy,
-        DateTimeImmutable $createdAt,
-        DishSuggestionField $field,
-        string $language,
-        string $value,
-    ) {
+    private function __construct(int $createdBy, DateTimeImmutable $createdAt, DishSuggestionField $field, string $language, string $value)
+    {
         $this->createdBy = $createdBy;
         $this->createdAt = $createdAt;
         $this->field = $field;

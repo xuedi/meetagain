@@ -69,10 +69,7 @@ final class EmailGuardEvaluatorTest extends TestCase
 
         // Assert
         $this->assertCount(3, $results);
-        $this->assertSame(
-            ['rule1', 'rule2', 'rule3'],
-            array_map(static fn(EmailGuardResult $r) => $r->ruleName, $results),
-        );
+        $this->assertSame(['rule1', 'rule2', 'rule3'], array_map(static fn(EmailGuardResult $r) => $r->ruleName, $results));
         $this->assertSame(1, $invocations['rule3'], 'rule3 runs even after a Skip');
     }
 
@@ -88,9 +85,7 @@ final class EmailGuardEvaluatorTest extends TestCase
         $email->method('getGuardRules')->willReturn([$coreRule]);
 
         $provider = $this->createStub(EmailGuardRuleProviderInterface::class);
-        $provider->method('getRulesFor')->willReturnCallback(static fn(string $id): array => (
-            $id === 'test.email' ? [$pluginRule] : []
-        ));
+        $provider->method('getRulesFor')->willReturnCallback(static fn(string $id): array => $id === 'test.email' ? [$pluginRule] : []);
 
         $evaluator = new EmailGuardEvaluator([$provider]);
 

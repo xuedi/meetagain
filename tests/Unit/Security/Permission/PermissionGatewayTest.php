@@ -67,11 +67,7 @@ class PermissionGatewayTest extends TestCase
     public function testFirstGrantWinsOverEarlierAbstain(): void
     {
         // Arrange
-        $gateway = $this->makeGateway(
-            false,
-            $this->fixedChecker(supports: true, decision: null),
-            $this->fixedChecker(supports: true, decision: true),
-        );
+        $gateway = $this->makeGateway(false, $this->fixedChecker(supports: true, decision: null), $this->fixedChecker(supports: true, decision: true));
 
         // Act
         $result = $gateway->vote($this->makeToken(), null, ['anything']);
@@ -83,11 +79,7 @@ class PermissionGatewayTest extends TestCase
     public function testGrantBeatsDenyAcrossCheckers(): void
     {
         // Arrange - if any supporting checker grants, gateway grants
-        $gateway = $this->makeGateway(
-            false,
-            $this->fixedChecker(supports: true, decision: false),
-            $this->fixedChecker(supports: true, decision: true),
-        );
+        $gateway = $this->makeGateway(false, $this->fixedChecker(supports: true, decision: false), $this->fixedChecker(supports: true, decision: true));
 
         // Act
         $result = $gateway->vote($this->makeToken(), null, ['anything']);
@@ -159,11 +151,7 @@ class PermissionGatewayTest extends TestCase
     public function testSupportsAttributeReturnsTrueWhenAnyCheckerSupports(): void
     {
         // Arrange
-        $gateway = $this->makeGateway(
-            false,
-            $this->fixedChecker(supports: false, decision: null),
-            $this->fixedChecker(supports: true, decision: null),
-        );
+        $gateway = $this->makeGateway(false, $this->fixedChecker(supports: false, decision: null), $this->fixedChecker(supports: true, decision: null));
 
         // Act / Assert
         self::assertTrue($gateway->supportsAttribute('anything'));

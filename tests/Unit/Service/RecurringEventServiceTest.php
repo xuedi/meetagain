@@ -203,11 +203,7 @@ class RecurringEventServiceTest extends TestCase
 
         $repo = $this->createMock(EventRepository::class);
         $repo->expects($this->once())->method('findOneBy')->with(['id' => 1])->willReturn($parentEvent);
-        $repo
-            ->expects($this->once())
-            ->method('findFollowUpEvents')
-            ->with(1, $childEvent->getStart())
-            ->willReturn([$followUp1, $followUp2]);
+        $repo->expects($this->once())->method('findFollowUpEvents')->with(1, $childEvent->getStart())->willReturn([$followUp1, $followUp2]);
 
         $em = $this->createStub(EntityManagerInterface::class);
         $service = $this->createService($repo, $em);

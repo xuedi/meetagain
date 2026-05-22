@@ -50,13 +50,8 @@ final class AccessDeniedProvider extends AbstractSecurityProvider
     }
 
     #[Override]
-    protected function processEvent(
-        SecurityEventType $type,
-        Request $request,
-        array $context,
-        string $ip,
-        array $state,
-    ): array {
+    protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array
+    {
         $reason = is_string($context['reason'] ?? null) ? $context['reason'] : 'firewall';
         $now = time();
 
@@ -93,12 +88,7 @@ final class AccessDeniedProvider extends AbstractSecurityProvider
             $threatLevel = 100;
         }
 
-        $summary = sprintf(
-            '%d access-denied (distinct paths: %d, csrf: %d)',
-            $hits,
-            $distinctPaths,
-            (int) ($byReason['csrf'] ?? 0),
-        );
+        $summary = sprintf('%d access-denied (distinct paths: %d, csrf: %d)', $hits, $distinctPaths, (int) ($byReason['csrf'] ?? 0));
         $details = [
             'hits' => $hits,
             'byReason' => $byReason,

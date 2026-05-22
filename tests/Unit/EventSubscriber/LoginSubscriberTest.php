@@ -13,11 +13,8 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 class LoginSubscriberTest extends TestCase
 {
-    private function createLoginEvent(
-        UserInterface $user,
-        SessionInterface $session,
-        ?Response $response = null,
-    ): LoginSuccessEvent {
+    private function createLoginEvent(UserInterface $user, SessionInterface $session, ?Response $response = null): LoginSuccessEvent
+    {
         $request = new Request();
         $request->setSession($session);
         $response ??= new Response();

@@ -42,11 +42,7 @@ class FilmPollRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this
-            ->createQueryBuilder('p')
-            ->where('p.status = :status')
-            ->setParameter('status', PollStatus::Active)
-            ->orderBy('p.endDate', 'ASC');
+        $qb = $this->createQueryBuilder('p')->where('p.status = :status')->setParameter('status', PollStatus::Active)->orderBy('p.endDate', 'ASC');
 
         if ($allowedIds !== null) {
             $qb->andWhere('p.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -94,11 +90,7 @@ class FilmPollRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this
-            ->createQueryBuilder('p')
-            ->where('p.status = :status')
-            ->setParameter('status', PollStatus::Closed)
-            ->orderBy('p.closedAt', 'DESC');
+        $qb = $this->createQueryBuilder('p')->where('p.status = :status')->setParameter('status', PollStatus::Closed)->orderBy('p.closedAt', 'DESC');
 
         if ($allowedIds !== null) {
             $qb->andWhere('p.id IN (:ids)')->setParameter('ids', $allowedIds);

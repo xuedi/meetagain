@@ -45,13 +45,8 @@ final class RateLimitProvider extends AbstractSecurityProvider
     }
 
     #[Override]
-    protected function processEvent(
-        SecurityEventType $type,
-        Request $request,
-        array $context,
-        string $ip,
-        array $state,
-    ): array {
+    protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array
+    {
         $limiter = is_string($context['limiter'] ?? null) ? $context['limiter'] : 'unknown';
 
         $totalHits = (int) ($state['totalHits'] ?? 0) + 1;

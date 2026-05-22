@@ -101,11 +101,7 @@ readonly class PollService
         $leadingFilmIds = array_keys(array_filter($voteCounts, static fn($c) => $c === $maxVotes));
 
         $films = $poll->getFilms();
-        $leadingFilms = array_values(array_filter($films->toArray(), static fn(Film $f) => in_array(
-            $f->getId(),
-            $leadingFilmIds,
-            true,
-        )));
+        $leadingFilms = array_values(array_filter($films->toArray(), static fn(Film $f) => in_array($f->getId(), $leadingFilmIds, true)));
 
         if (count($leadingFilms) === 1) {
             $winner = $leadingFilms[0];

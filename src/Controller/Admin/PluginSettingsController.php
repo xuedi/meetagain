@@ -58,9 +58,7 @@ final class PluginSettingsController extends AbstractController implements Admin
 
             $forms = [];
             foreach ($providers as $providerKey => $other) {
-                $forms[$providerKey] = $providerKey === $key
-                    ? $form->createView()
-                    : $this->buildForm($other, $other->loadData())->createView();
+                $forms[$providerKey] = $providerKey === $key ? $form->createView() : $this->buildForm($other, $other->loadData())->createView();
             }
         } else {
             $forms = [];
@@ -70,11 +68,7 @@ final class PluginSettingsController extends AbstractController implements Admin
         }
 
         $adminTop = new AdminTop(info: [], actions: [
-            new AdminTopActionButton(
-                label: $this->translator->trans('global.button_back'),
-                target: $this->generateUrl('app_admin_plugin'),
-                icon: 'arrow-left',
-            ),
+            new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: $this->generateUrl('app_admin_plugin'), icon: 'arrow-left'),
         ]);
 
         return $this->render('admin/system/plugin_settings/index.html.twig', [

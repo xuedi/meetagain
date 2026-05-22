@@ -42,12 +42,8 @@ class Suggestion implements JsonSerializable
         );
     }
 
-    public static function fromParams(
-        int $createdBy,
-        DateTimeImmutable $createdAt,
-        SuggestionField $field,
-        string $value,
-    ): self {
+    public static function fromParams(int $createdBy, DateTimeImmutable $createdAt, SuggestionField $field, string $value): self
+    {
         return new self(createdBy: $createdBy, createdAt: $createdAt, field: $field, value: $value);
     }
 

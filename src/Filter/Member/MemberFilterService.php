@@ -79,13 +79,7 @@ readonly class MemberFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                MemberFilterInterface $a,
-                MemberFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(MemberFilterInterface $a, MemberFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

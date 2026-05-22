@@ -134,10 +134,7 @@ class ImageLocationProvidersTest extends TestCase
     public function testCmsBlockGetEditLink(): void
     {
         $provider = new CmsBlockLocationProvider($this->makeRepo(), $this->createStub(Connection::class));
-        static::assertSame(
-            ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 3]],
-            $provider->getEditLink(3),
-        );
+        static::assertSame(['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 3]], $provider->getEditLink(3));
     }
 
     public function testCmsBlockDiscoverImageIds(): void
@@ -199,10 +196,7 @@ class ImageLocationProvidersTest extends TestCase
     public function testCmsGalleryGetEditLink(): void
     {
         $provider = new CmsGalleryLocationProvider($this->makeRepo(), $this->createStub(Connection::class));
-        static::assertSame(
-            ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 4]],
-            $provider->getEditLink(4),
-        );
+        static::assertSame(['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 4]], $provider->getEditLink(4));
     }
 
     public function testCmsGalleryDiscoverImageIdsExtractsFromJson(): void
@@ -255,10 +249,7 @@ class ImageLocationProvidersTest extends TestCase
     public function testCmsCardImageGetEditLink(): void
     {
         $provider = new CmsCardImageLocationProvider($this->makeRepo(), $this->createStub(Connection::class));
-        static::assertSame(
-            ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 6]],
-            $provider->getEditLink(6),
-        );
+        static::assertSame(['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => 6]], $provider->getEditLink(6));
     }
 
     public function testCmsCardImageDiscoverImageIdsExtractsFromCards(): void

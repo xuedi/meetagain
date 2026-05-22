@@ -100,18 +100,9 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         }
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
-                $entry->getDate()->format('Y-m-d H:i:s'),
-                ENT_QUOTES,
-            ))),
-            new AdminTopInfoHtml(sprintf('<span class="tag is-medium">%s</span>', htmlspecialchars(
-                $entry->getLevel(),
-                ENT_QUOTES,
-            ))),
-            new AdminTopInfoHtml(sprintf('<span class="has-text-grey">%s</span>', htmlspecialchars(
-                $entry->getType(),
-                ENT_QUOTES,
-            ))),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($entry->getDate()->format('Y-m-d H:i:s'), ENT_QUOTES))),
+            new AdminTopInfoHtml(sprintf('<span class="tag is-medium">%s</span>', htmlspecialchars($entry->getLevel(), ENT_QUOTES))),
+            new AdminTopInfoHtml(sprintf('<span class="has-text-grey">%s</span>', htmlspecialchars($entry->getType(), ENT_QUOTES))),
         ], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('global.button_back'),
@@ -149,16 +140,10 @@ final class SystemLogController extends AbstractLogsController implements AdminN
     private function buildInfo(int $totalCount, array $allEntries, ?DateTimeImmutable $since): array
     {
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_logs.summary_total_entries'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_logs.summary_total_entries'))),
         ];
 
-        $rangeEntries = $since !== null
-            ? $this->systemLogService->filterEntries($allEntries, $since, null)
-            : $allEntries;
+        $rangeEntries = $since !== null ? $this->systemLogService->filterEntries($allEntries, $since, null) : $allEntries;
         $errorCount = $this->systemLogService->countByLevels($rangeEntries, [
             'ERROR',
             'CRITICAL',
@@ -188,10 +173,7 @@ final class SystemLogController extends AbstractLogsController implements AdminN
                 $this->translator->trans('admin_logs.summary_with_warnings'),
             ));
         } else {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                $this->translator->trans('admin_logs.summary_all_ok'),
-            ));
+            $info[] = new AdminTopInfoHtml(sprintf('<span class="tag is-success is-medium">%s</span>', $this->translator->trans('admin_logs.summary_all_ok')));
         }
 
         return $info;
@@ -200,12 +182,8 @@ final class SystemLogController extends AbstractLogsController implements AdminN
     /**
      * @param list<LogEntry> $allEntries
      */
-    private function buildLevelDropdown(
-        string $current,
-        string $range,
-        array $allEntries,
-        ?DateTimeImmutable $since,
-    ): AdminTopActionDropdown {
+    private function buildLevelDropdown(string $current, string $range, array $allEntries, ?DateTimeImmutable $since): AdminTopActionDropdown
+    {
         $rangeEntries = $this->systemLogService->filterEntries($allEntries, $since, null);
         $options = [];
         foreach (self::LEVEL_FILTERS as $key => $levels) {
@@ -229,11 +207,7 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.level_filter_label'),
-                $this->translator->trans('admin_logs.level_filter_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.level_filter_label'), $this->translator->trans('admin_logs.level_filter_' . $current)),
             options: $options,
             icon: 'filter',
         );
@@ -243,12 +217,8 @@ final class SystemLogController extends AbstractLogsController implements AdminN
      * @param list<LogEntry> $allEntries
      * @param list<string>|null $levels
      */
-    private function buildRangeDropdown(
-        string $current,
-        string $level,
-        array $allEntries,
-        ?array $levels,
-    ): AdminTopActionDropdown {
+    private function buildRangeDropdown(string $current, string $level, array $allEntries, ?array $levels): AdminTopActionDropdown
+    {
         $options = [];
         foreach (self::RANGE_OFFSETS as $key => $offset) {
             $params = [];
@@ -268,11 +238,7 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );

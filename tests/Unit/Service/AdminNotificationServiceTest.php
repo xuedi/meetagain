@@ -139,9 +139,7 @@ class AdminNotificationServiceTest extends TestCase
         $emailMock
             ->expects($this->once())
             ->method('send')
-            ->with(static::callback(
-                static fn($ctx) => $ctx['user'] === $adminUser && str_contains($ctx['sectionsHtml'], 'Jane Smith'),
-            ));
+            ->with(static::callback(static fn($ctx) => $ctx['user'] === $adminUser && str_contains($ctx['sectionsHtml'], 'Jane Smith')));
 
         $service = $this->buildService(
             providers: [$provider],

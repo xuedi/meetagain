@@ -141,10 +141,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
 
     public function getPlannedItems(DateTimeImmutable $from, DateTimeImmutable $to): array
     {
-        $events = $this->eventRepo->findEventsNeedingReminder(
-            $from->add(new DateInterval('PT5H')),
-            $to->add(new DateInterval('PT5H')),
-        );
+        $events = $this->eventRepo->findEventsNeedingReminder($from->add(new DateInterval('PT5H')), $to->add(new DateInterval('PT5H')));
 
         $items = [];
         foreach ($events as $event) {
@@ -162,8 +159,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
 
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::EventReminder->value,
-                label: 'Event: '
-                . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
+                label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
                 expectedTime: DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT5H')),
                 expectedRecipients: $eligibleCount,
             );

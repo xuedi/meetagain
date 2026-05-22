@@ -73,19 +73,9 @@ class DataHotfixRunnerTest extends TestCase
         $logger
             ->expects(static::once())
             ->method('error')
-            ->with(
-                'Data hotfix failed',
-                static::callback(
-                    static fn(array $context) => $context['identifier'] === 'c_throws' && isset($context['exception']),
-                ),
-            );
+            ->with('Data hotfix failed', static::callback(static fn(array $context) => $context['identifier'] === 'c_throws' && isset($context['exception'])));
 
-        $runner = new DataHotfixRunner(
-            [$hotfix],
-            $appState['service'],
-            $this->makeClock('2026-04-30T12:00:00+00:00'),
-            $logger,
-        );
+        $runner = new DataHotfixRunner([$hotfix], $appState['service'], $this->makeClock('2026-04-30T12:00:00+00:00'), $logger);
 
         // Act
         $result = $runner->runCronTask(new NullOutput());

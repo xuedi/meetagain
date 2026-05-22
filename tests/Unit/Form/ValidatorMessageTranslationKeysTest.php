@@ -54,8 +54,7 @@ class ValidatorMessageTranslationKeysTest extends TestCase
         static::assertSame(
             [],
             $offenders,
-            "Validator messages in {$file} must be translation keys (e.g. 'namespace.key'), "
-                . 'not English literals. Offending values: '
+            "Validator messages in {$file} must be translation keys (e.g. 'namespace.key'), " . 'not English literals. Offending values: '
                 . implode(', ', $offenders),
         );
     }

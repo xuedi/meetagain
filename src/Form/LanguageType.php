@@ -46,11 +46,7 @@ class LanguageType extends AbstractType
             'required' => false,
             'label' => 'admin_system_language.heading_tile_image',
             'constraints' => [
-                new File(
-                    maxSize: '5000k',
-                    mimeTypes: ['image/*'],
-                    mimeTypesMessage: 'shared.form_image_upload_mime_error',
-                ),
+                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error'),
             ],
         ]);
     }

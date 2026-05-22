@@ -36,10 +36,7 @@ final class SuggestionController extends AbstractController
         return $this->render('@Bookclub/suggestion/list.html.twig', [
             'suggestions' => $this->suggestionService->getPendingSuggestionsWithPriority(),
             'userSuggestions' => $userSuggestions,
-            'books' => array_filter(
-                $this->bookService->getApprovedList(),
-                static fn($b) => !in_array($b->getId(), $suggestedBookIds),
-            ),
+            'books' => array_filter($this->bookService->getApprovedList(), static fn($b) => !in_array($b->getId(), $suggestedBookIds)),
         ]);
     }
 
@@ -73,10 +70,7 @@ final class SuggestionController extends AbstractController
     #[Route('/withdraw/{suggestionId}', name: 'app_plugin_bookclub_withdraw', methods: ['POST'])]
     public function withdraw(Request $request, int $suggestionId): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_plugin_bookclub_withdraw' . $suggestionId,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_plugin_bookclub_withdraw' . $suggestionId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

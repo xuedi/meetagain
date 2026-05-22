@@ -45,12 +45,7 @@ final class ListController extends AbstractController
             $user = $this->getAuthedUser();
             $data = $form->getData();
 
-            $this->listService->createList(
-                userId: $user->getId(),
-                name: $data->getName(),
-                description: $data->getDescription(),
-                isPublic: $data->isPublic(),
-            );
+            $this->listService->createList(userId: $user->getId(), name: $data->getName(), description: $data->getDescription(), isPublic: $data->isPublic());
 
             $this->addFlash('success', $this->translator->trans('dinnerclub_lists.flash_created'));
 
@@ -123,10 +118,7 @@ final class ListController extends AbstractController
     #[Route('/delete/{id}', name: 'plugin_dinnerclub_lists_delete', methods: ['POST'])]
     public function delete(Request $request, int $id): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'plugin_dinnerclub_lists_delete' . $id,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('plugin_dinnerclub_lists_delete' . $id, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

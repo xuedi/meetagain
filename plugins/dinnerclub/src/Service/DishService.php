@@ -114,13 +114,8 @@ readonly class DishService
         $this->em->flush();
     }
 
-    public function addSuggestion(
-        int $dishId,
-        int $userId,
-        DishSuggestionField $field,
-        string $language,
-        string $value,
-    ): void {
+    public function addSuggestion(int $dishId, int $userId, DishSuggestionField $field, string $language, string $value): void
+    {
         $dish = $this->repo->find($dishId);
         if ($dish === null) {
             throw new RuntimeException('Dish not found');
@@ -228,15 +223,8 @@ readonly class DishService
         return $this->likeRepo->findByDishAndUser($dish, $userId) !== null;
     }
 
-    public function updateTranslation(
-        int $dishId,
-        string $language,
-        int $userId,
-        bool $isManager,
-        string $name,
-        ?string $description,
-        ?string $recipe,
-    ): void {
+    public function updateTranslation(int $dishId, string $language, int $userId, bool $isManager, string $name, ?string $description, ?string $recipe): void
+    {
         $dish = $this->repo->find($dishId);
         if ($dish === null) {
             throw new RuntimeException('Dish not found');
@@ -263,12 +251,7 @@ readonly class DishService
         }
 
         if ($isNewTranslation || $translation->getName() !== $name) {
-            $dish->addSuggestion(DishSuggestion::create(
-                createdBy: $userId,
-                field: DishSuggestionField::Name,
-                language: $language,
-                value: $name,
-            ));
+            $dish->addSuggestion(DishSuggestion::create(createdBy: $userId, field: DishSuggestionField::Name, language: $language, value: $name));
         }
 
         $currentDescription = $isNewTranslation ? '' : $translation->getDescription();
@@ -283,12 +266,7 @@ readonly class DishService
 
         $currentRecipe = $isNewTranslation ? null : $translation->getRecipe();
         if ($currentRecipe !== $recipe && ($recipe !== null && $recipe !== '')) {
-            $dish->addSuggestion(DishSuggestion::create(
-                createdBy: $userId,
-                field: DishSuggestionField::Recipe,
-                language: $language,
-                value: $recipe,
-            ));
+            $dish->addSuggestion(DishSuggestion::create(createdBy: $userId, field: DishSuggestionField::Recipe, language: $language, value: $recipe));
         }
 
         $this->em->persist($dish);
@@ -311,12 +289,7 @@ readonly class DishService
         }
 
         if ($dish->getOrigin() !== $origin && $origin !== null && $origin !== '') {
-            $dish->addSuggestion(DishSuggestion::create(
-                createdBy: $userId,
-                field: DishSuggestionField::Origin,
-                language: '',
-                value: $origin,
-            ));
+            $dish->addSuggestion(DishSuggestion::create(createdBy: $userId, field: DishSuggestionField::Origin, language: '', value: $origin));
 
             $this->em->persist($dish);
             $this->em->flush();
@@ -380,12 +353,8 @@ readonly class DishService
         }
     }
 
-    public function addImageSuggestion(
-        Dish $dish,
-        Image $image,
-        DishImageSuggestionType $type,
-        int $userId,
-    ): DishImageSuggestion {
+    public function addImageSuggestion(Dish $dish, Image $image, DishImageSuggestionType $type, int $userId): DishImageSuggestion
+    {
         $suggestion = new DishImageSuggestion();
         $suggestion->setDish($dish);
         $suggestion->setImage($image);

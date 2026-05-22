@@ -34,12 +34,7 @@ class ConfigServiceTest extends TestCase
         $this->cacheStub = $this->createStub(CacheInterface::class);
         $this->kernelStub = $this->createStub(KernelInterface::class);
         // Always simulate a cache miss so the callback (and thus the repo) is exercised
-        $this->cacheStub
-            ->method('get')
-            ->willReturnCallback(fn(
-                string $key,
-                callable $callback,
-            ): mixed => $callback($this->createStub(ItemInterface::class)));
+        $this->cacheStub->method('get')->willReturnCallback(fn(string $key, callable $callback): mixed => $callback($this->createStub(ItemInterface::class)));
         $this->subject = new ConfigService(
             repo: $this->configRepoStub,
             em: $this->entityManagerStub,
@@ -336,12 +331,8 @@ class ConfigServiceTest extends TestCase
     // ---- getSeoDescription ----
 
     #[DataProvider('seoDescriptionProvider')]
-    public function testGetSeoDescription(
-        string $context,
-        string $configKey,
-        string $storedValue,
-        string $expected,
-    ): void {
+    public function testGetSeoDescription(string $context, string $configKey, string $storedValue, string $expected): void
+    {
         // Arrange: only return a value when the correct config key is queried
         $this->configRepoStub->method('findOneBy')->willReturnCallback(static fn(array $c) => $c['name'] === $configKey
             ? new Config()->setValue($storedValue)
@@ -607,13 +598,7 @@ class ConfigServiceTest extends TestCase
         $emMock
             ->expects($this->once())
             ->method('persist')
-            ->with(static::callback(
-                static fn(Config $c) => (
-                    $c->getName() === 'new_key'
-                    && $c->getValue() === 'hello'
-                    && $c->getType() === ConfigType::String
-                ),
-            ));
+            ->with(static::callback(static fn(Config $c) => $c->getName() === 'new_key' && $c->getValue() === 'hello' && $c->getType() === ConfigType::String));
         $emMock->expects($this->once())->method('flush');
 
         $cacheMock = $this->createMock(CacheInterface::class);
@@ -672,13 +657,7 @@ class ConfigServiceTest extends TestCase
         $emMock
             ->expects($this->once())
             ->method('persist')
-            ->with(static::callback(
-                static fn(Config $c) => (
-                    $c->getName() === 'count_key'
-                    && $c->getValue() === '7'
-                    && $c->getType() === ConfigType::Integer
-                ),
-            ));
+            ->with(static::callback(static fn(Config $c) => $c->getName() === 'count_key' && $c->getValue() === '7' && $c->getType() === ConfigType::Integer));
         $emMock->expects($this->once())->method('flush');
 
         $cacheMock = $this->createMock(CacheInterface::class);

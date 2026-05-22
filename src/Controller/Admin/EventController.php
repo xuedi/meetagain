@@ -55,12 +55,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_event',
-                    route: 'app_admin_event',
-                    active: 'event',
-                    role: 'ROLE_ORGANIZER',
-                ),
+                new AdminLink(label: 'admin_shell.menu_event', route: 'app_admin_event', active: 'event', role: 'ROLE_ORGANIZER'),
             ],
             sectionPriority: 50,
         );
@@ -96,12 +91,7 @@ final class EventController extends AbstractController implements AdminNavigatio
             $scheduleFilter = 'all';
         }
 
-        $events = array_values(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
-            $e,
-            $hideAuto,
-            $typeFilter,
-            $scheduleFilter,
-        )));
+        $events = array_values(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $scheduleFilter)));
 
         $canceledCount = 0;
         foreach ($events as $event) {
@@ -112,11 +102,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($events),
-                $this->translator->trans('admin_event.summary_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($events), $this->translator->trans('admin_event.summary_total'))),
         ];
         if (count($events) !== count($allEvents)) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -174,12 +160,8 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @return array<string, int|string|bool> URL params preserving every active filter except $exclude.
      */
-    private function preserveFiltersExcept(
-        string $exclude,
-        bool $hideAuto,
-        ?int $typeFilter,
-        string $scheduleFilter,
-    ): array {
+    private function preserveFiltersExcept(string $exclude, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): array
+    {
         $p = [];
         if ($exclude !== 'hide_auto' && $hideAuto) {
             $p['hide_auto'] = 1;
@@ -202,9 +184,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         return new AdminTopActionButton(
-            label: $this->translator->trans(
-                $hideAuto ? 'admin_event.button_show_auto' : 'admin_event.button_hide_auto',
-            ),
+            label: $this->translator->trans($hideAuto ? 'admin_event.button_show_auto' : 'admin_event.button_hide_auto'),
             target: $this->generateUrl('app_admin_event', $params),
             icon: $hideAuto ? 'eye' : 'eye-slash',
         );
@@ -213,28 +193,14 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildTypeDropdown(
-        array $allEvents,
-        bool $hideAuto,
-        ?int $typeFilter,
-        string $scheduleFilter,
-    ): AdminTopActionDropdown {
-        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
-            $e,
-            $hideAuto,
-            null,
-            $scheduleFilter,
-        )));
+    private function buildTypeDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    {
+        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, null, $scheduleFilter)));
 
         $options = [
             new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_event.filter_type_any'),
-                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept(
-                    'type',
-                    $hideAuto,
-                    $typeFilter,
-                    $scheduleFilter,
-                )),
+                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter)),
                 isActive: $typeFilter === null,
                 count: $countAll,
             ),
@@ -242,12 +208,7 @@ final class EventController extends AbstractController implements AdminNavigatio
 
         $activeLabel = $this->translator->trans('admin_event.filter_type_any');
         foreach (EventTypeEnum::cases() as $case) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
-                $e,
-                $hideAuto,
-                $case->value,
-                $scheduleFilter,
-            )));
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, $case->value, $scheduleFilter)));
             $params = $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter);
             $params['type'] = $case->value;
             $label = $this->translator->trans('admin_event.filter_type_' . strtolower($case->name));
@@ -273,22 +234,13 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildScheduleDropdown(
-        array $allEvents,
-        bool $hideAuto,
-        ?int $typeFilter,
-        string $scheduleFilter,
-    ): AdminTopActionDropdown {
+    private function buildScheduleDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    {
         $values = ['all', 'onetime', 'series'];
         $options = [];
         $activeLabel = '';
         foreach ($values as $value) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
-                $e,
-                $hideAuto,
-                $typeFilter,
-                $value,
-            )));
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $value)));
             $params = $this->preserveFiltersExcept('schedule', $hideAuto, $typeFilter, $scheduleFilter);
             if ($value !== 'all') {
                 $params['schedule'] = $value;
@@ -620,11 +572,7 @@ final class EventController extends AbstractController implements AdminNavigatio
     private function buildBackOnlyTop(): AdminTop
     {
         return new AdminTop(actions: [
-            new AdminTopActionButton(
-                label: $this->translator->trans('global.button_back'),
-                target: $this->generateUrl('app_admin_event'),
-                icon: 'arrow-left',
-            ),
+            new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: $this->generateUrl('app_admin_event'), icon: 'arrow-left'),
         ]);
     }
 
@@ -632,9 +580,7 @@ final class EventController extends AbstractController implements AdminNavigatio
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException(
-                'Should never happen, see: config/packages/security.yaml',
-            );
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
         }
 
         return $user;

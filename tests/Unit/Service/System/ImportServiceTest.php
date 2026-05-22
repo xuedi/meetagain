@@ -146,11 +146,7 @@ class ImportServiceTest extends TestCase
         $removedDirs = [];
 
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('isDirectory')->willReturnCallback(static fn(string $path): bool => in_array(
-            $path,
-            ['/root', '/root/sub'],
-            true,
-        ));
+        $fs->method('isDirectory')->willReturnCallback(static fn(string $path): bool => in_array($path, ['/root', '/root/sub'], true));
         $fs->method('scanDirectory')->willReturnCallback(static fn(string $path): array => match ($path) {
             '/root' => ['.', '..', 'a.txt', 'sub'],
             '/root/sub' => ['.', '..', 'b.txt'],

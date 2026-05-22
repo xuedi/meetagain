@@ -23,12 +23,7 @@ class DinnerCourse
     #[ORM\Column]
     private int $sortOrder = 0;
 
-    #[ORM\OneToMany(
-        targetEntity: DinnerCourseItem::class,
-        mappedBy: 'course',
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true,
-    )]
+    #[ORM\OneToMany(targetEntity: DinnerCourseItem::class, mappedBy: 'course', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['isPrimary' => 'DESC', 'sortOrder' => 'ASC'])]
     private Collection $items;
 

@@ -128,11 +128,7 @@ final readonly class RedisCacheService
                 $rawHash = $this->arrayResult($this->redis->hGetAll($key));
                 $members = [];
                 foreach ($rawHash as $field => $fieldValue) {
-                    $members[] = sprintf(
-                        '%s = %s',
-                        $this->stringify((string) $field),
-                        $this->stringify((string) $fieldValue),
-                    );
+                    $members[] = sprintf('%s = %s', $this->stringify((string) $field), $this->stringify((string) $fieldValue));
                 }
                 $value = implode("\n", $members);
                 break;

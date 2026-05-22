@@ -12,10 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
-#[AsCommand(
-    name: 'filmclub:posters:rebuild-thumbnails',
-    description: 'Regenerate poster thumbnails for every film. Used after introducing the size provider.',
-)]
+#[AsCommand(name: 'filmclub:posters:rebuild-thumbnails', description: 'Regenerate poster thumbnails for every film. Used after introducing the size provider.')]
 final class RebuildPosterThumbnailsCommand extends Command
 {
     public function __construct(
@@ -51,12 +48,7 @@ final class RebuildPosterThumbnailsCommand extends Command
             }
         }
 
-        $io->success(sprintf(
-            'Built thumbnails for %d film(s); skipped %d (no poster); failed %d.',
-            $built,
-            $skipped,
-            $failed,
-        ));
+        $io->success(sprintf('Built thumbnails for %d film(s); skipped %d (no poster); failed %d.', $built, $skipped, $failed));
 
         return Command::SUCCESS;
     }

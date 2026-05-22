@@ -34,12 +34,7 @@ class EventTeaser implements BlockType
         return [
             new FieldDefinition('headline', FieldType::String),
             new FieldDefinition('text', FieldType::Text),
-            new FieldDefinition(
-                'eventCount',
-                FieldType::String,
-                required: false,
-                default: (string) self::DEFAULT_EVENT_COUNT,
-            ),
+            new FieldDefinition('eventCount', FieldType::String, required: false, default: (string) self::DEFAULT_EVENT_COUNT),
             new FieldDefinition('imageRight', FieldType::Boolean, required: false, default: false),
         ];
     }

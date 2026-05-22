@@ -57,10 +57,7 @@ class NormalizeNbspInEventDescriptionsTest extends TestCase
     public function testIdentifierIsDatePrefixedAndUnique(): void
     {
         // Arrange
-        $subject = new NormalizeNbspInEventDescriptions(
-            $this->createStub(EventTranslationRepository::class),
-            $this->createStub(EntityManagerInterface::class),
-        );
+        $subject = new NormalizeNbspInEventDescriptions($this->createStub(EventTranslationRepository::class), $this->createStub(EntityManagerInterface::class));
 
         // Act
         $id = $subject->getIdentifier();

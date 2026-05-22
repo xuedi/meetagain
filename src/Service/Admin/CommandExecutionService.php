@@ -16,10 +16,8 @@ readonly class CommandExecutionService
         private CommandExecutionLogRepository $repo,
     ) {}
 
-    public function start(
-        string $commandName,
-        CommandTriggerType $triggeredBy = CommandTriggerType::Cron,
-    ): CommandExecutionLog {
+    public function start(string $commandName, CommandTriggerType $triggeredBy = CommandTriggerType::Cron): CommandExecutionLog
+    {
         $log = new CommandExecutionLog();
         $log->setCommandName($commandName);
         $log->setStartedAt(new DateTimeImmutable());
@@ -32,12 +30,8 @@ readonly class CommandExecutionService
         return $log;
     }
 
-    public function complete(
-        CommandExecutionLog $log,
-        int $exitCode,
-        ?string $output = null,
-        ?string $errorOutput = null,
-    ): void {
+    public function complete(CommandExecutionLog $log, int $exitCode, ?string $output = null, ?string $errorOutput = null): void
+    {
         $log->setCompletedAt(new DateTimeImmutable());
         $log->setExitCode($exitCode);
         $log->setOutput($output);

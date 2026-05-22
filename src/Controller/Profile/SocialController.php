@@ -43,10 +43,7 @@ final class SocialController extends AbstractController
     #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow', methods: ['POST'])]
     public function toggleFollow(Request $request, int $id): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_profile_social_toggle_follow' . $id,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_profile_social_toggle_follow' . $id, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

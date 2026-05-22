@@ -38,13 +38,7 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new BlockedUser();
-        $subject->injectServices(
-            $this->router,
-            $this->imageRenderer,
-            $this->translator,
-            ['user_id' => 7],
-            [7 => 'Alice'],
-        );
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 7], [7 => 'Alice']);
 
         // Act + Assert
         static::assertSame('profile_social.activity_blocked_user', $subject->render());
@@ -54,13 +48,7 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new BlockedUser();
-        $subject->injectServices(
-            $this->router,
-            $this->imageRenderer,
-            $this->translator,
-            ['user_id' => 7],
-            [7 => 'Alice<'],
-        );
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 7], [7 => 'Alice<']);
 
         // Act + Assert
         static::assertSame('profile_social.activity_blocked_user', $subject->render(true));
@@ -107,13 +95,7 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new UnblockedUser();
-        $subject->injectServices(
-            $this->router,
-            $this->imageRenderer,
-            $this->translator,
-            ['user_id' => 3],
-            [3 => 'Bob'],
-        );
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 3], [3 => 'Bob']);
 
         // Act + Assert
         static::assertSame('profile_social.activity_unblocked_user', $subject->render());
@@ -123,13 +105,7 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new UnblockedUser();
-        $subject->injectServices(
-            $this->router,
-            $this->imageRenderer,
-            $this->translator,
-            ['user_id' => 3],
-            [3 => 'Bob>'],
-        );
+        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 3], [3 => 'Bob>']);
 
         // Act + Assert
         static::assertSame('profile_social.activity_unblocked_user', $subject->render(true));

@@ -41,9 +41,7 @@ final readonly class EventSchemaService
             // EventCancelled is emitted when the event is cancelled. previousStartDate is
             // intentionally omitted: the Event entity does not currently track a prior
             // start date for cancelled events.
-            'eventStatus' => $event->isCanceled()
-                ? 'https://schema.org/EventCancelled'
-                : 'https://schema.org/EventScheduled',
+            'eventStatus' => $event->isCanceled() ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
             'description' => $this->resolveDescription($event, $locale),
             'image' => $this->resolveImage($event, $organizer),

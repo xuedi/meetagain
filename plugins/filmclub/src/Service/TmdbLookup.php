@@ -79,9 +79,7 @@ readonly class TmdbLookup implements FilmMetadataLookupInterface
             title: $item['title'] ?? '',
             originalTitle: $item['original_title'] ?? null,
             description: $item['overview'] ?? null,
-            year: isset($item['release_date']) && $item['release_date'] !== ''
-                ? (int) substr($item['release_date'], 0, 4)
-                : null,
+            year: isset($item['release_date']) && $item['release_date'] !== '' ? (int) substr($item['release_date'], 0, 4) : null,
             posterUrl: isset($item['poster_path']) ? self::IMAGE_BASE . $item['poster_path'] : null,
         );
     }
@@ -96,9 +94,7 @@ readonly class TmdbLookup implements FilmMetadataLookupInterface
             title: $item['title'] ?? '',
             originalTitle: $item['original_title'] ?? null,
             description: $item['overview'] ?? null,
-            year: isset($item['release_date']) && $item['release_date'] !== ''
-                ? (int) substr($item['release_date'], 0, 4)
-                : null,
+            year: isset($item['release_date']) && $item['release_date'] !== '' ? (int) substr($item['release_date'], 0, 4) : null,
             runtime: isset($item['runtime']) && $item['runtime'] > 0 ? $item['runtime'] : null,
             genres: array_values($genres),
             posterUrl: isset($item['poster_path']) ? self::IMAGE_BASE . $item['poster_path'] : null,

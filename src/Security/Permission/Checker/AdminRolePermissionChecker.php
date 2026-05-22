@@ -79,9 +79,7 @@ final class AdminRolePermissionChecker implements PermissionCheckerInterface
     #[Override]
     public function supports(string $attribute, mixed $subject): bool
     {
-        return (
-            in_array($attribute, self::ORGANIZER_ATTRIBUTES, true) || in_array($attribute, self::ADMIN_ATTRIBUTES, true)
-        );
+        return in_array($attribute, self::ORGANIZER_ATTRIBUTES, true) || in_array($attribute, self::ADMIN_ATTRIBUTES, true);
     }
 
     #[Override]

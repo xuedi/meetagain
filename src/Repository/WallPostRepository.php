@@ -22,12 +22,7 @@ class WallPostRepository extends ServiceEntityRepository
      */
     public function findRecent(int $limit, ?array $allowedIds = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('p')
-            ->leftJoin('p.author', 'a')
-            ->addSelect('a')
-            ->orderBy('p.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('p')->leftJoin('p.author', 'a')->addSelect('a')->orderBy('p.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($allowedIds !== null) {
             if ($allowedIds === []) {

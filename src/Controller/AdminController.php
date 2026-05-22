@@ -60,16 +60,7 @@ final class AdminController extends AbstractController
         if ($isAdmin && $isPlatform) {
             $this->buildAdminPlatform($year, $week, $centerTiles, $sideTiles);
         } else {
-            $this->buildScopedTiles(
-                $year,
-                $week,
-                $scope,
-                $isOrganizer,
-                $isSteward,
-                $request->getLocale(),
-                $centerTiles,
-                $sideTiles,
-            );
+            $this->buildScopedTiles($year, $week, $scope, $isOrganizer, $isSteward, $request->getLocale(), $centerTiles, $sideTiles);
         }
 
         return $this->render('admin/index.html.twig', [
@@ -92,21 +83,9 @@ final class AdminController extends AbstractController
             canvasId: 'platformActivityChart',
             labels: $activity['labels'],
             datasets: [
-                new TileDataset(
-                    $this->translator->trans('admin_shell.dashboard_series_logins'),
-                    $activity['logins'],
-                    'rgba(54, 162, 235, 1)',
-                ),
-                new TileDataset(
-                    $this->translator->trans('admin_shell.dashboard_series_rsvps'),
-                    $activity['rsvps'],
-                    'rgba(75, 192, 75, 1)',
-                ),
-                new TileDataset(
-                    $this->translator->trans('admin_shell.dashboard_series_new_members'),
-                    $activity['newMembers'],
-                    'rgba(255, 159, 64, 1)',
-                ),
+                new TileDataset($this->translator->trans('admin_shell.dashboard_series_logins'), $activity['logins'], 'rgba(54, 162, 235, 1)'),
+                new TileDataset($this->translator->trans('admin_shell.dashboard_series_rsvps'), $activity['rsvps'], 'rgba(75, 192, 75, 1)'),
+                new TileDataset($this->translator->trans('admin_shell.dashboard_series_new_members'), $activity['newMembers'], 'rgba(255, 159, 64, 1)'),
             ],
         );
 
@@ -180,11 +159,7 @@ final class AdminController extends AbstractController
                 (bool) ($tests['diskSpace']['ok'] ?? false),
                 ($tests['diskSpace']['percentFree'] ?? 0) . '% free',
             ),
-            new TileHealthCheck(
-                'admin_shell.dashboard_health_php_version',
-                true,
-                $tests['phpVersion']['version'] ?? '',
-            ),
+            new TileHealthCheck('admin_shell.dashboard_health_php_version', true, $tests['phpVersion']['version'] ?? ''),
         ]);
     }
 

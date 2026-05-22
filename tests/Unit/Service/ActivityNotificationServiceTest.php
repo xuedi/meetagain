@@ -31,11 +31,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $activity->method('getMeta')->willReturn(['event_id' => 42]);
 
         $eventRepoMock = $this->createMock(EventRepository::class);
-        $eventRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => 42])
-            ->willReturn(new EventStub()->setId(42));
+        $eventRepoMock->expects($this->once())->method('findOneBy')->with(['id' => 42])->willReturn(new EventStub()->setId(42));
 
         $service = new ActivityNotificationService(
             notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),

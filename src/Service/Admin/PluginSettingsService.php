@@ -17,28 +17,15 @@ final readonly class PluginSettingsService
      */
     public function __construct(#[AutowireIterator(PluginSettingsProviderInterface::class)] iterable $providers)
     {
-        $materialised = $providers instanceof Traversable
-            ? iterator_to_array($providers, false)
-            : array_values($providers);
+        $materialised = $providers instanceof Traversable ? iterator_to_array($providers, false) : array_values($providers);
 
-        usort(
-            $materialised,
-            static fn(
-                PluginSettingsProviderInterface $a,
-                PluginSettingsProviderInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($materialised, static fn(PluginSettingsProviderInterface $a, PluginSettingsProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         $keyed = [];
         foreach ($materialised as $provider) {
             $key = $provider->getKey();
             if (isset($keyed[$key])) {
-                throw new LogicException(sprintf(
-                    'Duplicate plugin settings provider key "%s": %s and %s.',
-                    $key,
-                    $keyed[$key]::class,
-                    $provider::class,
-                ));
+                throw new LogicException(sprintf('Duplicate plugin settings provider key "%s": %s and %s.', $key, $keyed[$key]::class, $provider::class));
             }
             $keyed[$key] = $provider;
         }

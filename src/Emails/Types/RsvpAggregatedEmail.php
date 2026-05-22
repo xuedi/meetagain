@@ -132,10 +132,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
 
     public function getDueContexts(DateTimeImmutable $now): array
     {
-        $events = $this->eventRepo->findUpcomingEventsNeedingRsvpNotification(
-            $now,
-            $now->add(new DateInterval('PT48H')),
-        );
+        $events = $this->eventRepo->findUpcomingEventsNeedingRsvpNotification($now, $now->add(new DateInterval('PT48H')));
 
         $contexts = [];
         foreach ($events as $event) {
@@ -183,15 +180,11 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
                 }
             }
 
-            $expectedTime = max(
-                $from,
-                DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT48H')),
-            );
+            $expectedTime = max($from, DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT48H')));
 
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::NotificationRsvpAggregated->value,
-                label: 'Event: '
-                . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
+                label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
                 expectedTime: $expectedTime,
                 expectedRecipients: $eligibleCount,
             );

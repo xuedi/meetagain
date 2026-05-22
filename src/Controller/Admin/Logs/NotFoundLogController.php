@@ -100,11 +100,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
     private function buildInfo(int $totalCount, int $rangeCount): array
     {
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_logs.summary_total_404'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_logs.summary_total_404'))),
         ];
 
         if ($rangeCount === 0) {
@@ -116,11 +112,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
             return $info;
         }
 
-        $info[] = new AdminTopInfoHtml(sprintf(
-            '<strong>%d</strong>&nbsp;%s',
-            $rangeCount,
-            $this->translator->trans('admin_logs.summary_in_range'),
-        ));
+        $info[] = new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $rangeCount, $this->translator->trans('admin_logs.summary_in_range')));
 
         return $info;
     }
@@ -150,11 +142,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );

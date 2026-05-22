@@ -22,11 +22,7 @@ final readonly class SenderUserPresentRule implements EmailGuardRuleInterface
     public function evaluate(array $context): EmailGuardResult
     {
         if (!array_key_exists('sender', $context) || !$context['sender'] instanceof User) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing the 'sender' key, or it is not a User instance.",
-                'sender',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing the 'sender' key, or it is not a User instance.", 'sender');
         }
 
         return EmailGuardResult::pass($this->getName());

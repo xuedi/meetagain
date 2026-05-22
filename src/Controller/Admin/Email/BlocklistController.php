@@ -37,11 +37,7 @@ final class BlocklistController extends AbstractEmailController implements Admin
         $entries = $this->repo->findAllOrdered();
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($entries),
-                $this->translator->trans('admin_email_blocklist.summary_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($entries), $this->translator->trans('admin_email_blocklist.summary_total'))),
         ], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_email_blocklist.button_add'),
@@ -107,10 +103,7 @@ final class BlocklistController extends AbstractEmailController implements Admin
     #[Route('/{id}/delete', name: 'app_admin_email_blocklist_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function delete(Request $request, EmailBlocklistEntry $entry): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_email_blocklist_delete' . $entry->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_email_blocklist_delete' . $entry->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

@@ -40,13 +40,7 @@ final class SecurityAssertStateCommand extends Command
         $this
             ->addArgument('expectations', InputArgument::REQUIRED, 'Path to expectations JSON file')
             ->addOption('scenario', null, InputOption::VALUE_REQUIRED, 'Scenario name for the verdict file', 'scenario')
-            ->addOption(
-                'output-dir',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Where to write the verdict JSON',
-                'tests/reports/attack',
-            );
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'Where to write the verdict JSON', 'tests/reports/attack');
     }
 
     #[Override]
@@ -66,21 +60,14 @@ final class SecurityAssertStateCommand extends Command
         }
 
         $expectations = is_array($payload['expectations'] ?? null) ? $payload['expectations'] : [];
-        $scenario = is_string($payload['scenario'] ?? null)
-            ? $payload['scenario']
-            : (string) $input->getOption('scenario');
+        $scenario = is_string($payload['scenario'] ?? null) ? $payload['scenario'] : (string) $input->getOption('scenario');
 
         $verdicts = [];
         $allPassed = true;
         foreach ($expectations as $expectation) {
             $verdict = $this->evaluate(is_array($expectation) ? $expectation : []);
             $verdicts[] = $verdict;
-            $output->writeln(sprintf(
-                '%s	%s	%s',
-                $verdict['passed'] ? 'PASS' : 'FAIL',
-                $verdict['kind'],
-                $verdict['detail'],
-            ));
+            $output->writeln(sprintf('%s	%s	%s', $verdict['passed'] ? 'PASS' : 'FAIL', $verdict['kind'], $verdict['detail']));
             if (!$verdict['passed']) {
                 $allPassed = false;
             }
@@ -107,9 +94,7 @@ final class SecurityAssertStateCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln(
-            $allPassed ? '<info>All expectations passed.</info>' : '<error>One or more expectations failed.</error>',
-        );
+        $output->writeln($allPassed ? '<info>All expectations passed.</info>' : '<error>One or more expectations failed.</error>');
         $output->writeln(sprintf('Verdict written to %s', $verdictPath));
 
         return $allPassed ? Command::SUCCESS : Command::FAILURE;
@@ -171,12 +156,7 @@ final class SecurityAssertStateCommand extends Command
         return [
             'kind' => 'sessionBlocked',
             'passed' => $actual === $expected,
-            'detail' => sprintf(
-                'sessionId=%s expected=%s actual=%s',
-                $sessionId,
-                $this->bool($expected),
-                $this->bool($actual),
-            ),
+            'detail' => sprintf('sessionId=%s expected=%s actual=%s', $sessionId, $this->bool($expected), $this->bool($actual)),
             'expected' => $expected,
             'actual' => $actual,
         ];
@@ -190,9 +170,7 @@ final class SecurityAssertStateCommand extends Command
     {
         $since = $this->resolveSince($expectation['since'] ?? 'PT5M');
         $triggeredBy = is_string($expectation['triggeredBy'] ?? null) ? $expectation['triggeredBy'] : null;
-        $actual = $triggeredBy !== null
-            ? $this->incidentRepo->countSinceByTriggeredBy($since, $triggeredBy)
-            : $this->incidentRepo->countSince($since);
+        $actual = $triggeredBy !== null ? $this->incidentRepo->countSinceByTriggeredBy($since, $triggeredBy) : $this->incidentRepo->countSince($since);
 
         $passed = $this->compareCount($actual, $expectation);
         $expectedDescription = $this->describeCountExpectation($expectation);
@@ -253,9 +231,7 @@ final class SecurityAssertStateCommand extends Command
         $ip = is_string($expectation['ip'] ?? null) ? $expectation['ip'] : '';
         $expected = is_string($expectation['expected'] ?? null) ? $expectation['expected'] : '';
         $snapshot = $this->blockStore->getIpSnapshot($ip);
-        $actual = is_array($snapshot) && is_string($snapshot['primaryProvider'] ?? null)
-            ? $snapshot['primaryProvider']
-            : null;
+        $actual = is_array($snapshot) && is_string($snapshot['primaryProvider'] ?? null) ? $snapshot['primaryProvider'] : null;
 
         return [
             'kind' => 'blockSnapshotPrimaryProvider',

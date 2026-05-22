@@ -41,9 +41,7 @@ final class SeoController extends AbstractSettingsController implements AdminNav
             return $this->redirectToRoute('app_admin_system_seo');
         }
 
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
-            'admin_system_seo.intro',
-        ))], actions: [
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_seo.intro'))], actions: [
             new AdminTopActionForm(
                 label: $this->translator->trans('admin_system_seo.button_submit_indexnow'),
                 target: $this->generateUrl('app_admin_system_seo_indexnow_submit'),

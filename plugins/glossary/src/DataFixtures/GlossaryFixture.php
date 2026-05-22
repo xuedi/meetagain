@@ -34,38 +34,10 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
     private function getData(): array
     {
         return [
-            [
-                '草泥马',
-                'cǎo ní mǎ',
-                'fuck off',
-                Category::Swearing,
-                1,
-                true,
-            ],
-            [
-                '干嘛',
-                'gàn má',
-                'how is it going?',
-                Category::Greeting,
-                2,
-                true,
-            ],
-            [
-                '你吃了吗？',
-                'nǐ chī le ma?',
-                'have you heating?',
-                Category::Greeting,
-                2,
-                true,
-            ],
-            [
-                '你好',
-                'nĭ hăo',
-                'hello nobody uses anymore, you can use when seeing your ex after 10 years',
-                Category::Greeting,
-                2,
-                false,
-            ],
+            ['草泥马',     'cǎo ní mǎ',     'fuck off',                                                                  Category::Swearing, 1, true],
+            ['干嘛',       'gàn má',        'how is it going?',                                                          Category::Greeting, 2, true],
+            ['你吃了吗？', 'nǐ chī le ma?', 'have you heating?',                                                         Category::Greeting, 2, true],
+            ['你好',       'nĭ hăo',        'hello nobody uses anymore, you can use when seeing your ex after 10 years', Category::Greeting, 2, false],
         ];
     }
 

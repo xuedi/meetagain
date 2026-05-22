@@ -34,11 +34,7 @@ class SendMessageTest extends TestCase
         $userNames = [$userId => $userName];
 
         $router = $this->createMock(RouterInterface::class);
-        $router
-            ->expects($this->once())
-            ->method('generate')
-            ->with('app_member_view', ['id' => $userId])
-            ->willReturn('/members/view/42');
+        $router->expects($this->once())->method('generate')->with('app_member_view', ['id' => $userId])->willReturn('/members/view/42');
 
         $subject = new SendMessage();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, $userNames);
@@ -72,9 +68,7 @@ class SendMessageTest extends TestCase
 
     public function testCanCatchNonNumericUserId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.send_message'"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.send_message'"));
 
         $subject = new SendMessage();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => 'not-a-number']);

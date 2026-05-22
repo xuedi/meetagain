@@ -30,10 +30,7 @@ class EmailTemplateServiceTest extends TestCase
         $templates = $service->getDefaultTemplates('de');
 
         // Assert
-        static::assertSame(
-            '<de>body:' . EmailType::Welcome->value . '.html',
-            $templates[EmailType::Welcome->value]['body'],
-        );
+        static::assertSame('<de>body:' . EmailType::Welcome->value . '.html', $templates[EmailType::Welcome->value]['body']);
     }
 
     public function testGetDefaultTemplatesFallsBackToDefaultTemplateWhenLanguageFileMissing(): void
@@ -48,10 +45,7 @@ class EmailTemplateServiceTest extends TestCase
         $templates = $service->getDefaultTemplates('de');
 
         // Assert
-        static::assertSame(
-            '<en>body:' . EmailType::Welcome->value . '.html',
-            $templates[EmailType::Welcome->value]['body'],
-        );
+        static::assertSame('<en>body:' . EmailType::Welcome->value . '.html', $templates[EmailType::Welcome->value]['body']);
     }
 
     public function testGetDefaultTemplatesThrowsWhenNeitherFileExists(): void
@@ -135,11 +129,7 @@ class EmailTemplateServiceTest extends TestCase
     public function testRenderContentSubstitutesScalars(string $template, array $context, string $expected): void
     {
         // Arrange
-        $service = new EmailTemplateService(
-            $this->createStub(EmailTemplateRepository::class),
-            $this->createStub(ExtendedFilesystem::class),
-            self::PROJECT_DIR,
-        );
+        $service = new EmailTemplateService($this->createStub(EmailTemplateRepository::class), $this->createStub(ExtendedFilesystem::class), self::PROJECT_DIR);
 
         // Act
         $rendered = $service->renderContent($template, $context);

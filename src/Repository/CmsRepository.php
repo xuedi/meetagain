@@ -45,11 +45,7 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function findPublishedBySlug(string $slug, ?array $allowedIds = null): ?Cms
     {
-        $qb = $this
-            ->createQueryBuilder('c')
-            ->where('c.slug = :slug')
-            ->andWhere('c.published = true')
-            ->setParameter('slug', $slug);
+        $qb = $this->createQueryBuilder('c')->where('c.slug = :slug')->andWhere('c.published = true')->setParameter('slug', $slug);
 
         if ($allowedIds !== null) {
             if ($allowedIds === []) {
@@ -74,12 +70,7 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function findPublished(): array
     {
-        return $this
-            ->createQueryBuilder('c')
-            ->where('c.published = true')
-            ->orderBy('c.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('c')->where('c.published = true')->orderBy('c.createdAt', 'DESC')->getQuery()->getResult();
     }
 
     /**
@@ -136,9 +127,7 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function findByMenuLocation(MenuLocation $location): array
     {
-        $ids = $this->cache->get('cms_menu_location_' . $location->value, function (ItemInterface $item) use (
-            $location,
-        ): array {
+        $ids = $this->cache->get('cms_menu_location_' . $location->value, function (ItemInterface $item) use ($location): array {
             $item->expiresAfter(self::CACHE_TTL);
             $item->tag(['cms_menu']);
 
@@ -168,12 +157,7 @@ class CmsRepository extends ServiceEntityRepository
         return $this->cache->get('cms_locked_ids', function (ItemInterface $item): array {
             $item->expiresAfter(self::CACHE_TTL);
 
-            return $this
-                ->createQueryBuilder('c')
-                ->select('c.id')
-                ->where('c.locked = true')
-                ->getQuery()
-                ->getSingleColumnResult();
+            return $this->createQueryBuilder('c')->select('c.id')->where('c.locked = true')->getQuery()->getSingleColumnResult();
         });
     }
 }

@@ -21,11 +21,8 @@ class LocaleValidationSubscriberTest extends TestCase
         return new RequestEvent($kernel, $request, $type);
     }
 
-    private function makeSubscriber(
-        bool $isValid = true,
-        bool $isFilteredValid = true,
-        string $defaultLocale = 'en',
-    ): LocaleValidationSubscriber {
+    private function makeSubscriber(bool $isValid = true, bool $isFilteredValid = true, string $defaultLocale = 'en'): LocaleValidationSubscriber
+    {
         $lang = $this->createStub(LanguageService::class);
         $lang->method('isValidCode')->willReturn($isValid);
         $lang->method('isFilteredValidCode')->willReturn($isFilteredValid);

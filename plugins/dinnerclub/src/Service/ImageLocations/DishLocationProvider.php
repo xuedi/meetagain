@@ -29,9 +29,7 @@ final class DishLocationProvider extends AbstractImageLocationProvider
         $pairs = [];
 
         // Gallery images from the join table
-        $gallery = $this->connection->fetchAllAssociative(
-            'SELECT image_id, dish_id AS location_id FROM dinnerclub_dish_image',
-        );
+        $gallery = $this->connection->fetchAllAssociative('SELECT image_id, dish_id AS location_id FROM dinnerclub_dish_image');
         foreach ($gallery as $row) {
             $key = $row['image_id'] . ':' . $row['location_id'];
             $pairs[$key] = ['imageId' => (int) $row['image_id'], 'locationId' => (int) $row['location_id']];

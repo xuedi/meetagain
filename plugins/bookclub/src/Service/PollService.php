@@ -127,9 +127,7 @@ readonly class PollService
         $poll->setEndDate(new DateTimeImmutable());
 
         foreach ($poll->getSuggestions() as $suggestion) {
-            $suggestion->setStatus(
-                $suggestion->getId() === $winner->getId() ? SuggestionStatus::Selected : SuggestionStatus::Pending,
-            );
+            $suggestion->setStatus($suggestion->getId() === $winner->getId() ? SuggestionStatus::Selected : SuggestionStatus::Pending);
             if ($suggestion->getId() !== $winner->getId()) {
                 $suggestion->setPoll(null);
                 $suggestion->setResubmitCount($suggestion->getResubmitCount() + 1);

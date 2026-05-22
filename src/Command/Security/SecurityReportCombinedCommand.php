@@ -11,10 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Twig\Environment;
 
-#[AsCommand(
-    name: 'app:security:report-combined',
-    description: 'Combine attack-test verdict + k6 summary JSON files into a single HTML index.',
-)]
+#[AsCommand(name: 'app:security:report-combined', description: 'Combine attack-test verdict + k6 summary JSON files into a single HTML index.')]
 final class SecurityReportCombinedCommand extends Command
 {
     public function __construct(
@@ -32,13 +29,7 @@ final class SecurityReportCombinedCommand extends Command
             InputOption::VALUE_REQUIRED,
             'Directory containing *.verdict.json and *.k6-summary.json',
             'tests/reports/attack',
-        )->addOption(
-            'output',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'HTML output path',
-            'tests/reports/attack/index.html',
-        );
+        )->addOption('output', null, InputOption::VALUE_REQUIRED, 'HTML output path', 'tests/reports/attack/index.html');
     }
 
     #[Override]
@@ -86,12 +77,7 @@ final class SecurityReportCombinedCommand extends Command
         }
         file_put_contents($outputPath, $html);
 
-        $output->writeln(sprintf(
-            'Combined report: %s (%d scenarios, %s)',
-            $outputPath,
-            count($scenarios),
-            $allPassed ? 'all PASS' : 'one or more FAIL',
-        ));
+        $output->writeln(sprintf('Combined report: %s (%d scenarios, %s)', $outputPath, count($scenarios), $allPassed ? 'all PASS' : 'one or more FAIL'));
 
         return $allPassed ? Command::SUCCESS : Command::FAILURE;
     }

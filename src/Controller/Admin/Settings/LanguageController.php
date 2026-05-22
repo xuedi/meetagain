@@ -28,9 +28,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/language')]
-final class LanguageController extends AbstractSettingsController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class LanguageController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -57,16 +55,8 @@ final class LanguageController extends AbstractSettingsController implements
         }
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($languages),
-                $this->translator->trans('admin_system_language.summary_total'),
-            )),
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $enabledCount,
-                $this->translator->trans('admin_system_language.summary_enabled'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($languages), $this->translator->trans('admin_system_language.summary_total'))),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $enabledCount, $this->translator->trans('admin_system_language.summary_enabled'))),
         ]);
 
         return $this->render('admin/system/language/list.html.twig', [
@@ -92,11 +82,7 @@ final class LanguageController extends AbstractSettingsController implements
 
             $newTile = $language->getTileImage();
             if ($newTile !== null) {
-                $this->imageLocationService->addLocation(
-                    $newTile->getId(),
-                    ImageType::LanguageTile,
-                    $language->getId(),
-                );
+                $this->imageLocationService->addLocation($newTile->getId(), ImageType::LanguageTile, $language->getId());
             }
 
             $this->languageService->invalidateCache();
@@ -131,17 +117,9 @@ final class LanguageController extends AbstractSettingsController implements
             $newTile = $language->getTileImage();
             if ($newTile !== null && $newTile->getId() !== $oldTileId) {
                 if ($oldTileId !== null) {
-                    $this->imageLocationService->removeLocation(
-                        $oldTileId,
-                        ImageType::LanguageTile,
-                        $language->getId(),
-                    );
+                    $this->imageLocationService->removeLocation($oldTileId, ImageType::LanguageTile, $language->getId());
                 }
-                $this->imageLocationService->addLocation(
-                    $newTile->getId(),
-                    ImageType::LanguageTile,
-                    $language->getId(),
-                );
+                $this->imageLocationService->addLocation($newTile->getId(), ImageType::LanguageTile, $language->getId());
             }
 
             $this->languageService->invalidateCache();
@@ -164,10 +142,7 @@ final class LanguageController extends AbstractSettingsController implements
     #[Route('/{id}/toggle', name: 'app_admin_language_toggle', methods: ['POST'])]
     public function toggle(Language $language, Request $request): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_admin_language_toggle' . $language->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_admin_language_toggle' . $language->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -182,11 +157,7 @@ final class LanguageController extends AbstractSettingsController implements
     {
         $titleKey = $isEdit ? 'admin_system_language.page_title_edit' : 'admin_system_language.page_title_add';
         $info = [
-            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
-                $this->translator->trans($titleKey),
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($this->translator->trans($titleKey), ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
         ];
         if ($isEdit && $language !== null) {
             $info[] = new AdminTopInfoHtml(sprintf('<span class="tag is-light">%s</span>', htmlspecialchars(

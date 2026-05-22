@@ -97,17 +97,10 @@ final class ConfigController extends AbstractController
         return $this->redirectToRoute('app_profile_config');
     }
 
-    #[Route(
-        '/profile/config/toggleNotification/{type}',
-        name: 'app_profile_config_toggle_notification',
-        methods: ['POST'],
-    )]
+    #[Route('/profile/config/toggleNotification/{type}', name: 'app_profile_config_toggle_notification', methods: ['POST'])]
     public function toggleNotification(Request $request, string $type): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_profile_config_toggle_notification' . $type,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_profile_config_toggle_notification' . $type, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

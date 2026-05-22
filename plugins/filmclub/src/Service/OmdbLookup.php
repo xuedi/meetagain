@@ -65,10 +65,7 @@ readonly class OmdbLookup implements FilmMetadataLookupInterface
                 return null;
             }
 
-            $genres = array_filter(array_map(
-                static fn(string $g) => strtolower(trim($g)),
-                explode(',', $data['Genre'] ?? ''),
-            ));
+            $genres = array_filter(array_map(static fn(string $g) => strtolower(trim($g)), explode(',', $data['Genre'] ?? '')));
 
             return new FilmMetadata(
                 externalId: $data['imdbID'] ?? $externalId,

@@ -60,8 +60,7 @@ class Kernel implements Plugin
 
         if ($user !== null && method_exists($user, 'getId')) {
             if ($selection !== null) {
-                $isWishlisted =
-                    $this->wishlistRepo->findByUserAndFilm($user->getId(), $selection->getFilm()->getId()) !== null;
+                $isWishlisted = $this->wishlistRepo->findByUserAndFilm($user->getId(), $selection->getFilm()->getId()) !== null;
             }
 
             if ($activePoll !== null) {
@@ -74,9 +73,7 @@ class Kernel implements Plugin
             }
 
             if ($canCreatePoll) {
-                $wishlistPoolCount = count(
-                    $this->wishlistRepo->aggregateByFilm($this->groupFilter->getAllowedWishlistEntryIds()),
-                );
+                $wishlistPoolCount = count($this->wishlistRepo->aggregateByFilm($this->groupFilter->getAllowedWishlistEntryIds()));
             }
         }
 

@@ -115,11 +115,7 @@ class EventType extends AbstractType
                 'required' => false,
                 'label' => $this->translator->trans('admin_event.form_label_preview_image'),
                 'constraints' => [
-                    new File(
-                        maxSize: '5000k',
-                        mimeTypes: ['image/*'],
-                        mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error'),
-                    ),
+                    new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error')),
                 ],
             ])
             ->add('allFollowing', CheckboxType::class, [

@@ -46,11 +46,7 @@ readonly class CloseExpiredPollsCron implements CronTaskInterface
                     'poll_id' => $poll->getId(),
                     'error' => $e->getMessage(),
                 ]);
-                $output->writeln(sprintf(
-                    'CloseExpiredPollsCron: error on poll %d: %s',
-                    $poll->getId(),
-                    $e->getMessage(),
-                ));
+                $output->writeln(sprintf('CloseExpiredPollsCron: error on poll %d: %s', $poll->getId(), $e->getMessage()));
             }
         }
 

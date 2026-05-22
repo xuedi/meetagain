@@ -74,10 +74,7 @@ class OgImageResolverTest extends TestCase
 
         // Assert
         static::assertNotNull($result);
-        static::assertSame(
-            'https://example.test/images/thumbnails/sysHash_1200x630.webp?v20260503120000',
-            $result->absoluteUrl,
-        );
+        static::assertSame('https://example.test/images/thumbnails/sysHash_1200x630.webp?v20260503120000', $result->absoluteUrl);
         static::assertSame(1200, $result->width);
         static::assertSame(630, $result->height);
         static::assertSame('Default Alt', $result->altText);
@@ -145,18 +142,8 @@ class OgImageResolverTest extends TestCase
     public function testFirstProviderClaimWinsAcrossChain(): void
     {
         // Arrange
-        $firstResolved = new ResolvedOgImage(
-            absoluteUrl: 'https://first.test/img.webp',
-            width: 1200,
-            height: 630,
-            altText: 'First',
-        );
-        $secondResolved = new ResolvedOgImage(
-            absoluteUrl: 'https://second.test/img.webp',
-            width: 1200,
-            height: 630,
-            altText: 'Second',
-        );
+        $firstResolved = new ResolvedOgImage(absoluteUrl: 'https://first.test/img.webp', width: 1200, height: 630, altText: 'First');
+        $secondResolved = new ResolvedOgImage(absoluteUrl: 'https://second.test/img.webp', width: 1200, height: 630, altText: 'Second');
         $first = $this->createStub(OgImageProviderInterface::class);
         $first->method('resolveOgImage')->willReturn($firstResolved);
         $second = $this->createStub(OgImageProviderInterface::class);

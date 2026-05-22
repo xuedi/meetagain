@@ -24,11 +24,7 @@ class SiteLogoType extends AbstractType
             'required' => false,
             'label' => 'admin_system_theme.field_logo',
             'constraints' => [
-                new File(
-                    maxSize: '5000k',
-                    mimeTypes: ['image/*'],
-                    mimeTypesMessage: $this->translator->trans('admin_system_theme.logo_mime_error'),
-                ),
+                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('admin_system_theme.logo_mime_error')),
             ],
         ]);
     }

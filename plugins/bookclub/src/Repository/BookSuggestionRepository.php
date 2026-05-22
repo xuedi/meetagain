@@ -46,11 +46,7 @@ class BookSuggestionRepository extends ServiceEntityRepository
      */
     public function findAllPending(?array $allowedIds = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('s')
-            ->where('s.status = :status')
-            ->setParameter('status', SuggestionStatus::Pending)
-            ->orderBy('s.suggestedAt', 'ASC');
+        $qb = $this->createQueryBuilder('s')->where('s.status = :status')->setParameter('status', SuggestionStatus::Pending)->orderBy('s.suggestedAt', 'ASC');
 
         if ($allowedIds !== null) {
             if ($allowedIds === []) {

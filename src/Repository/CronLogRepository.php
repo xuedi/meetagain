@@ -68,12 +68,7 @@ class CronLogRepository extends ServiceEntityRepository
 
     public function findMostRecent(): ?CronLog
     {
-        return $this
-            ->createQueryBuilder('c')
-            ->orderBy('c.runAt', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->createQueryBuilder('c')->orderBy('c.runAt', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }
 
     public function countAll(): int

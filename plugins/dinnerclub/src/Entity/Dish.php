@@ -19,20 +19,10 @@ class Dish
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToMany(
-        targetEntity: DishTranslation::class,
-        mappedBy: 'dish',
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true,
-    )]
+    #[ORM\OneToMany(targetEntity: DishTranslation::class, mappedBy: 'dish', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $translations;
 
-    #[ORM\OneToMany(
-        targetEntity: DishImage::class,
-        mappedBy: 'dish',
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true,
-    )]
+    #[ORM\OneToMany(targetEntity: DishImage::class, mappedBy: 'dish', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['sortOrder' => 'ASC', 'createdAt' => 'ASC'])]
     private Collection $galleryImages;
 
@@ -273,10 +263,7 @@ class Dish
             return $this;
         }
 
-        $this->suggestions = array_values(array_filter(
-            $this->suggestions,
-            static fn(array $s) => DishSuggestion::fromJson($s)->getHash() !== $hash,
-        ));
+        $this->suggestions = array_values(array_filter($this->suggestions, static fn(array $s) => DishSuggestion::fromJson($s)->getHash() !== $hash));
 
         if ($this->suggestions === []) {
             $this->suggestions = null;
@@ -369,9 +356,6 @@ class Dish
      */
     public function getVisibleGalleryImages(): array
     {
-        return array_values(array_filter(
-            $this->galleryImages->toArray(),
-            static fn(DishImage $di) => $di->getImage()?->getReported() === null,
-        ));
+        return array_values(array_filter($this->galleryImages->toArray(), static fn(DishImage $di) => $di->getImage()?->getReported() === null));
     }
 }

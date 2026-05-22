@@ -79,10 +79,7 @@ final class ActivityLogController extends AbstractLogsController implements Admi
             );
         }
 
-        $adminTop = new AdminTop(
-            info: $this->buildInfo($totalCount, $rangeCount, $since, $userFilter),
-            actions: $actions,
-        );
+        $adminTop = new AdminTop(info: $this->buildInfo($totalCount, $rangeCount, $since, $userFilter), actions: $actions);
 
         return $this->render('admin/logs/logs_activity_list.html.twig', [
             'active' => 'logs',
@@ -134,19 +131,11 @@ final class ActivityLogController extends AbstractLogsController implements Admi
     private function buildInfo(int $totalCount, int $rangeCount, ?DateTimeImmutable $since, ?User $userFilter): array
     {
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_logs.summary_total_activities'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_logs.summary_total_activities'))),
         ];
 
         if ($since !== null || $userFilter !== null) {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $rangeCount,
-                $this->translator->trans('admin_logs.summary_in_range'),
-            ));
+            $info[] = new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $rangeCount, $this->translator->trans('admin_logs.summary_in_range')));
         }
 
         return $info;
@@ -170,11 +159,7 @@ final class ActivityLogController extends AbstractLogsController implements Admi
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );

@@ -23,9 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/security/rate-limiting')]
-final class RateLimitingController extends AbstractSecurityController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class RateLimitingController extends AbstractSecurityController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
 
@@ -63,22 +61,12 @@ final class RateLimitingController extends AbstractSecurityController implements
         $toFilter = $this->parseDateParam($request->query->getString('to', ''));
 
         $top = $this->rateLimitLogRepo->getTop100($since);
-        $recent = $this->rateLimitLogRepo->findFiltered(
-            limit: 200,
-            since: $since,
-            ip: $ipFilter,
-            from: $fromFilter,
-            to: $toFilter,
-        );
+        $recent = $this->rateLimitLogRepo->findFiltered(limit: 200, since: $since, ip: $ipFilter, from: $fromFilter, to: $toFilter);
         $totalCount = $this->rateLimitLogRepo->countAll();
         $rangeCount = $since !== null ? $this->rateLimitLogRepo->countSince($since) : $totalCount;
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_security.summary_total_rate_limiting'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_security.summary_total_rate_limiting'))),
         ];
         if ($rangeCount === 0) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -86,11 +74,7 @@ final class RateLimitingController extends AbstractSecurityController implements
                 $this->translator->trans('admin_security.summary_no_rate_limiting_in_range'),
             ));
         } else {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $rangeCount,
-                $this->translator->trans('admin_security.summary_in_range'),
-            ));
+            $info[] = new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $rangeCount, $this->translator->trans('admin_security.summary_in_range')));
         }
 
         $actions = [];
@@ -154,11 +138,7 @@ final class RateLimitingController extends AbstractSecurityController implements
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );

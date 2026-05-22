@@ -36,11 +36,7 @@ class RsvpYesTest extends TestCase
         $eventNames = [$eventId => $eventName];
 
         $router = $this->createMock(RouterInterface::class);
-        $router
-            ->expects($this->once())
-            ->method('generate')
-            ->with('app_event_details', ['id' => $eventId])
-            ->willReturn($eventUrl);
+        $router->expects($this->once())->method('generate')->with('app_event_details', ['id' => $eventId])->willReturn($eventUrl);
 
         $subject = new RsvpYes();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, [], $eventNames);
@@ -76,9 +72,7 @@ class RsvpYesTest extends TestCase
 
     public function testCanCatchNonNumericEventId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.rsvp_yes'"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.rsvp_yes'"));
 
         $subject = new RsvpYes();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);

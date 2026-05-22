@@ -125,9 +125,7 @@ class Kernel extends BaseKernel
         $routes->import($configDir . '/{routes}/' . $this->environment . '/*.{php,yaml}');
         $routes->import($configDir . '/{routes}/*.{php,yaml}');
 
-        $routes->import(
-            is_file($configDir . '/routes.yaml') ? $configDir . '/routes.yaml' : $configDir . '/{routes}.php',
-        );
+        $routes->import(is_file($configDir . '/routes.yaml') ? $configDir . '/routes.yaml' : $configDir . '/{routes}.php');
 
         $reflection = new ReflectionObject($this);
         if (false !== ($fileName = $reflection->getFileName())) {

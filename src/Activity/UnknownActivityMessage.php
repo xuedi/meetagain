@@ -36,9 +36,7 @@ class UnknownActivityMessage implements MessageInterface
         $namespace = $parts[0];
         $action = $parts[1] ?? '';
 
-        return $action !== ''
-            ? sprintf('[%s] %s (plugin inactive)', $namespace, $action)
-            : sprintf('[unknown] %s (plugin inactive)', $this->type);
+        return $action !== '' ? sprintf('[%s] %s (plugin inactive)', $namespace, $action) : sprintf('[unknown] %s (plugin inactive)', $this->type);
     }
 
     public function validate(): self

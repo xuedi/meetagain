@@ -54,9 +54,7 @@ class AdminMemberDeniedTest extends TestCase
     public function testCanCatchMissingUserId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_denied"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'user_id' in meta in core.admin_member_denied"));
 
         $subject = new AdminMemberDenied();
         $subject->injectServices($this->router, $this->imageService, $this->translator, []);
@@ -68,9 +66,7 @@ class AdminMemberDeniedTest extends TestCase
     public function testCanCatchNonNumericUserId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.admin_member_denied'"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'user_id' has to be numeric in 'core.admin_member_denied'"));
 
         $subject = new AdminMemberDenied();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => 'not-a-number']);

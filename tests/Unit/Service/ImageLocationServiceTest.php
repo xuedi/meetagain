@@ -108,10 +108,7 @@ class ImageLocationServiceTest extends TestCase
         $workingProvider = $this->createMock(ImageLocationProviderInterface::class);
         $workingProvider->expects($this->once())->method('sync');
 
-        $service = $this->createService(
-            logger: $this->createStub(LoggerInterface::class),
-            providers: [$failingProvider, $workingProvider],
-        );
+        $service = $this->createService(logger: $this->createStub(LoggerInterface::class), providers: [$failingProvider, $workingProvider]);
 
         // Act
         $service->discover();

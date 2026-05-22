@@ -41,9 +41,7 @@ class AdminEventDeletedTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_deleted"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_deleted"));
 
         $subject = new AdminEventDeleted();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_name' => 'Old Meetup']);
@@ -55,9 +53,7 @@ class AdminEventDeletedTest extends TestCase
     public function testCanCatchMissingEventName(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'event_name' in meta in core.admin_event_deleted"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_name' in meta in core.admin_event_deleted"));
 
         $subject = new AdminEventDeleted();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 42]);
