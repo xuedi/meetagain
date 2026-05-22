@@ -41,9 +41,6 @@ class EchoCommandTest extends TestCase
         $exitCode = $this->commandTester->execute(['message' => 'Test with "quotes" and \'apostrophes\'']);
 
         static::assertSame(Command::SUCCESS, $exitCode);
-        static::assertStringContainsString(
-            'Test with "quotes" and \'apostrophes\'',
-            $this->commandTester->getDisplay(),
-        );
+        static::assertStringContainsString('Test with "quotes" and \'apostrophes\'', $this->commandTester->getDisplay());
     }
 }

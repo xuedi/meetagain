@@ -69,11 +69,7 @@ class FixturesLoadCommandTest extends TestCase
 
         // Mock the application to return our mocked doctrine command
         $application = $this->createMock(Application::class);
-        $application
-            ->expects($this->once())
-            ->method('find')
-            ->with('doctrine:fixtures:load')
-            ->willReturn($doctrineCommand);
+        $application->expects($this->once())->method('find')->with('doctrine:fixtures:load')->willReturn($doctrineCommand);
 
         $command->setApplication($application);
         $this->commandTester = new CommandTester($command);

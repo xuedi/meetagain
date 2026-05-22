@@ -82,13 +82,7 @@ readonly class ImageGalleryFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                ImageGalleryFilterInterface $a,
-                ImageGalleryFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(ImageGalleryFilterInterface $a, ImageGalleryFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

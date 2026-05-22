@@ -21,12 +21,7 @@ class EventSchemaServiceTest extends TestCase
     public function testFullyPopulatedEventEmitsAllFiveRecommendedFields(): void
     {
         // Arrange
-        $event = $this->makeEvent(
-            title: 'Coffee chat',
-            teaser: 'Meet up for coffee in the park',
-            previewImageHash: 'abc123',
-            hostName: 'Berlin Crew',
-        );
+        $event = $this->makeEvent(title: 'Coffee chat', teaser: 'Meet up for coffee in the park', previewImageHash: 'abc123', hostName: 'Berlin Crew');
         $subject = $this->makeService();
 
         // Act
@@ -56,11 +51,7 @@ class EventSchemaServiceTest extends TestCase
 
         // Assert: every field falls back to a non-empty value
         static::assertSame('Coffee chat', $schema['description'], 'description falls back to title');
-        static::assertSame(
-            [self::PLATFORM_HOST . '/images/locations/default.jpg'],
-            $schema['image'],
-            'image falls back to default static asset',
-        );
+        static::assertSame([self::PLATFORM_HOST . '/images/locations/default.jpg'], $schema['image'], 'image falls back to default static asset');
         static::assertSame('https://schema.org/EventScheduled', $schema['eventStatus']);
         static::assertSame('MeetAgain', $schema['organizer']['name'], 'organizer falls back to platform org');
         static::assertSame($schema['organizer'], $schema['performer'], 'performer mirrors organizer when no host');
@@ -150,11 +141,7 @@ class EventSchemaServiceTest extends TestCase
     public function testDescriptionPrefersTeaserOverDescription(): void
     {
         // Arrange
-        $event = $this->makeEvent(
-            title: 'Coffee chat',
-            teaser: 'Short teaser text',
-            description: '<p>Long description body</p>',
-        );
+        $event = $this->makeEvent(title: 'Coffee chat', teaser: 'Short teaser text', description: '<p>Long description body</p>');
         $subject = $this->makeService();
 
         // Act

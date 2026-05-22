@@ -21,12 +21,7 @@ abstract class AbstractEmailController extends AbstractController
         return new AdminNavigationConfig(
             section: 'admin_shell.section_system',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_email',
-                    route: 'app_admin_email_templates',
-                    active: 'email',
-                    role: 'ROLE_ADMIN',
-                ),
+                new AdminLink(label: 'admin_shell.menu_email', route: 'app_admin_email_templates', active: 'email', role: 'ROLE_ADMIN'),
             ],
             sectionPriority: 100,
         );

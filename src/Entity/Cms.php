@@ -242,9 +242,7 @@ class Cms
 
     public function getLinkName(string $language): ?string
     {
-        return $this->linkNames
-            ->findFirst(static fn(int $k, CmsLinkName $l) => $l->getLanguage() === $language)
-            ?->getName();
+        return $this->linkNames->findFirst(static fn(int $k, CmsLinkName $l) => $l->getLanguage() === $language)?->getName();
     }
 
     public function getPageContent(string $language): ?string

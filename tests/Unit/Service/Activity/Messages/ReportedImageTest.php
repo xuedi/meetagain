@@ -75,9 +75,7 @@ class ReportedImageTest extends TestCase
 
     public function testCanCatchNonNumericImageId(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'image_id' has to be numeric in 'core.reported_image'"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'image_id' has to be numeric in 'core.reported_image'"));
 
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, $this->translator, [
@@ -98,9 +96,7 @@ class ReportedImageTest extends TestCase
 
     public function testCanCatchNonNumericReason(): void
     {
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'reason' has to be numeric in 'core.reported_image'"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'reason' has to be numeric in 'core.reported_image'"));
 
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, $this->translator, [

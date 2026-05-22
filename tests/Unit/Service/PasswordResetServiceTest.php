@@ -85,11 +85,7 @@ class PasswordResetServiceTest extends TestCase
         $emailMock = $this->createMock(PasswordResetEmail::class);
         $emailMock->expects($this->once())->method('send')->with(['user' => $user]);
 
-        $service = $this->createService(
-            userRepo: $userRepoStub,
-            activityService: $activityMock,
-            passwordResetEmail: $emailMock,
-        );
+        $service = $this->createService(userRepo: $userRepoStub, activityService: $activityMock, passwordResetEmail: $emailMock);
 
         $service->requestReset('test@example.com');
     }
@@ -128,11 +124,7 @@ class PasswordResetServiceTest extends TestCase
         $user->setPassword('old-hashed-password');
 
         $hasherMock = $this->createMock(UserPasswordHasherInterface::class);
-        $hasherMock
-            ->expects($this->once())
-            ->method('hashPassword')
-            ->with($user, 'newPassword123')
-            ->willReturn('new-hashed-password');
+        $hasherMock->expects($this->once())->method('hashPassword')->with($user, 'newPassword123')->willReturn('new-hashed-password');
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('persist')->with($user);
@@ -172,11 +164,7 @@ class PasswordResetServiceTest extends TestCase
         $emailMock = $this->createMock(PasswordResetEmail::class);
         $emailMock->expects($this->never())->method('send');
 
-        $service = $this->createService(
-            userRepo: $userRepoMock,
-            passwordResetEmail: $emailMock,
-            blocklist: $blocklistStub,
-        );
+        $service = $this->createService(userRepo: $userRepoMock, passwordResetEmail: $emailMock, blocklist: $blocklistStub);
 
         static::assertNull($service->requestReset('blocked@example.com'));
     }
@@ -200,12 +188,7 @@ class PasswordResetServiceTest extends TestCase
         $activityMock = $this->createMock(ActivityService::class);
         $activityMock->expects($this->never())->method('log');
 
-        $service = $this->createService(
-            em: $emMock,
-            hasher: $hasherMock,
-            activityService: $activityMock,
-            blocklist: $blocklistStub,
-        );
+        $service = $this->createService(em: $emMock, hasher: $hasherMock, activityService: $activityMock, blocklist: $blocklistStub);
 
         static::assertFalse($service->resetPassword($user, 'newPassword'));
         static::assertSame('old-hashed-password', $user->getPassword());

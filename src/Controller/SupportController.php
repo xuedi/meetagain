@@ -70,12 +70,8 @@ final class SupportController extends AbstractController
 
             if ($form->getErrors(true)->count() === 0) {
                 $supportRequest = new SupportRequest();
-                $supportRequest->setName(
-                    $user instanceof User ? (string) $user->getName() : (string) $form->get('name')->getData(),
-                );
-                $supportRequest->setEmail(
-                    $user instanceof User ? (string) $user->getEmail() : (string) $form->get('email')->getData(),
-                );
+                $supportRequest->setName($user instanceof User ? (string) $user->getName() : (string) $form->get('name')->getData());
+                $supportRequest->setEmail($user instanceof User ? (string) $user->getEmail() : (string) $form->get('email')->getData());
                 $supportRequest->setContactType($form->get('contactType')->getData());
                 $supportRequest->setMessage((string) $form->get('message')->getData());
                 $supportRequest->setCreatedAt(new DateTimeImmutable());

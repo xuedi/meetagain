@@ -28,11 +28,8 @@ class AppStateServiceTest extends TestCase
         $this->cache = new ArrayAdapter();
     }
 
-    private function makeService(
-        ?EntityManagerInterface $em = null,
-        ?CacheInterface $cache = null,
-        ?LoggerInterface $logger = null,
-    ): AppStateService {
+    private function makeService(?EntityManagerInterface $em = null, ?CacheInterface $cache = null, ?LoggerInterface $logger = null): AppStateService
+    {
         return new AppStateService(
             $this->repository,
             $em ?? $this->createStub(EntityManagerInterface::class),
@@ -151,12 +148,7 @@ class AppStateServiceTest extends TestCase
         $em
             ->expects($this->once())
             ->method('persist')
-            ->with(static::callback(
-                static fn(AppState $state): bool => (
-                    $state->getKeyName() === 'new_key'
-                    && $state->getValue() === 'new_value'
-                ),
-            ));
+            ->with(static::callback(static fn(AppState $state): bool => $state->getKeyName() === 'new_key' && $state->getValue() === 'new_value'));
         $em->expects($this->once())->method('flush');
 
         // Act

@@ -169,10 +169,7 @@ class MessageRepository extends ServiceEntityRepository
         $unreadQb = $this->createQueryBuilder('m')->select('COUNT(m.id)')->where('m.wasRead = false');
 
         if ($restrictToUserIds !== null) {
-            $totalQb
-                ->andWhere('IDENTITY(m.sender) IN (:userIds)')
-                ->andWhere('IDENTITY(m.receiver) IN (:userIds)')
-                ->setParameter('userIds', $restrictToUserIds);
+            $totalQb->andWhere('IDENTITY(m.sender) IN (:userIds)')->andWhere('IDENTITY(m.receiver) IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
 
             $unreadQb
                 ->andWhere('IDENTITY(m.sender) IN (:userIds)')

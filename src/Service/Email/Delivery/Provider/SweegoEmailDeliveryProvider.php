@@ -76,12 +76,7 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
                 ]);
             }
 
-            return new EmailDeliveryLogCollection(
-                $items,
-                $data['nb_result_without_offset'] ?? count($items),
-                $filter->offset,
-                $filter->size,
-            );
+            return new EmailDeliveryLogCollection($items, $data['nb_result_without_offset'] ?? count($items), $filter->offset, $filter->size);
         } catch (Throwable $e) {
             $this->logger->error('Sweego API request failed', [
                 'message' => $e->getMessage(),
@@ -105,12 +100,8 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
             messageId: $data['transaction_id'] ?? $data['swg_uid'] ?? '',
             status: $data['status'] ?? 'unknown',
             recipientEmail: $data['email_to'] ?? '',
-            createdAt: isset($data['email_creation'])
-                ? new DateTimeImmutable($data['email_creation'])
-                : new DateTimeImmutable(),
-            updatedAt: isset($data['email_last_update'])
-                ? new DateTimeImmutable($data['email_last_update'])
-                : new DateTimeImmutable(),
+            createdAt: isset($data['email_creation']) ? new DateTimeImmutable($data['email_creation']) : new DateTimeImmutable(),
+            updatedAt: isset($data['email_last_update']) ? new DateTimeImmutable($data['email_last_update']) : new DateTimeImmutable(),
             bounceType: $data['bounce_type'] ?? null,
             mailboxProvider: $data['msp'] ?? null,
             rawData: $data,

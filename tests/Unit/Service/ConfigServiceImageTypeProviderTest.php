@@ -25,9 +25,7 @@ class ConfigServiceImageTypeProviderTest extends TestCase
     private function build(?ImageThumbnailSizeProviderInterface $provider = null): ConfigService
     {
         $cache = $this->createStub(CacheInterface::class);
-        $cache
-            ->method('get')
-            ->willReturnCallback(fn(string $key, callable $cb): mixed => $cb($this->createStub(ItemInterface::class)));
+        $cache->method('get')->willReturnCallback(fn(string $key, callable $cb): mixed => $cb($this->createStub(ItemInterface::class)));
 
         return new ConfigService(
             repo: $this->createStub(ConfigRepository::class),
@@ -55,10 +53,7 @@ class ConfigServiceImageTypeProviderTest extends TestCase
         $provider->method('getThumbnailSizes')->willReturn(null);
         $service = $this->build($provider);
 
-        static::assertSame(
-            [[400, 400], [350, 350], [100, 100], [80, 80], [50, 50]],
-            $service->getThumbnailSizes(ImageType::ProfilePicture),
-        );
+        static::assertSame([[400, 400], [350, 350], [100, 100], [80, 80], [50, 50]], $service->getThumbnailSizes(ImageType::ProfilePicture));
     }
 
     public function testFitModeFitForSiteLogoFromCore(): void

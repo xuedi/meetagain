@@ -20,11 +20,7 @@ class RouteDiscovererTest extends TestCase
 
         $router = $this->createStub(RouterInterface::class);
         $router->method('getRouteCollection')->willReturn($collection);
-        $router
-            ->method('generate')
-            ->willReturnCallback(
-                static fn(string $name, array $params = []): string => $generator->generate($name, $params),
-            );
+        $router->method('generate')->willReturnCallback(static fn(string $name, array $params = []): string => $generator->generate($name, $params));
 
         $repo = $this->createStub(EntityRepository::class);
         $repo->method('findOneBy')->willReturn(null);

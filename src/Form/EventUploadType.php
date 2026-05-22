@@ -27,11 +27,7 @@ class EventUploadType extends AbstractType
             'multiple' => true,
             'constraints' => [
                 new All([
-                    new File(
-                        maxSize: '10M',
-                        mimeTypes: ['image/*'],
-                        mimeTypesMessage: $this->translator->trans('shared.form_image_upload_mime_error_4_3'),
-                    ),
+                    new File(maxSize: '10M', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('shared.form_image_upload_mime_error_4_3')),
                 ]),
             ],
         ]);

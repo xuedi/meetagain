@@ -22,13 +22,8 @@ class BlockedSessionStoreTest extends TestCase
      * @param Closure(BlockedSessionStore): list<array{key: string, snapshot: array<string, mixed>}> $list
      */
     #[DataProvider('provideAxisCases')]
-    public function testBlockAndUnblockLifecycleAcrossBothAxes(
-        Closure $block,
-        Closure $isBlocked,
-        Closure $getSnapshot,
-        Closure $unblock,
-        Closure $list,
-    ): void {
+    public function testBlockAndUnblockLifecycleAcrossBothAxes(Closure $block, Closure $isBlocked, Closure $getSnapshot, Closure $unblock, Closure $list): void
+    {
         // Arrange
         $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
 
@@ -213,12 +208,8 @@ class BlockedSessionStoreTest extends TestCase
      * @param Closure(BlockedSessionStore): mixed $invoke
      */
     #[DataProvider('provideCorruptedCacheCases')]
-    public function testCorruptedCacheValuesDegradeGracefully(
-        string $cacheKey,
-        mixed $plantedValue,
-        Closure $invoke,
-        mixed $expected,
-    ): void {
+    public function testCorruptedCacheValuesDegradeGracefully(string $cacheKey, mixed $plantedValue, Closure $invoke, mixed $expected): void
+    {
         // Arrange
         $pool = new ArrayAdapter();
         $item = $pool->getItem($cacheKey);

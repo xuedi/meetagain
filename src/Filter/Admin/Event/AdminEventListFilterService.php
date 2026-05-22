@@ -98,13 +98,7 @@ readonly class AdminEventListFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                AdminEventListFilterInterface $a,
-                AdminEventListFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(AdminEventListFilterInterface $a, AdminEventListFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

@@ -28,12 +28,7 @@ class ReviewNotificationItemTest extends TestCase
     public function testExplicitValuesAreStored(): void
     {
         // Arrange & Act
-        $item = new ReviewNotificationItem(
-            id: '42',
-            description: 'User wants to join',
-            canDeny: false,
-            icon: 'user-check',
-        );
+        $item = new ReviewNotificationItem(id: '42', description: 'User wants to join', canDeny: false, icon: 'user-check');
 
         // Assert
         static::assertSame('42', $item->id);

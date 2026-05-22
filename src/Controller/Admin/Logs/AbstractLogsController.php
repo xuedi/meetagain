@@ -21,12 +21,7 @@ abstract class AbstractLogsController extends AbstractController
         return new AdminNavigationConfig(
             section: 'admin_shell.section_system',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_logs',
-                    route: 'app_admin_activity_log',
-                    active: 'logs',
-                    role: 'ROLE_ADMIN',
-                ),
+                new AdminLink(label: 'admin_shell.menu_logs', route: 'app_admin_activity_log', active: 'logs', role: 'ROLE_ADMIN'),
             ],
             sectionPriority: 100,
         );

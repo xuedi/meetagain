@@ -88,11 +88,6 @@ class AccessDeniedSubscriberTest extends TestCase
 
     private function createEvent(\Throwable $throwable): ExceptionEvent
     {
-        return new ExceptionEvent(
-            $this->createStub(HttpKernelInterface::class),
-            Request::create('/'),
-            HttpKernelInterface::MAIN_REQUEST,
-            $throwable,
-        );
+        return new ExceptionEvent($this->createStub(HttpKernelInterface::class), Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $throwable);
     }
 }

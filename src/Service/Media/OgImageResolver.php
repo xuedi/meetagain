@@ -67,9 +67,7 @@ readonly class OgImageResolver
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $hostPrefix = $request !== null
-            ? $request->getSchemeAndHttpHost()
-            : rtrim($this->configService->getHost(), '/');
+        $hostPrefix = $request !== null ? $request->getSchemeAndHttpHost() : rtrim($this->configService->getHost(), '/');
 
         return $hostPrefix . $path;
     }

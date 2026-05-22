@@ -43,11 +43,7 @@ final readonly class GlossarySitemapPublisher implements SitemapPublisherInterfa
 
         $localeUrls = [];
         foreach ($locales as $locale) {
-            $localeUrls[$locale] = $this->urlGenerator->generate(
-                'app_plugin_glossary',
-                ['_locale' => $locale],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            );
+            $localeUrls[$locale] = $this->urlGenerator->generate('app_plugin_glossary', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         $urls = [];

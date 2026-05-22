@@ -71,18 +71,8 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $callOrder = [];
-        $low = $this->makeProvider(
-            'low',
-            priority: 0,
-            recommendation: SecurityRecommendation::Handled,
-            callOrder: $callOrder,
-        );
-        $high = $this->makeProvider(
-            'high',
-            priority: 1000,
-            recommendation: SecurityRecommendation::Handled,
-            callOrder: $callOrder,
-        );
+        $low = $this->makeProvider('low', priority: 0, recommendation: SecurityRecommendation::Handled, callOrder: $callOrder);
+        $high = $this->makeProvider('high', priority: 1000, recommendation: SecurityRecommendation::Handled, callOrder: $callOrder);
 
         $service = $this->buildService([$low, $high]);
         $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
@@ -107,14 +97,7 @@ class SecurityServiceTest extends TestCase
         $detector
             ->expects($this->once())
             ->method('observe')
-            ->with(
-                static::anything(),
-                static::anything(),
-                static::anything(),
-                static::anything(),
-                static::anything(),
-                true,
-            )
+            ->with(static::anything(), static::anything(), static::anything(), static::anything(), static::anything(), true)
             ->willReturn(new ProviderReport('not_found', 0, 'cached', SecurityRecommendation::Handled));
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -136,12 +119,7 @@ class SecurityServiceTest extends TestCase
         // Arrange
         $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
 
-        $detector = $this->makeProvider(
-            'not_found',
-            priority: 0,
-            recommendation: SecurityRecommendation::Block,
-            threatLevel: 95,
-        );
+        $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 95);
 
         $persistedIncident = null;
         $em = $this->createMock(EntityManagerInterface::class);
@@ -175,20 +153,11 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
-        $detector = $this->makeProvider(
-            'not_found',
-            priority: 0,
-            recommendation: SecurityRecommendation::Block,
-            threatLevel: 80,
-        );
+        $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
 
         $logRow = new NotFoundLog();
         $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
-        $notFoundRepo
-            ->expects($this->once())
-            ->method('findLatestUnlinkedForOffender')
-            ->with('1.2.3.4', 'ip:1.2.3.4')
-            ->willReturn($logRow);
+        $notFoundRepo->expects($this->once())->method('findLatestUnlinkedForOffender')->with('1.2.3.4', 'ip:1.2.3.4')->willReturn($logRow);
 
         $accessDeniedRepo = $this->createStub(AccessDeniedLogRepository::class);
 
@@ -196,13 +165,7 @@ class SecurityServiceTest extends TestCase
         $em->method('persist');
         $em->expects($this->exactly(2))->method('flush');
 
-        $service = $this->buildService(
-            [$detector],
-            $blockStore,
-            em: $em,
-            notFoundLogRepository: $notFoundRepo,
-            accessDeniedLogRepository: $accessDeniedRepo,
-        );
+        $service = $this->buildService([$detector], $blockStore, em: $em, notFoundLogRepository: $notFoundRepo, accessDeniedLogRepository: $accessDeniedRepo);
         $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
 
         // Act
@@ -216,20 +179,11 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
-        $detector = $this->makeProvider(
-            'access_denied',
-            priority: 0,
-            recommendation: SecurityRecommendation::Block,
-            threatLevel: 80,
-        );
+        $detector = $this->makeProvider('access_denied', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
 
         $logRow = new AccessDeniedLog();
         $accessDeniedRepo = $this->createMock(AccessDeniedLogRepository::class);
-        $accessDeniedRepo
-            ->expects($this->once())
-            ->method('findLatestUnlinkedForOffender')
-            ->with('1.2.3.4')
-            ->willReturn($logRow);
+        $accessDeniedRepo->expects($this->once())->method('findLatestUnlinkedForOffender')->with('1.2.3.4')->willReturn($logRow);
 
         $notFoundRepo = $this->createStub(NotFoundLogRepository::class);
 
@@ -237,13 +191,7 @@ class SecurityServiceTest extends TestCase
         $em->method('persist');
         $em->expects($this->exactly(2))->method('flush');
 
-        $service = $this->buildService(
-            [$detector],
-            $blockStore,
-            em: $em,
-            notFoundLogRepository: $notFoundRepo,
-            accessDeniedLogRepository: $accessDeniedRepo,
-        );
+        $service = $this->buildService([$detector], $blockStore, em: $em, notFoundLogRepository: $notFoundRepo, accessDeniedLogRepository: $accessDeniedRepo);
         $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
 
         // Act
@@ -257,12 +205,7 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
-        $detector = $this->makeProvider(
-            'rate_limit',
-            priority: 0,
-            recommendation: SecurityRecommendation::Block,
-            threatLevel: 80,
-        );
+        $detector = $this->makeProvider('rate_limit', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
 
         $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
         $notFoundRepo->expects($this->never())->method('findLatestUnlinkedForOffender');
@@ -274,13 +217,7 @@ class SecurityServiceTest extends TestCase
         $em->method('persist');
         $em->expects($this->once())->method('flush');
 
-        $service = $this->buildService(
-            [$detector],
-            $blockStore,
-            em: $em,
-            notFoundLogRepository: $notFoundRepo,
-            accessDeniedLogRepository: $accessDeniedRepo,
-        );
+        $service = $this->buildService([$detector], $blockStore, em: $em, notFoundLogRepository: $notFoundRepo, accessDeniedLogRepository: $accessDeniedRepo);
         $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
 
         // Act
@@ -294,17 +231,12 @@ class SecurityServiceTest extends TestCase
     {
         // Arrange
         $appState = $this->createMock(AppStateService::class);
-        $appState
-            ->expects($this->once())
-            ->method('set')
-            ->with(SecurityService::KEY_LAST_RETROSPECTIVE_RUN, static::anything());
+        $appState->expects($this->once())->method('set')->with(SecurityService::KEY_LAST_RETROSPECTIVE_RUN, static::anything());
 
         $detector = $this->createStub(SecurityProviderInterface::class);
         $detector->method('getKey')->willReturn('not_found');
         $detector->method('getPriority')->willReturn(0);
-        $detector
-            ->method('scanRetrospective')
-            ->willReturn(new ProviderReport('not_found', 5, 'ok', SecurityRecommendation::Handled));
+        $detector->method('scanRetrospective')->willReturn(new ProviderReport('not_found', 5, 'ok', SecurityRecommendation::Handled));
 
         $service = $this->buildService([$detector], appState: $appState);
 

@@ -58,12 +58,7 @@ final class NoteController extends AbstractController
             $wasRevealed = $existingNote?->isRevealToGroup() ?? false;
             $revealToGroup = (bool) $form->get('revealToGroup')->getData();
 
-            $note = $this->noteService->upsert(
-                $user->getId(),
-                $film,
-                (string) $form->get('body')->getData(),
-                $revealToGroup,
-            );
+            $note = $this->noteService->upsert($user->getId(), $film, (string) $form->get('body')->getData(), $revealToGroup);
 
             $activityType = NoteAdded::TYPE;
             if ($revealToGroup && !$wasRevealed) {

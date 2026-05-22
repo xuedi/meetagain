@@ -65,18 +65,7 @@ class LogEntry
     public function getHash(): string
     {
         return substr(
-            hash(
-                'sha256',
-                $this->date->format('c')
-                . '|'
-                . $this->type
-                . '|'
-                . $this->level
-                . '|'
-                . $this->message
-                . '|'
-                . ($this->json ?? ''),
-            ),
+            hash('sha256', $this->date->format('c') . '|' . $this->type . '|' . $this->level . '|' . $this->message . '|' . ($this->json ?? '')),
             0,
             16,
         );

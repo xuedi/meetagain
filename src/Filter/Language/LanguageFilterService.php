@@ -79,13 +79,7 @@ readonly class LanguageFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                LanguageFilterInterface $a,
-                LanguageFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(LanguageFilterInterface $a, LanguageFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

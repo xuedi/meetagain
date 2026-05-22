@@ -23,11 +23,9 @@ readonly class DinnerclubImageSuggestionAdminNotificationProvider implements Adm
         $items = [];
 
         foreach ($this->repository->findDishesWithPendingSuggestions() as $dish) {
-            $items[] = new AdminNotificationItem(
-                label: $this->getDishName($dish),
-                route: 'plugin_dinnerclub_image_suggestion_view',
-                routeParams: ['id' => $dish->getId()],
-            );
+            $items[] = new AdminNotificationItem(label: $this->getDishName($dish), route: 'plugin_dinnerclub_image_suggestion_view', routeParams: [
+                'id' => $dish->getId(),
+            ]);
         }
 
         return $items;

@@ -67,11 +67,7 @@ final class PlannedController extends AbstractEmailController implements AdminNa
             );
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($items),
-                $this->translator->trans('admin_email_planned.summary_planned'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($items), $this->translator->trans('admin_email_planned.summary_planned'))),
             new AdminTopInfoText($this->translator->trans($modeKey)),
         ], actions: [$toggleAction]);
 
@@ -162,40 +158,19 @@ final class PlannedController extends AbstractEmailController implements AdminNa
         }
         $filteredRows = match ($outcomeFilter) {
             'all' => $rows,
-            'pass' => array_values(array_filter(
-                $rows,
-                static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Pass,
-            )),
-            'skip' => array_values(array_filter(
-                $rows,
-                static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Skip,
-            )),
-            'error' => array_values(array_filter(
-                $rows,
-                static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Error,
-            )),
+            'pass' => array_values(array_filter($rows, static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Pass)),
+            'skip' => array_values(array_filter($rows, static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Skip)),
+            'error' => array_values(array_filter($rows, static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Error)),
         };
 
         $results = $previewContext !== null ? $this->guardEvaluator->evaluateAll($email, $previewContext) : [];
         $rules = $email->getGuardRules();
 
         $info = [
-            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
-                $matchedItem->mailType,
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($matchedItem->mailType, ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
             new AdminTopInfoHtml(sprintf('<strong>%s</strong>', $matchedItem->expectedTime->format('Y-m-d H:i'))),
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $passCount,
-                $this->translator->trans('admin_email_planned.summary_pass'),
-            )),
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $skipCount,
-                $this->translator->trans('admin_email_planned.summary_skip'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $passCount, $this->translator->trans('admin_email_planned.summary_pass'))),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $skipCount, $this->translator->trans('admin_email_planned.summary_skip'))),
         ];
         if ($errorCount > 0) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -233,11 +208,7 @@ final class PlannedController extends AbstractEmailController implements AdminNa
 
         $adminTop = new AdminTop(info: $info, actions: [
             new AdminTopActionDropdown(
-                label: sprintf(
-                    '%s %s',
-                    $this->translator->trans('admin_email_planned.outcome_filter_label'),
-                    $activeLabel,
-                ),
+                label: sprintf('%s %s', $this->translator->trans('admin_email_planned.outcome_filter_label'), $activeLabel),
                 options: $dropdownOptions,
                 icon: 'filter',
             ),

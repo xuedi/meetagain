@@ -13,10 +13,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class LocaleSubscriberTest extends TestCase
 {
-    private function createLanguageServiceStub(
-        string $filteredDefaultLocale = 'en',
-        array $enabledCodes = ['en', 'de', 'zh'],
-    ): LanguageService {
+    private function createLanguageServiceStub(string $filteredDefaultLocale = 'en', array $enabledCodes = ['en', 'de', 'zh']): LanguageService
+    {
         $languageService = $this->createStub(LanguageService::class);
         $languageService->method('getFilteredDefaultLocale')->willReturn($filteredDefaultLocale);
         $languageService->method('getEnabledCodes')->willReturn($enabledCodes);

@@ -139,10 +139,7 @@ final class PollController extends AbstractController
         $pendingSuggestions = $this->suggestionService->getPendingSuggestionsWithPriority();
         $approvedBooks = $this->bookService->getApprovedList();
         $usedEventIds = $this->pollService->getUsedEventIds();
-        $upcomingEvents = array_filter(
-            $this->eventRepository->getUpcomingEvents(20),
-            static fn($event) => !in_array($event->getId(), $usedEventIds),
-        );
+        $upcomingEvents = array_filter($this->eventRepository->getUpcomingEvents(20), static fn($event) => !in_array($event->getId(), $usedEventIds));
 
         $preselectedEventId = $request->query->getInt('eventId') ?: null;
 

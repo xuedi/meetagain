@@ -13,8 +13,7 @@ class UserPendingApprovalNotificationProviderTest extends TestCase
     public function testGetSectionReturnsExpectedString(): void
     {
         // Arrange
-        $provider =
-            new UserPendingApprovalNotificationProvider(userRepository: $this->createStub(UserRepository::class));
+        $provider = new UserPendingApprovalNotificationProvider(userRepository: $this->createStub(UserRepository::class));
 
         // Act & Assert
         static::assertSame('Users Pending Approval', $provider->getSection());

@@ -94,10 +94,7 @@ readonly class ConfigService
             }
         }
 
-        throw new RuntimeException(sprintf(
-            'No 350-width admin preview thumbnail registered for image type "%s".',
-            $type->name,
-        ));
+        throw new RuntimeException(sprintf('No 350-width admin preview thumbnail registered for image type "%s".', $type->name));
     }
 
     public function getFitMode(ImageType $type): ImageFitMode
@@ -201,10 +198,7 @@ readonly class ConfigService
 
     public function getMailerAddress(): Address
     {
-        return new Address(
-            $this->getString('email_sender_mail', 'sender@email.com'),
-            $this->getString('email_sender_name', 'email sender'),
-        );
+        return new Address($this->getString('email_sender_mail', 'sender@email.com'), $this->getString('email_sender_name', 'email sender'));
     }
 
     public function isShowFrontpage(): bool
@@ -344,11 +338,7 @@ readonly class ConfigService
                 continue;
             }
 
-            $content = preg_replace(
-                '/(\$' . preg_quote($scssVar, '/') . '\s*:\s*)#[0-9a-fA-F]{3,6}(\s*;)/',
-                '${1}' . $value . '${2}',
-                $content,
-            );
+            $content = preg_replace('/(\$' . preg_quote($scssVar, '/') . '\s*:\s*)#[0-9a-fA-F]{3,6}(\s*;)/', '${1}' . $value . '${2}', $content);
         }
 
         if (is_string($content)) {

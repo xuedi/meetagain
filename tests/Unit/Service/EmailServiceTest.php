@@ -172,21 +172,13 @@ final class EmailServiceTest extends TestCase
 
         // Arrange: mock mail repository to return pending email
         $mailRepoMock = $this->createMock(EmailQueueRepository::class);
-        $mailRepoMock
-            ->expects($this->once())
-            ->method('findBy')
-            ->with(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000)
-            ->willReturn([$queued]);
+        $mailRepoMock->expects($this->once())->method('findBy')->with(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000)->willReturn([$queued]);
 
         // Arrange: mock transport to verify send is called
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('msg-id-123');
         $mailerMock = $this->createMock(TransportInterface::class);
-        $mailerMock
-            ->expects($this->once())
-            ->method('send')
-            ->with(static::isInstanceOf(TemplatedEmail::class))
-            ->willReturn($sentMessage);
+        $mailerMock->expects($this->once())->method('send')->with(static::isInstanceOf(TemplatedEmail::class))->willReturn($sentMessage);
 
         // Arrange: mock entity manager to verify persist/flush
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -228,10 +220,7 @@ final class EmailServiceTest extends TestCase
         $mailerMock->expects($this->never())->method('send');
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock
-            ->expects($this->once())
-            ->method('error')
-            ->with('Email dispatch skipped: past max_send_by cutoff', static::anything());
+        $loggerMock->expects($this->once())->method('error')->with('Email dispatch skipped: past max_send_by cutoff', static::anything());
         $loggerMock->expects($this->once())->method('warning');
 
         $service = $this->createService(mailer: $mailerMock, mailRepo: $mailRepoStub, logger: $loggerMock);
@@ -355,10 +344,7 @@ final class EmailServiceTest extends TestCase
         $mailerStub->method('send')->willReturnOnConsecutiveCalls($sentMessage, $this->throwException($exception));
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock
-            ->expects($this->once())
-            ->method('warning')
-            ->with('Email queue processed with issues', ['sent' => 1, 'failed' => 1, 'late' => 0]);
+        $loggerMock->expects($this->once())->method('warning')->with('Email queue processed with issues', ['sent' => 1, 'failed' => 1, 'late' => 0]);
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, logger: $loggerMock);
 
@@ -407,9 +393,7 @@ final class EmailServiceTest extends TestCase
                     'subject' => 'Test Subject',
                     'body' => '<p>Test Body</p>',
                 ]);
-            $templateService
-                ->method('renderContent')
-                ->willReturnCallback(static fn(string $content, array $context) => $content);
+            $templateService->method('renderContent')->willReturnCallback(static fn(string $content, array $context) => $content);
         }
 
         return new EmailService(

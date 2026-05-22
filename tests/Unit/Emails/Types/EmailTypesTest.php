@@ -60,12 +60,7 @@ class EmailTypesTest extends TestCase
                 $this->createStub(TranslatorInterface::class),
                 $this->host,
             ),
-            'NotificationEventCanceled' => new NotificationEventCanceledEmail(
-                $this->blocklist,
-                $this->queue,
-                $this->config,
-                $this->host,
-            ),
+            'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->blocklist, $this->queue, $this->config, $this->host),
             'NotificationMessage' => new NotificationMessageEmail(
                 $this->blocklist,
                 $this->queue,
@@ -91,12 +86,7 @@ class EmailTypesTest extends TestCase
                 $this->createStub(AppStateService::class),
                 [],
             ),
-            'VerificationRequest' => new VerificationRequestEmail(
-                $this->blocklist,
-                $this->queue,
-                $this->config,
-                $this->host,
-            ),
+            'VerificationRequest' => new VerificationRequestEmail($this->blocklist, $this->queue, $this->config, $this->host),
             'Welcome' => new WelcomeEmail($this->blocklist, $this->queue, $this->config, $this->host),
         ];
     }

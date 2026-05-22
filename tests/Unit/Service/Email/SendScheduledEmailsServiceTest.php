@@ -97,9 +97,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
 
             public function evaluate(array $context): EmailGuardResult
             {
-                return $context['user'] === $this->matchUser
-                    ? EmailGuardResult::pass('test-gate')
-                    : EmailGuardResult::skip('test-gate', 'not the chosen one');
+                return $context['user'] === $this->matchUser ? EmailGuardResult::pass('test-gate') : EmailGuardResult::skip('test-gate', 'not the chosen one');
             }
         };
 
@@ -172,12 +170,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $email2->method('getDueContexts')->willReturn([$ctx2]);
         $email2->method('guardCheck')->willReturn(true);
 
-        $service = new SendScheduledEmailsService(
-            [$email1, $email2],
-            $clock,
-            new NullLogger(),
-            new EmailGuardEvaluator(),
-        );
+        $service = new SendScheduledEmailsService([$email1, $email2], $clock, new NullLogger(), new EmailGuardEvaluator());
 
         // Act
         $output = new BufferedOutput();
@@ -206,10 +199,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $email->expects($this->once())->method('markContextSent');
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger
-            ->expects($this->once())
-            ->method('error')
-            ->with('guard rule returned Error - email skipped', $this->anything());
+        $logger->expects($this->once())->method('error')->with('guard rule returned Error - email skipped', $this->anything());
 
         $service = new SendScheduledEmailsService([$email], $clock, $logger, new EmailGuardEvaluator());
 
@@ -289,11 +279,8 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $service->runCronTask(new BufferedOutput());
     }
 
-    private function errorRuleForUser(
-        UserStub $matchUser,
-        string $ruleName,
-        string $explanation,
-    ): EmailGuardRuleInterface {
+    private function errorRuleForUser(UserStub $matchUser, string $ruleName, string $explanation): EmailGuardRuleInterface
+    {
         return new class($matchUser, $ruleName, $explanation) implements EmailGuardRuleInterface {
             public function __construct(
                 private readonly UserStub $matchUser,

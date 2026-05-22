@@ -29,13 +29,7 @@ class PluginListCommand extends Command
         foreach ($plugins as $plugin) {
             $status = $plugin['enabled'] ? 'Enabled' : ($plugin['installed'] ? 'Installed' : 'Available');
 
-            $output->writeln(sprintf(
-                '  %s - %s (%s) [%s]',
-                $plugin['key'],
-                $plugin['name'],
-                $plugin['version'],
-                $status,
-            ));
+            $output->writeln(sprintf('  %s - %s (%s) [%s]', $plugin['key'], $plugin['name'], $plugin['version'], $status));
             if ($plugin['description']) {
                 $output->writeln(sprintf('    %s', $plugin['description']));
             }

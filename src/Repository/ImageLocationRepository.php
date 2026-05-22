@@ -85,10 +85,7 @@ class ImageLocationRepository extends ServiceEntityRepository
      */
     public function countPerImageId(): array
     {
-        $rows = $this
-            ->getEntityManager()
-            ->getConnection()
-            ->fetchAllAssociative('SELECT image_id, COUNT(*) AS cnt FROM image_location GROUP BY image_id');
+        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative('SELECT image_id, COUNT(*) AS cnt FROM image_location GROUP BY image_id');
 
         $result = [];
         foreach ($rows as $row) {
@@ -103,11 +100,6 @@ class ImageLocationRepository extends ServiceEntityRepository
      */
     public function findByImageId(int $imageId): array
     {
-        return $this
-            ->createQueryBuilder('il')
-            ->where('il.image = :imageId')
-            ->setParameter('imageId', $imageId)
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('il')->where('il.image = :imageId')->setParameter('imageId', $imageId)->getQuery()->getResult();
     }
 }

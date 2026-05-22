@@ -107,12 +107,7 @@ readonly class AdminNavigationService
                     }
                 }
 
-                $sectionsMap[$section]['links'][] = new AdminLink(
-                    label: $label,
-                    route: $route,
-                    active: $active,
-                    role: $role,
-                );
+                $sectionsMap[$section]['links'][] = new AdminLink(label: $label, route: $route, active: $active, role: $role);
             }
         }
 
@@ -134,10 +129,7 @@ readonly class AdminNavigationService
                 continue;
             }
 
-            $visibleLinks = array_filter(
-                $data['links'],
-                fn(AdminLink $link) => $link->role === null || $this->security->isGranted($link->role),
-            );
+            $visibleLinks = array_filter($data['links'], fn(AdminLink $link) => $link->role === null || $this->security->isGranted($link->role));
 
             if ($visibleLinks === []) {
                 continue;

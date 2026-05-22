@@ -98,13 +98,7 @@ readonly class AdminHostListFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                AdminHostListFilterInterface $a,
-                AdminHostListFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(AdminHostListFilterInterface $a, AdminHostListFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

@@ -10,14 +10,7 @@ class ImportSummaryTest extends TestCase
     public function testConstructorAssignsAllCounters(): void
     {
         // Act
-        $summary = new ImportSummary(
-            usersCreated: 1,
-            usersSkipped: 2,
-            locationsCreated: 3,
-            eventsCreated: 4,
-            cmsPagesCreated: 5,
-            cmsPagesSkipped: 6,
-        );
+        $summary = new ImportSummary(usersCreated: 1, usersSkipped: 2, locationsCreated: 3, eventsCreated: 4, cmsPagesCreated: 5, cmsPagesSkipped: 6);
 
         // Assert
         static::assertSame(1, $summary->usersCreated);

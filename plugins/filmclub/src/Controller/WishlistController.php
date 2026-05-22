@@ -34,9 +34,7 @@ final class WishlistController extends AbstractController
         $waitingSince = [];
         foreach ($entries as $entry) {
             if ($entry->getCreatedAt() !== null) {
-                $waitingSince[$entry->getId()] = $this->wishlistService->countPastEventsInGroupSince(
-                    $entry->getCreatedAt(),
-                );
+                $waitingSince[$entry->getId()] = $this->wishlistService->countPastEventsInGroupSince($entry->getCreatedAt());
             } else {
                 $waitingSince[$entry->getId()] = 0;
             }

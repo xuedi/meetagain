@@ -25,9 +25,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/security/incidents')]
-final class IncidentsController extends AbstractSecurityController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class IncidentsController extends AbstractSecurityController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
 
@@ -65,11 +63,7 @@ final class IncidentsController extends AbstractSecurityController implements
         $rangeCount = $since !== null ? $this->incidentRepo->countSince($since) : $totalCount;
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_security.summary_total_incidents'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_security.summary_total_incidents'))),
         ];
         if ($rangeCount === 0) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -77,11 +71,7 @@ final class IncidentsController extends AbstractSecurityController implements
                 $this->translator->trans('admin_security.summary_no_incidents_in_range'),
             ));
         } else {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $rangeCount,
-                $this->translator->trans('admin_security.summary_in_range'),
-            ));
+            $info[] = new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $rangeCount, $this->translator->trans('admin_security.summary_in_range')));
         }
 
         $actions = [];
@@ -160,20 +150,12 @@ final class IncidentsController extends AbstractSecurityController implements
         return $this->redirectToRoute('app_admin_security_incidents');
     }
 
-    #[Route(
-        '/{id}/unblock',
-        name: 'app_admin_security_incidents_unblock',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/{id}/unblock', name: 'app_admin_security_incidents_unblock', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function unblock(Request $request, Incident $incident): RedirectResponse
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_INCIDENTS_READ);
 
-        if (!$this->isCsrfTokenValid(
-            'admin_security_incidents_unblock' . $incident->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_security_incidents_unblock' . $incident->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -212,11 +194,7 @@ final class IncidentsController extends AbstractSecurityController implements
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );

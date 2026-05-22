@@ -133,18 +133,13 @@ readonly class SecurityService implements CronTaskInterface
         if ($lastRunRaw !== null) {
             $elapsed = $now->getTimestamp() - (int) $lastRunRaw;
             if ($elapsed < self::RETROSPECTIVE_THROTTLE_SECONDS) {
-                $output->writeln(sprintf(
-                    'SecurityRetrospectiveScan: skipped (last run %d min ago)',
-                    (int) round($elapsed / 60),
-                ));
+                $output->writeln(sprintf('SecurityRetrospectiveScan: skipped (last run %d min ago)', (int) round($elapsed / 60)));
                 return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'Skipped - throttled');
             }
         }
 
         try {
-            $from = $lastRunRaw !== null
-                ? new DateTimeImmutable()->setTimestamp((int) $lastRunRaw)
-                : $now->modify('-1 hour');
+            $from = $lastRunRaw !== null ? new DateTimeImmutable()->setTimestamp((int) $lastRunRaw) : $now->modify('-1 hour');
 
             // TODO(2026-05-09) Aggregated reports are currently observation-only:
             // hook in admin notification dispatch / threshold alerting once the
@@ -192,13 +187,7 @@ readonly class SecurityService implements CronTaskInterface
         foreach ($this->providers as $provider) {
             $list[] = $provider;
         }
-        usort(
-            $list,
-            static fn(
-                SecurityProviderInterface $a,
-                SecurityProviderInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($list, static fn(SecurityProviderInterface $a, SecurityProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $list;
     }
@@ -237,13 +226,8 @@ readonly class SecurityService implements CronTaskInterface
     /**
      * @param list<ProviderReport> $reports
      */
-    private function writeIncident(
-        Request $request,
-        string $sessionId,
-        string $ip,
-        string $triggeredBy,
-        array $reports,
-    ): ?int {
+    private function writeIncident(Request $request, string $sessionId, string $ip, string $triggeredBy, array $reports): ?int
+    {
         $maxThreat = 0;
         $serialised = [];
         foreach ($reports as $report) {

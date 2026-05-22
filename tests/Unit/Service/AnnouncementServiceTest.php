@@ -109,10 +109,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: user repository returns subscribers
         $userRepoMock = $this->createMock(UserRepository::class);
-        $userRepoMock
-            ->expects($this->once())
-            ->method('findAnnouncementSubscribers')
-            ->willReturn([$subscriber1, $subscriber2]);
+        $userRepoMock->expects($this->once())->method('findAnnouncementSubscribers')->willReturn([$subscriber1, $subscriber2]);
 
         // Arrange: config service returns host
         $configService = $this->createStub(ConfigService::class);
@@ -173,10 +170,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: user repository returns both subscribers
         $userRepoMock = $this->createMock(UserRepository::class);
-        $userRepoMock
-            ->expects($this->once())
-            ->method('findAnnouncementSubscribers')
-            ->willReturn([$enabledSubscriber, $disabledSubscriber]);
+        $userRepoMock->expects($this->once())->method('findAnnouncementSubscribers')->willReturn([$enabledSubscriber, $disabledSubscriber]);
 
         // Arrange: email class should only be called once (for enabled subscriber)
         $announcementEmailMock = $this->createMock(AnnouncementEmail::class);
@@ -310,11 +304,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: template service returns null
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
-        $templateServiceMock
-            ->expects($this->once())
-            ->method('getTemplate')
-            ->with(EmailType::Announcement)
-            ->willReturn(null);
+        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement)->willReturn(null);
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
@@ -353,19 +343,11 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange: template service
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
-        $templateServiceMock
-            ->expects($this->once())
-            ->method('getTemplate')
-            ->with(EmailType::Announcement)
-            ->willReturn($emailTemplate);
+        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement)->willReturn($emailTemplate);
         $templateServiceMock
             ->expects($this->exactly(2))
             ->method('renderContent')
-            ->willReturnCallback(static fn(string $content) => str_replace(
-                ['{{title}}', '{{content}}'],
-                ['My Title', ''],
-                $content,
-            ));
+            ->willReturnCallback(static fn(string $content) => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content));
 
         // Arrange: config service
         $configService = $this->createStub(ConfigService::class);

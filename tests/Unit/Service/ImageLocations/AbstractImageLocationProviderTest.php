@@ -42,12 +42,8 @@ class AbstractImageLocationProviderTest extends TestCase
     // ---- sync(): DataProvider for insert/delete/no-op scenarios ----
 
     #[DataProvider('syncProvider')]
-    public function testSync(
-        array $currentPairs,
-        array $discoveredPairs,
-        array $expectedToInsert,
-        array $expectedToDelete,
-    ): void {
+    public function testSync(array $currentPairs, array $discoveredPairs, array $expectedToInsert, array $expectedToDelete): void
+    {
         // Arrange
         $repoMock = $this->createMock(ImageLocationRepository::class);
         $repoMock->method('findPairsByType')->willReturn($currentPairs);
@@ -60,10 +56,7 @@ class AbstractImageLocationProviderTest extends TestCase
         }
 
         if ($expectedToDelete !== []) {
-            $repoMock
-                ->expects($this->once())
-                ->method('deleteByTypeAndPairs')
-                ->with(ImageType::EventTeaser, $expectedToDelete);
+            $repoMock->expects($this->once())->method('deleteByTypeAndPairs')->with(ImageType::EventTeaser, $expectedToDelete);
         }
         if ($expectedToDelete === []) {
             $repoMock->expects($this->never())->method('deleteByTypeAndPairs');

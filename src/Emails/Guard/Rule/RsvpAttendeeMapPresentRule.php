@@ -21,11 +21,7 @@ final readonly class RsvpAttendeeMapPresentRule implements EmailGuardRuleInterfa
     public function evaluate(array $context): EmailGuardResult
     {
         if (!array_key_exists('attendeeMap', $context) || $context['attendeeMap'] === null) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing the 'attendeeMap' key.",
-                'attendeeMap',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing the 'attendeeMap' key.", 'attendeeMap');
         }
 
         return EmailGuardResult::pass($this->getName());

@@ -81,20 +81,11 @@ class SupportNotificationEmailTest extends TestCase
         $queue->expects($this->never())->method('enqueue');
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger
-            ->expects($this->once())
-            ->method('warning')
-            ->with('Support ticket received but no active admin recipients found', $this->anything());
+        $logger->expects($this->once())->method('warning')->with('Support ticket received but no active admin recipients found', $this->anything());
 
         $request = $this->makeRequest();
 
-        $emailType = new SupportNotificationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
-            $queue,
-            $config,
-            $userRepo,
-            $logger,
-        );
+        $emailType = new SupportNotificationEmail($this->createStub(BlocklistCheckerInterface::class), $queue, $config, $userRepo, $logger);
 
         // Act
         $emailType->send(['request' => $request]);

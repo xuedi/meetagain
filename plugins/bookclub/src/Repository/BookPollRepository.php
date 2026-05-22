@@ -22,11 +22,7 @@ class BookPollRepository extends ServiceEntityRepository
      */
     public function findActivePoll(?array $allowedEventIds = null): ?BookPoll
     {
-        $qb = $this
-            ->createQueryBuilder('p')
-            ->where('p.status = :status')
-            ->setParameter('status', PollStatus::Active)
-            ->setMaxResults(1);
+        $qb = $this->createQueryBuilder('p')->where('p.status = :status')->setParameter('status', PollStatus::Active)->setMaxResults(1);
 
         if ($allowedEventIds !== null) {
             if ($allowedEventIds === []) {

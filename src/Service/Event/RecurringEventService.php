@@ -72,9 +72,7 @@ readonly class RecurringEventService implements CronTaskInterface
             return 0; // no parent, no recurring, nothing to do
         }
 
-        $parent = $event->getRecurringRule() instanceof EventInterval
-            ? clone $event
-            : $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
+        $parent = $event->getRecurringRule() instanceof EventInterval ? clone $event : $this->repo->findOneBy(['id' => $event->getRecurringOf()]);
 
         if ($parent === null) {
             return 0;
@@ -216,11 +214,7 @@ readonly class RecurringEventService implements CronTaskInterface
         }
 
         $newDate = DateTime::createFromInterface($target);
-        $newDate->setDate(
-            year: (int) $occurrence->format('Y'),
-            month: (int) $occurrence->format('m'),
-            day: (int) $occurrence->format('d'),
-        );
+        $newDate->setDate(year: (int) $occurrence->format('Y'), month: (int) $occurrence->format('m'), day: (int) $occurrence->format('d'));
 
         return $newDate;
     }

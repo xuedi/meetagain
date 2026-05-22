@@ -26,13 +26,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testEmitsStaticRoutesWithLocaleAlternates(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en', 'de'],
-            cmsPages: [],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
-        );
+        $publisher = $this->makePublisher(locales: ['en', 'de'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -48,13 +42,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testEmitsAllExpectedStaticRoutes(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -72,23 +60,14 @@ class CoreSitemapPublisherTest extends TestCase
             'app_reset',
         ];
         foreach ($expected as $route) {
-            self::assertNotEmpty(
-                array_filter($locs, static fn($loc) => str_contains($loc, $route)),
-                "expected route {$route} in sitemap",
-            );
+            self::assertNotEmpty(array_filter($locs, static fn($loc) => str_contains($loc, $route)), "expected route {$route} in sitemap");
         }
     }
 
     public function testAuthRoutesUseLowPriority(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -195,13 +174,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $event = $this->makeEvent(42, new DateTime('2026-05-01'));
 
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [],
-            events: [$event],
-            cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: false,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: false);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -218,13 +191,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $event = $this->makeEvent(42, new DateTime('2026-05-01'));
 
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [],
-            events: [$event],
-            cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
 
         // Act
         $urls = $publisher->getSitemapUrls();

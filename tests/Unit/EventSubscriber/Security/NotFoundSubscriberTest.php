@@ -27,10 +27,7 @@ class NotFoundSubscriberTest extends TestCase
     {
         // Arrange
         $securityService = $this->createMock(SecurityService::class);
-        $securityService
-            ->expects($this->once())
-            ->method('event')
-            ->with(SecurityEventType::NotFound, static::isInstanceOf(Request::class));
+        $securityService->expects($this->once())->method('event')->with(SecurityEventType::NotFound, static::isInstanceOf(Request::class));
 
         $subscriber = new NotFoundSubscriber($securityService);
         $event = $this->createEvent(new NotFoundHttpException('missing'));
@@ -54,11 +51,6 @@ class NotFoundSubscriberTest extends TestCase
 
     private function createEvent(\Throwable $throwable): ExceptionEvent
     {
-        return new ExceptionEvent(
-            $this->createStub(HttpKernelInterface::class),
-            Request::create('/'),
-            HttpKernelInterface::MAIN_REQUEST,
-            $throwable,
-        );
+        return new ExceptionEvent($this->createStub(HttpKernelInterface::class), Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $throwable);
     }
 }

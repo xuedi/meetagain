@@ -94,10 +94,7 @@ class ActivityServiceTest extends TestCase
 
         // Arrange: mock MessageFactory to build messages for each activity
         $messageFactoryMock = $this->createMock(MessageFactory::class);
-        $messageFactoryMock
-            ->expects($this->exactly(2))
-            ->method('build')
-            ->willReturnOnConsecutiveCalls($message1, $message2);
+        $messageFactoryMock->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls($message1, $message2);
 
         // Arrange: create subject with mocked dependencies
         $subject = new ActivityService(
@@ -140,10 +137,7 @@ class ActivityServiceTest extends TestCase
 
         // Arrange: mock MessageFactory to build messages for each activity
         $messageFactoryMock = $this->createMock(MessageFactory::class);
-        $messageFactoryMock
-            ->expects($this->exactly(2))
-            ->method('build')
-            ->willReturnOnConsecutiveCalls($message1, $message2);
+        $messageFactoryMock->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls($message1, $message2);
 
         // Arrange: create subject with mocked dependencies
         $subject = new ActivityService(

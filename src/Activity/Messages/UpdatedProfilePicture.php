@@ -33,10 +33,6 @@ class UpdatedProfilePicture extends MessageAbstract
         $box = '<div class="is-pulled-top-right">%s<i class="fa-solid fa-arrow-right"></i>%s</div>';
         $msgTemplate = $this->translator->trans('profile_social.activity_updated_profile_picture') . $box;
 
-        return sprintf(
-            $msgTemplate,
-            $this->imageRenderer->renderThumbnail($this->meta['old']),
-            $this->imageRenderer->renderThumbnail($this->meta['new']),
-        );
+        return sprintf($msgTemplate, $this->imageRenderer->renderThumbnail($this->meta['old']), $this->imageRenderer->renderThumbnail($this->meta['new']));
     }
 }

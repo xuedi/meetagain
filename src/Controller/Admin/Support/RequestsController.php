@@ -33,11 +33,7 @@ final class RequestsController extends AbstractSupportController implements Admi
     #[Route('', name: 'app_admin_support_list')]
     public function list(): Response
     {
-        $requests = $this->supportRequestRepo
-            ->createQueryBuilder('sr')
-            ->orderBy('sr.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $requests = $this->supportRequestRepo->createQueryBuilder('sr')->orderBy('sr.createdAt', 'DESC')->getQuery()->getResult();
 
         $newCount = 0;
         foreach ($requests as $request) {
@@ -50,11 +46,7 @@ final class RequestsController extends AbstractSupportController implements Admi
         $totalCount = count($requests);
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_support.summary_total_requests'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_support.summary_total_requests'))),
         ];
         $info[] = $newCount > 0
             ? new AdminTopInfoHtml(sprintf(
@@ -62,10 +54,7 @@ final class RequestsController extends AbstractSupportController implements Admi
                 $newCount,
                 $this->translator->trans('admin_support.summary_new_requests'),
             ))
-            : new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                $this->translator->trans('admin_support.summary_all_read'),
-            ));
+            : new AdminTopInfoHtml(sprintf('<span class="tag is-success is-medium">%s</span>', $this->translator->trans('admin_support.summary_all_read')));
 
         $adminTop = new AdminTop(info: $info);
 

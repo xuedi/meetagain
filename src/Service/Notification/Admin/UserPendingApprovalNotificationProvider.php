@@ -23,10 +23,7 @@ readonly class UserPendingApprovalNotificationProvider implements AdminNotificat
         $items = [];
 
         foreach ($users as $user) {
-            $items[] = new AdminNotificationItem(
-                label: sprintf('%s (%s)', $user->getName(), $user->getEmail()),
-                route: 'app_admin_member',
-            );
+            $items[] = new AdminNotificationItem(label: sprintf('%s (%s)', $user->getName(), $user->getEmail()), route: 'app_admin_member');
         }
 
         return $items;

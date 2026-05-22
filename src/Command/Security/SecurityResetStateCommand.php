@@ -35,12 +35,7 @@ final class SecurityResetStateCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this->addOption(
-            'reset-incidents',
-            null,
-            InputOption::VALUE_NONE,
-            'Also DELETE all rows from logs_incident (destructive).',
-        );
+        $this->addOption('reset-incidents', null, InputOption::VALUE_NONE, 'Also DELETE all rows from logs_incident (destructive).');
     }
 
     #[Override]

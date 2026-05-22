@@ -20,10 +20,7 @@ readonly class SecretBox
         $decoded = base64_decode($base64Key, strict: true);
 
         if ($decoded === false || strlen($decoded) !== SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
-            throw new SecretBoxException(sprintf(
-                'APP_SECRET_BOX_KEY must be a base64-encoded %d-byte value.',
-                SODIUM_CRYPTO_SECRETBOX_KEYBYTES,
-            ));
+            throw new SecretBoxException(sprintf('APP_SECRET_BOX_KEY must be a base64-encoded %d-byte value.', SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
         }
 
         $this->key = $decoded;

@@ -38,13 +38,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         private iterable $enrichers,
     ) {}
 
-    public function enqueue(
-        EmailInterface $source,
-        TemplatedEmail $email,
-        EmailType $type,
-        array $context,
-        bool $flush = true,
-    ): bool {
+    public function enqueue(EmailInterface $source, TemplatedEmail $email, EmailType $type, array $context, bool $flush = true): bool
+    {
         $locale = $email->getLocale() ?? 'en';
         $templateContent = $this->templateService->getTemplateContent($type, $locale);
 
@@ -85,9 +80,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         try {
             $result = $this->sendQueue();
             $output->writeln('EmailService: ' . $result);
-            $status = str_contains($result, '(Failed:') || str_contains($result, '(Late:')
-                ? CronTaskStatus::warning
-                : CronTaskStatus::ok;
+            $status = str_contains($result, '(Failed:') || str_contains($result, '(Late:') ? CronTaskStatus::warning : CronTaskStatus::ok;
 
             return new CronTaskResult($this->getIdentifier(), $status, $result);
         } catch (\Throwable $e) {
@@ -108,11 +101,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
             $cutoff = $mail->getMaxSendBy();
             if ($cutoff !== null && $now > $cutoff) {
                 $mail->setStatus(EmailQueueStatus::Late);
-                $mail->setErrorMessage(sprintf(
-                    'Dispatch cutoff passed: max_send_by=%s, now=%s',
-                    $cutoff->format('c'),
-                    $now->format('c'),
-                ));
+                $mail->setErrorMessage(sprintf('Dispatch cutoff passed: max_send_by=%s, now=%s', $cutoff->format('c'), $now->format('c')));
                 $this->logger->error('Email dispatch skipped: past max_send_by cutoff', [
                     'email_queue_id' => $mail->getId(),
                     'template' => $mail->getTemplate()?->value,

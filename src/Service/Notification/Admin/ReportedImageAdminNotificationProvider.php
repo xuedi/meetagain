@@ -23,11 +23,7 @@ readonly class ReportedImageAdminNotificationProvider implements AdminNotificati
 
         foreach ($reports as $report) {
             $items[] = new AdminNotificationItem(
-                label: sprintf(
-                    'Image #%s reported for: %s',
-                    $report->getImage()?->getId() ?? 'deleted',
-                    $report->getReason()->name,
-                ),
+                label: sprintf('Image #%s reported for: %s', $report->getImage()?->getId() ?? 'deleted', $report->getReason()->name),
                 route: 'app_admin_support_reports',
             );
         }

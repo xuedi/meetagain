@@ -29,18 +29,9 @@ final class ReviewController extends AbstractController
         ]);
     }
 
-    #[Route(
-        '/profile/review/{providerIdentifier}/approve/{itemId}',
-        name: 'app_profile_review_approve',
-        methods: ['POST'],
-    )]
-    public function approve(
-        Request $request,
-        string $providerIdentifier,
-        string $itemId,
-        #[CurrentUser]
-        User $user,
-    ): Response {
+    #[Route('/profile/review/{providerIdentifier}/approve/{itemId}', name: 'app_profile_review_approve', methods: ['POST'])]
+    public function approve(Request $request, string $providerIdentifier, string $itemId, #[CurrentUser] User $user): Response
+    {
         if (!$this->isCsrfTokenValid('review_action', $request->request->getString('_token'))) {
             $this->addFlash('error', 'profile_review.flash_invalid_csrf');
 
@@ -57,13 +48,8 @@ final class ReviewController extends AbstractController
     }
 
     #[Route('/profile/review/{providerIdentifier}/deny/{itemId}', name: 'app_profile_review_deny', methods: ['POST'])]
-    public function deny(
-        Request $request,
-        string $providerIdentifier,
-        string $itemId,
-        #[CurrentUser]
-        User $user,
-    ): Response {
+    public function deny(Request $request, string $providerIdentifier, string $itemId, #[CurrentUser] User $user): Response
+    {
         if (!$this->isCsrfTokenValid('review_action', $request->request->getString('_token'))) {
             $this->addFlash('error', 'profile_review.flash_invalid_csrf');
 

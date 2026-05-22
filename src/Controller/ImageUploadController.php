@@ -160,12 +160,7 @@ final class ImageUploadController extends AbstractController
         return $this->returnBackToImage($entityName, $id);
     }
 
-    #[Route(
-        '/image/event/{id}/upload',
-        name: 'app_event_image_upload',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/image/event/{id}/upload', name: 'app_event_image_upload', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function uploadEventImages(Request $request, int $id): Response
     {
         $user = $this->getAuthedUser();
@@ -196,12 +191,7 @@ final class ImageUploadController extends AbstractController
         return $this->redirectToRoute('app_event_details', ['id' => $id]);
     }
 
-    #[Route(
-        '/image/rotate/{entity}/{id}',
-        name: 'app_image_rotate',
-        requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/image/rotate/{entity}/{id}', name: 'app_image_rotate', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'], methods: ['POST'])]
     public function rotate(Request $request, string $entity, int $id): Response
     {
         if (!$this->isCsrfTokenValid('app_image_rotate' . $id, (string) $request->request->get('_token'))) {
@@ -271,12 +261,8 @@ final class ImageUploadController extends AbstractController
         ];
     }
 
-    private function buildSelectableGallery(
-        array $rawGallery,
-        ?Image $currentImage,
-        string $entityString,
-        int $id,
-    ): array {
+    private function buildSelectableGallery(array $rawGallery, ?Image $currentImage, string $entityString, int $id): array
+    {
         if ($currentImage === null) {
             return [];
         }

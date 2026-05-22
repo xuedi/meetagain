@@ -80,10 +80,7 @@ final class ConfigController extends AbstractSettingsController implements Admin
                     }
                     $this->imageLocationService->addLocation($image->getId(), ImageType::WebsiteImage, 0);
                     $this->cmsService->invalidateAll();
-                    $this->addFlash(
-                        'success',
-                        $this->translator->trans('admin_system_config.flash_website_image_saved'),
-                    );
+                    $this->addFlash('success', $this->translator->trans('admin_system_config.flash_website_image_saved'));
                 }
             }
         }
@@ -94,9 +91,7 @@ final class ConfigController extends AbstractSettingsController implements Admin
             $currentWebsiteImage = $this->imageRepository->find($currentWebsiteImageId);
         }
 
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
-            'admin_system_config.intro',
-        ))], actions: [
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_config.intro'))], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_system_config.button_view_redis_cache'),
                 target: $this->generateUrl('app_admin_system_redis_cache'),

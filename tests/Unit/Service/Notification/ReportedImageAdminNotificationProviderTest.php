@@ -15,8 +15,7 @@ class ReportedImageAdminNotificationProviderTest extends TestCase
     public function testGetSectionReturnsExpectedString(): void
     {
         // Arrange
-        $provider =
-            new ReportedImageAdminNotificationProvider(imageReportRepository: $this->createStub(ImageReportRepository::class));
+        $provider = new ReportedImageAdminNotificationProvider(imageReportRepository: $this->createStub(ImageReportRepository::class));
 
         // Act & Assert
         static::assertSame('Reported Images', $provider->getSection());

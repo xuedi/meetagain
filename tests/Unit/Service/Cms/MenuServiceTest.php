@@ -61,9 +61,7 @@ class MenuServiceTest extends TestCase
             });
 
         $filterService = $this->createStub(CmsFilterService::class);
-        $filterService
-            ->method('getCmsIdFilter')
-            ->willReturn($cmsIds === [] ? CmsFilterResult::noFilter() : new CmsFilterResult($cmsIds, true));
+        $filterService->method('getCmsIdFilter')->willReturn($cmsIds === [] ? CmsFilterResult::noFilter() : new CmsFilterResult($cmsIds, true));
 
         $service = $this->createService(cmsRepo: $cmsRepo, filterService: $filterService);
 
@@ -147,11 +145,7 @@ class MenuServiceTest extends TestCase
             $filterService = $this->createStub(CmsFilterService::class);
             $filterService->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
         }
-        return new MenuService(
-            $cmsRepo ?? $this->createStub(CmsRepository::class),
-            $filterService,
-            new TagAwareAdapter(new ArrayAdapter()),
-        );
+        return new MenuService($cmsRepo ?? $this->createStub(CmsRepository::class), $filterService, new TagAwareAdapter(new ArrayAdapter()));
     }
 
     private function makeCmsStub(int $id, string $slug, string $linkName): Cms

@@ -51,11 +51,7 @@ class NotFoundLogControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(
-            0,
-            $crawler->filter('.container .column.is-4')->count(),
-            'The top-100 sidebar column should be gone',
-        );
+        static::assertSame(0, $crawler->filter('.container .column.is-4')->count(), 'The top-100 sidebar column should be gone');
         static::assertSame(1, $crawler->filter('.container table')->count(), 'Only one table should remain');
     }
 

@@ -33,13 +33,7 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
      * @param array<string, mixed> $state
      * @return array{state: array<string, mixed>, threatLevel: int, summary: string, details: array<string, mixed>}
      */
-    abstract protected function processEvent(
-        SecurityEventType $type,
-        Request $request,
-        array $context,
-        string $ip,
-        array $state,
-    ): array;
+    abstract protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array;
 
     /**
      * @return array{threatLevel: int, summary: string, details: array<string, mixed>}

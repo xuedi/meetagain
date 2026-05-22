@@ -98,13 +98,7 @@ readonly class AdminMemberListFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                AdminMemberListFilterInterface $a,
-                AdminMemberListFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(AdminMemberListFilterInterface $a, AdminMemberListFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

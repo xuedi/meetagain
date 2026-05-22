@@ -92,12 +92,7 @@ final class PollController extends AbstractController
             try {
                 $durationDays = (int) $form->get('durationDays')->getData();
 
-                $poll = $this->pollService->create(
-                    $event,
-                    $form->get('films')->getData()->toArray(),
-                    $durationDays,
-                    $user->getId(),
-                );
+                $poll = $this->pollService->create($event, $form->get('films')->getData()->toArray(), $durationDays, $user->getId());
 
                 $this->activityService->log(PollCreated::TYPE, $user, [
                     'poll_id' => $poll->getId(),
@@ -134,11 +129,7 @@ final class PollController extends AbstractController
         if ($request->isMethod('POST')) {
             $selectedIds = array_map('intval', $request->request->all('films'));
 
-            $selectedFilms = array_values(array_filter($poll->getFilms()->toArray(), static fn(Film $f) => in_array(
-                $f->getId(),
-                $selectedIds,
-                true,
-            )));
+            $selectedFilms = array_values(array_filter($poll->getFilms()->toArray(), static fn(Film $f) => in_array($f->getId(), $selectedIds, true)));
 
             try {
                 $this->pollService->castVote($user->getId(), $poll, $selectedFilms);
@@ -246,10 +237,7 @@ final class PollController extends AbstractController
             return $this->redirectToRoute('app_plugin_filmclub_wishlist_group');
         }
 
-        $films = array_filter(
-            array_map(fn(int $id) => $this->filmRepo->find($id), $filmIds),
-            static fn(?Film $f) => $f !== null,
-        );
+        $films = array_filter(array_map(fn(int $id) => $this->filmRepo->find($id), $filmIds), static fn(?Film $f) => $f !== null);
 
         $user = $this->getAuthedUser();
 

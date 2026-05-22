@@ -17,9 +17,7 @@ use Plugin\Bookclub\Service\PollService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-readonly class BookclubNotificationProvider implements
-    NotificationProviderInterface,
-    ReviewNotificationProviderInterface
+readonly class BookclubNotificationProvider implements NotificationProviderInterface, ReviewNotificationProviderInterface
 {
     public function __construct(
         private BookRepository $bookRepository,
@@ -43,11 +41,7 @@ readonly class BookclubNotificationProvider implements
         if ($activePoll !== null) {
             $vote = $this->pollService->getUserVote($activePoll->getId(), $user->getId());
             if ($vote === null) {
-                $notifications[] = new NotificationItem(
-                    label: 'Open book poll - cast your vote!',
-                    icon: 'fa-vote-yea',
-                    route: 'app_plugin_bookclub_poll',
-                );
+                $notifications[] = new NotificationItem(label: 'Open book poll - cast your vote!', icon: 'fa-vote-yea', route: 'app_plugin_bookclub_poll');
             }
         }
 
@@ -74,11 +68,7 @@ readonly class BookclubNotificationProvider implements
 
             $items[] = new ReviewNotificationItem(
                 id: (string) $book->getId(),
-                description: sprintf(
-                    "Book '%s' suggested by %s is pending approval",
-                    $book->getTitle() ?? '',
-                    $creatorName,
-                ),
+                description: sprintf("Book '%s' suggested by %s is pending approval", $book->getTitle() ?? '', $creatorName),
                 canDeny: true,
                 icon: 'book',
             );

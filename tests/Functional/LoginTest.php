@@ -30,16 +30,8 @@ class LoginTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Login form should exist');
-        static::assertGreaterThan(
-            0,
-            $crawler->filter('input[name="_username"]')->count(),
-            'Username field should exist',
-        );
-        static::assertGreaterThan(
-            0,
-            $crawler->filter('input[name="_password"]')->count(),
-            'Password field should exist',
-        );
+        static::assertGreaterThan(0, $crawler->filter('input[name="_username"]')->count(), 'Username field should exist');
+        static::assertGreaterThan(0, $crawler->filter('input[name="_password"]')->count(), 'Password field should exist');
     }
 
     public function testLoginWithValidCredentials(): void
@@ -93,11 +85,7 @@ class LoginTest extends WebTestCase
         $this->assertResponseRedirects();
 
         $crawler = $client->followRedirect();
-        static::assertGreaterThan(
-            0,
-            $crawler->filter('.notification.is-danger')->count(),
-            'Error alert should be shown',
-        );
+        static::assertGreaterThan(0, $crawler->filter('.notification.is-danger')->count(), 'Error alert should be shown');
     }
 
     public function testLoginWithEmptyCredentials(): void

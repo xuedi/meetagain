@@ -42,12 +42,7 @@ final class TownHallController extends AbstractController
         ]);
     }
 
-    #[Route(
-        '/townhall/wall/{postId}',
-        name: 'app_townhall_wall_topic',
-        requirements: ['postId' => '\d+'],
-        methods: ['GET'],
-    )]
+    #[Route('/townhall/wall/{postId}', name: 'app_townhall_wall_topic', requirements: ['postId' => '\d+'], methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function topic(int $postId): Response
     {
