@@ -7,9 +7,16 @@ use App\Enum\ConfigType;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class ConfigFixture extends AbstractFixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    public function __construct(
+        #[Autowire(service: 'cache.config')]
+        private readonly CacheItemPoolInterface $configPool,
+    ) {}
+
     public function load(ObjectManager $manager): void
     {
         $this->start();
@@ -22,6 +29,7 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
             $manager->persist($user);
         }
         $manager->flush();
+        $this->configPool->clear();
         $this->stop();
     }
 

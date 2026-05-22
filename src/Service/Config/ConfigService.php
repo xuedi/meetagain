@@ -14,6 +14,7 @@ use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mime\Address;
@@ -24,7 +25,6 @@ readonly class ConfigService
 {
     private const string CACHE_KEY_THEME_COLORS = 'theme_colors';
     private const string CACHE_KEY_PREFIX = 'config_';
-    private const int CACHE_TTL = 60 * 60 * 24;
 
     /**
      * @param iterable<ImageThumbnailSizeProviderInterface> $thumbnailSizeProviders
@@ -32,6 +32,7 @@ readonly class ConfigService
     public function __construct(
         private ConfigRepository $repo,
         private EntityManagerInterface $em,
+        #[Autowire(service: 'cache.config')]
         private CacheInterface $cache,
         private KernelInterface $kernel,
         private AppStateService $appState,
@@ -304,7 +305,7 @@ readonly class ConfigService
     public function getThemeColors(): array
     {
         return $this->cache->get(self::CACHE_KEY_THEME_COLORS, function (ItemInterface $item): array {
-            $item->expiresAfter(self::CACHE_TTL);
+            $item->expiresAfter(null);
 
             return $this->parseConfigScss();
         });
@@ -387,7 +388,7 @@ readonly class ConfigService
     private function getCachedValue(string $name): ?string
     {
         return $this->cache->get(self::CACHE_KEY_PREFIX . $name, function (ItemInterface $item) use ($name): ?string {
-            $item->expiresAfter(self::CACHE_TTL);
+            $item->expiresAfter(null);
 
             return $this->repo->findOneBy(['name' => $name])?->getValue();
         });
