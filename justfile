@@ -274,6 +274,14 @@ testSmoke +parameter='':
     @echo
     @echo
 
+# Profile DB query counts per GET route - identifies caching candidates
+[group('testing')]
+appProfileQueries +parameter='':
+    @{{PHP}} php bin/console cache:warmup --env=test --quiet
+    @{{PHP}} php bin/console app:profile:queries --env=test {{parameter}}
+    @echo
+    @echo
+
 # Print AI-readable test results (for Haiku agent)
 [group('testing')]
 testPrintResults +parameter='':
