@@ -52,7 +52,7 @@ jobs:
         run: vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=default --no-coverage
 
   functional:
-    name: Functional Tests
+    name: Functional + Smoke Tests
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -76,6 +76,10 @@ jobs:
           --health-interval=3s
           --health-timeout=3s
           --health-retries=5
+
+    env:
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
+      REDIS_URL: redis://127.0.0.1:6379
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -109,13 +113,10 @@ jobs:
           php bin/console sass:build
 
       - name: Setup test environment
-        env:
-          DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
-          REDIS_URL: redis://127.0.0.1:6379
         run: |
           cp .env.dist .env
-          echo "DATABASE_URL=mysql://root:root@127.0.0.1:3306/meetAgain_test" >> .env
-          echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
+          echo "DATABASE_URL=${DATABASE_URL}" >> .env
+          echo "REDIS_URL=${REDIS_URL}" >> .env
           echo "APP_ENV=test" >> .env
           php bin/console doctrine:schema:create --no-interaction
           php bin/console doctrine:fixtures:load --no-interaction --group=install
@@ -125,10 +126,13 @@ jobs:
           php bin/console app:plugin:post-fixtures
 
       - name: Run functional tests
-        env:
-          DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
-          REDIS_URL: redis://127.0.0.1:6379
         run: vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-coverage
+
+      - name: Warm cache for smoke tests
+        run: php bin/console cache:warmup --env=test --quiet
+
+      - name: Run smoke tests
+        run: vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=4 --functional --no-coverage
 
   checks:
     name: Code Quality
@@ -159,5 +163,14 @@ jobs:
       - name: Validate composer
         run: composer validate --strict
 
-      - name: Mago
+      - name: Mago lint
         run: vendor/bin/mago --config tests/config/mago.toml lint
+
+      - name: Mago analyze
+        run: vendor/bin/mago --config tests/config/mago.toml analyze
+
+      - name: Mago guard
+        run: vendor/bin/mago --config tests/config/mago.toml guard
+
+      - name: GET-route purity check
+        run: php bin/check-get-routes.php
