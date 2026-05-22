@@ -6,17 +6,37 @@ use App\Entity\AppState;
 use App\Repository\AppStateRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Throwable;
 
-readonly class AppStateService
+class AppStateService
 {
+    private bool $cacheFailureLogged = false;
+
     public function __construct(
-        private AppStateRepository $repository,
-        private EntityManagerInterface $entityManager,
+        private readonly AppStateRepository $repository,
+        private readonly EntityManagerInterface $entityManager,
+        #[Autowire(service: 'cache.app_state')]
+        private readonly CacheInterface $cache,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function get(string $key): ?string
     {
-        return $this->repository->findByKey($key)?->getValue();
+        try {
+            return $this->cache->get($this->cacheKey($key), function (ItemInterface $item) use ($key): ?string {
+                $item->expiresAfter(null);
+
+                return $this->repository->findByKey($key)?->getValue();
+            });
+        } catch (Throwable $exception) {
+            $this->logCacheFailureOnce($exception);
+
+            return $this->repository->findByKey($key)?->getValue();
+        }
     }
 
     public function set(string $key, string $value): void
@@ -27,12 +47,14 @@ readonly class AppStateService
             $entry = new AppState($key, $value, new DateTimeImmutable('now'));
             $this->entityManager->persist($entry);
             $this->entityManager->flush();
+            $this->invalidate($key);
             return;
         }
         $entry->setValue($value);
         $entry->setUpdatedAt(new DateTimeImmutable('now'));
 
         $this->entityManager->flush();
+        $this->invalidate($key);
     }
 
     public function remove(string $key): void
@@ -45,5 +67,31 @@ readonly class AppStateService
 
         $this->entityManager->remove($entry);
         $this->entityManager->flush();
+        $this->invalidate($key);
+    }
+
+    private function invalidate(string $key): void
+    {
+        try {
+            $this->cache->delete($this->cacheKey($key));
+        } catch (Throwable $exception) {
+            $this->logCacheFailureOnce($exception);
+        }
+    }
+
+    private function cacheKey(string $key): string
+    {
+        return 'app_state.' . $key;
+    }
+
+    private function logCacheFailureOnce(Throwable $exception): void
+    {
+        if ($this->cacheFailureLogged) {
+            return;
+        }
+        $this->cacheFailureLogged = true;
+        $this->logger->warning('AppState cache backend unreachable, falling back to database', [
+            'exception' => $exception->getMessage(),
+        ]);
     }
 }

@@ -8,3 +8,5 @@ framework:
             cache.cms_page_cache:
                 adapter: cache.adapter.redis_tag_aware
                 default_lifetime: 86400
+            cache.app_state:
+                adapter: cache.adapter.redis_tag_aware
