@@ -6,9 +6,16 @@ use App\Entity\AppState;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class AppStateFixture extends AbstractFixture implements FixtureGroupInterface
 {
+    public function __construct(
+        #[Autowire(service: 'cache.app_state')]
+        private readonly CacheItemPoolInterface $appStatePool,
+    ) {}
+
     public function load(ObjectManager $manager): void
     {
         $this->start();
@@ -18,6 +25,7 @@ class AppStateFixture extends AbstractFixture implements FixtureGroupInterface
             $manager->persist($entry);
         }
         $manager->flush();
+        $this->appStatePool->clear();
         $this->stop();
     }
 

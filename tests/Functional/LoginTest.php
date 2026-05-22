@@ -6,6 +6,7 @@ use App\Activity\Messages\Login;
 use App\Entity\Activity;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -19,6 +20,7 @@ class LoginTest extends WebTestCase
 {
     private const ADMIN_EMAIL = 'Admin@example.org';
     private const ADMIN_PASSWORD = '1234';
+    private const int MAX_QUERIES_LOGIN = 30;
 
     public function testLoginPageLoads(): void
     {
@@ -185,5 +187,33 @@ class LoginTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Reset form should exist');
+    }
+
+    public function testLoginPageStaysUnderBaselineQueryBudget(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/en/login');
+
+        // Assert
+        static::assertResponseIsSuccessful();
+
+        $profile = $client->getProfile();
+        static::assertNotFalse($profile, 'Profiler must be enabled in test env to run this regression guard.');
+
+        $collector = $profile->getCollector('db');
+        static::assertInstanceOf(DoctrineDataCollector::class, $collector);
+
+        static::assertLessThan(
+            self::MAX_QUERIES_LOGIN,
+            $collector->getQueryCount(),
+            sprintf(
+                '/en/login fired %d queries (threshold %d). Baseline memoization (AppStateService cache) may have regressed.',
+                $collector->getQueryCount(),
+                self::MAX_QUERIES_LOGIN,
+            ),
+        );
     }
 }
