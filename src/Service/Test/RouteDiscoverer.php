@@ -11,21 +11,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 readonly class RouteDiscoverer
 {
-    private const array SKIP_NAME_PATTERNS = [
-        'logout',
-        '_wdt',
-        '_profiler',
-        '_error',
-        'app_install',
-        'delete',
-        '_up',
-        '_down',
-        'remove',
-        'toggle',
-        'resend',
-        'verify',
-    ];
-
     public function __construct(
         private RouterInterface $router,
         private EntityManagerInterface $entityManager,
@@ -38,7 +23,8 @@ readonly class RouteDiscoverer
 
         $urls = [];
         foreach ($this->router->getRouteCollection()->all() as $name => $route) {
-            if ($this->shouldSkip($name, $route->getMethods())) {
+            $methods = $route->getMethods();
+            if ($methods !== [] && !in_array('GET', $methods, true)) {
                 continue;
             }
 
@@ -55,23 +41,6 @@ readonly class RouteDiscoverer
         sort($urls);
 
         return $urls;
-    }
-
-    /** @param string[] $methods */
-    private function shouldSkip(string $routeName, array $methods): bool
-    {
-        if ($methods !== [] && !in_array('GET', $methods, true)) {
-            return true;
-        }
-
-        $lower = strtolower($routeName);
-        foreach (self::SKIP_NAME_PATTERNS as $pattern) {
-            if (str_contains($lower, $pattern)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /** @return array<string, mixed> */
