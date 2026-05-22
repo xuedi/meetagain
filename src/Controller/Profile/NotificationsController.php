@@ -4,10 +4,8 @@ namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
 use App\Service\Notification\User\NotificationService;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 final class NotificationsController extends AbstractController
 {
@@ -16,13 +14,8 @@ final class NotificationsController extends AbstractController
     ) {}
 
     #[Route('/profile/notifications', name: 'app_profile_notifications')]
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        if (!$this->getUser() instanceof UserInterface) {
-            $request->getSession()->set('redirectUrl', $request->getRequestUri());
-            return $this->redirectToRoute('app_login');
-        }
-
         $user = $this->getAuthedUser();
         $notifications = $this->notificationService->getNotifications($user);
 
