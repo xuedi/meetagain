@@ -24,7 +24,14 @@ class BookRepository extends ServiceEntityRepository
     /** @return Book[] */
     public function findApproved(?array $allowedBookIds = null): array
     {
-        $qb = $this->createQueryBuilder('b')->where('b.approved = true')->orderBy('b.title', 'ASC');
+        $qb = $this->createQueryBuilder('b')
+            ->leftJoin('b.coverImage', 'ci')->addSelect('ci')
+            ->leftJoin('b.selections', 's')->addSelect('s')
+            ->leftJoin('s.event', 'e')->addSelect('e')
+            ->leftJoin('e.translations', 'et')->addSelect('et')
+            ->where('b.approved = true')
+            ->orderBy('b.title', 'ASC')
+            ->distinct();
 
         if ($allowedBookIds !== null) {
             if ($allowedBookIds === []) {

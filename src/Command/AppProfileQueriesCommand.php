@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\DataCollector\TimeDataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector as BundleDoctrineDataCollector;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
@@ -45,7 +46,8 @@ class AppProfileQueriesCommand extends Command
             ->addOption('admin-only', null, InputOption::VALUE_NONE, 'Skip the anonymous pass')
             ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Cap the number of routes processed per pass')
             ->addOption('json', null, InputOption::VALUE_REQUIRED, 'Override JSON output path')
-            ->addOption('threshold', null, InputOption::VALUE_REQUIRED, 'In the console table, only show routes with at least N queries', 0);
+            ->addOption('threshold', null, InputOption::VALUE_REQUIRED, 'In the console table, only show routes with at least N queries', 0)
+            ->addOption('dump-sql', null, InputOption::VALUE_REQUIRED, 'Dump grouped SQL for a single URL instead of running the sweep (investigation mode)');
     }
 
     #[Override]
@@ -65,6 +67,11 @@ class AppProfileQueriesCommand extends Command
         $limit = $limit === null ? null : max(1, (int) $limit);
         $threshold = max(0, (int) $input->getOption('threshold'));
         $jsonPath = (string) ($input->getOption('json') ?? $this->kernelProjectDir . '/tests/reports/query-profile.json');
+
+        $dumpUrl = $input->getOption('dump-sql');
+        if ($dumpUrl !== null) {
+            return $this->dumpSql($output, (string) $dumpUrl, $adminOnly);
+        }
 
         if ($anonymousOnly && $adminOnly) {
             $output->writeln('STATUS: ERROR');
@@ -100,6 +107,66 @@ class AppProfileQueriesCommand extends Command
 
         $this->writeJson($jsonPath, $results);
         $this->renderConsole($output, $results, $threshold, $jsonPath);
+
+        return Command::SUCCESS;
+    }
+
+    private function dumpSql(OutputInterface $output, string $url, bool $authenticated): int
+    {
+        $client = new KernelBrowser($this->kernel);
+        $client->disableReboot();
+        $client->catchExceptions(true);
+
+        if ($authenticated) {
+            $admin = $this->entityManager->getRepository(User::class)->findOneBy(['email' => self::ADMIN_EMAIL]);
+            if ($admin === null) {
+                $output->writeln('STATUS: ERROR');
+                $output->writeln('---');
+                $output->writeln('Admin user not found.');
+                return Command::FAILURE;
+            }
+            $client->loginUser($admin);
+        }
+
+        $client->request('GET', $url);
+        $status = $client->getResponse()->getStatusCode();
+        $profile = $client->getProfile();
+
+        if ($profile === false || !$profile->hasCollector('db')) {
+            $output->writeln('STATUS: ERROR');
+            $output->writeln('---');
+            $output->writeln('Profile unavailable.');
+            return Command::FAILURE;
+        }
+
+        $db = $profile->getCollector('db');
+        if (!$db instanceof DoctrineDataCollector) {
+            return Command::FAILURE;
+        }
+
+        $output->writeln(sprintf('URL: %s', $url));
+        $output->writeln(sprintf('STATUS: %d', $status));
+        $output->writeln(sprintf('QUERIES: %d', $db->getQueryCount()));
+        $output->writeln('---');
+
+        if ($db instanceof BundleDoctrineDataCollector) {
+            foreach ($db->getGroupedQueries() as $connectionGroups) {
+                foreach ($connectionGroups as $row) {
+                    $sql = (string) preg_replace('/\s+/', ' ', (string) $row['sql']);
+                    $count = (int) ($row['count'] ?? 1);
+                    $marker = $count > 1 ? sprintf('[x%-3d]', $count) : '       ';
+                    $output->writeln(sprintf('%s %s', $marker, mb_substr($sql, 0, 220)));
+                }
+            }
+            return Command::SUCCESS;
+        }
+
+        foreach ($db->getQueries() as $connectionQueries) {
+            foreach ($connectionQueries as $q) {
+                $sql = (string) preg_replace('/\s+/', ' ', (string) $q['sql']);
+                $output->writeln('        ' . mb_substr($sql, 0, 220));
+            }
+        }
 
         return Command::SUCCESS;
     }
@@ -158,7 +225,7 @@ class AppProfileQueriesCommand extends Command
             if ($profile->hasCollector('time')) {
                 $time = $profile->getCollector('time');
                 if ($time instanceof TimeDataCollector) {
-                    $durationMs = round((float) $time->getDuration(), 2);
+                    $durationMs = round($time->getDuration(), 2);
                 }
             }
         }
