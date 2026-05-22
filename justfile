@@ -272,7 +272,7 @@ testFunctional +parameter='':
 [group('testing')]
 testSmoke +parameter='':
     @{{PHP}} php bin/console cache:warmup --env=test --quiet
-    @{{PHP}} vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=4 --functional --no-coverage --log-junit tests/reports/junit.xml {{parameter}}
+    @{{PHP}} sh -c 'vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=$(nproc) --functional --no-coverage --log-junit tests/reports/junit.xml {{parameter}}'
     @echo
     @echo
 
